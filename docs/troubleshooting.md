@@ -121,6 +121,47 @@ Verification:
 - The alias resolves to the canonical `.agents` target.
 - `realpath` on the alias path matches the target path.
 
+## Eval Errors
+
+Use this section for:
+
+- `EVAL_SUBCOMMAND_REQUIRED`
+- `UNKNOWN_EVAL_SUBCOMMAND`
+- `EVAL_SKILL_REQUIRED`
+- `EVAL_SKILL_NOT_FOUND`
+- `EVAL_SUITE_NOT_FOUND`
+- `EVAL_SUITE_INVALID`
+- `EVAL_SKILL_INVALID`
+- `EVAL_MODELS_NOT_CONFIGURED`
+- `EVAL_MODEL_DESCRIPTOR_INVALID`
+- `MODEL_FLAG_VALUE_REQUIRED`
+- `EVAL_PROVIDER_NOT_SUPPORTED`
+- `EVAL_PROVIDER_AUTH_MISSING`
+- `EVAL_PROVIDER_FAILED`
+- `EVAL_FETCH_UNAVAILABLE`
+- `EVAL_CANCELLED`
+
+Recommended path:
+
+1. Start with the intended pit-of-success command: `vasir eval run <skill>`.
+2. Confirm the skill exists locally under `skills/<skill>` or `.agents/skills/<skill>`, or exists in the global catalog.
+3. Confirm the skill has a built-in suite at `evals/suites/<skill>/suite.json`.
+4. Decide whether you want the default live models or an explicit override:
+   - default run: `vasir eval run <skill>`
+   - zero-cost smoke test: `vasir eval run <skill> --model mock`
+   - explicit live override: `vasir eval run <skill> --model openai` or `--model opus`
+5. If using live providers, confirm the matching provider credentials are set:
+   - `OPENAI_API_KEY`
+   - `ANTHROPIC_API_KEY`
+6. If the terminal is interactive, rerun without `--json` and let Vasir prompt you to paste or skip a missing provider key.
+7. Rerun the eval and inspect the printed results directory under `.agents/vasir-evals/` if a partial run was written.
+
+Verification:
+
+- `vasir eval run <skill>` exits successfully.
+- The command prints a results path under `.agents/vasir-evals/<skill>/...`.
+- That directory contains `summary.json` and `rows.json`.
+
 ## Unexpected Errors
 
 Use this section for:

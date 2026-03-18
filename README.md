@@ -36,6 +36,7 @@ If the command fails, start with [docs/troubleshooting.md](./docs/troubleshootin
 
 - Need commands, flags, JSON envelopes, or filesystem facts? See [docs/cli-reference.md](./docs/cli-reference.md).
 - Need recovery steps for an error or failed install? See [docs/troubleshooting.md](./docs/troubleshooting.md).
+- Need to measure whether a skill change actually improved steering? Start with `vasir eval run <skill>`. It defaults to `openai:gpt-5.4` and `anthropic:claude-opus-4-6`, and `--model mock` gives you a zero-cost local smoke test. See [docs/cli-reference.md](./docs/cli-reference.md#eval).
 - Want to build your first skill end-to-end? See [docs/create-your-first-skill.md](./docs/create-your-first-skill.md).
 - Need the authoring workflow for new or revised skills? See [docs/writing-skills.md](./docs/writing-skills.md).
 - Need field-level metadata and layout facts? See [docs/skill-reference.md](./docs/skill-reference.md).

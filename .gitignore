@@ -13,6 +13,7 @@ node_modules/
 packages/cli/dist/
 
 docs/work
+.agents/vasir-evals/
 
 # Logs
 *.log

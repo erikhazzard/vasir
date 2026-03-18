@@ -109,10 +109,10 @@ function captureCommandWriters() {
   };
 }
 
-test("help output documents json support across commands and the explicit replace path", () => {
+test("help output documents json support across commands and the explicit replace path", async () => {
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "--help"], capturedOutput);
+  const statusCode = await runCommandLine(["node", "vasir", "--help"], capturedOutput);
 
   assert.equal(statusCode, 0);
   assert.match(capturedOutput.readStdout(), /^vasir/m);
@@ -120,9 +120,11 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /vasir update \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir list \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir add <skill> \[skill...\] \[--json\] \[--replace\]/);
+  assert.match(capturedOutput.readStdout(), /vasir eval run <skill> \[--json\] \[--model <name>\]/);
   assert.match(capturedOutput.readStdout(), /vasir --version/);
   assert.match(capturedOutput.readStdout(), /--json/);
   assert.match(capturedOutput.readStdout(), /--replace/);
+  assert.match(capturedOutput.readStdout(), /--model openai, --model opus, --model mock/i);
   assert.match(capturedOutput.readStdout(), /mutate the global catalog under ~\/\.agents\/vasir/i);
   assert.match(capturedOutput.readStdout(), /mutates only the current repo/i);
   assert.match(capturedOutput.readStdout(), /auto-initializes the global catalog if needed/i);
@@ -130,22 +132,22 @@ test("help output documents json support across commands and the explicit replac
   assert.doesNotMatch(capturedOutput.readStdout(), /npx vasir/);
 });
 
-test("version output gives a beginner the installed cli version immediately", () => {
+test("version output gives a beginner the installed cli version immediately", async () => {
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "--version"], capturedOutput);
+  const statusCode = await runCommandLine(["node", "vasir", "--version"], capturedOutput);
 
   assert.equal(statusCode, 0);
   assert.equal(capturedOutput.readStdout().trim(), "vasir 0.1.0");
   assert.equal(capturedOutput.readStderr(), "");
 });
 
-test("list supports json output for automation and llm consumers", () => {
+test("list supports json output for automation and llm consumers", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "list", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "list", "--json"], {
     homeDirectory,
     repositoryUrl,
     ...capturedOutput
@@ -159,13 +161,13 @@ test("list supports json output for automation and llm consumers", () => {
   assert.equal(parsedOutput.skills[0].name, "react");
 });
 
-test("unknown skills return a structured json error with a next-step suggestion", () => {
+test("unknown skills return a structured json error with a next-step suggestion", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "add", "unknown-skill", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "add", "unknown-skill", "--json"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -181,10 +183,10 @@ test("unknown skills return a structured json error with a next-step suggestion"
   assert.equal(parsedError.docsRef, `${DOCS_BASE_URL}/docs/cli-reference.md#add`);
 });
 
-test("replace is rejected outside the add command", () => {
+test("replace is rejected outside the add command", async () => {
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "list", "--replace", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "list", "--replace", "--json"], {
     ...capturedOutput
   });
 
@@ -195,10 +197,38 @@ test("replace is rejected outside the add command", () => {
   assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
 });
 
-test("doctor is not part of the public command surface", () => {
+test("--model is rejected outside the eval command", async () => {
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "doctor", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "list", "--model", "mock", "--json"], {
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "list");
+  assert.equal(parsedError.status, "error");
+  assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
+});
+
+test("--model requires a value", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "eval", "run", "react", "--json", "--model"], {
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "eval");
+  assert.equal(parsedError.status, "error");
+  assert.equal(parsedError.code, "MODEL_FLAG_VALUE_REQUIRED");
+});
+
+test("doctor is not part of the public command surface", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "doctor", "--json"], {
     ...capturedOutput
   });
 
@@ -213,13 +243,13 @@ test("doctor is not part of the public command surface", () => {
   );
 });
 
-test("text add output tells a beginner exactly where Vasir wrote project skills", () => {
+test("text add output tells a beginner exactly where Vasir wrote project skills", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -238,13 +268,13 @@ test("text add output tells a beginner exactly where Vasir wrote project skills"
   );
 });
 
-test("add success supports json output for automation consumers", () => {
+test("add success supports json output for automation consumers", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "add", "react", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -260,7 +290,7 @@ test("add success supports json output for automation consumers", () => {
   assert.deepEqual(parsedOutput.replacedSkills, []);
 });
 
-test("replace on an untracked manual skill returns a structured json error with docs guidance", () => {
+test("replace on an untracked manual skill returns a structured json error with docs guidance", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -284,7 +314,7 @@ test("replace on an untracked manual skill returns a structured json error with 
     )}\n`
   );
 
-  const statusCode = runCommandLine(["node", "vasir", "add", "react", "--replace", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace", "--json"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -302,10 +332,10 @@ test("replace on an untracked manual skill returns a structured json error with 
   );
 });
 
-test("init fails with a structured actionable error when git is unavailable", () => {
+test("init fails with a structured actionable error when git is unavailable", async () => {
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "init", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir", "init", "--json"], {
     homeDirectory: createTemporaryDirectory(),
     repositoryUrl: "file:///unused",
     spawnSyncImplementation() {

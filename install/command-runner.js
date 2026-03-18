@@ -9,12 +9,15 @@ import {
 } from "./cli-error.js";
 import {
   ADD_REFERENCE_DOCS_REF,
+  EVAL_REFERENCE_DOCS_REF,
   REPLACE_REFERENCE_DOCS_REF,
   UNKNOWN_COMMAND_TROUBLESHOOTING_DOCS_REF
 } from "./docs-ref.js";
 import { readPackageMetadata } from "./package-metadata.js";
 import { readGlobalRegistry, synchronizeGlobalCatalog } from "./global-catalog.js";
 import { installSkillsIntoProject } from "./project-skills.js";
+import { canPromptInteractively, promptForMissingProviderCredential } from "../eval/interactive.js";
+import { runSkillEval } from "../eval/run-skill-eval.js";
 
 function writeLine(outputWriter, message) {
   outputWriter(`${message}\n`);
@@ -37,6 +40,7 @@ Usage:
   vasir update [--json]                             Fast-forward ~/.agents/vasir; bootstraps if missing
   vasir list [--json]                               Show available skills from the global catalog
   vasir add <skill> [skill...] [--json] [--replace] Copy skills into the current repo root at .agents/skills
+  vasir eval run <skill> [--json] [--model <name>] Run the built-in baseline vs treatment eval for a skill
   vasir --version [--json]                          Print the installed Vasir CLI version
   vasir --help
 
@@ -47,6 +51,10 @@ Notes:
   add mutates only the current repo root (nearest parent with .git, or the current directory if none exists).
   add auto-initializes the global catalog if needed.
   Use --replace only to refresh an unmodified project-local skill from the global catalog.
+  eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
+  eval defaults to openai:gpt-5.4 and anthropic:claude-opus-4-6.
+  Pass --model openai, --model opus, --model mock, or --model <provider:model> to override.
+  If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip it.
 `;
 }
 
@@ -65,10 +73,12 @@ function parseCommandInvocation(argumentVector) {
   const positionalArguments = [];
   let jsonOutput = false;
   let helpRequested = false;
+  let modelArguments = [];
   let replaceExistingSkills = false;
   let versionRequested = false;
 
-  for (const rawArgument of rawArguments) {
+  for (let argumentIndex = 0; argumentIndex < rawArguments.length; argumentIndex += 1) {
+    const rawArgument = rawArguments[argumentIndex];
     if (rawArgument === "--json") {
       jsonOutput = true;
       continue;
@@ -89,6 +99,23 @@ function parseCommandInvocation(argumentVector) {
       continue;
     }
 
+    if (rawArgument === "--model") {
+      const modelArgument = rawArguments[argumentIndex + 1];
+      if (!modelArgument || modelArgument.startsWith("--")) {
+        throw new VasirCliError({
+          code: "MODEL_FLAG_VALUE_REQUIRED",
+          message: "`--model` requires a provider alias or provider:model descriptor.",
+          suggestion:
+            "Use `--model openai`, `--model opus`, `--model mock`, or `--model <provider:model>`.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+
+      modelArguments = [...modelArguments, modelArgument];
+      argumentIndex += 1;
+      continue;
+    }
+
     if (rawArgument.startsWith("--")) {
       throw new VasirCliError({
         code: "UNKNOWN_FLAG",
@@ -106,6 +133,7 @@ function parseCommandInvocation(argumentVector) {
     commandName,
     commandArguments: positionalArguments.slice(1),
     jsonOutput,
+    modelArguments,
     replaceExistingSkills,
     versionRequested,
     helpRequested: helpRequested || commandName === "help"
@@ -248,9 +276,80 @@ function runAdd({
   };
 }
 
-function runSelectedCommand({
+async function runEval({
+  evalArguments,
+  modelArguments,
+  homeDirectory,
+  currentWorkingDirectory,
+  repositoryUrl,
+  platform,
+  spawnSyncImplementation,
+  stdoutWriter,
+  jsonOutput,
+  inputStream,
+  outputStream,
+  environmentVariables,
+  fetchImplementation
+}) {
+  const evalSubcommand = evalArguments[0];
+  if (!evalSubcommand) {
+    throw new VasirCliError({
+      code: "EVAL_SUBCOMMAND_REQUIRED",
+      message: "An eval subcommand is required.",
+      suggestion: "Use `vasir eval run <skill>` to run the built-in skill eval.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (evalSubcommand !== "run") {
+    throw new VasirCliError({
+      code: "UNKNOWN_EVAL_SUBCOMMAND",
+      message: `Unknown eval subcommand: ${evalSubcommand}`,
+      suggestion: "Use `vasir eval run <skill>` to run the built-in skill eval.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  const skillName = evalArguments[1];
+  if (!skillName) {
+    throw new VasirCliError({
+      code: "EVAL_SKILL_REQUIRED",
+      message: "A skill name is required for `vasir eval run`.",
+      suggestion: "Run `vasir eval run <skill>` with a skill that exists locally or in the global catalog.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  const promptForMissingCredential =
+    !jsonOutput && canPromptInteractively({ inputStream, outputStream })
+      ? (promptOptions) =>
+          promptForMissingProviderCredential({
+            ...promptOptions,
+            inputStream,
+            outputStream
+          })
+      : null;
+
+  return runSkillEval({
+    skillName,
+    homeDirectory,
+    currentWorkingDirectory,
+    repositoryUrl,
+    platform,
+    spawnSyncImplementation,
+    requestedModelArguments: modelArguments,
+    promptForMissingCredential,
+    stdoutWriter,
+    jsonOutput,
+    environmentVariables,
+    fetchImplementation
+  });
+}
+
+async function runSelectedCommand({
   commandName,
   commandArguments,
+  modelArguments,
   replaceExistingSkills,
   homeDirectory,
   currentWorkingDirectory,
@@ -258,7 +357,11 @@ function runSelectedCommand({
   platform,
   spawnSyncImplementation,
   stdoutWriter,
-  jsonOutput
+  jsonOutput,
+  inputStream,
+  outputStream,
+  environmentVariables,
+  fetchImplementation
 }) {
   if (replaceExistingSkills && commandName !== "add") {
     throw new VasirCliError({
@@ -266,6 +369,16 @@ function runSelectedCommand({
       message: "--replace is only supported by `vasir add`.",
       suggestion: "Use `vasir add --replace <skill>` when you want to refresh a project-local skill copy.",
       docsRef: REPLACE_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (modelArguments.length > 0 && commandName !== "eval") {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--model is only supported by `vasir eval`.",
+      suggestion:
+        "Use `vasir eval run <skill> --model <provider>` when you want to override the default eval models.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
 
@@ -316,6 +429,24 @@ function runSelectedCommand({
     });
   }
 
+  if (commandName === "eval") {
+    return runEval({
+      evalArguments: commandArguments,
+      modelArguments,
+      homeDirectory,
+      currentWorkingDirectory,
+      repositoryUrl,
+      platform,
+      spawnSyncImplementation,
+      stdoutWriter,
+      jsonOutput,
+      inputStream,
+      outputStream,
+      environmentVariables,
+      fetchImplementation
+    });
+  }
+
   throw new VasirCliError({
     code: "UNKNOWN_COMMAND",
     message: `Unknown command: ${commandName}`,
@@ -324,7 +455,7 @@ function runSelectedCommand({
   });
 }
 
-export function runCommandLine(
+export async function runCommandLine(
   argumentVector,
   {
     homeDirectory,
@@ -332,12 +463,17 @@ export function runCommandLine(
     repositoryUrl,
     platform = process.platform,
     spawnSyncImplementation = childProcess.spawnSync,
-    stdoutWriter = (message) => process.stdout.write(message),
+    inputStream = process.stdin,
+    outputStream = process.stdout,
+    environmentVariables = process.env,
+    fetchImplementation = globalThis.fetch,
+    stdoutWriter = (message) => outputStream.write(message),
     stderrWriter = (message) => process.stderr.write(message)
   } = {}
 ) {
-  let commandName = "init";
-  let jsonOutput = false;
+  const rawArguments = argumentVector.slice(2);
+  let commandName = rawArguments.find((argument) => !argument.startsWith("--")) ?? "init";
+  let jsonOutput = rawArguments.includes("--json");
 
   try {
     const invocation = parseCommandInvocation(argumentVector);
@@ -367,9 +503,10 @@ export function runCommandLine(
       return 0;
     }
 
-    const commandResult = runSelectedCommand({
+    const commandResult = await runSelectedCommand({
       commandName,
       commandArguments: invocation.commandArguments,
+      modelArguments: invocation.modelArguments,
       replaceExistingSkills: invocation.replaceExistingSkills,
       homeDirectory,
       currentWorkingDirectory,
@@ -377,7 +514,11 @@ export function runCommandLine(
       platform,
       spawnSyncImplementation,
       stdoutWriter,
-      jsonOutput
+      jsonOutput,
+      inputStream,
+      outputStream,
+      environmentVariables,
+      fetchImplementation
     });
 
     if (jsonOutput) {

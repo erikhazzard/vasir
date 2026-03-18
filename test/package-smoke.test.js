@@ -129,6 +129,7 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   const helpResult = runCommand(binaryPath, ["--help"], packDirectory);
   assert.equal(helpResult.status, 0, helpResult.stderr);
   assert.match(helpResult.stdout, /vasir add <skill> \[skill...\] \[--json\] \[--replace\]/);
+  assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\]/);
   assert.doesNotMatch(helpResult.stdout, /vasir doctor/);
 
   const versionResult = runCommand(binaryPath, ["--version"], packDirectory);
@@ -147,4 +148,13 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.match(addResult.stdout, /Project skills ready at/);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+
+  const evalResult = runCommand(
+    binaryPath,
+    ["eval", "run", "react", "--model", "mock"],
+    REPO_ROOT,
+    npmEnvironmentVariables
+  );
+  assert.equal(evalResult.status, 0, evalResult.stderr);
+  assert.match(evalResult.stdout, /hard score lift/i);
 });

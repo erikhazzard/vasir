@@ -1,0 +1,20 @@
+{
+  "id": "deterministic-core",
+  "title": "Deterministic Skill Core",
+  "cases": [
+    {
+      "id": "replayable-random-reward",
+      "task": "Add a random reward selection step to a replayable gameplay system. Keep the answer concise but concrete.",
+      "outputHint": "Show how randomness and time are handled so the behavior can replay exactly.",
+      "requiredSubstrings": [
+        "seed",
+        "rng",
+        "clock"
+      ],
+      "forbiddenSubstrings": [
+        "Math.random",
+        "Date.now"
+      ]
+    }
+  ]
+}

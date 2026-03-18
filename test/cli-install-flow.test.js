@@ -136,12 +136,12 @@ function captureCommandWriters() {
   };
 }
 
-test("init creates the canonical global catalog and compatibility aliases", () => {
+test("init creates the canonical global catalog and compatibility aliases", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "init"], {
+  const statusCode = await runCommandLine(["node", "vasir", "init"], {
     homeDirectory,
     repositoryUrl,
     ...capturedOutput
@@ -155,12 +155,12 @@ test("init creates the canonical global catalog and compatibility aliases", () =
   assert.match(capturedOutput.readStdout(), /Global catalog ready/);
 });
 
-test("update bootstraps the canonical global catalog when it is missing", () => {
+test("update bootstraps the canonical global catalog when it is missing", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "update"], {
+  const statusCode = await runCommandLine(["node", "vasir", "update"], {
     homeDirectory,
     repositoryUrl,
     ...capturedOutput
@@ -171,12 +171,12 @@ test("update bootstraps the canonical global catalog when it is missing", () => 
   assert.match(capturedOutput.readStdout(), /Global catalog updated/);
 });
 
-test("list auto-initializes and prints grouped skills", () => {
+test("list auto-initializes and prints grouped skills", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "list"], {
+  const statusCode = await runCommandLine(["node", "vasir", "list"], {
     homeDirectory,
     repositoryUrl,
     ...capturedOutput
@@ -190,13 +190,13 @@ test("list auto-initializes and prints grouped skills", () => {
   assert.match(capturedOutput.readStdout(), /react - React component boundaries and effect discipline/);
 });
 
-test("add installs skills into repo-local .agents and repairs compatibility aliases", () => {
+test("add installs skills into repo-local .agents and repairs compatibility aliases", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
-  const statusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -218,7 +218,7 @@ test("add installs skills into repo-local .agents and repairs compatibility alia
   assert.match(capturedOutput.readStdout(), /Installed react/);
 });
 
-test("add installs into the repository root when invoked from a nested subdirectory", () => {
+test("add installs into the repository root when invoked from a nested subdirectory", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -230,7 +230,7 @@ test("add installs into the repository root when invoked from a nested subdirect
   runGitCommand(projectDirectory, ["config", "user.email", "test@example.com"]);
   runGitCommand(projectDirectory, ["config", "user.name", "Test Runner"]);
 
-  const statusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectNestedDirectory,
     repositoryUrl,
@@ -244,7 +244,7 @@ test("add installs into the repository root when invoked from a nested subdirect
   assert.ok(!fs.existsSync(path.join(projectNestedDirectory, "AGENTS.md")));
 });
 
-test("add --replace refuses to overwrite a manual untracked project skill", () => {
+test("add --replace refuses to overwrite a manual untracked project skill", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -268,7 +268,7 @@ test("add --replace refuses to overwrite a manual untracked project skill", () =
     )}\n`
   );
 
-  const replaceStatusCode = runCommandLine(["node", "vasir", "add", "react", "--replace"], {
+  const replaceStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -279,13 +279,13 @@ test("add --replace refuses to overwrite a manual untracked project skill", () =
   assert.match(replaceCommandOutput.readStderr(), /PROJECT_SKILL_UNTRACKED/);
 });
 
-test("add refuses to overwrite an existing project skill", () => {
+test("add refuses to overwrite an existing project skill", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
 
   const firstCommandOutput = captureCommandWriters();
-  const firstStatusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const firstStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -294,7 +294,7 @@ test("add refuses to overwrite an existing project skill", () => {
   assert.equal(firstStatusCode, 0);
 
   const secondCommandOutput = captureCommandWriters();
-  const secondStatusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const secondStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -304,13 +304,13 @@ test("add refuses to overwrite an existing project skill", () => {
   assert.match(secondCommandOutput.readStderr(), /Project skill already exists/);
 });
 
-test("add --replace refreshes an unmodified existing project skill from the global catalog", () => {
+test("add --replace refreshes an unmodified existing project skill from the global catalog", async () => {
   const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
 
   const firstCommandOutput = captureCommandWriters();
-  const firstStatusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const firstStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -324,7 +324,7 @@ test("add --replace refreshes an unmodified existing project skill from the glob
   runGitCommand(repositoryDirectory, ["commit", "-m", "update react skill"]);
 
   const updateCommandOutput = captureCommandWriters();
-  const updateStatusCode = runCommandLine(["node", "vasir", "update"], {
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update"], {
     homeDirectory,
     repositoryUrl,
     ...updateCommandOutput
@@ -332,7 +332,7 @@ test("add --replace refreshes an unmodified existing project skill from the glob
   assert.equal(updateStatusCode, 0);
 
   const replaceCommandOutput = captureCommandWriters();
-  const replaceStatusCode = runCommandLine(["node", "vasir", "add", "react", "--replace"], {
+  const replaceStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -344,13 +344,13 @@ test("add --replace refreshes an unmodified existing project skill from the glob
   assert.match(replaceCommandOutput.readStdout(), /Replaced react/);
 });
 
-test("add --replace refuses to overwrite a locally modified project skill", () => {
+test("add --replace refuses to overwrite a locally modified project skill", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
 
   const firstCommandOutput = captureCommandWriters();
-  const firstStatusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const firstStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -362,7 +362,7 @@ test("add --replace refuses to overwrite a locally modified project skill", () =
   writeFile(projectSkillFilePath, "# Local Override\n");
 
   const replaceCommandOutput = captureCommandWriters();
-  const replaceStatusCode = runCommandLine(["node", "vasir", "add", "react", "--replace"], {
+  const replaceStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -373,13 +373,13 @@ test("add --replace refuses to overwrite a locally modified project skill", () =
   assert.match(replaceCommandOutput.readStderr(), /PROJECT_SKILL_MODIFIED/);
 });
 
-test("add --replace refuses to delete unexpected local files inside a project skill", () => {
+test("add --replace refuses to delete unexpected local files inside a project skill", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
 
   const firstCommandOutput = captureCommandWriters();
-  const firstStatusCode = runCommandLine(["node", "vasir", "add", "react"], {
+  const firstStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -390,7 +390,7 @@ test("add --replace refuses to delete unexpected local files inside a project sk
   writeFile(path.join(projectDirectory, ".agents", "skills", "react", "NOTES.md"), "local note\n");
 
   const replaceCommandOutput = captureCommandWriters();
-  const replaceStatusCode = runCommandLine(["node", "vasir", "add", "react", "--replace"], {
+  const replaceStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace"], {
     homeDirectory,
     currentWorkingDirectory: projectDirectory,
     repositoryUrl,
@@ -401,12 +401,12 @@ test("add --replace refuses to delete unexpected local files inside a project sk
   assert.match(replaceCommandOutput.readStderr(), /PROJECT_SKILL_MODIFIED/);
 });
 
-test("update fails closed when the global catalog is dirty", () => {
+test("update fails closed when the global catalog is dirty", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
 
   const initOutput = captureCommandWriters();
-  const initStatusCode = runCommandLine(["node", "vasir", "init"], {
+  const initStatusCode = await runCommandLine(["node", "vasir", "init"], {
     homeDirectory,
     repositoryUrl,
     ...initOutput
@@ -417,7 +417,7 @@ test("update fails closed when the global catalog is dirty", () => {
   writeFile(path.join(globalCatalogDirectory, "LOCAL_OVERRIDE.md"), "dirty\n");
 
   const updateOutput = captureCommandWriters();
-  const updateStatusCode = runCommandLine(["node", "vasir", "update"], {
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update"], {
     homeDirectory,
     repositoryUrl,
     ...updateOutput

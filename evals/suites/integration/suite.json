@@ -1,0 +1,20 @@
+{
+  "id": "integration-core",
+  "title": "Integration Skill Core",
+  "cases": [
+    {
+      "id": "value-path-purchase-flow",
+      "task": "A purchase flow regressed. Describe the test you would add first and what it should prove. Keep the answer concise but concrete.",
+      "outputHint": "Focus on the user-visible flow, not private helper mechanics.",
+      "requiredSubstrings": [
+        "integration test",
+        "purchase flow",
+        "observable"
+      ],
+      "forbiddenSubstrings": [
+        "mocked helper",
+        "private function"
+      ]
+    }
+  ]
+}

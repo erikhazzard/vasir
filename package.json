@@ -22,7 +22,9 @@
   ],
   "files": [
     "bin/",
-    "install/"
+    "install/",
+    "eval/",
+    "evals/"
   ],
   "engines": {
     "node": ">=18.17"

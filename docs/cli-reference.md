@@ -24,6 +24,7 @@ vasir --version
 | `update` | `vasir update [--json]` | Fast-forward `~/.agents/vasir`; bootstraps if missing |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
 | `add` | `vasir add <skill> [skill...] [--json] [--replace]` | Copy skills into the current repo root at `.agents/skills` |
+| `eval run` | `vasir eval run <skill> [--json] [--model <name>]` | Run the built-in baseline vs treatment eval for a skill |
 | `--version` | `vasir --version [--json]` | Print the installed CLI name and version |
 
 ### `init`
@@ -87,6 +88,63 @@ vasir add react netcode
 
 Text-mode success output also prints the resolved project skills directory so you can see exactly where Vasir wrote files.
 
+## Eval
+
+`vasir eval run <skill>` is the one-command developer workflow for measuring whether a skill improved steering.
+
+```bash
+vasir eval run react
+```
+
+What it does:
+
+- Resolves the skill from the local repo first:
+  - `skills/<skill>/...` when you are editing the source skill in a repo like Vasir
+  - `.agents/skills/<skill>/...` when you are evaluating an installed project-local skill
+  - falls back to the global catalog copy if neither local path exists
+- Loads the built-in suite for that skill.
+- Runs the same case set twice for every configured model:
+  - baseline: no skill
+  - treatment: with the skill
+- Scores the outputs with built-in hard checks.
+- Stores local run history under `.agents/vasir-evals/<skill>/...`.
+- Prints lift versus baseline and, when available, versus the previous recorded run for that skill.
+
+Built-in defaults:
+
+- `openai:gpt-5.4`
+- `anthropic:claude-opus-4-6`
+
+Override surface:
+
+- Pass `--model openai` for only OpenAI with the default model.
+- Pass `--model opus` for only Anthropic Opus 4.6.
+- Pass `--model mock` for a zero-cost local smoke test.
+- Pass `--model <provider:model>` for an explicit full descriptor.
+- Repeat `--model` to evaluate multiple explicit models in one run.
+
+Examples:
+
+```bash
+vasir eval run react
+
+# only OpenAI gpt-5.4
+vasir eval run react --model openai
+
+# zero-cost local smoke test
+vasir eval run react --model mock
+
+# explicit multi-model override
+vasir eval run react --model openai:gpt-5.4 --model anthropic:claude-opus-4-6
+```
+
+Notes:
+
+- The current M1 implementation uses built-in hard scorers, not blind pairwise judging yet.
+- If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip that provider.
+- In non-interactive environments, missing live-provider credentials cause those providers to be skipped. If nothing runnable remains, the command fails cleanly and points you to `--model mock`.
+- Eval artifacts are tool-owned local files and are ignored by this repo via `.agents/vasir-evals/`.
+
 ## Version
 
 Use this when you need to confirm the installed CLI version before troubleshooting or reporting a bug.
@@ -118,7 +176,7 @@ Facts:
 
 ## JSON Output
 
-`--json` is supported by `init`, `update`, `list`, and `add`.
+`--json` is supported by `init`, `update`, `list`, `add`, and `eval run`.
 
 Success envelope:
 
@@ -163,6 +221,27 @@ Example success envelope:
   "projectSkillsDirectory": "/repo/.agents/skills",
   "installedSkills": ["react"],
   "replacedSkills": []
+}
+```
+
+Example eval success envelope:
+
+```json
+{
+  "command": "eval",
+  "status": "success",
+  "subcommand": "run",
+  "runId": "2026-03-18T12-00-00-000Z__abc123def456",
+  "skillName": "react",
+  "suiteId": "react-core",
+  "modelIds": ["mock:skill-aware"],
+  "outputDirectory": "/repo/.agents/vasir-evals/react/2026-03-18T12-00-00-000Z__abc123def456",
+  "summary": {
+    "global": {
+      "averageScoreLift": 0.5,
+      "passRateLift": 1
+    }
+  }
 }
 ```
 
