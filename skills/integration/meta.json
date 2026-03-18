@@ -1,0 +1,20 @@
+{
+  "name": "integration",
+  "version": "1.0.0",
+  "description": "Outcome-driven integration testing strategies for proving user-visible behavior end to end",
+  "category": "testing",
+  "tags": [
+    "testing",
+    "integration",
+    "contracts",
+    "value-path",
+    "ci"
+  ],
+  "recommends": [
+    "deterministic",
+    "devops"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

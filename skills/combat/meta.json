@@ -1,0 +1,21 @@
+{
+  "name": "combat",
+  "version": "1.0.0",
+  "description": "Combat loops, damage pipelines, frame data, and hit logic for JavaScript games",
+  "category": "games",
+  "tags": [
+    "combat",
+    "damage",
+    "hitboxes",
+    "frame-data",
+    "gameplay"
+  ],
+  "recommends": [
+    "deterministic-kernel",
+    "game-juice",
+    "inventory"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

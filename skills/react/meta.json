@@ -1,0 +1,20 @@
+{
+  "name": "react",
+  "version": "1.0.0",
+  "description": "React component patterns, state ownership, and async effect discipline for production UIs",
+  "category": "frontend",
+  "tags": [
+    "react",
+    "components",
+    "state",
+    "effects",
+    "performance"
+  ],
+  "recommends": [
+    "ui-layout",
+    "integration"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

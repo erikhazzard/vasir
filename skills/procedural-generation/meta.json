@@ -1,0 +1,20 @@
+{
+  "name": "procedural-generation",
+  "version": "1.0.0",
+  "description": "Seed-deterministic terrain, dungeons, wave generation, and content placement systems",
+  "category": "games",
+  "tags": [
+    "procedural",
+    "generation",
+    "seeded",
+    "dungeons",
+    "waves"
+  ],
+  "recommends": [
+    "deterministic-kernel",
+    "roguelike"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

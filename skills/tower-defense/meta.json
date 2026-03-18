@@ -1,0 +1,20 @@
+{
+  "name": "tower-defense",
+  "version": "1.0.0",
+  "description": "Path systems, tower placement, wave pacing, targeting rules, and economy tuning for tower defense games",
+  "category": "games",
+  "tags": [
+    "tower-defense",
+    "pathing",
+    "waves",
+    "economy",
+    "strategy"
+  ],
+  "recommends": [
+    "economy",
+    "ui-layout"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

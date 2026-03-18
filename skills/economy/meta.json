@@ -1,0 +1,21 @@
+{
+  "name": "economy",
+  "version": "1.0.0",
+  "description": "Resource flows, reward curves, inflation control, and progression balancing for game economies",
+  "category": "games",
+  "tags": [
+    "economy",
+    "progression",
+    "balance",
+    "rewards",
+    "currencies"
+  ],
+  "recommends": [
+    "idle-game",
+    "roguelike",
+    "inventory"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

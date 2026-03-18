@@ -1,0 +1,22 @@
+{
+  "name": "roguelike",
+  "version": "1.0.0",
+  "description": "Procedural dungeons, permadeath, item synergy design, and run-based progression for roguelikes",
+  "category": "games",
+  "tags": [
+    "roguelike",
+    "roguelite",
+    "procedural",
+    "runs",
+    "systems"
+  ],
+  "recommends": [
+    "deterministic-kernel",
+    "combat",
+    "procedural-generation",
+    "economy"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

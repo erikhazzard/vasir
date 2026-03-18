@@ -1,0 +1,19 @@
+{
+  "name": "devops",
+  "version": "1.0.0",
+  "description": "CI/CD pipelines, immutable artifacts, deploy health gates, and operational readiness checks",
+  "category": "infra",
+  "tags": [
+    "ci",
+    "cd",
+    "deploy",
+    "monitoring",
+    "operations"
+  ],
+  "recommends": [
+    "integration"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

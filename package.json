@@ -1,0 +1,35 @@
+{
+  "name": "vasir",
+  "version": "0.1.0",
+  "description": "A collection of skill files for conditioning LLMs away from the mode",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "vasir": "./bin/vasir.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erikhazzard/vasir.git"
+  },
+  "keywords": [
+    "llm",
+    "skills",
+    "agents",
+    "claude",
+    "codex",
+    "prompt-engineering",
+    "game-dev"
+  ],
+  "files": [
+    "bin/",
+    "install/"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "build:registry": "node registry/build.js --write",
+    "check:registry": "node registry/build.js --check",
+    "test": "node --test test/*.test.js"
+  }
+}

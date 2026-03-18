@@ -1,0 +1,20 @@
+{
+  "name": "idle-game",
+  "version": "1.0.0",
+  "description": "Offline progression, prestige loops, large-number math, and upgrade curves for idle games",
+  "category": "games",
+  "tags": [
+    "idle",
+    "incremental",
+    "prestige",
+    "offline-progress",
+    "economy"
+  ],
+  "recommends": [
+    "economy",
+    "ui-layout"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

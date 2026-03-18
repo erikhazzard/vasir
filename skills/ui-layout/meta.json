@@ -1,0 +1,19 @@
+{
+  "name": "ui-layout",
+  "version": "1.0.0",
+  "description": "BEM-first layout systems, responsive composition, and maintainable CSS architecture for frontend UI",
+  "category": "frontend",
+  "tags": [
+    "css",
+    "layout",
+    "bem",
+    "responsive",
+    "design-system"
+  ],
+  "recommends": [
+    "react"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

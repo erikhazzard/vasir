@@ -1,0 +1,20 @@
+{
+  "name": "deterministic",
+  "version": "1.0.0",
+  "description": "Replay testing, seeded fixtures, clock control, and deterministic failure triage",
+  "category": "testing",
+  "tags": [
+    "deterministic",
+    "replay",
+    "seeds",
+    "time-control",
+    "testing"
+  ],
+  "recommends": [
+    "integration",
+    "deterministic-kernel"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

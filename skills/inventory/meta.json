@@ -1,0 +1,20 @@
+{
+  "name": "inventory",
+  "version": "1.0.0",
+  "description": "Items, equipment, stacking, crafting, and serialization for inventory-heavy games",
+  "category": "games",
+  "tags": [
+    "inventory",
+    "items",
+    "equipment",
+    "crafting",
+    "serialization"
+  ],
+  "recommends": [
+    "combat",
+    "economy"
+  ],
+  "files": [
+    "SKILL.md"
+  ]
+}

@@ -1,0 +1,386 @@
+{
+  "version": "0.1.0",
+  "repo": "https://github.com/erikhazzard/vasir",
+  "raw_base": "https://raw.githubusercontent.com/erikhazzard/vasir/main",
+  "skills": [
+    {
+      "name": "combat",
+      "version": "1.0.0",
+      "description": "Combat loops, damage pipelines, frame data, and hit logic for JavaScript games",
+      "category": "games",
+      "tags": [
+        "combat",
+        "damage",
+        "hitboxes",
+        "frame-data",
+        "gameplay"
+      ],
+      "recommends": [
+        "deterministic-kernel",
+        "game-juice",
+        "inventory"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/combat",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "deterministic-kernel",
+      "version": "1.0.0",
+      "description": "Seeded RNG, tick-based state, and kernel/shell separation for deterministic game replays",
+      "category": "games",
+      "tags": [
+        "determinism",
+        "rng",
+        "kernel",
+        "replay",
+        "simulation"
+      ],
+      "recommends": [
+        "combat",
+        "procedural-generation",
+        "deterministic"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/deterministic-kernel",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "economy",
+      "version": "1.0.0",
+      "description": "Resource flows, reward curves, inflation control, and progression balancing for game economies",
+      "category": "games",
+      "tags": [
+        "economy",
+        "progression",
+        "balance",
+        "rewards",
+        "currencies"
+      ],
+      "recommends": [
+        "idle-game",
+        "roguelike",
+        "inventory"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/economy",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "endless-runner",
+      "version": "1.0.0",
+      "description": "Obstacle generation, speed ramping, lane systems, and session tuning for endless runners",
+      "category": "games",
+      "tags": [
+        "runner",
+        "endless-runner",
+        "lanes",
+        "difficulty",
+        "mobile"
+      ],
+      "recommends": [
+        "game-juice",
+        "ui-layout"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/endless-runner",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-juice",
+      "version": "1.0.0",
+      "description": "Screen shake, particles, tweening, hit feedback, and layered feedback systems for 2D games",
+      "category": "games",
+      "tags": [
+        "vfx",
+        "polish",
+        "canvas",
+        "2d",
+        "feedback"
+      ],
+      "recommends": [
+        "deterministic-kernel",
+        "platformer",
+        "endless-runner"
+      ],
+      "files": [
+        "SKILL.md",
+        "references/character-movement.md"
+      ],
+      "path": "skills/game-juice",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "idle-game",
+      "version": "1.0.0",
+      "description": "Offline progression, prestige loops, large-number math, and upgrade curves for idle games",
+      "category": "games",
+      "tags": [
+        "idle",
+        "incremental",
+        "prestige",
+        "offline-progress",
+        "economy"
+      ],
+      "recommends": [
+        "economy",
+        "ui-layout"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/idle-game",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "inventory",
+      "version": "1.0.0",
+      "description": "Items, equipment, stacking, crafting, and serialization for inventory-heavy games",
+      "category": "games",
+      "tags": [
+        "inventory",
+        "items",
+        "equipment",
+        "crafting",
+        "serialization"
+      ],
+      "recommends": [
+        "combat",
+        "economy"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/inventory",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "platformer",
+      "version": "1.0.0",
+      "description": "2D platformer movement, collision, jump feel, and touch-friendly controls for side-scrollers",
+      "category": "games",
+      "tags": [
+        "platformer",
+        "movement",
+        "collision",
+        "physics",
+        "touch"
+      ],
+      "recommends": [
+        "deterministic-kernel",
+        "game-juice"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/platformer",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "procedural-generation",
+      "version": "1.0.0",
+      "description": "Seed-deterministic terrain, dungeons, wave generation, and content placement systems",
+      "category": "games",
+      "tags": [
+        "procedural",
+        "generation",
+        "seeded",
+        "dungeons",
+        "waves"
+      ],
+      "recommends": [
+        "deterministic-kernel",
+        "roguelike"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/procedural-generation",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "roguelike",
+      "version": "1.0.0",
+      "description": "Procedural dungeons, permadeath, item synergy design, and run-based progression for roguelikes",
+      "category": "games",
+      "tags": [
+        "roguelike",
+        "roguelite",
+        "procedural",
+        "runs",
+        "systems"
+      ],
+      "recommends": [
+        "deterministic-kernel",
+        "combat",
+        "procedural-generation",
+        "economy"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/roguelike",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "tower-defense",
+      "version": "1.0.0",
+      "description": "Path systems, tower placement, wave pacing, targeting rules, and economy tuning for tower defense games",
+      "category": "games",
+      "tags": [
+        "tower-defense",
+        "pathing",
+        "waves",
+        "economy",
+        "strategy"
+      ],
+      "recommends": [
+        "economy",
+        "ui-layout"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/tower-defense",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "react",
+      "version": "1.0.0",
+      "description": "React component patterns, state ownership, and async effect discipline for production UIs",
+      "category": "frontend",
+      "tags": [
+        "react",
+        "components",
+        "state",
+        "effects",
+        "performance"
+      ],
+      "recommends": [
+        "ui-layout",
+        "integration"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/react",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "ui-layout",
+      "version": "1.0.0",
+      "description": "BEM-first layout systems, responsive composition, and maintainable CSS architecture for frontend UI",
+      "category": "frontend",
+      "tags": [
+        "css",
+        "layout",
+        "bem",
+        "responsive",
+        "design-system"
+      ],
+      "recommends": [
+        "react"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/ui-layout",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "devops",
+      "version": "1.0.0",
+      "description": "CI/CD pipelines, immutable artifacts, deploy health gates, and operational readiness checks",
+      "category": "infra",
+      "tags": [
+        "ci",
+        "cd",
+        "deploy",
+        "monitoring",
+        "operations"
+      ],
+      "recommends": [
+        "integration"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/devops",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "netcode",
+      "version": "1.0.0",
+      "description": "Authoritative multiplayer netcode with prediction, reconciliation, and bandwidth-aware state sync",
+      "category": "infra",
+      "tags": [
+        "multiplayer",
+        "netcode",
+        "prediction",
+        "reconciliation",
+        "bandwidth"
+      ],
+      "recommends": [
+        "deterministic-kernel",
+        "integration"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/netcode",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "deterministic",
+      "version": "1.0.0",
+      "description": "Replay testing, seeded fixtures, clock control, and deterministic failure triage",
+      "category": "testing",
+      "tags": [
+        "deterministic",
+        "replay",
+        "seeds",
+        "time-control",
+        "testing"
+      ],
+      "recommends": [
+        "integration",
+        "deterministic-kernel"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/deterministic",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "integration",
+      "version": "1.0.0",
+      "description": "Outcome-driven integration testing strategies for proving user-visible behavior end to end",
+      "category": "testing",
+      "tags": [
+        "testing",
+        "integration",
+        "contracts",
+        "value-path",
+        "ci"
+      ],
+      "recommends": [
+        "deterministic",
+        "devops"
+      ],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/integration",
+      "entry": "SKILL.md"
+    }
+  ]
+}
