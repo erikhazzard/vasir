@@ -24,7 +24,8 @@
     "bin/",
     "install/",
     "eval/",
-    "evals/"
+    "evals/",
+    "scripts/"
   ],
   "engines": {
     "node": ">=18.17"
@@ -32,6 +33,7 @@
   "scripts": {
     "build:registry": "node registry/build.js --write",
     "check:registry": "node registry/build.js --check",
+    "eval": "node ./scripts/eval.js",
     "test": "node --test test/*.test.js"
   }
 }

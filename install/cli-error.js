@@ -1,4 +1,7 @@
+import process from "node:process";
+
 import { UNEXPECTED_ERROR_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
+import { createCommandUi } from "../scripts/ui/command-output.js";
 
 export class VasirCliError extends Error {
   constructor({
@@ -38,22 +41,31 @@ export function wrapUnknownCliError(error) {
   });
 }
 
-export function formatCliErrorForText(error) {
-  const renderedLines = [error.message];
+export function formatCliErrorForText(error, { outputStream = process.stderr } = {}) {
+  const ui = createCommandUi({ stream: outputStream });
+  const renderedLines = [
+    ui.formatStatusLine({
+      kind: "error",
+      text: error.message
+    })
+  ];
 
   if (error.code) {
-    renderedLines.push(`Code: ${error.code}`);
+    renderedLines.push(ui.formatField("code", ui.colors.bold(error.code)));
   }
 
   if (error.suggestion) {
-    renderedLines.push(`Suggestion: ${error.suggestion}`);
+    renderedLines.push(ui.formatField("suggestion", error.suggestion));
   }
 
   if (error.docsRef) {
-    renderedLines.push(`Docs: ${error.docsRef}`);
+    renderedLines.push(ui.formatField("docs", ui.formatPath(error.docsRef)));
   }
 
-  return `${renderedLines.join("\n")}\n`;
+  return ui.renderPanel({
+    title: "Error",
+    lines: renderedLines
+  });
 }
 
 export function formatCliErrorForJson({ commandName, error }) {

@@ -96,7 +96,7 @@ function createMissingCredentialError() {
     code: "EVAL_MODELS_NOT_CONFIGURED",
     message: "No eval models are ready to run.",
     suggestion:
-      "Use the built-in defaults with provider API keys available, or run `vasir eval run <skill> --model mock` for a zero-cost local smoke test.",
+      "Add provider keys to `keys.json`, set them in the environment, or run `vasir eval run <skill> --model mock` for a zero-cost local smoke test.",
     docsRef: EVAL_REFERENCE_DOCS_REF
   });
 }
@@ -106,7 +106,7 @@ function createCancelledError() {
     code: "EVAL_CANCELLED",
     message: "Eval setup was cancelled before any model ran.",
     suggestion:
-      "Rerun `vasir eval run <skill>` and provide a provider key, skip the provider, or pass `--model mock` for a local smoke test.",
+      "Rerun `vasir eval run <skill>` and provide a provider key, add it to `keys.json`, skip the provider, or pass `--model mock` for a local smoke test.",
     docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
   });
 }

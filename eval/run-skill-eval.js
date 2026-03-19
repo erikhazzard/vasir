@@ -1,5 +1,7 @@
 import process from "node:process";
 
+import { createCommandUi } from "../scripts/ui/command-output.js";
+import { resolveEvalEnvironmentVariables } from "./keys-file.js";
 import { generateEvalResponse } from "./providers.js";
 import { resolveEvalModels } from "./provider-config.js";
 import { summarizeEvalRows, scoreCaseOutput } from "./scoring.js";
@@ -8,11 +10,6 @@ import { resolveSuiteSource } from "./suite-source.js";
 import { readPreviousRunSummary, writeEvalRunArtifacts } from "./history.js";
 
 const EVAL_HARNESS_VERSION = 1;
-
-function formatLift(value) {
-  const percentagePoints = (value * 100).toFixed(1);
-  return `${value >= 0 ? "+" : ""}${percentagePoints}`;
-}
 
 function createRunId({ skillHash }) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -78,6 +75,7 @@ export async function runSkillEval({
   promptForMissingCredential = null,
   environmentVariables = process.env,
   fetchImplementation = globalThis.fetch,
+  outputStream = process.stdout,
   stdoutWriter,
   jsonOutput
 }) {
@@ -99,12 +97,19 @@ export async function runSkillEval({
     globalCatalogDirectory: skillSource.globalCatalogDirectory
   });
   const {
+    environmentVariables: configuredEnvironmentVariables,
+    projectKeysLoaded
+  } = resolveEvalEnvironmentVariables({
+    currentWorkingDirectory,
+    environmentVariables
+  });
+  const {
     modelDescriptors,
     environmentVariables: resolvedEnvironmentVariables,
     skippedProviders
   } = await resolveEvalModels({
     requestedModelArguments,
-    environmentVariables,
+    environmentVariables: configuredEnvironmentVariables,
     promptForMissingCredential
   });
   const previousSummary = readPreviousRunSummary({
@@ -184,38 +189,75 @@ export async function runSkillEval({
   const previousComparison = createPreviousComparison(summaryPayload, previousSummary);
 
   if (!jsonOutput) {
-    stdoutWriter(`${skillName}  ${skillSource.skillHash.slice(0, 12)}\n`);
-    stdoutWriter(
-      `suite: ${suiteSource.suiteDefinition.id}  cases: ${suiteSource.suiteDefinition.cases.length}  models: ${modelDescriptors.length}\n\n`
-    );
-    stdoutWriter(`hard score lift: ${formatLift(summary.global.averageScoreLift)} pts\n`);
-    stdoutWriter(`hard pass lift:  ${formatLift(summary.global.passRateLift)} pts\n`);
-    stdoutWriter(`results:         ${runDirectoryPath}\n`);
+    const ui = createCommandUi({ stream: outputStream });
+    const renderedLines = [
+      ui.formatField("skill", ui.colors.bold(skillName)),
+      ui.formatField("hash", ui.colors.muted(skillSource.skillHash.slice(0, 12))),
+      ui.formatField("suite", suiteSource.suiteDefinition.id),
+      ui.formatField("cases", String(suiteSource.suiteDefinition.cases.length)),
+      ui.formatField("models", String(modelDescriptors.length)),
+      ui.formatField("hard score lift", ui.formatLift(summary.global.averageScoreLift)),
+      ui.formatField("hard pass lift", ui.formatLift(summary.global.passRateLift)),
+      ui.formatField("results", ui.formatPath(runDirectoryPath))
+    ];
+
+    if (projectKeysLoaded) {
+      renderedLines.push(ui.formatField("keys", "loaded from keys.json"));
+    }
 
     if (skippedProviders.length > 0) {
-      stdoutWriter(`skipped:\n`);
+      renderedLines.push("");
+      renderedLines.push(ui.colors.header("Skipped"));
       for (const skippedProvider of skippedProviders) {
-        stdoutWriter(`- ${skippedProvider.modelId}  ${skippedProvider.reason}\n`);
+        renderedLines.push(
+          ui.formatBullet(`${skippedProvider.modelId} ${skippedProvider.reason}`)
+        );
       }
     }
 
     if (summary.perModel.length > 0) {
-      stdoutWriter(`\nper-model:\n`);
+      renderedLines.push("");
+      renderedLines.push(ui.colors.header("Per-model"));
       for (const modelEntry of summary.perModel) {
-        stdoutWriter(
-          `- ${modelEntry.modelId}  score ${formatLift(modelEntry.averageScoreLift)} pts  pass ${formatLift(modelEntry.passRateLift)} pts\n`
+        renderedLines.push(
+          ui.formatBullet(
+            `${modelEntry.modelId}  score ${ui.formatLift(modelEntry.averageScoreLift)}  pass ${ui.formatLift(modelEntry.passRateLift)}`
+          )
         );
       }
     }
 
     if (previousComparison) {
-      stdoutWriter(`\nhistory vs previous run:\n`);
-      stdoutWriter(
-        `- previous run: ${previousComparison.previousRunId}\n- hard score lift delta: ${formatLift(previousComparison.averageScoreLiftDelta)} pts\n- hard pass lift delta:  ${formatLift(previousComparison.passRateLiftDelta)} pts\n`
+      renderedLines.push("");
+      renderedLines.push(ui.colors.header("History vs previous run"));
+      renderedLines.push(ui.formatBullet(`previous run ${previousComparison.previousRunId}`));
+      renderedLines.push(
+        ui.formatBullet(
+          `hard score lift delta ${ui.formatLift(previousComparison.averageScoreLiftDelta)}`
+        )
+      );
+      renderedLines.push(
+        ui.formatBullet(
+          `hard pass lift delta ${ui.formatLift(previousComparison.passRateLiftDelta)}`
+        )
       );
     } else {
-      stdoutWriter(`\nhistory: first recorded run for this skill\n`);
+      renderedLines.push("");
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "history",
+          detail: "first recorded run for this skill"
+        })
+      );
     }
+
+    stdoutWriter(
+      ui.renderPanel({
+        title: `Eval ${skillName}`,
+        lines: renderedLines
+      })
+    );
   }
 
   return {

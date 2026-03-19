@@ -134,6 +134,7 @@ Use this section for:
 - `EVAL_SKILL_INVALID`
 - `EVAL_MODELS_NOT_CONFIGURED`
 - `EVAL_MODEL_DESCRIPTOR_INVALID`
+- `EVAL_KEYS_INVALID`
 - `MODEL_FLAG_VALUE_REQUIRED`
 - `EVAL_PROVIDER_NOT_SUPPORTED`
 - `EVAL_PROVIDER_AUTH_MISSING`
@@ -150,7 +151,7 @@ Recommended path:
    - default run: `vasir eval run <skill>`
    - zero-cost smoke test: `vasir eval run <skill> --model mock`
    - explicit live override: `vasir eval run <skill> --model openai` or `--model opus`
-5. If using live providers, confirm the matching provider credentials are set:
+5. If using live providers, prefer a repo-local `keys.json` copied from [keys.json.example](../keys.json.example), or confirm the matching provider credentials are set in the environment:
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY`
 6. If the terminal is interactive, rerun without `--json` and let Vasir prompt you to paste or skip a missing provider key.

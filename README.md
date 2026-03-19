@@ -30,6 +30,12 @@ Verify first success:
 
 Vasir resolves the project root as the nearest parent containing `.git`. If there is no `.git` ancestor, it uses the current working directory.
 
+Repo-local eval workflow:
+
+- `npm run eval react`
+- `npm run eval` to pick a skill interactively when needed
+- Copy [keys.json.example](./keys.json.example) to `keys.json` to keep OpenAI/Anthropic keys out of the prompt flow
+
 If the command fails, start with [docs/troubleshooting.md](./docs/troubleshooting.md).
 
 ## Documentation Map

@@ -18,6 +18,7 @@ import { readGlobalRegistry, synchronizeGlobalCatalog } from "./global-catalog.j
 import { installSkillsIntoProject } from "./project-skills.js";
 import { canPromptInteractively, promptForMissingProviderCredential } from "../eval/interactive.js";
 import { runSkillEval } from "../eval/run-skill-eval.js";
+import { createCommandUi } from "../scripts/ui/command-output.js";
 
 function writeLine(outputWriter, message) {
   outputWriter(`${message}\n`);
@@ -145,6 +146,7 @@ function runInit({
   repositoryUrl,
   platform,
   spawnSyncImplementation,
+  outputStream,
   stdoutWriter,
   jsonOutput
 }) {
@@ -156,7 +158,19 @@ function runInit({
   });
 
   if (!jsonOutput) {
-    writeLine(stdoutWriter, `Global catalog ready at ${globalPaths.globalCatalogDirectory}`);
+    const ui = createCommandUi({ stream: outputStream });
+    stdoutWriter(
+      ui.renderPanel({
+        title: "Init",
+        lines: [
+          ui.formatStatusLine({
+            kind: "ok",
+            text: "Global catalog ready"
+          }),
+          ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
+        ]
+      })
+    );
   }
 
   return {
@@ -169,6 +183,7 @@ function runUpdate({
   repositoryUrl,
   platform,
   spawnSyncImplementation,
+  outputStream,
   stdoutWriter,
   jsonOutput
 }) {
@@ -180,7 +195,19 @@ function runUpdate({
   });
 
   if (!jsonOutput) {
-    writeLine(stdoutWriter, `Global catalog updated at ${globalPaths.globalCatalogDirectory}`);
+    const ui = createCommandUi({ stream: outputStream });
+    stdoutWriter(
+      ui.renderPanel({
+        title: "Update",
+        lines: [
+          ui.formatStatusLine({
+            kind: "ok",
+            text: "Global catalog updated"
+          }),
+          ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
+        ]
+      })
+    );
   }
 
   return {
@@ -193,6 +220,7 @@ function runList({
   repositoryUrl,
   platform,
   spawnSyncImplementation,
+  outputStream,
   stdoutWriter,
   jsonOutput
 }) {
@@ -204,11 +232,12 @@ function runList({
   });
 
   if (!jsonOutput) {
+    const ui = createCommandUi({ stream: outputStream });
     const groupedSkills = groupSkillsByCategory(registry.skills);
     for (const [categoryName, skillEntries] of groupedSkills.entries()) {
-      writeLine(stdoutWriter, categoryName);
+      writeLine(stdoutWriter, ui.colors.header(categoryName));
       for (const skillEntry of skillEntries) {
-        writeLine(stdoutWriter, `  ${skillEntry.name} - ${skillEntry.description}`);
+        writeLine(stdoutWriter, `  ${ui.formatBullet(`${skillEntry.name} - ${skillEntry.description}`)}`);
       }
       writeLine(stdoutWriter, "");
     }
@@ -228,6 +257,7 @@ function runAdd({
   repositoryUrl,
   platform,
   spawnSyncImplementation,
+  outputStream,
   stdoutWriter,
   jsonOutput
 }) {
@@ -257,13 +287,29 @@ function runAdd({
   });
 
   if (!jsonOutput) {
+    const ui = createCommandUi({ stream: outputStream });
+    const renderedLines = [];
     for (const installedSkillName of installResult.installedSkillNames) {
       const actionVerb = installResult.replacedSkillNames.includes(installedSkillName) ? "Replaced" : "Installed";
-      writeLine(stdoutWriter, `${actionVerb} ${installedSkillName}`);
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "ok",
+          text: `${actionVerb} ${installedSkillName}`
+        })
+      );
     }
-    writeLine(
-      stdoutWriter,
-      `Project skills ready at ${installResult.projectPaths.projectSkillsDirectory}`
+    renderedLines.push(
+      ui.formatStatusLine({
+        kind: "info",
+        text: "Project skills ready at",
+        detail: installResult.projectPaths.projectSkillsDirectory
+      })
+    );
+    stdoutWriter(
+      ui.renderPanel({
+        title: "Project Skills",
+        lines: renderedLines
+      })
     );
   }
 
@@ -339,6 +385,7 @@ async function runEval({
     spawnSyncImplementation,
     requestedModelArguments: modelArguments,
     promptForMissingCredential,
+    outputStream,
     stdoutWriter,
     jsonOutput,
     environmentVariables,
@@ -388,6 +435,7 @@ async function runSelectedCommand({
       repositoryUrl,
       platform,
       spawnSyncImplementation,
+      outputStream,
       stdoutWriter,
       jsonOutput
     });
@@ -399,6 +447,7 @@ async function runSelectedCommand({
       repositoryUrl,
       platform,
       spawnSyncImplementation,
+      outputStream,
       stdoutWriter,
       jsonOutput
     });
@@ -410,6 +459,7 @@ async function runSelectedCommand({
       repositoryUrl,
       platform,
       spawnSyncImplementation,
+      outputStream,
       stdoutWriter,
       jsonOutput
     });
@@ -424,6 +474,7 @@ async function runSelectedCommand({
       repositoryUrl,
       platform,
       spawnSyncImplementation,
+      outputStream,
       stdoutWriter,
       jsonOutput
     });
@@ -465,10 +516,11 @@ export async function runCommandLine(
     spawnSyncImplementation = childProcess.spawnSync,
     inputStream = process.stdin,
     outputStream = process.stdout,
+    errorStream = process.stderr,
     environmentVariables = process.env,
     fetchImplementation = globalThis.fetch,
     stdoutWriter = (message) => outputStream.write(message),
-    stderrWriter = (message) => process.stderr.write(message)
+    stderrWriter = (message) => errorStream.write(message)
   } = {}
 ) {
   const rawArguments = argumentVector.slice(2);
@@ -542,7 +594,11 @@ export async function runCommandLine(
         })
       );
     } else {
-      stderrWriter(formatCliErrorForText(normalizedError));
+      stderrWriter(
+        formatCliErrorForText(normalizedError, {
+          outputStream: errorStream
+        })
+      );
     }
 
     return normalizedError.exitCode;

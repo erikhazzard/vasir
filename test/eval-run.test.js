@@ -145,3 +145,78 @@ test("eval run scores baseline vs treatment with --model mock and stores history
   const secondRun = JSON.parse(secondOutput.readStdout());
   assert.equal(secondRun.previousComparison.previousRunId, firstRun.runId);
 });
+
+test("eval run loads provider credentials from repo-root keys.json", async () => {
+  const repositoryDirectory = createEvalFixtureRepository();
+  writeFile(
+    path.join(repositoryDirectory, "keys.json"),
+    `${JSON.stringify(
+      {
+        OPENAI_API_KEY: "sk-from-keys-file"
+      },
+      null,
+      2
+    )}\n`
+  );
+  const capturedOutput = captureCommandWriters();
+  const authorizationHeaders = [];
+
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "openai"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {},
+      fetchImplementation: async (url, requestOptions = {}) => {
+        authorizationHeaders.push(requestOptions.headers?.authorization ?? "");
+        const requestBody = JSON.parse(requestOptions.body);
+        const promptText = `${requestBody.instructions}\n${requestBody.input}`;
+        const skillApplied = promptText.includes("--- Skill Guidance Start ---");
+        const responseText = promptText.includes("UserPanel")
+          ? skillApplied
+            ? "Use AbortController with a loading state and role=\"alert\" for errors."
+            : "Fetch the user and render the result."
+          : skillApplied
+            ? "Use startTransition and useDeferredValue for the SearchBox."
+            : "Use useEffect to run the query.";
+
+        return {
+          ok: true,
+          async json() {
+            return {
+              output_text: responseText,
+              usage: null
+            };
+          }
+        };
+      },
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 0, capturedOutput.readStderr());
+  assert.ok(authorizationHeaders.length > 0);
+  assert.ok(authorizationHeaders.every((value) => value === "Bearer sk-from-keys-file"));
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "eval");
+  assert.equal(parsedOutput.status, "success");
+});
+
+test("eval run fails with a structured error when keys.json is invalid", async () => {
+  const repositoryDirectory = createEvalFixtureRepository();
+  writeFile(path.join(repositoryDirectory, "keys.json"), "{not valid json}\n");
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "openai"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {},
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "eval");
+  assert.equal(parsedError.code, "EVAL_KEYS_INVALID");
+});

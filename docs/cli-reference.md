@@ -110,6 +110,17 @@ What it does:
 - Stores local run history under `.agents/vasir-evals/<skill>/...`.
 - Prints lift versus baseline and, when available, versus the previous recorded run for that skill.
 
+Local provider keys:
+
+- Create `keys.json` at the repo root by copying [keys.json.example](../keys.json.example).
+- Supported keys are:
+  - `OPENAI_API_KEY`
+  - `ANTHROPIC_API_KEY`
+  - `OPENAI_BASE_URL`
+  - `ANTHROPIC_BASE_URL`
+- Environment variables still work and win over `keys.json`.
+- Interactive prompting only fills keys that are still missing after env vars and `keys.json` are applied.
+
 Built-in defaults:
 
 - `openai:gpt-5.4`

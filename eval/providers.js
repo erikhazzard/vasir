@@ -140,7 +140,7 @@ async function runOpenAiModel({
       code: "EVAL_PROVIDER_AUTH_MISSING",
       message: "OPENAI_API_KEY is required for OpenAI eval models.",
       suggestion:
-        "Set `OPENAI_API_KEY`, rerun interactively so Vasir can prompt for it, or use `--model mock` for a local smoke test.",
+        "Add `OPENAI_API_KEY` to `keys.json`, set it in the environment, rerun interactively so Vasir can prompt for it, or use `--model mock` for a local smoke test.",
       docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
     });
   }
@@ -195,7 +195,7 @@ async function runAnthropicModel({
       code: "EVAL_PROVIDER_AUTH_MISSING",
       message: "ANTHROPIC_API_KEY is required for Anthropic eval models.",
       suggestion:
-        "Set `ANTHROPIC_API_KEY`, rerun interactively so Vasir can prompt for it, or use `--model mock` for a local smoke test.",
+        "Add `ANTHROPIC_API_KEY` to `keys.json`, set it in the environment, rerun interactively so Vasir can prompt for it, or use `--model mock` for a local smoke test.",
       docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
     });
   }

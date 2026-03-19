@@ -1,0 +1,7 @@
+{
+  "OPENAI_API_KEY": "sk-...",
+  "ANTHROPIC_API_KEY": "sk-ant-...",
+  "OPENAI_BASE_URL": "https://api.openai.com/v1",
+  "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
+  "GEMINI_API_KEY": "AI..."
+}
