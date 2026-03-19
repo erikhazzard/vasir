@@ -6,43 +6,33 @@ import { VasirCliError } from "../install/cli-error.js";
 import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
 import { readGlobalRegistry } from "../install/global-catalog.js";
 import { buildProjectPaths } from "../install/path-layout.js";
+import {
+  listSkillPromptMarkdownFiles,
+  readSkillMetadata as readSkillMetadataFromDirectory,
+  SKILL_MANIFEST_FILE_NAME
+} from "../install/skill-metadata.js";
 
-function readSkillMetadata(skillDirectoryPath) {
-  const metadataPath = path.join(skillDirectoryPath, "meta.json");
-  if (!fs.existsSync(metadataPath)) {
+function tryReadSkillMetadata(skillDirectoryPath) {
+  const manifestPath = path.join(skillDirectoryPath, SKILL_MANIFEST_FILE_NAME);
+  if (!fs.existsSync(manifestPath)) {
     return null;
   }
 
   try {
-    return JSON.parse(fs.readFileSync(metadataPath, "utf8"));
+    return readSkillMetadataFromDirectory(skillDirectoryPath);
   } catch (error) {
     throw new VasirCliError({
       code: "EVAL_SKILL_INVALID",
-      message: `Skill metadata is invalid at ${metadataPath}.`,
-      suggestion: "Fix the local skill metadata or use a different skill source, then rerun the eval.",
+      message: `Skill metadata is invalid at ${skillDirectoryPath}.`,
+      suggestion: "Fix the local skill manifest or compatibility metadata, then rerun the eval.",
       docsRef: EVAL_TROUBLESHOOTING_DOCS_REF,
       cause: error
     });
   }
 }
 
-function buildSkillPromptFiles({ skillDirectoryPath, skillMetadata }) {
-  const managedMarkdownFiles = (skillMetadata.files ?? [])
-    .filter(
-      (relativeFilePath) =>
-        relativeFilePath.endsWith(".md") && !relativeFilePath.startsWith("evals/")
-    )
-    .sort((leftPath, rightPath) => {
-      if (leftPath === "SKILL.md") return -1;
-      if (rightPath === "SKILL.md") return 1;
-      return leftPath.localeCompare(rightPath);
-    });
-
-  if (!managedMarkdownFiles.includes("SKILL.md")) {
-    managedMarkdownFiles.unshift("SKILL.md");
-  }
-
-  return managedMarkdownFiles.map((relativeFilePath) => ({
+function buildSkillPromptFiles({ skillDirectoryPath }) {
+  return listSkillPromptMarkdownFiles(skillDirectoryPath).map((relativeFilePath) => ({
     relativeFilePath,
     contents: fs.readFileSync(path.join(skillDirectoryPath, relativeFilePath), "utf8")
   }));
@@ -69,14 +59,13 @@ function tryResolveLocalSkill({ projectRootDirectory, skillName }) {
     { sourceType: "repo-source", skillDirectoryPath: localSourceDirectory },
     { sourceType: "project-local", skillDirectoryPath: projectSkillDirectory }
   ]) {
-    const skillMetadata = readSkillMetadata(candidate.skillDirectoryPath);
+    const skillMetadata = tryReadSkillMetadata(candidate.skillDirectoryPath);
     if (!skillMetadata) {
       continue;
     }
 
     const promptFiles = buildSkillPromptFiles({
-      skillDirectoryPath: candidate.skillDirectoryPath,
-      skillMetadata
+      skillDirectoryPath: candidate.skillDirectoryPath
     });
     const promptText = serializeSkillPromptText(promptFiles);
 
@@ -134,7 +123,7 @@ export function resolveSkillSource({
   }
 
   const skillDirectoryPath = path.join(globalPaths.globalCatalogDirectory, registrySkillEntry.path);
-  const skillMetadata = readSkillMetadata(skillDirectoryPath);
+  const skillMetadata = tryReadSkillMetadata(skillDirectoryPath);
   if (!skillMetadata) {
     throw new VasirCliError({
       code: "EVAL_SKILL_INVALID",
@@ -145,8 +134,7 @@ export function resolveSkillSource({
   }
 
   const promptFiles = buildSkillPromptFiles({
-    skillDirectoryPath,
-    skillMetadata
+    skillDirectoryPath
   });
   const promptText = serializeSkillPromptText(promptFiles);
 

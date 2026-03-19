@@ -3,6 +3,8 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { buildSkillCatalogEntry, SKILL_MANIFEST_FILE_NAME } from "../install/skill-metadata.js";
+
 const MODULE_FILE_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(MODULE_FILE_PATH), "..");
 const SKILLS_ROOT = path.join(REPO_ROOT, "skills");
@@ -18,7 +20,8 @@ const CATEGORY_ORDER = new Map([
   ["games", 0],
   ["frontend", 1],
   ["infra", 2],
-  ["testing", 3]
+  ["testing", 3],
+  ["uncategorized", 4]
 ]);
 
 function toRepoPath(absolutePath) {
@@ -46,9 +49,11 @@ function listSkillDirectories() {
     .sort();
 
   for (const skillDirectory of skillDirectories) {
-    const metaPath = path.join(skillDirectory, "meta.json");
-    if (!fs.existsSync(metaPath)) {
-      throw new Error(`Every direct child of skills/ must be a skill directory with meta.json: ${toRepoPath(skillDirectory)}`);
+    const manifestPath = path.join(skillDirectory, SKILL_MANIFEST_FILE_NAME);
+    if (!fs.existsSync(manifestPath)) {
+      throw new Error(
+        `Every direct child of skills/ must be a skill directory with ${SKILL_MANIFEST_FILE_NAME}: ${toRepoPath(skillDirectory)}`
+      );
     }
   }
 
@@ -63,35 +68,14 @@ function listSkillDirectories() {
   return skillDirectories;
 }
 
-function readMeta(metaPath) {
-  const raw = fs.readFileSync(metaPath, "utf8");
-  const meta = JSON.parse(raw);
-  const dir = path.dirname(metaPath);
-
-  if (!meta.name) throw new Error(`Missing name in ${toRepoPath(metaPath)}`);
-  if (!meta.description) throw new Error(`Missing description in ${toRepoPath(metaPath)}`);
-  if (!meta.category) throw new Error(`Missing category in ${toRepoPath(metaPath)}`);
-  if (!Array.isArray(meta.tags)) throw new Error(`Missing tags[] in ${toRepoPath(metaPath)}`);
-  if (!Array.isArray(meta.recommends)) throw new Error(`Missing recommends[] in ${toRepoPath(metaPath)}`);
-  if (!Array.isArray(meta.files)) throw new Error(`Missing files[] in ${toRepoPath(metaPath)}`);
-
-  for (const file of meta.files) {
-    const filePath = path.join(dir, file);
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`meta.json in ${toRepoPath(dir)} references missing file ${file}`);
-    }
-  }
-
-  return {
-    ...meta,
-    path: toRepoPath(dir),
-    entry: "SKILL.md"
-  };
-}
-
 export function buildRegistry() {
   const skills = listSkillDirectories()
-    .map((skillDirectory) => readMeta(path.join(skillDirectory, "meta.json")))
+    .map((skillDirectory) =>
+      buildSkillCatalogEntry({
+        skillDirectoryPath: skillDirectory,
+        relativeSkillDirectoryPath: toRepoPath(skillDirectory)
+      })
+    )
     .sort((leftSkillEntry, rightSkillEntry) => {
       if (leftSkillEntry.category !== rightSkillEntry.category) {
         return (CATEGORY_ORDER.get(leftSkillEntry.category) ?? Number.MAX_SAFE_INTEGER) -

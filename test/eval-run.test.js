@@ -127,6 +127,9 @@ test("eval run scores baseline vs treatment with --model mock and stores history
   assert.equal(firstRun.status, "success");
   assert.equal(firstRun.subcommand, "run");
   assert.equal(firstRun.skillName, "react");
+  assert.equal(firstRun.runStatus, "complete");
+  assert.ok(typeof firstRun.scorerVersion === "number");
+  assert.ok(typeof firstRun.suiteHash === "string" && firstRun.suiteHash.length > 0);
   assert.ok(firstRun.summary.global.averageScoreLift > 0);
   assert.equal(firstRun.previousVersionComparison.outcome, "no_prior");
   assert.ok(fs.existsSync(path.join(firstRun.outputDirectory, "summary.json")));
@@ -144,6 +147,7 @@ test("eval run scores baseline vs treatment with --model mock and stores history
 
   assert.equal(secondStatusCode, 0, secondOutput.readStderr());
   const secondRun = JSON.parse(secondOutput.readStdout());
+  assert.equal(secondRun.previousComparison.comparable, true);
   assert.equal(secondRun.previousComparison.previousRunId, firstRun.runId);
 });
 
@@ -240,6 +244,60 @@ test("eval run prints preparation and per-step progress in text mode", async () 
   assert.match(capturedOutput.readStdout(), /no older skill hash recorded yet/i);
 });
 
+test("eval run keeps successful rows when one row fails and marks the run incomplete", async () => {
+  const repositoryDirectory = createEvalFixtureRepository();
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "openai"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {
+        OPENAI_API_KEY: "sk-test"
+      },
+      fetchImplementation: async (_url, requestOptions = {}) => {
+        const requestBody = JSON.parse(requestOptions.body);
+        const promptText = `${requestBody.instructions}\n${requestBody.input}`;
+        const skillApplied = promptText.includes("--- Skill Guidance Start ---");
+
+        if (promptText.includes("SearchBox") && skillApplied) {
+          throw new Error("provider exploded");
+        }
+
+        const responseText = promptText.includes("UserPanel")
+          ? skillApplied
+            ? "Use AbortController with a loading state and role=\"alert\" for errors."
+            : "Fetch the user and render the result."
+          : skillApplied
+            ? "Use startTransition and useDeferredValue for the SearchBox."
+            : "Use useEffect(() => runQuery()) for the SearchBox.";
+
+        return {
+          ok: true,
+          async json() {
+            return {
+              output_text: responseText,
+              usage: null
+            };
+          }
+        };
+      },
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 0, capturedOutput.readStderr());
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.runStatus, "incomplete");
+  assert.equal(parsedOutput.summary.rowCounts.failed, 1);
+  assert.equal(parsedOutput.summary.global.comparablePairCount, 1);
+  assert.equal(parsedOutput.summary.global.totalPairCount, 2);
+  const persistedRows = JSON.parse(
+    fs.readFileSync(path.join(parsedOutput.outputDirectory, "rows.json"), "utf8")
+  );
+  assert.equal(persistedRows.filter((row) => row.rowStatus === "error").length, 1);
+});
+
 test("eval run explains why treatment regressed against baseline", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
@@ -300,7 +358,7 @@ test("eval run explains why treatment regressed against baseline", async () => {
           async json() {
             return {
               output_text: skillApplied
-                ? "Use a seed-driven rng and injected clock. Avoid Math.random and Date.now."
+                ? "Use a seed-driven rng and injected clock, but call Math.random() for the final reward roll."
                 : "Use a seed-driven rng and injected clock.",
               usage: null
             };
@@ -314,7 +372,7 @@ test("eval run explains why treatment regressed against baseline", async () => {
   assert.equal(statusCode, 0, capturedOutput.readStderr());
   assert.match(capturedOutput.readStdout(), /result:\s+WORSE/i);
   assert.match(capturedOutput.readStdout(), /Why It Moved/i);
-  assert.match(capturedOutput.readStdout(), /introduced forbidden hits: Math\.random, Date\.now/i);
+  assert.match(capturedOutput.readStdout(), /introduced forbidden hits: Math\.random/i);
 });
 
 test("eval run compares against the previous recorded skill version when the hash changes", async () => {
@@ -362,6 +420,74 @@ test("eval run compares against the previous recorded skill version when the has
   assert.equal(secondRun.previousVersionComparison.previousSkillHash, firstRun.skillHash);
 });
 
+test("eval run refuses to compare previous versions across suite hash changes", async () => {
+  const repositoryDirectory = createEvalFixtureRepository();
+  const firstOutput = captureCommandWriters();
+
+  const firstStatusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "mock"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {},
+      ...firstOutput
+    }
+  );
+
+  assert.equal(firstStatusCode, 0, firstOutput.readStderr());
+
+  writeFile(
+    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    [
+      "# React",
+      "",
+      "Use local state first.",
+      "Prefer explicit loading and error states.",
+      "Use AbortController in async effects.",
+      "Use startTransition and useDeferredValue for expensive search updates."
+    ].join("\n")
+  );
+  writeFile(
+    path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
+    `${JSON.stringify(
+      {
+        id: "react-core",
+        cases: [
+          {
+            id: "abortable-user-fetch",
+            task: "Implement a React component named UserPanel that fetches a user whenever userId changes. Include loading and accessible errors.",
+            requiredSubstrings: ["AbortController", "loading", "role=\"alert\"", "error"],
+            forbiddenSubstrings: ["useContext("]
+          },
+          {
+            id: "urgent-vs-non-urgent-search",
+            task: "Implement a React SearchBox that keeps typing responsive while an expensive query runs in the background.",
+            requiredSubstrings: ["startTransition", "useDeferredValue"],
+            forbiddenSubstrings: ["useEffect(() => runQuery"]
+          }
+        ]
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  const secondOutput = captureCommandWriters();
+  const secondStatusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "mock"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {},
+      ...secondOutput
+    }
+  );
+
+  assert.equal(secondStatusCode, 0, secondOutput.readStderr());
+  const secondRun = JSON.parse(secondOutput.readStdout());
+  assert.equal(secondRun.previousVersionComparison.outcome, "not_comparable");
+  assert.match(secondRun.previousVersionComparison.reason, /suite version changed/i);
+  assert.equal(secondRun.previousComparison.outcome, "not_comparable");
+});
+
 test("eval run dispatches planned rows concurrently", async () => {
   const repositoryDirectory = createEvalFixtureRepository();
   const capturedOutput = captureCommandWriters();
@@ -370,11 +496,12 @@ test("eval run dispatches planned rows concurrently", async () => {
   let requestCount = 0;
 
   const statusCode = await runCommandLine(
-    ["node", "vasir", "eval", "run", "react", "--json", "--model", "openai"],
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "openai", "--model", "opus"],
     {
       currentWorkingDirectory: repositoryDirectory,
       environmentVariables: {
-        OPENAI_API_KEY: "sk-test"
+        OPENAI_API_KEY: "sk-test",
+        ANTHROPIC_API_KEY: "sk-ant-test"
       },
       fetchImplementation: async (_url, requestOptions = {}) => {
         requestCount += 1;
@@ -411,8 +538,9 @@ test("eval run dispatches planned rows concurrently", async () => {
   );
 
   assert.equal(statusCode, 0, capturedOutput.readStderr());
-  assert.equal(requestCount, 4);
+  assert.equal(requestCount, 8);
   assert.ok(maxInFlightRequestCount > 1);
+  assert.ok(maxInFlightRequestCount <= 4);
 });
 
 test("eval run loads provider credentials from repo-root keys.json", async () => {

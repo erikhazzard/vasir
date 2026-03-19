@@ -1,12 +1,13 @@
 import path from "node:path";
 import process from "node:process";
 
+import { wrapUnknownCliError } from "../install/cli-error.js";
 import { createCommandUi } from "../scripts/ui/command-output.js";
 import { canRenderLiveProgress, createLiveProgress } from "../scripts/ui/live-progress.js";
 import { resolveEvalEnvironmentVariables } from "./keys-file.js";
-import { generateEvalResponse } from "./providers.js";
+import { DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS, generateEvalResponse } from "./providers.js";
 import { resolveEvalModels } from "./provider-config.js";
-import { summarizeEvalRows, scoreCaseOutput } from "./scoring.js";
+import { SCORER_VERSION, summarizeEvalRows, scoreCaseOutput } from "./scoring.js";
 import { resolveSkillSource } from "./skill-source.js";
 import { resolveSuiteSource } from "./suite-source.js";
 import {
@@ -17,6 +18,7 @@ import {
 
 const EVAL_HARNESS_VERSION = 1;
 const COMPARISON_EPSILON = 1e-9;
+const DEFAULT_MAX_IN_FLIGHT_ROWS = 4;
 const EVAL_CONDITIONS = Object.freeze([
   { conditionId: "baseline:none", includeSkill: false },
   { conditionId: "treatment", includeSkill: true }
@@ -63,10 +65,30 @@ function createPrompt({
 
 function createPreviousComparison(currentSummary, previousSummary) {
   if (!previousSummary) {
-    return null;
+    return {
+      outcome: "no_prior",
+      comparable: false
+    };
+  }
+
+  const comparability = getComparability(currentSummary, previousSummary);
+  if (!comparability.comparable) {
+    return {
+      outcome: "not_comparable",
+      comparable: false,
+      previousRunId: previousSummary.runId,
+      reason: comparability.reason
+    };
   }
 
   return {
+    outcome: classifyOutcome({
+      averageScoreDelta:
+        currentSummary.summary.global.averageScoreLift - previousSummary.summary.global.averageScoreLift,
+      passRateDelta:
+        currentSummary.summary.global.passRateLift - previousSummary.summary.global.passRateLift
+    }),
+    comparable: true,
     previousRunId: previousSummary.runId,
     averageScoreLiftDelta:
       currentSummary.summary.global.averageScoreLift - previousSummary.summary.global.averageScoreLift,
@@ -80,15 +102,56 @@ function normalizeModelIds(modelIds) {
 }
 
 function areSummariesComparable(currentSummary, previousSummary) {
+  return getComparability(currentSummary, previousSummary).comparable;
+}
+
+function getComparability(currentSummary, previousSummary) {
   if (!previousSummary) {
-    return false;
+    return {
+      comparable: false,
+      reason: "no previous summary recorded"
+    };
   }
 
-  return (
-    currentSummary.suiteId === previousSummary.suiteId &&
-    currentSummary.caseCount === previousSummary.caseCount &&
-    normalizeModelIds(currentSummary.modelIds) === normalizeModelIds(previousSummary.modelIds)
-  );
+  if (currentSummary.runStatus !== "complete" || previousSummary.runStatus !== "complete") {
+    return {
+      comparable: false,
+      reason: "one of the runs is incomplete"
+    };
+  }
+
+  if (!currentSummary.suiteHash || !previousSummary.suiteHash || currentSummary.suiteHash !== previousSummary.suiteHash) {
+    return {
+      comparable: false,
+      reason: "the suite version changed"
+    };
+  }
+
+  if (currentSummary.scorerVersion !== previousSummary.scorerVersion) {
+    return {
+      comparable: false,
+      reason: "the scorer version changed"
+    };
+  }
+
+  if (currentSummary.harnessVersion !== previousSummary.harnessVersion) {
+    return {
+      comparable: false,
+      reason: "the eval harness version changed"
+    };
+  }
+
+  if (normalizeModelIds(currentSummary.modelIds) !== normalizeModelIds(previousSummary.modelIds)) {
+    return {
+      comparable: false,
+      reason: "the model set changed"
+    };
+  }
+
+  return {
+    comparable: true,
+    reason: ""
+  };
 }
 
 function classifyOutcome({ averageScoreDelta, passRateDelta }) {
@@ -133,10 +196,7 @@ function toRelativeResultsPath({ currentWorkingDirectory, runDirectoryPath }) {
 
 function countModelOutcomes(perModelEntries, expectedOutcome) {
   return perModelEntries.filter((modelEntry) => (
-    classifyOutcome({
-      averageScoreDelta: modelEntry.averageScoreLift,
-      passRateDelta: modelEntry.passRateLift
-    }) === expectedOutcome
+    describeLiftOutcome(modelEntry) === expectedOutcome
   )).length;
 }
 
@@ -148,14 +208,16 @@ function createPreviousVersionComparison(currentSummary, previousVersionSummary)
     };
   }
 
-  if (!areSummariesComparable(currentSummary, previousVersionSummary)) {
+  const comparability = getComparability(currentSummary, previousVersionSummary);
+  if (!comparability.comparable) {
     return {
       outcome: "not_comparable",
       comparable: false,
       previousRunId: previousVersionSummary.runId,
       previousSkillHash: previousVersionSummary.skillHash,
       previousSuiteId: previousVersionSummary.suiteId,
-      previousModelIds: previousVersionSummary.modelIds
+      previousModelIds: previousVersionSummary.modelIds,
+      reason: comparability.reason
     };
   }
 
@@ -239,6 +301,9 @@ function createMovementSummary(rows) {
   const pairedRows = new Map();
 
   for (const row of rows) {
+    if (!row?.hardScore) {
+      continue;
+    }
     const rowKey = `${row.modelId}::${row.caseId}`;
     const existingPair = pairedRows.get(rowKey) ?? {};
     if (row.conditionId === "baseline:none") {
@@ -294,6 +359,56 @@ function createMovementSummary(rows) {
       .filter((movement) => movement.outcome === "better")
       .sort(sortByImpact)
   };
+}
+
+function createFailedRowSummary(rows) {
+  return rows
+    .filter((row) => row.rowStatus === "error" && row.error)
+    .map((row) => ({
+      modelId: row.modelId,
+      caseId: row.caseId,
+      conditionId: row.conditionId,
+      code: row.error.code,
+      message: row.error.message
+    }));
+}
+
+function describeLiftOutcome(summarySlice) {
+  if (!summarySlice || summarySlice.comparablePairCount === 0) {
+    return "no_data";
+  }
+
+  return classifyOutcome({
+    averageScoreDelta: summarySlice.averageScoreLift,
+    passRateDelta: summarySlice.passRateLift
+  });
+}
+
+async function runTasksWithConcurrency(taskList, concurrencyLimit, runTask) {
+  if (taskList.length === 0) {
+    return [];
+  }
+
+  const effectiveConcurrency = Math.max(1, Math.min(concurrencyLimit, taskList.length));
+  const results = new Array(taskList.length);
+  let nextTaskIndex = 0;
+
+  async function consumeTaskQueue() {
+    while (true) {
+      const taskIndex = nextTaskIndex;
+      nextTaskIndex += 1;
+      if (taskIndex >= taskList.length) {
+        return;
+      }
+
+      results[taskIndex] = await runTask(taskList[taskIndex], taskIndex);
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: effectiveConcurrency }, () => consumeTaskQueue())
+  );
+  return results;
 }
 
 function createEvalTaskPlan({ modelDescriptors, suiteDefinition }) {
@@ -389,6 +504,7 @@ export async function runSkillEval({
     suiteDefinition: suiteSource.suiteDefinition
   });
   const totalSteps = evalTaskPlan.length;
+  const maxInFlightRows = Math.min(DEFAULT_MAX_IN_FLIGHT_ROWS, totalSteps);
   const runId = createRunId({ skillHash: skillSource.skillHash });
   const startedAt = new Date().toISOString();
 
@@ -401,7 +517,8 @@ export async function runSkillEval({
         "plan",
         `${modelDescriptors.length} models x ${suiteSource.suiteDefinition.cases.length} cases x baseline/treatment = ${totalSteps} runs`
       ),
-      ui.formatField("execution", "parallel")
+      ui.formatField("execution", "parallel"),
+      ui.formatField("concurrency", `${maxInFlightRows} in flight`)
     ];
 
     if (projectKeysLoaded) {
@@ -420,14 +537,14 @@ export async function runSkillEval({
     );
     if (liveProgress) {
       liveProgress.start(
-        `${ui.formatProgress({ current: 0, total: totalSteps })} ${ui.colors.dim("launched all runs in parallel")}`
+        `${ui.formatProgress({ current: 0, total: totalSteps })} ${ui.colors.dim("scheduled with bounded concurrency")}`
       );
     } else {
       stdoutWriter(
         `${ui.formatStatusLine({
           kind: "info",
           text: ui.formatProgress({ current: 0, total: totalSteps }),
-          detail: "launched all runs in parallel"
+          detail: "scheduled with bounded concurrency"
         })}\n`
       );
     }
@@ -435,23 +552,25 @@ export async function runSkillEval({
 
   let completedSteps = 0;
   let rows;
-
-  try {
-    rows = await Promise.all(
-      evalTaskPlan.map(async (task) => {
-        const prompt = createPrompt({
-          caseDefinition: task.caseDefinition,
-          skillName,
-          skillPromptText: skillSource.promptText,
-          includeSkill: task.includeSkill
-        });
-        const startedRowAtMs = Date.now();
+  rows = await runTasksWithConcurrency(
+    evalTaskPlan,
+    maxInFlightRows,
+    async (task) => {
+      const prompt = createPrompt({
+        caseDefinition: task.caseDefinition,
+        skillName,
+        skillPromptText: skillSource.promptText,
+        includeSkill: task.includeSkill
+      });
+      const startedRowAtMs = Date.now();
+      try {
         const responsePayload = await generateEvalResponse({
           modelDescriptor: task.modelDescriptor,
           systemPrompt: prompt.systemPrompt,
           userPrompt: prompt.userPrompt,
           environmentVariables: resolvedEnvironmentVariables,
-          fetchImplementation
+          fetchImplementation,
+          requestTimeoutMs: DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS
         });
         const elapsedMs = Date.now() - startedRowAtMs;
         const hardScore = scoreCaseOutput({
@@ -480,59 +599,106 @@ export async function runSkillEval({
         return {
           runId,
           suiteId: suiteSource.suiteDefinition.id,
+          suiteHash: suiteSource.suiteHash,
           caseId: task.caseDefinition.id,
           modelId: task.modelDescriptor.id,
           conditionId: task.includeSkill
             ? `treatment:${skillSource.skillHash.slice(0, 12)}`
             : task.conditionId,
           skillHash: skillSource.skillHash,
+          harnessVersion: EVAL_HARNESS_VERSION,
+          scorerVersion: SCORER_VERSION,
+          rowStatus: "scored",
           hardScore,
           outputText: responsePayload.text,
           usage: responsePayload.usage,
           elapsedMs,
           prompt
         };
-      })
-    );
-  } catch (error) {
-    if (liveProgress && ui) {
-      liveProgress.stop(
-        ui.formatStatusLine({
-          kind: "error",
-          text: ui.formatProgress({ current: completedSteps, total: totalSteps }),
-          detail: "eval failed"
-        })
-      );
+      } catch (error) {
+        const normalizedError = wrapUnknownCliError(error);
+        const elapsedMs = Date.now() - startedRowAtMs;
+        completedSteps += 1;
+        if (ui) {
+          const progressDetail = `${formatTaskDetail(task)} ${normalizedError.code}`;
+          if (liveProgress) {
+            liveProgress.update(
+              `${ui.formatProgress({ current: completedSteps, total: totalSteps })} ${ui.colors.dim(progressDetail)}`
+            );
+          } else {
+            stdoutWriter(
+              `${ui.formatStatusLine({
+                kind: "warn",
+                text: ui.formatProgress({ current: completedSteps, total: totalSteps }),
+                detail: progressDetail
+              })}\n`
+            );
+          }
+        }
+
+        return {
+          runId,
+          suiteId: suiteSource.suiteDefinition.id,
+          suiteHash: suiteSource.suiteHash,
+          caseId: task.caseDefinition.id,
+          modelId: task.modelDescriptor.id,
+          conditionId: task.includeSkill
+            ? `treatment:${skillSource.skillHash.slice(0, 12)}`
+            : task.conditionId,
+          skillHash: skillSource.skillHash,
+          harnessVersion: EVAL_HARNESS_VERSION,
+          scorerVersion: SCORER_VERSION,
+          rowStatus: "error",
+          hardScore: null,
+          outputText: "",
+          usage: null,
+          elapsedMs,
+          prompt,
+          error: {
+            code: normalizedError.code,
+            message: normalizedError.message
+          }
+        };
+      }
     }
-    throw error;
-  }
+  );
 
   if (liveProgress && ui) {
+    const failedRowCount = rows.filter((row) => row.rowStatus === "error").length;
     liveProgress.stop(
       ui.formatStatusLine({
-        kind: "ok",
+        kind: failedRowCount > 0 ? "warn" : "ok",
         text: ui.formatProgress({ current: totalSteps, total: totalSteps }),
-        detail: "all runs completed"
+        detail: failedRowCount > 0 ? `completed with ${failedRowCount} row failures` : "all runs completed"
       })
     );
   }
 
-  const summary = summarizeEvalRows(rows);
+  const summary = summarizeEvalRows({
+    rows,
+    expectedPairCount: modelDescriptors.length * suiteSource.suiteDefinition.cases.length
+  });
   const movementSummary = createMovementSummary(rows);
+  const failedRowSummary = createFailedRowSummary(rows);
+  const runStatus = summary.rowCounts.failed > 0 ? "incomplete" : "complete";
   const summaryPayload = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     runId,
     startedAt,
     completedAt: new Date().toISOString(),
     harnessVersion: EVAL_HARNESS_VERSION,
+    scorerVersion: SCORER_VERSION,
     skillName,
     skillHash: skillSource.skillHash,
     skillSourceType: skillSource.sourceType,
     suiteId: suiteSource.suiteDefinition.id,
+    suiteHash: suiteSource.suiteHash,
     suiteSourceType: suiteSource.sourceType,
     modelIds: modelDescriptors.map((modelDescriptor) => modelDescriptor.id),
     skippedProviders,
     caseCount: suiteSource.suiteDefinition.cases.length,
+    runStatus,
+    rowCounts: summary.rowCounts,
     summary
   };
   const runDirectoryPath = writeEvalRunArtifacts({
@@ -554,10 +720,7 @@ export async function runSkillEval({
   );
 
   if (ui) {
-    const overallOutcome = classifyOutcome({
-      averageScoreDelta: summary.global.averageScoreLift,
-      passRateDelta: summary.global.passRateLift
-    });
+    const overallOutcome = describeLiftOutcome(summary.global);
     const modelsHelpedCount = countModelOutcomes(summary.perModel, "better");
     const modelsHurtCount = countModelOutcomes(summary.perModel, "worse");
     const labelWidth = 14;
@@ -568,8 +731,10 @@ export async function runSkillEval({
     const renderedLines = [
       ui.formatField("skill", ui.colors.bold(skillName), { labelWidth }),
       ui.formatField("hash", ui.colors.muted(skillSource.skillHash.slice(0, 12)), { labelWidth }),
+      ui.formatField("run status", ui.formatOutcome(runStatus), { labelWidth }),
       ui.formatField("suite", suiteSource.suiteDefinition.id, { labelWidth }),
       ui.formatField("plan", `${modelDescriptors.length} models x ${suiteSource.suiteDefinition.cases.length} cases x baseline/treatment`, { labelWidth }),
+      ui.formatField("coverage", `${summary.global.comparablePairCount}/${summary.global.totalPairCount} comparable pairs`, { labelWidth }),
       ui.formatField("artifacts", ui.formatPath(relativeResultsPath), { labelWidth })
     ];
 
@@ -596,6 +761,9 @@ export async function runSkillEval({
     );
     renderedLines.push(ui.formatField("models better", `${modelsHelpedCount}/${summary.perModel.length}`, { labelWidth }));
     renderedLines.push(ui.formatField("models worse", `${modelsHurtCount}/${summary.perModel.length}`, { labelWidth }));
+    if (summary.rowCounts.failed > 0) {
+      renderedLines.push(ui.formatField("rows failed", `${summary.rowCounts.failed}/${summary.rowCounts.planned}`, { labelWidth }));
+    }
 
     if (movementSummary.regressions.length > 0 || movementSummary.improvements.length > 0) {
       renderedLines.push("");
@@ -654,7 +822,7 @@ export async function runSkillEval({
     } else if (previousVersionComparison.outcome === "not_comparable") {
       renderedLines.push(
         ui.formatBullet(
-          `previous hash ${previousVersionComparison.previousSkillHash.slice(0, 12)} used a different suite or model set`
+          `previous hash ${previousVersionComparison.previousSkillHash.slice(0, 12)} is not comparable: ${previousVersionComparison.reason}`
         )
       );
     } else {
@@ -679,19 +847,36 @@ export async function runSkillEval({
           averageScoreDelta: modelEntry.averageScoreLift,
           passRateDelta: modelEntry.passRateLift
         });
+        const renderedModelOutcome = modelEntry.comparablePairCount === 0 ? "no_data" : modelOutcome;
         renderedLines.push(
           ui.formatField(
             modelEntry.modelId,
-            `${ui.formatOutcome(modelOutcome)}  ${ui.formatPercent(modelEntry.baseline.averageScore)} -> ${ui.formatPercent(modelEntry.treatment.averageScore)} (${ui.formatLift(modelEntry.averageScoreLift)})`,
+            `${ui.formatOutcome(renderedModelOutcome)}  ${ui.formatPercent(modelEntry.baseline.averageScore)} -> ${ui.formatPercent(modelEntry.treatment.averageScore)} (${ui.formatLift(modelEntry.averageScoreLift)})`,
             { labelWidth: 24 }
           )
         );
       }
     }
 
-    if (previousComparison) {
+    if (failedRowSummary.length > 0) {
       renderedLines.push("");
-      renderedLines.push(ui.colors.header("Last Run"));
+      renderedLines.push(ui.colors.header("Row Failures"));
+      for (const failedRow of failedRowSummary.slice(0, 4)) {
+        renderedLines.push(
+          ui.formatBullet(
+            `${failedRow.modelId} / ${failedRow.caseId} / ${failedRow.conditionId} ${failedRow.code}`
+          )
+        );
+        renderedLines.push(
+          ui.formatField("error", failedRow.message, { labelWidth })
+        );
+      }
+    }
+
+    renderedLines.push("");
+    renderedLines.push(ui.colors.header("Last Run"));
+    renderedLines.push(ui.formatField("result", ui.formatOutcome(previousComparison.outcome), { labelWidth }));
+    if (previousComparison.comparable) {
       renderedLines.push(ui.formatBullet(`previous run ${previousComparison.previousRunId}`));
       renderedLines.push(
         ui.formatBullet(
@@ -703,15 +888,10 @@ export async function runSkillEval({
           `pass edge moved ${ui.formatLift(previousComparison.passRateLiftDelta)}`
         )
       );
+    } else if (previousComparison.outcome === "not_comparable") {
+      renderedLines.push(ui.formatBullet(`${previousComparison.previousRunId} is not comparable: ${previousComparison.reason}`));
     } else {
-      renderedLines.push("");
-      renderedLines.push(
-        ui.formatStatusLine({
-          kind: "info",
-          text: "last run",
-          detail: "first recorded run for this skill"
-        })
-      );
+      renderedLines.push(ui.formatBullet("first recorded run for this skill"));
     }
 
     stdoutWriter(
@@ -729,7 +909,10 @@ export async function runSkillEval({
     skillHash: skillSource.skillHash,
     skillSourceType: skillSource.sourceType,
     suiteId: suiteSource.suiteDefinition.id,
+    suiteHash: suiteSource.suiteHash,
     modelIds: modelDescriptors.map((modelDescriptor) => modelDescriptor.id),
+    runStatus,
+    scorerVersion: SCORER_VERSION,
     skippedProviders,
     outputDirectory: runDirectoryPath,
     summary,

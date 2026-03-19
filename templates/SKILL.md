@@ -1,6 +1,10 @@
 ---
 name: skill-name
 description: Dense one-line description of what this skill does and when to use it.
+category: uncategorized
+tags: []
+recommends: []
+version: 0.1.0
 ---
 
 # Skill Name

@@ -15,6 +15,7 @@ import {
   readProjectInstallState,
   writeProjectInstallState
 } from "./project-install-state.js";
+import { listSkillFiles } from "./skill-metadata.js";
 
 function copyFileIntoProject({ sourceFilePath, targetFilePath }) {
   fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
@@ -24,7 +25,6 @@ function copyFileIntoProject({ sourceFilePath, targetFilePath }) {
 function copySkillDirectory({
   sourceSkillDirectory,
   targetSkillDirectory,
-  skillEntry,
   replaceExistingSkills
 }) {
   if (fs.existsSync(targetSkillDirectory)) {
@@ -42,18 +42,16 @@ function copySkillDirectory({
   }
 
   fs.mkdirSync(targetSkillDirectory, { recursive: true });
+  const managedRelativeFilePaths = listSkillFiles(sourceSkillDirectory);
 
-  copyFileIntoProject({
-    sourceFilePath: path.join(sourceSkillDirectory, "meta.json"),
-    targetFilePath: path.join(targetSkillDirectory, "meta.json")
-  });
-
-  for (const relativeFilePath of skillEntry.files) {
+  for (const relativeFilePath of managedRelativeFilePaths) {
     copyFileIntoProject({
       sourceFilePath: path.join(sourceSkillDirectory, relativeFilePath),
       targetFilePath: path.join(targetSkillDirectory, relativeFilePath)
     });
   }
+
+  return managedRelativeFilePaths;
 }
 
 export function installSkillsIntoProject({
@@ -135,15 +133,14 @@ export function installSkillsIntoProject({
     const targetSkillDirectory = path.join(projectPaths.projectSkillsDirectory, skillName);
     const willReplaceExistingSkill = fs.existsSync(targetSkillDirectory);
 
-    copySkillDirectory({
+    const managedRelativeFilePaths = copySkillDirectory({
       sourceSkillDirectory,
       targetSkillDirectory,
-      skillEntry,
       replaceExistingSkills
     });
     projectInstallState.skills[skillName] = createProjectSkillInstallStateEntry({
       targetSkillDirectory,
-      managedRelativeFilePaths: ["meta.json", ...skillEntry.files]
+      managedRelativeFilePaths
     });
     installedSkillNames.push(skillName);
     if (willReplaceExistingSkill) {

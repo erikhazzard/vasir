@@ -113,8 +113,17 @@ export function createCommandUi({ stream }) {
     if (outcome === "worse") {
       return colors.error("WORSE");
     }
+    if (outcome === "complete") {
+      return colors.ok("COMPLETE");
+    }
+    if (outcome === "incomplete") {
+      return colors.warn("INCOMPLETE");
+    }
     if (outcome === "mixed") {
       return colors.warn("MIXED");
+    }
+    if (outcome === "no_data") {
+      return colors.warn("NO DATA");
     }
     if (outcome === "no_prior") {
       return colors.dim("NO PRIOR VERSION");

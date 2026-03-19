@@ -38,7 +38,7 @@ Repo-local eval workflow:
 - Copy [keys.json.example](./keys.json.example) to `keys.json` to keep OpenAI/Anthropic keys out of the prompt flow
 - Built-in eval contracts now live beside the skill at `skills/<name>/evals/`
 
-The repo-local wrapper prints setup, uses an animated live spinner/progress row on TTYs, launches the full eval batch in parallel, and ends with a scoreboard for `Vs No Skill` and `Vs Previous Version`.
+The repo-local wrapper prints setup, uses an animated live spinner/progress row on TTYs, runs the batch with bounded concurrency, keeps partial results when a provider row fails, and ends with a scoreboard for `Vs No Skill` and `Vs Previous Version`.
 
 If the command fails, start with [docs/troubleshooting.md](./docs/troubleshooting.md).
 
@@ -63,4 +63,4 @@ Browse [skills/](./skills/) directly or inspect [registry.json](./registry.json)
 npm run build:registry
 ```
 
-`registry.json` is generated from per-skill `meta.json` files. The same metadata powers CLI install, human browsing, agent discovery, and repo validation.
+`registry.json` is generated from each skill directory, with `SKILL.md` as the primary source and optional `meta.json` as a compatibility fallback. The same catalog powers CLI install, human browsing, agent discovery, and repo validation.

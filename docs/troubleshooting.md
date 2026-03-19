@@ -139,6 +139,7 @@ Use this section for:
 - `EVAL_PROVIDER_NOT_SUPPORTED`
 - `EVAL_PROVIDER_AUTH_MISSING`
 - `EVAL_PROVIDER_FAILED`
+- `EVAL_PROVIDER_TIMEOUT`
 - `EVAL_FETCH_UNAVAILABLE`
 - `EVAL_CANCELLED`
 
@@ -155,7 +156,8 @@ Recommended path:
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY`
 6. If the terminal is interactive, rerun without `--json` and let Vasir prompt you to paste or skip a missing provider key.
-7. Rerun the eval and inspect the printed results directory under `.agents/vasir-evals/` if a partial run was written.
+7. If the report says `INCOMPLETE`, inspect the `Row Failures` section and the saved `rows.json` under `.agents/vasir-evals/<skill>/...`.
+8. Rerun the eval and inspect the printed results directory under `.agents/vasir-evals/` if a partial run was written.
 
 Verification:
 

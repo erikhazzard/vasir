@@ -4,8 +4,8 @@
   "cases": [
     {
       "id": "abortable-user-fetch",
-      "task": "Implement a React component named UserPanel that fetches a user whenever userId changes. The component must show a loading state, render the user on success, and render an accessible error on failure. Keep the answer concise but concrete.",
-      "outputHint": "Return code or pseudocode that makes the state ownership and async effect strategy obvious.",
+      "task": "Implement a React component named UserPanel that fetches a user whenever userId changes and makes its async states obvious to the user. Keep the answer concise but concrete.",
+      "outputHint": "Make state ownership, cancellation, and user-visible failure handling obvious.",
       "requiredSubstrings": [
         "AbortController",
         "loading",
@@ -19,7 +19,7 @@
     {
       "id": "urgent-vs-non-urgent-search",
       "task": "Implement a React SearchBox that keeps typing responsive while an expensive query runs in the background. Keep the answer concise but concrete.",
-      "outputHint": "Return code or pseudocode that shows the urgent update path and the deferred or transitional work path.",
+      "outputHint": "Show how input stays urgent while result work is deferred or transitional.",
       "requiredSubstrings": [
         "startTransition",
         "useDeferredValue"

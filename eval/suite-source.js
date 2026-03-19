@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -16,6 +17,25 @@ function readSuiteFile(suiteFilePath) {
       cause: error
     });
   }
+}
+
+function stableSerialize(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableSerialize(entry)).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    const serializedEntries = Object.keys(value)
+      .sort((leftKey, rightKey) => leftKey.localeCompare(rightKey))
+      .map((key) => `${JSON.stringify(key)}:${stableSerialize(value[key])}`);
+    return `{${serializedEntries.join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
+function createSuiteHash(suiteDefinition) {
+  return crypto.createHash("sha256").update(stableSerialize(suiteDefinition)).digest("hex");
 }
 
 function validateSuiteDefinition(suiteDefinition, suiteFilePath) {
@@ -76,7 +96,8 @@ export function resolveSuiteSource({ skillSource }) {
     return {
       sourceType: skillSource.sourceType,
       suiteFilePath,
-      suiteDefinition
+      suiteDefinition,
+      suiteHash: createSuiteHash(suiteDefinition)
     };
   }
 

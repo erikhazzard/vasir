@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { readSkillMetadata } from "../install/skill-metadata.js";
 import { runCommandLine } from "../install/command-runner.js";
 import { createCommandUi } from "./ui/command-output.js";
 import { interactiveSelect } from "./ui/interactive-select.js";
@@ -48,14 +49,11 @@ function listEvalCandidates() {
         // Keep the fallback values. The CLI will validate the suite if this skill is selected.
       }
 
-      const metaFilePath = path.join(REPO_ROOT, "skills", skillName, "meta.json");
-      if (fs.existsSync(metaFilePath)) {
-        try {
-          const skillMetadata = readJsonFile(metaFilePath);
-          description = skillMetadata.description || "";
-        } catch {
-          // Keep the fallback description when metadata cannot be parsed.
-        }
+      try {
+        const skillMetadata = readSkillMetadata(path.join(REPO_ROOT, "skills", skillName));
+        description = skillMetadata.description || "";
+      } catch {
+        // Keep the fallback description when the skill manifest or compatibility metadata cannot be parsed.
       }
 
       return {

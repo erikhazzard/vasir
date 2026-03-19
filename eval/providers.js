@@ -1,6 +1,8 @@
 import { VasirCliError } from "../install/cli-error.js";
 import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
 
+export const DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS = 45_000;
+
 function readResponseTextFromOpenAiPayload(responsePayload) {
   if (typeof responsePayload?.output_text === "string" && responsePayload.output_text.trim().length > 0) {
     return responsePayload.output_text.trim();
@@ -98,16 +100,22 @@ function inferMockResponseText({ modelDescriptor, promptText }) {
     return "Store query in state and useEffect to run the search whenever the query changes.";
   }
 
-  if (promptTextLowerCase.includes("random reward") || promptTextLowerCase.includes("replayable")) {
+  if (
+    promptTextLowerCase.includes("random reward") ||
+    promptTextLowerCase.includes("replayable") ||
+    promptTextLowerCase.includes("critical hit") ||
+    promptTextLowerCase.includes("cooldown")
+  ) {
     if (skillApplied) {
       return [
         "Use a seeded rng instead of Math.random().",
         "Inject a clock instead of Date.now().",
-        "Add a replay regression test with a fixed seed."
+        "Add a replay regression test with a fixed seed.",
+        "Do not use setTimeout() to wait for determinism."
       ].join(" ");
     }
 
-    return "Use Math.random() to pick the reward and Date.now() to label the event.";
+    return "Use Math.random() to pick the reward, Date.now() to label the event, and setTimeout() until the flaky path reproduces.";
   }
 
   if (promptTextLowerCase.includes("purchase flow") || promptTextLowerCase.includes("value-path")) {
@@ -132,7 +140,8 @@ async function runOpenAiModel({
   systemPrompt,
   userPrompt,
   environmentVariables,
-  fetchImplementation
+  fetchImplementation,
+  requestTimeoutMs = DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS
 }) {
   const apiKey = environmentVariables.OPENAI_API_KEY;
   if (!apiKey) {
@@ -146,40 +155,71 @@ async function runOpenAiModel({
   }
 
   const baseUrl = environmentVariables.OPENAI_BASE_URL ?? "https://api.openai.com/v1";
-  const response = await fetchImplementation(`${baseUrl}/responses`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: modelDescriptor.model,
-      temperature: 0.2,
-      instructions: systemPrompt,
-      input: userPrompt
-    })
-  });
-
-  const responsePayload = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new VasirCliError({
-      code: "EVAL_PROVIDER_FAILED",
-      message: `OpenAI eval request failed for ${modelDescriptor.id}.`,
+  const timeoutError = () =>
+    new VasirCliError({
+      code: "EVAL_PROVIDER_TIMEOUT",
+      message: `OpenAI eval request timed out for ${modelDescriptor.id} after ${requestTimeoutMs}ms.`,
       suggestion:
-        "Inspect the OpenAI model id and credentials, or rerun with `--model mock` to isolate the eval harness from the provider.",
-      context: {
-        provider: modelDescriptor.provider,
-        model: modelDescriptor.model,
-        responsePayload
-      },
+        "Retry the eval, reduce the live model set, or rerun with `--model mock` to isolate the harness from provider latency.",
       docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
     });
-  }
+  const abortController = typeof AbortController === "function" ? new AbortController() : null;
+  let timeoutHandle = null;
 
-  return {
-    text: readResponseTextFromOpenAiPayload(responsePayload),
-    usage: responsePayload?.usage ?? null
-  };
+  try {
+    const fetchPromise = fetchImplementation(`${baseUrl}/responses`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: modelDescriptor.model,
+        temperature: 0.2,
+        instructions: systemPrompt,
+        input: userPrompt
+      }),
+      ...(abortController ? { signal: abortController.signal } : {})
+    });
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        abortController?.abort();
+        reject(timeoutError());
+      }, requestTimeoutMs);
+    });
+
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+    const responsePayload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new VasirCliError({
+        code: "EVAL_PROVIDER_FAILED",
+        message: `OpenAI eval request failed for ${modelDescriptor.id}.`,
+        suggestion:
+          "Inspect the OpenAI model id and credentials, or rerun with `--model mock` to isolate the eval harness from the provider.",
+        context: {
+          provider: modelDescriptor.provider,
+          model: modelDescriptor.model,
+          responsePayload
+        },
+        docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
+      });
+    }
+
+    return {
+      text: readResponseTextFromOpenAiPayload(responsePayload),
+      usage: responsePayload?.usage ?? null
+    };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw timeoutError();
+    }
+    throw error;
+  } finally {
+    if (timeoutHandle !== null) {
+      clearTimeout(timeoutHandle);
+    }
+  }
 }
 
 async function runAnthropicModel({
@@ -187,7 +227,8 @@ async function runAnthropicModel({
   systemPrompt,
   userPrompt,
   environmentVariables,
-  fetchImplementation
+  fetchImplementation,
+  requestTimeoutMs = DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS
 }) {
   const apiKey = environmentVariables.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -201,42 +242,73 @@ async function runAnthropicModel({
   }
 
   const baseUrl = environmentVariables.ANTHROPIC_BASE_URL ?? "https://api.anthropic.com";
-  const response = await fetchImplementation(`${baseUrl}/v1/messages`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01"
-    },
-    body: JSON.stringify({
-      model: modelDescriptor.model,
-      max_tokens: 1200,
-      temperature: 0.2,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }]
-    })
-  });
-
-  const responsePayload = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new VasirCliError({
-      code: "EVAL_PROVIDER_FAILED",
-      message: `Anthropic eval request failed for ${modelDescriptor.id}.`,
+  const timeoutError = () =>
+    new VasirCliError({
+      code: "EVAL_PROVIDER_TIMEOUT",
+      message: `Anthropic eval request timed out for ${modelDescriptor.id} after ${requestTimeoutMs}ms.`,
       suggestion:
-        "Inspect the Anthropic model id and credentials, or rerun with `--model mock` to isolate the eval harness from the provider.",
-      context: {
-        provider: modelDescriptor.provider,
-        model: modelDescriptor.model,
-        responsePayload
-      },
+        "Retry the eval, reduce the live model set, or rerun with `--model mock` to isolate the harness from provider latency.",
       docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
     });
-  }
+  const abortController = typeof AbortController === "function" ? new AbortController() : null;
+  let timeoutHandle = null;
 
-  return {
-    text: readResponseTextFromAnthropicPayload(responsePayload),
-    usage: responsePayload?.usage ?? null
-  };
+  try {
+    const fetchPromise = fetchImplementation(`${baseUrl}/v1/messages`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: modelDescriptor.model,
+        max_tokens: 1200,
+        temperature: 0.2,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      }),
+      ...(abortController ? { signal: abortController.signal } : {})
+    });
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        abortController?.abort();
+        reject(timeoutError());
+      }, requestTimeoutMs);
+    });
+
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+    const responsePayload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new VasirCliError({
+        code: "EVAL_PROVIDER_FAILED",
+        message: `Anthropic eval request failed for ${modelDescriptor.id}.`,
+        suggestion:
+          "Inspect the Anthropic model id and credentials, or rerun with `--model mock` to isolate the eval harness from the provider.",
+        context: {
+          provider: modelDescriptor.provider,
+          model: modelDescriptor.model,
+          responsePayload
+        },
+        docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
+      });
+    }
+
+    return {
+      text: readResponseTextFromAnthropicPayload(responsePayload),
+      usage: responsePayload?.usage ?? null
+    };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw timeoutError();
+    }
+    throw error;
+  } finally {
+    if (timeoutHandle !== null) {
+      clearTimeout(timeoutHandle);
+    }
+  }
 }
 
 export async function generateEvalResponse({
@@ -244,7 +316,8 @@ export async function generateEvalResponse({
   systemPrompt,
   userPrompt,
   environmentVariables,
-  fetchImplementation = globalThis.fetch
+  fetchImplementation = globalThis.fetch,
+  requestTimeoutMs = DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS
 }) {
   if (modelDescriptor.provider === "mock") {
     return {
@@ -272,7 +345,8 @@ export async function generateEvalResponse({
       systemPrompt,
       userPrompt,
       environmentVariables,
-      fetchImplementation
+      fetchImplementation,
+      requestTimeoutMs
     });
   }
 
@@ -282,7 +356,8 @@ export async function generateEvalResponse({
       systemPrompt,
       userPrompt,
       environmentVariables,
-      fetchImplementation
+      fetchImplementation,
+      requestTimeoutMs
     });
   }
 

@@ -17,11 +17,13 @@ The treatment output should beat baseline by making deterministic control surfac
 - seeded RNG
 - injected or controlled clock
 - replay-safe language instead of ambient randomness or time
+- deterministic waiting instead of sleep-based guessing
 
 ## Current Cases
 
 - `replayable-random-reward`
+- `reproduce-flaky-crit-window`
 
 ## Current Limits
 
-This suite is currently a smoke test. It checks whether the answer names the deterministic boundary, not whether the design is a complete replay architecture.
+This is still a built-in steering suite, not a full replay-engine benchmark. It now checks both deterministic design and deterministic bug-reproduction posture.

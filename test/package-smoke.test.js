@@ -68,22 +68,22 @@ function createFixtureRepository() {
 
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
   writeFile(path.join(repositoryDirectory, "templates", "AGENTS.md"), "# Project Agents\n");
-  writeFile(path.join(repositoryDirectory, "skills", "react", "SKILL.md"), "# React\n");
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "meta.json"),
-    `${JSON.stringify(
-      {
-        name: "react",
-        version: "1.0.0",
-        description: "React component boundaries and effect discipline",
-        category: "frontend",
-        tags: ["react"],
-        recommends: [],
-        files: ["SKILL.md"]
-      },
-      null,
-      2
-    )}\n`
+    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    [
+      "---",
+      "name: react",
+      "description: React component boundaries and effect discipline.",
+      "category: frontend",
+      "tags: [react]",
+      "recommends: []",
+      "version: 1.0.0",
+      "---",
+      "",
+      "# React",
+      "",
+      "Use local state first."
+    ].join("\n")
   );
 
   runGitCommand(repositoryDirectory, ["init"]);

@@ -29,7 +29,7 @@ Do not create a skill for:
 5. Add concrete examples before you add explanation.
 6. Name at least two specific anti-patterns.
 7. Add `references/` only if the root skill would otherwise become bloated.
-8. Update `meta.json`.
+8. If you want richer catalog metadata than the defaults, set `category`, `tags`, `recommends`, or `version` in `SKILL.md` frontmatter.
 9. If the skill should be measurable with `vasir eval run <skill>`, add `skills/<name>/evals/suite.json` and `skills/<name>/evals/README.md`.
 10. Run `npm run build:registry`.
 11. Run `npm test`.
@@ -59,7 +59,7 @@ Before you treat a skill as done, ask:
 - Are the examples real code or precise patterns?
 - Are the anti-patterns specific?
 - If the skill owns a built-in eval, does `skills/<name>/evals/` explain what good looks like?
-- Does `meta.json.files` match what is on disk?
+- If you skipped extra metadata, are the defaults (`uncategorized`, `[]`, `0.1.0`) acceptable?
 - Did you rebuild `registry.json` and rerun the tests?
 
 ## Related Pages

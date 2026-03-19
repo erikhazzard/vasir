@@ -4,8 +4,8 @@
   "cases": [
     {
       "id": "replayable-random-reward",
-      "task": "Add a random reward selection step to a replayable gameplay system. Keep the answer concise but concrete.",
-      "outputHint": "Show how randomness and time are handled so the behavior can replay exactly.",
+      "task": "Add a reward selection step to a gameplay system that must support exact replay of production failures. Keep the answer concise but concrete.",
+      "outputHint": "Make the nondeterminism boundary explicit instead of relying on ambient randomness or wall time.",
       "requiredSubstrings": [
         "seed",
         "rng",
@@ -14,6 +14,21 @@
       "forbiddenSubstrings": [
         "Math.random",
         "Date.now"
+      ]
+    },
+    {
+      "id": "reproduce-flaky-crit-window",
+      "task": "A combat test flakes only when a critical hit lines up with a cooldown window. Describe the change you would make so the failure can be replayed and debugged locally. Keep the answer concise but concrete.",
+      "outputHint": "Focus on explicit control of randomness, time, and waiting.",
+      "requiredSubstrings": [
+        "seed",
+        "clock",
+        "replay"
+      ],
+      "forbiddenSubstrings": [
+        "Math.random",
+        "Date.now",
+        "setTimeout"
       ]
     }
   ]

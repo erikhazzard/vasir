@@ -109,13 +109,14 @@ What it does:
 - Runs the same case set twice for every configured model:
   - baseline: no skill
   - treatment: with the skill
-- Launches the planned model/case/condition rows in parallel and streams completion progress.
+- Launches the planned model/case/condition rows with bounded concurrency and streams completion progress.
 - On TTYs, renders a live animated spinner/progress row while the batch is in flight.
 - Scores the outputs with built-in hard checks.
 - Stores local run history under `.agents/vasir-evals/<skill>/...`.
 - Prints a scoreboard that answers:
   - did this skill beat no skill?
   - did this skill version beat the previous recorded version of the skill?
+- Marks the run `COMPLETE` or `INCOMPLETE` and keeps successful rows even if some provider rows fail.
 
 Local provider keys:
 
@@ -166,9 +167,10 @@ Notes:
 
 - The current M1 implementation uses built-in hard scorers, not blind pairwise judging yet.
 - `Vs No Skill` is the main result: it compares baseline task-only outputs against treatment outputs with the skill applied.
-- `Vs Previous Version` compares against the latest recorded run with a different skill hash when the suite and model set are comparable.
+- `Vs Previous Version` compares against the latest recorded run with a different skill hash when the suite hash, scorer version, harness version, model set, and run completeness are comparable.
 - If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip that provider.
 - In non-interactive environments, missing live-provider credentials cause those providers to be skipped. If nothing runnable remains, the command fails cleanly and points you to `--model mock`.
+- Live provider rows use a request timeout. If a row times out or a provider call fails, the run stays on disk and the final report is marked incomplete instead of discarding the successful rows.
 - `npm run eval` prints setup, launches the batch in parallel, streams completions, and accepts positional model shorthands like `npm run eval react mock` or `npm run eval react openai`.
 - Eval artifacts are tool-owned local files and are ignored by this repo via `.agents/vasir-evals/`.
 
@@ -261,12 +263,22 @@ Example eval success envelope:
   "runId": "2026-03-18T12-00-00-000Z__abc123def456",
   "skillName": "react",
   "suiteId": "react-core",
+  "suiteHash": "4d5e6f...",
+  "runStatus": "complete",
+  "scorerVersion": 3,
   "modelIds": ["mock:skill-aware"],
   "outputDirectory": "/repo/.agents/vasir-evals/react/2026-03-18T12-00-00-000Z__abc123def456",
   "summary": {
+    "rowCounts": {
+      "planned": 4,
+      "scored": 4,
+      "failed": 0
+    },
     "global": {
       "averageScoreLift": 0.5,
-      "passRateLift": 1
+      "passRateLift": 1,
+      "comparablePairCount": 2,
+      "totalPairCount": 2
     }
   }
 }

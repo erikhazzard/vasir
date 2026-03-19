@@ -4,6 +4,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildRegistry } from "../registry/build.js";
+
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS_ROOT = path.join(REPO_ROOT, "skills");
 
@@ -27,35 +29,46 @@ function findLocalMarkdownLinks(filePath) {
 }
 
 test("skills use a flat skills/<name> directory layout", () => {
+  const skillManifestPaths = walkFiles(SKILLS_ROOT).filter((filePath) => path.basename(filePath) === "SKILL.md");
+  assert.ok(skillManifestPaths.length > 0, "expected at least one skill");
+
+  for (const manifestPath of skillManifestPaths) {
+    const relativeManifestPath = path.relative(REPO_ROOT, manifestPath).replace(/\\/g, "/");
+    assert.match(
+      relativeManifestPath,
+      /^skills\/[^/]+\/SKILL\.md$/,
+      `root skill manifests must live directly under skills/<name>: ${relativeManifestPath}`
+    );
+  }
+});
+
+test("optional legacy meta.json files only appear at skills/<name>/meta.json", () => {
   const metaFilePaths = walkFiles(SKILLS_ROOT).filter((filePath) => path.basename(filePath) === "meta.json");
-  assert.ok(metaFilePaths.length > 0, "expected at least one skill");
 
   for (const metaFilePath of metaFilePaths) {
     const relativeMetaPath = path.relative(REPO_ROOT, metaFilePath).replace(/\\/g, "/");
     assert.match(
       relativeMetaPath,
       /^skills\/[^/]+\/meta\.json$/,
-      `skill metadata must live directly under skills/<name>: ${relativeMetaPath}`
+      `legacy meta.json files must live directly under skills/<name>: ${relativeMetaPath}`
     );
   }
 });
 
-test("every skill metadata inventory matches checked-in files", () => {
-  const metaFilePaths = walkFiles(SKILLS_ROOT).filter((filePath) => path.basename(filePath) === "meta.json");
-  assert.ok(metaFilePaths.length > 0, "expected at least one skill");
+test("built registry file inventories match checked-in skill files", () => {
+  const registry = buildRegistry();
+  assert.ok(registry.skills.length > 0, "expected at least one built skill");
 
-  for (const metaFilePath of metaFilePaths) {
-    const skillDirectoryPath = path.dirname(metaFilePath);
-    const skillMetadata = JSON.parse(fs.readFileSync(metaFilePath, "utf8"));
+  for (const skillEntry of registry.skills) {
+    const skillDirectoryPath = path.join(REPO_ROOT, skillEntry.path);
     const actualRelativeFilePaths = walkFiles(skillDirectoryPath)
       .map((filePath) => path.relative(skillDirectoryPath, filePath).replace(/\\/g, "/"))
-      .filter((relativeFilePath) => relativeFilePath !== "meta.json")
       .sort();
 
     assert.deepEqual(
-      skillMetadata.files,
+      skillEntry.files,
       actualRelativeFilePaths,
-      `file inventory mismatch for ${path.relative(REPO_ROOT, skillDirectoryPath)}`
+      `file inventory mismatch for ${skillEntry.path}`
     );
   }
 });

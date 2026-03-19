@@ -69,39 +69,39 @@ function createFixtureRepository() {
 
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
   writeFile(path.join(repositoryDirectory, "templates", "AGENTS.md"), "# Project Agents\n");
-  writeFile(path.join(repositoryDirectory, "skills", "react", "SKILL.md"), "# React\n");
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "meta.json"),
-    `${JSON.stringify(
-      {
-        name: "react",
-        version: "1.0.0",
-        description: "React component boundaries and effect discipline",
-        category: "frontend",
-        tags: ["react"],
-        recommends: [],
-        files: ["SKILL.md"]
-      },
-      null,
-      2
-    )}\n`
+    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    [
+      "---",
+      "name: react",
+      "description: React component boundaries and effect discipline.",
+      "category: frontend",
+      "tags: [react]",
+      "recommends: []",
+      "version: 1.0.0",
+      "---",
+      "",
+      "# React",
+      "",
+      "Use local state first."
+    ].join("\n")
   );
-  writeFile(path.join(repositoryDirectory, "skills", "roguelike", "SKILL.md"), "# Roguelike\n");
   writeFile(
-    path.join(repositoryDirectory, "skills", "roguelike", "meta.json"),
-    `${JSON.stringify(
-      {
-        name: "roguelike",
-        version: "1.0.0",
-        description: "Run structure and procedural dungeon design",
-        category: "games",
-        tags: ["games"],
-        recommends: [],
-        files: ["SKILL.md"]
-      },
-      null,
-      2
-    )}\n`
+    path.join(repositoryDirectory, "skills", "roguelike", "SKILL.md"),
+    [
+      "---",
+      "name: roguelike",
+      "description: Run structure and procedural dungeon design.",
+      "category: games",
+      "tags: [games]",
+      "recommends: []",
+      "version: 1.0.0",
+      "---",
+      "",
+      "# Roguelike",
+      "",
+      "Build run structure around clear escalation."
+    ].join("\n")
   );
 
   runGitCommand(repositoryDirectory, ["init"]);
@@ -205,7 +205,6 @@ test("add installs skills into repo-local .agents and repairs compatibility alia
 
   assert.equal(statusCode, 0);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
-  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "meta.json")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
   assert.equal(
     fs.realpathSync(path.join(projectDirectory, ".claude", "skills")),
@@ -251,22 +250,6 @@ test("add --replace refuses to overwrite a manual untracked project skill", asyn
   const replaceCommandOutput = captureCommandWriters();
 
   writeFile(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "# Manual React\n");
-  writeFile(
-    path.join(projectDirectory, ".agents", "skills", "react", "meta.json"),
-    `${JSON.stringify(
-      {
-        name: "react",
-        version: "1.0.0",
-        description: "Manual install",
-        category: "frontend",
-        tags: ["react"],
-        recommends: [],
-        files: ["SKILL.md"]
-      },
-      null,
-      2
-    )}\n`
-  );
 
   const replaceStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace"], {
     homeDirectory,

@@ -299,13 +299,11 @@ eval/
 skills/
   react/
     SKILL.md
-    meta.json
     evals/
       README.md
       suite.json
   deterministic/
     SKILL.md
-    meta.json
     evals/
       README.md
       suite.json

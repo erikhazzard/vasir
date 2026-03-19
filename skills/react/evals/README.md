@@ -18,6 +18,7 @@ The treatment output should beat baseline by making the intended React posture m
 - abortable async effects
 - explicit loading and accessible error states
 - `startTransition` / `useDeferredValue` for expensive background work
+- clearer separation between urgent input and deferred result work
 
 ## Current Cases
 
@@ -26,4 +27,4 @@ The treatment output should beat baseline by making the intended React posture m
 
 ## Current Limits
 
-This is a built-in steering suite, not a full React quality benchmark. It checks for the patterns this skill is meant to force into the answer.
+This is a built-in steering suite, not a full React quality benchmark. It checks whether the answer reaches for the repo’s React defaults instead of generic public-code patterns.

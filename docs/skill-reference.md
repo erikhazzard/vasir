@@ -1,6 +1,6 @@
 # Skill Reference
 
-Use this page when you need authoritative facts about skill layout, `meta.json`, root manifest structure, or versioning rules.
+Use this page when you need authoritative facts about skill layout, manifest frontmatter, optional compatibility metadata, or versioning rules.
 
 ## Skill Directory Layout
 
@@ -9,34 +9,33 @@ Each skill lives directly under `skills/<name>/`.
 Required files:
 
 - `SKILL.md`
-- `meta.json`
 
 Optional files:
 
+- `meta.json`
 - `references/...`
 - `evals/README.md`
 - `evals/suite.json`
 
-## `meta.json`
+## Catalog Fields
 
-`meta.json` is the local source of truth. `registry.json` is generated from it.
+`registry.json` is generated from each skill directory. `SKILL.md` is the primary source of truth. `meta.json` is optional compatibility metadata for older skills.
 
-| Field | Type | Required | Meaning |
-| --- | --- | --- | --- |
-| `name` | string | yes | Unique lowercase hyphenated skill identifier |
-| `version` | string | yes | Skill-local semver |
-| `description` | string | yes | Dense one-line description used for discovery |
-| `category` | string | yes | Display grouping such as `games`, `frontend`, `infra`, or `testing` |
-| `tags` | string[] | yes | Searchable keywords |
-| `recommends` | string[] | yes | Non-required companion skills |
-| `files` | string[] | yes | Every checked-in file in the skill directory except `meta.json` |
+| Field | Primary source | Fallback / default |
+| --- | --- | --- |
+| `name` | `SKILL.md` frontmatter `name` | directory name; if present it must match `skills/<name>` |
+| `description` | `SKILL.md` frontmatter `description` | first prose paragraph in `SKILL.md`, then optional `meta.json.description` |
+| `category` | `SKILL.md` frontmatter `category` | `meta.json.category`, then `uncategorized` |
+| `tags` | `SKILL.md` frontmatter `tags` | `meta.json.tags`, then `[]` |
+| `recommends` | `SKILL.md` frontmatter `recommends` | `meta.json.recommends`, then `[]` |
+| `version` | `SKILL.md` frontmatter `version` | `meta.json.version`, then `0.1.0` |
+| `files` | inferred from disk | every checked-in file in the skill directory, including optional `meta.json` |
 
 Rules:
 
-- `files[0]` should normally be `SKILL.md`.
-- `files` must stay in sync with the checked-in file inventory.
-- If you add `references/...`, add those files to `files`.
-- If the skill owns a built-in eval, add the `evals/...` files to `files`.
+- `SKILL.md` must exist directly under `skills/<name>/`.
+- `files` is generated from the checked-in file inventory; there is no manual file list to maintain.
+- If you keep `meta.json`, it must live directly under `skills/<name>/meta.json`.
 
 ## Root `SKILL.md`
 
@@ -44,7 +43,7 @@ The root skill is the default control surface. Keep it dense and focused.
 
 Recommended root structure:
 
-- frontmatter with `name` and `description`
+- frontmatter with `name`, `description`, and optional catalog fields
 - core principle
 - quick reference
 - implementation patterns
@@ -82,7 +81,7 @@ Rules:
 The repo validation path checks:
 
 - skill directories are flat under `skills/<name>/`
-- `meta.json.files` matches the checked-in file inventory
+- generated file inventories match the checked-in file inventory
 - local markdown links resolve
 - `registry.json` matches generated output
 
