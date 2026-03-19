@@ -25,16 +25,16 @@ function readJsonFile(filePath) {
 }
 
 function listEvalCandidates() {
-  const suitesDirectoryPath = path.join(REPO_ROOT, "evals", "suites");
-  if (!fs.existsSync(suitesDirectoryPath)) {
+  const skillsDirectoryPath = path.join(REPO_ROOT, "skills");
+  if (!fs.existsSync(skillsDirectoryPath)) {
     return [];
   }
 
-  return fs.readdirSync(suitesDirectoryPath, { withFileTypes: true })
+  return fs.readdirSync(skillsDirectoryPath, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => {
       const skillName = entry.name;
-      const suiteFilePath = path.join(suitesDirectoryPath, skillName, "suite.json");
+      const suiteFilePath = path.join(skillsDirectoryPath, skillName, "evals", "suite.json");
       if (!fs.existsSync(suiteFilePath)) {
         return null;
       }

@@ -3,8 +3,6 @@ import path from "node:path";
 
 import { VasirCliError } from "../install/cli-error.js";
 import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
-import { readGlobalRegistry } from "../install/global-catalog.js";
-import { buildProjectPaths } from "../install/path-layout.js";
 
 function readSuiteFile(suiteFilePath) {
   try {
@@ -40,60 +38,53 @@ function validateSuiteDefinition(suiteDefinition, suiteFilePath) {
   }
 }
 
-function tryResolveLocalSuite({ projectRootDirectory, skillName }) {
-  const suiteFilePath = path.join(projectRootDirectory, "evals", "suites", skillName, "suite.json");
-  if (!fs.existsSync(suiteFilePath)) {
-    return null;
+function buildLegacySuiteFilePath(skillSource) {
+  if (skillSource.sourceType === "global-catalog") {
+    return skillSource.globalCatalogDirectory
+      ? path.join(skillSource.globalCatalogDirectory, "evals", "suites", skillSource.skillName, "suite.json")
+      : null;
   }
 
-  const suiteDefinition = readSuiteFile(suiteFilePath);
-  validateSuiteDefinition(suiteDefinition, suiteFilePath);
-  return {
-    sourceType: "repo-source",
-    suiteFilePath,
-    suiteDefinition
-  };
+  return path.join(
+    skillSource.projectPaths.projectRootDirectory,
+    "evals",
+    "suites",
+    skillSource.skillName,
+    "suite.json"
+  );
 }
 
-export function resolveSuiteSource({
-  skillName,
-  currentWorkingDirectory,
-  homeDirectory,
-  repositoryUrl,
-  platform,
-  spawnSyncImplementation,
-  globalCatalogDirectory = null
-}) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
-  const localSuite = tryResolveLocalSuite({
-    projectRootDirectory: projectPaths.projectRootDirectory,
-    skillName
+function buildSuiteCandidatePaths(skillSource) {
+  const candidatePaths = [
+    path.join(skillSource.skillDirectoryPath, "evals", "suite.json")
+  ];
+  const legacySuiteFilePath = buildLegacySuiteFilePath(skillSource);
+  if (legacySuiteFilePath && !candidatePaths.includes(legacySuiteFilePath)) {
+    candidatePaths.push(legacySuiteFilePath);
+  }
+  return candidatePaths;
+}
+
+export function resolveSuiteSource({ skillSource }) {
+  for (const suiteFilePath of buildSuiteCandidatePaths(skillSource)) {
+    if (!fs.existsSync(suiteFilePath)) {
+      continue;
+    }
+
+    const suiteDefinition = readSuiteFile(suiteFilePath);
+    validateSuiteDefinition(suiteDefinition, suiteFilePath);
+    return {
+      sourceType: skillSource.sourceType,
+      suiteFilePath,
+      suiteDefinition
+    };
+  }
+
+  throw new VasirCliError({
+    code: "EVAL_SUITE_NOT_FOUND",
+    message: `No built-in eval suite was found for ${skillSource.skillName}.`,
+    suggestion:
+      "Add `skills/<skill>/evals/suite.json` to the skill directory or choose a skill that already owns a built-in eval suite.",
+    docsRef: EVAL_REFERENCE_DOCS_REF
   });
-  if (localSuite) {
-    return localSuite;
-  }
-
-  const resolvedGlobalCatalogDirectory = globalCatalogDirectory ?? readGlobalRegistry({
-    homeDirectory,
-    repositoryUrl,
-    platform,
-    spawnSyncImplementation
-  }).globalPaths.globalCatalogDirectory;
-  const suiteFilePath = path.join(resolvedGlobalCatalogDirectory, "evals", "suites", skillName, "suite.json");
-  if (!fs.existsSync(suiteFilePath)) {
-    throw new VasirCliError({
-      code: "EVAL_SUITE_NOT_FOUND",
-      message: `No built-in eval suite was found for ${skillName}.`,
-      suggestion: "Add `evals/suites/<skill>/suite.json` in the repo or choose a skill that already has a built-in eval suite.",
-      docsRef: EVAL_REFERENCE_DOCS_REF
-    });
-  }
-
-  const suiteDefinition = readSuiteFile(suiteFilePath);
-  validateSuiteDefinition(suiteDefinition, suiteFilePath);
-  return {
-    sourceType: "global-catalog",
-    suiteFilePath,
-    suiteDefinition
-  };
 }

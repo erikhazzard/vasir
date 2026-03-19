@@ -149,3 +149,4 @@ You now have a checked-in skill that appears in the registry and passes the repo
 
 - Use [docs/writing-skills.md](./writing-skills.md) for the authoring workflow.
 - Use [docs/skill-reference.md](./skill-reference.md) when you need field-level facts.
+- If you want `vasir eval run <skill>` to work for this skill, add `skills/<name>/evals/suite.json` plus a short `skills/<name>/evals/README.md` that explains the failure mode and win condition.

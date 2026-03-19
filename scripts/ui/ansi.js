@@ -35,6 +35,10 @@ export const ansi = Object.freeze({
   dim:       '\u001b[2m',
   italic:    '\u001b[3m',
   underline: '\u001b[4m',
+  clearLine: '\u001b[2K',
+  hideCursor:'\u001b[?25l',
+  showCursor:'\u001b[?25h',
+  carriageReturn: '\r',
   fg256:     (colorIndex) => `\u001b[38;5;${colorIndex}m`,
   bg256:     (colorIndex) => `\u001b[48;5;${colorIndex}m`,
 });

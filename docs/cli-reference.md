@@ -102,11 +102,15 @@ What it does:
   - `skills/<skill>/...` when you are editing the source skill in a repo like Vasir
   - `.agents/skills/<skill>/...` when you are evaluating an installed project-local skill
   - falls back to the global catalog copy if neither local path exists
-- Loads the built-in suite for that skill.
+- Loads the built-in suite that lives beside that resolved skill source:
+  - `skills/<skill>/evals/suite.json`
+  - `.agents/skills/<skill>/evals/suite.json`
+  - the matching global catalog skill directory when falling back globally
 - Runs the same case set twice for every configured model:
   - baseline: no skill
   - treatment: with the skill
 - Launches the planned model/case/condition rows in parallel and streams completion progress.
+- On TTYs, renders a live animated spinner/progress row while the batch is in flight.
 - Scores the outputs with built-in hard checks.
 - Stores local run history under `.agents/vasir-evals/<skill>/...`.
 - Prints a scoreboard that answers:

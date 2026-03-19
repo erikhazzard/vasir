@@ -28,7 +28,10 @@ function readSkillMetadata(skillDirectoryPath) {
 
 function buildSkillPromptFiles({ skillDirectoryPath, skillMetadata }) {
   const managedMarkdownFiles = (skillMetadata.files ?? [])
-    .filter((relativeFilePath) => relativeFilePath.endsWith(".md"))
+    .filter(
+      (relativeFilePath) =>
+        relativeFilePath.endsWith(".md") && !relativeFilePath.startsWith("evals/")
+    )
     .sort((leftPath, rightPath) => {
       if (leftPath === "SKILL.md") return -1;
       if (rightPath === "SKILL.md") return 1;

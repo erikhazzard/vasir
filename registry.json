@@ -269,7 +269,9 @@
         "integration"
       ],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
       ],
       "path": "skills/react",
       "entry": "SKILL.md"
@@ -355,7 +357,9 @@
         "deterministic-kernel"
       ],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
       ],
       "path": "skills/deterministic",
       "entry": "SKILL.md"
@@ -377,7 +381,9 @@
         "devops"
       ],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
       ],
       "path": "skills/integration",
       "entry": "SKILL.md"

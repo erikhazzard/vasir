@@ -296,22 +296,29 @@ eval/
   providers/
   scorers/
   reporting/
-evals/
-  suites/
-    react-core/
+skills/
+  react/
+    SKILL.md
+    meta.json
+    evals/
+      README.md
       suite.json
-      cases/
-        user-panel-fetch/
-          task.md
-          fixture/...
-          scorer.json
+  deterministic/
+    SKILL.md
+    meta.json
+    evals/
+      README.md
+      suite.json
+evals/
+  packs/                  # optional future shared or cross-skill benchmark packs
   results/               # local artifact root; not intended for git by default
 ```
 
 Rationale:
 
 - `eval/` owns product logic.
-- `evals/` owns versioned benchmark data.
+- Skill-owned eval contracts live beside the skill they measure.
+- Root `evals/` is reserved for optional shared or cross-skill benchmark packs.
 - Local run artifacts stay out of the canonical source tree by default unless explicitly exported.
 
 ### 6.2 Run protocol

@@ -14,6 +14,8 @@ Required files:
 Optional files:
 
 - `references/...`
+- `evals/README.md`
+- `evals/suite.json`
 
 ## `meta.json`
 
@@ -34,6 +36,7 @@ Rules:
 - `files[0]` should normally be `SKILL.md`.
 - `files` must stay in sync with the checked-in file inventory.
 - If you add `references/...`, add those files to `files`.
+- If the skill owns a built-in eval, add the `evals/...` files to `files`.
 
 ## Root `SKILL.md`
 
@@ -54,6 +57,19 @@ Rules:
 - Put invariants near the top.
 - Keep the root small enough to scan quickly.
 - Move variants into `references/` instead of bloating the root manifest.
+
+## Skill-Owned Evals
+
+If a skill ships with a built-in eval, keep that contract inside the skill directory:
+
+- `skills/<name>/evals/suite.json`
+- `skills/<name>/evals/README.md`
+
+Rules:
+
+- `suite.json` is the machine-readable contract for `vasir eval run <skill>`.
+- `README.md` explains the failure mode, win condition, and current limits in plain English.
+- `evals/...` files are copied with the skill, but they are not part of the prompt surface that steers generation.
 
 ## Versioning
 

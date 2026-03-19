@@ -45,7 +45,7 @@ function createEvalFixtureRepository() {
     ].join("\n")
   );
   writeFile(
-    path.join(repositoryDirectory, "evals", "suites", "react", "suite.json"),
+    path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "react-core",
@@ -147,6 +147,74 @@ test("eval run scores baseline vs treatment with --model mock and stores history
   assert.equal(secondRun.previousComparison.previousRunId, firstRun.runId);
 });
 
+test("eval run resolves the suite from a project-local skill copy", async () => {
+  const repositoryDirectory = createTemporaryDirectory();
+
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "meta.json"),
+    `${JSON.stringify(
+      {
+        name: "react",
+        version: "1.0.0",
+        description: "React component boundaries and effect discipline",
+        category: "frontend",
+        tags: ["react"],
+        recommends: [],
+        files: ["SKILL.md", "evals/README.md", "evals/suite.json"]
+      },
+      null,
+      2
+    )}\n`
+  );
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
+    [
+      "# React",
+      "",
+      "Use local state first.",
+      "Use AbortController in async effects."
+    ].join("\n")
+  );
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "README.md"),
+    "# React Eval\n"
+  );
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "suite.json"),
+    `${JSON.stringify(
+      {
+        id: "react-core",
+        cases: [
+          {
+            id: "abortable-user-fetch",
+            task: "Implement a React component named UserPanel that fetches a user whenever userId changes.",
+            requiredSubstrings: ["AbortController"],
+            forbiddenSubstrings: ["useContext("]
+          }
+        ]
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  const capturedOutput = captureCommandWriters();
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "mock"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {},
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 0, capturedOutput.readStderr());
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "eval");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.suiteId, "react-core");
+});
+
 test("eval run prints preparation and per-step progress in text mode", async () => {
   const repositoryDirectory = createEvalFixtureRepository();
   const capturedOutput = captureCommandWriters();
@@ -167,8 +235,86 @@ test("eval run prints preparation and per-step progress in text mode", async () 
   assert.match(capturedOutput.readStdout(), /0\/4/i);
   assert.match(capturedOutput.readStdout(), /4\/4 mock:skill-aware .*treatment/i);
   assert.match(capturedOutput.readStdout(), /Vs No Skill/i);
+  assert.match(capturedOutput.readStdout(), /Why It Moved/i);
   assert.match(capturedOutput.readStdout(), /Vs Previous Version/i);
   assert.match(capturedOutput.readStdout(), /no older skill hash recorded yet/i);
+});
+
+test("eval run explains why treatment regressed against baseline", async () => {
+  const repositoryDirectory = createTemporaryDirectory();
+  writeFile(
+    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    `${JSON.stringify(
+      {
+        name: "deterministic",
+        version: "1.0.0",
+        description: "Replay testing, seeded fixtures, and injected clocks",
+        category: "testing",
+        tags: ["deterministic"],
+        recommends: [],
+        files: ["SKILL.md"]
+      },
+      null,
+      2
+    )}\n`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    ["# Deterministic", "", "Inject clocks.", "Seed rng."].join("\n")
+  );
+  writeFile(
+    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    `${JSON.stringify(
+      {
+        id: "deterministic-core",
+        cases: [
+          {
+            id: "replayable-random-reward",
+            task: "Add a random reward selection step to a replayable gameplay system.",
+            requiredSubstrings: ["seed", "rng", "clock"],
+            forbiddenSubstrings: ["Math.random", "Date.now"]
+          }
+        ]
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  const capturedOutput = captureCommandWriters();
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "deterministic", "--model", "openai"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {
+        OPENAI_API_KEY: "sk-test"
+      },
+      outputStream: { isTTY: false },
+      fetchImplementation: async (_url, requestOptions = {}) => {
+        const requestBody = JSON.parse(requestOptions.body);
+        const promptText = `${requestBody.instructions}\n${requestBody.input}`;
+        const skillApplied = promptText.includes("--- Skill Guidance Start ---");
+
+        return {
+          ok: true,
+          async json() {
+            return {
+              output_text: skillApplied
+                ? "Use a seed-driven rng and injected clock. Avoid Math.random and Date.now."
+                : "Use a seed-driven rng and injected clock.",
+              usage: null
+            };
+          }
+        };
+      },
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 0, capturedOutput.readStderr());
+  assert.match(capturedOutput.readStdout(), /result:\s+WORSE/i);
+  assert.match(capturedOutput.readStdout(), /Why It Moved/i);
+  assert.match(capturedOutput.readStdout(), /introduced forbidden hits: Math\.random, Date\.now/i);
 });
 
 test("eval run compares against the previous recorded skill version when the hash changes", async () => {

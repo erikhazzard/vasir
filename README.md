@@ -36,8 +36,9 @@ Repo-local eval workflow:
 - `npm run eval react mock` for a zero-cost local smoke test
 - `npm run eval` to pick a skill interactively when needed
 - Copy [keys.json.example](./keys.json.example) to `keys.json` to keep OpenAI/Anthropic keys out of the prompt flow
+- Built-in eval contracts now live beside the skill at `skills/<name>/evals/`
 
-The repo-local wrapper prints setup, launches the full eval batch in parallel, streams completions, and ends with a scoreboard for `Vs No Skill` and `Vs Previous Version`.
+The repo-local wrapper prints setup, uses an animated live spinner/progress row on TTYs, launches the full eval batch in parallel, and ends with a scoreboard for `Vs No Skill` and `Vs Previous Version`.
 
 If the command fails, start with [docs/troubleshooting.md](./docs/troubleshooting.md).
 

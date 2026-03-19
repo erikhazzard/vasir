@@ -146,7 +146,7 @@ Recommended path:
 
 1. Start with the intended pit-of-success command: `vasir eval run <skill>`.
 2. Confirm the skill exists locally under `skills/<skill>` or `.agents/skills/<skill>`, or exists in the global catalog.
-3. Confirm the skill has a built-in suite at `evals/suites/<skill>/suite.json`.
+3. Confirm the skill owns a built-in suite at `skills/<skill>/evals/suite.json` or `.agents/skills/<skill>/evals/suite.json`.
 4. Decide whether you want the default live models or an explicit override:
    - default run: `vasir eval run <skill>`
    - zero-cost smoke test: `vasir eval run <skill> --model mock`

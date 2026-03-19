@@ -60,6 +60,23 @@ test("every skill metadata inventory matches checked-in files", () => {
   }
 });
 
+test("built-in eval suites live with their owning skills and include guidelines", () => {
+  const suiteFilePaths = walkFiles(SKILLS_ROOT).filter((filePath) => path.basename(filePath) === "suite.json");
+  assert.ok(suiteFilePaths.length > 0, "expected at least one built-in skill eval suite");
+
+  for (const suiteFilePath of suiteFilePaths) {
+    const relativeSuitePath = path.relative(REPO_ROOT, suiteFilePath).replace(/\\/g, "/");
+    assert.match(
+      relativeSuitePath,
+      /^skills\/[^/]+\/evals\/suite\.json$/,
+      `built-in eval suites must live under skills/<name>/evals: ${relativeSuitePath}`
+    );
+
+    const readmePath = path.join(path.dirname(suiteFilePath), "README.md");
+    assert.ok(fs.existsSync(readmePath), `missing eval guidelines beside ${relativeSuitePath}`);
+  }
+});
+
 test("local markdown links resolve", () => {
   const documentPathsToCheck = [
     "README.md",

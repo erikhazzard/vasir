@@ -1,4 +1,4 @@
-import { ansi } from "./ansi.js";
+import { ansi, stripAnsi } from "./ansi.js";
 import { box } from "./borders.js";
 import { glyph } from "./glyphs.js";
 import { paintOn } from "./paint.js";
@@ -66,8 +66,12 @@ export function createCommandUi({ stream }) {
     return `${colors.dim(glyph.bullet)} ${text}`;
   }
 
-  function formatField(label, value) {
-    return `${colors.dim(`${label}:`)} ${value}`;
+  function formatField(label, value, { labelWidth = 0 } = {}) {
+    const labelText = `${label}:`;
+    const labelPadding = labelWidth > 0
+      ? " ".repeat(Math.max(0, labelWidth - stripAnsi(labelText).length))
+      : "";
+    return `${colors.dim(labelText)}${labelPadding} ${value}`;
   }
 
   function formatPath(pathText) {
