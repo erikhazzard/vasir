@@ -2,7 +2,6 @@ function normalizeText(text) {
   return String(text ?? "").toLowerCase();
 }
 
-export const SCORER_VERSION = 3;
 export const SCORER_VERSION = 4;
 
 function escapeRegExp(text) {

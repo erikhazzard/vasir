@@ -71,37 +71,33 @@ function createFixtureRepository() {
   writeFile(path.join(repositoryDirectory, "templates", "AGENTS.md"), "# Project Agents\n");
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
-    [
-      "---",
-      "name: react",
-      "description: React component boundaries and effect discipline.",
-      "category: frontend",
-      "tags: [react]",
-      "recommends: []",
-      "version: 1.0.0",
-      "---",
-      "",
-      "# React",
-      "",
-      "Use local state first."
-    ].join("\n")
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.0.0
+---
+
+# React
+
+Use local state first.`
   );
   writeFile(
     path.join(repositoryDirectory, "skills", "roguelike", "SKILL.md"),
-    [
-      "---",
-      "name: roguelike",
-      "description: Run structure and procedural dungeon design.",
-      "category: games",
-      "tags: [games]",
-      "recommends: []",
-      "version: 1.0.0",
-      "---",
-      "",
-      "# Roguelike",
-      "",
-      "Build run structure around clear escalation."
-    ].join("\n")
+    `---
+name: roguelike
+description: Run structure and procedural dungeon design.
+category: games
+tags: [games]
+recommends: []
+version: 1.0.0
+---
+
+# Roguelike
+
+Build run structure around clear escalation.`
   );
 
   runGitCommand(repositoryDirectory, ["init"]);

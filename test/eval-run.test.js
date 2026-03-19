@@ -36,13 +36,11 @@ function createEvalFixtureRepository() {
   );
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
-    [
-      "# React",
-      "",
-      "Use local state first.",
-      "Use AbortController in async effects.",
-      "Use startTransition and useDeferredValue for expensive search updates."
-    ].join("\n")
+    `# React
+
+Use local state first.
+Use AbortController in async effects.
+Use startTransition and useDeferredValue for expensive search updates.`
   );
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
@@ -172,12 +170,10 @@ test("eval run resolves the suite from a project-local skill copy", async () => 
   );
   writeFile(
     path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
-    [
-      "# React",
-      "",
-      "Use local state first.",
-      "Use AbortController in async effects."
-    ].join("\n")
+    `# React
+
+Use local state first.
+Use AbortController in async effects.`
   );
   writeFile(
     path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "README.md"),
@@ -318,7 +314,10 @@ test("eval run explains why treatment regressed against baseline", async () => {
   );
   writeFile(
     path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
-    ["# Deterministic", "", "Inject clocks.", "Seed rng."].join("\n")
+    `# Deterministic
+
+Inject clocks.
+Seed rng.`
   );
   writeFile(
     path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
@@ -393,14 +392,12 @@ test("eval run compares against the previous recorded skill version when the has
 
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
-    [
-      "# React",
-      "",
-      "Use local state first.",
-      "Prefer explicit loading and error states.",
-      "Use AbortController in async effects.",
-      "Use startTransition and useDeferredValue for expensive search updates."
-    ].join("\n")
+    `# React
+
+Use local state first.
+Prefer explicit loading and error states.
+Use AbortController in async effects.
+Use startTransition and useDeferredValue for expensive search updates.`
   );
 
   const secondOutput = captureCommandWriters();
@@ -437,14 +434,12 @@ test("eval run refuses to compare previous versions across suite hash changes", 
 
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
-    [
-      "# React",
-      "",
-      "Use local state first.",
-      "Prefer explicit loading and error states.",
-      "Use AbortController in async effects.",
-      "Use startTransition and useDeferredValue for expensive search updates."
-    ].join("\n")
+    `# React
+
+Use local state first.
+Prefer explicit loading and error states.
+Use AbortController in async effects.
+Use startTransition and useDeferredValue for expensive search updates.`
   );
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),

@@ -27,15 +27,13 @@ test("readSkillMetadata infers defaults and description without meta.json", () =
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
-    [
-      "# Example Constraints",
-      "",
-      "Repo-specific constraints that keep generated changes inside the supported architecture.",
-      "",
-      "## Core Principle",
-      "",
-      "- Stay inside the supported boundary."
-    ].join("\n")
+    `# Example Constraints
+
+Repo-specific constraints that keep generated changes inside the supported architecture.
+
+## Core Principle
+
+- Stay inside the supported boundary.`
   );
   writeFile(path.join(skillDirectoryPath, "references", "patterns.md"), "# Patterns\n");
 
@@ -59,15 +57,13 @@ test("readSkillMetadata prefers manifest prose over stale legacy description", (
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
-    [
-      "# Example Constraints",
-      "",
-      "Fresh manifest guidance should drive the catalog description.",
-      "",
-      "## Core Principle",
-      "",
-      "Stay inside the supported boundary."
-    ].join("\n")
+    `# Example Constraints
+
+Fresh manifest guidance should drive the catalog description.
+
+## Core Principle
+
+Stay inside the supported boundary.`
   );
   writeFile(
     path.join(skillDirectoryPath, "meta.json"),
@@ -85,22 +81,20 @@ test("readSkillMetadata prefers SKILL.md frontmatter and keeps file inventory in
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
-    [
-      "---",
-      "name: react",
-      "description: React component boundaries and effect discipline.",
-      "category: frontend",
-      "tags:",
-      "  - react",
-      "  - ui",
-      "recommends: [ui-layout]",
-      "version: 2.1.0",
-      "---",
-      "",
-      "# React",
-      "",
-      "Use local state first."
-    ].join("\n")
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags:
+  - react
+  - ui
+recommends: [ui-layout]
+version: 2.1.0
+---
+
+# React
+
+Use local state first.`
   );
   writeFile(path.join(skillDirectoryPath, "meta.json"), "{\"description\":\"stale\"}\n");
   writeFile(path.join(skillDirectoryPath, "references", "patterns.md"), "# Patterns\n");
@@ -122,16 +116,14 @@ test("resolveSkillSource accepts repo skills that only define manifest metadata"
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
-    [
-      "---",
-      "name: react",
-      "description: React component boundaries and effect discipline.",
-      "---",
-      "",
-      "# React",
-      "",
-      "Use AbortController in async effects."
-    ].join("\n")
+    `---
+name: react
+description: React component boundaries and effect discipline.
+---
+
+# React
+
+Use AbortController in async effects.`
   );
   writeFile(path.join(skillDirectoryPath, "references", "patterns.md"), "# Patterns\n");
   writeFile(path.join(skillDirectoryPath, "evals", "README.md"), "# Eval\n");

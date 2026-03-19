@@ -153,7 +153,9 @@ export function createCommandUi({ stream }) {
   function renderSection({ title, lines }) {
     const normalizedLines = Array.isArray(lines) ? lines : [];
     const renderedTitle = colors.header(title);
-    return `${[renderedTitle, ...normalizedLines].join("\n")}\n`;
+    return normalizedLines.length > 0
+      ? `${renderedTitle}\n${normalizedLines.join("\n")}\n`
+      : `${renderedTitle}\n`;
   }
 
   function formatPrompt(label, hint = "") {
