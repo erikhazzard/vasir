@@ -156,5 +156,6 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
     npmEnvironmentVariables
   );
   assert.equal(evalResult.status, 0, evalResult.stderr);
-  assert.match(evalResult.stdout, /hard score lift/i);
+  assert.match(evalResult.stdout, /Vs No Skill/i);
+  assert.match(evalResult.stdout, /Vs Previous Version/i);
 });

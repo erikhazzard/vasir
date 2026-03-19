@@ -255,7 +255,28 @@ function createInPlaceRenderer(outputStream) {
     return previousLineCount;
   }
 
-  return { render, getLineCount };
+  function clear() {
+    if (previousLineCount === 0) {
+      return;
+    }
+
+    outputStream.write(cursorUp(previousLineCount));
+    for (let lineIndex = 0; lineIndex < previousLineCount; lineIndex++) {
+      outputStream.write(`${carriageReturn}${clearLine}`);
+      if (lineIndex < previousLineCount - 1) {
+        outputStream.write("\n");
+      }
+    }
+
+    if (previousLineCount > 1) {
+      outputStream.write(cursorUp(previousLineCount - 1));
+    }
+
+    outputStream.write(carriageReturn);
+    previousLineCount = 0;
+  }
+
+  return { render, getLineCount, clear };
 }
 
 // ---------------------------------------------------------------------------
@@ -399,6 +420,7 @@ export async function interactiveSelect(options) {
     promptLabel,
     initialCursorIndex = 0,
     maxVisibleItems = DEFAULT_MAX_VISIBLE_ITEMS,
+    clearOnExit = false,
   } = options;
 
   if (!items || items.length === 0) {
@@ -448,6 +470,9 @@ export async function interactiveSelect(options) {
 
   return new Promise((resolve) => {
     function cleanup(result) {
+      if (clearOnExit) {
+        renderer.clear();
+      }
       session.dispose();
       resolve(result);
     }

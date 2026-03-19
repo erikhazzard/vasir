@@ -23,6 +23,18 @@ function listSummaryFilePaths(skillHistoryDirectoryPath) {
   return summaryFilePaths.sort();
 }
 
+function readSummaryFile(summaryFilePath) {
+  return JSON.parse(fs.readFileSync(summaryFilePath, "utf8"));
+}
+
+function listSkillHistorySummaries({ currentWorkingDirectory, skillName }) {
+  const skillHistoryDirectoryPath = path.join(
+    getEvalHistoryRootDirectory({ currentWorkingDirectory }),
+    skillName
+  );
+  return listSummaryFilePaths(skillHistoryDirectoryPath).map(readSummaryFile);
+}
+
 export function getEvalHistoryRootDirectory({ currentWorkingDirectory }) {
   const projectPaths = buildProjectPaths({ currentWorkingDirectory });
   return path.join(projectPaths.agentsDirectory, "vasir-evals");
@@ -40,17 +52,35 @@ export function readPreviousRunSummary({
   currentWorkingDirectory,
   skillName
 }) {
-  const skillHistoryDirectoryPath = path.join(
-    getEvalHistoryRootDirectory({ currentWorkingDirectory }),
+  const summaries = listSkillHistorySummaries({
+    currentWorkingDirectory,
     skillName
-  );
-  const summaryFilePaths = listSummaryFilePaths(skillHistoryDirectoryPath);
-  if (summaryFilePaths.length === 0) {
+  });
+  if (summaries.length === 0) {
     return null;
   }
 
-  const latestSummaryFilePath = summaryFilePaths.at(-1);
-  return JSON.parse(fs.readFileSync(latestSummaryFilePath, "utf8"));
+  return summaries.at(-1);
+}
+
+export function readPreviousVersionSummary({
+  currentWorkingDirectory,
+  skillName,
+  currentSkillHash
+}) {
+  const summaries = listSkillHistorySummaries({
+    currentWorkingDirectory,
+    skillName
+  });
+
+  for (let summaryIndex = summaries.length - 1; summaryIndex >= 0; summaryIndex -= 1) {
+    const summary = summaries[summaryIndex];
+    if (summary?.skillHash && summary.skillHash !== currentSkillHash) {
+      return summary;
+    }
+  }
+
+  return null;
 }
 
 export function writeEvalRunArtifacts({

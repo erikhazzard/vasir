@@ -35,5 +35,8 @@
     "check:registry": "node registry/build.js --check",
     "eval": "node ./scripts/eval.js",
     "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "cli-spinners": "^3.4.0"
   }
 }

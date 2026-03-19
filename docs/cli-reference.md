@@ -106,9 +106,12 @@ What it does:
 - Runs the same case set twice for every configured model:
   - baseline: no skill
   - treatment: with the skill
+- Launches the planned model/case/condition rows in parallel and streams completion progress.
 - Scores the outputs with built-in hard checks.
 - Stores local run history under `.agents/vasir-evals/<skill>/...`.
-- Prints lift versus baseline and, when available, versus the previous recorded run for that skill.
+- Prints a scoreboard that answers:
+  - did this skill beat no skill?
+  - did this skill version beat the previous recorded version of the skill?
 
 Local provider keys:
 
@@ -139,6 +142,12 @@ Examples:
 ```bash
 vasir eval run react
 
+# repo-local wrapper with the same built-in defaults
+npm run eval react
+
+# repo-local zero-cost smoke test without the npm -- delimiter
+npm run eval react mock
+
 # only OpenAI gpt-5.4
 vasir eval run react --model openai
 
@@ -152,8 +161,11 @@ vasir eval run react --model openai:gpt-5.4 --model anthropic:claude-opus-4-6
 Notes:
 
 - The current M1 implementation uses built-in hard scorers, not blind pairwise judging yet.
+- `Vs No Skill` is the main result: it compares baseline task-only outputs against treatment outputs with the skill applied.
+- `Vs Previous Version` compares against the latest recorded run with a different skill hash when the suite and model set are comparable.
 - If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip that provider.
 - In non-interactive environments, missing live-provider credentials cause those providers to be skipped. If nothing runnable remains, the command fails cleanly and points you to `--model mock`.
+- `npm run eval` prints setup, launches the batch in parallel, streams completions, and accepts positional model shorthands like `npm run eval react mock` or `npm run eval react openai`.
 - Eval artifacts are tool-owned local files and are ignored by this repo via `.agents/vasir-evals/`.
 
 ## Version

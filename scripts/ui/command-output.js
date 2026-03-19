@@ -52,6 +52,8 @@ function createPalette(stream) {
 export function createCommandUi({ stream }) {
   const colors = createPalette(stream);
   const frameOutput = Boolean(stream?.isTTY);
+  const meterFilledGlyph = "█";
+  const meterEmptyGlyph = "░";
 
   function formatStatusLine({ kind = "info", text, detail = "" }) {
     const meta = STATUS_META[kind] ?? STATUS_META.info;
@@ -72,6 +74,10 @@ export function createCommandUi({ stream }) {
     return colors.muted(pathText);
   }
 
+  function formatPercent(value) {
+    return `${(Number(value ?? 0) * 100).toFixed(1)}%`;
+  }
+
   function formatLift(value, suffix = " pts") {
     const percentagePoints = `${value >= 0 ? "+" : ""}${(value * 100).toFixed(1)}${suffix}`;
     if (value > 0) {
@@ -81,6 +87,38 @@ export function createCommandUi({ stream }) {
       return colors.error(percentagePoints);
     }
     return colors.dim(percentagePoints);
+  }
+
+  function formatMeter({ value, total = 1, width = 12 }) {
+    const safeTotal = total > 0 ? total : 1;
+    const normalizedValue = Math.max(0, Math.min(1, Number(value ?? 0) / safeTotal));
+    const filledWidth = Math.round(normalizedValue * width);
+    const filledSegment = meterFilledGlyph.repeat(filledWidth);
+    const emptySegment = meterEmptyGlyph.repeat(Math.max(0, width - filledWidth));
+    return `${colors.frost(filledSegment)}${colors.dim(emptySegment)}`;
+  }
+
+  function formatProgress({ current, total, width = 12 }) {
+    return `${formatMeter({ value: current, total, width })} ${current}/${total}`;
+  }
+
+  function formatOutcome(outcome) {
+    if (outcome === "better") {
+      return colors.ok("BETTER");
+    }
+    if (outcome === "worse") {
+      return colors.error("WORSE");
+    }
+    if (outcome === "mixed") {
+      return colors.warn("MIXED");
+    }
+    if (outcome === "no_prior") {
+      return colors.dim("NO PRIOR VERSION");
+    }
+    if (outcome === "not_comparable") {
+      return colors.warn("NOT COMPARABLE");
+    }
+    return colors.dim("NO CHANGE");
   }
 
   function renderPanel({ title, lines, minWidth = 54, maxWidth = 96 }) {
@@ -120,7 +158,11 @@ export function createCommandUi({ stream }) {
     formatBullet,
     formatField,
     formatPath,
+    formatPercent,
     formatLift,
+    formatMeter,
+    formatProgress,
+    formatOutcome,
     formatPrompt,
     renderPanel,
     renderSection

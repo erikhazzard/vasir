@@ -27,7 +27,7 @@ function runCommand(commandName, argumentList, currentWorkingDirectory, environm
 test("npm run eval accepts a positional skill name without requiring --", () => {
   const commandResult = runCommand(
     "npm",
-    ["run", "eval", "react", "--model", "mock"],
+    ["run", "eval", "react", "mock"],
     REPO_ROOT,
     {
       NO_COLOR: "1"
@@ -35,21 +35,26 @@ test("npm run eval accepts a positional skill name without requiring --", () => 
   );
 
   assert.equal(commandResult.status, 0, commandResult.stderr);
-  assert.match(commandResult.stdout, /hard score lift/i);
+  assert.match(commandResult.stdout, /Starting Eval react/i);
+  assert.match(commandResult.stdout, /Preparing Eval react/i);
+  assert.match(commandResult.stdout, /0\/4/i);
+  assert.match(commandResult.stdout, /4\/4 mock:skill-aware .*treatment/i);
+  assert.match(commandResult.stdout, /Vs No Skill/i);
+  assert.match(commandResult.stdout, /Vs Previous Version/i);
 });
 
-test("npm run eval infers the skill from INIT_CWD when invoked inside a skill directory", () => {
+test("npm run eval infers the skill from INIT_CWD and accepts a positional model selector", () => {
   const commandResult = runCommand(
     "npm",
-    ["run", "eval"],
+    ["run", "eval", "mock"],
     path.join(REPO_ROOT, "skills", "react"),
     {
-      NO_COLOR: "1",
-      VASIR_EVAL_MODELS: "mock:skill-aware"
+      NO_COLOR: "1"
     }
   );
 
   assert.equal(commandResult.status, 0, commandResult.stderr);
+  assert.match(commandResult.stdout, /Starting Eval react/i);
   assert.match(commandResult.stdout, /Eval react/);
-  assert.match(commandResult.stdout, /hard score lift/i);
+  assert.match(commandResult.stdout, /Vs No Skill/i);
 });
