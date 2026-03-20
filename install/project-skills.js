@@ -200,3 +200,27 @@ export function removeSkillsFromProject({
     missingSkillNames
   };
 }
+
+export function listInstalledProjectSkills({
+  currentWorkingDirectory = process.cwd()
+}) {
+  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  readProjectInstallState({ projectPaths });
+
+  if (!fs.existsSync(projectPaths.projectSkillsDirectory)) {
+    return {
+      projectPaths,
+      skillNames: []
+    };
+  }
+
+  const skillNames = fs.readdirSync(projectPaths.projectSkillsDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((leftSkillName, rightSkillName) => leftSkillName.localeCompare(rightSkillName));
+
+  return {
+    projectPaths,
+    skillNames
+  };
+}

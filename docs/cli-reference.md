@@ -101,6 +101,7 @@ Text-mode success output also prints the resolved project skills directory so yo
 - Notes:
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.
+  - If you omit skill names in an interactive terminal, Vasir opens a multi-select prompt over the installed project-local skills.
   - Removing a missing skill is a clean no-op and is reported back in the command result.
   - `AGENTS.md` is not edited automatically; remove or update any routing to the deleted skill yourself.
 
@@ -109,6 +110,7 @@ Examples:
 ```bash
 vasir remove react
 vasir remove react roguelike
+vasir remove
 ```
 
 ## Eval

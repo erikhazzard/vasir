@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import childProcess from "node:child_process";
+import { EventEmitter } from "node:events";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -128,6 +129,35 @@ function captureCommandWriters() {
     },
     readStderr() {
       return standardError.join("");
+    }
+  };
+}
+
+function createFakeTtyInputStream() {
+  return new (class extends EventEmitter {
+    constructor() {
+      super();
+      this.isTTY = true;
+      this.isRaw = false;
+    }
+
+    setRawMode(nextRawMode) {
+      this.isRaw = nextRawMode;
+    }
+  })();
+}
+
+function createFakeTtyOutputStream() {
+  const writes = [];
+
+  return {
+    isTTY: true,
+    columns: 100,
+    write(chunk) {
+      writes.push(chunk);
+    },
+    readOutput() {
+      return writes.join("");
     }
   };
 }
@@ -316,6 +346,47 @@ test("remove reports already-absent skills and prunes stale install-state entrie
     fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
   );
   assert.deepEqual(installState.skills, {});
+});
+
+test("remove prompts interactively when no skill names are provided", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const inputStream = createFakeTtyInputStream();
+  const outputStream = createFakeTtyOutputStream();
+  const stderrOutput = [];
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+
+  const removePromise = runCommandLine(["node", "vasir", "remove"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    inputStream,
+    outputStream,
+    stdoutWriter: (message) => outputStream.write(message),
+    stderrWriter: (message) => stderrOutput.push(message)
+  });
+
+  setTimeout(() => {
+    inputStream.emit("keypress", " ", { name: "space" });
+    inputStream.emit("keypress", "\r", { name: "return" });
+  }, 0);
+
+  const removeStatusCode = await removePromise;
+  assert.equal(removeStatusCode, 0, stderrOutput.join(""));
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react")));
+  assert.match(outputStream.readOutput(), /Choose skills to remove/i);
+  assert.match(outputStream.readOutput(), /Removed react/i);
 });
 
 test("add --replace refuses to overwrite a manual untracked project skill", async () => {

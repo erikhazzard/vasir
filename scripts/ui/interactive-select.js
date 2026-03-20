@@ -469,8 +469,8 @@ export async function interactiveSelect(options) {
     return null;
   }
 
-  const inputStream = stdinDefault;
-  const outputStream = stdoutDefault;
+  const inputStream = options.inputStream ?? stdinDefault;
+  const outputStream = options.outputStream ?? stdoutDefault;
 
   // why: Non-TTY fallback preserves CI/piped-input compatibility.
   if (!inputStream.isTTY || !outputStream.isTTY) {
@@ -596,14 +596,15 @@ export async function interactiveMultiSelect(options) {
     initialCursorIndex = 0,
     maxVisibleItems = DEFAULT_MAX_VISIBLE_ITEMS,
     allowEmpty = false,
+    clearOnExit = false,
   } = options;
 
   if (!items || items.length === 0) {
     return null;
   }
 
-  const inputStream = stdinDefault;
-  const outputStream = stdoutDefault;
+  const inputStream = options.inputStream ?? stdinDefault;
+  const outputStream = options.outputStream ?? stdoutDefault;
 
   // why: Non-TTY fallback preserves CI/piped-input compatibility.
   if (!inputStream.isTTY || !outputStream.isTTY) {
@@ -699,6 +700,9 @@ export async function interactiveMultiSelect(options) {
 
   return new Promise((resolve) => {
     function cleanup(result) {
+      if (clearOnExit) {
+        renderer.clear();
+      }
       session.dispose();
       resolve(result);
     }

@@ -16,12 +16,17 @@ import {
 } from "./docs-ref.js";
 import { readPackageMetadata } from "./package-metadata.js";
 import { readGlobalRegistry, synchronizeGlobalCatalog } from "./global-catalog.js";
-import { installSkillsIntoProject, removeSkillsFromProject } from "./project-skills.js";
+import {
+  installSkillsIntoProject,
+  listInstalledProjectSkills,
+  removeSkillsFromProject
+} from "./project-skills.js";
 import { canPromptInteractively, promptForMissingProviderCredential } from "../eval/interactive.js";
 import { inspectSkillEval } from "../eval/inspect-skill-eval.js";
 import { rescoreSkillEval } from "../eval/rescore-skill-eval.js";
 import { runSkillEval } from "../eval/run-skill-eval.js";
 import { createCommandUi } from "../scripts/ui/command-output.js";
+import { interactiveMultiSelect } from "../scripts/ui/interactive-select.js";
 
 function writeLine(outputWriter, message) {
   outputWriter(`${message}\n`);
@@ -358,14 +363,47 @@ function runAdd({
   };
 }
 
-function runRemove({
+async function runRemove({
   skillNames,
   currentWorkingDirectory,
+  inputStream,
   outputStream,
   stdoutWriter,
   jsonOutput
 }) {
-  if (skillNames.length === 0) {
+  let resolvedSkillNames = [...skillNames];
+
+  if (resolvedSkillNames.length === 0 && !jsonOutput && canPromptInteractively({ inputStream, outputStream })) {
+    const installedSkills = listInstalledProjectSkills({
+      currentWorkingDirectory
+    });
+
+    if (installedSkills.skillNames.length === 0) {
+      throw new VasirCliError({
+        code: "SKILL_NAME_REQUIRED",
+        message: "No project-local skills are installed in this repo.",
+        suggestion: "Run `vasir add <skill>` first, or rerun `vasir remove <skill>` with an explicit skill name.",
+        docsRef: REMOVE_REFERENCE_DOCS_REF
+      });
+    }
+
+    const selection = await interactiveMultiSelect({
+      title: "Choose skills to remove",
+      promptLabel: "Skills",
+      allowEmpty: false,
+      clearOnExit: true,
+      inputStream,
+      outputStream,
+      items: installedSkills.skillNames.map((installedSkillName) => ({
+        value: installedSkillName,
+        label: installedSkillName
+      }))
+    });
+
+    resolvedSkillNames = selection?.values ?? [];
+  }
+
+  if (resolvedSkillNames.length === 0) {
     throw new VasirCliError({
       code: "SKILL_NAME_REQUIRED",
       message: "At least one skill name is required.",
@@ -375,7 +413,7 @@ function runRemove({
   }
 
   const removeResult = removeSkillsFromProject({
-    skillNames,
+    skillNames: resolvedSkillNames,
     currentWorkingDirectory
   });
 
@@ -420,8 +458,8 @@ function runRemove({
   return {
     projectRootDirectory: removeResult.projectPaths.projectRootDirectory,
     projectSkillsDirectory: removeResult.projectPaths.projectSkillsDirectory,
-    removedSkills: removeResult.removedSkillNames,
-    missingSkills: removeResult.missingSkillNames
+      removedSkills: removeResult.removedSkillNames,
+      missingSkills: removeResult.missingSkillNames
   };
 }
 
@@ -643,9 +681,10 @@ async function runSelectedCommand({
   }
 
   if (commandName === "remove") {
-    return runRemove({
+    return await runRemove({
       skillNames: commandArguments,
       currentWorkingDirectory,
+      inputStream,
       outputStream,
       stdoutWriter,
       jsonOutput
