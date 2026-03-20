@@ -87,6 +87,20 @@ test("built-in eval suites live with their owning skills and include guidelines"
 
     const readmePath = path.join(path.dirname(suiteFilePath), "README.md");
     assert.ok(fs.existsSync(readmePath), `missing eval guidelines beside ${relativeSuitePath}`);
+
+    const suiteDefinition = JSON.parse(fs.readFileSync(suiteFilePath, "utf8"));
+    assert.ok(!Object.hasOwn(suiteDefinition, "mode"), `suite should omit mode: ${relativeSuitePath}`);
+    assert.ok(!Object.hasOwn(suiteDefinition, "judge"), `suite should use judgePrompt, not judge: ${relativeSuitePath}`);
+    assert.ok(!Object.hasOwn(suiteDefinition, "validator"), `suite should not define validator commands: ${relativeSuitePath}`);
+    for (const caseDefinition of suiteDefinition.cases) {
+      const hardCheckCount =
+        (Array.isArray(caseDefinition.requiredSubstrings) ? caseDefinition.requiredSubstrings.length : 0) +
+        (Array.isArray(caseDefinition.forbiddenSubstrings) ? caseDefinition.forbiddenSubstrings.length : 0);
+      assert.ok(
+        hardCheckCount > 0,
+        `suite cases must define at least one hard check: ${relativeSuitePath}#${caseDefinition.id}`
+      );
+    }
   }
 });
 

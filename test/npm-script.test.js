@@ -37,10 +37,11 @@ test("npm run eval accepts a positional skill name without requiring --", () => 
   assert.equal(commandResult.status, 0, commandResult.stderr);
   assert.match(commandResult.stdout, /Starting Eval react/i);
   assert.match(commandResult.stdout, /Preparing Eval react/i);
-  assert.match(commandResult.stdout, /0\/4/i);
-  assert.match(commandResult.stdout, /4\/4 mock:skill-aware .*treatment/i);
-  assert.match(commandResult.stdout, /Vs No Skill/i);
-  assert.match(commandResult.stdout, /Vs Previous Version/i);
+  assert.match(commandResult.stdout, /0\/12/i);
+  assert.match(commandResult.stdout, /12\/12 mock:skill-aware .*trial-3 .*treatment/i);
+  assert.match(commandResult.stdout, /Summary/i);
+  assert.match(commandResult.stdout, /summary via:\s+mock:skill-aware/i);
+  assert.match(commandResult.stdout, /Inspect/i);
 });
 
 test("npm run eval infers the skill from INIT_CWD and accepts a positional model selector", () => {
@@ -56,5 +57,39 @@ test("npm run eval infers the skill from INIT_CWD and accepts a positional model
   assert.equal(commandResult.status, 0, commandResult.stderr);
   assert.match(commandResult.stdout, /Starting Eval react/i);
   assert.match(commandResult.stdout, /Eval react/);
-  assert.match(commandResult.stdout, /Vs No Skill/i);
+  assert.match(commandResult.stdout, /Summary/i);
+});
+
+test("repo eval wrapper makes the eval-ready skill split explicit when no skill is specified", () => {
+  const commandResult = runCommand(
+    "node",
+    ["./scripts/eval.js"],
+    REPO_ROOT,
+    {
+      NO_COLOR: "1"
+    }
+  );
+
+  assert.equal(commandResult.status, 1);
+  assert.match(commandResult.stderr, /Eval-Ready Skills/i);
+  assert.match(commandResult.stderr, /Missing Built-In Evals/i);
+  assert.match(commandResult.stderr, /react/i);
+  assert.match(commandResult.stderr, /combat/i);
+});
+
+test("repo eval wrapper infers a non-eval skill from INIT_CWD before treating a positional model as the target", () => {
+  const commandResult = runCommand(
+    "node",
+    ["./scripts/eval.js", "mock", "--json"],
+    REPO_ROOT,
+    {
+      INIT_CWD: path.join(REPO_ROOT, "skills", "combat"),
+      NO_COLOR: "1"
+    }
+  );
+
+  assert.equal(commandResult.status, 1);
+  const parsedError = JSON.parse(commandResult.stderr);
+  assert.equal(parsedError.code, "EVAL_SUITE_NOT_FOUND");
+  assert.match(parsedError.message, /combat/i);
 });

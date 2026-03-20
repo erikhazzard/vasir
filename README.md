@@ -28,17 +28,25 @@ Verify first success:
 3. That directory contains `react/SKILL.md`.
 4. Open the generated `AGENTS.md` in your repo root, or start from the filled example in [docs/example-agents.md](./docs/example-agents.md).
 
+Remove a project-local skill:
+
+```bash
+vasir remove react
+```
+
 Vasir resolves the project root as the nearest parent containing `.git`. If there is no `.git` ancestor, it uses the current working directory.
 
 Repo-local eval workflow:
 
 - `npm run eval react`
 - `npm run eval react mock` for a zero-cost local smoke test
+- `npm run eval inspect react` to reopen the latest saved run for a skill
+- `npm run eval rescore react` to recompute a saved run with the current scorer
 - `npm run eval` to pick a skill interactively when needed
 - Copy [keys.json.example](./keys.json.example) to `keys.json` to keep OpenAI/Anthropic keys out of the prompt flow
 - Built-in eval contracts now live beside the skill at `skills/<name>/evals/`
 
-The repo-local wrapper prints setup, uses an animated live spinner/progress row on TTYs, runs the batch with bounded concurrency, keeps partial results when a provider row fails, and ends with a scoreboard for `Vs No Skill` and `Vs Previous Version`.
+`vasir eval run <skill>` now defaults to 3 trials per model/case pair, uses bounded concurrency, keeps partial results when a provider row fails, and ends with a scoreboard that names the actual evidence source for the suite. Built-in eval suites use one contract: every case must define a hard-check floor, with optional `judgePrompt` layered on top for the fixed OpenAI + Anthropic judge pass. If the judge layer is unavailable, the run still reports the hard-floor movement, but the top-line verdict fails closed to `NO SIGNAL` unless the hard floor itself regressed. `inspect` and `rescore` operate on the saved artifacts under `.agents/vasir-evals/`, with `run.json` as the combined artifact.
 
 If the command fails, start with [docs/troubleshooting.md](./docs/troubleshooting.md).
 
@@ -46,7 +54,7 @@ If the command fails, start with [docs/troubleshooting.md](./docs/troubleshootin
 
 - Need commands, flags, JSON envelopes, or filesystem facts? See [docs/cli-reference.md](./docs/cli-reference.md).
 - Need recovery steps for an error or failed install? See [docs/troubleshooting.md](./docs/troubleshooting.md).
-- Need to measure whether a skill change actually improved steering? Start with `vasir eval run <skill>`. It defaults to `openai:gpt-5.4` and `anthropic:claude-opus-4-6`, and `--model mock` gives you a zero-cost local smoke test. See [docs/cli-reference.md](./docs/cli-reference.md#eval).
+- Need to measure whether a skill change actually improved steering? Start with `vasir eval run <skill>`. It defaults to `openai:gpt-5.4`, `anthropic:claude-opus-4-6`, and `3` trials per pair, supports optional `judgePrompt` on top of a required hard floor, and still supports `--model mock` for a zero-cost local smoke test. Use `vasir eval inspect <skill>` to inspect the latest saved run or `vasir eval rescore <skill>` after scorer changes. See [docs/cli-reference.md](./docs/cli-reference.md#eval).
 - Want to build your first skill end-to-end? See [docs/create-your-first-skill.md](./docs/create-your-first-skill.md).
 - Need the authoring workflow for new or revised skills? See [docs/writing-skills.md](./docs/writing-skills.md).
 - Need field-level metadata and layout facts? See [docs/skill-reference.md](./docs/skill-reference.md).

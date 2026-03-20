@@ -14,6 +14,22 @@ function createEmptyProjectInstallState() {
   };
 }
 
+function pruneMissingSkillEntries(projectInstallState, projectPaths) {
+  let didPrune = false;
+
+  for (const skillName of Object.keys(projectInstallState.skills)) {
+    const targetSkillDirectory = path.join(projectPaths.projectSkillsDirectory, skillName);
+    if (fs.existsSync(targetSkillDirectory)) {
+      continue;
+    }
+
+    delete projectInstallState.skills[skillName];
+    didPrune = true;
+  }
+
+  return didPrune;
+}
+
 function computeFileSha256(filePath) {
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
@@ -67,6 +83,13 @@ export function readProjectInstallState({ projectPaths }) {
       Array.isArray(parsedInstallState.skills)
     ) {
       throw new Error("Unexpected install state schema.");
+    }
+
+    if (pruneMissingSkillEntries(parsedInstallState, projectPaths)) {
+      writeProjectInstallState({
+        projectPaths,
+        projectInstallState: parsedInstallState
+      });
     }
 
     return parsedInstallState;

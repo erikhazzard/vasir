@@ -24,7 +24,10 @@ vasir --version
 | `update` | `vasir update [--json]` | Fast-forward `~/.agents/vasir`; bootstraps if missing |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
 | `add` | `vasir add <skill> [skill...] [--json] [--replace]` | Copy skills into the current repo root at `.agents/skills` |
-| `eval run` | `vasir eval run <skill> [--json] [--model <name>]` | Run the built-in baseline vs treatment eval for a skill |
+| `remove` | `vasir remove <skill> [skill...] [--json]` | Remove project-local skills from the current repo root |
+| `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>]` | Run the built-in baseline vs treatment eval for a skill |
+| `eval inspect` | `vasir eval inspect <skill> [run-id] [--json]` | Inspect the latest or named saved eval artifact for a skill |
+| `eval rescore` | `vasir eval rescore <skill> [run-id] [--json]` | Recompute a saved eval artifact with the current scorer |
 | `--version` | `vasir --version [--json]` | Print the installed CLI name and version |
 
 ### `init`
@@ -88,6 +91,26 @@ vasir add react netcode
 
 Text-mode success output also prints the resolved project skills directory so you can see exactly where Vasir wrote files.
 
+### `remove`
+
+- Purpose: delete one or more project-local skills from the resolved repo root.
+- Result:
+  - `.agents/skills/<name>` is removed when it exists.
+  - `.agents/vasir-install-state.json` is updated so Vasir stops tracking the removed skill.
+  - `.claude/skills` and `.codex/skills` keep pointing at `.agents/skills`.
+- Notes:
+  - The repo root is the nearest parent containing `.git`.
+  - If no `.git` ancestor exists, the current working directory is used.
+  - Removing a missing skill is a clean no-op and is reported back in the command result.
+  - `AGENTS.md` is not edited automatically; remove or update any routing to the deleted skill yourself.
+
+Examples:
+
+```bash
+vasir remove react
+vasir remove react roguelike
+```
+
 ## Eval
 
 `vasir eval run <skill>` is the one-command developer workflow for measuring whether a skill improved steering.
@@ -109,13 +132,20 @@ What it does:
 - Runs the same case set twice for every configured model:
   - baseline: no skill
   - treatment: with the skill
+- Repeats every model/case baseline-vs-treatment pair 3 times by default so a single lucky sample does not dominate the result.
 - Launches the planned model/case/condition rows with bounded concurrency and streams completion progress.
 - On TTYs, renders a live animated spinner/progress row while the batch is in flight.
-- Scores the outputs with built-in hard checks.
+- Scores every output with built-in hard checks from each case's `requiredSubstrings` and `forbiddenSubstrings`.
+- Every case must define at least one hard check. `judgePrompt` augments that floor; it does not replace it.
+- If the suite defines `judgePrompt`, Vasir also runs the fixed OpenAI + Anthropic pairwise judges on top of that hard-check floor.
 - Stores local run history under `.agents/vasir-evals/<skill>/...`.
-- Prints a scoreboard that answers:
-  - did this skill beat no skill?
-  - did this skill version beat the previous recorded version of the skill?
+- Prints a compact narrative summary first:
+  - overall verdict
+  - a short summary generated from the saved eval facts, using an LLM when available
+  - a few decisive reasons
+  - the next recommended action
+- Points you to `vasir eval inspect <skill> [run-id]` for the full pair-level drill-down.
+- Prints usage totals when the provider reports them.
 - Marks the run `COMPLETE` or `INCOMPLETE` and keeps successful rows even if some provider rows fail.
 
 Local provider keys:
@@ -141,6 +171,7 @@ Override surface:
 - Pass `--model mock` for a zero-cost local smoke test.
 - Pass `--model <provider:model>` for an explicit full descriptor.
 - Repeat `--model` to evaluate multiple explicit models in one run.
+- Pass `--trials <count>` to override the default 3-trial run plan.
 
 Examples:
 
@@ -149,6 +180,12 @@ vasir eval run react
 
 # repo-local wrapper with the same built-in defaults
 npm run eval react
+
+# inspect the latest saved react eval
+vasir eval inspect react
+
+# rescore the latest saved react eval with the current scorer
+vasir eval rescore react
 
 # repo-local zero-cost smoke test without the npm -- delimiter
 npm run eval react mock
@@ -165,14 +202,23 @@ vasir eval run react --model openai:gpt-5.4 --model anthropic:claude-opus-4-6
 
 Notes:
 
-- The current M1 implementation uses built-in hard scorers, not blind pairwise judging yet.
-- `Vs No Skill` is the main result: it compares baseline task-only outputs against treatment outputs with the skill applied.
-- `Vs Previous Version` compares against the latest recorded run with a different skill hash when the suite hash, scorer version, harness version, model set, and run completeness are comparable.
+- The built-in eval path is suite-owned and single-shape:
+  - every suite defines case-level hard checks
+  - a suite may add `judgePrompt` to turn on the fixed OpenAI + Anthropic judge layer
+- If the fixed judges are unavailable, the hard-check section still renders, but the top-line verdict fails closed to `NO SIGNAL` unless the hard floor itself regresses.
+- Older `mode: "command"` and `mode: "judge"` suites are rejected with a migration error. Rewrite them as hard checks plus optional `judgePrompt`.
+- The `run` command now optimizes for a short verdict first; use `inspect` when you want the per-pair evidence.
+- `run` now defaults to 3 trials per model/case pair. Use `--trials 1` if you want the fastest or cheapest possible check.
+- `inspect` reopens a saved run and shows the pair-level swings, the baseline and treatment outputs, and the saved judge reasons when they exist.
+- Historical comparisons still use the latest recorded comparable runs behind the summary.
+- `rescore` rereads the saved outputs and recomputes `hardScore` with the current scorer. This is the fix path after scorer bugs or scorer improvements.
+- Token totals are only available when the provider returns usage. Live OpenAI and Anthropic runs should report them. `--model mock` shows usage as unavailable.
 - If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip that provider.
 - In non-interactive environments, missing live-provider credentials cause those providers to be skipped. If nothing runnable remains, the command fails cleanly and points you to `--model mock`.
 - Live provider rows use a request timeout. If a row times out or a provider call fails, the run stays on disk and the final report is marked incomplete instead of discarding the successful rows.
 - `npm run eval` prints setup, launches the batch in parallel, streams completions, and accepts positional model shorthands like `npm run eval react mock` or `npm run eval react openai`.
 - Eval artifacts are tool-owned local files and are ignored by this repo via `.agents/vasir-evals/`.
+- Every saved run is stored as a single `run.json` artifact.
 
 ## Version
 
@@ -205,7 +251,7 @@ Facts:
 
 ## JSON Output
 
-`--json` is supported by `init`, `update`, `list`, `add`, and `eval run`.
+`--json` is supported by `init`, `update`, `list`, `add`, `remove`, and `eval run`.
 
 Success envelope:
 
@@ -214,6 +260,7 @@ Success envelope:
 - `globalCatalogDirectory` for `init`, `update`, `list`, and `add`
 - `skills` for `list`
 - `projectRootDirectory`, `projectSkillsDirectory`, `installedSkills`, and `replacedSkills` for `add`
+- `projectRootDirectory`, `projectSkillsDirectory`, `removedSkills`, and `missingSkills` for `remove`
 
 `list --json` returns `skills[]` entries with:
 
@@ -265,20 +312,24 @@ Example eval success envelope:
   "suiteId": "react-core",
   "suiteHash": "4d5e6f...",
   "runStatus": "complete",
-  "scorerVersion": 3,
+  "trialCount": 3,
+  "scorerVersion": 4,
   "modelIds": ["mock:skill-aware"],
   "outputDirectory": "/repo/.agents/vasir-evals/react/2026-03-18T12-00-00-000Z__abc123def456",
   "summary": {
     "rowCounts": {
-      "planned": 4,
-      "scored": 4,
+      "planned": 12,
+      "scored": 12,
       "failed": 0
     },
     "global": {
       "averageScoreLift": 0.5,
+      "medianScoreLift": 0.5,
       "passRateLift": 1,
-      "comparablePairCount": 2,
-      "totalPairCount": 2
+      "winRate": 1,
+      "directionConfidence": 0.875,
+      "comparablePairCount": 6,
+      "totalPairCount": 6
     }
   }
 }
@@ -319,6 +370,7 @@ Project-local:
 ```
 
 Project-local skills are copied files that you own and can edit. They are never linked back to the global catalog.
+`.agents/vasir-install-state.json` is Vasir's local snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, and now prunes entries automatically when the matching skill directory is gone.
 
 ## Advanced Override
 

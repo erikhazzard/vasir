@@ -8,7 +8,8 @@ Without the skill, models often:
 
 - use `Math.random()` directly
 - use `Date.now()` or implicit wall-clock time
-- describe replayability without naming the seed or clock boundary
+- reach for `setTimeout()` or sleeps to advance time
+- describe replayability without naming the seed, clock, or scheduling boundary
 
 ## Win Condition
 
@@ -16,12 +17,14 @@ The treatment output should beat baseline by making deterministic control surfac
 
 - seeded RNG
 - injected or controlled clock
+- explicit ticks or deterministic progression instead of sleeps
 - replay-safe language instead of ambient randomness or time
 - deterministic waiting instead of sleep-based guessing
 
 ## Current Cases
 
-- `replayable-random-reward`
+- `crit-loot-drop-replay`
+- `cooldown-toast-without-sleeps`
 - `reproduce-flaky-crit-window`
 
 ## Current Limits

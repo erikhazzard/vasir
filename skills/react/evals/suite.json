@@ -1,6 +1,7 @@
 {
   "id": "react-core",
   "title": "React Skill Core",
+  "judgePrompt": "Prefer the answer that follows the React skill's intent: local state first, explicit loading and error states, disciplined async effects, and urgent vs non-urgent work split correctly. Return tie if both answers are equally compliant or equally weak.",
   "cases": [
     {
       "id": "abortable-user-fetch",

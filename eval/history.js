@@ -1,38 +1,85 @@
 import fs from "node:fs";
 import path from "node:path";
+import process from "node:process";
 
+import { VasirCliError } from "../install/cli-error.js";
+import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
 import { buildProjectPaths } from "../install/path-layout.js";
 
-function listSummaryFilePaths(skillHistoryDirectoryPath) {
+function readJsonFile(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    throw new VasirCliError({
+      code: "EVAL_RUN_INVALID",
+      message: `Eval run artifact is invalid at ${filePath}.`,
+      suggestion: "Repair or delete the broken eval artifact, then rerun the eval.",
+      docsRef: EVAL_TROUBLESHOOTING_DOCS_REF,
+      cause: error
+    });
+  }
+}
+
+function writeJsonFileAtomic(filePath, payload) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  const temporaryFilePath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(temporaryFilePath, `${JSON.stringify(payload, null, 2)}\n`);
+  fs.renameSync(temporaryFilePath, filePath);
+}
+
+function normalizeRunPayload(payload, { runFilePath, skillName }) {
+  if (!payload || typeof payload !== "object") {
+    throw new VasirCliError({
+      code: "EVAL_RUN_INVALID",
+      message: `Eval run artifact is invalid at ${runFilePath}.`,
+      suggestion: "Repair or delete the broken eval artifact, then rerun the eval.",
+      docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
+    });
+  }
+
+  if (typeof payload.runId !== "string" || payload.runId.trim().length === 0) {
+    throw new VasirCliError({
+      code: "EVAL_RUN_INVALID",
+      message: `Eval run artifact is missing runId at ${runFilePath}.`,
+      suggestion: "Repair or delete the broken eval artifact, then rerun the eval.",
+      docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
+    });
+  }
+
+  if (!payload.summary || typeof payload.summary !== "object" || !Array.isArray(payload.rows)) {
+    throw new VasirCliError({
+      code: "EVAL_RUN_INVALID",
+      message: `Eval run artifact is missing summary or rows at ${runFilePath}.`,
+      suggestion: "Repair or delete the broken eval artifact, then rerun the eval.",
+      docsRef: EVAL_TROUBLESHOOTING_DOCS_REF
+    });
+  }
+
+  return {
+    ...payload,
+    skillName: payload.skillName ?? skillName,
+    judgeModels: Array.isArray(payload.judgeModels) ? payload.judgeModels : [],
+    pairs: Array.isArray(payload.pairs) ? payload.pairs : []
+  };
+}
+
+function readRunPayload(runFilePath, { skillName }) {
+  return normalizeRunPayload(readJsonFile(runFilePath), {
+    runFilePath,
+    skillName
+  });
+}
+
+function listRunFilePaths(skillHistoryDirectoryPath) {
   if (!fs.existsSync(skillHistoryDirectoryPath)) {
     return [];
   }
 
-  const summaryFilePaths = [];
-  for (const directoryEntry of fs.readdirSync(skillHistoryDirectoryPath, { withFileTypes: true })) {
-    if (!directoryEntry.isDirectory()) {
-      continue;
-    }
-
-    const summaryFilePath = path.join(skillHistoryDirectoryPath, directoryEntry.name, "summary.json");
-    if (fs.existsSync(summaryFilePath)) {
-      summaryFilePaths.push(summaryFilePath);
-    }
-  }
-
-  return summaryFilePaths.sort();
-}
-
-function readSummaryFile(summaryFilePath) {
-  return JSON.parse(fs.readFileSync(summaryFilePath, "utf8"));
-}
-
-function listSkillHistorySummaries({ currentWorkingDirectory, skillName }) {
-  const skillHistoryDirectoryPath = path.join(
-    getEvalHistoryRootDirectory({ currentWorkingDirectory }),
-    skillName
-  );
-  return listSummaryFilePaths(skillHistoryDirectoryPath).map(readSummaryFile);
+  return fs.readdirSync(skillHistoryDirectoryPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(skillHistoryDirectoryPath, entry.name, "run.json"))
+    .filter((runFilePath) => fs.existsSync(runFilePath))
+    .sort();
 }
 
 export function getEvalHistoryRootDirectory({ currentWorkingDirectory }) {
@@ -48,19 +95,37 @@ export function buildRunDirectoryPath({
   return path.join(getEvalHistoryRootDirectory({ currentWorkingDirectory }), skillName, runId);
 }
 
+export function listSkillHistorySummaries({ currentWorkingDirectory, skillName }) {
+  const skillHistoryDirectoryPath = path.join(
+    getEvalHistoryRootDirectory({ currentWorkingDirectory }),
+    skillName
+  );
+
+  const runs = [];
+  for (const runFilePath of listRunFilePaths(skillHistoryDirectoryPath)) {
+    try {
+      runs.push(readRunPayload(runFilePath, { skillName }));
+    } catch (error) {
+      if (error?.code === "EVAL_RUN_INVALID") {
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  return runs;
+}
+
 export function readPreviousRunSummary({
   currentWorkingDirectory,
   skillName
 }) {
-  const summaries = listSkillHistorySummaries({
+  const runs = listSkillHistorySummaries({
     currentWorkingDirectory,
     skillName
   });
-  if (summaries.length === 0) {
-    return null;
-  }
-
-  return summaries.at(-1);
+  return runs.length === 0 ? null : runs.at(-1);
 }
 
 export function readPreviousVersionSummary({
@@ -68,15 +133,15 @@ export function readPreviousVersionSummary({
   skillName,
   currentSkillHash
 }) {
-  const summaries = listSkillHistorySummaries({
+  const runs = listSkillHistorySummaries({
     currentWorkingDirectory,
     skillName
   });
 
-  for (let summaryIndex = summaries.length - 1; summaryIndex >= 0; summaryIndex -= 1) {
-    const summary = summaries[summaryIndex];
-    if (summary?.skillHash && summary.skillHash !== currentSkillHash) {
-      return summary;
+  for (let runIndex = runs.length - 1; runIndex >= 0; runIndex -= 1) {
+    const run = runs[runIndex];
+    if (run?.skillHash && run.skillHash !== currentSkillHash) {
+      return run;
     }
   }
 
@@ -87,16 +152,71 @@ export function writeEvalRunArtifacts({
   currentWorkingDirectory,
   skillName,
   runId,
-  summaryPayload,
-  rowsPayload
+  runPayload
 }) {
+  const normalizedRunPayload = normalizeRunPayload(runPayload, {
+    runFilePath: path.join(
+      buildRunDirectoryPath({
+        currentWorkingDirectory,
+        skillName,
+        runId: runPayload?.runId ?? runId
+      }),
+      "run.json"
+    ),
+    skillName
+  });
   const runDirectoryPath = buildRunDirectoryPath({
     currentWorkingDirectory,
     skillName,
-    runId
+    runId: normalizedRunPayload.runId
   });
+
   fs.mkdirSync(runDirectoryPath, { recursive: true });
-  fs.writeFileSync(path.join(runDirectoryPath, "summary.json"), `${JSON.stringify(summaryPayload, null, 2)}\n`);
-  fs.writeFileSync(path.join(runDirectoryPath, "rows.json"), `${JSON.stringify(rowsPayload, null, 2)}\n`);
+  writeJsonFileAtomic(path.join(runDirectoryPath, "run.json"), normalizedRunPayload);
+
   return runDirectoryPath;
+}
+
+export function readEvalRunArtifacts({
+  currentWorkingDirectory,
+  skillName,
+  runId = null
+}) {
+  const runs = listSkillHistorySummaries({
+    currentWorkingDirectory,
+    skillName
+  });
+  const resolvedRunId = runId ?? runs.at(-1)?.runId ?? null;
+
+  if (!resolvedRunId) {
+    throw new VasirCliError({
+      code: "EVAL_RUN_NOT_FOUND",
+      message: `No eval runs were found for ${skillName}.`,
+      suggestion: "Run `vasir eval run <skill>` first, then inspect or rescore that recorded run.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  const runDirectoryPath = buildRunDirectoryPath({
+    currentWorkingDirectory,
+    skillName,
+    runId: resolvedRunId
+  });
+  const runFilePath = path.join(runDirectoryPath, "run.json");
+
+  if (!fs.existsSync(runFilePath)) {
+    throw new VasirCliError({
+      code: "EVAL_RUN_NOT_FOUND",
+      message: `Eval run not found for ${skillName}: ${resolvedRunId}`,
+      suggestion:
+        "Use a valid recorded run id under `.agents/vasir-evals/<skill>/`, or rerun the eval to create a fresh artifact.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  return {
+    runDirectoryPath,
+    runFilePath,
+    run: readRunPayload(runFilePath, { skillName })
+  };
 }

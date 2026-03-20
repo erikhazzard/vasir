@@ -44,12 +44,51 @@ const carriageReturn = '\r';
 
 const DEFAULT_MAX_VISIBLE_ITEMS = 16;
 
+function isSelectableItem(item) {
+  return item?.selectable !== false;
+}
+
+function findNextSelectableIndex(items, startIndex, direction) {
+  if (!items.some((item) => isSelectableItem(item))) {
+    return -1;
+  }
+
+  let currentIndex = startIndex;
+  for (let stepCount = 0; stepCount < items.length; stepCount += 1) {
+    currentIndex = (currentIndex + direction + items.length) % items.length;
+    if (isSelectableItem(items[currentIndex])) {
+      return currentIndex;
+    }
+  }
+
+  return -1;
+}
+
+function findFirstSelectableIndex(items, preferredIndex = 0) {
+  if (items.length === 0) {
+    return -1;
+  }
+
+  const clampedIndex = Math.max(0, Math.min(preferredIndex, items.length - 1));
+  if (isSelectableItem(items[clampedIndex])) {
+    return clampedIndex;
+  }
+
+  const forwardIndex = findNextSelectableIndex(items, clampedIndex - 1, 1);
+  if (forwardIndex >= 0) {
+    return forwardIndex;
+  }
+
+  return findNextSelectableIndex(items, clampedIndex + 1, -1);
+}
+
 // ---------------------------------------------------------------------------
 // Rendering helpers
 // ---------------------------------------------------------------------------
 
 function renderSelectableItem(options) {
   const { item, isCursorRow, isSelected, isMultiSelect } = options;
+  const selectable = isSelectableItem(item);
 
   const cursorIndicator = isCursorRow
     ? c.frost(`${glyph.pointer} `)
@@ -61,7 +100,7 @@ function renderSelectableItem(options) {
       ? c.ok(`${glyph.ok} `)
       : c.dim(`${glyph.pending} `);
   } else {
-    selectionIndicator = isCursorRow
+    selectionIndicator = selectable && isCursorRow
       ? c.frost(`${glyph.ok} `)
       : '  ';
   }
@@ -76,7 +115,7 @@ function renderSelectableItem(options) {
     return `${cursorIndicator}${selectionIndicator}${specialLabel}${specialHint}`;
   }
 
-  return `${cursorIndicator}${selectionIndicator}${c.ink(labelText)}${hintText}`;
+  return `${cursorIndicator}${selectionIndicator}${selectable ? c.ink(labelText) : c.dim(labelText)}${hintText}`;
 }
 
 function renderFooterHints(options) {
@@ -140,15 +179,6 @@ function buildSelectLines(options) {
     const item = items[itemIndex];
     const isCursorRow = itemIndex === cursorIndex;
     const isSelected = selectedValues.has(item.value);
-
-    // why: Separator line before the game list when special items are followed by regular items.
-    if (itemIndex > 0 && !item.isSpecial && items[itemIndex - 1]?.isSpecial) {
-      if (itemIndex === scrollOffset) {
-        // don't show separator if it would be at scroll boundary
-      } else {
-        lines.push(c.dim(`  ${glyph.divider.repeat(3)} games ${glyph.divider.repeat(3)}`));
-      }
-    }
 
     lines.push(renderSelectableItem({
       item,
@@ -285,14 +315,19 @@ function createInPlaceRenderer(outputStream) {
 
 async function fallbackSingleSelect(options) {
   const { items, title, promptLabel } = options;
+  const selectableItems = items.filter((item) => isSelectableItem(item));
+
+  if (selectableItems.length === 0) {
+    return null;
+  }
 
   if (title) {
     printLine(`\n  ${title}`);
     printLine('');
   }
 
-  for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
-    const item = items[itemIndex];
+  for (let itemIndex = 0; itemIndex < selectableItems.length; itemIndex++) {
+    const item = selectableItems[itemIndex];
     const indexLabel = c.frost(String(itemIndex + 1).padStart(2, ' '));
     const label = item.label || String(item.value);
     const hint = item.hint ? c.dim(` ${item.hint}`) : '';
@@ -308,21 +343,24 @@ async function fallbackSingleSelect(options) {
       {
         validate: (value) => {
           const parsed = Number.parseInt(value, 10);
-          if (Number.isInteger(parsed) && parsed >= 1 && parsed <= items.length) {
+          if (Number.isInteger(parsed) && parsed >= 1 && parsed <= selectableItems.length) {
             return null;
           }
-          const found = items.find((item) => item.value === value || item.label === value);
+          const found = selectableItems.find((item) => item.value === value || item.label === value);
           if (found) return null;
-          return `Enter 1-${items.length} or a valid value.`;
+          return `Enter 1-${selectableItems.length} or a valid value.`;
         },
       }
     );
 
     const parsed = Number.parseInt(answer, 10);
-    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= items.length) {
-      return { value: items[parsed - 1].value, index: parsed - 1 };
+    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= selectableItems.length) {
+      const selectedItem = selectableItems[parsed - 1];
+      return { value: selectedItem.value, index: items.findIndex((item) => item.value === selectedItem.value) };
     }
-    const foundIndex = items.findIndex((item) => item.value === answer || item.label === answer);
+    const foundIndex = items.findIndex((item) =>
+      isSelectableItem(item) && (item.value === answer || item.label === answer)
+    );
     if (foundIndex >= 0) {
       return { value: items[foundIndex].value, index: foundIndex };
     }
@@ -427,6 +465,10 @@ export async function interactiveSelect(options) {
     return null;
   }
 
+  if (!items.some((item) => isSelectableItem(item))) {
+    return null;
+  }
+
   const inputStream = stdinDefault;
   const outputStream = stdoutDefault;
 
@@ -439,7 +481,7 @@ export async function interactiveSelect(options) {
   const session = createRawKeypressSession(inputStream, outputStream);
   const renderer = createInPlaceRenderer(outputStream);
 
-  let cursorIndex = Math.max(0, Math.min(initialCursorIndex, items.length - 1));
+  let cursorIndex = findFirstSelectableIndex(items, initialCursorIndex);
   let scrollOffset = 0;
   const selectedValues = new Set();
 
@@ -489,6 +531,9 @@ export async function interactiveSelect(options) {
 
       // Confirm
       if (key.name === 'return' || key.name === 'space') {
+        if (!isSelectableItem(items[cursorIndex])) {
+          return;
+        }
         redraw();
         cleanup({ value: items[cursorIndex].value, index: cursorIndex });
         return;
@@ -496,28 +541,28 @@ export async function interactiveSelect(options) {
 
       // Navigate up
       if (key.name === 'up' || key.name === 'k') {
-        cursorIndex = cursorIndex > 0 ? cursorIndex - 1 : items.length - 1;
+        cursorIndex = findNextSelectableIndex(items, cursorIndex, -1);
         redraw();
         return;
       }
 
       // Navigate down
       if (key.name === 'down' || key.name === 'j') {
-        cursorIndex = cursorIndex < items.length - 1 ? cursorIndex + 1 : 0;
+        cursorIndex = findNextSelectableIndex(items, cursorIndex, 1);
         redraw();
         return;
       }
 
       // Home
       if (key.name === 'home') {
-        cursorIndex = 0;
+        cursorIndex = findFirstSelectableIndex(items, 0);
         redraw();
         return;
       }
 
       // End
       if (key.name === 'end') {
-        cursorIndex = items.length - 1;
+        cursorIndex = findFirstSelectableIndex(items, items.length - 1);
         redraw();
         return;
       }

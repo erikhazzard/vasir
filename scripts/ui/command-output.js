@@ -82,6 +82,10 @@ export function createCommandUi({ stream }) {
     return `${(Number(value ?? 0) * 100).toFixed(1)}%`;
   }
 
+  function formatCount(value) {
+    return Number(value ?? 0).toLocaleString("en-US");
+  }
+
   function formatLift(value, suffix = " pts") {
     const percentagePoints = `${value >= 0 ? "+" : ""}${(value * 100).toFixed(1)}${suffix}`;
     if (value > 0) {
@@ -122,8 +126,14 @@ export function createCommandUi({ stream }) {
     if (outcome === "mixed") {
       return colors.warn("MIXED");
     }
+    if (outcome === "inconclusive") {
+      return colors.warn("INCONCLUSIVE");
+    }
     if (outcome === "no_data") {
       return colors.warn("NO DATA");
+    }
+    if (outcome === "no_signal") {
+      return colors.dim("NO SIGNAL");
     }
     if (outcome === "no_prior") {
       return colors.dim("NO PRIOR VERSION");
@@ -174,6 +184,7 @@ export function createCommandUi({ stream }) {
     formatField,
     formatPath,
     formatPercent,
+    formatCount,
     formatLift,
     formatMeter,
     formatProgress,

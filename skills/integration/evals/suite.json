@@ -1,6 +1,7 @@
 {
   "id": "integration-core",
   "title": "Integration Skill Core",
+  "judgePrompt": "Prefer the answer that proves the user-visible journey with a deterministic integration test over unit-test-only or mock-heavy advice. Return tie if both answers are equally compliant or equally weak.",
   "cases": [
     {
       "id": "value-path-purchase-flow",

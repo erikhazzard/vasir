@@ -127,7 +127,10 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   const helpResult = runCommand(binaryPath, ["--help"], packDirectory);
   assert.equal(helpResult.status, 0, helpResult.stderr);
   assert.match(helpResult.stdout, /vasir add <skill> \[skill...\] \[--json\] \[--replace\]/);
-  assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\]/);
+  assert.match(helpResult.stdout, /vasir remove <skill> \[skill...\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
+  assert.match(helpResult.stdout, /vasir eval inspect <skill> \[run-id\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir eval rescore <skill> \[run-id\] \[--json\]/);
   assert.doesNotMatch(helpResult.stdout, /vasir doctor/);
 
   const versionResult = runCommand(binaryPath, ["--version"], packDirectory);
@@ -147,6 +150,11 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
 
+  const removeResult = runCommand(binaryPath, ["remove", "react"], projectDirectory, addEnvironmentVariables);
+  assert.equal(removeResult.status, 0, removeResult.stderr);
+  assert.match(removeResult.stdout, /Removed react/);
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react")));
+
   const evalResult = runCommand(
     binaryPath,
     ["eval", "run", "react", "--model", "mock"],
@@ -154,6 +162,6 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
     npmEnvironmentVariables
   );
   assert.equal(evalResult.status, 0, evalResult.stderr);
-  assert.match(evalResult.stdout, /Vs No Skill/i);
-  assert.match(evalResult.stdout, /Vs Previous Version/i);
+  assert.match(evalResult.stdout, /Summary/i);
+  assert.match(evalResult.stdout, /Inspect/i);
 });

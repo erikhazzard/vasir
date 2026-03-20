@@ -56,7 +56,27 @@ Recommended path:
 
 Verification:
 
-- `vasir add <skill>` succeeds with a listed skill name.
+- `vasir add <skill>` or `vasir remove <skill>` succeeds with a listed or installed skill name.
+
+## Remove and Local State
+
+Use this section when:
+
+- `vasir remove <skill>` did not remove what you expected
+- `.agents/vasir-install-state.json` looks stale after manual edits
+
+Recommended path:
+
+1. Prefer `vasir remove <skill>` over manual deletion when you want to remove a project-local skill.
+2. If you already deleted `.agents/skills/<skill>` manually, rerun `vasir remove <skill>` once to let Vasir report it as already absent and keep the local snapshot clean.
+3. Inspect `.agents/skills/` as the canonical directory. Do not delete from `.claude/skills` or `.codex/skills`; those are aliases.
+4. Update `AGENTS.md` yourself if it still routes to a removed skill.
+
+Verification:
+
+- `.agents/skills/<skill>` is gone.
+- `.claude/skills` and `.codex/skills` still resolve to `.agents/skills`.
+- `.agents/vasir-install-state.json` no longer contains the removed skill entry.
 
 ## Global Catalog Problems
 
@@ -152,18 +172,23 @@ Recommended path:
    - default run: `vasir eval run <skill>`
    - zero-cost smoke test: `vasir eval run <skill> --model mock`
    - explicit live override: `vasir eval run <skill> --model openai` or `--model opus`
+   - faster single-sample run: `vasir eval run <skill> --trials 1`
 5. If using live providers, prefer a repo-local `keys.json` copied from [keys.json.example](../keys.json.example), or confirm the matching provider credentials are set in the environment:
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY`
 6. If the terminal is interactive, rerun without `--json` and let Vasir prompt you to paste or skip a missing provider key.
-7. If the report says `INCOMPLETE`, inspect the `Row Failures` section and the saved `rows.json` under `.agents/vasir-evals/<skill>/...`.
-8. Rerun the eval and inspect the printed results directory under `.agents/vasir-evals/` if a partial run was written.
+7. If the report says `INCOMPLETE`, run `vasir eval inspect <skill> [run-id]` and inspect the saved `run.json` under `.agents/vasir-evals/<skill>/...`.
+8. If the report says `hard checks only`, that means the suite is intentionally rules-only. If the suite defines `judgePrompt` and the fixed judges were unavailable, the hard-check section still renders but the top-line verdict should fail closed to `NO SIGNAL` unless the hard floor regressed. Rerun with both OpenAI and Anthropic credentials available if you need the full suite verdict.
+9. Run `vasir eval inspect <skill>` to reopen the latest saved run and see the exact baseline/treatment outputs and judge reasons that moved the score.
+10. If you changed the scorer logic, run `vasir eval rescore <skill>` before trusting an older saved summary.
+11. If token totals show as unavailable, confirm you are running a live provider. `--model mock` does not report provider usage.
+12. Rerun the eval and inspect the printed results directory under `.agents/vasir-evals/` if a partial run was written.
 
 Verification:
 
 - `vasir eval run <skill>` exits successfully.
 - The command prints a results path under `.agents/vasir-evals/<skill>/...`.
-- That directory contains `summary.json` and `rows.json`.
+- That directory contains `run.json`.
 
 ## Unexpected Errors
 

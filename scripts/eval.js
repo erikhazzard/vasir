@@ -9,6 +9,7 @@ import { createCommandUi } from "./ui/command-output.js";
 import { interactiveSelect } from "./ui/interactive-select.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const KNOWN_EVAL_SUBCOMMANDS = new Set(["run", "inspect", "rescore"]);
 const POSITIONAL_MODEL_ALIASES = new Set([
   "anthropic",
   "claude-opus-4-6",
@@ -25,7 +26,7 @@ function readJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-function listEvalCandidates() {
+function listSkills() {
   const skillsDirectoryPath = path.join(REPO_ROOT, "skills");
   if (!fs.existsSync(skillsDirectoryPath)) {
     return [];
@@ -36,8 +37,23 @@ function listEvalCandidates() {
     .map((entry) => {
       const skillName = entry.name;
       const suiteFilePath = path.join(skillsDirectoryPath, skillName, "evals", "suite.json");
+      const hasEvalSuite = fs.existsSync(suiteFilePath);
+
       if (!fs.existsSync(suiteFilePath)) {
-        return null;
+        let description = "";
+        try {
+          const skillMetadata = readSkillMetadata(path.join(REPO_ROOT, "skills", skillName));
+          description = skillMetadata.description || "";
+        } catch {
+          // Keep the fallback description when the skill manifest or compatibility metadata cannot be parsed.
+        }
+
+        return {
+          name: skillName,
+          suiteId: null,
+          description,
+          hasEvalSuite
+        };
       }
 
       let suiteId = skillName;
@@ -59,10 +75,10 @@ function listEvalCandidates() {
       return {
         name: skillName,
         suiteId,
-        description
+        description,
+        hasEvalSuite
       };
     })
-    .filter(Boolean)
     .sort((leftCandidate, rightCandidate) => leftCandidate.name.localeCompare(rightCandidate.name));
 }
 
@@ -79,9 +95,7 @@ function inferSkillFromInvocationDirectory(candidateNames) {
   const inferredSkillName =
     pathSegments[0] === "skills" && pathSegments[1]
       ? pathSegments[1]
-      : pathSegments[0] === "evals" && pathSegments[1] === "suites" && pathSegments[2]
-        ? pathSegments[2]
-        : null;
+      : null;
 
   return inferredSkillName && candidateNames.has(inferredSkillName) ? inferredSkillName : null;
 }
@@ -90,7 +104,22 @@ function looksLikeModelSelector(argumentText) {
   return argumentText.includes(":") || POSITIONAL_MODEL_ALIASES.has(argumentText.toLowerCase());
 }
 
-function parseWrapperArguments(rawArguments, { candidateNames, inferredSkillName }) {
+function splitSubcommand(rawArguments) {
+  const firstArgument = rawArguments[0] ?? null;
+  if (firstArgument && KNOWN_EVAL_SUBCOMMANDS.has(firstArgument)) {
+    return {
+      subcommand: firstArgument,
+      commandArguments: rawArguments.slice(1)
+    };
+  }
+
+  return {
+    subcommand: "run",
+    commandArguments: rawArguments
+  };
+}
+
+function parseWrapperArguments(rawArguments, { candidateNames, inferredSkillName, subcommand }) {
   const passthroughArguments = [];
   const positionalArguments = [];
   const explicitModelSelectors = [];
@@ -115,6 +144,16 @@ function parseWrapperArguments(rawArguments, { candidateNames, inferredSkillName
       continue;
     }
 
+    if (rawArgument === "--trials") {
+      const trialCountArgument = rawArguments[argumentIndex + 1];
+      passthroughArguments.push(rawArgument);
+      if (trialCountArgument) {
+        passthroughArguments.push(trialCountArgument);
+        argumentIndex += 1;
+      }
+      continue;
+    }
+
     if (rawArgument.startsWith("--")) {
       passthroughArguments.push(rawArgument);
       continue;
@@ -125,6 +164,28 @@ function parseWrapperArguments(rawArguments, { candidateNames, inferredSkillName
 
   let explicitSkillName = null;
   let positionalModelSelectors = [];
+
+  if (subcommand !== "run") {
+    if (positionalArguments.length > 0) {
+      const firstPositionalArgument = positionalArguments[0];
+      if (candidateNames.has(firstPositionalArgument)) {
+        explicitSkillName = firstPositionalArgument;
+        passthroughArguments.push(...positionalArguments.slice(1));
+      } else if (inferredSkillName) {
+        passthroughArguments.push(...positionalArguments);
+      } else {
+        explicitSkillName = firstPositionalArgument;
+        passthroughArguments.push(...positionalArguments.slice(1));
+      }
+    }
+
+    return {
+      explicitSkillName,
+      forwardedArguments: passthroughArguments,
+      jsonOutput,
+      modelSelectors: explicitModelSelectors
+    };
+  }
 
   if (positionalArguments.length > 0) {
     const firstPositionalArgument = positionalArguments[0];
@@ -168,15 +229,43 @@ async function resolveSkillName(explicitSkillName, candidates) {
   }
 
   if (process.stdin.isTTY && process.stdout.isTTY) {
+    const evalReadySkills = candidates.filter((candidate) => candidate.hasEvalSuite);
+    const missingEvalSkills = candidates.filter((candidate) => !candidate.hasEvalSuite);
     const selection = await interactiveSelect({
       title: "Choose a skill to evaluate",
       promptLabel: "Skill",
       clearOnExit: true,
-      items: candidates.map((candidate) => ({
-        value: candidate.name,
-        label: candidate.name,
-        hint: candidate.description || candidate.suiteId
-      }))
+      items: [
+        {
+          value: "__eval_enabled__",
+          label: "Eval Enabled",
+          hint: `${evalReadySkills.length}/${candidates.length}`,
+          isSpecial: true,
+          selectable: false
+        },
+        ...evalReadySkills.map((candidate) => ({
+          value: candidate.name,
+          label: candidate.name,
+          hint: candidate.description || candidate.suiteId
+        })),
+        ...(missingEvalSkills.length > 0
+          ? [
+            {
+              value: "__missing_evals__",
+              label: "Not Yet Enabled",
+              hint: `${missingEvalSkills.length}/${candidates.length}`,
+              isSpecial: true,
+              selectable: false
+            },
+            ...missingEvalSkills.map((candidate) => ({
+              value: candidate.name,
+              label: candidate.name,
+              hint: candidate.description || "no built-in eval suite yet",
+              selectable: false
+            }))
+          ]
+          : [])
+      ]
     });
     return selection?.value ?? null;
   }
@@ -184,11 +273,20 @@ async function resolveSkillName(explicitSkillName, candidates) {
   return null;
 }
 
-function renderMissingSkillHelp(candidates) {
-  const ui = createCommandUi({ stream: process.stderr });
-  const previewCandidates = candidates.slice(0, 6).map((candidate) =>
-    ui.formatBullet(`${candidate.name} ${candidate.description || candidate.suiteId}`.trim())
+function renderSkillPreview(ui, skills) {
+  return skills.map((skill) =>
+    ui.formatBullet(
+      skill.hasEvalSuite
+        ? `${skill.name} ${skill.description || skill.suiteId}`.trim()
+        : `${skill.name} ${skill.description || "no built-in eval suite yet"}`.trim()
+    )
   );
+}
+
+function renderMissingSkillHelp(skills) {
+  const ui = createCommandUi({ stream: process.stderr });
+  const evalReadySkills = skills.filter((skill) => skill.hasEvalSuite);
+  const missingEvalSkills = skills.filter((skill) => !skill.hasEvalSuite);
   const lines = [
     ui.formatStatusLine({
       kind: "warn",
@@ -198,10 +296,19 @@ function renderMissingSkillHelp(candidates) {
     ui.formatBullet("Run `npm run eval react mock` for a zero-cost local smoke test.")
   ];
 
-  if (previewCandidates.length > 0) {
+  if (skills.length > 0) {
     lines.push("");
-    lines.push(ui.colors.header("Available skills"));
-    lines.push(...previewCandidates);
+    lines.push(ui.colors.header(`Eval-Ready Skills (${evalReadySkills.length}/${skills.length})`));
+    lines.push(...renderSkillPreview(ui, evalReadySkills.slice(0, 8)));
+
+    if (missingEvalSkills.length > 0) {
+      lines.push("");
+      lines.push(ui.colors.header(`Missing Built-In Evals (${missingEvalSkills.length}/${skills.length})`));
+      lines.push(...renderSkillPreview(ui, missingEvalSkills.slice(0, 8)));
+      if (missingEvalSkills.length > 8) {
+        lines.push(ui.formatBullet(`+${missingEvalSkills.length - 8} more without built-in eval suites`));
+      }
+    }
   }
 
   return ui.renderPanel({
@@ -233,22 +340,24 @@ function renderEvalStart({ skillName, modelSelectors }) {
 }
 
 async function main() {
-  const rawArguments = process.argv.slice(2);
-  const candidates = listEvalCandidates();
-  const candidateNames = new Set(candidates.map((candidate) => candidate.name));
-  const inferredSkillName = inferSkillFromInvocationDirectory(candidateNames);
-  const parsedArguments = parseWrapperArguments(rawArguments, {
-    candidateNames,
-    inferredSkillName
+  const { subcommand, commandArguments } = splitSubcommand(process.argv.slice(2));
+  const skills = listSkills();
+  const skillNames = new Set(skills.map((skill) => skill.name));
+  const inferredSkillName = inferSkillFromInvocationDirectory(skillNames);
+  const parsedArguments = parseWrapperArguments(commandArguments, {
+    candidateNames: skillNames,
+    inferredSkillName,
+    subcommand
   });
-  const resolvedSkillName = await resolveSkillName(parsedArguments.explicitSkillName, candidates);
+  const resolvedSkillName = await resolveSkillName(parsedArguments.explicitSkillName, skills);
+  const resolvedSkill = skills.find((skill) => skill.name === resolvedSkillName) ?? null;
 
   if (!resolvedSkillName) {
-    process.stderr.write(renderMissingSkillHelp(candidates));
+    process.stderr.write(renderMissingSkillHelp(skills));
     return 1;
   }
 
-  if (!parsedArguments.jsonOutput) {
+  if (subcommand === "run" && !parsedArguments.jsonOutput && resolvedSkill?.hasEvalSuite) {
     process.stdout.write(
       renderEvalStart({
         skillName: resolvedSkillName,
@@ -258,7 +367,7 @@ async function main() {
   }
 
   return runCommandLine(
-    ["node", "vasir", "eval", "run", resolvedSkillName, ...parsedArguments.forwardedArguments],
+    ["node", "vasir", "eval", subcommand, resolvedSkillName, ...parsedArguments.forwardedArguments],
     {
       currentWorkingDirectory: process.env.INIT_CWD
         ? path.resolve(process.env.INIT_CWD)

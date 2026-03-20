@@ -10,13 +10,16 @@ import {
 import {
   ADD_REFERENCE_DOCS_REF,
   EVAL_REFERENCE_DOCS_REF,
+  REMOVE_REFERENCE_DOCS_REF,
   REPLACE_REFERENCE_DOCS_REF,
   UNKNOWN_COMMAND_TROUBLESHOOTING_DOCS_REF
 } from "./docs-ref.js";
 import { readPackageMetadata } from "./package-metadata.js";
 import { readGlobalRegistry, synchronizeGlobalCatalog } from "./global-catalog.js";
-import { installSkillsIntoProject } from "./project-skills.js";
+import { installSkillsIntoProject, removeSkillsFromProject } from "./project-skills.js";
 import { canPromptInteractively, promptForMissingProviderCredential } from "../eval/interactive.js";
+import { inspectSkillEval } from "../eval/inspect-skill-eval.js";
+import { rescoreSkillEval } from "../eval/rescore-skill-eval.js";
 import { runSkillEval } from "../eval/run-skill-eval.js";
 import { createCommandUi } from "../scripts/ui/command-output.js";
 
@@ -41,7 +44,10 @@ Usage:
   vasir update [--json]                             Fast-forward ~/.agents/vasir; bootstraps if missing
   vasir list [--json]                               Show available skills from the global catalog
   vasir add <skill> [skill...] [--json] [--replace] Copy skills into the current repo root at .agents/skills
-  vasir eval run <skill> [--json] [--model <name>] Run the built-in baseline vs treatment eval for a skill
+  vasir remove <skill> [skill...] [--json]          Remove project-local skills from the current repo root
+  vasir eval run <skill> [--json] [--model <name>] [--trials <count>] Run the built-in baseline vs treatment eval for a skill
+  vasir eval inspect <skill> [run-id] [--json]     Inspect the latest or named eval artifact for a skill
+  vasir eval rescore <skill> [run-id] [--json]     Rescore an existing eval artifact with the current scorer
   vasir --version [--json]                          Print the installed Vasir CLI version
   vasir --help
 
@@ -52,9 +58,11 @@ Notes:
   add mutates only the current repo root (nearest parent with .git, or the current directory if none exists).
   add auto-initializes the global catalog if needed.
   Use --replace only to refresh an unmodified project-local skill from the global catalog.
+  remove mutates only the current repo root and also updates .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
   eval defaults to openai:gpt-5.4 and anthropic:claude-opus-4-6.
   Pass --model openai, --model opus, --model mock, or --model <provider:model> to override.
+  Pass --trials <count> to repeat each model/case baseline-vs-treatment pair.
   If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip it.
 `;
 }
@@ -76,6 +84,7 @@ function parseCommandInvocation(argumentVector) {
   let helpRequested = false;
   let modelArguments = [];
   let replaceExistingSkills = false;
+  let requestedTrialCount = null;
   let versionRequested = false;
 
   for (let argumentIndex = 0; argumentIndex < rawArguments.length; argumentIndex += 1) {
@@ -117,6 +126,32 @@ function parseCommandInvocation(argumentVector) {
       continue;
     }
 
+    if (rawArgument === "--trials") {
+      const trialCountArgument = rawArguments[argumentIndex + 1];
+      if (!trialCountArgument || trialCountArgument.startsWith("--")) {
+        throw new VasirCliError({
+          code: "TRIALS_FLAG_VALUE_REQUIRED",
+          message: "`--trials` requires a positive integer value.",
+          suggestion: "Use `--trials 3` or another positive integer when running `vasir eval run <skill>`.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+
+      const parsedTrialCount = Number.parseInt(trialCountArgument, 10);
+      if (!Number.isInteger(parsedTrialCount) || parsedTrialCount <= 0) {
+        throw new VasirCliError({
+          code: "TRIALS_FLAG_VALUE_INVALID",
+          message: `Invalid trial count: ${trialCountArgument}`,
+          suggestion: "Use `--trials` with a positive integer such as `1`, `3`, or `5`.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+
+      requestedTrialCount = parsedTrialCount;
+      argumentIndex += 1;
+      continue;
+    }
+
     if (rawArgument.startsWith("--")) {
       throw new VasirCliError({
         code: "UNKNOWN_FLAG",
@@ -135,6 +170,7 @@ function parseCommandInvocation(argumentVector) {
     commandArguments: positionalArguments.slice(1),
     jsonOutput,
     modelArguments,
+    requestedTrialCount,
     replaceExistingSkills,
     versionRequested,
     helpRequested: helpRequested || commandName === "help"
@@ -322,9 +358,77 @@ function runAdd({
   };
 }
 
+function runRemove({
+  skillNames,
+  currentWorkingDirectory,
+  outputStream,
+  stdoutWriter,
+  jsonOutput
+}) {
+  if (skillNames.length === 0) {
+    throw new VasirCliError({
+      code: "SKILL_NAME_REQUIRED",
+      message: "At least one skill name is required.",
+      suggestion: "Run `vasir remove <skill>` with one or more project-local skill names.",
+      docsRef: REMOVE_REFERENCE_DOCS_REF
+    });
+  }
+
+  const removeResult = removeSkillsFromProject({
+    skillNames,
+    currentWorkingDirectory
+  });
+
+  if (!jsonOutput) {
+    const ui = createCommandUi({ stream: outputStream });
+    const renderedLines = [];
+
+    for (const removedSkillName of removeResult.removedSkillNames) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "ok",
+          text: `Removed ${removedSkillName}`
+        })
+      );
+    }
+
+    for (const missingSkillName of removeResult.missingSkillNames) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "warn",
+          text: `${missingSkillName} already absent`
+        })
+      );
+    }
+
+    renderedLines.push(
+      ui.formatStatusLine({
+        kind: "info",
+        text: "Project skills now live at",
+        detail: removeResult.projectPaths.projectSkillsDirectory
+      })
+    );
+
+    stdoutWriter(
+      ui.renderPanel({
+        title: "Project Skills",
+        lines: renderedLines
+      })
+    );
+  }
+
+  return {
+    projectRootDirectory: removeResult.projectPaths.projectRootDirectory,
+    projectSkillsDirectory: removeResult.projectPaths.projectSkillsDirectory,
+    removedSkills: removeResult.removedSkillNames,
+    missingSkills: removeResult.missingSkillNames
+  };
+}
+
 async function runEval({
   evalArguments,
   modelArguments,
+  requestedTrialCount,
   homeDirectory,
   currentWorkingDirectory,
   repositoryUrl,
@@ -342,16 +446,16 @@ async function runEval({
     throw new VasirCliError({
       code: "EVAL_SUBCOMMAND_REQUIRED",
       message: "An eval subcommand is required.",
-      suggestion: "Use `vasir eval run <skill>` to run the built-in skill eval.",
+      suggestion: "Use `vasir eval run <skill>`, `vasir eval inspect <skill>`, or `vasir eval rescore <skill>`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
 
-  if (evalSubcommand !== "run") {
+  if (!["run", "inspect", "rescore"].includes(evalSubcommand)) {
     throw new VasirCliError({
       code: "UNKNOWN_EVAL_SUBCOMMAND",
       message: `Unknown eval subcommand: ${evalSubcommand}`,
-      suggestion: "Use `vasir eval run <skill>` to run the built-in skill eval.",
+      suggestion: "Use `vasir eval run <skill>`, `vasir eval inspect <skill>`, or `vasir eval rescore <skill>`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -366,6 +470,8 @@ async function runEval({
     });
   }
 
+  const runId = evalArguments[2] ?? null;
+
   const promptForMissingCredential =
     !jsonOutput && canPromptInteractively({ inputStream, outputStream })
       ? (promptOptions) =>
@@ -376,20 +482,65 @@ async function runEval({
           })
       : null;
 
-  return runSkillEval({
+  if (evalSubcommand === "run") {
+    return runSkillEval({
+      skillName,
+      homeDirectory,
+      currentWorkingDirectory,
+      repositoryUrl,
+      platform,
+      spawnSyncImplementation,
+      requestedModelArguments: modelArguments,
+      promptForMissingCredential,
+      outputStream,
+      stdoutWriter,
+      jsonOutput,
+      environmentVariables,
+      fetchImplementation,
+      trialCount: requestedTrialCount ?? undefined
+    });
+  }
+
+  if (modelArguments.length > 0) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--model is only supported by `vasir eval run`.",
+      suggestion: "Use `vasir eval inspect <skill>` or `vasir eval rescore <skill>` without `--model`.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (requestedTrialCount !== null) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--trials is only supported by `vasir eval run`.",
+      suggestion: "Use `vasir eval run <skill> --trials <count>` when you want repeated eval trials.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (evalSubcommand === "inspect") {
+    return inspectSkillEval({
+      skillName,
+      runId,
+      currentWorkingDirectory,
+      outputStream,
+      stdoutWriter,
+      jsonOutput
+    });
+  }
+
+  return rescoreSkillEval({
     skillName,
-    homeDirectory,
+    runId,
     currentWorkingDirectory,
+    homeDirectory,
     repositoryUrl,
     platform,
     spawnSyncImplementation,
-    requestedModelArguments: modelArguments,
-    promptForMissingCredential,
     outputStream,
     stdoutWriter,
-    jsonOutput,
-    environmentVariables,
-    fetchImplementation
+    jsonOutput
   });
 }
 
@@ -397,6 +548,7 @@ async function runSelectedCommand({
   commandName,
   commandArguments,
   modelArguments,
+  requestedTrialCount,
   replaceExistingSkills,
   homeDirectory,
   currentWorkingDirectory,
@@ -425,6 +577,16 @@ async function runSelectedCommand({
       message: "--model is only supported by `vasir eval`.",
       suggestion:
         "Use `vasir eval run <skill> --model <provider>` when you want to override the default eval models.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (requestedTrialCount !== null && commandName !== "eval") {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--trials is only supported by `vasir eval`.",
+      suggestion:
+        "Use `vasir eval run <skill> --trials <count>` when you want repeated eval trials.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -480,21 +642,32 @@ async function runSelectedCommand({
     });
   }
 
+  if (commandName === "remove") {
+    return runRemove({
+      skillNames: commandArguments,
+      currentWorkingDirectory,
+      outputStream,
+      stdoutWriter,
+      jsonOutput
+    });
+  }
+
   if (commandName === "eval") {
     return runEval({
       evalArguments: commandArguments,
       modelArguments,
+      requestedTrialCount,
       homeDirectory,
       currentWorkingDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
-      stdoutWriter,
-      jsonOutput,
       inputStream,
       outputStream,
       environmentVariables,
-      fetchImplementation
+      fetchImplementation,
+      stdoutWriter,
+      jsonOutput,
     });
   }
 
@@ -559,6 +732,7 @@ export async function runCommandLine(
       commandName,
       commandArguments: invocation.commandArguments,
       modelArguments: invocation.modelArguments,
+      requestedTrialCount: invocation.requestedTrialCount,
       replaceExistingSkills: invocation.replaceExistingSkills,
       homeDirectory,
       currentWorkingDirectory,

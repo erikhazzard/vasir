@@ -239,6 +239,85 @@ test("add installs into the repository root when invoked from a nested subdirect
   assert.ok(!fs.existsSync(path.join(projectNestedDirectory, "AGENTS.md")));
 });
 
+test("remove deletes installed project-local skills and updates install state", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const removeOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "roguelike"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
+
+  const removeStatusCode = await runCommandLine(["node", "vasir", "remove", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...removeOutput
+  });
+
+  assert.equal(removeStatusCode, 0);
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
+  assert.equal(
+    fs.realpathSync(path.join(projectDirectory, ".claude", "skills")),
+    fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
+  );
+  assert.equal(
+    fs.realpathSync(path.join(projectDirectory, ".codex", "skills")),
+    fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
+  );
+
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.deepEqual(Object.keys(installState.skills).sort(), ["roguelike"]);
+  assert.match(removeOutput.readStdout(), /Removed react/);
+});
+
+test("remove reports already-absent skills and prunes stale install-state entries", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const removeOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  fs.rmSync(path.join(projectDirectory, ".agents", "skills", "react"), { recursive: true, force: true });
+
+  const removeStatusCode = await runCommandLine(["node", "vasir", "remove", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...removeOutput
+  });
+
+  assert.equal(removeStatusCode, 0, removeOutput.readStderr());
+  const parsedOutput = JSON.parse(removeOutput.readStdout());
+  assert.deepEqual(parsedOutput.removedSkills, []);
+  assert.deepEqual(parsedOutput.missingSkills, ["react"]);
+
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.deepEqual(installState.skills, {});
+});
+
 test("add --replace refuses to overwrite a manual untracked project skill", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();

@@ -72,6 +72,109 @@ function inferMockResponseText({ modelDescriptor, promptText }) {
   const skillApplied = promptText.includes("--- Skill Guidance Start ---");
   const modelName = modelDescriptor.model;
 
+  if (promptText.includes("Eval summary facts:")) {
+    const hasWorse = promptText.includes("\"overallVerdict\": \"WORSE\"");
+    const hasBetter = promptText.includes("\"overallVerdict\": \"BETTER\"");
+    const hasIncomplete = promptText.includes("\"runStatus\": \"incomplete\"");
+    const hasFailure = promptText.includes("\"rowFailures\": [") && !promptText.includes("\"rowFailures\": []");
+    const headline = hasWorse
+      ? "WORSE: hard-check regressions are the decisive signal."
+      : hasBetter
+        ? "BETTER: the measured checks moved in the right direction."
+        : "NO SIGNAL: the evidence is mixed.";
+    const summary = [
+      hasBetter
+        ? "The skill improved the measured checks."
+        : hasWorse
+          ? "The skill regressed on the measured checks."
+          : "The run did not produce a clean directional signal.",
+      hasIncomplete ? "The run is incomplete." : "",
+      hasFailure ? "Row failures are part of the story." : ""
+    ].filter(Boolean).join(" ");
+
+    const decisiveReasons = [];
+    if (promptText.includes("\"hardChecks\":")) {
+      decisiveReasons.push("Hard-check aggregates are the primary floor.");
+    }
+    if (promptText.includes("\"topRegressions\": [") && !promptText.includes("\"topRegressions\": []")) {
+      decisiveReasons.push("Top regressions explain why the treatment lost.");
+    }
+    if (promptText.includes("\"topImprovements\": [") && !promptText.includes("\"topImprovements\": []")) {
+      decisiveReasons.push("Top improvements explain where the treatment helped.");
+    }
+    if (hasFailure) {
+      decisiveReasons.push("Row failures kept the run from being fully complete.");
+    }
+
+    return JSON.stringify({
+      headline,
+      summary,
+      decisiveReasons: decisiveReasons.slice(0, 4),
+      nextStep: hasWorse
+        ? "Tighten the failing path, then rerun the eval."
+        : "Use inspect only if you need pair-level evidence."
+    });
+  }
+
+  if (promptText.includes("Output A:") && promptText.includes("Output B:")) {
+    const outputAMatch = promptText.match(/Output A:\n([\s\S]*?)\n\nOutput B:/);
+    const outputBMatch = promptText.match(/Output B:\n([\s\S]*?)\n\nReturn JSON only/);
+    const outputA = outputAMatch?.[1] ?? "";
+    const outputB = outputBMatch?.[1] ?? "";
+    const scoreOutput = (text) => {
+      const lowerText = text.toLowerCase();
+      let score = 0;
+      if (lowerText.includes("abortcontroller")) {
+        score += 2;
+      }
+      if (lowerText.includes("loading")) {
+        score += 1;
+      }
+      if (lowerText.includes("role=\"alert\"")) {
+        score += 1;
+      }
+      if (lowerText.includes("starttransition")) {
+        score += 1;
+      }
+      if (lowerText.includes("usedeferredvalue")) {
+        score += 1;
+      }
+      if (lowerText.includes("seed")) {
+        score += 1;
+      }
+      if (lowerText.includes("rng")) {
+        score += 1;
+      }
+      if (lowerText.includes("clock")) {
+        score += 1;
+      }
+      if (lowerText.includes("replay")) {
+        score += 1;
+      }
+      if (lowerText.includes("math.random")) {
+        score -= 2;
+      }
+      if (lowerText.includes("date.now")) {
+        score -= 2;
+      }
+      if (lowerText.includes("settimeout")) {
+        score -= 2;
+      }
+      if (lowerText.includes("usecontext(") || lowerText.includes("global store")) {
+        score -= 2;
+      }
+      return score;
+    };
+    const scoreA = scoreOutput(outputA);
+    const scoreB = scoreOutput(outputB);
+    const winner = scoreA === scoreB ? "tie" : scoreA > scoreB ? "a" : "b";
+    return JSON.stringify({
+      winner,
+      confidence: 0.75,
+      reason: winner === "tie" ? "Both outputs are equally strong." : "One output followed the rubric more closely."
+    });
+  }
+
   if (modelName === "flat") {
     return "Use a straightforward implementation with a generic effect and shared state if needed.";
   }
@@ -104,15 +207,13 @@ function inferMockResponseText({ modelDescriptor, promptText }) {
     promptTextLowerCase.includes("random reward") ||
     promptTextLowerCase.includes("replayable") ||
     promptTextLowerCase.includes("critical hit") ||
-    promptTextLowerCase.includes("cooldown")
+    promptTextLowerCase.includes("cooldown") ||
+    promptTextLowerCase.includes("loot drop") ||
+    promptTextLowerCase.includes("ready\" toast") ||
+    promptTextLowerCase.includes("ready toast")
   ) {
     if (skillApplied) {
-      return [
-        "Use a seeded rng instead of Math.random().",
-        "Inject a clock instead of Date.now().",
-        "Add a replay regression test with a fixed seed.",
-        "Do not use setTimeout() to wait for determinism."
-      ].join(" ");
+      return "Use a seeded rng instead of Math.random(). Drive time from an injected clock with explicit ticks instead of Date.now() or setTimeout(). Capture the seed and tick timeline in a replay regression test.";
     }
 
     return "Use Math.random() to pick the reward, Date.now() to label the event, and setTimeout() until the flaky path reproduces.";

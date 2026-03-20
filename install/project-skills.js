@@ -167,3 +167,36 @@ export function installSkillsIntoProject({
     replacedSkillNames
   };
 }
+
+export function removeSkillsFromProject({
+  skillNames,
+  currentWorkingDirectory = process.cwd()
+}) {
+  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectInstallState = readProjectInstallState({ projectPaths });
+  const removedSkillNames = [];
+  const missingSkillNames = [];
+
+  for (const skillName of skillNames) {
+    const targetSkillDirectory = path.join(projectPaths.projectSkillsDirectory, skillName);
+    if (fs.existsSync(targetSkillDirectory)) {
+      fs.rmSync(targetSkillDirectory, { recursive: true, force: true });
+      removedSkillNames.push(skillName);
+    } else {
+      missingSkillNames.push(skillName);
+    }
+
+    delete projectInstallState.skills[skillName];
+  }
+
+  writeProjectInstallState({
+    projectPaths,
+    projectInstallState
+  });
+
+  return {
+    projectPaths,
+    removedSkillNames,
+    missingSkillNames
+  };
+}

@@ -58,3 +58,17 @@ const now = Date.now();`
   assert.equal(score.passed, false);
   assert.deepEqual(score.presentForbiddenSubstrings, ["Math.random", "Date.now"]);
 });
+
+test("cases with no measured checks do not score as perfect passes", () => {
+  const score = scoreCaseOutput({
+    caseDefinition: {
+      requiredSubstrings: [],
+      forbiddenSubstrings: []
+    },
+    outputText: "Anything at all."
+  });
+
+  assert.equal(score.passed, false);
+  assert.equal(score.score, 0);
+  assert.equal(score.measuredCheckCount, 0);
+});

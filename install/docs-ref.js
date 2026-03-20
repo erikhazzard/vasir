@@ -2,6 +2,7 @@ const REPOSITORY_DOCS_BASE_URL = "https://github.com/erikhazzard/vasir/blob/main
 
 export const COMMANDS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#commands`;
 export const ADD_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#add`;
+export const REMOVE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#remove`;
 export const REPLACE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#replace`;
 export const EVAL_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#eval`;
 
