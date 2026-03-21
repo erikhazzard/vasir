@@ -58,6 +58,7 @@ If the command fails, start with [docs/troubleshooting.md](./docs/troubleshootin
 - Want to build your first skill end-to-end? See [docs/create-your-first-skill.md](./docs/create-your-first-skill.md).
 - Need the authoring workflow for new or revised skills? See [docs/writing-skills.md](./docs/writing-skills.md).
 - Need field-level metadata and layout facts? See [docs/skill-reference.md](./docs/skill-reference.md).
+- Need the fastest AGENTS template starting point? See [templates/agents/README.md](./templates/agents/README.md).
 - Need a filled `AGENTS.md` example? See [docs/example-agents.md](./docs/example-agents.md).
 - Want the conceptual why? Read [MANIFESTO.md](./MANIFESTO.md).
 

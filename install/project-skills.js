@@ -151,7 +151,7 @@ export function installSkillsIntoProject({
   const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
   if (!fs.existsSync(projectAgentsFilePath)) {
     copyFileIntoProject({
-      sourceFilePath: path.join(globalCatalogDirectory, "templates", "AGENTS.md"),
+      sourceFilePath: path.join(globalCatalogDirectory, "templates", "agents", "AGENTS.md"),
       targetFilePath: projectAgentsFilePath
     });
   }

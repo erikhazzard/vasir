@@ -2,6 +2,8 @@
 
 Use this page when you want a filled example to adapt, not just the blank template.
 
+For the fastest starting point, see [templates/agents/README.md](../templates/agents/README.md). For the composable blank skeleton, see [templates/agents/AGENTS.md](../templates/agents/AGENTS.md).
+
 Copy the structure below into your repo root `AGENTS.md`, then replace the routed skills and verification commands with the ones that match your project.
 
 ```markdown
@@ -68,4 +70,9 @@ If a command fails, read it, diagnose the root cause, and fix the real failure b
 Related pages:
 
 - [templates/AGENTS.md](../templates/AGENTS.md)
+- [templates/agents/README.md](../templates/agents/README.md)
+- [templates/agents/AGENTS.md](../templates/agents/AGENTS.md)
+- [templates/agents/profiles/backend.md](../templates/agents/profiles/backend.md)
+- [templates/agents/profiles/frontend.md](../templates/agents/profiles/frontend.md)
+- [templates/agents/profiles/ios.md](../templates/agents/profiles/ios.md)
 - [docs/cli-reference.md](./cli-reference.md)

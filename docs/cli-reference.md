@@ -76,7 +76,7 @@ vasir list
 - Result:
   - `.agents/skills/<name>/...` is created in the resolved repo root.
   - `.claude/skills` and `.codex/skills` are repaired as aliases to `.agents/skills`.
-  - `AGENTS.md` is copied into the repo root if it does not already exist.
+  - `AGENTS.md` is copied into the repo root if it does not already exist, using the canonical blank template at `templates/agents/AGENTS.md`.
 - Notes:
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.

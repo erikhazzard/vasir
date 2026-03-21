@@ -59,7 +59,7 @@ function createFixtureRepository() {
   };
 
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
-  writeFile(path.join(repositoryDirectory, "templates", "AGENTS.md"), "# Project Agents\n");
+  writeFile(path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"), "# Project Agents\n");
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
     `---

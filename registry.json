@@ -404,6 +404,25 @@
       ],
       "path": "skills/integration",
       "entry": "SKILL.md"
+    },
+    {
+      "name": "critiquing-architecture-designs",
+      "description": "Critiques architecture proposals by forcing a user-journey-first simplification pass, happy-path sequence, complexity inventory, and minimal replacement design. Use when reviewing architecture plans, multi-step features, worker or queue proposals, client protocols, or new infrastructure added \"for scale\".",
+      "category": "architecture",
+      "tags": [
+        "architecture",
+        "review",
+        "simplification",
+        "queues",
+        "protocols"
+      ],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": "skills/critiquing-architecture-designs",
+      "entry": "SKILL.md"
     }
   ]
 }
