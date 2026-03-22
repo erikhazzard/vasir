@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createLiveProgress } from "../scripts/ui/live-progress.js";
+import { createLiveProgress } from "../cli/ui/live-progress.js";
 
 function createFakeTtyStream() {
   const writes = [];

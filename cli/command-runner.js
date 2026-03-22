@@ -1,6 +1,7 @@
 import childProcess from "node:child_process";
 import process from "node:process";
 
+import { runAgents } from "./agents.js";
 import {
   formatCliErrorForJson,
   formatCliErrorForText,
@@ -21,12 +22,12 @@ import {
   listInstalledProjectSkills,
   removeSkillsFromProject
 } from "./project-skills.js";
-import { canPromptInteractively, promptForMissingProviderCredential } from "../eval/interactive.js";
-import { inspectSkillEval } from "../eval/inspect-skill-eval.js";
-import { rescoreSkillEval } from "../eval/rescore-skill-eval.js";
-import { runSkillEval } from "../eval/run-skill-eval.js";
-import { createCommandUi } from "../scripts/ui/command-output.js";
-import { interactiveMultiSelect } from "../scripts/ui/interactive-select.js";
+import { canPromptInteractively, promptForMissingProviderCredential } from "./eval/interactive.js";
+import { inspectSkillEval } from "./eval/inspect-skill-eval.js";
+import { rescoreSkillEval } from "./eval/rescore-skill-eval.js";
+import { runSkillEval } from "./eval/run-skill-eval.js";
+import { createCommandUi } from "./ui/command-output.js";
+import { interactiveMultiSelect } from "./ui/interactive-select.js";
 
 function writeLine(outputWriter, message) {
   outputWriter(`${message}\n`);
@@ -48,8 +49,11 @@ Usage:
   vasir init [--json]                               Clone or refresh ~/.agents/vasir and repair global aliases
   vasir update [--json]                             Fast-forward ~/.agents/vasir; bootstraps if missing
   vasir list [--json]                               Show available skills from the global catalog
-  vasir add <skill> [skill...] [--json] [--replace] Copy skills into the current repo root at .agents/skills
+  vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] Copy skills into the current repo root at .agents/skills
   vasir remove <skill> [skill...] [--json]          Remove project-local skills from the current repo root
+  vasir agents init <profile> [--json] [--replace]  Write AGENTS.md in the current repo root from a stack-specific starter
+  vasir agents draft-purpose [--json] [--write] [--model <name>] Draft a repo-specific AGENTS purpose paragraph
+  vasir agents validate [--json]                    Fail closed when AGENTS.md still contains scaffold placeholders
   vasir eval run <skill> [--json] [--model <name>] [--trials <count>] Run the built-in baseline vs treatment eval for a skill
   vasir eval inspect <skill> [run-id] [--json]     Inspect the latest or named eval artifact for a skill
   vasir eval rescore <skill> [run-id] [--json]     Rescore an existing eval artifact with the current scorer
@@ -62,7 +66,11 @@ Notes:
   init and update mutate the global catalog under ~/.agents/vasir.
   add mutates only the current repo root (nearest parent with .git, or the current directory if none exists).
   add auto-initializes the global catalog if needed.
-  Use --replace only to refresh an unmodified project-local skill from the global catalog.
+  add can also seed AGENTS.md from a stack-specific profile via --agents-profile backend|frontend|ios.
+  agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
+  agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
+  agents validate fails closed when AGENTS.md still contains known scaffold placeholders.
+  Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md during vasir agents init.
   remove mutates only the current repo root and also updates .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
   eval defaults to openai:gpt-5.4 and anthropic:claude-opus-4-6.
@@ -87,10 +95,12 @@ function parseCommandInvocation(argumentVector) {
   const positionalArguments = [];
   let jsonOutput = false;
   let helpRequested = false;
+  let agentsProfileName = null;
   let modelArguments = [];
   let replaceExistingSkills = false;
   let requestedTrialCount = null;
   let versionRequested = false;
+  let writeGeneratedOutput = false;
 
   for (let argumentIndex = 0; argumentIndex < rawArguments.length; argumentIndex += 1) {
     const rawArgument = rawArguments[argumentIndex];
@@ -111,6 +121,27 @@ function parseCommandInvocation(argumentVector) {
 
     if (rawArgument === "--replace") {
       replaceExistingSkills = true;
+      continue;
+    }
+
+    if (rawArgument === "--agents-profile") {
+      const agentsProfileArgument = rawArguments[argumentIndex + 1];
+      if (!agentsProfileArgument || agentsProfileArgument.startsWith("--")) {
+        throw new VasirCliError({
+          code: "AGENTS_PROFILE_FLAG_VALUE_REQUIRED",
+          message: "`--agents-profile` requires one of: backend, frontend, ios.",
+          suggestion: "Use `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios`.",
+          docsRef: REPLACE_REFERENCE_DOCS_REF
+        });
+      }
+
+      agentsProfileName = agentsProfileArgument;
+      argumentIndex += 1;
+      continue;
+    }
+
+    if (rawArgument === "--write") {
+      writeGeneratedOutput = true;
       continue;
     }
 
@@ -174,9 +205,11 @@ function parseCommandInvocation(argumentVector) {
     commandName,
     commandArguments: positionalArguments.slice(1),
     jsonOutput,
+    agentsProfileName,
     modelArguments,
     requestedTrialCount,
     replaceExistingSkills,
+    writeGeneratedOutput,
     versionRequested,
     helpRequested: helpRequested || commandName === "help"
   };
@@ -292,6 +325,7 @@ function runList({
 
 function runAdd({
   skillNames,
+  agentsProfileName,
   replaceExistingSkills,
   homeDirectory,
   currentWorkingDirectory,
@@ -322,6 +356,7 @@ function runAdd({
     registry,
     globalCatalogDirectory: globalPaths.globalCatalogDirectory,
     skillNames,
+    agentsProfileName,
     replaceExistingSkills,
     currentWorkingDirectory,
     platform
@@ -346,6 +381,33 @@ function runAdd({
         detail: installResult.projectPaths.projectSkillsDirectory
       })
     );
+    if (installResult.wroteAgentsFile) {
+      const agentsLineText = installResult.agentsProfile === "generic"
+        ? "AGENTS starter ready at"
+        : `AGENTS starter ready at (${installResult.agentsProfile})`;
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: agentsLineText,
+          detail: installResult.agentsFilePath
+        })
+      );
+    } else {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "AGENTS left unchanged at",
+          detail: installResult.agentsFilePath
+        })
+      );
+    }
+    renderedLines.push(
+      ui.formatStatusLine({
+        kind: "info",
+        text: "Next",
+        detail: "vasir agents draft-purpose --write --model openai, then vasir agents validate"
+      })
+    );
     stdoutWriter(
       ui.renderPanel({
         title: "Project Skills",
@@ -359,7 +421,10 @@ function runAdd({
     projectRootDirectory: installResult.projectPaths.projectRootDirectory,
     projectSkillsDirectory: installResult.projectPaths.projectSkillsDirectory,
     installedSkills: installResult.installedSkillNames,
-    replacedSkills: installResult.replacedSkillNames
+    replacedSkills: installResult.replacedSkillNames,
+    agentsFilePath: installResult.agentsFilePath,
+    agentsProfile: installResult.agentsProfile,
+    wroteAgentsFile: installResult.wroteAgentsFile
   };
 }
 
@@ -585,9 +650,11 @@ async function runEval({
 async function runSelectedCommand({
   commandName,
   commandArguments,
+  agentsProfileName,
   modelArguments,
   requestedTrialCount,
   replaceExistingSkills,
+  writeGeneratedOutput,
   homeDirectory,
   currentWorkingDirectory,
   repositoryUrl,
@@ -600,21 +667,40 @@ async function runSelectedCommand({
   environmentVariables,
   fetchImplementation
 }) {
-  if (replaceExistingSkills && commandName !== "add") {
+  if (
+    replaceExistingSkills &&
+    !(commandName === "add" || (commandName === "agents" && commandArguments[0] === "init"))
+  ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--replace is only supported by `vasir add`.",
-      suggestion: "Use `vasir add --replace <skill>` when you want to refresh a project-local skill copy.",
+      message: "--replace is only supported by `vasir add` and `vasir agents init`.",
+      suggestion:
+        "Use `vasir add --replace <skill>` to refresh a project-local skill copy, or `vasir agents init <profile> --replace` to overwrite AGENTS.md intentionally.",
       docsRef: REPLACE_REFERENCE_DOCS_REF
     });
   }
 
-  if (modelArguments.length > 0 && commandName !== "eval") {
+  if (
+    agentsProfileName !== null &&
+    commandName !== "add"
+  ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--model is only supported by `vasir eval`.",
+      message: "--agents-profile is only supported by `vasir add`.",
+      suggestion: "Use `vasir add <skill> --agents-profile <backend|frontend|ios>` when you want one-command skill install plus AGENTS scaffolding.",
+      docsRef: REPLACE_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (
+    modelArguments.length > 0 &&
+    !(commandName === "eval" || (commandName === "agents" && commandArguments[0] === "draft-purpose"))
+  ) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--model is only supported by `vasir eval` and `vasir agents draft-purpose`.",
       suggestion:
-        "Use `vasir eval run <skill> --model <provider>` when you want to override the default eval models.",
+        "Use `vasir eval run <skill> --model <provider>` or `vasir agents draft-purpose --model <provider>` when you want to override the default model choice.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -626,6 +712,15 @@ async function runSelectedCommand({
       suggestion:
         "Use `vasir eval run <skill> --trials <count>` when you want repeated eval trials.",
       docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (writeGeneratedOutput && !(commandName === "agents" && commandArguments[0] === "draft-purpose")) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--write is only supported by `vasir agents draft-purpose`.",
+      suggestion: "Use `vasir agents draft-purpose --write` when you want Vasir to replace the placeholder block in AGENTS.md.",
+      docsRef: UNKNOWN_COMMAND_TROUBLESHOOTING_DOCS_REF
     });
   }
 
@@ -668,6 +763,7 @@ async function runSelectedCommand({
   if (commandName === "add") {
     return runAdd({
       skillNames: commandArguments,
+      agentsProfileName,
       replaceExistingSkills,
       homeDirectory,
       currentWorkingDirectory,
@@ -688,6 +784,26 @@ async function runSelectedCommand({
       outputStream,
       stdoutWriter,
       jsonOutput
+    });
+  }
+
+  if (commandName === "agents") {
+    return runAgents({
+      agentsArguments: commandArguments,
+      replaceExistingAgentsFile: replaceExistingSkills,
+      writeGeneratedOutput,
+      modelArguments,
+      homeDirectory,
+      currentWorkingDirectory,
+      repositoryUrl,
+      platform,
+      spawnSyncImplementation,
+      inputStream,
+      outputStream,
+      stdoutWriter,
+      jsonOutput,
+      environmentVariables,
+      fetchImplementation
     });
   }
 
@@ -770,9 +886,11 @@ export async function runCommandLine(
     const commandResult = await runSelectedCommand({
       commandName,
       commandArguments: invocation.commandArguments,
+      agentsProfileName: invocation.agentsProfileName,
       modelArguments: invocation.modelArguments,
       requestedTrialCount: invocation.requestedTrialCount,
       replaceExistingSkills: invocation.replaceExistingSkills,
+      writeGeneratedOutput: invocation.writeGeneratedOutput,
       homeDirectory,
       currentWorkingDirectory,
       repositoryUrl,

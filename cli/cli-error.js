@@ -1,7 +1,7 @@
 import process from "node:process";
 
 import { UNEXPECTED_ERROR_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
-import { createCommandUi } from "../scripts/ui/command-output.js";
+import { createCommandUi } from "./ui/command-output.js";
 
 export class VasirCliError extends Error {
   constructor({

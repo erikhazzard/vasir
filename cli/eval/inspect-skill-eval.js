@@ -1,7 +1,7 @@
 import path from "node:path";
 import process from "node:process";
 
-import { createCommandUi } from "../scripts/ui/command-output.js";
+import { createCommandUi } from "../ui/command-output.js";
 import { createFailedRowSummary, createMovementSummary } from "./analysis.js";
 import { readEvalRunArtifacts } from "./history.js";
 

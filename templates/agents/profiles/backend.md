@@ -1,8 +1,15 @@
-# AGENTS.md Profile: Backend Service
+# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:backend -->
 
-Use this when the repo is mostly APIs, workers, queues, or data services.
+> EDIT THESE FIRST
+> 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
+> 2. Replace the routing bullets in Section 1 with the real API, jobs, and data-layer paths in this repo.
+> 3. Delete any queue, worker, or migration rule that is not true here.
 
-Copy this file into the target repo root as `AGENTS.md`, then replace bracketed placeholders with verified repo truth. Delete any line that is not true in that repo.
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
 
 ---
 

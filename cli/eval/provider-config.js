@@ -1,8 +1,8 @@
-import { VasirCliError } from "../install/cli-error.js";
+import { VasirCliError } from "../cli-error.js";
 import {
   EVAL_REFERENCE_DOCS_REF,
   EVAL_TROUBLESHOOTING_DOCS_REF
-} from "../install/docs-ref.js";
+} from "../docs-ref.js";
 
 const DEFAULT_EVAL_MODELS = Object.freeze([
   "openai:gpt-5.4",

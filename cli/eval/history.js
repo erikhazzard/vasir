@@ -2,9 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-import { VasirCliError } from "../install/cli-error.js";
-import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
-import { buildProjectPaths } from "../install/path-layout.js";
+import { VasirCliError } from "../cli-error.js";
+import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
+import { buildProjectPaths } from "../path-layout.js";
 
 function readJsonFile(filePath) {
   try {

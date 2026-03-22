@@ -239,10 +239,10 @@ If not, the report must say `NOT COMPARABLE` and explain why.
 
 ## 11) Source Map
 
-- [install/command-runner.js](../../install/command-runner.js)
-- [eval/run-skill-eval.js](../../eval/run-skill-eval.js)
-- [eval/suite-source.js](../../eval/suite-source.js)
-- [eval/evidence.js](../../eval/evidence.js)
-- [eval/history.js](../../eval/history.js)
-- [eval/inspect-skill-eval.js](../../eval/inspect-skill-eval.js)
-- [eval/rescore-skill-eval.js](../../eval/rescore-skill-eval.js)
+- [cli/command-runner.js](../../cli/command-runner.js)
+- [cli/eval/run-skill-eval.js](../../cli/eval/run-skill-eval.js)
+- [cli/eval/suite-source.js](../../cli/eval/suite-source.js)
+- [cli/eval/evidence.js](../../cli/eval/evidence.js)
+- [cli/eval/history.js](../../cli/eval/history.js)
+- [cli/eval/inspect-skill-eval.js](../../cli/eval/inspect-skill-eval.js)
+- [cli/eval/rescore-skill-eval.js](../../cli/eval/rescore-skill-eval.js)

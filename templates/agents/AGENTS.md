@@ -1,11 +1,16 @@
 # AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:generic -->
+
+> EDIT THESE FIRST
+> 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
+> 2. Replace the example routing bullets in Section 1 with real repo paths.
+> 3. Delete any line that is not true in this repo.
+> 4. If this repo is mostly backend, frontend, or iOS code, rerun `vasir agents init <profile> --replace` for a better starter.
 
 **Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
-**Purpose:** This is a strict specification for non-deterministic AI agents operating in this repository. Do not guess. Do not rely on pre-training bias. Obey the routing and constraints below.
-
-If you want one obvious file to copy and edit, start with [templates/agents/README.md](./README.md).
-
-Use this file only when you want to change the shared section structure. For a filled example, see [docs/example-agents.md](../../docs/example-agents.md).
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
 
 ---
 

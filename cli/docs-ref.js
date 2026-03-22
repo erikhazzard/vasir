@@ -4,6 +4,7 @@ export const COMMANDS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli
 export const ADD_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#add`;
 export const REMOVE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#remove`;
 export const REPLACE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#replace`;
+export const AGENTS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#agents`;
 export const EVAL_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#eval`;
 
 export const GIT_TROUBLESHOOTING_DOCS_REF =

@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-import { buildSkillCatalogEntry, SKILL_MANIFEST_FILE_NAME } from "../install/skill-metadata.js";
+import { buildSkillCatalogEntry, SKILL_MANIFEST_FILE_NAME } from "../cli/skill-metadata.js";
 
 const MODULE_FILE_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(MODULE_FILE_PATH), "..");

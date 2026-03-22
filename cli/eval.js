@@ -3,8 +3,8 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-import { readSkillMetadata } from "../install/skill-metadata.js";
-import { runCommandLine } from "../install/command-runner.js";
+import { readSkillMetadata } from "./skill-metadata.js";
+import { runCommandLine } from "./command-runner.js";
 import { createCommandUi } from "./ui/command-output.js";
 import { interactiveSelect } from "./ui/interactive-select.js";
 

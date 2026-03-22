@@ -113,7 +113,7 @@ test("local markdown links resolve", () => {
     "docs/example-agents.md",
     "docs/skill-reference.md",
     "docs/troubleshooting.md",
-    "docs/work/WORK.md",
+    "work/WORK.md",
     "docs/writing-skills.md",
     "templates/AGENTS.md",
     "templates/agents/README.md",

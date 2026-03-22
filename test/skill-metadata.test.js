@@ -4,13 +4,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { resolveSkillSource } from "../eval/skill-source.js";
+import { resolveSkillSource } from "../cli/eval/skill-source.js";
 import {
   DEFAULT_SKILL_CATEGORY,
   DEFAULT_SKILL_VERSION,
   listSkillPromptMarkdownFiles,
   readSkillMetadata
-} from "../install/skill-metadata.js";
+} from "../cli/skill-metadata.js";
 
 function createTemporaryDirectory() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "vasir-skill-meta-"));

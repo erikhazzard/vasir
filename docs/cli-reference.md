@@ -23,8 +23,11 @@ vasir --version
 | `init` | `vasir init [--json]` | Clone or refresh `~/.agents/vasir` and repair global aliases |
 | `update` | `vasir update [--json]` | Fast-forward `~/.agents/vasir`; bootstraps if missing |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
-| `add` | `vasir add <skill> [skill...] [--json] [--replace]` | Copy skills into the current repo root at `.agents/skills` |
+| `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding |
 | `remove` | `vasir remove <skill> [skill...] [--json]` | Remove project-local skills from the current repo root |
+| `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace]` | Write a stack-specific `AGENTS.md` starter in the current repo root |
+| `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
+| `agents validate` | `vasir agents validate [--json]` | Fail closed when `AGENTS.md` still contains scaffold placeholders |
 | `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>]` | Run the built-in baseline vs treatment eval for a skill |
 | `eval inspect` | `vasir eval inspect <skill> [run-id] [--json]` | Inspect the latest or named saved eval artifact for a skill |
 | `eval rescore` | `vasir eval rescore <skill> [run-id] [--json]` | Recompute a saved eval artifact with the current scorer |
@@ -81,11 +84,14 @@ vasir list
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
+  - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` for one-command skill install plus stack-specific AGENTS scaffolding.
+  - If you pass `--agents-profile` and `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
 
 Examples:
 
 ```bash
 vasir add react
+vasir add react --agents-profile frontend
 vasir add react netcode
 ```
 
@@ -111,6 +117,68 @@ Examples:
 vasir remove react
 vasir remove react roguelike
 vasir remove
+```
+
+## Agents
+
+`vasir agents` exists for one job: make the repo-root `AGENTS.md` obvious to scaffold and obvious to customize.
+
+### `agents init`
+
+- Purpose: write a stack-specific `AGENTS.md` starter into the resolved repo root.
+- Result:
+  - `AGENTS.md` exists in the resolved repo root.
+  - The file has the guessed project name filled in.
+  - The file has a loud `EDIT THESE FIRST` block at the top.
+  - The `Purpose` block is still a safe placeholder until you replace it manually or via `draft-purpose --write`.
+- Notes:
+  - Supported profiles are `backend`, `frontend`, and `ios`.
+  - The repo root is the nearest parent containing `.git`.
+  - If `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
+
+Examples:
+
+```bash
+vasir agents init backend
+vasir agents init frontend --replace
+```
+
+### `agents draft-purpose`
+
+- Purpose: inspect the current repo and draft a repo-specific opening paragraph for `AGENTS.md`.
+- Result:
+  - Prints a 2-3 sentence `Purpose` draft based on local repo context.
+  - When `--write` is set, replaces the untouched Vasir placeholder block in `AGENTS.md`.
+- Notes:
+  - Reads repo-local context such as the root name, top-level entries, `package.json`, and the first screen of `README.md` when present.
+  - Defaults to `openai:gpt-5.4`.
+  - Accepts the same single-model override surface as eval: `--model openai`, `--model opus`, `--model mock`, or `--model <provider:model>`.
+  - `--write` fails closed if the purpose placeholder has already been edited. In that case, paste the printed draft manually.
+  - `--model mock` is the zero-cost local smoke-test path for the command.
+
+Examples:
+
+```bash
+vasir agents draft-purpose
+vasir agents draft-purpose --model mock
+vasir agents draft-purpose --write --model openai
+```
+
+### `agents validate`
+
+- Purpose: catch leftover scaffold markers before you treat `AGENTS.md` as finished.
+- Result:
+  - Succeeds cleanly when `AGENTS.md` no longer contains known placeholders or example-only instructions.
+  - Fails closed with structured issue details when scaffold markers are still present.
+- Notes:
+  - This is the last step after `agents init` and `agents draft-purpose --write`.
+  - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, and untouched purpose markers.
+
+Examples:
+
+```bash
+vasir agents validate
+vasir agents validate --json
 ```
 
 ## Eval

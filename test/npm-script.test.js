@@ -63,7 +63,7 @@ test("npm run eval infers the skill from INIT_CWD and accepts a positional model
 test("repo eval wrapper makes the eval-ready skill split explicit when no skill is specified", () => {
   const commandResult = runCommand(
     "node",
-    ["./scripts/eval.js"],
+    ["./cli/eval.js"],
     REPO_ROOT,
     {
       NO_COLOR: "1"
@@ -80,7 +80,7 @@ test("repo eval wrapper makes the eval-ready skill split explicit when no skill 
 test("repo eval wrapper infers a non-eval skill from INIT_CWD before treating a positional model as the target", () => {
   const commandResult = runCommand(
     "node",
-    ["./scripts/eval.js", "mock", "--json"],
+    ["./cli/eval.js", "mock", "--json"],
     REPO_ROOT,
     {
       INIT_CWD: path.join(REPO_ROOT, "skills", "combat"),

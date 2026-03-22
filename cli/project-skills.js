@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { assertSupportedAgentsProfile, initializeProjectAgentsFile } from "./agents.js";
 import { VasirCliError } from "./cli-error.js";
 import {
   ADD_REFERENCE_DOCS_REF,
@@ -58,12 +59,27 @@ export function installSkillsIntoProject({
   registry,
   globalCatalogDirectory,
   skillNames,
+  agentsProfileName = null,
   replaceExistingSkills = false,
   currentWorkingDirectory = process.cwd(),
   platform = process.platform
 }) {
   const projectPaths = buildProjectPaths({ currentWorkingDirectory });
   const projectInstallState = readProjectInstallState({ projectPaths });
+  const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
+
+  if (agentsProfileName !== null) {
+    assertSupportedAgentsProfile(agentsProfileName);
+    if (fs.existsSync(projectAgentsFilePath) && !replaceExistingSkills) {
+      throw new VasirCliError({
+        code: "AGENTS_FILE_EXISTS",
+        message: `AGENTS.md already exists at ${projectAgentsFilePath}`,
+        suggestion:
+          "Review the existing file, or rerun `vasir add <skill> --agents-profile <profile> --replace` if you explicitly want to overwrite it as part of add.",
+        docsRef: REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF
+      });
+    }
+  }
 
   const skillEntriesByName = new Map(registry.skills.map((skillEntry) => [skillEntry.name, skillEntry]));
   const seenSkillNames = new Set();
@@ -148,13 +164,12 @@ export function installSkillsIntoProject({
     }
   }
 
-  const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
-  if (!fs.existsSync(projectAgentsFilePath)) {
-    copyFileIntoProject({
-      sourceFilePath: path.join(globalCatalogDirectory, "templates", "agents", "AGENTS.md"),
-      targetFilePath: projectAgentsFilePath
-    });
-  }
+  const agentsInitialization = initializeProjectAgentsFile({
+    globalCatalogDirectory,
+    projectRootDirectory: projectPaths.projectRootDirectory,
+    profileName: agentsProfileName,
+    ifExists: agentsProfileName ? replaceExistingSkills ? "replace" : "error" : "skip"
+  });
 
   writeProjectInstallState({
     projectPaths,
@@ -164,7 +179,10 @@ export function installSkillsIntoProject({
   return {
     projectPaths,
     installedSkillNames,
-    replacedSkillNames
+    replacedSkillNames,
+    agentsFilePath: agentsInitialization.agentsFilePath,
+    agentsProfile: agentsInitialization.profile,
+    wroteAgentsFile: agentsInitialization.wroteAgentsFile
   };
 }
 

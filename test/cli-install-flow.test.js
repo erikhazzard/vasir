@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { runCommandLine } from "../install/command-runner.js";
+import { runCommandLine } from "../cli/command-runner.js";
 
 function createTemporaryDirectory() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "vasir-"));

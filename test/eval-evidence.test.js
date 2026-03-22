@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createBottomLine, createPrimaryEvidence, getRunComparability } from "../eval/evidence.js";
+import { createBottomLine, createPrimaryEvidence, getRunComparability } from "../cli/eval/evidence.js";
 
 function createRunSummary({
   averageScoreLift = 0.2,

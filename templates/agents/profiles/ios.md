@@ -1,8 +1,15 @@
-# AGENTS.md Profile: iOS App
+# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:ios -->
 
-Use this when the repo is mostly native iOS, SwiftUI/UIKit, or mobile platform code.
+> EDIT THESE FIRST
+> 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
+> 2. Replace the routing bullets in Section 1 with the real lifecycle, sync, and UI paths in this repo.
+> 3. Delete any lifecycle, offline, or performance rule that is not true here.
 
-Copy this file into the target repo root as `AGENTS.md`, then replace bracketed placeholders with verified repo truth. Delete any line that is not true in that repo.
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
 
 ---
 

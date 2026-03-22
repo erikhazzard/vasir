@@ -2,7 +2,17 @@
 
 Start here.
 
-This folder is the canonical source for AGENTS starter content. If you want one obvious file to edit, use the table below and stop there.
+This folder is the canonical source for AGENTS starter content.
+
+Fastest path:
+
+1. Run `vasir add <skill> --agents-profile backend|frontend|ios`, or run `vasir agents init backend|frontend|ios` if you only want the AGENTS starter.
+2. Open the generated repo-root `AGENTS.md`.
+3. Rewrite the `Purpose` block and replace the Section 1 routing examples.
+4. Optional: run `vasir agents draft-purpose --write --model openai` for a repo-aware first draft of the opening paragraph.
+5. Finish with `vasir agents validate`.
+
+If you want to edit the source templates directly, use the table below and stop there.
 
 ## Which File Do I Edit?
 

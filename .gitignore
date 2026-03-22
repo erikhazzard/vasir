@@ -12,7 +12,6 @@ Thumbs.db
 node_modules/
 packages/cli/dist/
 
-docs/work
 .agents/vasir-evals/
 keys.json
 

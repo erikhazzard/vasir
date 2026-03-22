@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { scoreCaseOutput } from "../eval/scoring.js";
+import { scoreCaseOutput } from "../cli/eval/scoring.js";
 
 const DETERMINISTIC_CASE = {
   requiredSubstrings: ["seed", "rng", "clock"],

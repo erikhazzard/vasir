@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { generateEvalResponse } from "../eval/providers.js";
+import { generateEvalResponse } from "../cli/eval/providers.js";
 
 test("live provider requests time out with a structured eval error", async () => {
   await assert.rejects(

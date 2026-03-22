@@ -67,7 +67,50 @@ function createFixtureRepository() {
   };
 
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
-  writeFile(path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"), "# Project Agents\n");
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"),
+    `# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:generic -->
+
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "profiles", "frontend.md"),
+    `# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:frontend -->
+
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this frontend repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "profiles", "backend.md"),
+    `# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:backend -->
+
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "profiles", "ios.md"),
+    `# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:ios -->
+
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+`
+  );
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
     `---
@@ -126,8 +169,14 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
 
   const helpResult = runCommand(binaryPath, ["--help"], packDirectory);
   assert.equal(helpResult.status, 0, helpResult.stderr);
-  assert.match(helpResult.stdout, /vasir add <skill> \[skill...\] \[--json\] \[--replace\]/);
+  assert.match(
+    helpResult.stdout,
+    /vasir add <skill> \[skill...\] \[--json\] \[--replace\] \[--agents-profile <name>\]/
+  );
   assert.match(helpResult.stdout, /vasir remove <skill> \[skill...\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir agents init <profile> \[--json\] \[--replace\]/);
+  assert.match(helpResult.stdout, /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
+  assert.match(helpResult.stdout, /vasir agents validate \[--json\]/);
   assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(helpResult.stdout, /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(helpResult.stdout, /vasir eval rescore <skill> \[run-id\] \[--json\]/);
@@ -143,12 +192,26 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
     USERPROFILE: homeDirectory,
     VASIR_REPOSITORY_URL: repositoryUrl
   };
-  const addResult = runCommand(binaryPath, ["add", "react"], projectDirectory, addEnvironmentVariables);
+  const addResult = runCommand(
+    binaryPath,
+    ["add", "react", "--agents-profile", "frontend"],
+    projectDirectory,
+    addEnvironmentVariables
+  );
   assert.equal(addResult.status, 0, addResult.stderr);
   assert.match(addResult.stdout, /Installed react/);
   assert.match(addResult.stdout, /Project skills ready at/);
+  assert.match(addResult.stdout, /AGENTS starter ready at \(frontend\)/);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.match(
+    fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"),
+    /<!-- vasir:profile:frontend -->/
+  );
+
+  const validateResult = runCommand(binaryPath, ["agents", "validate", "--json"], projectDirectory, addEnvironmentVariables);
+  assert.equal(validateResult.status, 1);
+  assert.match(validateResult.stderr, /AGENTS_VALIDATION_FAILED/);
 
   const removeResult = runCommand(binaryPath, ["remove", "react"], projectDirectory, addEnvironmentVariables);
   assert.equal(removeResult.status, 0, removeResult.stderr);

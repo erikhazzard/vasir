@@ -1,7 +1,7 @@
 import readline from "node:readline/promises";
 import process from "node:process";
 
-import { createCommandUi } from "../scripts/ui/command-output.js";
+import { createCommandUi } from "../ui/command-output.js";
 
 export function canPromptInteractively({
   inputStream = process.stdin,

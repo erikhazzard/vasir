@@ -1,8 +1,8 @@
 import process from "node:process";
 
-import { VasirCliError } from "../install/cli-error.js";
-import { EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
-import { createCommandUi } from "../scripts/ui/command-output.js";
+import { VasirCliError } from "../cli-error.js";
+import { EVAL_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
+import { createCommandUi } from "../ui/command-output.js";
 import { createBottomLine as createEvalBottomLine } from "./evidence.js";
 import { readEvalRunArtifacts, writeEvalRunArtifacts } from "./history.js";
 import {

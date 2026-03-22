@@ -1,5 +1,5 @@
-import { VasirCliError } from "../install/cli-error.js";
-import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
+import { VasirCliError } from "../cli-error.js";
+import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
 
 export const DEFAULT_PROVIDER_REQUEST_TIMEOUT_MS = 45_000;
 
@@ -71,6 +71,13 @@ function inferMockResponseText({ modelDescriptor, promptText }) {
   const promptTextLowerCase = promptText.toLowerCase();
   const skillApplied = promptText.includes("--- Skill Guidance Start ---");
   const modelName = modelDescriptor.model;
+
+  if (promptText.includes("AGENTS Purpose Draft Request")) {
+    return JSON.stringify({
+      purpose:
+        "This repository appears to ship tooling and authored markdown that help teams install, evaluate, and maintain repo-specific agent guidance. Agents should optimize for correct local workflow changes, obvious file ownership, and edits that keep the CLI, templates, and documentation aligned."
+    });
+  }
 
   if (promptText.includes("Eval summary facts:")) {
     const hasWorse = promptText.includes("\"overallVerdict\": \"WORSE\"");

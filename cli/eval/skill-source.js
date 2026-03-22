@@ -2,15 +2,15 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-import { VasirCliError } from "../install/cli-error.js";
-import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../install/docs-ref.js";
-import { readGlobalRegistry } from "../install/global-catalog.js";
-import { buildProjectPaths } from "../install/path-layout.js";
+import { VasirCliError } from "../cli-error.js";
+import { EVAL_REFERENCE_DOCS_REF, EVAL_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
+import { readGlobalRegistry } from "../global-catalog.js";
+import { buildProjectPaths } from "../path-layout.js";
 import {
   listSkillPromptMarkdownFiles,
   readSkillMetadata as readSkillMetadataFromDirectory,
   SKILL_MANIFEST_FILE_NAME
-} from "../install/skill-metadata.js";
+} from "../skill-metadata.js";
 
 function tryReadSkillMetadata(skillDirectoryPath) {
   const manifestPath = path.join(skillDirectoryPath, SKILL_MANIFEST_FILE_NAME);

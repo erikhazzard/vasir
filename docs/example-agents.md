@@ -2,7 +2,7 @@
 
 Use this page when you want a filled example to adapt, not just the blank template.
 
-For the fastest starting point, see [templates/agents/README.md](../templates/agents/README.md). For the composable blank skeleton, see [templates/agents/AGENTS.md](../templates/agents/AGENTS.md).
+For the fastest starting point, run `vasir agents init backend`, `vasir agents init frontend`, or `vasir agents init ios`. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). For the composable blank skeleton, see [templates/agents/AGENTS.md](../templates/agents/AGENTS.md).
 
 Copy the structure below into your repo root `AGENTS.md`, then replace the routed skills and verification commands with the ones that match your project.
 

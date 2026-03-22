@@ -1,9 +1,9 @@
 import path from "node:path";
 import process from "node:process";
 
-import { VasirCliError } from "../install/cli-error.js";
-import { createCommandUi } from "../scripts/ui/command-output.js";
-import { createLiveProgress, canRenderLiveProgress } from "../scripts/ui/live-progress.js";
+import { VasirCliError } from "../cli-error.js";
+import { createCommandUi } from "../ui/command-output.js";
+import { createLiveProgress, canRenderLiveProgress } from "../ui/live-progress.js";
 import { createFailedRowSummary, createMovementSummary } from "./analysis.js";
 import { createBottomLine, createEvidenceComparison } from "./evidence.js";
 import {
