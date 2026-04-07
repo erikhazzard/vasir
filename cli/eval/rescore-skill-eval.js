@@ -115,12 +115,14 @@ export function rescoreSkillEval({
   skillName,
   runId = null,
   currentWorkingDirectory = process.cwd(),
+  projectRootDirectory = null,
   outputStream = process.stdout,
   stdoutWriter,
   jsonOutput
 }) {
   const { runDirectoryPath, run } = readEvalRunArtifacts({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     runId
   });
@@ -188,6 +190,7 @@ export function rescoreSkillEval({
 
   writeEvalRunArtifacts({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     runId: run.runId,
     runPayload: updatedRun

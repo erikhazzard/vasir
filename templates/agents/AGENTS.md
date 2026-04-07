@@ -3,9 +3,10 @@
 
 > EDIT THESE FIRST
 > 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
-> 2. Replace the example routing bullets in Section 1 with real repo paths.
-> 3. Delete any line that is not true in this repo.
-> 4. If this repo is mostly backend, frontend, or iOS code, rerun `vasir agents init <profile> --replace` for a better starter.
+> 2. Replace the example routing block in Section 1 with real repo lanes, or run `vasir agents draft-routing --write`.
+> 3. Create any scoped `AGENTS.md` files that Section 1 points at, or collapse those rules back into this root file.
+> 4. Delete any line that is not true in this repo.
+> 5. If this repo is mostly backend, frontend, or iOS code, rerun `vasir agents init <profile> --replace` for a better starter.
 
 **Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 <!-- vasir:purpose:start -->
@@ -18,10 +19,12 @@
 
 This root file contains only global rules. For domain-specific logic, you MUST read the scoped agent files before modifying code in those directories.
 
+<!-- vasir:routing:start -->
 * **[Example] Network Sync:** If touching `/src/network/`, you must first read `/src/network/AGENTS.md`.
 * **[Example] AI Agent Logic:** If modifying NPC behaviors, read `/src/ai/AGENTS.md` before proceeding.
 * **[Example] Frontend/UI:** See `/src/ui/AGENTS.md` for custom hydration, rendering, or accessibility rules.
 * **Cold Storage:** Do not read files in `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
 
 ---
 

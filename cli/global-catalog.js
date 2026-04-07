@@ -1,150 +1,338 @@
-import childProcess from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 
 import { VasirCliError } from "./cli-error.js";
-import {
-  GIT_TROUBLESHOOTING_DOCS_REF,
-  GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
-} from "./docs-ref.js";
+import { GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 import { ensureDirectoryAlias } from "./link-directory.js";
+import { getPackageRootDirectory, readPackageMetadata } from "./package-metadata.js";
 import { buildGlobalPaths } from "./path-layout.js";
 
-export const DEFAULT_REPOSITORY_URL = "https://github.com/erikhazzard/vasir.git";
+const CATALOG_ROOT_DIRECTORIES = Object.freeze(["skills", "templates"]);
+const CATALOG_ROOT_FILES = Object.freeze(["registry.json"]);
+const GLOBAL_CATALOG_STATE_FILE_NAME = ".vasir-catalog-state.json";
+const ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES = new Set([
+  ...CATALOG_ROOT_DIRECTORIES,
+  ...CATALOG_ROOT_FILES,
+  GLOBAL_CATALOG_STATE_FILE_NAME
+]);
 
-export function probeGitAvailability({
-  spawnSyncImplementation = childProcess.spawnSync
-} = {}) {
-  const commandResult = spawnSyncImplementation("git", ["--version"], {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"]
-  });
+export const DEFAULT_REPOSITORY_URL = null;
 
-  if (commandResult.error) {
-    if (commandResult.error.code === "ENOENT") {
-      return {
-        available: false,
-        error: new VasirCliError({
-          code: "GIT_NOT_FOUND",
-          message: "Git is required but was not found on PATH.",
-          suggestion: "Install Git, confirm `git --version` works, then rerun the Vasir command.",
-          docsRef: GIT_TROUBLESHOOTING_DOCS_REF
-        })
-      };
-    }
-
-    return {
-      available: false,
-      error: new VasirCliError({
-        code: "GIT_UNAVAILABLE",
-        message: `Git could not be started: ${commandResult.error.message}`,
-        suggestion: "Fix the local Git installation, confirm `git --version` works, then rerun the Vasir command.",
-        docsRef: GIT_TROUBLESHOOTING_DOCS_REF
-      })
-    };
+function normalizeLocalCatalogSourcePath(repositoryUrl) {
+  if (!repositoryUrl) {
+    return null;
   }
 
-  if (commandResult.status !== 0) {
-    return {
-      available: false,
-      error: new VasirCliError({
-        code: "GIT_UNAVAILABLE",
-        message: (commandResult.stderr || commandResult.stdout || "Git is unavailable.").trim(),
-        suggestion: "Fix the local Git installation, confirm `git --version` works, then rerun the Vasir command.",
-        docsRef: GIT_TROUBLESHOOTING_DOCS_REF
-      })
-    };
-  }
-
-  return {
-    available: true,
-    versionText: (commandResult.stdout || commandResult.stderr || "").trim()
-  };
-}
-
-function assertGitAvailable({ spawnSyncImplementation = childProcess.spawnSync } = {}) {
-  const gitProbe = probeGitAvailability({ spawnSyncImplementation });
-  if (!gitProbe.available) {
-    throw gitProbe.error;
-  }
-}
-
-function runGitCommand({
-  argumentList,
-  currentWorkingDirectory,
-  spawnSyncImplementation = childProcess.spawnSync
-}) {
-  assertGitAvailable({ spawnSyncImplementation });
-  const commandResult = spawnSyncImplementation("git", argumentList, {
-    cwd: currentWorkingDirectory,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"]
-  });
-
-  if (commandResult.error) {
-    if (commandResult.error.code === "ENOENT") {
-      throw new VasirCliError({
-        code: "GIT_NOT_FOUND",
-        message: "Git is required but was not found on PATH.",
-        suggestion: "Install Git, confirm `git --version` works, then rerun the Vasir command.",
-        docsRef: GIT_TROUBLESHOOTING_DOCS_REF
-      });
+  try {
+    const parsedUrl = new URL(repositoryUrl);
+    if (parsedUrl.protocol === "file:") {
+      return fileURLToPath(parsedUrl);
     }
 
     throw new VasirCliError({
-      code: "GIT_UNAVAILABLE",
-      message: `Git could not be started: ${commandResult.error.message}`,
-      suggestion: "Fix the local Git installation, confirm `git --version` works, then rerun the Vasir command.",
-      docsRef: GIT_TROUBLESHOOTING_DOCS_REF
-    });
-  }
-
-  if (commandResult.status !== 0) {
-    throw new VasirCliError({
-      code: "GIT_COMMAND_FAILED",
-      message: (commandResult.stderr || commandResult.stdout || "git command failed").trim(),
-      suggestion: "Inspect the Git repository state, then rerun the Vasir command.",
+      code: "CATALOG_SOURCE_UNSUPPORTED",
+      message: `Unsupported Vasir catalog source override: ${repositoryUrl}`,
+      suggestion:
+        "Use `VASIR_REPOSITORY_URL` only with a local directory path or `file:///...` URL that contains registry.json, skills/, and templates/.",
       docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
     });
+  } catch (error) {
+    if (error instanceof VasirCliError) {
+      throw error;
+    }
+
+    return path.resolve(repositoryUrl);
+  }
+}
+
+function resolveCatalogSourceDirectory({ repositoryUrl = DEFAULT_REPOSITORY_URL } = {}) {
+  const candidateDirectory = normalizeLocalCatalogSourcePath(repositoryUrl) ?? getPackageRootDirectory();
+
+  assertCatalogDirectoryLooksValid({
+    catalogDirectory: candidateDirectory,
+    label: repositoryUrl ? "catalog source override" : "bundled catalog"
+  });
+
+  return candidateDirectory;
+}
+
+function assertCatalogDirectoryLooksValid({ catalogDirectory, label }) {
+  for (const requiredRootFile of CATALOG_ROOT_FILES) {
+    if (!fs.existsSync(path.join(catalogDirectory, requiredRootFile))) {
+      throw new VasirCliError({
+        code: "INVALID_GLOBAL_CATALOG",
+        message: `${label} is missing ${requiredRootFile}: ${catalogDirectory}`,
+        suggestion: "Repair the bundled catalog or override path, then rerun the Vasir command.",
+        docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
+      });
+    }
   }
 
-  return (commandResult.stdout || "").trim();
+  for (const requiredDirectory of CATALOG_ROOT_DIRECTORIES) {
+    const requiredDirectoryPath = path.join(catalogDirectory, requiredDirectory);
+    if (!fs.existsSync(requiredDirectoryPath) || !fs.statSync(requiredDirectoryPath).isDirectory()) {
+      throw new VasirCliError({
+        code: "INVALID_GLOBAL_CATALOG",
+        message: `${label} is missing ${requiredDirectory}/: ${catalogDirectory}`,
+        suggestion: "Repair the bundled catalog or override path, then rerun the Vasir command.",
+        docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
+      });
+    }
+  }
+}
+
+function readCatalogSnapshotEntries(catalogDirectory) {
+  const snapshotEntries = [];
+
+  for (const rootFileName of CATALOG_ROOT_FILES) {
+    snapshotEntries.push({
+      absolutePath: path.join(catalogDirectory, rootFileName),
+      relativePath: rootFileName
+    });
+  }
+
+  for (const rootDirectoryName of CATALOG_ROOT_DIRECTORIES) {
+    const rootDirectoryPath = path.join(catalogDirectory, rootDirectoryName);
+    const directoryEntries = fs.readdirSync(rootDirectoryPath, { withFileTypes: true });
+
+    function walk(currentDirectoryPath, currentRelativeDirectoryPath) {
+      for (const directoryEntry of fs.readdirSync(currentDirectoryPath, { withFileTypes: true })) {
+        const entryAbsolutePath = path.join(currentDirectoryPath, directoryEntry.name);
+        const entryRelativePath = path.join(currentRelativeDirectoryPath, directoryEntry.name).replace(/\\/g, "/");
+
+        if (directoryEntry.isDirectory()) {
+          walk(entryAbsolutePath, entryRelativePath);
+          continue;
+        }
+
+        if (directoryEntry.isFile()) {
+          snapshotEntries.push({
+            absolutePath: entryAbsolutePath,
+            relativePath: entryRelativePath
+          });
+        }
+      }
+    }
+
+    for (const directoryEntry of directoryEntries) {
+      const entryAbsolutePath = path.join(rootDirectoryPath, directoryEntry.name);
+      const entryRelativePath = path.join(rootDirectoryName, directoryEntry.name).replace(/\\/g, "/");
+
+      if (directoryEntry.isDirectory()) {
+        walk(entryAbsolutePath, entryRelativePath);
+        continue;
+      }
+
+      if (directoryEntry.isFile()) {
+        snapshotEntries.push({
+          absolutePath: entryAbsolutePath,
+          relativePath: entryRelativePath
+        });
+      }
+    }
+  }
+
+  return snapshotEntries.sort((leftEntry, rightEntry) => leftEntry.relativePath.localeCompare(rightEntry.relativePath));
+}
+
+function computeCatalogSnapshotHash(catalogDirectory) {
+  const hash = crypto.createHash("sha256");
+
+  for (const snapshotEntry of readCatalogSnapshotEntries(catalogDirectory)) {
+    hash.update(snapshotEntry.relativePath);
+    hash.update("\n");
+    hash.update(fs.readFileSync(snapshotEntry.absolutePath));
+    hash.update("\n");
+  }
+
+  return hash.digest("hex");
+}
+
+function readGlobalCatalogState(globalCatalogDirectory) {
+  const stateFilePath = path.join(globalCatalogDirectory, GLOBAL_CATALOG_STATE_FILE_NAME);
+  if (!fs.existsSync(stateFilePath)) {
+    return null;
+  }
+
+  try {
+    const parsedState = JSON.parse(fs.readFileSync(stateFilePath, "utf8"));
+    if (
+      typeof parsedState !== "object" ||
+      parsedState === null ||
+      typeof parsedState.sourceHash !== "string" ||
+      typeof parsedState.packageVersion !== "string"
+    ) {
+      return null;
+    }
+
+    return parsedState;
+  } catch {
+    return null;
+  }
+}
+
+function writeGlobalCatalogState({
+  globalCatalogDirectory,
+  sourceHash
+}) {
+  const packageMetadata = readPackageMetadata();
+  fs.writeFileSync(
+    path.join(globalCatalogDirectory, GLOBAL_CATALOG_STATE_FILE_NAME),
+    `${JSON.stringify({
+      packageVersion: packageMetadata.version,
+      sourceHash
+    }, null, 2)}\n`
+  );
+}
+
+function copyCatalogSnapshot({
+  sourceDirectory,
+  targetDirectory
+}) {
+  fs.rmSync(targetDirectory, { recursive: true, force: true });
+  fs.mkdirSync(targetDirectory, { recursive: true });
+
+  for (const rootFileName of CATALOG_ROOT_FILES) {
+    fs.copyFileSync(
+      path.join(sourceDirectory, rootFileName),
+      path.join(targetDirectory, rootFileName)
+    );
+  }
+
+  for (const rootDirectoryName of CATALOG_ROOT_DIRECTORIES) {
+    fs.cpSync(
+      path.join(sourceDirectory, rootDirectoryName),
+      path.join(targetDirectory, rootDirectoryName),
+      { recursive: true }
+    );
+  }
 }
 
 function assertGlobalCatalogLooksValid(globalCatalogDirectory) {
-  if (!fs.existsSync(path.join(globalCatalogDirectory, ".git"))) {
-    throw new VasirCliError({
-      code: "INVALID_GLOBAL_CATALOG",
-      message: `Global catalog is missing .git metadata: ${globalCatalogDirectory}`,
-      suggestion: "Remove the broken global catalog directory, then rerun `vasir init`.",
-      docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
-    });
-  }
-
-  if (!fs.existsSync(path.join(globalCatalogDirectory, "registry.json"))) {
-    throw new VasirCliError({
-      code: "INVALID_GLOBAL_CATALOG",
-      message: `Global catalog is missing registry.json: ${globalCatalogDirectory}`,
-      suggestion: "Remove the broken global catalog directory, then rerun `vasir init`.",
-      docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
-    });
-  }
+  assertCatalogDirectoryLooksValid({
+    catalogDirectory: globalCatalogDirectory,
+    label: "global catalog"
+  });
 }
 
-function assertGlobalCatalogIsClean({ globalCatalogDirectory, spawnSyncImplementation }) {
-  const porcelainOutput = runGitCommand({
-    argumentList: ["status", "--porcelain"],
-    currentWorkingDirectory: globalCatalogDirectory,
-    spawnSyncImplementation
-  });
+function listUnexpectedCatalogRootEntries(globalCatalogDirectory) {
+  if (!fs.existsSync(globalCatalogDirectory)) {
+    return [];
+  }
 
-  if (porcelainOutput.length > 0) {
+  return fs.readdirSync(globalCatalogDirectory, { withFileTypes: true })
+    .filter((entry) => !ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES.has(entry.name))
+    .map((entry) => entry.name)
+    .sort();
+}
+
+function synchronizeCatalogCache({
+  globalCatalogDirectory,
+  sourceDirectory
+}) {
+  fs.mkdirSync(path.dirname(globalCatalogDirectory), { recursive: true });
+  copyCatalogSnapshot({
+    sourceDirectory,
+    targetDirectory: globalCatalogDirectory
+  });
+  writeGlobalCatalogState({
+    globalCatalogDirectory,
+    sourceHash: computeCatalogSnapshotHash(sourceDirectory)
+  });
+}
+
+function inspectCatalogCache({
+  globalCatalogDirectory,
+  sourceDirectory
+}) {
+  const expectedSourceHash = computeCatalogSnapshotHash(sourceDirectory);
+  const packageMetadata = readPackageMetadata();
+  const globalCatalogState = fs.existsSync(globalCatalogDirectory)
+    ? readGlobalCatalogState(globalCatalogDirectory)
+    : null;
+
+  let actualTargetHash = null;
+  if (fs.existsSync(globalCatalogDirectory)) {
+    try {
+      actualTargetHash = computeCatalogSnapshotHash(globalCatalogDirectory);
+    } catch {
+      actualTargetHash = null;
+    }
+  }
+
+  if (
+    fs.existsSync(globalCatalogDirectory) &&
+    globalCatalogState?.sourceHash &&
+    actualTargetHash !== null &&
+    actualTargetHash !== globalCatalogState.sourceHash
+  ) {
     throw new VasirCliError({
       code: "GLOBAL_CATALOG_DIRTY",
-      message: `Global catalog has uncommitted changes at ${globalCatalogDirectory}. Refusing to update or install from a dirty source.`,
-      suggestion: "Clean or relocate the modified global catalog directory, then rerun the Vasir command.",
+      message: `Global catalog cache has local changes and cannot be refreshed safely: ${globalCatalogDirectory}`,
+      suggestion:
+        "Move aside or delete `~/.agents/vasir` if you want Vasir to rebuild the cache from the installed bundle or local override source, then rerun the command.",
       docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
+    });
+  }
+
+  const unexpectedRootEntries = listUnexpectedCatalogRootEntries(globalCatalogDirectory);
+  if (unexpectedRootEntries.length > 0) {
+    throw new VasirCliError({
+      code: "GLOBAL_CATALOG_DIRTY",
+      message: `Global catalog cache has local changes and cannot be refreshed safely: ${globalCatalogDirectory}`,
+      suggestion:
+        "Move aside or delete `~/.agents/vasir` if you want Vasir to rebuild the cache from the installed bundle or local override source, then rerun the command.",
+      context: {
+        unexpectedRootEntries
+      },
+      docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
+    });
+  }
+
+  const needsSynchronization =
+    !fs.existsSync(globalCatalogDirectory) ||
+    globalCatalogState?.sourceHash !== expectedSourceHash ||
+    actualTargetHash !== expectedSourceHash;
+
+  return {
+    packageVersion: packageMetadata.version,
+    sourceHash: expectedSourceHash,
+    needsSynchronization
+  };
+}
+
+function ensureCatalogCacheCurrent({
+  globalCatalogDirectory,
+  sourceDirectory
+}) {
+  const catalogState = inspectCatalogCache({
+    globalCatalogDirectory,
+    sourceDirectory
+  });
+
+  if (catalogState.needsSynchronization) {
+    synchronizeCatalogCache({
+      globalCatalogDirectory,
+      sourceDirectory
+    });
+  }
+
+  return catalogState;
+}
+
+function readRegistryFromCatalogDirectory(catalogDirectory) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(catalogDirectory, "registry.json"), "utf8"));
+  } catch (error) {
+    throw new VasirCliError({
+      code: "INVALID_GLOBAL_CATALOG",
+      message: `Global catalog registry is invalid at ${catalogDirectory}.`,
+      suggestion: "Repair the bundled catalog or override path, then rerun the Vasir command.",
+      docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF,
+      cause: error
     });
   }
 }
@@ -162,99 +350,94 @@ function repairGlobalAliases({ globalPaths, platform }) {
   });
 }
 
-function cloneGlobalCatalog({
-  globalCatalogDirectory,
-  repositoryUrl,
-  spawnSyncImplementation
-}) {
-  fs.mkdirSync(path.dirname(globalCatalogDirectory), { recursive: true });
-  runGitCommand({
-    argumentList: ["clone", "--depth", "1", repositoryUrl, globalCatalogDirectory],
-    currentWorkingDirectory: process.cwd(),
-    spawnSyncImplementation
-  });
-}
-
-function pullGlobalCatalog({
-  globalCatalogDirectory,
-  spawnSyncImplementation
-}) {
-  runGitCommand({
-    argumentList: ["-C", globalCatalogDirectory, "pull", "--ff-only"],
-    currentWorkingDirectory: process.cwd(),
-    spawnSyncImplementation
-  });
-}
-
 export function ensureGlobalCatalogPresent({
   homeDirectory,
   repositoryUrl = DEFAULT_REPOSITORY_URL,
   platform = process.platform,
-  spawnSyncImplementation = childProcess.spawnSync
+  spawnSyncImplementation = null
 } = {}) {
   const globalPaths = buildGlobalPaths({ homeDirectory });
-
-  if (!fs.existsSync(globalPaths.globalCatalogDirectory)) {
-    cloneGlobalCatalog({
-      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-      repositoryUrl,
-      spawnSyncImplementation
-    });
-  }
+  const sourceDirectory = resolveCatalogSourceDirectory({ repositoryUrl });
+  const catalogState = ensureCatalogCacheCurrent({
+    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    sourceDirectory
+  });
 
   assertGlobalCatalogLooksValid(globalPaths.globalCatalogDirectory);
-  assertGlobalCatalogIsClean({
-    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-    spawnSyncImplementation
-  });
   repairGlobalAliases({ globalPaths, platform });
 
-  return globalPaths;
+  return {
+    globalPaths,
+    sourceDirectory,
+    catalogState
+  };
 }
 
 export function synchronizeGlobalCatalog({
   homeDirectory,
   repositoryUrl = DEFAULT_REPOSITORY_URL,
   platform = process.platform,
-  spawnSyncImplementation = childProcess.spawnSync
+  spawnSyncImplementation = null
 } = {}) {
   const globalPaths = buildGlobalPaths({ homeDirectory });
+  const sourceDirectory = resolveCatalogSourceDirectory({ repositoryUrl });
+  const catalogState = ensureCatalogCacheCurrent({
+    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    sourceDirectory
+  });
 
-  if (!fs.existsSync(globalPaths.globalCatalogDirectory)) {
-    cloneGlobalCatalog({
+  if (catalogState.needsSynchronization) {
+    synchronizeCatalogCache({
       globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-      repositoryUrl,
-      spawnSyncImplementation
-    });
-  } else {
-    assertGlobalCatalogLooksValid(globalPaths.globalCatalogDirectory);
-    assertGlobalCatalogIsClean({
-      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-      spawnSyncImplementation
-    });
-    pullGlobalCatalog({
-      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-      spawnSyncImplementation
+      sourceDirectory
     });
   }
-
   assertGlobalCatalogLooksValid(globalPaths.globalCatalogDirectory);
-  assertGlobalCatalogIsClean({
-    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-    spawnSyncImplementation
-  });
   repairGlobalAliases({ globalPaths, platform });
 
-  return globalPaths;
+  return {
+    globalPaths,
+    sourceDirectory,
+    catalogState: {
+      packageVersion: catalogState.packageVersion,
+      sourceHash: catalogState.sourceHash
+    }
+  };
+}
+
+export function inspectGlobalCatalog({
+  homeDirectory,
+  repositoryUrl = DEFAULT_REPOSITORY_URL,
+  platform = process.platform,
+  spawnSyncImplementation = null
+} = {}) {
+  const globalPaths = buildGlobalPaths({ homeDirectory });
+  const sourceDirectory = resolveCatalogSourceDirectory({ repositoryUrl });
+  const catalogState = inspectCatalogCache({
+    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    sourceDirectory
+  });
+
+  assertCatalogDirectoryLooksValid({
+    catalogDirectory: sourceDirectory,
+    label: repositoryUrl ? "catalog source override" : "bundled catalog"
+  });
+
+  return {
+    globalPaths,
+    sourceDirectory,
+    catalogState,
+    registry: readRegistryFromCatalogDirectory(sourceDirectory)
+  };
 }
 
 export function readGlobalRegistry({
   homeDirectory,
   repositoryUrl = DEFAULT_REPOSITORY_URL,
   platform = process.platform,
-  spawnSyncImplementation = childProcess.spawnSync
+  spawnSyncImplementation = null
 } = {}) {
-  const globalPaths = ensureGlobalCatalogPresent({
+  const { globalPaths, sourceDirectory, catalogState } = ensureGlobalCatalogPresent({
     homeDirectory,
     repositoryUrl,
     platform,
@@ -263,18 +446,8 @@ export function readGlobalRegistry({
 
   return {
     globalPaths,
-    registry: (() => {
-      try {
-        return JSON.parse(fs.readFileSync(path.join(globalPaths.globalCatalogDirectory, "registry.json"), "utf8"));
-      } catch (error) {
-        throw new VasirCliError({
-          code: "INVALID_GLOBAL_CATALOG",
-          message: `Global catalog registry is invalid at ${globalPaths.globalCatalogDirectory}.`,
-          suggestion: "Remove the broken global catalog directory, then rerun `vasir init`.",
-          docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF,
-          cause: error
-        });
-      }
-    })()
+    sourceDirectory,
+    catalogState,
+    registry: readRegistryFromCatalogDirectory(sourceDirectory)
   };
 }

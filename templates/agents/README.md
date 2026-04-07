@@ -6,11 +6,12 @@ This folder is the canonical source for AGENTS starter content.
 
 Fastest path:
 
-1. Run `vasir add <skill> --agents-profile backend|frontend|ios`, or run `vasir agents init backend|frontend|ios` if you only want the AGENTS starter.
-2. Open the generated repo-root `AGENTS.md`.
-3. Rewrite the `Purpose` block and replace the Section 1 routing examples.
-4. Optional: run `vasir agents draft-purpose --write --model openai` for a repo-aware first draft of the opening paragraph.
-5. Finish with `vasir agents validate`.
+1. Run `vasir add <skill>`. Vasir now seeds `AGENTS.md` automatically, and `--agents-profile backend|frontend|ios` is the override when you want to force a stronger starter.
+2. If you only want the AGENTS starter, run `vasir agents init backend|frontend|ios`.
+3. Open the generated repo-root `AGENTS.md`.
+4. Rewrite the `Purpose` block and replace the Section 1 routing examples, or run `vasir agents draft-purpose --write --model openai` plus `vasir agents draft-routing --write`.
+5. Create any scoped `AGENTS.md` files that Section 1 points at, or collapse those rules back into the root file.
+6. Finish with `vasir agents validate`.
 
 If you want to edit the source templates directly, use the table below and stop there.
 

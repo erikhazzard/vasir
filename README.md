@@ -8,26 +8,29 @@ The product is the markdown itself. The CLI exists to make the correct `.agents`
 
 ## Quick Start
 
-Vasir is not published on npm yet. Install it directly from GitHub for now:
+Vasir is not published on npm yet. Install it directly from GitHub for now, and pin a tag or commit in production:
 
 ```bash
-npm install -g git+https://github.com/erikhazzard/vasir.git
+npm install -g git+https://github.com/erikhazzard/vasir.git#<tag-or-sha>
 vasir --version
-vasir add react --agents-profile frontend
+vasir add react
+# or copy the full catalog into this repo
+vasir add all
 ```
 
 Prerequisites:
 
 - Node 18.17+
-- Git on `PATH`
 
 Verify first success:
 
 1. `vasir --version` prints the installed CLI version.
-2. `vasir add react --agents-profile frontend` prints `Project skills ready at .../.agents/skills`.
+2. `vasir add react` prints `Project skills ready at .../.agents/skills`.
 3. That directory contains `react/SKILL.md`.
-4. The same command also seeds `AGENTS.md` from the frontend profile in your repo root.
-5. Optional: run `vasir agents draft-purpose --write --model openai`, then `vasir agents validate`.
+4. The same command also seeds `AGENTS.md` in your repo root, inferring a stronger profile when the repo shape is obvious.
+5. Optional: run `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, then `vasir agents validate`.
+
+`vasir add all` installs every catalog skill into the current repo when you want the full bundle instead of picking individual skills.
 
 Remove a project-local skill:
 
@@ -35,7 +38,20 @@ Remove a project-local skill:
 vasir remove react
 ```
 
-Vasir resolves the project root as the nearest parent containing `.git`. If there is no `.git` ancestor, it uses the current working directory.
+Vasir resolves the project root as the nearest parent containing `.git`. If there is no `.git` ancestor, it uses the current working directory. Pass `--repo-root <path>` when you want to target an explicit subproject root instead, including monorepo packages.
+
+The installed CLI now carries its own bundled catalog. Normal `vasir init`, `list`, `add`, and `update` flows do not need Git or a live upstream catalog after installation.
+
+To keep another repo up to date after upgrading Vasir itself, install the newer CLI version first, then run:
+
+```bash
+vasir update --dry-run
+vasir update
+```
+
+Add `--repo-root <path>` when the target is a nested package or subproject. `vasir update` refreshes the global cache under `~/.agents/vasir`, then refreshes the Vasir-managed skills already installed in the targeted repo.
+
+`VASIR_REPOSITORY_URL` is now a local testing override only. Use it only with a local directory path or `file:///...` URL that already contains `registry.json`, `skills/`, and `templates/`.
 
 Repo-local eval workflow:
 
@@ -55,7 +71,7 @@ If the command fails, start with [docs/troubleshooting.md](./docs/troubleshootin
 
 - Need commands, flags, JSON envelopes, or filesystem facts? See [docs/cli-reference.md](./docs/cli-reference.md).
 - Need recovery steps for an error or failed install? See [docs/troubleshooting.md](./docs/troubleshooting.md).
-- Need the fastest AGENTS scaffold flow? Run `vasir add <skill> --agents-profile <backend|frontend|ios>` or `vasir agents init <backend|frontend|ios>`, then see [templates/agents/README.md](./templates/agents/README.md).
+- Need the fastest AGENTS scaffold flow? Run `vasir add <skill>` or `vasir add <skill> --agents-profile <backend|frontend|ios>` when you want to force the starter, then see [templates/agents/README.md](./templates/agents/README.md).
 - Need to measure whether a skill change actually improved steering? Start with `vasir eval run <skill>`. It defaults to `openai:gpt-5.4`, `anthropic:claude-opus-4-6`, and `3` trials per pair, supports optional `judgePrompt` on top of a required hard floor, and still supports `--model mock` for a zero-cost local smoke test. Use `vasir eval inspect <skill>` to inspect the latest saved run or `vasir eval rescore <skill>` after scorer changes. See [docs/cli-reference.md](./docs/cli-reference.md#eval).
 - Want to build your first skill end-to-end? See [docs/create-your-first-skill.md](./docs/create-your-first-skill.md).
 - Need the authoring workflow for new or revised skills? See [docs/writing-skills.md](./docs/writing-skills.md).

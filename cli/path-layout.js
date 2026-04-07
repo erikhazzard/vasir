@@ -24,15 +24,21 @@ export function buildGlobalPaths({ homeDirectory = getHomeDirectory() } = {}) {
   };
 }
 
-export function buildProjectPaths({ currentWorkingDirectory = process.cwd() } = {}) {
-  const projectRootDirectory = findProjectRootDirectory({ currentWorkingDirectory });
-  const agentsDirectory = path.join(projectRootDirectory, ".agents");
-  const claudeDirectory = path.join(projectRootDirectory, ".claude");
-  const codexDirectory = path.join(projectRootDirectory, ".codex");
+export function buildProjectPaths({
+  currentWorkingDirectory = process.cwd(),
+  projectRootDirectory = null
+} = {}) {
+  const resolvedProjectRootDirectory = findProjectRootDirectory({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
+  const agentsDirectory = path.join(resolvedProjectRootDirectory, ".agents");
+  const claudeDirectory = path.join(resolvedProjectRootDirectory, ".claude");
+  const codexDirectory = path.join(resolvedProjectRootDirectory, ".codex");
   const projectSkillsDirectory = path.join(agentsDirectory, "skills");
 
   return {
-    projectRootDirectory,
+    projectRootDirectory: resolvedProjectRootDirectory,
     agentsDirectory,
     claudeDirectory,
     codexDirectory,
@@ -42,7 +48,14 @@ export function buildProjectPaths({ currentWorkingDirectory = process.cwd() } = 
   };
 }
 
-export function findProjectRootDirectory({ currentWorkingDirectory = process.cwd() } = {}) {
+export function findProjectRootDirectory({
+  currentWorkingDirectory = process.cwd(),
+  projectRootDirectory = null
+} = {}) {
+  if (projectRootDirectory !== null) {
+    return path.resolve(projectRootDirectory);
+  }
+
   let candidateDirectory = path.resolve(currentWorkingDirectory);
 
   while (true) {

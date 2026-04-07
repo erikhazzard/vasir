@@ -68,6 +68,9 @@ function createFixtureRepository() {
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **[Example] Core Area:** If touching \`/src/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
 `
   );
   writeFile(
@@ -79,8 +82,10 @@ function createFixtureRepository() {
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this frontend repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
-
 ## 1. Topography & Routing Protocol (The Map)
+<!-- vasir:routing:start -->
+* **UI Surface:** If touching \`/src/components/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
 `
   );
   writeFile(
@@ -92,6 +97,9 @@ function createFixtureRepository() {
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **API Surface:** If touching \`/src/api/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
 `
   );
   writeFile(
@@ -103,6 +111,9 @@ function createFixtureRepository() {
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **App Lifecycle:** If touching \`/ios/App/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
 `
   );
   writeFile(
@@ -169,17 +180,22 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /vasir remove <skill> \[skill...\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents init <profile> \[--json\] \[--replace\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
+  assert.match(capturedOutput.readStdout(), /vasir agents draft-routing \[--json\] \[--write\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents validate \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval rescore <skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir --version/);
+  assert.match(capturedOutput.readStdout(), /vasir add all/i);
   assert.match(capturedOutput.readStdout(), /--json/);
   assert.match(capturedOutput.readStdout(), /--replace/);
+  assert.match(capturedOutput.readStdout(), /--repo-root <path>/);
+  assert.match(capturedOutput.readStdout(), /--dry-run/);
   assert.match(capturedOutput.readStdout(), /--write/);
   assert.match(capturedOutput.readStdout(), /--trials <count>/);
   assert.match(capturedOutput.readStdout(), /--model openai, --model opus, --model mock/i);
-  assert.match(capturedOutput.readStdout(), /mutate the global catalog under ~\/\.agents\/vasir/i);
+  assert.match(capturedOutput.readStdout(), /init inside a repo installs the full catalog into that repo/i);
+  assert.match(capturedOutput.readStdout(), /refreshes the skills tracked by the current repo/i);
   assert.match(capturedOutput.readStdout(), /mutates only the current repo/i);
   assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root/i);
   assert.match(capturedOutput.readStdout(), /agents validate fails closed/i);
@@ -445,6 +461,84 @@ test("add can install skills and seed a stack-specific AGENTS starter in one com
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
 });
 
+test("add all installs the full catalog into the current repo", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console" }, null, 2)}\n`
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "add", "all", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "add");
+  assert.equal(parsedOutput.status, "success");
+  assert.deepEqual(parsedOutput.installedSkills, ["react"]);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+});
+
+test("add rejects mixing all with specific skill names", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "add", "all", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "add");
+  assert.equal(parsedError.code, "ALL_SKILLS_REQUEST_CONFLICT");
+  assert.match(parsedError.message, /cannot be combined/i);
+});
+
+test("add infers a stronger AGENTS profile when the repo shape is obvious", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "add");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.agentsProfile, "frontend");
+  assert.equal(parsedOutput.agentsProfileSource, "inferred");
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.match(
+    fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"),
+    /<!-- vasir:profile:frontend -->/
+  );
+});
+
 test("agents draft-purpose can replace the untouched purpose placeholder with a repo-aware draft", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
@@ -490,6 +584,46 @@ test("agents draft-purpose can replace the untouched purpose placeholder with a 
   assert.doesNotMatch(agentsText, /<!-- vasir:purpose:start -->/);
   assert.doesNotMatch(agentsText, /Replace this block first\./);
   assert.match(agentsText, /\*\*Purpose:\*\* This repository appears to ship tooling and authored markdown/i);
+});
+
+test("agents draft-routing can replace the Section 1 placeholder with repo-aware lanes", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedInitOutput = captureCommandWriters();
+
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+  writeFile(path.join(projectDirectory, "src", "styles", "tokens.css"), ":root {}\n");
+
+  const initStatusCode = await runCommandLine(["node", "vasir", "agents", "init", "frontend", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedInitOutput
+  });
+  assert.equal(initStatusCode, 0);
+
+  const capturedDraftOutput = captureCommandWriters();
+  const draftStatusCode = await runCommandLine(
+    ["node", "vasir", "agents", "draft-routing", "--write", "--json"],
+    {
+      currentWorkingDirectory: projectDirectory,
+      ...capturedDraftOutput
+    }
+  );
+
+  assert.equal(draftStatusCode, 0);
+  const parsedOutput = JSON.parse(capturedDraftOutput.readStdout());
+  assert.equal(parsedOutput.command, "agents");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.subcommand, "draft-routing");
+  assert.equal(parsedOutput.wroteRouting, true);
+  assert.ok(parsedOutput.routingLines.some((line) => line.includes("/src/components/")));
+
+  const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  assert.match(agentsText, /<!-- vasir:routing:start -->/);
+  assert.match(agentsText, /\/src\/components\//);
+  assert.doesNotMatch(agentsText, /\[Example\]/);
 });
 
 test("agents validate fails closed on leftover scaffold markers and passes once the file is clean", async () => {
@@ -540,6 +674,49 @@ test("agents validate fails closed on leftover scaffold markers and passes once 
   assert.deepEqual(parsedOutput.issues, []);
 });
 
+test("agents validate fails when a routed lane points at a directory without a scoped AGENTS file", async () => {
+  const projectDirectory = createTemporaryDirectory();
+  const capturedInvalidOutput = captureCommandWriters();
+
+  fs.mkdirSync(path.join(projectDirectory, "src", "components"), { recursive: true });
+  writeFile(
+    path.join(projectDirectory, "AGENTS.md"),
+    `# AGENTS.md: Clean Root Manifest
+
+**Last Updated:** 2026-03-21 - update alongside major architectural PRs
+**Purpose:** This repository ships a clean AGENTS manifest for deterministic local agent work.
+
+## 1. Topography & Routing Protocol (The Map)
+
+* **UI Surface:** If touching \`/src/components/\`, you must first read that directory's local \`AGENTS.md\` before changing component structure.
+`
+  );
+
+  const invalidStatusCode = await runCommandLine(["node", "vasir", "agents", "validate", "--json"], {
+    currentWorkingDirectory: projectDirectory,
+    ...capturedInvalidOutput
+  });
+
+  assert.equal(invalidStatusCode, 1);
+  const parsedError = JSON.parse(capturedInvalidOutput.readStderr());
+  assert.equal(parsedError.command, "agents");
+  assert.equal(parsedError.code, "AGENTS_VALIDATION_FAILED");
+  assert.ok(parsedError.context.issues.some((issue) => issue.code === "SCOPED_AGENTS_MISSING"));
+
+  writeFile(
+    path.join(projectDirectory, "src", "components", "AGENTS.md"),
+    "# UI Lane Manifest\n"
+  );
+
+  const capturedValidOutput = captureCommandWriters();
+  const validStatusCode = await runCommandLine(["node", "vasir", "agents", "validate", "--json"], {
+    currentWorkingDirectory: projectDirectory,
+    ...capturedValidOutput
+  });
+
+  assert.equal(validStatusCode, 0);
+});
+
 test("add success supports json output for automation consumers", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
@@ -588,30 +765,22 @@ test("replace on an untracked manual skill returns a structured json error with 
   );
 });
 
-test("init fails with a structured actionable error when git is unavailable", async () => {
+test("init rejects unsupported remote catalog overrides with structured guidance", async () => {
   const capturedOutput = captureCommandWriters();
 
   const statusCode = await runCommandLine(["node", "vasir", "init", "--json"], {
     homeDirectory: createTemporaryDirectory(),
-    repositoryUrl: "file:///unused",
-    spawnSyncImplementation() {
-      return {
-        error: Object.assign(new Error("spawn git ENOENT"), { code: "ENOENT" }),
-        status: null,
-        stdout: "",
-        stderr: ""
-      };
-    },
+    repositoryUrl: "https://example.com/vasir.git",
     ...capturedOutput
   });
 
   assert.equal(statusCode, 1);
   const parsedError = JSON.parse(capturedOutput.readStderr());
-  assert.equal(parsedError.code, "GIT_NOT_FOUND");
-  assert.match(parsedError.suggestion, /Install Git/);
+  assert.equal(parsedError.code, "CATALOG_SOURCE_UNSUPPORTED");
+  assert.match(parsedError.suggestion, /local directory path/i);
   assert.equal(parsedError.command, "init");
   assert.equal(
     parsedError.docsRef,
-    `${DOCS_BASE_URL}/docs/troubleshooting.md#git-and-node-prerequisites`
+    `${DOCS_BASE_URL}/docs/troubleshooting.md#global-catalog-problems`
   );
 });

@@ -3,8 +3,9 @@
 
 > EDIT THESE FIRST
 > 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
-> 2. Replace the routing bullets in Section 1 with the real UI, route, and styling paths in this repo.
-> 3. Delete any rendering, state, or styling rule that is not true here.
+> 2. Replace the routing block in Section 1 with the real UI, route, and styling lanes in this repo, or run `vasir agents draft-routing --write`.
+> 3. Create any scoped `AGENTS.md` files that Section 1 points at, or collapse those rules back into this root file.
+> 4. Delete any rendering, state, or styling rule that is not true here.
 
 **Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 <!-- vasir:purpose:start -->
@@ -17,10 +18,12 @@
 
 This root file contains only global rules. For domain-specific logic, you MUST read the scoped agent files before modifying code in those directories.
 
+<!-- vasir:routing:start -->
 * **UI Surface:** If touching `/src/ui/`, `/src/components/`, or `/app/components/`, read the UI manifest before changing component structure.
 * **Routing / Data Loading:** If touching `/src/routes/`, `/app/`, or page-level loaders, read the route manifest before changing navigation or hydration.
 * **Styling / Design System:** If touching `/src/styles/`, tokens, or the design system, read the styling manifest before introducing new primitives.
 * **Cold Storage:** Do not read `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
 
 ---
 

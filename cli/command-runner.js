@@ -1,7 +1,10 @@
 import childProcess from "node:child_process";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import process from "node:process";
 
-import { runAgents } from "./agents.js";
+import { resolveRecommendedAgentsProfile, runAgents } from "./agents.js";
 import {
   formatCliErrorForJson,
   formatCliErrorForText,
@@ -9,6 +12,7 @@ import {
   wrapUnknownCliError
 } from "./cli-error.js";
 import {
+  COMMANDS_REFERENCE_DOCS_REF,
   ADD_REFERENCE_DOCS_REF,
   EVAL_REFERENCE_DOCS_REF,
   REMOVE_REFERENCE_DOCS_REF,
@@ -16,18 +20,24 @@ import {
   UNKNOWN_COMMAND_TROUBLESHOOTING_DOCS_REF
 } from "./docs-ref.js";
 import { readPackageMetadata } from "./package-metadata.js";
-import { readGlobalRegistry, synchronizeGlobalCatalog } from "./global-catalog.js";
+import { inspectGlobalCatalog, readGlobalRegistry, synchronizeGlobalCatalog } from "./global-catalog.js";
+import { buildProjectPaths } from "./path-layout.js";
 import {
   installSkillsIntoProject,
   listInstalledProjectSkills,
+  listManagedProjectSkills,
   removeSkillsFromProject
 } from "./project-skills.js";
+import { inspectProjectSkillReplaceSafety, readProjectInstallState } from "./project-install-state.js";
+import { listSkillFiles } from "./skill-metadata.js";
 import { canPromptInteractively, promptForMissingProviderCredential } from "./eval/interactive.js";
 import { inspectSkillEval } from "./eval/inspect-skill-eval.js";
 import { rescoreSkillEval } from "./eval/rescore-skill-eval.js";
 import { runSkillEval } from "./eval/run-skill-eval.js";
 import { createCommandUi } from "./ui/command-output.js";
 import { interactiveMultiSelect } from "./ui/interactive-select.js";
+
+const ADD_ALL_SKILLS_KEYWORD = "all";
 
 function writeLine(outputWriter, message) {
   outputWriter(`${message}\n`);
@@ -42,34 +52,236 @@ function formatVersionText() {
   return `${packageMetadata.name} ${packageMetadata.version}`;
 }
 
+function computeFileSha256(filePath) {
+  return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+}
+
+function resolveProjectRootDirectoryFlag(projectRootArgument) {
+  if (projectRootArgument === null) {
+    return null;
+  }
+
+  const resolvedProjectRootDirectory = path.resolve(projectRootArgument);
+  if (!fs.existsSync(resolvedProjectRootDirectory)) {
+    throw new VasirCliError({
+      code: "PROJECT_ROOT_NOT_FOUND",
+      message: `Project root does not exist: ${resolvedProjectRootDirectory}`,
+      suggestion: "Pass `--repo-root <path>` with an existing directory when targeting a specific repo root.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (!fs.statSync(resolvedProjectRootDirectory).isDirectory()) {
+    throw new VasirCliError({
+      code: "PROJECT_ROOT_NOT_DIRECTORY",
+      message: `Project root must be a directory: ${resolvedProjectRootDirectory}`,
+      suggestion: "Pass `--repo-root <path>` with a directory that should be treated as the repo root.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
+    });
+  }
+
+  return resolvedProjectRootDirectory;
+}
+
+function buildCatalogSkillEntryMap(registry) {
+  return new Map(registry.skills.map((skillEntry) => [skillEntry.name, skillEntry]));
+}
+
+function resolveProjectTrackingMode({
+  projectInstallState,
+  registry,
+  managedSkillNames
+}) {
+  const explicitTrackingMode = projectInstallState.catalog?.trackingMode ?? null;
+  if (explicitTrackingMode === "all" || explicitTrackingMode === "selected") {
+    return explicitTrackingMode;
+  }
+
+  if (managedSkillNames.length === 0) {
+    return null;
+  }
+
+  const installedSkillNameSet = new Set(managedSkillNames);
+  const catalogSkillNames = registry.skills.map((skillEntry) => skillEntry.name);
+  const coversFullCatalog =
+    installedSkillNameSet.size === catalogSkillNames.length &&
+    catalogSkillNames.every((skillName) => installedSkillNameSet.has(skillName));
+
+  return coversFullCatalog ? "all" : "selected";
+}
+
+function classifyManagedSkillUpdates({
+  desiredSkillNames,
+  registry,
+  globalCatalogDirectory,
+  projectPaths,
+  projectInstallState
+}) {
+  const skillEntriesByName = buildCatalogSkillEntryMap(registry);
+  const planEntries = [];
+
+  for (const skillName of desiredSkillNames) {
+    const targetSkillDirectory = path.join(projectPaths.projectSkillsDirectory, skillName);
+    const trackedSkillEntry = projectInstallState.skills[skillName] ?? null;
+    const catalogSkillEntry = skillEntriesByName.get(skillName) ?? null;
+
+    if (!catalogSkillEntry) {
+      planEntries.push({
+        skillName,
+        status: "blocked",
+        installedVersion: trackedSkillEntry?.provenance?.skillVersion ?? null,
+        availableVersion: null,
+        reason: "Skill no longer exists in the current Vasir catalog.",
+        error: new VasirCliError({
+          code: "UNKNOWN_SKILL",
+          message: `Unknown skill: ${skillName}`,
+          suggestion: "Run `vasir list` to see valid skill names.",
+          docsRef: ADD_REFERENCE_DOCS_REF
+        })
+      });
+      continue;
+    }
+
+    if (!fs.existsSync(targetSkillDirectory)) {
+      planEntries.push({
+        skillName,
+        status: "install",
+        installedVersion: null,
+        availableVersion: catalogSkillEntry.version ?? null,
+        reason: "Skill is part of this repo's tracking policy but is not installed locally."
+      });
+      continue;
+    }
+
+    const safetyInspection = inspectProjectSkillReplaceSafety({
+      projectInstallState,
+      skillName,
+      targetSkillDirectory
+    });
+
+    if (!safetyInspection.ok) {
+      planEntries.push({
+        skillName,
+        status: "blocked",
+        installedVersion: trackedSkillEntry?.provenance?.skillVersion ?? null,
+        availableVersion: catalogSkillEntry.version ?? null,
+        reason: safetyInspection.error.message,
+        error: safetyInspection.error
+      });
+      continue;
+    }
+
+    const sourceSkillDirectory = path.join(globalCatalogDirectory, catalogSkillEntry.path);
+    const sourceRelativeFilePaths = listSkillFiles(sourceSkillDirectory).sort();
+    const trackedRelativeFilePaths = [...safetyInspection.trackedSkillEntry.managedFiles].sort();
+    const fileSetMatches =
+      sourceRelativeFilePaths.length === trackedRelativeFilePaths.length &&
+      sourceRelativeFilePaths.every((relativeFilePath, index) => relativeFilePath === trackedRelativeFilePaths[index]);
+    const hashMatches =
+      fileSetMatches &&
+      sourceRelativeFilePaths.every(
+        (relativeFilePath) =>
+          computeFileSha256(path.join(sourceSkillDirectory, relativeFilePath)) ===
+            safetyInspection.trackedSkillEntry.fileHashes[relativeFilePath]
+      );
+
+    planEntries.push({
+      skillName,
+      status: hashMatches ? "unchanged" : "update",
+      installedVersion: trackedSkillEntry?.provenance?.skillVersion ?? null,
+      availableVersion: catalogSkillEntry.version ?? null,
+      reason: hashMatches ? "Already matches the current bundled catalog." : "Local copy differs from the current bundled catalog."
+    });
+  }
+
+  return planEntries;
+}
+
+function createProjectSyncPlan({
+  registry,
+  globalCatalogDirectory,
+  projectPaths,
+  projectInstallState,
+  managedSkillNames
+}) {
+  const trackingMode = resolveProjectTrackingMode({
+    projectInstallState,
+    registry,
+    managedSkillNames
+  });
+  const desiredSkillNames = trackingMode === "all"
+    ? registry.skills.map((skillEntry) => skillEntry.name)
+    : managedSkillNames;
+  const planEntries = desiredSkillNames.length > 0
+    ? classifyManagedSkillUpdates({
+        desiredSkillNames,
+        registry,
+        globalCatalogDirectory,
+        projectPaths,
+        projectInstallState
+      })
+    : [];
+
+  return {
+    trackingMode,
+    desiredSkillNames,
+    planEntries,
+    blockedSkillPlans: planEntries.filter((planEntry) => planEntry.status === "blocked"),
+    installedSkillNames: planEntries
+      .filter((planEntry) => planEntry.status === "install")
+      .map((planEntry) => planEntry.skillName),
+    updatedSkillNames: planEntries
+      .filter((planEntry) => planEntry.status === "update")
+      .map((planEntry) => planEntry.skillName),
+    unchangedSkillNames: planEntries
+      .filter((planEntry) => planEntry.status === "unchanged")
+      .map((planEntry) => planEntry.skillName)
+  };
+}
+
+function readAgentsProfileHintFromFile(agentsFilePath) {
+  if (!fs.existsSync(agentsFilePath)) {
+    return null;
+  }
+
+  const agentsText = fs.readFileSync(agentsFilePath, "utf8");
+  return agentsText.match(/<!--\s*vasir:profile:([a-z0-9-]+)\s*-->/i)?.[1] ?? null;
+}
+
 function formatUsage() {
   return `vasir
 
 Usage:
-  vasir init [--json]                               Clone or refresh ~/.agents/vasir and repair global aliases
-  vasir update [--json]                             Fast-forward ~/.agents/vasir; bootstraps if missing
+  vasir init [--json] [--repo-root <path>]         Sync ~/.agents/vasir; inside a repo, install and track the full catalog
+  vasir update [--json] [--dry-run] [--repo-root <path>] Sync ~/.agents/vasir and update the tracked Vasir skills in this repo
   vasir list [--json]                               Show available skills from the global catalog
-  vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] Copy skills into the current repo root at .agents/skills
-  vasir remove <skill> [skill...] [--json]          Remove project-local skills from the current repo root
-  vasir agents init <profile> [--json] [--replace]  Write AGENTS.md in the current repo root from a stack-specific starter
-  vasir agents draft-purpose [--json] [--write] [--model <name>] Draft a repo-specific AGENTS purpose paragraph
-  vasir agents validate [--json]                    Fail closed when AGENTS.md still contains scaffold placeholders
-  vasir eval run <skill> [--json] [--model <name>] [--trials <count>] Run the built-in baseline vs treatment eval for a skill
-  vasir eval inspect <skill> [run-id] [--json]     Inspect the latest or named eval artifact for a skill
-  vasir eval rescore <skill> [run-id] [--json]     Rescore an existing eval artifact with the current scorer
+  vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>] Copy skills into the current repo root at .agents/skills
+  vasir remove <skill> [skill...] [--json] [--repo-root <path>] Remove project-local skills from the current repo root
+  vasir agents init <profile> [--json] [--replace] [--repo-root <path>] Write AGENTS.md in the current repo root from a stack-specific starter
+  vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
+  vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
+  vasir agents validate [--json] [--repo-root <path>] Fail closed when AGENTS.md still contains scaffold placeholders
+  vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run the built-in baseline vs treatment eval for a skill
+  vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>] Inspect the latest or named eval artifact for a skill
+  vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>] Rescore an existing eval artifact with the current scorer
   vasir --version [--json]                          Print the installed Vasir CLI version
   vasir --help
 
 Notes:
-  Requires Git on PATH.
   Use --json for automation and LLM consumers.
-  init and update mutate the global catalog under ~/.agents/vasir.
+  init outside a repo mutates only the global catalog under ~/.agents/vasir.
+  init inside a repo installs the full catalog into that repo and marks it for full-catalog updates.
+  update mutates the global catalog under ~/.agents/vasir and refreshes the skills tracked by the current repo.
+  update --dry-run shows the global refresh and repo-local skill changes without mutating either location.
   add mutates only the current repo root (nearest parent with .git, or the current directory if none exists).
+  Pass --repo-root <path> to target an explicit repo root, including monorepo subprojects.
+  Use "vasir add all" to install every catalog skill into the current repo.
   add auto-initializes the global catalog if needed.
-  add can also seed AGENTS.md from a stack-specific profile via --agents-profile backend|frontend|ios.
+  add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios overrides profile inference.
   agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
-  agents validate fails closed when AGENTS.md still contains known scaffold placeholders.
+  agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
+  agents validate fails closed when AGENTS.md still contains known scaffold placeholders or broken repo routes.
   Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md during vasir agents init.
   remove mutates only the current repo root and also updates .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
@@ -90,13 +302,52 @@ function groupSkillsByCategory(skillEntries) {
   return groupedSkills;
 }
 
+function resolveRequestedAddSkillNames({ requestedSkillNames, registry }) {
+  if (requestedSkillNames.length === 0) {
+    throw new VasirCliError({
+      code: "SKILL_NAME_REQUIRED",
+      message: "At least one skill name is required.",
+      suggestion: "Run `vasir list` to discover valid skill names, then rerun `vasir add <skill>` or `vasir add all`.",
+      docsRef: ADD_REFERENCE_DOCS_REF
+    });
+  }
+
+  const wantsAll = requestedSkillNames.some(
+    (requestedSkillName) => requestedSkillName.toLowerCase() === ADD_ALL_SKILLS_KEYWORD
+  );
+
+  if (!wantsAll) {
+    return requestedSkillNames;
+  }
+
+  const nonAllSkillNames = requestedSkillNames.filter(
+    (requestedSkillName) => requestedSkillName.toLowerCase() !== ADD_ALL_SKILLS_KEYWORD
+  );
+
+  if (nonAllSkillNames.length > 0) {
+    throw new VasirCliError({
+      code: "ALL_SKILLS_REQUEST_CONFLICT",
+      message: "`all` installs the full catalog and cannot be combined with specific skill names in the same command.",
+      suggestion: "Use `vasir add all` to install every catalog skill, or remove `all` and list only the specific skills you want.",
+      docsRef: ADD_REFERENCE_DOCS_REF,
+      context: {
+        conflictingSkillNames: nonAllSkillNames
+      }
+    });
+  }
+
+  return registry.skills.map((skillEntry) => skillEntry.name);
+}
+
 function parseCommandInvocation(argumentVector) {
   const rawArguments = argumentVector.slice(2);
   const positionalArguments = [];
   let jsonOutput = false;
   let helpRequested = false;
   let agentsProfileName = null;
+  let dryRunRequested = false;
   let modelArguments = [];
+  let projectRootArgument = null;
   let replaceExistingSkills = false;
   let requestedTrialCount = null;
   let versionRequested = false;
@@ -121,6 +372,27 @@ function parseCommandInvocation(argumentVector) {
 
     if (rawArgument === "--replace") {
       replaceExistingSkills = true;
+      continue;
+    }
+
+    if (rawArgument === "--dry-run") {
+      dryRunRequested = true;
+      continue;
+    }
+
+    if (rawArgument === "--repo-root") {
+      const projectRootValue = rawArguments[argumentIndex + 1];
+      if (!projectRootValue || projectRootValue.startsWith("--")) {
+        throw new VasirCliError({
+          code: "PROJECT_ROOT_FLAG_VALUE_REQUIRED",
+          message: "`--repo-root` requires a directory path.",
+          suggestion: "Use `--repo-root /absolute/path/to/repo` or `--repo-root relative/path/to/repo`.",
+          docsRef: COMMANDS_REFERENCE_DOCS_REF
+        });
+      }
+
+      projectRootArgument = projectRootValue;
+      argumentIndex += 1;
       continue;
     }
 
@@ -206,7 +478,9 @@ function parseCommandInvocation(argumentVector) {
     commandArguments: positionalArguments.slice(1),
     jsonOutput,
     agentsProfileName,
+    dryRunRequested,
     modelArguments,
+    projectRootArgument,
     requestedTrialCount,
     replaceExistingSkills,
     writeGeneratedOutput,
@@ -215,77 +489,428 @@ function parseCommandInvocation(argumentVector) {
   };
 }
 
-function runInit({
+async function runInit({
   homeDirectory,
+  currentWorkingDirectory,
+  projectRootDirectory,
   repositoryUrl,
   platform,
   spawnSyncImplementation,
+  inputStream,
   outputStream,
   stdoutWriter,
   jsonOutput
 }) {
-  const globalPaths = synchronizeGlobalCatalog({
+  const { globalPaths, catalogState } = synchronizeGlobalCatalog({
     homeDirectory,
     repositoryUrl,
     platform,
     spawnSyncImplementation
   });
+  const resolvedProjectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
+  const repoTargeted =
+    projectRootDirectory !== null ||
+    fs.existsSync(path.join(resolvedProjectPaths.projectRootDirectory, ".git"));
+
+  if (!repoTargeted) {
+    if (!jsonOutput) {
+      const ui = createCommandUi({ stream: outputStream });
+      stdoutWriter(
+        ui.renderPanel({
+          title: "Init",
+          lines: [
+            ui.formatStatusLine({
+              kind: "ok",
+              text: "Global catalog ready"
+            }),
+            ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory)),
+            ui.formatStatusLine({
+              kind: "info",
+              text: "Repo setup",
+              detail: "Run `vasir init` inside a repo to install and track the full catalog there."
+            })
+          ]
+        })
+      );
+    }
+
+    return {
+      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+      projectInitialized: false,
+      trackingMode: null
+    };
+  }
+
+  const { registry } = readGlobalRegistry({
+    homeDirectory,
+    repositoryUrl,
+    platform,
+    spawnSyncImplementation
+  });
+  const managedProjectSkills = listManagedProjectSkills({
+    projectRootDirectory,
+    currentWorkingDirectory
+  });
+  const projectInstallState = readProjectInstallState({
+    projectPaths: managedProjectSkills.projectPaths
+  });
+  const syncPlan = createProjectSyncPlan({
+    registry,
+    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    projectPaths: managedProjectSkills.projectPaths,
+    projectInstallState,
+    managedSkillNames: managedProjectSkills.skillNames
+  });
+
+  let projectInitialized = false;
+  let installedSkills = [];
+  let updatedSkills = [];
+  let unchangedSkills = [];
+  let effectiveTrackingMode = syncPlan.trackingMode;
+  let agentsFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "AGENTS.md");
+  let wroteAgentsFile = false;
+
+  if (syncPlan.trackingMode === null) {
+    const projectAgentsFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "AGENTS.md");
+    const agentsSelection = fs.existsSync(projectAgentsFilePath)
+      ? {
+          profileName: null
+        }
+      : await resolveRecommendedAgentsProfile({
+          projectRootDirectory: managedProjectSkills.projectPaths.projectRootDirectory,
+          inputStream,
+          outputStream,
+          jsonOutput
+        });
+    const initResult = installSkillsIntoProject({
+      registry,
+      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+      skillNames: registry.skills.map((skillEntry) => skillEntry.name),
+      agentsProfileName: agentsSelection.profileName,
+      catalogProvenance: catalogState,
+      trackingMode: "all",
+      replaceExistingSkills: false,
+      projectRootDirectory,
+      currentWorkingDirectory,
+      platform
+    });
+
+    projectInitialized = true;
+    installedSkills = initResult.installedSkillNames;
+    updatedSkills = initResult.replacedSkillNames;
+    unchangedSkills = [];
+    effectiveTrackingMode = "all";
+    agentsFilePath = initResult.agentsFilePath;
+    wroteAgentsFile = initResult.wroteAgentsFile;
+  } else {
+    if (syncPlan.blockedSkillPlans.length > 0) {
+      throw syncPlan.blockedSkillPlans[0].error;
+    }
+
+    if (syncPlan.desiredSkillNames.length > 0) {
+      installSkillsIntoProject({
+        registry,
+        globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+        skillNames: syncPlan.desiredSkillNames,
+        initializeAgentsFile: false,
+        catalogProvenance: catalogState,
+        trackingMode: syncPlan.trackingMode,
+        replaceExistingSkills: true,
+        projectRootDirectory,
+        currentWorkingDirectory,
+        platform
+      });
+    }
+
+    installedSkills = syncPlan.installedSkillNames;
+    updatedSkills = syncPlan.updatedSkillNames;
+    unchangedSkills = syncPlan.unchangedSkillNames;
+  }
 
   if (!jsonOutput) {
     const ui = createCommandUi({ stream: outputStream });
+    const renderedLines = [
+      ui.formatStatusLine({
+        kind: "ok",
+        text: "Global catalog ready"
+      }),
+      ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory)),
+      ui.formatStatusLine({
+        kind: "ok",
+        text: projectInitialized ? "Repo initialized" : "Repo synced",
+        detail: managedProjectSkills.projectPaths.projectRootDirectory
+      }),
+      ui.formatStatusLine({
+        kind: "info",
+        text: "Tracking",
+        detail: effectiveTrackingMode === "all" ? "Full catalog" : "Selected skills"
+      })
+    ];
+
+    for (const installedSkillName of installedSkills) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "ok",
+          text: `${projectInitialized ? "Installed" : "Added"} ${installedSkillName}`
+        })
+      );
+    }
+
+    for (const updatedSkillName of updatedSkills) {
+      if (installedSkills.includes(updatedSkillName)) {
+        continue;
+      }
+
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "ok",
+          text: `Updated ${updatedSkillName}`
+        })
+      );
+    }
+
+    if (unchangedSkills.length > 0 && !projectInitialized) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "Already current",
+          detail: `${unchangedSkills.length} skill${unchangedSkills.length === 1 ? "" : "s"}`
+        })
+      );
+    }
+
+    renderedLines.push(
+      ui.formatStatusLine({
+        kind: "info",
+        text: "Project skills ready at",
+        detail: managedProjectSkills.projectPaths.projectSkillsDirectory
+      })
+    );
+
+    if (wroteAgentsFile) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "AGENTS starter ready at",
+          detail: agentsFilePath
+        })
+      );
+    }
+
+    renderedLines.push(
+      ui.formatStatusLine({
+        kind: "info",
+        text: "Next",
+        detail: projectInitialized
+          ? "Run `vasir update` later in this repo to keep the tracked skills current."
+          : "Run `vasir update` later in this repo to keep the tracked skills current."
+      })
+    );
+
     stdoutWriter(
       ui.renderPanel({
         title: "Init",
-        lines: [
-          ui.formatStatusLine({
-            kind: "ok",
-            text: "Global catalog ready"
-          }),
-          ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
-        ]
+        lines: renderedLines
       })
     );
   }
 
   return {
-    globalCatalogDirectory: globalPaths.globalCatalogDirectory
+    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    projectInitialized,
+    projectRootDirectory: managedProjectSkills.projectPaths.projectRootDirectory,
+    projectSkillsDirectory: managedProjectSkills.projectPaths.projectSkillsDirectory,
+    trackingMode: effectiveTrackingMode,
+    installedSkills,
+    updatedSkills,
+    unchangedSkills,
+    agentsFilePath,
+    wroteAgentsFile
   };
 }
 
 function runUpdate({
   homeDirectory,
+  currentWorkingDirectory,
+  projectRootDirectory,
   repositoryUrl,
   platform,
   spawnSyncImplementation,
   outputStream,
   stdoutWriter,
-  jsonOutput
+  jsonOutput,
+  dryRunRequested
 }) {
-  const globalPaths = synchronizeGlobalCatalog({
-    homeDirectory,
-    repositoryUrl,
-    platform,
-    spawnSyncImplementation
+  const globalCatalogInspection = dryRunRequested
+    ? inspectGlobalCatalog({
+        homeDirectory,
+        repositoryUrl,
+        platform,
+        spawnSyncImplementation
+      })
+    : null;
+  const synchronizedCatalog = dryRunRequested
+    ? null
+    : synchronizeGlobalCatalog({
+        homeDirectory,
+        repositoryUrl,
+        platform,
+        spawnSyncImplementation
+      });
+  const { globalPaths, catalogState } = dryRunRequested
+    ? globalCatalogInspection
+    : synchronizedCatalog;
+  const { registry } = dryRunRequested
+    ? globalCatalogInspection
+    : readGlobalRegistry({
+        homeDirectory,
+        repositoryUrl,
+        platform,
+        spawnSyncImplementation
+      });
+  const managedProjectSkills = listManagedProjectSkills({
+    projectRootDirectory,
+    currentWorkingDirectory
   });
+  const projectInstallState = readProjectInstallState({
+    projectPaths: managedProjectSkills.projectPaths
+  });
+  const comparisonCatalogDirectory = dryRunRequested
+    ? globalCatalogInspection.sourceDirectory
+    : globalPaths.globalCatalogDirectory;
+  const syncPlan = createProjectSyncPlan({
+    registry,
+    globalCatalogDirectory: comparisonCatalogDirectory,
+    projectPaths: managedProjectSkills.projectPaths,
+    projectInstallState,
+    managedSkillNames: managedProjectSkills.skillNames
+  });
+  const blockedSkillPlans = syncPlan.blockedSkillPlans;
+  const installedSkills = syncPlan.installedSkillNames;
+  const updatedSkills = syncPlan.updatedSkillNames;
+  const unchangedSkills = syncPlan.unchangedSkillNames;
+
+  if (!dryRunRequested && blockedSkillPlans.length > 0) {
+    throw blockedSkillPlans[0].error;
+  }
+
+  if (!dryRunRequested && syncPlan.desiredSkillNames.length > 0) {
+    installSkillsIntoProject({
+      registry,
+      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+      skillNames: syncPlan.desiredSkillNames,
+      initializeAgentsFile: false,
+      catalogProvenance: catalogState,
+      trackingMode: syncPlan.trackingMode,
+      replaceExistingSkills: true,
+      projectRootDirectory,
+      currentWorkingDirectory,
+      platform
+    });
+  }
 
   if (!jsonOutput) {
     const ui = createCommandUi({ stream: outputStream });
+    const renderedLines = [
+      ui.formatStatusLine({
+        kind: dryRunRequested
+          ? globalCatalogInspection.catalogState.needsSynchronization ? "info" : "ok"
+          : "ok",
+        text: dryRunRequested
+          ? globalCatalogInspection.catalogState.needsSynchronization ? "Global catalog would refresh" : "Global catalog already current"
+          : "Global catalog updated"
+      }),
+      ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
+    ];
+
+    if (syncPlan.planEntries.length > 0) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "Tracking",
+          detail: syncPlan.trackingMode === "all" ? "Full catalog" : "Selected skills"
+        })
+      );
+
+      for (const planEntry of syncPlan.planEntries) {
+        renderedLines.push(
+          ui.formatStatusLine({
+            kind:
+              planEntry.status === "install" ? (dryRunRequested ? "info" : "ok")
+                : planEntry.status === "update" ? (dryRunRequested ? "info" : "ok")
+                : planEntry.status === "unchanged" ? "info"
+                  : "warn",
+            text:
+              planEntry.status === "install"
+                ? `${dryRunRequested ? "Would install" : "Installed"} ${planEntry.skillName}`
+                : planEntry.status === "update"
+                ? `${dryRunRequested ? "Would update" : "Updated"} ${planEntry.skillName}`
+                : planEntry.status === "unchanged"
+                  ? `Already current ${planEntry.skillName}`
+                  : `Blocked ${planEntry.skillName}`,
+            detail:
+              planEntry.installedVersion || planEntry.availableVersion
+                ? `${planEntry.installedVersion ?? "unknown"} -> ${planEntry.availableVersion ?? "missing"}`
+                : planEntry.reason
+          })
+        );
+      }
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: dryRunRequested ? "Project skills target" : "Project skills updated at",
+          detail: managedProjectSkills.projectPaths.projectSkillsDirectory
+        })
+      );
+      if (dryRunRequested && blockedSkillPlans.length > 0) {
+        renderedLines.push(
+          ui.formatStatusLine({
+            kind: "warn",
+            text: "Dry run found blocked skills",
+            detail: "Actual `vasir update` would fail closed until those local changes are resolved."
+          })
+        );
+      }
+    } else {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "warn",
+          text: "Repo not initialized",
+          detail: "Run `vasir init` in this repo to install and track the full catalog, or `vasir add <skill>` to track a selected set."
+        })
+      );
+    }
+
     stdoutWriter(
       ui.renderPanel({
         title: "Update",
-        lines: [
-          ui.formatStatusLine({
-            kind: "ok",
-            text: "Global catalog updated"
-          }),
-          ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
-        ]
+        lines: renderedLines
       })
     );
   }
 
   return {
-    globalCatalogDirectory: globalPaths.globalCatalogDirectory
+    dryRun: dryRunRequested,
+    globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    projectRootDirectory: managedProjectSkills.projectPaths.projectRootDirectory,
+    projectSkillsDirectory: managedProjectSkills.projectPaths.projectSkillsDirectory,
+    trackingMode: syncPlan.trackingMode,
+    installedSkills,
+    updatedSkills,
+    unchangedSkills,
+    blockedSkills: blockedSkillPlans.map((planEntry) => ({
+      skillName: planEntry.skillName,
+      installedVersion: planEntry.installedVersion,
+      availableVersion: planEntry.availableVersion,
+      reason: planEntry.reason,
+      code: planEntry.error.code
+    })),
+    globalCatalogStatus: dryRunRequested
+      ? globalCatalogInspection.catalogState.needsSynchronization ? "would-sync" : "current"
+      : "updated"
   };
 }
 
@@ -323,44 +948,75 @@ function runList({
   };
 }
 
-function runAdd({
+async function runAdd({
   skillNames,
   agentsProfileName,
   replaceExistingSkills,
   homeDirectory,
   currentWorkingDirectory,
+  projectRootDirectory,
   repositoryUrl,
   platform,
   spawnSyncImplementation,
+  inputStream,
   outputStream,
   stdoutWriter,
   jsonOutput
 }) {
-  if (skillNames.length === 0) {
-    throw new VasirCliError({
-      code: "SKILL_NAME_REQUIRED",
-      message: "At least one skill name is required.",
-      suggestion: "Run `vasir list` to discover valid skill names, then rerun `vasir add <skill>`.",
-      docsRef: ADD_REFERENCE_DOCS_REF
-    });
-  }
-
-  const { globalPaths, registry } = readGlobalRegistry({
+  const { globalPaths, registry, catalogState } = readGlobalRegistry({
     homeDirectory,
     repositoryUrl,
     platform,
     spawnSyncImplementation
   });
+  const tracksFullCatalog = skillNames.some(
+    (requestedSkillName) => requestedSkillName.toLowerCase() === ADD_ALL_SKILLS_KEYWORD
+  );
+  const resolvedSkillNames = resolveRequestedAddSkillNames({
+    requestedSkillNames: skillNames,
+    registry
+  });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
+  const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
+  const agentsSelection = agentsProfileName !== null
+    ? {
+        profileName: agentsProfileName,
+        source: "flag",
+        reason: "Explicitly requested via --agents-profile."
+      }
+    : fs.existsSync(projectAgentsFilePath)
+      ? {
+          profileName: null,
+          source: "existing",
+          reason: "AGENTS.md already exists, so Vasir left it unchanged."
+        }
+      : await resolveRecommendedAgentsProfile({
+          projectRootDirectory: projectPaths.projectRootDirectory,
+          inputStream,
+          outputStream,
+          jsonOutput
+        });
 
   const installResult = installSkillsIntoProject({
     registry,
     globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-    skillNames,
-    agentsProfileName,
+    skillNames: resolvedSkillNames,
+    agentsProfileName: agentsSelection.profileName,
+    catalogProvenance: catalogState,
+    trackingMode: tracksFullCatalog ? "all" : "selected",
     replaceExistingSkills,
+    projectRootDirectory,
     currentWorkingDirectory,
     platform
   });
+  const effectiveAgentsProfile = installResult.wroteAgentsFile
+    ? installResult.agentsProfile
+    : agentsSelection.source === "existing"
+      ? readAgentsProfileHintFromFile(projectAgentsFilePath) ?? "custom"
+      : installResult.agentsProfile;
 
   if (!jsonOutput) {
     const ui = createCommandUi({ stream: outputStream });
@@ -382,16 +1038,32 @@ function runAdd({
       })
     );
     if (installResult.wroteAgentsFile) {
-      const agentsLineText = installResult.agentsProfile === "generic"
-        ? "AGENTS starter ready at"
-        : `AGENTS starter ready at (${installResult.agentsProfile})`;
+      const profileLabel = effectiveAgentsProfile === "generic"
+        ? "generic"
+        : effectiveAgentsProfile;
+      const sourceLabel = agentsSelection.source === "flag"
+        ? "explicit"
+        : agentsSelection.source === "prompt"
+          ? "selected"
+          : agentsSelection.source === "inferred"
+            ? "inferred"
+            : "default";
       renderedLines.push(
         ui.formatStatusLine({
           kind: "info",
-          text: agentsLineText,
+          text: `AGENTS starter ready at (${profileLabel}, ${sourceLabel})`,
           detail: installResult.agentsFilePath
         })
       );
+      if (agentsSelection.reason) {
+        renderedLines.push(
+          ui.formatStatusLine({
+            kind: agentsSelection.source === "default-generic" ? "warn" : "info",
+            text: "AGENTS profile",
+            detail: agentsSelection.reason
+          })
+        );
+      }
     } else {
       renderedLines.push(
         ui.formatStatusLine({
@@ -405,7 +1077,8 @@ function runAdd({
       ui.formatStatusLine({
         kind: "info",
         text: "Next",
-        detail: "vasir agents draft-purpose --write --model openai, then vasir agents validate"
+        detail:
+          "vasir agents draft-purpose --write --model openai, vasir agents draft-routing --write, then vasir agents validate"
       })
     );
     stdoutWriter(
@@ -423,7 +1096,8 @@ function runAdd({
     installedSkills: installResult.installedSkillNames,
     replacedSkills: installResult.replacedSkillNames,
     agentsFilePath: installResult.agentsFilePath,
-    agentsProfile: installResult.agentsProfile,
+    agentsProfile: effectiveAgentsProfile,
+    agentsProfileSource: agentsSelection.source,
     wroteAgentsFile: installResult.wroteAgentsFile
   };
 }
@@ -431,6 +1105,7 @@ function runAdd({
 async function runRemove({
   skillNames,
   currentWorkingDirectory,
+  projectRootDirectory,
   inputStream,
   outputStream,
   stdoutWriter,
@@ -440,6 +1115,7 @@ async function runRemove({
 
   if (resolvedSkillNames.length === 0 && !jsonOutput && canPromptInteractively({ inputStream, outputStream })) {
     const installedSkills = listInstalledProjectSkills({
+      projectRootDirectory,
       currentWorkingDirectory
     });
 
@@ -479,6 +1155,7 @@ async function runRemove({
 
   const removeResult = removeSkillsFromProject({
     skillNames: resolvedSkillNames,
+    projectRootDirectory,
     currentWorkingDirectory
   });
 
@@ -512,6 +1189,16 @@ async function runRemove({
       })
     );
 
+    if (removeResult.switchedTrackingModeToSelected) {
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "warn",
+          text: "Tracking changed",
+          detail: "This repo no longer tracks the full catalog automatically; future `vasir update` runs will sync only the remaining installed skills."
+        })
+      );
+    }
+
     stdoutWriter(
       ui.renderPanel({
         title: "Project Skills",
@@ -523,8 +1210,9 @@ async function runRemove({
   return {
     projectRootDirectory: removeResult.projectPaths.projectRootDirectory,
     projectSkillsDirectory: removeResult.projectPaths.projectSkillsDirectory,
-      removedSkills: removeResult.removedSkillNames,
-      missingSkills: removeResult.missingSkillNames
+    removedSkills: removeResult.removedSkillNames,
+    missingSkills: removeResult.missingSkillNames,
+    switchedTrackingModeToSelected: removeResult.switchedTrackingModeToSelected
   };
 }
 
@@ -534,6 +1222,7 @@ async function runEval({
   requestedTrialCount,
   homeDirectory,
   currentWorkingDirectory,
+  projectRootDirectory,
   repositoryUrl,
   platform,
   spawnSyncImplementation,
@@ -590,6 +1279,7 @@ async function runEval({
       skillName,
       homeDirectory,
       currentWorkingDirectory,
+      projectRootDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
@@ -627,6 +1317,7 @@ async function runEval({
       skillName,
       runId,
       currentWorkingDirectory,
+      projectRootDirectory,
       outputStream,
       stdoutWriter,
       jsonOutput
@@ -637,6 +1328,7 @@ async function runEval({
     skillName,
     runId,
     currentWorkingDirectory,
+    projectRootDirectory,
     homeDirectory,
     repositoryUrl,
     platform,
@@ -651,7 +1343,9 @@ async function runSelectedCommand({
   commandName,
   commandArguments,
   agentsProfileName,
+  dryRunRequested,
   modelArguments,
+  projectRootArgument,
   requestedTrialCount,
   replaceExistingSkills,
   writeGeneratedOutput,
@@ -715,21 +1409,51 @@ async function runSelectedCommand({
     });
   }
 
-  if (writeGeneratedOutput && !(commandName === "agents" && commandArguments[0] === "draft-purpose")) {
+  if (
+    writeGeneratedOutput &&
+    !(commandName === "agents" && ["draft-purpose", "draft-routing"].includes(commandArguments[0]))
+  ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--write is only supported by `vasir agents draft-purpose`.",
-      suggestion: "Use `vasir agents draft-purpose --write` when you want Vasir to replace the placeholder block in AGENTS.md.",
+      message: "--write is only supported by `vasir agents draft-purpose` and `vasir agents draft-routing`.",
+      suggestion:
+        "Use `vasir agents draft-purpose --write` or `vasir agents draft-routing --write` when you want Vasir to replace a placeholder block in AGENTS.md.",
       docsRef: UNKNOWN_COMMAND_TROUBLESHOOTING_DOCS_REF
     });
   }
 
+  if (dryRunRequested && commandName !== "update") {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--dry-run is only supported by `vasir update`.",
+      suggestion: "Use `vasir update --dry-run` when you want to preview repo-local refreshes without mutating files.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (
+    projectRootArgument !== null &&
+    !["init", "update", "add", "remove", "agents", "eval"].includes(commandName)
+  ) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--repo-root is only supported by repo-bound commands.",
+      suggestion: "Use `--repo-root <path>` with `vasir init`, `update`, `add`, `remove`, `agents`, or `eval`.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
+    });
+  }
+
+  const projectRootDirectory = resolveProjectRootDirectoryFlag(projectRootArgument);
+
   if (commandName === "init") {
-    return runInit({
+    return await runInit({
       homeDirectory,
+      currentWorkingDirectory,
+      projectRootDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
+      inputStream,
       outputStream,
       stdoutWriter,
       jsonOutput
@@ -739,12 +1463,15 @@ async function runSelectedCommand({
   if (commandName === "update") {
     return runUpdate({
       homeDirectory,
+      currentWorkingDirectory,
+      projectRootDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
       outputStream,
       stdoutWriter,
-      jsonOutput
+      jsonOutput,
+      dryRunRequested
     });
   }
 
@@ -761,15 +1488,17 @@ async function runSelectedCommand({
   }
 
   if (commandName === "add") {
-    return runAdd({
+    return await runAdd({
       skillNames: commandArguments,
       agentsProfileName,
       replaceExistingSkills,
       homeDirectory,
       currentWorkingDirectory,
+      projectRootDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
+      inputStream,
       outputStream,
       stdoutWriter,
       jsonOutput
@@ -780,6 +1509,7 @@ async function runSelectedCommand({
     return await runRemove({
       skillNames: commandArguments,
       currentWorkingDirectory,
+      projectRootDirectory,
       inputStream,
       outputStream,
       stdoutWriter,
@@ -795,6 +1525,7 @@ async function runSelectedCommand({
       modelArguments,
       homeDirectory,
       currentWorkingDirectory,
+      projectRootDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
@@ -814,6 +1545,7 @@ async function runSelectedCommand({
       requestedTrialCount,
       homeDirectory,
       currentWorkingDirectory,
+      projectRootDirectory,
       repositoryUrl,
       platform,
       spawnSyncImplementation,
@@ -887,7 +1619,9 @@ export async function runCommandLine(
       commandName,
       commandArguments: invocation.commandArguments,
       agentsProfileName: invocation.agentsProfileName,
+      dryRunRequested: invocation.dryRunRequested,
       modelArguments: invocation.modelArguments,
+      projectRootArgument: invocation.projectRootArgument,
       requestedTrialCount: invocation.requestedTrialCount,
       replaceExistingSkills: invocation.replaceExistingSkills,
       writeGeneratedOutput: invocation.writeGeneratedOutput,

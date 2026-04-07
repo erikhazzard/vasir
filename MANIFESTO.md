@@ -172,3 +172,8 @@ The ideal outcome is boringly robust. A human can browse the repo. An agent can 
 If you are one developer, the leverage point is not keeping every tradeoff in your head. The leverage point is encoding your judgments into checked-in files: constraints, examples, anti-patterns, verification steps, and recovery paths. Taste that stays in your head does not scale. Taste encoded into files does.
 
 That simplicity is the point.
+
+- The Bottom Line for 10x Output
+The hard part about writing software is the design, specification, and testing of conceptual abstractions. The actual labor of writing code—knowing how to type it—is now commoditized by LLMs.
+
+AGENTS.md is how we instruct the LLM on the what. The what has always been the hard part of software development. AI has solved the execution, but the highest leverage skill an engineer now possesses is defining the exact, immutable constraints of that execution.

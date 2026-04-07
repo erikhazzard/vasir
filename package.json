@@ -11,6 +11,9 @@
     "type": "git",
     "url": "https://github.com/erikhazzard/vasir.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "llm",
     "skills",
@@ -22,7 +25,10 @@
   ],
   "files": [
     "bin/",
-    "cli/"
+    "cli/",
+    "registry.json",
+    "skills/",
+    "templates/"
   ],
   "engines": {
     "node": ">=18.17"

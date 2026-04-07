@@ -2,7 +2,7 @@
 
 Use this page when you want a filled example to adapt, not just the blank template.
 
-For the fastest starting point, run `vasir agents init backend`, `vasir agents init frontend`, or `vasir agents init ios`. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). For the composable blank skeleton, see [templates/agents/AGENTS.md](../templates/agents/AGENTS.md).
+For the fastest starting point, run `vasir add <skill>` and let Vasir seed `AGENTS.md`, or force a specific starter with `vasir add <skill> --agents-profile backend|frontend|ios`. If you only want the manifest starter, run `vasir agents init backend`, `vasir agents init frontend`, or `vasir agents init ios`, then follow with `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, and `vasir agents validate`. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). For the composable blank skeleton, see [templates/agents/AGENTS.md](../templates/agents/AGENTS.md).
 
 Copy the structure below into your repo root `AGENTS.md`, then replace the routed skills and verification commands with the ones that match your project.
 
@@ -69,7 +69,6 @@ If a command fails, read it, diagnose the root cause, and fix the real failure b
 
 Related pages:
 
-- [templates/AGENTS.md](../templates/AGENTS.md)
 - [templates/agents/README.md](../templates/agents/README.md)
 - [templates/agents/AGENTS.md](../templates/agents/AGENTS.md)
 - [templates/agents/profiles/backend.md](../templates/agents/profiles/backend.md)

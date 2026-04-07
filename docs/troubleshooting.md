@@ -4,23 +4,22 @@ Use this page when a `vasir` command fails, an alias points at the wrong place, 
 
 Every structured CLI error includes a `docsRef` URL that points back to one of the sections on this page or to the CLI reference.
 
-## Git and Node Prerequisites
+## Node Prerequisites
 
 Use this section for:
 
-- `GIT_NOT_FOUND`
-- `GIT_UNAVAILABLE`
+- Node runtime or launch failures before Vasir can run normally
 
 Recommended path:
 
 1. Confirm Node is installed and recent enough for this repo.
-2. Confirm Git is installed and `git --version` succeeds on your shell `PATH`.
+2. Confirm `node --version` succeeds on your shell `PATH`.
 3. Rerun the same `vasir` command.
 
 Verification:
 
-- `git --version` prints a version instead of an error.
-- `vasir init` or `vasir list` now runs without a Git preflight error.
+- `node --version` prints a version instead of an error.
+- `vasir --version` now runs successfully.
 
 ## Unknown Command or Flag
 
@@ -47,16 +46,18 @@ Use this section for:
 - `SKILL_NAME_REQUIRED`
 - `UNKNOWN_SKILL`
 - `DUPLICATE_SKILL_REQUEST`
+- `ALL_SKILLS_REQUEST_CONFLICT`
 
 Recommended path:
 
 1. Run `vasir list` to inspect the current catalog.
 2. Copy the skill name exactly as listed.
 3. Pass each requested skill once.
+4. Use `vasir add all` by itself when you want the full catalog.
 
 Verification:
 
-- `vasir add <skill>` or `vasir remove <skill>` succeeds with a listed or installed skill name.
+- `vasir add <skill>`, `vasir add all`, or `vasir remove <skill>` succeeds with a listed or installed skill name.
 
 ## Remove and Local State
 
@@ -82,22 +83,26 @@ Verification:
 
 Use this section for:
 
-- `GIT_COMMAND_FAILED`
+- `CATALOG_SOURCE_UNSUPPORTED`
 - `INVALID_GLOBAL_CATALOG`
 - `GLOBAL_CATALOG_DIRTY`
 
 Recommended path:
 
 1. Inspect `~/.agents/vasir`.
-2. If you intentionally edited that clone, either clean it or move it aside.
-3. If the clone is broken or incomplete, delete or rename it.
-4. Rerun `vasir init`.
+2. If you intentionally edited that cache, either clean it or move it aside.
+3. If you set `VASIR_REPOSITORY_URL`, confirm it points at a local directory or `file:///...` URL with `registry.json`, `skills/`, and `templates/`.
+4. If the cache is broken or incomplete, delete or rename it.
+5. Rerun `vasir init`.
 
 Verification:
 
-- `~/.agents/vasir/.git` exists.
 - `~/.agents/vasir/registry.json` exists and is parseable.
+- `~/.agents/vasir/skills/` exists.
+- `~/.agents/vasir/templates/` exists.
 - `vasir update` succeeds without a dirty-catalog error.
+
+If you expected a repo-local skill refresh too, rerun `vasir update` from inside the target repo root or pass `--repo-root <path>`. The command only refreshes project-local skills that Vasir already manages in that repo.
 
 ## Replace Safety Errors
 
@@ -140,6 +145,36 @@ Verification:
 
 - The alias resolves to the canonical `.agents` target.
 - `realpath` on the alias path matches the target path.
+
+## AGENTS Workflow Errors
+
+Use this section for:
+
+- `AGENTS_PROFILE_FLAG_VALUE_REQUIRED`
+- `AGENTS_PROFILE_REQUIRED`
+- `AGENTS_PROFILE_UNKNOWN`
+- `AGENTS_FILE_EXISTS`
+- `AGENTS_FILE_MISSING`
+- `AGENTS_PURPOSE_PLACEHOLDER_MISSING`
+- `AGENTS_PURPOSE_ALREADY_EDITED`
+- `AGENTS_ROUTING_PLACEHOLDER_MISSING`
+- `AGENTS_VALIDATION_FAILED`
+
+Recommended path:
+
+1. Start from the pit-of-success command: `vasir add <skill>`.
+2. If Vasir inferred the wrong starter, rerun with `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios`.
+3. If `AGENTS.md` already exists and you want to keep it, do not rerun a write command with `--replace`.
+4. If you explicitly want to refresh the starter, rerun `vasir agents init <profile> --replace`.
+5. Use `vasir agents draft-purpose --write --model openai` for the opening paragraph and `vasir agents draft-routing --write` for Section 1.
+6. When validation fails on scoped lanes, either create the referenced local `AGENTS.md` files or collapse those rules back into the root file.
+7. Finish with `vasir agents validate`.
+
+Verification:
+
+- `AGENTS.md` exists at the repo root.
+- The file no longer contains scaffold text like `EDIT THESE FIRST`, `[Project Name]`, or `[Example]`.
+- Any routed directory in Section 1 exists and owns a local `AGENTS.md`, or that route has been removed.
 
 ## Eval Errors
 

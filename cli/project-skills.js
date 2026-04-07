@@ -60,11 +60,18 @@ export function installSkillsIntoProject({
   globalCatalogDirectory,
   skillNames,
   agentsProfileName = null,
+  initializeAgentsFile = true,
+  catalogProvenance = null,
+  trackingMode = null,
   replaceExistingSkills = false,
+  projectRootDirectory = null,
   currentWorkingDirectory = process.cwd(),
   platform = process.platform
 }) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   const projectInstallState = readProjectInstallState({ projectPaths });
   const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
 
@@ -156,7 +163,14 @@ export function installSkillsIntoProject({
     });
     projectInstallState.skills[skillName] = createProjectSkillInstallStateEntry({
       targetSkillDirectory,
-      managedRelativeFilePaths
+      managedRelativeFilePaths,
+      provenance: {
+        installedAt: new Date().toISOString(),
+        installedByVersion: catalogProvenance?.packageVersion ?? null,
+        sourceHash: catalogProvenance?.sourceHash ?? null,
+        skillVersion: skillEntry.version ?? null,
+        sourcePath: skillEntry.path ?? null
+      }
     });
     installedSkillNames.push(skillName);
     if (willReplaceExistingSkill) {
@@ -164,12 +178,34 @@ export function installSkillsIntoProject({
     }
   }
 
-  const agentsInitialization = initializeProjectAgentsFile({
-    globalCatalogDirectory,
-    projectRootDirectory: projectPaths.projectRootDirectory,
-    profileName: agentsProfileName,
-    ifExists: agentsProfileName ? replaceExistingSkills ? "replace" : "error" : "skip"
-  });
+  projectInstallState.catalog = catalogProvenance
+    ? {
+        packageVersion: catalogProvenance.packageVersion ?? null,
+        sourceHash: catalogProvenance.sourceHash ?? null
+      }
+    : projectInstallState.catalog ?? null;
+  if (projectInstallState.catalog && trackingMode !== null) {
+    projectInstallState.catalog.trackingMode = trackingMode;
+  } else if (projectInstallState.catalog === null && trackingMode !== null) {
+    projectInstallState.catalog = {
+      packageVersion: null,
+      sourceHash: null,
+      trackingMode
+    };
+  }
+
+  const agentsInitialization = initializeAgentsFile
+    ? initializeProjectAgentsFile({
+        globalCatalogDirectory,
+        projectRootDirectory: projectPaths.projectRootDirectory,
+        profileName: agentsProfileName,
+        ifExists: agentsProfileName ? replaceExistingSkills ? "replace" : "error" : "skip"
+      })
+    : {
+        agentsFilePath: path.join(projectPaths.projectRootDirectory, "AGENTS.md"),
+        profile: null,
+        wroteAgentsFile: false
+      };
 
   writeProjectInstallState({
     projectPaths,
@@ -188,9 +224,13 @@ export function installSkillsIntoProject({
 
 export function removeSkillsFromProject({
   skillNames,
+  projectRootDirectory = null,
   currentWorkingDirectory = process.cwd()
 }) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   const projectInstallState = readProjectInstallState({ projectPaths });
   const removedSkillNames = [];
   const missingSkillNames = [];
@@ -207,6 +247,13 @@ export function removeSkillsFromProject({
     delete projectInstallState.skills[skillName];
   }
 
+  const switchedTrackingModeToSelected =
+    projectInstallState.catalog?.trackingMode === "all" && removedSkillNames.length > 0;
+
+  if (switchedTrackingModeToSelected) {
+    projectInstallState.catalog.trackingMode = "selected";
+  }
+
   writeProjectInstallState({
     projectPaths,
     projectInstallState
@@ -215,14 +262,19 @@ export function removeSkillsFromProject({
   return {
     projectPaths,
     removedSkillNames,
-    missingSkillNames
+    missingSkillNames,
+    switchedTrackingModeToSelected
   };
 }
 
 export function listInstalledProjectSkills({
+  projectRootDirectory = null,
   currentWorkingDirectory = process.cwd()
 }) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   readProjectInstallState({ projectPaths });
 
   if (!fs.existsSync(projectPaths.projectSkillsDirectory)) {
@@ -240,5 +292,22 @@ export function listInstalledProjectSkills({
   return {
     projectPaths,
     skillNames
+  };
+}
+
+export function listManagedProjectSkills({
+  projectRootDirectory = null,
+  currentWorkingDirectory = process.cwd()
+}) {
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
+  const projectInstallState = readProjectInstallState({ projectPaths });
+
+  return {
+    projectPaths,
+    skillNames: Object.keys(projectInstallState.skills)
+      .sort((leftSkillName, rightSkillName) => leftSkillName.localeCompare(rightSkillName))
   };
 }

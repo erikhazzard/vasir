@@ -312,7 +312,7 @@ The repo docs must tell one coherent story:
 - `templates/agents/README.md` is the single "start here" page for AGENTS templates and profile selection.
 - `docs/example-agents.md` provides a filled `AGENTS.md` example alongside the blank template.
 - `README.md` routes readers to the companion pages for repo-root resolution, CLI details, and troubleshooting.
-- `templates/agents/AGENTS.md` is the canonical blank root manifest template; `templates/AGENTS.md` is a compatibility redirect.
+- `templates/agents/AGENTS.md` is the canonical blank root manifest template.
 - `docs/writing-skills.md` keeps the flat `skills/<name>` authoring contract.
 
 ## 12. Implementation Sequence

@@ -3,8 +3,9 @@
 
 > EDIT THESE FIRST
 > 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
-> 2. Replace the routing bullets in Section 1 with the real lifecycle, sync, and UI paths in this repo.
-> 3. Delete any lifecycle, offline, or performance rule that is not true here.
+> 2. Replace the routing block in Section 1 with the real lifecycle, sync, and UI lanes in this repo, or run `vasir agents draft-routing --write`.
+> 3. Create any scoped `AGENTS.md` files that Section 1 points at, or collapse those rules back into this root file.
+> 4. Delete any lifecycle, offline, or performance rule that is not true here.
 
 **Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 <!-- vasir:purpose:start -->
@@ -17,10 +18,12 @@
 
 This root file contains only global rules. For domain-specific logic, you MUST read the scoped agent files before modifying code in those directories.
 
+<!-- vasir:routing:start -->
 * **App Lifecycle:** If touching `/ios/App/`, startup, or backgrounding code, read the platform manifest before changing lifecycle behavior.
 * **Networking / Sync:** If touching `/ios/Sync/`, `/ios/Networking/`, or cache layers, read the sync manifest before changing offline or retry behavior.
 * **UI Modules:** If touching `/ios/UI/`, feature screens, or design-system components, read the screen or UI manifest before editing layout or navigation.
 * **Cold Storage:** Do not read `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
 
 ---
 

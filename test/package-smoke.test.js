@@ -4,7 +4,7 @@ import childProcess from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -35,112 +35,8 @@ function runCommand(commandName, argumentList, currentWorkingDirectory, environm
   return commandResult;
 }
 
-function runGitCommand(repositoryDirectory, argumentList) {
-  const commandResult = runCommand("git", argumentList, repositoryDirectory);
-
-  if (commandResult.status !== 0) {
-    throw new Error((commandResult.stderr || commandResult.stdout || "git command failed").trim());
-  }
-
-  return (commandResult.stdout || "").trim();
-}
-
-function createFixtureRepository() {
-  const repositoryDirectory = createTemporaryDirectory();
-  const registry = {
-    version: "0.1.0",
-    repo: "https://github.com/erikhazzard/vasir",
-    raw_base: "https://raw.githubusercontent.com/erikhazzard/vasir/main",
-    skills: [
-      {
-        name: "react",
-        path: "skills/react",
-        entry: "SKILL.md",
-        description: "React component boundaries and effect discipline",
-        category: "frontend",
-        tags: ["react"],
-        version: "1.0.0",
-        recommends: [],
-        files: ["SKILL.md"]
-      }
-    ]
-  };
-
-  writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
-  writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:generic -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
-<!-- vasir:purpose:start -->
-**Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
-<!-- vasir:purpose:end -->
-`
-  );
-  writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "profiles", "frontend.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:frontend -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
-<!-- vasir:purpose:start -->
-**Purpose:** [Describe this frontend repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
-<!-- vasir:purpose:end -->
-`
-  );
-  writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "profiles", "backend.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:backend -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
-<!-- vasir:purpose:start -->
-**Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
-<!-- vasir:purpose:end -->
-`
-  );
-  writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "profiles", "ios.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:ios -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
-<!-- vasir:purpose:start -->
-**Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
-<!-- vasir:purpose:end -->
-`
-  );
-  writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
-    `---
-name: react
-description: React component boundaries and effect discipline.
-category: frontend
-tags: [react]
-recommends: []
-version: 1.0.0
----
-
-# React
-
-Use local state first.`
-  );
-
-  runGitCommand(repositoryDirectory, ["init"]);
-  runGitCommand(repositoryDirectory, ["config", "user.email", "test@example.com"]);
-  runGitCommand(repositoryDirectory, ["config", "user.name", "Test Runner"]);
-  runGitCommand(repositoryDirectory, ["add", "."]);
-  runGitCommand(repositoryDirectory, ["commit", "-m", "fixture"]);
-
-  return {
-    repositoryUrl: pathToFileURL(repositoryDirectory).href
-  };
-}
-
 test("npm pack produces a runnable vasir binary with help and add support", () => {
   const packDirectory = createTemporaryDirectory();
-  const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
   const npmCacheDirectory = path.join(packDirectory, "npm-cache");
@@ -176,10 +72,12 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.match(helpResult.stdout, /vasir remove <skill> \[skill...\] \[--json\]/);
   assert.match(helpResult.stdout, /vasir agents init <profile> \[--json\] \[--replace\]/);
   assert.match(helpResult.stdout, /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
+  assert.match(helpResult.stdout, /vasir agents draft-routing \[--json\] \[--write\]/);
   assert.match(helpResult.stdout, /vasir agents validate \[--json\]/);
   assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(helpResult.stdout, /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(helpResult.stdout, /vasir eval rescore <skill> \[run-id\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir add all/i);
   assert.doesNotMatch(helpResult.stdout, /vasir doctor/);
 
   const versionResult = runCommand(binaryPath, ["--version"], packDirectory);
@@ -189,19 +87,23 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   const addEnvironmentVariables = {
     ...npmEnvironmentVariables,
     HOME: homeDirectory,
-    USERPROFILE: homeDirectory,
-    VASIR_REPOSITORY_URL: repositoryUrl
+    USERPROFILE: homeDirectory
   };
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
   const addResult = runCommand(
     binaryPath,
-    ["add", "react", "--agents-profile", "frontend"],
+    ["add", "react"],
     projectDirectory,
     addEnvironmentVariables
   );
   assert.equal(addResult.status, 0, addResult.stderr);
   assert.match(addResult.stdout, /Installed react/);
   assert.match(addResult.stdout, /Project skills ready at/);
-  assert.match(addResult.stdout, /AGENTS starter ready at \(frontend\)/);
+  assert.match(addResult.stdout, /AGENTS starter ready at \(frontend, inferred\)/);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
   assert.match(

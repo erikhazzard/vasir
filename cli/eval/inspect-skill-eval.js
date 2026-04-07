@@ -37,12 +37,14 @@ export function inspectSkillEval({
   skillName,
   runId = null,
   currentWorkingDirectory = process.cwd(),
+  projectRootDirectory = null,
   outputStream = process.stdout,
   stdoutWriter,
   jsonOutput
 }) {
   const { runDirectoryPath, run } = readEvalRunArtifacts({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     runId
   });

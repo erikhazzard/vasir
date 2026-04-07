@@ -4,10 +4,10 @@ Use this page when you need facts about commands, flags, JSON output, filesystem
 
 ## Install
 
-Until Vasir is published on npm, install it directly from GitHub:
+Until Vasir is published on npm, install it directly from GitHub and pin the exact release you want:
 
 ```bash
-npm install -g git+https://github.com/erikhazzard/vasir.git
+npm install -g git+https://github.com/erikhazzard/vasir.git#<tag-or-sha>
 ```
 
 Verify the installed binary:
@@ -20,17 +20,18 @@ vasir --version
 
 | Command | Syntax | What it does |
 | --- | --- | --- |
-| `init` | `vasir init [--json]` | Clone or refresh `~/.agents/vasir` and repair global aliases |
-| `update` | `vasir update [--json]` | Fast-forward `~/.agents/vasir`; bootstraps if missing |
+| `init` | `vasir init [--json]` | Sync the installed bundled catalog into `~/.agents/vasir` and repair global aliases |
+| `update` | `vasir update [--json] [--dry-run] [--repo-root <path>]` | Sync `~/.agents/vasir`; when run inside a repo with Vasir-managed skills, refresh those local copies too |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
-| `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding |
-| `remove` | `vasir remove <skill> [skill...] [--json]` | Remove project-local skills from the current repo root |
-| `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace]` | Write a stack-specific `AGENTS.md` starter in the current repo root |
-| `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
-| `agents validate` | `vasir agents validate [--json]` | Fail closed when `AGENTS.md` still contains scaffold placeholders |
-| `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>]` | Run the built-in baseline vs treatment eval for a skill |
-| `eval inspect` | `vasir eval inspect <skill> [run-id] [--json]` | Inspect the latest or named saved eval artifact for a skill |
-| `eval rescore` | `vasir eval rescore <skill> [run-id] [--json]` | Recompute a saved eval artifact with the current scorer |
+| `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
+| `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
+| `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write a stack-specific `AGENTS.md` starter in the current repo root |
+| `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
+| `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
+| `agents validate` | `vasir agents validate [--json] [--repo-root <path>]` | Fail closed when `AGENTS.md` still contains scaffold placeholders or broken repo routes |
+| `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment eval for a skill |
+| `eval inspect` | `vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>]` | Inspect the latest or named saved eval artifact for a skill |
+| `eval rescore` | `vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>]` | Recompute a saved eval artifact with the current scorer |
 | `--version` | `vasir --version [--json]` | Print the installed CLI name and version |
 
 ### `init`
@@ -38,8 +39,8 @@ vasir --version
 - Purpose: prepare the canonical global catalog.
 - Result: `~/.agents/vasir` exists and `~/.claude/vasir` and `~/.codex/vasir` point to it.
 - Notes:
-  - Requires Git on `PATH`.
-  - If the existing global clone is dirty or invalid, the command fails closed.
+  - Vasir copies the catalog from the installed package bundle by default.
+  - If the existing global cache is dirty or invalid, the command fails closed.
 
 Example:
 
@@ -49,15 +50,23 @@ vasir init
 
 ### `update`
 
-- Purpose: refresh the canonical global catalog without touching any current project.
-- Result: `~/.agents/vasir` fast-forwards to the latest upstream state, or bootstraps if missing.
+- Purpose: refresh the canonical global catalog and, when applicable, refresh the current repo's installed Vasir skills from it.
+- Result:
+  - `~/.agents/vasir` syncs to the currently installed bundled catalog, or bootstraps if missing.
+  - If the current repo already has Vasir-managed skills under `.agents/skills`, those installed copies are refreshed from the synced catalog.
 - Notes:
-  - Fails closed if the existing global clone is dirty.
+  - Fails closed if the existing global cache is dirty.
+  - Uses the current repo root as the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
+  - Only refreshes Vasir-managed skills already tracked in `.agents/vasir-install-state.json`.
+  - Local edits to a managed skill still fail closed, the same way `vasir add <skill> --replace` does.
+  - `--dry-run` shows which repo-local skills would update, which are already current, and which are blocked by local edits without mutating the cache or repo.
 
 Example:
 
 ```bash
 vasir update
+vasir update --dry-run
+vasir update --repo-root packages/web
 ```
 
 ### `list`
@@ -79,18 +88,22 @@ vasir list
 - Result:
   - `.agents/skills/<name>/...` is created in the resolved repo root.
   - `.claude/skills` and `.codex/skills` are repaired as aliases to `.agents/skills`.
-  - `AGENTS.md` is copied into the repo root if it does not already exist, using the canonical blank template at `templates/agents/AGENTS.md`.
+  - `AGENTS.md` is copied into the repo root if it does not already exist, using an inferred stack-specific starter when the repo shape is obvious, or the canonical blank template when it is not.
 - Notes:
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.
+  - `--repo-root <path>` overrides that detection and treats the provided directory as the repo root.
+  - Use `vasir add all` when you want every catalog skill copied into the current repo.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
-  - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` for one-command skill install plus stack-specific AGENTS scaffolding.
+  - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` when you want to override inference and force a specific AGENTS starter.
   - If you pass `--agents-profile` and `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
+  - `all` cannot be combined with specific skill names in the same command.
 
 Examples:
 
 ```bash
 vasir add react
+vasir add all
 vasir add react --agents-profile frontend
 vasir add react netcode
 ```
@@ -107,6 +120,7 @@ Text-mode success output also prints the resolved project skills directory so yo
 - Notes:
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.
+  - `--repo-root <path>` overrides that detection and treats the provided directory as the repo root.
   - If you omit skill names in an interactive terminal, Vasir opens a multi-select prompt over the installed project-local skills.
   - Removing a missing skill is a clean no-op and is reported back in the command result.
   - `AGENTS.md` is not edited automatically; remove or update any routing to the deleted skill yourself.
@@ -130,10 +144,10 @@ vasir remove
   - `AGENTS.md` exists in the resolved repo root.
   - The file has the guessed project name filled in.
   - The file has a loud `EDIT THESE FIRST` block at the top.
-  - The `Purpose` block is still a safe placeholder until you replace it manually or via `draft-purpose --write`.
+  - The `Purpose` block and Section 1 routing block are still safe placeholders until you replace them manually or via `draft-purpose --write` and `draft-routing --write`.
 - Notes:
   - Supported profiles are `backend`, `frontend`, and `ios`.
-  - The repo root is the nearest parent containing `.git`.
+  - The repo root is the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
   - If `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
 
 Examples:
@@ -164,15 +178,33 @@ vasir agents draft-purpose --model mock
 vasir agents draft-purpose --write --model openai
 ```
 
+### `agents draft-routing`
+
+- Purpose: inspect the current repo and draft a repo-aware Section 1 routing block for `AGENTS.md`.
+- Result:
+  - Prints a set of scoped routing lanes based on the actual repo directories.
+  - When `--write` is set, replaces the writable routing block in Section 1.
+- Notes:
+  - Uses deterministic repo signals such as top-level directories and common stack lanes.
+  - Drafted lanes point at real directories first, then expect a local `AGENTS.md` inside those directories if the lane truly needs scoped rules.
+  - `--write` keeps the routing markers in place until you finalize Section 1. `agents validate` will keep failing until you remove those markers and either create the referenced scoped `AGENTS.md` files or collapse the rules back into the root file.
+
+Examples:
+
+```bash
+vasir agents draft-routing
+vasir agents draft-routing --write
+```
+
 ### `agents validate`
 
-- Purpose: catch leftover scaffold markers before you treat `AGENTS.md` as finished.
+- Purpose: catch leftover scaffold markers and broken repo routes before you treat `AGENTS.md` as finished.
 - Result:
-  - Succeeds cleanly when `AGENTS.md` no longer contains known placeholders or example-only instructions.
-  - Fails closed with structured issue details when scaffold markers are still present.
+  - Succeeds cleanly when `AGENTS.md` no longer contains known placeholders, write-back markers, or broken repo routes.
+  - Fails closed with structured issue details when scaffold markers are still present or a routed directory is missing its scoped `AGENTS.md`.
 - Notes:
-  - This is the last step after `agents init` and `agents draft-purpose --write`.
-  - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, and untouched purpose markers.
+  - This is the last step after `agents init`, `agents draft-purpose --write`, and `agents draft-routing --write`.
+  - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a local `AGENTS.md`.
 
 Examples:
 
@@ -328,6 +360,7 @@ Success envelope:
 - `command`
 - `status`
 - `globalCatalogDirectory` for `init`, `update`, `list`, and `add`
+- `projectRootDirectory`, `projectSkillsDirectory`, and `updatedSkills` for `update`
 - `skills` for `list`
 - `projectRootDirectory`, `projectSkillsDirectory`, `installedSkills`, and `replacedSkills` for `add`
 - `projectRootDirectory`, `projectSkillsDirectory`, `removedSkills`, and `missingSkills` for `remove`
@@ -440,11 +473,12 @@ Project-local:
 ```
 
 Project-local skills are copied files that you own and can edit. They are never linked back to the global catalog.
-`.agents/vasir-install-state.json` is Vasir's local snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, and now prunes entries automatically when the matching skill directory is gone.
+`.agents/vasir-install-state.json` is Vasir's local snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, prunes entries automatically when the matching skill directory is gone, and records catalog provenance such as the installed Vasir version, catalog hash, and per-skill source version so `vasir update --dry-run` can explain pending refreshes.
 
 ## Advanced Override
 
 `VASIR_REPOSITORY_URL` is a troubleshooting override for local testing or mirror scenarios.
+It only accepts a local directory path or `file:///...` URL that already contains `registry.json`, `skills/`, and `templates/`.
 
 ```bash
 VASIR_REPOSITORY_URL=file:///absolute/path/to/vasir-fixture-repo vasir init

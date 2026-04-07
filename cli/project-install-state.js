@@ -5,12 +5,95 @@ import path from "node:path";
 import { VasirCliError } from "./cli-error.js";
 import { REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 
-const PROJECT_INSTALL_STATE_SCHEMA_VERSION = 1;
+const PROJECT_INSTALL_STATE_SCHEMA_VERSION = 3;
 
 function createEmptyProjectInstallState() {
   return {
     schemaVersion: PROJECT_INSTALL_STATE_SCHEMA_VERSION,
+    catalog: null,
     skills: {}
+  };
+}
+
+function normalizeTrackedSkillEntry(rawSkillEntry) {
+  if (!rawSkillEntry || typeof rawSkillEntry !== "object" || Array.isArray(rawSkillEntry)) {
+    throw new Error("Unexpected skill entry shape.");
+  }
+
+  if (!Array.isArray(rawSkillEntry.managedFiles)) {
+    throw new Error("Unexpected managedFiles shape.");
+  }
+
+  if (!rawSkillEntry.fileHashes || typeof rawSkillEntry.fileHashes !== "object" || Array.isArray(rawSkillEntry.fileHashes)) {
+    throw new Error("Unexpected fileHashes shape.");
+  }
+
+  return {
+    managedFiles: [...rawSkillEntry.managedFiles].sort(),
+    fileHashes: { ...rawSkillEntry.fileHashes },
+    provenance:
+      rawSkillEntry.provenance && typeof rawSkillEntry.provenance === "object" && !Array.isArray(rawSkillEntry.provenance)
+        ? {
+            installedAt: typeof rawSkillEntry.provenance.installedAt === "string"
+              ? rawSkillEntry.provenance.installedAt
+              : null,
+            installedByVersion: typeof rawSkillEntry.provenance.installedByVersion === "string"
+              ? rawSkillEntry.provenance.installedByVersion
+              : null,
+            sourceHash: typeof rawSkillEntry.provenance.sourceHash === "string"
+              ? rawSkillEntry.provenance.sourceHash
+              : null,
+            skillVersion: typeof rawSkillEntry.provenance.skillVersion === "string"
+              ? rawSkillEntry.provenance.skillVersion
+              : null,
+            sourcePath: typeof rawSkillEntry.provenance.sourcePath === "string"
+              ? rawSkillEntry.provenance.sourcePath
+              : null
+          }
+        : null
+  };
+}
+
+function normalizeProjectInstallState(parsedInstallState) {
+  if (
+    !parsedInstallState ||
+    typeof parsedInstallState !== "object" ||
+    Array.isArray(parsedInstallState) ||
+    typeof parsedInstallState.skills !== "object" ||
+    parsedInstallState.skills === null ||
+    Array.isArray(parsedInstallState.skills)
+  ) {
+    throw new Error("Unexpected install state schema.");
+  }
+
+  if (![1, 2, PROJECT_INSTALL_STATE_SCHEMA_VERSION].includes(parsedInstallState.schemaVersion)) {
+    throw new Error("Unexpected install state schema.");
+  }
+
+  const normalizedSkills = {};
+  for (const [skillName, rawSkillEntry] of Object.entries(parsedInstallState.skills)) {
+    normalizedSkills[skillName] = normalizeTrackedSkillEntry(rawSkillEntry);
+  }
+
+  const catalog = parsedInstallState.catalog && typeof parsedInstallState.catalog === "object" && !Array.isArray(parsedInstallState.catalog)
+    ? {
+        packageVersion: typeof parsedInstallState.catalog.packageVersion === "string"
+          ? parsedInstallState.catalog.packageVersion
+          : null,
+        sourceHash: typeof parsedInstallState.catalog.sourceHash === "string"
+          ? parsedInstallState.catalog.sourceHash
+          : null,
+        trackingMode:
+          parsedInstallState.catalog.trackingMode === "all" || parsedInstallState.catalog.trackingMode === "selected"
+            ? parsedInstallState.catalog.trackingMode
+            : null
+      }
+    : null;
+
+  return {
+    schemaVersion: PROJECT_INSTALL_STATE_SCHEMA_VERSION,
+    catalog,
+    skills: normalizedSkills
   };
 }
 
@@ -75,15 +158,9 @@ export function readProjectInstallState({ projectPaths }) {
   }
 
   try {
-    const parsedInstallState = JSON.parse(fs.readFileSync(projectInstallStateFilePath, "utf8"));
-    if (
-      parsedInstallState.schemaVersion !== PROJECT_INSTALL_STATE_SCHEMA_VERSION ||
-      typeof parsedInstallState.skills !== "object" ||
-      parsedInstallState.skills === null ||
-      Array.isArray(parsedInstallState.skills)
-    ) {
-      throw new Error("Unexpected install state schema.");
-    }
+    const parsedInstallState = normalizeProjectInstallState(
+      JSON.parse(fs.readFileSync(projectInstallStateFilePath, "utf8"))
+    );
 
     if (pruneMissingSkillEntries(parsedInstallState, projectPaths)) {
       writeProjectInstallState({
@@ -115,7 +192,8 @@ export function writeProjectInstallState({ projectPaths, projectInstallState }) 
 
 export function createProjectSkillInstallStateEntry({
   targetSkillDirectory,
-  managedRelativeFilePaths
+  managedRelativeFilePaths,
+  provenance = null
 }) {
   const sortedManagedRelativeFilePaths = [...managedRelativeFilePaths].sort();
   const fileHashes = {};
@@ -126,24 +204,28 @@ export function createProjectSkillInstallStateEntry({
 
   return {
     managedFiles: sortedManagedRelativeFilePaths,
-    fileHashes
+    fileHashes,
+    provenance
   };
 }
 
-export function assertProjectSkillReplaceSafety({
+export function inspectProjectSkillReplaceSafety({
   projectInstallState,
   skillName,
   targetSkillDirectory
 }) {
   const trackedSkillEntry = projectInstallState.skills[skillName];
   if (!trackedSkillEntry) {
-    throw new VasirCliError({
-      code: "PROJECT_SKILL_UNTRACKED",
-      message: `Project skill cannot be safely replaced because Vasir has no install snapshot for ${targetSkillDirectory}.`,
-      suggestion:
-        "Delete the project-local skill directory manually if you want a fresh copy, then rerun `vasir add <skill>`.",
-      docsRef: REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF
-    });
+    return {
+      ok: false,
+      error: new VasirCliError({
+        code: "PROJECT_SKILL_UNTRACKED",
+        message: `Project skill cannot be safely replaced because Vasir has no install snapshot for ${targetSkillDirectory}.`,
+        suggestion:
+          "Delete the project-local skill directory manually if you want a fresh copy, then rerun `vasir add <skill>`.",
+        docsRef: REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF
+      })
+    };
   }
 
   const actualRelativeFilePaths = listRelativeFilePathsRecursively(targetSkillDirectory);
@@ -156,14 +238,17 @@ export function assertProjectSkillReplaceSafety({
   );
 
   if (unexpectedRelativeFilePaths.length > 0 || missingRelativeFilePaths.length > 0) {
-    throw createModifiedSkillError({
-      targetSkillDirectory,
-      detailMessage: "The on-disk file inventory no longer matches the last Vasir-managed snapshot.",
-      context: {
-        unexpectedRelativeFilePaths,
-        missingRelativeFilePaths
-      }
-    });
+    return {
+      ok: false,
+      error: createModifiedSkillError({
+        targetSkillDirectory,
+        detailMessage: "The on-disk file inventory no longer matches the last Vasir-managed snapshot.",
+        context: {
+          unexpectedRelativeFilePaths,
+          missingRelativeFilePaths
+        }
+      })
+    };
   }
 
   const modifiedRelativeFilePaths = [];
@@ -175,12 +260,35 @@ export function assertProjectSkillReplaceSafety({
   }
 
   if (modifiedRelativeFilePaths.length > 0) {
-    throw createModifiedSkillError({
-      targetSkillDirectory,
-      detailMessage: "One or more managed files were edited after installation.",
-      context: {
-        modifiedRelativeFilePaths
-      }
-    });
+    return {
+      ok: false,
+      error: createModifiedSkillError({
+        targetSkillDirectory,
+        detailMessage: "One or more managed files were edited after installation.",
+        context: {
+          modifiedRelativeFilePaths
+        }
+      })
+    };
+  }
+
+  return {
+    ok: true,
+    trackedSkillEntry
+  };
+}
+
+export function assertProjectSkillReplaceSafety({
+  projectInstallState,
+  skillName,
+  targetSkillDirectory
+}) {
+  const safetyInspection = inspectProjectSkillReplaceSafety({
+    projectInstallState,
+    skillName,
+    targetSkillDirectory
+  });
+  if (!safetyInspection.ok) {
+    throw safetyInspection.error;
   }
 }

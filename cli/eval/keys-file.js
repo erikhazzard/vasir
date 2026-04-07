@@ -28,9 +28,13 @@ function createInvalidKeysFileError({ projectKeysFilePath, reason, cause }) {
 
 export function resolveEvalEnvironmentVariables({
   currentWorkingDirectory,
+  projectRootDirectory = null,
   environmentVariables
 }) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   const projectKeysFilePath = path.join(projectPaths.projectRootDirectory, "keys.json");
 
   if (!fs.existsSync(projectKeysFilePath)) {

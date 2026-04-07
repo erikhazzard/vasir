@@ -70,6 +70,9 @@ function createFixtureRepository() {
 
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
   writeFile(path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"), "# Project Agents\n");
+  writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "frontend.md"), "# Frontend Agents\n");
+  writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "backend.md"), "# Backend Agents\n");
+  writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "ios.md"), "# iOS Agents\n");
   writeFile(
     path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
     `---
@@ -165,10 +168,12 @@ function createFakeTtyOutputStream() {
 test("init creates the canonical global catalog and compatibility aliases", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
+  const currentWorkingDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
   const statusCode = await runCommandLine(["node", "vasir", "init"], {
     homeDirectory,
+    currentWorkingDirectory,
     repositoryUrl,
     ...capturedOutput
   });
@@ -181,13 +186,48 @@ test("init creates the canonical global catalog and compatibility aliases", asyn
   assert.match(capturedOutput.readStdout(), /Global catalog ready/);
 });
 
+test("init inside a repo installs and tracks the full catalog", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  runGitCommand(projectDirectory, ["init"]);
+  runGitCommand(projectDirectory, ["config", "user.email", "test@example.com"]);
+  runGitCommand(projectDirectory, ["config", "user.name", "Test Runner"]);
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+
+  const statusCode = await runCommandLine(["node", "vasir", "init"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.equal(installState.catalog.trackingMode, "all");
+  assert.match(capturedOutput.readStdout(), /Tracking Full catalog/);
+});
+
 test("update bootstraps the canonical global catalog when it is missing", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
+  const currentWorkingDirectory = createTemporaryDirectory();
   const capturedOutput = captureCommandWriters();
 
   const statusCode = await runCommandLine(["node", "vasir", "update"], {
     homeDirectory,
+    currentWorkingDirectory,
     repositoryUrl,
     ...capturedOutput
   });
@@ -195,6 +235,297 @@ test("update bootstraps the canonical global catalog when it is missing", async 
   assert.equal(statusCode, 0);
   assert.ok(fs.existsSync(path.join(homeDirectory, ".agents", "vasir", "registry.json")));
   assert.match(capturedOutput.readStdout(), /Global catalog updated/);
+});
+
+test("update refreshes Vasir-managed project-local skills when run inside the repo", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const updateOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  assert.match(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "utf8"),
+    /Use local state first\./
+  );
+
+  writeFile(
+    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.1.0
+---
+
+# React
+
+Use AbortController in async effects.`
+  );
+  runGitCommand(repositoryDirectory, ["add", "."]);
+  runGitCommand(repositoryDirectory, ["commit", "-m", "update react skill"]);
+
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...updateOutput
+  });
+
+  assert.equal(updateStatusCode, 0);
+  assert.match(updateOutput.readStdout(), /Updated react/);
+  assert.match(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "utf8"),
+    /Use AbortController in async effects\./
+  );
+});
+
+test("update installs newly added catalog skills for repos tracking the full catalog", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const initOutput = captureCommandWriters();
+  const updateOutput = captureCommandWriters();
+
+  runGitCommand(projectDirectory, ["init"]);
+  runGitCommand(projectDirectory, ["config", "user.email", "test@example.com"]);
+  runGitCommand(projectDirectory, ["config", "user.name", "Test Runner"]);
+
+  const initStatusCode = await runCommandLine(["node", "vasir", "init"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...initOutput
+  });
+
+  assert.equal(initStatusCode, 0);
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "platformer", "SKILL.md")));
+
+  const nextRegistry = JSON.parse(fs.readFileSync(path.join(repositoryDirectory, "registry.json"), "utf8"));
+  nextRegistry.skills.push({
+    name: "platformer",
+    path: "skills/platformer",
+    entry: "SKILL.md",
+    description: "Tight jump arcs and collision feel",
+    category: "games",
+    tags: ["games"],
+    version: "1.0.0",
+    recommends: [],
+    files: ["SKILL.md"]
+  });
+  writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(nextRegistry, null, 2)}\n`);
+  writeFile(
+    path.join(repositoryDirectory, "skills", "platformer", "SKILL.md"),
+    `---
+name: platformer
+description: Tight jump arcs and collision feel.
+category: games
+tags: [games]
+recommends: []
+version: 1.0.0
+---
+
+# Platformer
+
+Tune jump arcs before adding content.`
+  );
+  runGitCommand(repositoryDirectory, ["add", "."]);
+  runGitCommand(repositoryDirectory, ["commit", "-m", "add platformer skill"]);
+
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...updateOutput
+  });
+
+  assert.equal(updateStatusCode, 0);
+  assert.match(updateOutput.readStdout(), /Installed platformer/);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "platformer", "SKILL.md")));
+});
+
+test("update --dry-run previews repo-local refreshes without mutating files", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const updateOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+
+  writeFile(
+    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.1.0
+---
+
+# React
+
+Use AbortController in async effects.`
+  );
+
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update", "--dry-run"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...updateOutput
+  });
+
+  assert.equal(updateStatusCode, 0);
+  assert.match(updateOutput.readStdout(), /Would update react/);
+  assert.match(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "utf8"),
+    /Use local state first\./
+  );
+  assert.match(
+    fs.readFileSync(path.join(homeDirectory, ".agents", "vasir", "skills", "react", "SKILL.md"), "utf8"),
+    /Use local state first\./
+  );
+});
+
+test("add records install provenance for safer repo updates", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...captureCommandWriters()
+  });
+
+  assert.equal(addStatusCode, 0);
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+
+  assert.equal(installState.schemaVersion, 3);
+  assert.equal(installState.catalog.packageVersion, "0.1.0");
+  assert.equal(typeof installState.catalog.sourceHash, "string");
+  assert.ok(installState.catalog.sourceHash.length > 0);
+  assert.equal(installState.catalog.trackingMode, "selected");
+  assert.equal(installState.skills.react.provenance.skillVersion, "1.0.0");
+  assert.equal(installState.skills.react.provenance.sourcePath, "skills/react");
+  assert.equal(installState.skills.react.provenance.installedByVersion, "0.1.0");
+  assert.equal(typeof installState.skills.react.provenance.installedAt, "string");
+});
+
+test("add and update honor --repo-root for monorepo subprojects", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const monorepoDirectory = createTemporaryDirectory();
+  const appDirectory = path.join(monorepoDirectory, "packages", "web");
+  const addOutput = captureCommandWriters();
+  const updateOutput = captureCommandWriters();
+
+  runGitCommand(monorepoDirectory, ["init"]);
+  runGitCommand(monorepoDirectory, ["config", "user.email", "test@example.com"]);
+  runGitCommand(monorepoDirectory, ["config", "user.name", "Test Runner"]);
+  writeFile(
+    path.join(appDirectory, "package.json"),
+    `${JSON.stringify({ name: "web", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(appDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+
+  const addStatusCode = await runCommandLine(
+    ["node", "vasir", "add", "react", "--repo-root", appDirectory],
+    {
+      homeDirectory,
+      currentWorkingDirectory: monorepoDirectory,
+      repositoryUrl,
+      ...addOutput
+    }
+  );
+
+  assert.equal(addStatusCode, 0);
+  assert.ok(fs.existsSync(path.join(appDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(!fs.existsSync(path.join(monorepoDirectory, ".agents", "skills", "react", "SKILL.md")));
+
+  writeFile(
+    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.1.0
+---
+
+# React
+
+Use AbortController in async effects.`
+  );
+
+  const updateStatusCode = await runCommandLine(
+    ["node", "vasir", "update", "--repo-root", appDirectory],
+    {
+      homeDirectory,
+      currentWorkingDirectory: monorepoDirectory,
+      repositoryUrl,
+      ...updateOutput
+    }
+  );
+
+  assert.equal(updateStatusCode, 0);
+  assert.match(updateOutput.readStdout(), /Updated react/);
+  assert.match(
+    fs.readFileSync(path.join(appDirectory, ".agents", "skills", "react", "SKILL.md"), "utf8"),
+    /Use AbortController in async effects\./
+  );
+});
+
+test("update fails closed when a Vasir-managed project-local skill has local edits", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const updateOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  writeFile(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "# locally edited\n");
+
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...updateOutput
+  });
+
+  assert.equal(updateStatusCode, 1);
+  const parsedError = JSON.parse(updateOutput.readStderr());
+  assert.equal(parsedError.command, "update");
+  assert.equal(parsedError.code, "PROJECT_SKILL_MODIFIED");
 });
 
 test("list auto-initializes and prints grouped skills", async () => {
@@ -267,6 +598,26 @@ test("add installs into the repository root when invoked from a nested subdirect
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
   assert.ok(!fs.existsSync(path.join(projectNestedDirectory, ".agents")));
   assert.ok(!fs.existsSync(path.join(projectNestedDirectory, "AGENTS.md")));
+});
+
+test("add all installs every catalog skill into the repository root", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "add", "all"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
+  assert.match(capturedOutput.readStdout(), /Installed react/);
+  assert.match(capturedOutput.readStdout(), /Installed roguelike/);
 });
 
 test("remove deletes installed project-local skills and updates install state", async () => {
@@ -533,10 +884,12 @@ test("add --replace refuses to delete unexpected local files inside a project sk
 test("update fails closed when the global catalog is dirty", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
+  const currentWorkingDirectory = createTemporaryDirectory();
 
   const initOutput = captureCommandWriters();
   const initStatusCode = await runCommandLine(["node", "vasir", "init"], {
     homeDirectory,
+    currentWorkingDirectory,
     repositoryUrl,
     ...initOutput
   });
@@ -548,10 +901,11 @@ test("update fails closed when the global catalog is dirty", async () => {
   const updateOutput = captureCommandWriters();
   const updateStatusCode = await runCommandLine(["node", "vasir", "update"], {
     homeDirectory,
+    currentWorkingDirectory,
     repositoryUrl,
     ...updateOutput
   });
 
   assert.equal(updateStatusCode, 1);
-  assert.match(updateOutput.readStderr(), /uncommitted changes/);
+  assert.match(updateOutput.readStderr(), /local changes/i);
 });

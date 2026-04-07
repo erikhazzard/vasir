@@ -86,12 +86,16 @@ function tryResolveLocalSkill({ projectRootDirectory, skillName }) {
 export function resolveSkillSource({
   skillName,
   currentWorkingDirectory,
+  projectRootDirectory = null,
   homeDirectory,
   repositoryUrl,
   platform,
   spawnSyncImplementation
 }) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   const localSkill = tryResolveLocalSkill({
     projectRootDirectory: projectPaths.projectRootDirectory,
     skillName

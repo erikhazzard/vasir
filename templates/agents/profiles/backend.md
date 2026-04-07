@@ -3,8 +3,9 @@
 
 > EDIT THESE FIRST
 > 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
-> 2. Replace the routing bullets in Section 1 with the real API, jobs, and data-layer paths in this repo.
-> 3. Delete any queue, worker, or migration rule that is not true here.
+> 2. Replace the routing block in Section 1 with the real API, jobs, and data-layer lanes in this repo, or run `vasir agents draft-routing --write`.
+> 3. Create any scoped `AGENTS.md` files that Section 1 points at, or collapse those rules back into this root file.
+> 4. Delete any queue, worker, or migration rule that is not true here.
 
 **Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 <!-- vasir:purpose:start -->
@@ -17,10 +18,12 @@
 
 This root file contains only global rules. For domain-specific logic, you MUST read the scoped agent files before modifying code in those directories.
 
+<!-- vasir:routing:start -->
 * **API Surface:** If touching `/src/api/` or `/app/api/`, read the API manifest before changing request or response behavior.
 * **Async Work:** If touching `/src/jobs/`, `/src/workers/`, or queue consumers, read the worker manifest before changing retry or delivery behavior.
 * **Data Layer:** If touching `/db/`, `/migrations/`, or raw SQL paths, read the data manifest before editing queries or schemas.
 * **Cold Storage:** Do not read `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
 
 ---
 

@@ -82,22 +82,40 @@ function listRunFilePaths(skillHistoryDirectoryPath) {
     .sort();
 }
 
-export function getEvalHistoryRootDirectory({ currentWorkingDirectory }) {
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+export function getEvalHistoryRootDirectory({ currentWorkingDirectory, projectRootDirectory = null }) {
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   return path.join(projectPaths.agentsDirectory, "vasir-evals");
 }
 
 export function buildRunDirectoryPath({
   currentWorkingDirectory,
+  projectRootDirectory = null,
   skillName,
   runId
 }) {
-  return path.join(getEvalHistoryRootDirectory({ currentWorkingDirectory }), skillName, runId);
+  return path.join(
+    getEvalHistoryRootDirectory({
+      currentWorkingDirectory,
+      projectRootDirectory
+    }),
+    skillName,
+    runId
+  );
 }
 
-export function listSkillHistorySummaries({ currentWorkingDirectory, skillName }) {
+export function listSkillHistorySummaries({
+  currentWorkingDirectory,
+  projectRootDirectory = null,
+  skillName
+}) {
   const skillHistoryDirectoryPath = path.join(
-    getEvalHistoryRootDirectory({ currentWorkingDirectory }),
+    getEvalHistoryRootDirectory({
+      currentWorkingDirectory,
+      projectRootDirectory
+    }),
     skillName
   );
 
@@ -119,10 +137,12 @@ export function listSkillHistorySummaries({ currentWorkingDirectory, skillName }
 
 export function readPreviousRunSummary({
   currentWorkingDirectory,
+  projectRootDirectory = null,
   skillName
 }) {
   const runs = listSkillHistorySummaries({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName
   });
   return runs.length === 0 ? null : runs.at(-1);
@@ -130,11 +150,13 @@ export function readPreviousRunSummary({
 
 export function readPreviousVersionSummary({
   currentWorkingDirectory,
+  projectRootDirectory = null,
   skillName,
   currentSkillHash
 }) {
   const runs = listSkillHistorySummaries({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName
   });
 
@@ -150,6 +172,7 @@ export function readPreviousVersionSummary({
 
 export function writeEvalRunArtifacts({
   currentWorkingDirectory,
+  projectRootDirectory = null,
   skillName,
   runId,
   runPayload
@@ -158,6 +181,7 @@ export function writeEvalRunArtifacts({
     runFilePath: path.join(
       buildRunDirectoryPath({
         currentWorkingDirectory,
+        projectRootDirectory,
         skillName,
         runId: runPayload?.runId ?? runId
       }),
@@ -167,6 +191,7 @@ export function writeEvalRunArtifacts({
   });
   const runDirectoryPath = buildRunDirectoryPath({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     runId: normalizedRunPayload.runId
   });
@@ -179,11 +204,13 @@ export function writeEvalRunArtifacts({
 
 export function readEvalRunArtifacts({
   currentWorkingDirectory,
+  projectRootDirectory = null,
   skillName,
   runId = null
 }) {
   const runs = listSkillHistorySummaries({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName
   });
   const resolvedRunId = runId ?? runs.at(-1)?.runId ?? null;
@@ -199,6 +226,7 @@ export function readEvalRunArtifacts({
 
   const runDirectoryPath = buildRunDirectoryPath({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     runId: resolvedRunId
   });

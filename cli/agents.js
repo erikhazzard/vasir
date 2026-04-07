@@ -7,6 +7,7 @@ import { AGENTS_REFERENCE_DOCS_REF } from "./docs-ref.js";
 import { readGlobalRegistry } from "./global-catalog.js";
 import { buildProjectPaths } from "./path-layout.js";
 import { createCommandUi } from "./ui/command-output.js";
+import { interactiveSelect } from "./ui/interactive-select.js";
 import { resolveEvalEnvironmentVariables } from "./eval/keys-file.js";
 import { resolveEvalModels } from "./eval/provider-config.js";
 import { generateEvalResponse } from "./eval/providers.js";
@@ -14,6 +15,8 @@ import { canPromptInteractively, promptForMissingProviderCredential } from "./ev
 
 const PURPOSE_START_MARKER = "<!-- vasir:purpose:start -->";
 const PURPOSE_END_MARKER = "<!-- vasir:purpose:end -->";
+const ROUTING_START_MARKER = "<!-- vasir:routing:start -->";
+const ROUTING_END_MARKER = "<!-- vasir:routing:end -->";
 const PURPOSE_PLACEHOLDER_FRAGMENT = "Replace this block first.";
 const LAST_UPDATED_PLACEHOLDER = "[YYYY-MM-DD - update alongside major architectural PRs]";
 const DEFAULT_AGENTS_TEMPLATE = path.join("templates", "agents", "AGENTS.md");
@@ -23,6 +26,153 @@ const AGENTS_PROFILE_TEMPLATES = Object.freeze({
   frontend: path.join("templates", "agents", "profiles", "frontend.md"),
   ios: path.join("templates", "agents", "profiles", "ios.md")
 });
+
+const AGENTS_PROFILE_LABELS = Object.freeze({
+  backend: "backend",
+  frontend: "frontend",
+  ios: "ios",
+  generic: "generic"
+});
+
+const AGENTS_PROFILE_HINTS = Object.freeze({
+  backend: "APIs, jobs, workers, and data-layer repos",
+  frontend: "React, routes, components, and design-system repos",
+  ios: "Swift, Xcode, app lifecycle, and native UI repos",
+  generic: "mixed repos or repos without one dominant stack"
+});
+
+const IGNORED_PROJECT_DIRECTORY_NAMES = new Set([
+  ".git",
+  ".svn",
+  ".hg",
+  "node_modules",
+  "dist",
+  "build",
+  "coverage",
+  "tmp",
+  "temp",
+  "vendor",
+  "Pods",
+  ".next",
+  ".nuxt",
+  ".turbo",
+  ".cache"
+]);
+
+const ROUTING_LANE_DEFINITIONS = Object.freeze([
+  {
+    id: "api-surface",
+    label: "API Surface",
+    patterns: ["src/api", "app/api", "api", "server", "src/server"],
+    detail: "before changing request, response, or handler behavior.",
+    profiles: ["backend"],
+    priority: 90
+  },
+  {
+    id: "async-work",
+    label: "Async Work",
+    patterns: ["src/jobs", "jobs", "workers", "src/workers", "queues"],
+    detail: "before changing delivery, retries, or worker behavior.",
+    profiles: ["backend"],
+    priority: 88
+  },
+  {
+    id: "data-layer",
+    label: "Data Layer",
+    patterns: ["db", "src/db", "migrations", "prisma", "sql"],
+    detail: "before changing schemas, queries, or persistence behavior.",
+    profiles: ["backend"],
+    priority: 86
+  },
+  {
+    id: "ui-surface",
+    label: "UI Surface",
+    patterns: ["src/ui", "src/components", "components", "src/app", "app", "pages", "src/pages"],
+    detail: "before changing component structure, routes, or page behavior.",
+    profiles: ["frontend"],
+    priority: 90
+  },
+  {
+    id: "state-data",
+    label: "State & Data Fetching",
+    patterns: ["src/store", "src/state", "stores", "src/hooks", "hooks", "src/lib/api", "lib/api"],
+    detail: "before changing state ownership, loaders, or data-fetching behavior.",
+    profiles: ["frontend"],
+    priority: 87
+  },
+  {
+    id: "design-system",
+    label: "Design System",
+    patterns: ["src/styles", "styles", "design-system", "src/design-system"],
+    detail: "before introducing new tokens, styling primitives, or layout conventions.",
+    profiles: ["frontend"],
+    priority: 84
+  },
+  {
+    id: "ios-lifecycle",
+    label: "App Lifecycle",
+    patterns: ["ios/App", "App", "Sources/App", "Sources"],
+    detail: "before changing startup, scene, or lifecycle behavior.",
+    profiles: ["ios"],
+    priority: 90
+  },
+  {
+    id: "ios-networking",
+    label: "Networking & Sync",
+    patterns: ["ios/Networking", "Networking", "ios/Sync", "Sync", "Services"],
+    detail: "before changing offline, retry, or cache behavior.",
+    profiles: ["ios"],
+    priority: 88
+  },
+  {
+    id: "ios-ui",
+    label: "UI Modules",
+    patterns: ["ios/UI", "UI", "Features", "Modules", "DesignSystem"],
+    detail: "before changing screens, navigation, or UI primitives.",
+    profiles: ["ios"],
+    priority: 86
+  },
+  {
+    id: "cli-runtime",
+    label: "CLI Runtime",
+    patterns: ["cli", "bin"],
+    detail: "before changing command parsing, output, or runtime behavior.",
+    profiles: ["backend", "generic"],
+    priority: 75
+  },
+  {
+    id: "skill-content",
+    label: "Skill Content",
+    patterns: ["skills"],
+    detail: "before changing installed or source skill behavior.",
+    profiles: ["generic"],
+    priority: 72
+  },
+  {
+    id: "template-content",
+    label: "Template Content",
+    patterns: ["templates"],
+    detail: "before changing starter manifests or scaffolds.",
+    profiles: ["generic"],
+    priority: 70
+  },
+  {
+    id: "public-docs",
+    label: "Public Docs",
+    patterns: ["docs"],
+    detail: "before changing user-facing documentation contracts.",
+    profiles: ["generic"],
+    priority: 68
+  },
+  {
+    id: "internal-work",
+    label: "Internal Work Docs",
+    patterns: ["work"],
+    detail: "before changing internal implementation notes or operating guidance.",
+    profiles: ["generic"],
+    priority: 66
+  }
+]);
 
 const AGENTS_VALIDATION_RULES = Object.freeze([
   {
@@ -39,6 +189,11 @@ const AGENTS_VALIDATION_RULES = Object.freeze([
     code: "SCAFFOLD_NOTE_LEFT_IN_FILE",
     matches: (line) => line.includes("Replace the routing bullets"),
     message: "Replace the scaffold routing instructions with repo truth."
+  },
+  {
+    code: "ROUTING_MARKER_LEFT_IN_FILE",
+    matches: (line) => line.includes(ROUTING_START_MARKER) || line.includes(ROUTING_END_MARKER),
+    message: "Remove the routing write-back markers by finalizing Section 1."
   },
   {
     code: "SCAFFOLD_NOTE_LEFT_IN_FILE",
@@ -88,6 +243,85 @@ function normalizeInlineText(value) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function toPosixPath(value) {
+  return String(value ?? "").split(path.sep).join("/");
+}
+
+function formatDisplayPath(relativePath) {
+  const normalizedPath = toPosixPath(relativePath).replace(/^\/+/, "").replace(/\/+$/, "");
+  return normalizedPath.length === 0 ? "/" : `/${normalizedPath}/`;
+}
+
+function sanitizePathToken(token) {
+  return token.replace(/[),.;:]+$/g, "");
+}
+
+function isProjectPathToken(token) {
+  if (token.includes(" ")) {
+    return false;
+  }
+
+  if (/^[A-Za-z]+:/.test(token) && !token.startsWith("../") && !token.startsWith("./")) {
+    return false;
+  }
+
+  return token.startsWith("/") || token.startsWith("./") || token.startsWith("../") || token.includes("/");
+}
+
+function readProjectDirectories(projectRootDirectory, maxDepth = 2) {
+  const discoveredDirectories = [];
+  const seenRelativePaths = new Set();
+
+  function walk(currentDirectory, relativeDirectory, depth) {
+    if (depth > maxDepth) {
+      return;
+    }
+
+    let directoryEntries = [];
+    try {
+      directoryEntries = fs.readdirSync(currentDirectory, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of directoryEntries) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+
+      if (entry.name.startsWith(".") || IGNORED_PROJECT_DIRECTORY_NAMES.has(entry.name)) {
+        continue;
+      }
+
+      const childRelativeDirectory = relativeDirectory.length > 0
+        ? `${relativeDirectory}/${entry.name}`
+        : entry.name;
+
+      if (!seenRelativePaths.has(childRelativeDirectory)) {
+        seenRelativePaths.add(childRelativeDirectory);
+        discoveredDirectories.push(childRelativeDirectory);
+      }
+
+      walk(path.join(currentDirectory, entry.name), childRelativeDirectory, depth + 1);
+    }
+  }
+
+  walk(projectRootDirectory, "", 1);
+
+  return discoveredDirectories;
+}
+
+function formatPathLabel(relativePath) {
+  const pathSegments = toPosixPath(relativePath).split("/").filter((segment) => segment.length > 0);
+  if (pathSegments.length === 0) {
+    return "Core Area";
+  }
+
+  return pathSegments.at(-1)
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function readJsonFileIfPresent(filePath) {
@@ -202,6 +436,185 @@ function buildRepositoryContext({ projectRootDirectory, agentsText }) {
   };
 }
 
+function inferAgentsProfile({ projectRootDirectory, repositoryContext }) {
+  const directoryPaths = readProjectDirectories(projectRootDirectory, 2);
+  const directorySet = new Set(directoryPaths);
+  const topLevelNames = repositoryContext.topLevelEntries.map((entry) => entry.name);
+  const dependencyNames = [
+    ...(repositoryContext.packageJson?.dependencies ?? []),
+    ...(repositoryContext.packageJson?.devDependencies ?? [])
+  ].map((dependencyName) => String(dependencyName).toLowerCase());
+  const readmeText = normalizeInlineText(repositoryContext.readmeExcerpt ?? "").toLowerCase();
+  const scores = {
+    backend: 0,
+    frontend: 0,
+    ios: 0
+  };
+  const reasons = {
+    backend: [],
+    frontend: [],
+    ios: []
+  };
+
+  function addScore(profileName, scoreDelta, reason) {
+    scores[profileName] += scoreDelta;
+    reasons[profileName].push(reason);
+  }
+
+  function hasDirectory(...candidatePaths) {
+    return candidatePaths.some((candidatePath) => directorySet.has(candidatePath));
+  }
+
+  function hasDependency(...candidateDependencies) {
+    return candidateDependencies.some((candidateDependency) => dependencyNames.includes(candidateDependency));
+  }
+
+  function hasTopLevelMatch(matchPredicate) {
+    return topLevelNames.some((entryName) => matchPredicate(entryName));
+  }
+
+  if (hasDependency("react", "next", "vite", "astro", "svelte", "vue", "@types/react")) {
+    addScore("frontend", 4, "package.json includes frontend framework dependencies");
+  }
+
+  if (hasDirectory("src/ui", "src/components", "components", "src/app", "app", "pages", "src/pages")) {
+    addScore("frontend", 4, "the repo has clear UI or route directories");
+  }
+
+  if (hasDirectory("src/styles", "styles", "design-system", "src/design-system")) {
+    addScore("frontend", 2, "the repo has styling or design-system directories");
+  }
+
+  if (readmeText.includes("design system") || readmeText.includes("component library")) {
+    addScore("frontend", 2, "the README describes a UI or design-system product");
+  }
+
+  if (hasDependency("express", "fastify", "hono", "koa", "@nestjs/core", "prisma", "pg", "mysql2", "mongoose", "bullmq")) {
+    addScore("backend", 4, "package.json includes backend or data-layer dependencies");
+  }
+
+  if (hasDirectory("src/api", "app/api", "api", "server", "src/server", "db", "migrations", "workers", "src/workers", "jobs", "prisma")) {
+    addScore("backend", 4, "the repo has API, worker, or data-layer directories");
+  }
+
+  if (readmeText.includes("api") || readmeText.includes("worker") || readmeText.includes("queue")) {
+    addScore("backend", 1, "the README describes backend request or async work");
+  }
+
+  if (hasTopLevelMatch((entryName) => entryName.endsWith(".xcodeproj") || entryName.endsWith(".xcworkspace"))) {
+    addScore("ios", 5, "the repo has Xcode project files at the root");
+  }
+
+  if (fs.existsSync(path.join(projectRootDirectory, "Package.swift"))) {
+    addScore("ios", 4, "the repo has a Swift Package manifest");
+  }
+
+  if (hasDirectory("ios", "App", "Sources", "Modules", "Features", "UI", "DesignSystem", "Networking", "Sync")) {
+    addScore("ios", 4, "the repo has native iOS or Swift module directories");
+  }
+
+  if (
+    hasDependency("swiftlint", "xcodegen") ||
+    readmeText.includes("swiftui") ||
+    readmeText.includes("uikit") ||
+    readmeText.includes("ios")
+  ) {
+    addScore("ios", 2, "the repo metadata looks iOS-native");
+  }
+
+  const rankedProfiles = Object.entries(scores)
+    .sort((leftEntry, rightEntry) => rightEntry[1] - leftEntry[1]);
+  const [topProfileName, topScore] = rankedProfiles[0];
+  const secondScore = rankedProfiles[1]?.[1] ?? 0;
+
+  if (topScore <= 0) {
+    return {
+      profileName: null,
+      confident: false,
+      reason: "Repo signals are too mixed to infer a stack-specific starter confidently."
+    };
+  }
+
+  const confident = topScore >= secondScore + 2 || (topScore >= 4 && secondScore === 0);
+
+  return {
+    profileName: topProfileName,
+    confident,
+    reason: reasons[topProfileName][0] ?? "Repo structure suggests this stack.",
+    scores,
+    reasons
+  };
+}
+
+export async function resolveRecommendedAgentsProfile({
+  projectRootDirectory,
+  inputStream = process.stdin,
+  outputStream = process.stdout,
+  jsonOutput = false
+}) {
+  const repositoryContext = buildRepositoryContext({
+    projectRootDirectory,
+    agentsText: ""
+  });
+  const inference = inferAgentsProfile({
+    projectRootDirectory,
+    repositoryContext
+  });
+
+  if (inference.profileName && inference.confident) {
+    return {
+      profileName: inference.profileName,
+      source: "inferred",
+      reason: inference.reason
+    };
+  }
+
+  if (!jsonOutput && canPromptInteractively({ inputStream, outputStream })) {
+    const orderedProfiles = [
+      inference.profileName,
+      "backend",
+      "frontend",
+      "ios"
+    ].filter((profileName, profileIndex, profileList) =>
+      profileName && profileList.indexOf(profileName) === profileIndex
+    );
+
+    const selection = await interactiveSelect({
+      title: "Choose the AGENTS starter profile",
+      promptLabel: "Profile",
+      clearOnExit: true,
+      inputStream,
+      outputStream,
+      items: [
+        ...orderedProfiles.map((profileName) => ({
+          value: profileName,
+          label: AGENTS_PROFILE_LABELS[profileName],
+          hint: profileName === inference.profileName && inference.reason
+            ? `${inference.reason} (recommended)`
+            : AGENTS_PROFILE_HINTS[profileName]
+        })),
+        {
+          value: "generic",
+          label: AGENTS_PROFILE_LABELS.generic,
+          hint: AGENTS_PROFILE_HINTS.generic
+        }
+      ]
+    });
+
+    return {
+      profileName: selection?.value === "generic" ? null : selection?.value ?? inference.profileName ?? null,
+      source: selection ? "prompt" : inference.profileName ? "inferred" : "default-generic",
+      reason: selection ? "Selected interactively for this repo." : inference.reason
+    };
+  }
+
+  return {
+    profileName: inference.profileName,
+    source: inference.profileName ? "inferred" : "default-generic",
+    reason: inference.reason
+  };
+}
+
 function renderAgentsTemplate({ templateText, projectName, currentDate }) {
   return templateText
     .replace(/\[Project Name\]/g, projectName)
@@ -248,15 +661,179 @@ function createAgentsValidationError({ agentsFilePath, issues }) {
 
   return new VasirCliError({
     code: "AGENTS_VALIDATION_FAILED",
-    message: `AGENTS.md still contains scaffold placeholders. ${issueSummary}`,
+    message: `AGENTS.md still contains scaffold or repo-truth issues. ${issueSummary}`,
     suggestion:
-      "Edit the flagged lines or rerun `vasir agents init <profile> --replace`, then rerun `vasir agents validate`.",
+      "Edit the flagged lines, create any missing scoped AGENTS.md files, or rerun `vasir agents init <profile> --replace`, then rerun `vasir agents validate`.",
     context: {
       agentsFilePath,
       issues
     },
     docsRef: AGENTS_REFERENCE_DOCS_REF
   });
+}
+
+function resolveProjectPathToken({ projectRootDirectory, pathToken }) {
+  const sanitizedToken = sanitizePathToken(pathToken);
+  const absolutePath = sanitizedToken.startsWith("/")
+    ? path.join(projectRootDirectory, sanitizedToken.replace(/^\/+/, ""))
+    : path.resolve(projectRootDirectory, sanitizedToken);
+
+  return {
+    token: sanitizedToken,
+    absolutePath
+  };
+}
+
+function findAgentsPathValidationIssues({ agentsText, projectRootDirectory }) {
+  const issues = [];
+  let inRoutingSection = false;
+
+  for (const [lineIndex, lineText] of agentsText.split(/\r?\n/).entries()) {
+    const trimmedLine = lineText.trim();
+    if (trimmedLine.startsWith("## ")) {
+      inRoutingSection = trimmedLine.startsWith("## 1. Topography & Routing Protocol");
+    }
+
+    if (trimmedLine.length === 0) {
+      continue;
+    }
+
+    const inlineTokens = [...trimmedLine.matchAll(/`([^`\n]+)`/g)]
+      .map((match) => match[1].trim())
+      .filter((token) => isProjectPathToken(token));
+
+    for (const inlineToken of inlineTokens) {
+      const resolvedToken = resolveProjectPathToken({
+        projectRootDirectory,
+        pathToken: inlineToken
+      });
+      if (!fs.existsSync(resolvedToken.absolutePath)) {
+        issues.push({
+          code: "ROUTED_PATH_MISSING",
+          lineNumber: lineIndex + 1,
+          message: `Referenced repo path does not exist: ${resolvedToken.token}`,
+          lineText: trimmedLine
+        });
+        continue;
+      }
+
+      if (
+        inRoutingSection &&
+        trimmedLine.includes("local `AGENTS.md`") &&
+        fs.statSync(resolvedToken.absolutePath).isDirectory()
+      ) {
+        const scopedAgentsFilePath = path.join(resolvedToken.absolutePath, "AGENTS.md");
+        if (!fs.existsSync(scopedAgentsFilePath)) {
+          issues.push({
+            code: "SCOPED_AGENTS_MISSING",
+            lineNumber: lineIndex + 1,
+            message:
+              `Scoped AGENTS lane is referenced at ${resolvedToken.token}, but /${toPosixPath(path.relative(projectRootDirectory, scopedAgentsFilePath))} does not exist yet.`,
+            lineText: trimmedLine
+          });
+        }
+      }
+    }
+  }
+
+  return issues;
+}
+
+function findRoutingLanes({ projectRootDirectory, profileHint }) {
+  const directoryPaths = readProjectDirectories(projectRootDirectory, 2);
+  const lanes = [];
+  const seenLanePaths = new Set();
+
+  for (const laneDefinition of ROUTING_LANE_DEFINITIONS) {
+    const matchedDirectory = laneDefinition.patterns.find((candidatePath) => directoryPaths.includes(candidatePath));
+    if (!matchedDirectory || seenLanePaths.has(matchedDirectory)) {
+      continue;
+    }
+
+    seenLanePaths.add(matchedDirectory);
+    const profileBoost = laneDefinition.profiles.includes(profileHint)
+      ? 20
+      : laneDefinition.profiles.includes("generic")
+        ? 8
+        : 0;
+
+    lanes.push({
+      label: laneDefinition.label,
+      detail: laneDefinition.detail,
+      relativePath: matchedDirectory,
+      priority: laneDefinition.priority + profileBoost
+    });
+  }
+
+  if (lanes.length === 0) {
+    const fallbackDirectories = readTopLevelEntries(projectRootDirectory)
+      .filter((entry) => entry.kind === "directory")
+      .map((entry) => entry.name)
+      .filter((entryName) => !IGNORED_PROJECT_DIRECTORY_NAMES.has(entryName) && !entryName.startsWith("."))
+      .slice(0, 3);
+
+    for (const fallbackDirectory of fallbackDirectories) {
+      lanes.push({
+        label: formatPathLabel(fallbackDirectory),
+        detail: "before changing local-only behavior in that lane.",
+        relativePath: fallbackDirectory,
+        priority: 40
+      });
+    }
+  }
+
+  const sortedLanes = lanes
+    .sort((leftLane, rightLane) => {
+      if (rightLane.priority !== leftLane.priority) {
+        return rightLane.priority - leftLane.priority;
+      }
+      return leftLane.relativePath.localeCompare(rightLane.relativePath);
+    })
+    .slice(0, 4)
+    .map((lane) => ({
+      ...lane,
+      displayPath: formatDisplayPath(lane.relativePath)
+    }));
+
+  if (fs.existsSync(path.join(projectRootDirectory, "docs", "legacy"))) {
+    sortedLanes.push({
+      label: "Cold Storage",
+      detail: "Do not read `AGENTS.md` files under that lane unless the user explicitly tells you to.",
+      relativePath: "docs/legacy",
+      displayPath: "/docs/legacy/",
+      priority: 0,
+      coldStorage: true
+    });
+  }
+
+  return sortedLanes;
+}
+
+function formatRoutingLines({ projectRootDirectory, agentsText }) {
+  const profileHint = readAgentsProfileHint(agentsText);
+  const inferredProfile = inferAgentsProfile({
+    projectRootDirectory,
+    repositoryContext: buildRepositoryContext({
+      projectRootDirectory,
+      agentsText
+    })
+  }).profileName;
+  const effectiveProfileHint = profileHint === "generic" ? inferredProfile ?? "generic" : profileHint ?? inferredProfile ?? "generic";
+  const lanes = findRoutingLanes({
+    projectRootDirectory,
+    profileHint: effectiveProfileHint
+  });
+
+  return {
+    effectiveProfileHint,
+    routingLines: lanes.map((lane) => {
+      if (lane.coldStorage) {
+        return `* **${lane.label}:** Do not read \`${lane.displayPath}\` unless explicitly instructed by the user.`;
+      }
+
+      return `* **${lane.label}:** If touching \`${lane.displayPath}\`, you must first read that directory's local \`AGENTS.md\` ${lane.detail}`;
+    })
+  };
 }
 
 export function initializeProjectAgentsFile({
@@ -319,12 +896,41 @@ export function validateProjectAgentsFile({ projectRootDirectory }) {
   }
 
   const agentsText = fs.readFileSync(agentsFilePath, "utf8");
-  const issues = findAgentsValidationIssues(agentsText);
+  const issues = [
+    ...findAgentsValidationIssues(agentsText),
+    ...findAgentsPathValidationIssues({
+      agentsText,
+      projectRootDirectory
+    })
+  ];
 
   return {
     agentsFilePath,
     issues
   };
+}
+
+function replaceRoutingPlaceholder({ agentsText, routingLines }) {
+  const routingPattern = new RegExp(
+    `${escapeRegExp(ROUTING_START_MARKER)}\\n([\\s\\S]*?)\\n${escapeRegExp(ROUTING_END_MARKER)}`,
+    "m"
+  );
+  const routingMatch = agentsText.match(routingPattern);
+
+  if (!routingMatch) {
+    throw new VasirCliError({
+      code: "AGENTS_ROUTING_PLACEHOLDER_MISSING",
+      message: "AGENTS.md does not contain a writable Vasir routing placeholder block.",
+      suggestion:
+        "Paste the printed routing draft into Section 1 manually, or rerun `vasir agents init <profile> --replace` to restore the writable routing block first.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  return agentsText.replace(
+    routingPattern,
+    `${ROUTING_START_MARKER}\n${routingLines.join("\n")}\n${ROUTING_END_MARKER}`
+  );
 }
 
 function replacePurposePlaceholder({ agentsText, purposeText }) {
@@ -403,6 +1009,7 @@ function createPurposeDraftPrompt(repositoryContext) {
 async function resolveDraftModel({
   requestedModelArguments,
   currentWorkingDirectory,
+  projectRootDirectory = null,
   environmentVariables,
   inputStream,
   outputStream,
@@ -420,6 +1027,7 @@ async function resolveDraftModel({
 
   const envResolution = resolveEvalEnvironmentVariables({
     currentWorkingDirectory,
+    projectRootDirectory,
     environmentVariables
   });
   const promptForMissingCredential =
@@ -452,6 +1060,7 @@ export async function runAgents({
   modelArguments = [],
   homeDirectory,
   currentWorkingDirectory = process.cwd(),
+  projectRootDirectory = null,
   repositoryUrl,
   platform,
   spawnSyncImplementation,
@@ -467,16 +1076,18 @@ export async function runAgents({
     throw new VasirCliError({
       code: "AGENTS_SUBCOMMAND_REQUIRED",
       message: "An AGENTS subcommand is required.",
-      suggestion: "Use `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, or `vasir agents validate`.",
+      suggestion:
+        "Use `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
 
-  if (!["init", "draft-purpose", "validate"].includes(agentsSubcommand)) {
+  if (!["init", "draft-purpose", "draft-routing", "validate"].includes(agentsSubcommand)) {
     throw new VasirCliError({
       code: "UNKNOWN_AGENTS_SUBCOMMAND",
       message: `Unknown AGENTS subcommand: ${agentsSubcommand}`,
-      suggestion: "Use `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, or `vasir agents validate`.",
+      suggestion:
+        "Use `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
@@ -516,7 +1127,10 @@ export async function runAgents({
       platform,
       spawnSyncImplementation
     });
-    const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+    const projectPaths = buildProjectPaths({
+      currentWorkingDirectory,
+      projectRootDirectory
+    });
     const agentsInitialization = initializeProjectAgentsFile({
       globalCatalogDirectory: globalPaths.globalCatalogDirectory,
       projectRootDirectory: projectPaths.projectRootDirectory,
@@ -536,7 +1150,10 @@ export async function runAgents({
             }),
             ui.formatField("path", ui.formatPath(agentsInitialization.agentsFilePath)),
             ui.formatField("edit first", "Purpose block, Section 1 routing, and any placeholder lines"),
-            ui.formatField("next", "vasir agents draft-purpose --write --model openai, then vasir agents validate")
+            ui.formatField(
+              "next",
+              "vasir agents draft-purpose --write --model openai, vasir agents draft-routing --write, then vasir agents validate"
+            )
           ]
         })
       );
@@ -547,6 +1164,73 @@ export async function runAgents({
       profile: agentsInitialization.profile,
       projectRootDirectory: projectPaths.projectRootDirectory,
       agentsFilePath: agentsInitialization.agentsFilePath
+    };
+  }
+
+  if (agentsSubcommand === "draft-routing") {
+    if (modelArguments.length > 0) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "--model is only supported by `vasir agents draft-purpose`.",
+        suggestion: "Run `vasir agents draft-routing` without `--model`.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    const projectPaths = buildProjectPaths({
+      currentWorkingDirectory,
+      projectRootDirectory
+    });
+    const validation = validateProjectAgentsFile({
+      projectRootDirectory: projectPaths.projectRootDirectory
+    });
+    const agentsFilePath = validation.agentsFilePath;
+    const agentsText = fs.readFileSync(agentsFilePath, "utf8");
+    const routingDraft = formatRoutingLines({
+      projectRootDirectory: projectPaths.projectRootDirectory,
+      agentsText
+    });
+
+    let wroteRouting = false;
+    if (writeGeneratedOutput) {
+      const updatedAgentsText = replaceRoutingPlaceholder({
+        agentsText,
+        routingLines: routingDraft.routingLines
+      });
+      fs.writeFileSync(agentsFilePath, updatedAgentsText);
+      wroteRouting = true;
+    }
+
+    if (!jsonOutput) {
+      const ui = createCommandUi({ stream: outputStream });
+      stdoutWriter(
+        ui.renderPanel({
+          title: "Agents Routing Draft",
+          lines: [
+            ui.formatStatusLine({
+              kind: "ok",
+              text: wroteRouting ? "Updated AGENTS routing block" : "Drafted AGENTS routing block"
+            }),
+            ui.formatField("profile", routingDraft.effectiveProfileHint),
+            ui.formatField("path", ui.formatPath(agentsFilePath)),
+            ui.formatField(
+              "next",
+              wroteRouting
+                ? "Create any referenced local AGENTS.md files or collapse those routes back into the root file, then run `vasir agents validate`."
+                : "Rerun with --write to replace the routing placeholder, or paste the draft manually."
+            )
+          ]
+        })
+      );
+      stdoutWriter(`${routingDraft.routingLines.join("\n")}\n`);
+    }
+
+    return {
+      subcommand: "draft-routing",
+      agentsFilePath,
+      wroteRouting,
+      profile: routingDraft.effectiveProfileHint,
+      routingLines: routingDraft.routingLines
     };
   }
 
@@ -569,7 +1253,10 @@ export async function runAgents({
       });
     }
 
-    const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+    const projectPaths = buildProjectPaths({
+      currentWorkingDirectory,
+      projectRootDirectory
+    });
     const validation = validateProjectAgentsFile({
       projectRootDirectory: projectPaths.projectRootDirectory
     });
@@ -589,7 +1276,7 @@ export async function runAgents({
           lines: [
             ui.formatStatusLine({
               kind: "ok",
-              text: "AGENTS.md is free of known scaffold placeholders"
+              text: "AGENTS.md is free of known scaffold markers and broken repo routes"
             }),
             ui.formatField("path", ui.formatPath(validation.agentsFilePath))
           ]
@@ -604,7 +1291,10 @@ export async function runAgents({
     };
   }
 
-  const projectPaths = buildProjectPaths({ currentWorkingDirectory });
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
   const validation = validateProjectAgentsFile({
     projectRootDirectory: projectPaths.projectRootDirectory
   });
@@ -614,6 +1304,7 @@ export async function runAgents({
   const modelResolution = await resolveDraftModel({
     requestedModelArguments: modelArguments,
     currentWorkingDirectory,
+    projectRootDirectory,
     environmentVariables,
     inputStream,
     outputStream,
@@ -658,7 +1349,7 @@ export async function runAgents({
           ui.formatField(
             "next",
             wrotePurpose
-              ? "Run `vasir agents validate` after you finish replacing the remaining example lines"
+              ? "Run `vasir agents draft-routing --write`, then `vasir agents validate` after you finish replacing the remaining example lines"
               : "Rerun with --write to replace the placeholder, or paste the draft manually"
           )
         ]

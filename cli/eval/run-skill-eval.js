@@ -378,6 +378,7 @@ export async function runSkillEval({
   skillName,
   homeDirectory,
   currentWorkingDirectory = process.cwd(),
+  projectRootDirectory = null,
   repositoryUrl,
   platform,
   spawnSyncImplementation,
@@ -395,6 +396,7 @@ export async function runSkillEval({
   const skillSource = resolveSkillSource({
     skillName,
     currentWorkingDirectory,
+    projectRootDirectory,
     homeDirectory,
     repositoryUrl,
     platform,
@@ -403,6 +405,7 @@ export async function runSkillEval({
   const suiteSource = resolveSuiteSource({ skillSource });
   const envResolution = resolveEvalEnvironmentVariables({
     currentWorkingDirectory,
+    projectRootDirectory,
     environmentVariables
   });
   const modelResolution = await resolveEvalModels({
@@ -653,11 +656,13 @@ export async function runSkillEval({
     currentSummary: runSummary,
     previousSummary: readPreviousRunSummary({
       currentWorkingDirectory,
+      projectRootDirectory,
       skillName
     })
   });
   const previousVersion = readPreviousVersionSummary({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     currentSkillHash: skillSource.skillHash
   });
@@ -674,6 +679,7 @@ export async function runSkillEval({
 
   const outputDirectory = writeEvalRunArtifacts({
     currentWorkingDirectory,
+    projectRootDirectory,
     skillName,
     runId,
     runPayload: runSummary
