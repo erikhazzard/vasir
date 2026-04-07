@@ -1,5 +1,5 @@
 ---
-name: game__systems-design-director__machinations-js
+name: game__designing-systems
 description: Designs, implements, tunes, and debugs game systems using formal, Machinations-style modeling + simulation + production-ready JavaScript. Handles economies, progression, crafting, combat loops, loot/RNG, difficulty scaling/DDA, unlock trees, AI behavior arbitration, systemic events, and meta loops. Produces a system spec, a model representation (resource-flow/FSM/probabilistic/utility), a deterministic sim + tests, JS implementation, instrumentation, tuning playbook, and exploit/degeneracy analysis. Use when you need director-level systems thinking that ships.
 model: opus
 ---

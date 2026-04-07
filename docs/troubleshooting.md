@@ -91,18 +91,20 @@ Recommended path:
 
 1. Inspect `~/.agents/vasir`.
 2. If you intentionally edited that cache, either clean it or move it aside.
-3. If you set `VASIR_REPOSITORY_URL`, confirm it points at a local directory or `file:///...` URL with `registry.json`, `skills/`, and `templates/`.
+3. If you set `VASIR_REPOSITORY_URL`, confirm it points at a local directory or `file:///...` URL with `registry.json`, `.agents/skills/`, and `templates/`.
 4. If the cache is broken or incomplete, delete or rename it.
 5. Rerun `vasir init`.
 
 Verification:
 
 - `~/.agents/vasir/registry.json` exists and is parseable.
-- `~/.agents/vasir/skills/` exists.
+- `~/.agents/vasir/.agents/skills/` exists.
 - `~/.agents/vasir/templates/` exists.
 - `vasir update` succeeds without a dirty-catalog error.
 
-If you expected a repo-local skill refresh too, rerun `vasir update` from inside the target repo root or pass `--repo-root <path>`. The command only refreshes project-local skills that Vasir already manages in that repo.
+If you expected a repo-local skill refresh too, rerun `vasir update` from inside the target repo root or pass `--repo-root <path>`.
+- Repos initialized with `vasir init` or `vasir add all` track the full catalog, so `update` also installs newly added Vasir skills.
+- Repos initialized with `vasir add <specific skills>` track only that selected subset.
 
 ## Replace Safety Errors
 
@@ -201,8 +203,8 @@ Use this section for:
 Recommended path:
 
 1. Start with the intended pit-of-success command: `vasir eval run <skill>`.
-2. Confirm the skill exists locally under `skills/<skill>` or `.agents/skills/<skill>`, or exists in the global catalog.
-3. Confirm the skill owns a built-in suite at `skills/<skill>/evals/suite.json` or `.agents/skills/<skill>/evals/suite.json`.
+2. Confirm the skill exists locally under `.agents/skills/<skill>` or exists in the global catalog.
+3. Confirm the skill owns a built-in suite at `.agents/skills/<skill>/evals/suite.json`.
 4. Decide whether you want the default live models or an explicit override:
    - default run: `vasir eval run <skill>`
    - zero-cost smoke test: `vasir eval run <skill> --model mock`

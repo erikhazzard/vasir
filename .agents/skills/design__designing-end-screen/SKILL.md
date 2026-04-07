@@ -1,5 +1,5 @@
 ---
-name: design__designing-eng-screen
+name: design__designing-end-screen
 description: Design high-quality post-match and results screens for mobile games. Covers the universal 4-phase animated sequence (outcome burst, stat reveal, rewards cascade, social/next action), 12 patterns from top games (Candy Crush, Clash Royale, Brawl Stars, Subway Surfers, CoD Mobile, Royal Match), and a flexible template data contract for platform-level implementation. Use when designing end-of-match UI, victory/defeat screens, score displays, replay prompts, share cards, progression bars, or play-again CTAs. Trigger when designing the game over / victory / post match screen
 ---
 

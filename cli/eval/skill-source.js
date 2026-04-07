@@ -51,36 +51,35 @@ function createSkillHash(promptText) {
   return crypto.createHash("sha256").update(promptText).digest("hex");
 }
 
+function isCatalogSourceRepository(projectRootDirectory) {
+  return (
+    fs.existsSync(path.join(projectRootDirectory, "registry.json")) &&
+    fs.existsSync(path.join(projectRootDirectory, "templates")) &&
+    fs.statSync(path.join(projectRootDirectory, "templates")).isDirectory()
+  );
+}
+
 function tryResolveLocalSkill({ projectRootDirectory, skillName }) {
-  const localSourceDirectory = path.join(projectRootDirectory, "skills", skillName);
   const projectSkillDirectory = path.join(projectRootDirectory, ".agents", "skills", skillName);
-
-  for (const candidate of [
-    { sourceType: "repo-source", skillDirectoryPath: localSourceDirectory },
-    { sourceType: "project-local", skillDirectoryPath: projectSkillDirectory }
-  ]) {
-    const skillMetadata = tryReadSkillMetadata(candidate.skillDirectoryPath);
-    if (!skillMetadata) {
-      continue;
-    }
-
-    const promptFiles = buildSkillPromptFiles({
-      skillDirectoryPath: candidate.skillDirectoryPath
-    });
-    const promptText = serializeSkillPromptText(promptFiles);
-
-    return {
-      skillName,
-      sourceType: candidate.sourceType,
-      skillDirectoryPath: candidate.skillDirectoryPath,
-      skillMetadata,
-      promptFiles,
-      promptText,
-      skillHash: createSkillHash(promptText)
-    };
+  const skillMetadata = tryReadSkillMetadata(projectSkillDirectory);
+  if (!skillMetadata) {
+    return null;
   }
 
-  return null;
+  const promptFiles = buildSkillPromptFiles({
+    skillDirectoryPath: projectSkillDirectory
+  });
+  const promptText = serializeSkillPromptText(promptFiles);
+
+  return {
+    skillName,
+    sourceType: isCatalogSourceRepository(projectRootDirectory) ? "repo-source" : "project-local",
+    skillDirectoryPath: projectSkillDirectory,
+    skillMetadata,
+    promptFiles,
+    promptText,
+    skillHash: createSkillHash(promptText)
+  };
 }
 
 export function resolveSkillSource({
@@ -121,7 +120,7 @@ export function resolveSkillSource({
       code: "EVAL_SKILL_NOT_FOUND",
       message: `Eval skill not found: ${skillName}`,
       suggestion:
-        "Use a skill that exists locally under `skills/` or `.agents/skills/`, or install/list the available skills before running `vasir eval run <skill>`.",
+        "Use a skill that exists locally under `.agents/skills/`, or install/list the available skills before running `vasir eval run <skill>`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }

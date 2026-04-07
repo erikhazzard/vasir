@@ -46,7 +46,7 @@ function createFixtureRepository() {
     skills: [
       {
         name: "react",
-        path: "skills/react",
+        path: ".agents/skills/react",
         entry: "SKILL.md",
         description: "React component boundaries and effect discipline",
         category: "frontend",
@@ -117,7 +117,7 @@ function createFixtureRepository() {
 `
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `---
 name: react
 description: React component boundaries and effect discipline.

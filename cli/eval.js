@@ -27,7 +27,7 @@ function readJsonFile(filePath) {
 }
 
 function listSkills() {
-  const skillsDirectoryPath = path.join(REPO_ROOT, "skills");
+  const skillsDirectoryPath = path.join(REPO_ROOT, ".agents", "skills");
   if (!fs.existsSync(skillsDirectoryPath)) {
     return [];
   }
@@ -42,7 +42,7 @@ function listSkills() {
       if (!fs.existsSync(suiteFilePath)) {
         let description = "";
         try {
-          const skillMetadata = readSkillMetadata(path.join(REPO_ROOT, "skills", skillName));
+          const skillMetadata = readSkillMetadata(path.join(REPO_ROOT, ".agents", "skills", skillName));
           description = skillMetadata.description || "";
         } catch {
           // Keep the fallback description when the skill manifest or compatibility metadata cannot be parsed.
@@ -66,7 +66,7 @@ function listSkills() {
       }
 
       try {
-        const skillMetadata = readSkillMetadata(path.join(REPO_ROOT, "skills", skillName));
+        const skillMetadata = readSkillMetadata(path.join(REPO_ROOT, ".agents", "skills", skillName));
         description = skillMetadata.description || "";
       } catch {
         // Keep the fallback description when the skill manifest or compatibility metadata cannot be parsed.
@@ -93,8 +93,8 @@ function inferSkillFromInvocationDirectory(candidateNames) {
 
   const pathSegments = relativeInvocationPath.split(path.sep).filter(Boolean);
   const inferredSkillName =
-    pathSegments[0] === "skills" && pathSegments[1]
-      ? pathSegments[1]
+    pathSegments[0] === ".agents" && pathSegments[1] === "skills" && pathSegments[2]
+      ? pathSegments[2]
       : null;
 
   return inferredSkillName && candidateNames.has(inferredSkillName) ? inferredSkillName : null;
@@ -292,8 +292,8 @@ function renderMissingSkillHelp(skills) {
       kind: "warn",
       text: "No skill was specified for `npm run eval`."
     }),
-    ui.formatBullet("Run `npm run eval react` to target a specific skill."),
-    ui.formatBullet("Run `npm run eval react mock` for a zero-cost local smoke test.")
+    ui.formatBullet("Run `npm run eval testing__enforcing-mandate` to target a specific skill."),
+    ui.formatBullet("Run `npm run eval testing__enforcing-mandate mock` for a zero-cost local smoke test.")
   ];
 
   if (skills.length > 0) {

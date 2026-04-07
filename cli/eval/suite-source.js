@@ -176,7 +176,7 @@ export function resolveSuiteSource({ skillSource }) {
     code: "EVAL_SUITE_NOT_FOUND",
     message: `No built-in eval suite was found for ${skillSource.skillName}.`,
     suggestion:
-      "Add `skills/<skill>/evals/suite.json` to the skill directory or choose a skill that already owns a built-in eval suite.",
+      "Add `.agents/skills/<skill>/evals/suite.json` to the skill directory or choose a skill that already owns a built-in eval suite.",
     docsRef: EVAL_REFERENCE_DOCS_REF
   });
 }

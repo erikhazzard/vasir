@@ -10,11 +10,11 @@ import { ensureDirectoryAlias } from "./link-directory.js";
 import { getPackageRootDirectory, readPackageMetadata } from "./package-metadata.js";
 import { buildGlobalPaths } from "./path-layout.js";
 
-const CATALOG_ROOT_DIRECTORIES = Object.freeze(["skills", "templates"]);
+const CATALOG_DIRECTORY_PATHS = Object.freeze([".agents/skills", "templates"]);
 const CATALOG_ROOT_FILES = Object.freeze(["registry.json"]);
 const GLOBAL_CATALOG_STATE_FILE_NAME = ".vasir-catalog-state.json";
 const ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES = new Set([
-  ...CATALOG_ROOT_DIRECTORIES,
+  ...new Set(CATALOG_DIRECTORY_PATHS.map((directoryPath) => directoryPath.split("/")[0])),
   ...CATALOG_ROOT_FILES,
   GLOBAL_CATALOG_STATE_FILE_NAME
 ]);
@@ -36,7 +36,7 @@ function normalizeLocalCatalogSourcePath(repositoryUrl) {
       code: "CATALOG_SOURCE_UNSUPPORTED",
       message: `Unsupported Vasir catalog source override: ${repositoryUrl}`,
       suggestion:
-        "Use `VASIR_REPOSITORY_URL` only with a local directory path or `file:///...` URL that contains registry.json, skills/, and templates/.",
+        "Use `VASIR_REPOSITORY_URL` only with a local directory path or `file:///...` URL that contains registry.json, .agents/skills/, and templates/.",
       docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
     });
   } catch (error) {
@@ -71,7 +71,7 @@ function assertCatalogDirectoryLooksValid({ catalogDirectory, label }) {
     }
   }
 
-  for (const requiredDirectory of CATALOG_ROOT_DIRECTORIES) {
+  for (const requiredDirectory of CATALOG_DIRECTORY_PATHS) {
     const requiredDirectoryPath = path.join(catalogDirectory, requiredDirectory);
     if (!fs.existsSync(requiredDirectoryPath) || !fs.statSync(requiredDirectoryPath).isDirectory()) {
       throw new VasirCliError({
@@ -94,8 +94,8 @@ function readCatalogSnapshotEntries(catalogDirectory) {
     });
   }
 
-  for (const rootDirectoryName of CATALOG_ROOT_DIRECTORIES) {
-    const rootDirectoryPath = path.join(catalogDirectory, rootDirectoryName);
+  for (const rootDirectoryPathFragment of CATALOG_DIRECTORY_PATHS) {
+    const rootDirectoryPath = path.join(catalogDirectory, rootDirectoryPathFragment);
     const directoryEntries = fs.readdirSync(rootDirectoryPath, { withFileTypes: true });
 
     function walk(currentDirectoryPath, currentRelativeDirectoryPath) {
@@ -119,7 +119,7 @@ function readCatalogSnapshotEntries(catalogDirectory) {
 
     for (const directoryEntry of directoryEntries) {
       const entryAbsolutePath = path.join(rootDirectoryPath, directoryEntry.name);
-      const entryRelativePath = path.join(rootDirectoryName, directoryEntry.name).replace(/\\/g, "/");
+      const entryRelativePath = path.join(rootDirectoryPathFragment, directoryEntry.name).replace(/\\/g, "/");
 
       if (directoryEntry.isDirectory()) {
         walk(entryAbsolutePath, entryRelativePath);
@@ -202,10 +202,13 @@ function copyCatalogSnapshot({
     );
   }
 
-  for (const rootDirectoryName of CATALOG_ROOT_DIRECTORIES) {
+  for (const rootDirectoryPathFragment of CATALOG_DIRECTORY_PATHS) {
+    const sourceDirectoryPath = path.join(sourceDirectory, rootDirectoryPathFragment);
+    const targetDirectoryPath = path.join(targetDirectory, rootDirectoryPathFragment);
+    fs.mkdirSync(path.dirname(targetDirectoryPath), { recursive: true });
     fs.cpSync(
-      path.join(sourceDirectory, rootDirectoryName),
-      path.join(targetDirectory, rootDirectoryName),
+      sourceDirectoryPath,
+      targetDirectoryPath,
       { recursive: true }
     );
   }

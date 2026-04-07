@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { buildRegistry } from "../registry/build.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SKILLS_ROOT = path.join(REPO_ROOT, "skills");
+const SKILLS_ROOT = path.join(REPO_ROOT, ".agents", "skills");
 
 function walkFiles(directoryPath) {
   const discoveredFiles = [];
@@ -28,7 +28,7 @@ function findLocalMarkdownLinks(filePath) {
   return linkMatches.map((matchEntry) => matchEntry[1]);
 }
 
-test("skills use a flat skills/<name> directory layout", () => {
+test("skills use a flat .agents/skills/<name> directory layout", () => {
   const skillManifestPaths = walkFiles(SKILLS_ROOT).filter((filePath) => path.basename(filePath) === "SKILL.md");
   assert.ok(skillManifestPaths.length > 0, "expected at least one skill");
 
@@ -36,21 +36,21 @@ test("skills use a flat skills/<name> directory layout", () => {
     const relativeManifestPath = path.relative(REPO_ROOT, manifestPath).replace(/\\/g, "/");
     assert.match(
       relativeManifestPath,
-      /^skills\/[^/]+\/SKILL\.md$/,
-      `root skill manifests must live directly under skills/<name>: ${relativeManifestPath}`
+      /^\.agents\/skills\/[^/]+\/SKILL\.md$/,
+      `root skill manifests must live directly under .agents/skills/<name>: ${relativeManifestPath}`
     );
   }
 });
 
-test("optional legacy meta.json files only appear at skills/<name>/meta.json", () => {
+test("optional legacy meta.json files only appear at .agents/skills/<name>/meta.json", () => {
   const metaFilePaths = walkFiles(SKILLS_ROOT).filter((filePath) => path.basename(filePath) === "meta.json");
 
   for (const metaFilePath of metaFilePaths) {
     const relativeMetaPath = path.relative(REPO_ROOT, metaFilePath).replace(/\\/g, "/");
     assert.match(
       relativeMetaPath,
-      /^skills\/[^/]+\/meta\.json$/,
-      `legacy meta.json files must live directly under skills/<name>: ${relativeMetaPath}`
+      /^\.agents\/skills\/[^/]+\/meta\.json$/,
+      `legacy meta.json files must live directly under .agents/skills/<name>: ${relativeMetaPath}`
     );
   }
 });
@@ -81,8 +81,8 @@ test("built-in eval suites live with their owning skills and include guidelines"
     const relativeSuitePath = path.relative(REPO_ROOT, suiteFilePath).replace(/\\/g, "/");
     assert.match(
       relativeSuitePath,
-      /^skills\/[^/]+\/evals\/suite\.json$/,
-      `built-in eval suites must live under skills/<name>/evals: ${relativeSuitePath}`
+      /^\.agents\/skills\/[^/]+\/evals\/suite\.json$/,
+      `built-in eval suites must live under .agents/skills/<name>/evals: ${relativeSuitePath}`
     );
 
     const readmePath = path.join(path.dirname(suiteFilePath), "README.md");

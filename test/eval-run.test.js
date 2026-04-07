@@ -19,7 +19,7 @@ function createEvalFixtureRepository() {
   const repositoryDirectory = createTemporaryDirectory();
 
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "meta.json"),
     `${JSON.stringify(
       {
         name: "react",
@@ -35,7 +35,7 @@ function createEvalFixtureRepository() {
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `# React
 
 Use local state first.
@@ -43,7 +43,7 @@ Use AbortController in async effects.
 Use startTransition and useDeferredValue for expensive search updates.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "react-core",
@@ -390,7 +390,7 @@ test("eval run prints a human bottom line with better and worse models", async (
 test("eval run records fixed dual-judge consensus when a suite defines judgePrompt", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -406,14 +406,14 @@ test("eval run records fixed dual-judge consensus when a suite defines judgeProm
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",
@@ -504,7 +504,7 @@ Seed rng.`
 test("eval run fails closed when a suite expects judges but the fixed judge layer is unavailable", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -520,14 +520,14 @@ test("eval run fails closed when a suite expects judges but the fixed judge laye
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",
@@ -588,7 +588,7 @@ Seed rng.`
 test("eval run rejects unsupported judge-mode suite fields with migration guidance", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "meta.json"),
     `${JSON.stringify(
       {
         name: "react",
@@ -604,14 +604,14 @@ test("eval run rejects unsupported judge-mode suite fields with migration guidan
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `# React
 
 Prefer local state.
 Make async effects explicit.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "react-judge",
@@ -688,7 +688,7 @@ Make async effects explicit.`
 test("eval run stays on hard checks when a suite has no judgePrompt", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -704,14 +704,14 @@ test("eval run stays on hard checks when a suite has no judgePrompt", async () =
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",
@@ -773,7 +773,7 @@ Seed rng.`
 test("eval run rejects suites whose cases do not define a hard-check floor", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "integration", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "integration", "meta.json"),
     `${JSON.stringify(
       {
         name: "integration",
@@ -789,13 +789,13 @@ test("eval run rejects suites whose cases do not define a hard-check floor", asy
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "integration", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "integration", "SKILL.md"),
     `# Integration
 
 Prove user-visible behavior with deterministic integration tests.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "integration", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "integration", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "integration-core",
@@ -834,7 +834,7 @@ Prove user-visible behavior with deterministic integration tests.`
 test("eval run rejects unsupported command-mode suite fields with migration guidance", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -850,14 +850,14 @@ test("eval run rejects unsupported command-mode suite fields with migration guid
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",
@@ -916,7 +916,7 @@ Seed rng.`
 test("eval run rejects stray judge config without mode", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "meta.json"),
     `${JSON.stringify(
       {
         name: "react",
@@ -932,14 +932,14 @@ test("eval run rejects stray judge config without mode", async () => {
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `# React
 
 Prefer local state.
 Make async effects explicit.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "react-core",
@@ -981,7 +981,7 @@ Make async effects explicit.`
 test("eval run rejects stray validator config without mode", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -997,14 +997,14 @@ test("eval run rejects stray validator config without mode", async () => {
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",
@@ -1099,7 +1099,7 @@ test("eval run keeps successful rows when one row fails and marks the run incomp
 test("eval run explains why treatment regressed against baseline", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -1115,14 +1115,14 @@ test("eval run explains why treatment regressed against baseline", async () => {
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",
@@ -1196,7 +1196,7 @@ test("eval run compares against the previous recorded skill version when the has
   const firstRun = JSON.parse(firstOutput.readStdout());
 
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `# React
 
 Use local state first.
@@ -1238,7 +1238,7 @@ test("eval run refuses to compare previous versions across suite hash changes", 
   assert.equal(firstStatusCode, 0, firstOutput.readStderr());
 
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `# React
 
 Use local state first.
@@ -1247,7 +1247,7 @@ Use AbortController in async effects.
 Use startTransition and useDeferredValue for expensive search updates.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "react-core",
@@ -1398,7 +1398,7 @@ test("eval rescore recomputes a stored run from saved outputs and case snapshots
 test("eval rescore preserves persisted judge evidence and rebuilds the bottom line from it", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "meta.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),
     `${JSON.stringify(
       {
         name: "deterministic",
@@ -1414,14 +1414,14 @@ test("eval rescore preserves persisted judge evidence and rebuilds the bottom li
     )}\n`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "SKILL.md"),
     `# Deterministic
 
 Inject clocks.
 Seed rng.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "deterministic", "evals", "suite.json"),
+    path.join(repositoryDirectory, ".agents", "skills", "deterministic", "evals", "suite.json"),
     `${JSON.stringify(
       {
         id: "deterministic-core",

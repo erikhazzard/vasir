@@ -1,0 +1,17 @@
+{
+  "id": "testing-value-path",
+  "cases": [
+    {
+      "id": "purchase-flow-proof",
+      "task": "Protect a purchase flow value-path so regressions fail deterministically in CI.",
+      "requiredSubstrings": [
+        "deterministic integration test",
+        "observable outcomes",
+        "user journey"
+      ],
+      "forbiddenSubstrings": [
+        "mocked function was called"
+      ]
+    }
+  ]
+}

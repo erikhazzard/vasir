@@ -67,9 +67,9 @@ my-project/
   AGENTS.md
   .agents/
     skills/
-      react/
+      design__building-frontend/
         SKILL.md
-      netcode/
+      code__fixing-bugs/
         SKILL.md
   .claude/
     skills -> .agents/skills
@@ -192,7 +192,7 @@ vasir/
       live-progress.js
   registry/
     build.js
-  skills/
+  .agents/skills/
     <skill>/
       SKILL.md
       meta.json?            # optional compatibility metadata only
@@ -282,8 +282,8 @@ Required test surfaces:
    - `--json` success and error envelopes stay stable.
    - the packaged binary can execute the documented `add` journey against a local fixture clone source.
 2. `repository layout`
-   - every skill lives at `skills/<name>/SKILL.md`
-   - any optional `meta.json` lives at `skills/<name>/meta.json`
+   - every skill lives at `.agents/skills/<name>/SKILL.md`
+   - any optional `meta.json` lives at `.agents/skills/<name>/meta.json`
    - generated file inventories match disk
    - local markdown links resolve
    - skill count is dynamic, never hardcoded
@@ -313,7 +313,7 @@ The repo docs must tell one coherent story:
 - `docs/example-agents.md` provides a filled `AGENTS.md` example alongside the blank template.
 - `README.md` routes readers to the companion pages for repo-root resolution, CLI details, and troubleshooting.
 - `templates/agents/AGENTS.md` is the canonical blank root manifest template.
-- `docs/writing-skills.md` keeps the flat `skills/<name>` authoring contract.
+- `docs/writing-skills.md` keeps the flat `.agents/skills/<name>` authoring contract.
 
 ## 12. Implementation Sequence
 

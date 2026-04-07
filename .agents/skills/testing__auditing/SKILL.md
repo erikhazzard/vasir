@@ -1,5 +1,5 @@
 ---
-name: testing--auditing
+name: testing__auditing
 description: Audits automated test suites for surface completeness, oracle strength, determinism, boundary fidelity, and risk-weighted ship readiness. Trigger on any mention of "audit tests", "review tests", "test coverage", "are these tests enough", "test quality", or when a PR/feature has tests that seem suspiciously few for the scope of change.
 tools:
   - Read

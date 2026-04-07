@@ -1,5 +1,5 @@
 ---
-name: research-backed-prompting
+name: prompt__writing-persona
 description: Apply research-backed prompt engineering techniques to improve LLM's output quality. Use this skill whenever the user asks LLM to write, optimize, or review prompts for LLMs, or when the user wants help getting better results from AI models. Also trigger when the user mentions "prompt engineering," "system prompts," "prompt optimization," "better prompts," "improve my prompt," "expert prompting," or discusses techniques like EmotionPrompt, persona framing, or self-efficacy signals. Use this skill even when the user is indirectly trying to improve how they communicate with LLMs, such as asking "how do I get LLM to try harder" or "why are my prompts not working."
 ---
 

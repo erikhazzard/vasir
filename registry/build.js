@@ -7,7 +7,7 @@ import { buildSkillCatalogEntry, SKILL_MANIFEST_FILE_NAME } from "../cli/skill-m
 
 const MODULE_FILE_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(MODULE_FILE_PATH), "..");
-const SKILLS_ROOT = path.join(REPO_ROOT, "skills");
+const SKILLS_ROOT = path.join(REPO_ROOT, ".agents", "skills");
 const REGISTRY_PATH = path.join(REPO_ROOT, "registry.json");
 
 const REGISTRY_HEADER = {
@@ -52,7 +52,7 @@ function listSkillDirectories() {
     const manifestPath = path.join(skillDirectory, SKILL_MANIFEST_FILE_NAME);
     if (!fs.existsSync(manifestPath)) {
       throw new Error(
-        `Every direct child of skills/ must be a skill directory with ${SKILL_MANIFEST_FILE_NAME}: ${toRepoPath(skillDirectory)}`
+        `Every direct child of .agents/skills/ must be a skill directory with ${SKILL_MANIFEST_FILE_NAME}: ${toRepoPath(skillDirectory)}`
       );
     }
   }

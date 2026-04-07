@@ -23,7 +23,7 @@ function writeFile(filePath, fileContents) {
 
 test("readSkillMetadata infers defaults and description without meta.json", () => {
   const repositoryDirectory = createTemporaryDirectory();
-  const skillDirectoryPath = path.join(repositoryDirectory, "skills", "example-constraints");
+  const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "example-constraints");
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
@@ -53,7 +53,7 @@ Repo-specific constraints that keep generated changes inside the supported archi
 
 test("readSkillMetadata prefers manifest prose over stale legacy description", () => {
   const repositoryDirectory = createTemporaryDirectory();
-  const skillDirectoryPath = path.join(repositoryDirectory, "skills", "example-constraints");
+  const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "example-constraints");
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
@@ -77,7 +77,7 @@ Stay inside the supported boundary.`
 
 test("readSkillMetadata prefers SKILL.md frontmatter and keeps file inventory inferred", () => {
   const repositoryDirectory = createTemporaryDirectory();
-  const skillDirectoryPath = path.join(repositoryDirectory, "skills", "react");
+  const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "react");
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),
@@ -112,7 +112,9 @@ Use local state first.`
 
 test("resolveSkillSource accepts repo skills that only define manifest metadata", () => {
   const repositoryDirectory = createTemporaryDirectory();
-  const skillDirectoryPath = path.join(repositoryDirectory, "skills", "react");
+  const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "react");
+  writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify({ skills: [] }, null, 2)}\n`);
+  fs.mkdirSync(path.join(repositoryDirectory, "templates"), { recursive: true });
 
   writeFile(
     path.join(skillDirectoryPath, "SKILL.md"),

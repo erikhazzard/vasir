@@ -24,7 +24,7 @@
 
 1. Author edits a skill.
 2. Author runs `vasir eval run <skill>`.
-3. Vasir loads `skills/<skill>/evals/suite.json`.
+3. Vasir loads `.agents/skills/<skill>/evals/suite.json`.
 4. Vasir runs baseline and treatment for each `model x case x trial`.
 5. Vasir scores hard checks and, if `judgePrompt` exists, runs the fixed OpenAI + Anthropic judges.
 6. Vasir writes one run artifact and prints a verdict.
@@ -67,7 +67,7 @@ CLI -> Author: BETTER/WORSE/INCONCLUSIVE + why
 
 ### 3.1 Facts
 
-- Eval suites are skill-owned and resolve from `skills/<skill>/evals/suite.json` or `.agents/skills/<skill>/evals/suite.json`.
+- Eval suites are skill-owned and resolve from `.agents/skills/<skill>/evals/suite.json`.
 - Every current suite uses one authoring shape:
   - required and forbidden substring checks per case
   - optional suite-level `judgePrompt`

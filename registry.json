@@ -4,424 +4,605 @@
   "raw_base": "https://raw.githubusercontent.com/erikhazzard/vasir/main",
   "skills": [
     {
-      "name": "combat",
-      "description": "Combat loops, damage pipelines, frame data, and hit logic for JavaScript games.",
-      "category": "games",
-      "tags": [
-        "combat",
-        "damage",
-        "hitboxes",
-        "frame-data",
-        "gameplay"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic-kernel",
-        "game-juice",
-        "inventory"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/combat",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "deterministic-kernel",
-      "description": "Seeded RNG, tick-based state, and kernel/shell separation for deterministic game replays.",
-      "category": "games",
-      "tags": [
-        "determinism",
-        "rng",
-        "kernel",
-        "replay",
-        "simulation"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "combat",
-        "procedural-generation",
-        "deterministic"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/deterministic-kernel",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "economy",
-      "description": "Resource flows, reward curves, inflation control, and progression balancing for game economies.",
-      "category": "games",
-      "tags": [
-        "economy",
-        "progression",
-        "balance",
-        "rewards",
-        "currencies"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "idle-game",
-        "roguelike",
-        "inventory"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/economy",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "endless-runner",
-      "description": "Obstacle generation, speed ramping, lane systems, and session tuning for endless runners.",
-      "category": "games",
-      "tags": [
-        "runner",
-        "endless-runner",
-        "lanes",
-        "difficulty",
-        "mobile"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "game-juice",
-        "ui-layout"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/endless-runner",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "game-juice",
-      "description": "Screen shake, particles, tweening, hit feedback, and layered feedback systems for 2D games.",
-      "category": "games",
-      "tags": [
-        "vfx",
-        "polish",
-        "canvas",
-        "2d",
-        "feedback"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic-kernel",
-        "platformer",
-        "endless-runner"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json",
-        "references/character-movement.md"
-      ],
-      "path": "skills/game-juice",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "idle-game",
-      "description": "Offline progression, prestige loops, large-number math, and upgrade curves for idle games.",
-      "category": "games",
-      "tags": [
-        "idle",
-        "incremental",
-        "prestige",
-        "offline-progress",
-        "economy"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "economy",
-        "ui-layout"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/idle-game",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "inventory",
-      "description": "Items, equipment, stacking, crafting, and serialization for inventory-heavy games.",
-      "category": "games",
-      "tags": [
-        "inventory",
-        "items",
-        "equipment",
-        "crafting",
-        "serialization"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "combat",
-        "economy"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/inventory",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "platformer",
-      "description": "2D platformer movement, collision, jump feel, and touch-friendly controls for side-scrollers.",
-      "category": "games",
-      "tags": [
-        "platformer",
-        "movement",
-        "collision",
-        "physics",
-        "touch"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic-kernel",
-        "game-juice"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/platformer",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "procedural-generation",
-      "description": "Seed-deterministic terrain, dungeons, wave generation, and content placement systems.",
-      "category": "games",
-      "tags": [
-        "procedural",
-        "generation",
-        "seeded",
-        "dungeons",
-        "waves"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic-kernel",
-        "roguelike"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/procedural-generation",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "roguelike",
-      "description": "Procedural dungeons, permadeath, item synergy design, and run-based progression for roguelikes.",
-      "category": "games",
-      "tags": [
-        "roguelike",
-        "roguelite",
-        "procedural",
-        "runs",
-        "systems"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic-kernel",
-        "combat",
-        "procedural-generation",
-        "economy"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/roguelike",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "tower-defense",
-      "description": "Path systems, tower placement, wave pacing, targeting rules, and economy tuning for tower defense games.",
-      "category": "games",
-      "tags": [
-        "tower-defense",
-        "pathing",
-        "waves",
-        "economy",
-        "strategy"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "economy",
-        "ui-layout"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/tower-defense",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "react",
-      "description": "React component patterns, state ownership, and async effect discipline for production UIs.",
-      "category": "frontend",
-      "tags": [
-        "react",
-        "components",
-        "state",
-        "effects",
-        "performance"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "ui-layout",
-        "integration"
-      ],
-      "files": [
-        "SKILL.md",
-        "evals/README.md",
-        "evals/suite.json",
-        "meta.json"
-      ],
-      "path": "skills/react",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "ui-layout",
-      "description": "BEM-first layout systems, responsive composition, and maintainable CSS architecture for frontend UI.",
-      "category": "frontend",
-      "tags": [
-        "css",
-        "layout",
-        "bem",
-        "responsive",
-        "design-system"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "react"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/ui-layout",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "devops",
-      "description": "CI/CD pipelines, immutable artifacts, deploy health gates, and operational readiness checks.",
-      "category": "infra",
-      "tags": [
-        "ci",
-        "cd",
-        "deploy",
-        "monitoring",
-        "operations"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "integration"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/devops",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "netcode",
-      "description": "Authoritative multiplayer netcode with prediction, reconciliation, and bandwidth-aware state sync.",
-      "category": "infra",
-      "tags": [
-        "multiplayer",
-        "netcode",
-        "prediction",
-        "reconciliation",
-        "bandwidth"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic-kernel",
-        "integration"
-      ],
-      "files": [
-        "SKILL.md",
-        "meta.json"
-      ],
-      "path": "skills/netcode",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "deterministic",
-      "description": "Replay testing, seeded fixtures, clock control, and deterministic failure triage.",
-      "category": "testing",
-      "tags": [
-        "deterministic",
-        "replay",
-        "seeds",
-        "time-control",
-        "testing"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "integration",
-        "deterministic-kernel"
-      ],
-      "files": [
-        "SKILL.md",
-        "evals/README.md",
-        "evals/suite.json",
-        "meta.json"
-      ],
-      "path": "skills/deterministic",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "integration",
-      "description": "Outcome-driven integration testing strategies for proving user-visible behavior end to end.",
-      "category": "testing",
-      "tags": [
-        "testing",
-        "integration",
-        "contracts",
-        "value-path",
-        "ci"
-      ],
-      "version": "1.0.0",
-      "recommends": [
-        "deterministic",
-        "devops"
-      ],
-      "files": [
-        "SKILL.md",
-        "evals/README.md",
-        "evals/suite.json",
-        "meta.json"
-      ],
-      "path": "skills/integration",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "critiquing-architecture-designs",
-      "description": "Critiques architecture proposals by forcing a user-journey-first simplification pass, happy-path sequence, complexity inventory, and minimal replacement design. Use when reviewing architecture plans, multi-step features, worker or queue proposals, client protocols, or new infrastructure added \"for scale\".",
-      "category": "architecture",
-      "tags": [
-        "architecture",
-        "review",
-        "simplification",
-        "queues",
-        "protocols"
-      ],
+      "name": "agents__creating-folder-agents",
+      "description": "Write per-subsystem constraint documents that prevent AI coding agents from producing plausible-but-broken code. Use when defining hard-no rules, architectural gotchas, performance boundaries, or cultural style overrides for a specific folder or module — especially hot paths, netcode, deterministic systems, or anywhere standard AI defaults silently fail. Triggers on \"write rules for this folder,\" \"AGENTS.md section for [subsystem],\" \"constrain the agent for our [X],\" \"document the gotchas in [module],\" or any request to scope AI coding behavior to a specific part of the codebase.",
+      "category": "uncategorized",
+      "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md"
       ],
-      "path": "skills/critiquing-architecture-designs",
+      "path": ".agents/skills/agents__creating-folder-agents",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "architecture__critiquing-design",
+      "description": "After producing any architecture or multi-step design, you MUST run an internal “Zoom-Out Brake Pedal” review before finalizing your response.  Triggers on any architecutre proposal, any mediumish to large feature, anything with background worker/queue, any proposed multi-step client protocols, any new infrastructure \"for scale\"",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/architecture__critiquing-design",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "code__auditing",
+      "description": "Audits code for testability, correctness, efficiency, and production readiness against \"God-Tier\" standards. Identifies boundary issues, traces state ownership, flags inefficiencies, and recommends minimal high-leverage improvements. Produces actionable, evidence-based audit findings — never rewrites code. Use when reviewing modules for production readiness, investigating performance concerns, validating architecture boundaries, or assessing test coverage gaps.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/code__auditing",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "code__crafting-dev-ux",
+      "description": "Design every internal API, module, function, config surface, error type, event/message shape, and CLI so it’s trivially easy to use correctly and hard to use incorrectly — for both human developers and LLMs. Dev UX includes interface shape *and* the surrounding system, findability, first-success, workflow/debuggability, migration UX, governance/enforcement, and DX feedback loops.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/code__crafting-dev-ux",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "code__enforcing-principles",
+      "description": "Enforces the engineering constitution before writing or editing any code in the repo — features, fixes, refactors, tests, scripts, migrations, infra, no exceptions. Validates user-journey framing, pipeline semantics, deterministic integration tests, failure handling, observability, safe migrations, and tail-latency proof under 10M+ msg/sec with iOS client constraints. Use when starting any code change to ensure compliance with repo-wide engineering standards and architectural guardrails. Additionally triggers on mentions of code quality or code principles",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/code__enforcing-principles",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "code__fixing-bugs",
+      "description": "Investigates and fixes bugs, defects, and \"this isn't working\" reports using a strict workflow — defines the broken user-journey contract, reproduces with a minimal integration test using real dependencies, applies the smallest safe fix, and locks the fix with deterministic CI-ready guardrails. Use when diagnosing failures, hunting regressions, triaging defect reports, or applying targeted fixes that need reproduction tests.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/code__fixing-bugs",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__animating-interfaces",
+      "description": "Designs and implements UI animations for web and product interfaces — transition timing, easing curves, micro-interactions, feedback animations, loading states, and motion system architecture. Provides exact values, opinionated best practices, and in-depth reviews. Use when adding motion to components, building animation systems, tuning transition feel, reviewing animation performance, or establishing motion design tokens.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__animating-interfaces",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__building-frontend",
+      "description": "Builds production-grade frontend UI with BEM naming, strict class budgets, tokenized styling, and intentional aesthetics. Prohibits Tailwind and utility-class soup. Covers component architecture, responsive layouts, design token systems, and accessible markup. Use when creating web components, pages, or applications that require high design quality and maintainable CSS architecture.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__building-frontend",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__designing-cli",
+      "description": "Designs distinctive, production-grade terminal UIs that balance aesthetics with pragmatism. Covers layout composition, color palettes for terminal environments, progress indicators, table formatting, interactive prompts, and output hierarchy. Use when building CLI tools, formatting terminal output, designing interactive prompts, or creating dashboard-style terminal interfaces.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__designing-cli",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__designing-end-screen",
+      "description": "Design high-quality post-match and results screens for mobile games. Covers the universal 4-phase animated sequence (outcome burst, stat reveal, rewards cascade, social/next action), 12 patterns from top games (Candy Crush, Clash Royale, Brawl Stars, Subway Surfers, CoD Mobile, Royal Match), and a flexible template data contract for platform-level implementation. Use when designing end-of-match UI, victory/defeat screens, score displays, replay prompts, share cards, progression bars, or play-again CTAs. Trigger when designing the game over / victory / post match screen",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__designing-end-screen",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__designing-game-ui-for-idavoll",
+      "description": "Design high-quality mobile UI for our game",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__designing-game-ui-for-idavoll",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__designing-typography",
+      "description": "Designs and implements UI typography for web interfaces and mobile game UI — hierarchy, type scales, spacing/letterspacing rules, numerals, font selection, localization resilience, web font loading/performance, and typography system architecture. Produces exact values + copy‑paste code, opinionated defaults, audits/reviews, and debugging protocols. Use when choosing fonts, building a typography system, tuning readability/scanability, reviewing existing type specs, fixing “something feels off,” or shipping web fonts without layout shift.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__designing-typography",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__kicking-off",
+      "description": "Generates canonical production-grade frontend UI from scratch — pure BEM naming, strict class budgets, token-based styles, and intentional, distinctive aesthetics. Tailwind and utility-soup strictly forbidden. Establishes the initial design system foundation for a new project or component library. Use when starting a new frontend project, bootstrapping a component library, or establishing the visual identity and CSS architecture for a fresh codebase.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__kicking-off",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "design__visualizing-data",
+      "description": "Discovers, validates, and tells the strongest defensible story in data for the web. Combines Munzner-style task framing, Cleveland/McGill + Heer/Bostock perceptual accuracy, Tufte/Few/Cairo editorial clarity, Segel/Heer narrative modes, Hullman-style framing and uncertainty checks, FlowingData practical clarity tests, Du Bois’s moral force and graphic identity, and Minard’s multivariate hierarchy. Chooses among chart, table, text, or mixed artifact. Produces production-grade JS/React/D3/SVG implementations when appropriate.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/design__visualizing-data",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "doc__guard-drift",
+      "description": "Detects and prevents documentation drift by treating docs as testable claims and verifying them against primary source artifacts in the current repository. Compares docs to implementation, schemas, types, tests, configs, build/deploy files, and recent changes; then reports mismatches, missing coverage, and exact doc fixes. Use before releases, after refactors, during PR review, or whenever README/API docs/runbooks may have drifted from reality.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/doc__guard-drift",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "documentation__writing",
+      "description": "Creates, audits, restructures, and reviews technical documentation using the Diátaxis framework. Use when a user needs to write or reorganize tutorials, how-to guides, reference docs, explanation/concept pages, API docs, quickstarts/getting-started docs, installation guides, troubleshooting docs, or broader documentation structures.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/documentation__writing",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "exec__writing-feature-wip",
+      "description": "Writes files or appends content to files as part of feature development workflows. Creates new documents, updates existing files, and maintains work-in-progress artifacts. Use when modifying feature files, creating new documents during a workflow, or appending incremental progress to existing WIP files.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/exec__writing-feature-wip",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__adding-juice",
+      "description": "Adds game feel and game juice to JavaScript-built 2D games (Canvas, WebGL, Phaser, custom engines). Focuses on responsiveness, clarity, and virtual sensation, then layers high-ROI polish — camera work, hit feedback, animation timing, particles, UI motion, and readable spectacle. Prioritizes maximum perceptual payoff for minimum complexity and performance cost. Use when polishing game interactions, adding screen shake or hit-stop, implementing particle effects, tuning animation timing, or making any game action feel more satisfying.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/character-movement.md"
+      ],
+      "path": ".agents/skills/game__adding-juice",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__art-directing",
+      "description": "Art directs games from concept through implementation-ready specs. Covers the full visual stack — color systems, shape language, animation grammar, juice budgets, spatial pacing, UI hierarchy, procedural art systems, and mobile rendering constraints. Prioritizes gameplay readability first, emotional resonance second, aesthetic beauty third. Designs visual systems that produce O(n²) distinctiveness from O(n) authored assets. Use when establishing a game's visual identity, defining color palettes, specifying animation grammars, or creating implementation-ready art specs.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__art-directing",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__building-combat-damage",
+      "description": "Architects and implements combat and damage systems for JavaScript 2D games (Canvas, WebGL, Phaser, custom engines). Covers hitboxes/hurtboxes, attack lifecycles with frame data, combo/chain/cancel systems, input buffering, cooldowns, invincibility frames, damage formulas, damage types and resistances, health/shield/armor pipelines, projectile systems, AOE, DoT, and crit/proc rolls. Prioritizes correct timing, clean architecture, tunable math, and game-feel integration. Use when adding melee or ranged combat, designing damage pipelines, tuning hit feedback, or implementing health and defense systems.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__building-combat-damage",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__building-core-loop",
+      "description": "Designs, implements, diagnoses, and tunes the core game loop of mobile games in JavaScript. Covers loop architecture — state machines, input systems, feedback timing, session design, tension curves, difficulty pacing, and interruption recovery. Focuses on the fractal structure of play from micro-loop through session arc, mobile-native input design, and production-ready JS with feel parameters. Complements game__tuning-economy-progression — this skill builds the heartbeat, that skill builds the circulatory system. Use when architecting a new game loop, diagnosing pacing issues, tuning session flow, or wiring input-to-feedback timing.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__building-core-loop",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__building-inventory-system",
+      "description": "Designs and implements item and inventory systems for JavaScript games (Canvas, WebGL, Phaser, React, custom engines). Covers item data definitions, inventory grids, drag-and-drop, equipment slots, crafting recipes, stat modifiers/affixes, tooltip generation, stack/split, and serialization. Prioritizes data integrity, clean serialization, and edge-case correctness over clever abstractions. Use when creating inventory UIs, defining item schemas, implementing crafting systems, adding equipment slots, or building stack/split and drag-and-drop interactions.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__building-inventory-system",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__building-loot-systems",
+      "description": "Designs and implements complete loot and reward systems for JavaScript 2D games (Canvas, WebGL, Phaser, custom engines). Covers the full pipeline from kill-to-dopamine — weighted drop tables, rarity tiers, pity/mercy mechanics, procedural item generation, stat rolling, chest/crate breakables, pickup physics (bounce, magnet, float), and reward fanfare choreography. Handles the math, the feel, and the economy. Use when creating drop tables, implementing rarity systems, adding pickup physics, designing pity mechanics, or choreographing reward fanfare sequences.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__building-loot-systems",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__designing-systems",
+      "description": "Designs, implements, tunes, and debugs game systems using formal, Machinations-style modeling + simulation + production-ready JavaScript. Handles economies, progression, crafting, combat loops, loot/RNG, difficulty scaling/DDA, unlock trees, AI behavior arbitration, systemic events, and meta loops. Produces a system spec, a model representation (resource-flow/FSM/probabilistic/utility), a deterministic sim + tests, JS implementation, instrumentation, tuning playbook, and exploit/degeneracy analysis. Use when you need director-level systems thinking that ships.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__designing-systems",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__directing",
+      "description": "Directs LLM game generation by producing a compact, enforceable Design Brief and validation plan before any code gets written. Prevents incoherence where games run but feel random. Optimized for iOS touch-first games in portrait orientation, but adaptable to other targets. Use when starting a new game from scratch, establishing the creative vision, defining core mechanics upfront, or validating that generated code matches the intended design.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__directing",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__generating-procedural-content",
+      "description": "Designs and implements procedural generation systems for JavaScript games — dungeons, terrain, caves, placement, loot, waves, names, and infinite worlds. Produces seed-deterministic, designer-tunable, playable content from algorithms matched to the game's needs. Prioritizes output quality (playable, diverse, readable) over algorithmic cleverness. Use when creating level generators, implementing terrain algorithms, building wave spawners, designing name generators, or adding seed-based deterministic content pipelines.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__generating-procedural-content",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__genre--building-endless-runner",
+      "description": "Builds and improves endless/auto-runner games in JavaScript for mobile (iOS). Covers scroll engines, speed ramping, lane switching, obstacle generation with solvability guarantees, ground/segment recycling, near-miss detection, magnet pickups, shield/revive systems, distance-as-score, and session psychology. Targets Temple Run, Subway Surfers, and Canabalt style games. Use when creating runners from scratch, fixing unfair obstacle spawning, adding pickups/power-ups, tuning difficulty curves, or making a runner feel polished and addictive.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-endless-runner",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__genre--building-idle-games",
+      "description": "Builds idle and incremental games in JavaScript for mobile. Covers big number math (beyond Number.MAX_SAFE_INTEGER), prestige layers, offline progress calculation, upgrade cost curves (exponential, polynomial), auto-clickers, milestone unlocks, notation formatting (1.5M, 2.3e15), tick-based simulation with background catch-up, save/load persistence, and mobile-specific optimization (touch, battery, Page Visibility). References Cookie Clicker, Adventure Capitalist, and Antimatter Dimensions. Use when building, debugging, or enhancing any idle or incremental game.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-idle-games",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__genre--building-platformer",
+      "description": "Implements production-quality 2D side-scroller movement in JavaScript. Covers the complete movement vocabulary — variable jump, wall jump, wall slide, dash, double jump, ladders, moving platforms, one-way platforms, conveyor belts, spring pads, hazard zones, and checkpoints. Builds on a correct physics foundation (fixed timestep, semi-implicit Euler, AABB collision) and state machine architecture. Every mechanic ships with tunable parameters, interaction rules, edge-case handling, mobile touch considerations, and juice integration hooks. Targets mobile-native iOS via JS. Use when building platformer movement, tuning jump feel, adding wall mechanics, implementing collision systems, or wiring mobile touch controls for side-scrollers.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-platformer",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__genre--building-puzzle",
+      "description": "Builds grid-based puzzle games in JavaScript for mobile. Covers match-3 (Bejeweled, Candy Crush), merge puzzles (2048, Threes!), sliding/tile puzzles, Sokoban push-puzzles, and Tetris-likes. Core systems include grid state, match/rule detection, cascade resolution, gravity, animation sequencing, touch input, scoring, hints, shuffle, and undo. Targets mobile-first with touch input, portrait layout, and 60fps on low-end devices. Use when creating puzzle games from scratch, implementing grid mechanics, adding cascade animations, tuning match detection, or optimizing touch input for puzzle interactions.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-puzzle",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__genre--building-roguelike",
+      "description": "Designs and builds roguelike and roguelite games in JavaScript. Covers the full design stack — procedural generation philosophy, entity architecture, item synergy design, meta-progression, run pacing, economy, difficulty curves, and touch-native UI. Focuses on emergent gameplay, meaningful decisions, and the \"one more run\" compulsion loop. Prioritizes systems that produce O(n²) player experiences from O(n) authored content. Use when creating roguelikes from scratch, designing item synergy systems, implementing meta-progression, tuning run pacing, or building procedural content pipelines.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-roguelike",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__genre--building-tower-defense",
+      "description": "Designs and builds tower defense games in JavaScript. Focuses on systems design, balance, player decision-making, and information clarity. Covers path systems, grid placement, targeting, projectiles, upgrade trees, wave pacing, economy, and fast-forward/pause. References Bloons TD and Kingdom Rush. Prioritizes meaningful player decisions over feature count, balance over content volume, and information clarity over visual spectacle. Use when creating tower defense games, implementing placement grids, designing wave systems, tuning tower upgrades, or balancing economy and targeting.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-tower-defense",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__tuning-economy-progression",
+      "description": "Designs, implements, tunes, and debugs game economy and progression systems in JavaScript. Covers difficulty curves, XP curves, unlock trees, currency systems, loot rarity tables, difficulty scaling, idle/clicker math, reward schedules, and prestige mechanics. Focuses on systems thinking, player psychology, and tuning guidance. Use when balancing game economies, designing progression systems, tuning difficulty curves, debugging reward schedules, or implementing currency and unlock systems.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__tuning-economy-progression",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "persona__selecting",
+      "description": "Loads persona definitions so the agent can adopt a specific role for the current task. Only activates when explicitly invoked — never auto-invokes. Use when a specific persona or role-play mode is needed for a task, such as adopting an expert perspective or specialized voice.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/persona__selecting",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "plan__creating-milestones",
+      "description": "Creates test-driven milestones for complex features. Focuses on user journeys, experience invariants, and integration test coverage. Breaks large features into verifiable increments with clear acceptance criteria. Use when planning multi-step feature implementations, defining milestone boundaries, establishing test coverage targets, or structuring work into shippable increments.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__creating-milestones",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "plan__writing-feature-wip",
+      "description": "Maintains a living FEATURE-WIP markdown file as the durable source of truth for any feature, project, or initiative across sessions. Creates, updates, and audits FEATURE-WIP__*.md docs with epistemic discipline, sourced facts, labeled inferences, explicit contracts, and bounded next actions. Triggers when starting a new feature, resuming work on an in-flight feature, consolidating decisions after a design review or PR, restoring context after context compact, capturing architectural context for handoff, or when the user \"update the WIP,\" \"where did we leave off,\" \"what's the status of,\" \"write up the feature doc,\" or \"plan the feature\" or \"let's spec it out\". Also triggers on requests to define milestones, acceptance criteria, contracts, invariants, scope boundaries, capacity estimates, spec, or decision logs. Produces structured, scannable docs optimized for both human review and LLM re-ingestion.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__writing-feature-wip",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "prompt__improving",
+      "description": "Produce prompt analysis that identifies specific, high-leverage gaps — not surface-level rewrites or generic \"be more specific\" advice. Reverse-engineers the prompt's target domain, maps practitioner-level knowledge against the prompt's structure, and delivers prioritized, evidence-grounded fixes. Use when a user shares a prompt and asks to improve, optimize, audit, review, fix, tune, strengthen, or rewrite it, or asks \"what's wrong with this\" or \"how do I make this better.\" Also triggers on prompt analysis, prompt critique, or prompt engineering help. Handles system prompts, agent instructions, prompt chains, and prompt templates. NEVER triggers for writing new prompts from scratch.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/prompt__improving",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "prompt__improving--rewriting",
+      "description": "Rewrites a prompt based on a prior prompt__improving analysis. Takes the structured findings — intent mapping, failure criteria, domain research, and improvement opportunities — and produces a concrete rewritten prompt. Use after completing a prompt__improving analysis when ready to materialize the recommended improvements into an updated prompt.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/prompt__improving--rewriting",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "prompt__perform-root-casuse-analysis",
+      "description": "Perform deep root cause analysis after a bug fix, focusing on meta and systemic causes rather than surface-level mechanism recaps. Use this skill whenever a fix has been applied and the user wants to understand why the bug happened, prevent the class of issue from recurring, or improve LLM agent operating rules. Triggers include post-fix analysis, post-mortem, root cause analysis, RCA, \"why did this break\", \"how do we prevent this\", incident review, bug retrospective, failure analysis, agent policy update after a fix, defense-in-depth planning, or any request to convert a bug fix into guardrails, lint rules, test strategies, or agent behavior changes. Also use when the user asks to analyze contributing factors, identify systemic engineering process gaps, or generate \"lessons learned\" artifacts from a resolved issue. Produces structured output covering mechanism anchors, evidence maps, meta/meta-meta causes, defense-in-depth action tables, and concrete LLM agent policy patches.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/prompt__perform-root-casuse-analysis",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "prompt__reverse-engineering",
+      "description": "Reverse-engineers a system prompt from LLM output by analyzing the work just produced. Examines style, structure, constraints, and behavioral patterns to reconstruct the likely system prompt that drove the output. Use when extracting a reusable system prompt from high-quality LLM output, capturing implicit instructions from a successful generation, or creating a prompt template from observed behavior.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/prompt__reverse-engineering",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "prompt__writing-persona",
+      "description": "Apply research-backed prompt engineering techniques to improve LLM's output quality. Use this skill whenever the user asks LLM to write, optimize, or review prompts for LLMs, or when the user wants help getting better results from AI models. Also trigger when the user mentions \"prompt engineering,\" \"system prompts,\" \"prompt optimization,\" \"better prompts,\" \"improve my prompt,\" \"expert prompting,\" or discusses techniques like EmotionPrompt, persona framing, or self-efficacy signals. Use this skill even when the user is indirectly trying to improve how they communicate with LLMs, such as asking \"how do I get LLM to try harder\" or \"why are my prompts not working.\"",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/prompt__writing-persona",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "security__auditing-code",
+      "description": "Static attacker-grade audit for backend code, schema, policies, and adjacent config that mutate privileged or economic state. Maps workflows, invariants, authorization graphs, and async mutation pipelines; finds real exploit chains; produces evidence-based release blockers and a prioritized remediation plan without rewriting code.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/security__auditing-code",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "skills__creating",
+      "description": "Designs, rewrites, audits, and debugs reusable agent skills and SKILL.md manifests. Produces routing-aware metadata, lean manifests, supporting-file layouts, deterministic validators, and eval suites. Use when creating a new skill, improving an existing one, fixing trigger quality, choosing names or frontmatter, reviewing AGENTS.md or other agent context files, reducing manifest bloat, or capturing non-obvious repository constraints the agent cannot infer from code, AST, or file structure.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/skill-template.md"
+      ],
+      "path": ".agents/skills/skills__creating",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "testing__auditing",
+      "description": "Audits automated test suites for surface completeness, oracle strength, determinism, boundary fidelity, and risk-weighted ship readiness. Trigger on any mention of \"audit tests\", \"review tests\", \"test coverage\", \"are these tests enough\", \"test quality\", or when a PR/feature has tests that seem suspiciously few for the scope of change.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/testing__auditing",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "testing__enforcing-mandate",
+      "description": "Outcome-driven testing doctrine for production-safe shipping. Prioritizes public interfaces, real user journeys, Playwright/browser evals when appropriate, integration/value-path proofs, deterministic suites, repo-truth validation, and zero tolerance for unguarded critical paths. Triggers anytime we write code, anytime we we write tests, planning changes, or shipping code safely.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
+      ],
+      "path": ".agents/skills/testing__enforcing-mandate",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "ui__revamping-game-shell-ui",
+      "description": "Revamps any Idavoll game’s shell UI (HUD/menus/results/overlays) using vanilla DOM + @idavoll/game-ui-kit while preserving deterministic kernel + replay boundaries. Use when the user asks to redesign UI, change HUD/menu/results layout, migrate to the UI kit, restyle a game UI to match the design system, or fix UI breakage without touching gameplay determinism. Enforces “kernel vs shell” boundaries, stable UI kit entrypoints only, iframe-safe mobile-first layout, safe-area/thumb-zone rules, input safety (real interactive elements), semantic intents drained on simulation ticks, and required verification commands.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/ui__revamping-game-shell-ui",
       "entry": "SKILL.md"
     }
   ]

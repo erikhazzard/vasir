@@ -45,7 +45,7 @@ function createFixtureRepository() {
     skills: [
       {
         name: "react",
-        path: "skills/react",
+        path: ".agents/skills/react",
         entry: "SKILL.md",
         description: "React component boundaries and effect discipline",
         category: "frontend",
@@ -56,7 +56,7 @@ function createFixtureRepository() {
       },
       {
         name: "roguelike",
-        path: "skills/roguelike",
+        path: ".agents/skills/roguelike",
         entry: "SKILL.md",
         description: "Run structure and procedural dungeon design",
         category: "games",
@@ -74,7 +74,7 @@ function createFixtureRepository() {
   writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "backend.md"), "# Backend Agents\n");
   writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "ios.md"), "# iOS Agents\n");
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `---
 name: react
 description: React component boundaries and effect discipline.
@@ -89,7 +89,7 @@ version: 1.0.0
 Use local state first.`
   );
   writeFile(
-    path.join(repositoryDirectory, "skills", "roguelike", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "roguelike", "SKILL.md"),
     `---
 name: roguelike
 description: Run structure and procedural dungeon design.
@@ -258,7 +258,7 @@ test("update refreshes Vasir-managed project-local skills when run inside the re
   );
 
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `---
 name: react
 description: React component boundaries and effect discipline.
@@ -314,7 +314,7 @@ test("update installs newly added catalog skills for repos tracking the full cat
   const nextRegistry = JSON.parse(fs.readFileSync(path.join(repositoryDirectory, "registry.json"), "utf8"));
   nextRegistry.skills.push({
     name: "platformer",
-    path: "skills/platformer",
+    path: ".agents/skills/platformer",
     entry: "SKILL.md",
     description: "Tight jump arcs and collision feel",
     category: "games",
@@ -325,7 +325,7 @@ test("update installs newly added catalog skills for repos tracking the full cat
   });
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(nextRegistry, null, 2)}\n`);
   writeFile(
-    path.join(repositoryDirectory, "skills", "platformer", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "platformer", "SKILL.md"),
     `---
 name: platformer
 description: Tight jump arcs and collision feel.
@@ -371,7 +371,7 @@ test("update --dry-run previews repo-local refreshes without mutating files", as
   assert.equal(addStatusCode, 0);
 
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `---
 name: react
 description: React component boundaries and effect discipline.
@@ -400,7 +400,7 @@ Use AbortController in async effects.`
     /Use local state first\./
   );
   assert.match(
-    fs.readFileSync(path.join(homeDirectory, ".agents", "vasir", "skills", "react", "SKILL.md"), "utf8"),
+    fs.readFileSync(path.join(homeDirectory, ".agents", "vasir", ".agents", "skills", "react", "SKILL.md"), "utf8"),
     /Use local state first\./
   );
 });
@@ -428,7 +428,7 @@ test("add records install provenance for safer repo updates", async () => {
   assert.ok(installState.catalog.sourceHash.length > 0);
   assert.equal(installState.catalog.trackingMode, "selected");
   assert.equal(installState.skills.react.provenance.skillVersion, "1.0.0");
-  assert.equal(installState.skills.react.provenance.sourcePath, "skills/react");
+  assert.equal(installState.skills.react.provenance.sourcePath, ".agents/skills/react");
   assert.equal(installState.skills.react.provenance.installedByVersion, "0.1.0");
   assert.equal(typeof installState.skills.react.provenance.installedAt, "string");
 });
@@ -465,7 +465,7 @@ test("add and update honor --repo-root for monorepo subprojects", async () => {
   assert.ok(!fs.existsSync(path.join(monorepoDirectory, ".agents", "skills", "react", "SKILL.md")));
 
   writeFile(
-    path.join(repositoryDirectory, "skills", "react", "SKILL.md"),
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `---
 name: react
 description: React component boundaries and effect discipline.
@@ -799,7 +799,7 @@ test("add --replace refreshes an unmodified existing project skill from the glob
   assert.equal(firstStatusCode, 0);
 
   const projectSkillFilePath = path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md");
-  writeFile(path.join(repositoryDirectory, "skills", "react", "SKILL.md"), "# React Updated\n");
+  writeFile(path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"), "# React Updated\n");
   runGitCommand(repositoryDirectory, ["add", "."]);
   runGitCommand(repositoryDirectory, ["commit", "-m", "update react skill"]);
 

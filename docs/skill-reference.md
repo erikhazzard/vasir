@@ -4,7 +4,7 @@ Use this page when you need authoritative facts about skill layout, manifest fro
 
 ## Skill Directory Layout
 
-Each skill lives directly under `skills/<name>/`.
+Each skill lives directly under `.agents/skills/<name>/`.
 
 Required files:
 
@@ -23,7 +23,7 @@ Optional files:
 
 | Field | Primary source | Fallback / default |
 | --- | --- | --- |
-| `name` | `SKILL.md` frontmatter `name` | directory name; if present it must match `skills/<name>` |
+| `name` | `SKILL.md` frontmatter `name` | directory name; if present it must match `.agents/skills/<name>` |
 | `description` | `SKILL.md` frontmatter `description` | first prose paragraph in `SKILL.md`, then optional `meta.json.description` |
 | `category` | `SKILL.md` frontmatter `category` | `meta.json.category`, then `uncategorized` |
 | `tags` | `SKILL.md` frontmatter `tags` | `meta.json.tags`, then `[]` |
@@ -33,9 +33,9 @@ Optional files:
 
 Rules:
 
-- `SKILL.md` must exist directly under `skills/<name>/`.
+- `SKILL.md` must exist directly under `.agents/skills/<name>/`.
 - `files` is generated from the checked-in file inventory; there is no manual file list to maintain.
-- If you keep `meta.json`, it must live directly under `skills/<name>/meta.json`.
+- If you keep `meta.json`, it must live directly under `.agents/skills/<name>/meta.json`.
 
 ## Root `SKILL.md`
 
@@ -61,8 +61,8 @@ Rules:
 
 If a skill ships with a built-in eval, keep that contract inside the skill directory:
 
-- `skills/<name>/evals/suite.json`
-- `skills/<name>/evals/README.md`
+- `.agents/skills/<name>/evals/suite.json`
+- `.agents/skills/<name>/evals/README.md`
 
 Rules:
 
@@ -80,7 +80,7 @@ Rules:
 
 The repo validation path checks:
 
-- skill directories are flat under `skills/<name>/`
+- skill directories are flat under `.agents/skills/<name>/`
 - generated file inventories match the checked-in file inventory
 - local markdown links resolve
 - `registry.json` matches generated output

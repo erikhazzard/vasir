@@ -31,16 +31,16 @@ Expected result:
 Create:
 
 ```text
-skills/example-repo-constraints/
+.agents/skills/example-repo-constraints/
 ```
 
 Expected result:
 
-- The new skill has its own flat directory directly under `skills/`.
+- The new skill has its own flat directory directly under `.agents/skills/`.
 
 ## Step 3: Add `SKILL.md`
 
-Create `skills/example-repo-constraints/SKILL.md` and keep it dense:
+Create `.agents/skills/example-repo-constraints/SKILL.md` and keep it dense:
 
 ````markdown
 ---
@@ -136,4 +136,4 @@ You now have a checked-in skill that appears in the registry and passes the repo
 - Use [docs/writing-skills.md](./writing-skills.md) for the authoring workflow.
 - Use [docs/skill-reference.md](./skill-reference.md) when you need field-level facts.
 - Use `meta.json` only when maintaining an older skill that still keeps compatibility metadata there. New skills do not need it.
-- If you want `vasir eval run <skill>` to work for this skill, add `skills/<name>/evals/suite.json` plus a short `skills/<name>/evals/README.md` that explains the failure mode and win condition.
+- If you want `vasir eval run <skill>` to work for this skill, add `.agents/skills/<name>/evals/suite.json` plus a short `.agents/skills/<name>/evals/README.md` that explains the failure mode and win condition.

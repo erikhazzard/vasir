@@ -27,7 +27,7 @@
     "bin/",
     "cli/",
     "registry.json",
-    "skills/",
+    ".agents/skills/",
     "templates/"
   ],
   "engines": {

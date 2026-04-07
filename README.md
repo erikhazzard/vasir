@@ -13,9 +13,8 @@ Vasir is not published on npm yet. Install it directly from GitHub for now, and 
 ```bash
 npm install -g git+https://github.com/erikhazzard/vasir.git#<tag-or-sha>
 vasir --version
-vasir add react
-# or copy the full catalog into this repo
-vasir add all
+# inside a repo:
+vasir init
 ```
 
 Prerequisites:
@@ -25,17 +24,23 @@ Prerequisites:
 Verify first success:
 
 1. `vasir --version` prints the installed CLI version.
-2. `vasir add react` prints `Project skills ready at .../.agents/skills`.
-3. That directory contains `react/SKILL.md`.
+2. `vasir init` inside a repo prints `Repo initialized`.
+3. `.agents/skills/` now exists in that repo and contains the full Vasir catalog.
 4. The same command also seeds `AGENTS.md` in your repo root, inferring a stronger profile when the repo shape is obvious.
 5. Optional: run `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, then `vasir agents validate`.
 
-`vasir add all` installs every catalog skill into the current repo when you want the full bundle instead of picking individual skills.
+`vasir init` is now the obvious repo path: inside a repo it installs the full catalog and marks that repo to keep tracking the full catalog on future `vasir update` runs.
+
+If you want only a selected subset instead of full-catalog tracking, use:
+
+```bash
+vasir add design__building-frontend
+```
 
 Remove a project-local skill:
 
 ```bash
-vasir remove react
+vasir remove design__building-frontend
 ```
 
 Vasir resolves the project root as the nearest parent containing `.git`. If there is no `.git` ancestor, it uses the current working directory. Pass `--repo-root <path>` when you want to target an explicit subproject root instead, including monorepo packages.
@@ -45,23 +50,24 @@ The installed CLI now carries its own bundled catalog. Normal `vasir init`, `lis
 To keep another repo up to date after upgrading Vasir itself, install the newer CLI version first, then run:
 
 ```bash
+vasir init         # first time in a repo
 vasir update --dry-run
 vasir update
 ```
 
-Add `--repo-root <path>` when the target is a nested package or subproject. `vasir update` refreshes the global cache under `~/.agents/vasir`, then refreshes the Vasir-managed skills already installed in the targeted repo.
+Add `--repo-root <path>` when the target is a nested package or subproject. `vasir update` refreshes the global cache under `~/.agents/vasir`, then refreshes the skills tracked by the targeted repo. Repos initialized with `vasir init` track the full catalog, so new Vasir skills are installed automatically on later updates.
 
-`VASIR_REPOSITORY_URL` is now a local testing override only. Use it only with a local directory path or `file:///...` URL that already contains `registry.json`, `skills/`, and `templates/`.
+`VASIR_REPOSITORY_URL` is now a local testing override only. Use it only with a local directory path or `file:///...` URL that already contains `registry.json`, `.agents/skills/`, and `templates/`.
 
 Repo-local eval workflow:
 
-- `npm run eval react`
-- `npm run eval react mock` for a zero-cost local smoke test
-- `npm run eval inspect react` to reopen the latest saved run for a skill
-- `npm run eval rescore react` to recompute a saved run with the current scorer
+- `npm run eval testing__enforcing-mandate`
+- `npm run eval testing__enforcing-mandate mock` for a zero-cost local smoke test
+- `npm run eval inspect testing__enforcing-mandate` to reopen the latest saved run for a skill
+- `npm run eval rescore testing__enforcing-mandate` to recompute a saved run with the current scorer
 - `npm run eval` to pick a skill interactively when needed
 - Copy [keys.json.example](./keys.json.example) to `keys.json` to keep OpenAI/Anthropic keys out of the prompt flow
-- Built-in eval contracts now live beside the skill at `skills/<name>/evals/`
+- Built-in eval contracts now live beside the skill at `.agents/skills/<name>/evals/`
 
 `vasir eval run <skill>` now defaults to 3 trials per model/case pair, uses bounded concurrency, keeps partial results when a provider row fails, and ends with a scoreboard that names the actual evidence source for the suite. Built-in eval suites use one contract: every case must define a hard-check floor, with optional `judgePrompt` layered on top for the fixed OpenAI + Anthropic judge pass. If the judge layer is unavailable, the run still reports the hard-floor movement, but the top-line verdict fails closed to `NO SIGNAL` unless the hard floor itself regressed. `inspect` and `rescore` operate on the saved artifacts under `.agents/vasir-evals/`, with `run.json` as the combined artifact.
 
@@ -82,7 +88,7 @@ If the command fails, start with [docs/troubleshooting.md](./docs/troubleshootin
 
 ## Catalog
 
-Browse [skills/](./skills/) directly or inspect [registry.json](./registry.json). `registry.json` is the machine-readable catalog for both humans and agents.
+Browse [.agents/skills/](./.agents/skills/) directly or inspect [registry.json](./registry.json). `registry.json` is the machine-readable catalog for both humans and agents.
 
 ## Registry Build
 

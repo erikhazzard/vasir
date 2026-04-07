@@ -36,9 +36,9 @@ Fail closed when repo truth is unclear. Do not document guesses as facts.
 
 ## Phase 3: Architecture Router
 
-If touching React UI: -> .agents/skills/react/SKILL.md
-If touching deterministic simulation: -> .agents/skills/deterministic-kernel/SKILL.md
-If touching networking: -> .agents/skills/netcode/SKILL.md
+If touching frontend UI: -> .agents/skills/design__building-frontend/SKILL.md
+If touching test strategy or quality gates: -> .agents/skills/testing__enforcing-mandate/SKILL.md
+If touching bug triage or regression handling: -> .agents/skills/code__fixing-bugs/SKILL.md
 
 ## Phase 4: Verification Directives
 

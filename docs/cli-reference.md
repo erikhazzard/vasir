@@ -20,8 +20,8 @@ vasir --version
 
 | Command | Syntax | What it does |
 | --- | --- | --- |
-| `init` | `vasir init [--json]` | Sync the installed bundled catalog into `~/.agents/vasir` and repair global aliases |
-| `update` | `vasir update [--json] [--dry-run] [--repo-root <path>]` | Sync `~/.agents/vasir`; when run inside a repo with Vasir-managed skills, refresh those local copies too |
+| `init` | `vasir init [--json] [--repo-root <path>]` | Sync the installed bundled catalog into `~/.agents/vasir`; inside a repo, also install and track the full catalog there |
+| `update` | `vasir update [--json] [--dry-run] [--repo-root <path>]` | Sync `~/.agents/vasir`; then refresh whatever that repo is tracking: the full catalog or a selected installed subset |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
@@ -36,16 +36,21 @@ vasir --version
 
 ### `init`
 
-- Purpose: prepare the canonical global catalog.
-- Result: `~/.agents/vasir` exists and `~/.claude/vasir` and `~/.codex/vasir` point to it.
+- Purpose: make first success obvious.
+- Result:
+  - Outside a repo: `~/.agents/vasir` exists and `~/.claude/vasir` and `~/.codex/vasir` point to it.
+  - Inside a repo: the same global cache is prepared, then the full catalog is copied into that repo under `.agents/skills` and the repo is marked to keep tracking the full catalog on future `vasir update` runs.
 - Notes:
   - Vasir copies the catalog from the installed package bundle by default.
+  - Inside a repo, `init` is the pit-of-success command when you want “just give this repo everything and keep it current.”
+  - Pass `--repo-root <path>` when you want to initialize a nested package or subproject explicitly.
   - If the existing global cache is dirty or invalid, the command fails closed.
 
-Example:
+Examples:
 
 ```bash
 vasir init
+vasir init --repo-root packages/web
 ```
 
 ### `update`
@@ -53,11 +58,15 @@ vasir init
 - Purpose: refresh the canonical global catalog and, when applicable, refresh the current repo's installed Vasir skills from it.
 - Result:
   - `~/.agents/vasir` syncs to the currently installed bundled catalog, or bootstraps if missing.
-  - If the current repo already has Vasir-managed skills under `.agents/skills`, those installed copies are refreshed from the synced catalog.
+  - If the current repo tracks the full catalog, `update` refreshes existing skills and installs any new Vasir skills added since the last repo sync.
+  - If the current repo tracks only a selected installed subset, `update` refreshes only that subset.
 - Notes:
   - Fails closed if the existing global cache is dirty.
   - Uses the current repo root as the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
-  - Only refreshes Vasir-managed skills already tracked in `.agents/vasir-install-state.json`.
+  - `vasir init` marks a repo as full-catalog tracking.
+  - `vasir add <skill>` marks a repo as selected-subset tracking.
+  - `vasir add all` also marks a repo as full-catalog tracking.
+  - `vasir remove <skill>` from a full-catalog repo switches that repo back to selected-subset tracking so the removed skill does not come back unexpectedly.
   - Local edits to a managed skill still fail closed, the same way `vasir add <skill> --replace` does.
   - `--dry-run` shows which repo-local skills would update, which are already current, and which are blocked by local edits without mutating the cache or repo.
 
@@ -94,6 +103,8 @@ vasir list
   - If no `.git` ancestor exists, the current working directory is used.
   - `--repo-root <path>` overrides that detection and treats the provided directory as the repo root.
   - Use `vasir add all` when you want every catalog skill copied into the current repo.
+  - `vasir add all` marks the repo to keep tracking the full catalog on later `vasir update` runs.
+  - `vasir add <specific skills>` marks the repo to keep tracking only those installed skills on later `vasir update` runs.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
   - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` when you want to override inference and force a specific AGENTS starter.
   - If you pass `--agents-profile` and `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
@@ -102,10 +113,10 @@ vasir list
 Examples:
 
 ```bash
-vasir add react
+vasir add design__building-frontend
 vasir add all
-vasir add react --agents-profile frontend
-vasir add react netcode
+vasir add design__building-frontend --agents-profile frontend
+vasir add code__fixing-bugs testing__enforcing-mandate
 ```
 
 Text-mode success output also prints the resolved project skills directory so you can see exactly where Vasir wrote files.
@@ -123,13 +134,14 @@ Text-mode success output also prints the resolved project skills directory so yo
   - `--repo-root <path>` overrides that detection and treats the provided directory as the repo root.
   - If you omit skill names in an interactive terminal, Vasir opens a multi-select prompt over the installed project-local skills.
   - Removing a missing skill is a clean no-op and is reported back in the command result.
+  - Removing a skill from a repo that was tracking the full catalog switches that repo back to selected-subset tracking so later `vasir update` runs do not reinstall the removed skill.
   - `AGENTS.md` is not edited automatically; remove or update any routing to the deleted skill yourself.
 
 Examples:
 
 ```bash
-vasir remove react
-vasir remove react roguelike
+vasir remove design__building-frontend
+vasir remove design__building-frontend testing__enforcing-mandate
 vasir remove
 ```
 
@@ -218,17 +230,15 @@ vasir agents validate --json
 `vasir eval run <skill>` is the one-command developer workflow for measuring whether a skill improved steering.
 
 ```bash
-vasir eval run react
+vasir eval run testing__enforcing-mandate
 ```
 
 What it does:
 
 - Resolves the skill from the local repo first:
-  - `skills/<skill>/...` when you are editing the source skill in a repo like Vasir
-  - `.agents/skills/<skill>/...` when you are evaluating an installed project-local skill
+  - `.agents/skills/<skill>/...` when the current repo already contains that skill, whether you are editing the source catalog in Vasir or evaluating an installed project-local copy
   - falls back to the global catalog copy if neither local path exists
 - Loads the built-in suite that lives beside that resolved skill source:
-  - `skills/<skill>/evals/suite.json`
   - `.agents/skills/<skill>/evals/suite.json`
   - the matching global catalog skill directory when falling back globally
 - Runs the same case set twice for every configured model:
@@ -278,28 +288,28 @@ Override surface:
 Examples:
 
 ```bash
-vasir eval run react
+vasir eval run testing__enforcing-mandate
 
 # repo-local wrapper with the same built-in defaults
-npm run eval react
+npm run eval testing__enforcing-mandate
 
-# inspect the latest saved react eval
-vasir eval inspect react
+# inspect the latest saved testing__enforcing-mandate eval
+vasir eval inspect testing__enforcing-mandate
 
-# rescore the latest saved react eval with the current scorer
-vasir eval rescore react
+# rescore the latest saved testing__enforcing-mandate eval with the current scorer
+vasir eval rescore testing__enforcing-mandate
 
 # repo-local zero-cost smoke test without the npm -- delimiter
-npm run eval react mock
+npm run eval testing__enforcing-mandate mock
 
 # only OpenAI gpt-5.4
-vasir eval run react --model openai
+vasir eval run testing__enforcing-mandate --model openai
 
 # zero-cost local smoke test
-vasir eval run react --model mock
+vasir eval run testing__enforcing-mandate --model mock
 
 # explicit multi-model override
-vasir eval run react --model openai:gpt-5.4 --model anthropic:claude-opus-4-6
+vasir eval run testing__enforcing-mandate --model openai:gpt-5.4 --model anthropic:claude-opus-4-6
 ```
 
 Notes:
@@ -318,7 +328,7 @@ Notes:
 - If a default live provider is missing credentials and the terminal is interactive, Vasir prompts you to paste a key or skip that provider.
 - In non-interactive environments, missing live-provider credentials cause those providers to be skipped. If nothing runnable remains, the command fails cleanly and points you to `--model mock`.
 - Live provider rows use a request timeout. If a row times out or a provider call fails, the run stays on disk and the final report is marked incomplete instead of discarding the successful rows.
-- `npm run eval` prints setup, launches the batch in parallel, streams completions, and accepts positional model shorthands like `npm run eval react mock` or `npm run eval react openai`.
+- `npm run eval` prints setup, launches the batch in parallel, streams completions, and accepts positional model shorthands like `npm run eval testing__enforcing-mandate mock` or `npm run eval testing__enforcing-mandate openai`.
 - Eval artifacts are tool-owned local files and are ignored by this repo via `.agents/vasir-evals/`.
 - Every saved run is stored as a single `run.json` artifact.
 
@@ -341,7 +351,7 @@ vasir 0.1.0
 `--replace` is the explicit refresh path for an existing project-local skill copy.
 
 ```bash
-vasir add react --replace
+vasir add design__building-frontend --replace
 ```
 
 Facts:
@@ -398,7 +408,7 @@ Example success envelope:
   "globalCatalogDirectory": "/Users/example/.agents/vasir",
   "projectRootDirectory": "/repo",
   "projectSkillsDirectory": "/repo/.agents/skills",
-  "installedSkills": ["react"],
+  "installedSkills": ["design__building-frontend"],
   "replacedSkills": []
 }
 ```
@@ -411,18 +421,18 @@ Example eval success envelope:
   "status": "success",
   "subcommand": "run",
   "runId": "2026-03-18T12-00-00-000Z__abc123def456",
-  "skillName": "react",
-  "suiteId": "react-core",
+  "skillName": "testing__enforcing-mandate",
+  "suiteId": "testing-value-path",
   "suiteHash": "4d5e6f...",
   "runStatus": "complete",
   "trialCount": 3,
   "scorerVersion": 4,
   "modelIds": ["mock:skill-aware"],
-  "outputDirectory": "/repo/.agents/vasir-evals/react/2026-03-18T12-00-00-000Z__abc123def456",
+  "outputDirectory": "/repo/.agents/vasir-evals/testing__enforcing-mandate/2026-03-18T12-00-00-000Z__abc123def456",
   "summary": {
     "rowCounts": {
-      "planned": 12,
-      "scored": 12,
+      "planned": 6,
+      "scored": 6,
       "failed": 0
     },
     "global": {
@@ -445,7 +455,7 @@ Example error envelope:
   "command": "add",
   "status": "error",
   "code": "PROJECT_SKILL_UNTRACKED",
-  "message": "Project skill cannot be safely replaced because Vasir has no install snapshot for /repo/.agents/skills/react.",
+  "message": "Project skill cannot be safely replaced because Vasir has no install snapshot for /repo/.agents/skills/design__building-frontend.",
   "suggestion": "Delete the project-local skill directory manually if you want a fresh copy, then rerun `vasir add <skill>`.",
   "context": {},
   "docsRef": "https://github.com/erikhazzard/vasir/blob/main/docs/troubleshooting.md#replace-safety-errors"
@@ -478,7 +488,7 @@ Project-local skills are copied files that you own and can edit. They are never 
 ## Advanced Override
 
 `VASIR_REPOSITORY_URL` is a troubleshooting override for local testing or mirror scenarios.
-It only accepts a local directory path or `file:///...` URL that already contains `registry.json`, `skills/`, and `templates/`.
+It only accepts a local directory path or `file:///...` URL that already contains `registry.json`, `.agents/skills/`, and `templates/`.
 
 ```bash
 VASIR_REPOSITORY_URL=file:///absolute/path/to/vasir-fixture-repo vasir init

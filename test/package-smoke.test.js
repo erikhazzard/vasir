@@ -96,15 +96,15 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
   const addResult = runCommand(
     binaryPath,
-    ["add", "react"],
+    ["add", "design__building-frontend"],
     projectDirectory,
     addEnvironmentVariables
   );
   assert.equal(addResult.status, 0, addResult.stderr);
-  assert.match(addResult.stdout, /Installed react/);
+  assert.match(addResult.stdout, /Installed design__building-frontend/);
   assert.match(addResult.stdout, /Project skills ready at/);
   assert.match(addResult.stdout, /AGENTS starter ready at \(frontend, inferred\)/);
-  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "design__building-frontend", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
   assert.match(
     fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"),
@@ -115,14 +115,14 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.equal(validateResult.status, 1);
   assert.match(validateResult.stderr, /AGENTS_VALIDATION_FAILED/);
 
-  const removeResult = runCommand(binaryPath, ["remove", "react"], projectDirectory, addEnvironmentVariables);
+  const removeResult = runCommand(binaryPath, ["remove", "design__building-frontend"], projectDirectory, addEnvironmentVariables);
   assert.equal(removeResult.status, 0, removeResult.stderr);
-  assert.match(removeResult.stdout, /Removed react/);
-  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react")));
+  assert.match(removeResult.stdout, /Removed design__building-frontend/);
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "design__building-frontend")));
 
   const evalResult = runCommand(
     binaryPath,
-    ["eval", "run", "react", "--model", "mock"],
+    ["eval", "run", "testing__enforcing-mandate", "--model", "mock"],
     REPO_ROOT,
     npmEnvironmentVariables
   );
