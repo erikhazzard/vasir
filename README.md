@@ -13,6 +13,12 @@ Vasir is not published on npm yet. Install it directly from GitHub for now, and 
 ```bash
 npm install -g git+https://github.com/erikhazzard/vasir.git#<tag-or-sha>
 vasir --version
+# inspect-first, zero-risk:
+vasir
+# LLM/repo handshake, still zero-risk and local-only:
+vasir context --json
+# extra local timing and routing evidence when you need it:
+vasir context --json --debug
 # inside a repo:
 vasir init
 ```
@@ -24,12 +30,20 @@ Prerequisites:
 Verify first success:
 
 1. `vasir --version` prints the installed CLI version.
-2. `vasir init` inside a repo prints `Repo initialized`.
-3. `.agents/skills/` now exists in that repo and contains the full Vasir catalog.
-4. The same command also seeds `AGENTS.md` in your repo root, inferring a stronger profile when the repo shape is obvious.
-5. Optional: run `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, then `vasir agents validate`.
+2. `vasir` or `vasir status` prints the current global and repo-local Vasir state without mutating files.
+3. `vasir context --json` prints a machine-readable repo handshake without any model call, token usage, or network access.
+4. `vasir context --json --debug` prints the same handshake plus timing and routing evidence.
+5. `vasir init` inside a repo prints `Repo initialized`.
+6. `.agents/skills/` now exists in that repo and contains the full Vasir catalog.
+7. `.agents/vasir.json` now exists in that repo and records the repo's explicit Vasir tracking policy.
+8. The same command also seeds `AGENTS.md` in your repo root, inferring a stronger profile when the repo shape is obvious.
+9. Optional: run `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, then `vasir agents validate`.
 
 `vasir init` is now the obvious repo path: inside a repo it installs the full catalog and marks that repo to keep tracking the full catalog on future `vasir update` runs.
+
+The zero-argument path is now read-only. `vasir` defaults to `vasir status`, so the safest inspect-first command is also the shortest one.
+
+`.agents/vasir.json` is now the repo-level source of truth for what the repo wants to track. `.agents/vasir-install-state.json` still exists, but only as Vasir's operational snapshot for replace safety and update planning.
 
 If you want only a selected subset instead of full-catalog tracking, use:
 
@@ -41,6 +55,19 @@ Remove a project-local skill:
 
 ```bash
 vasir remove design__building-frontend
+```
+
+If a repo already has `.agents/skills/` from an older workflow and you want to start managing that tree without copying files again, use:
+
+```bash
+vasir adopt
+```
+
+When something looks off, use:
+
+```bash
+vasir doctor
+vasir repair
 ```
 
 Vasir resolves the project root as the nearest parent containing `.git`. If there is no `.git` ancestor, it uses the current working directory. Pass `--repo-root <path>` when you want to target an explicit subproject root instead, including monorepo packages.
@@ -56,6 +83,20 @@ vasir update
 ```
 
 Add `--repo-root <path>` when the target is a nested package or subproject. `vasir update` refreshes the global cache under `~/.agents/vasir`, then refreshes the skills tracked by the targeted repo. Repos initialized with `vasir init` track the full catalog, so new Vasir skills are installed automatically on later updates.
+
+Recommended day-2 loop:
+
+```bash
+vasir
+vasir context --json
+vasir doctor
+vasir repair   # when metadata, aliases, or missing tracked skills need recovery
+vasir diff
+vasir update --dry-run
+vasir update
+```
+
+`vasir context --json` is the intended LLM entrypoint. It is purely local repo introspection: no model call, no hidden provider token, no network. It reads repo facts already on disk, then returns the repo root, tracked skills, relevant `AGENTS.md` files, scored recommended skills with explanation signals, and the next safe Vasir commands. Add `--debug` when you want local timing detail, routed `AGENTS.md` path hints, profile inference evidence, and the top candidate recommendation set.
 
 `VASIR_REPOSITORY_URL` is now a local testing override only. Use it only with a local directory path or `file:///...` URL that already contains `registry.json`, `.agents/skills/`, and `templates/`.
 
@@ -96,4 +137,4 @@ Browse [.agents/skills/](./.agents/skills/) directly or inspect [registry.json](
 npm run build:registry
 ```
 
-`registry.json` is generated from each skill directory, with `SKILL.md` as the primary source and optional `meta.json` as a compatibility fallback. The same catalog powers CLI install, human browsing, agent discovery, and repo validation.
+`registry.json` and `.vasir-catalog-manifest.json` are generated from the current skill tree. `SKILL.md` remains the primary source and optional `meta.json` is still a compatibility fallback. The same catalog powers CLI install, human browsing, agent discovery, repo validation, and the bundled fast-path hash used by inspect commands.

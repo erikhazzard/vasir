@@ -42,6 +42,7 @@ export function buildProjectPaths({
     agentsDirectory,
     claudeDirectory,
     codexDirectory,
+    projectConfigFilePath: path.join(agentsDirectory, "vasir.json"),
     projectSkillsDirectory,
     claudeSkillsAliasPath: path.join(claudeDirectory, "skills"),
     codexSkillsAliasPath: path.join(codexDirectory, "skills")

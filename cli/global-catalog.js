@@ -11,11 +11,14 @@ import { getPackageRootDirectory, readPackageMetadata } from "./package-metadata
 import { buildGlobalPaths } from "./path-layout.js";
 
 const CATALOG_DIRECTORY_PATHS = Object.freeze([".agents/skills", "templates"]);
-const CATALOG_ROOT_FILES = Object.freeze(["registry.json"]);
+export const CATALOG_MANIFEST_FILE_NAME = ".vasir-catalog-manifest.json";
+const CATALOG_REQUIRED_ROOT_FILES = Object.freeze(["registry.json"]);
+const CATALOG_OPTIONAL_ROOT_FILES = Object.freeze([CATALOG_MANIFEST_FILE_NAME]);
 const GLOBAL_CATALOG_STATE_FILE_NAME = ".vasir-catalog-state.json";
 const ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES = new Set([
   ...new Set(CATALOG_DIRECTORY_PATHS.map((directoryPath) => directoryPath.split("/")[0])),
-  ...CATALOG_ROOT_FILES,
+  ...CATALOG_REQUIRED_ROOT_FILES,
+  ...CATALOG_OPTIONAL_ROOT_FILES,
   GLOBAL_CATALOG_STATE_FILE_NAME
 ]);
 
@@ -60,7 +63,7 @@ function resolveCatalogSourceDirectory({ repositoryUrl = DEFAULT_REPOSITORY_URL 
 }
 
 function assertCatalogDirectoryLooksValid({ catalogDirectory, label }) {
-  for (const requiredRootFile of CATALOG_ROOT_FILES) {
+  for (const requiredRootFile of CATALOG_REQUIRED_ROOT_FILES) {
     if (!fs.existsSync(path.join(catalogDirectory, requiredRootFile))) {
       throw new VasirCliError({
         code: "INVALID_GLOBAL_CATALOG",
@@ -87,7 +90,7 @@ function assertCatalogDirectoryLooksValid({ catalogDirectory, label }) {
 function readCatalogSnapshotEntries(catalogDirectory) {
   const snapshotEntries = [];
 
-  for (const rootFileName of CATALOG_ROOT_FILES) {
+  for (const rootFileName of CATALOG_REQUIRED_ROOT_FILES) {
     snapshotEntries.push({
       absolutePath: path.join(catalogDirectory, rootFileName),
       relativePath: rootFileName
@@ -151,6 +154,32 @@ function computeCatalogSnapshotHash(catalogDirectory) {
   return hash.digest("hex");
 }
 
+function readCatalogManifestIfPresent(catalogDirectory) {
+  const manifestFilePath = path.join(catalogDirectory, CATALOG_MANIFEST_FILE_NAME);
+  if (!fs.existsSync(manifestFilePath)) {
+    return null;
+  }
+
+  try {
+    const parsedManifest = JSON.parse(fs.readFileSync(manifestFilePath, "utf8"));
+    if (
+      typeof parsedManifest !== "object" ||
+      parsedManifest === null ||
+      typeof parsedManifest.sourceHash !== "string"
+    ) {
+      return null;
+    }
+
+    return parsedManifest;
+  } catch {
+    return null;
+  }
+}
+
+function resolveCatalogSourceHash(catalogDirectory) {
+  return readCatalogManifestIfPresent(catalogDirectory)?.sourceHash ?? computeCatalogSnapshotHash(catalogDirectory);
+}
+
 function readGlobalCatalogState(globalCatalogDirectory) {
   const stateFilePath = path.join(globalCatalogDirectory, GLOBAL_CATALOG_STATE_FILE_NAME);
   if (!fs.existsSync(stateFilePath)) {
@@ -195,10 +224,22 @@ function copyCatalogSnapshot({
   fs.rmSync(targetDirectory, { recursive: true, force: true });
   fs.mkdirSync(targetDirectory, { recursive: true });
 
-  for (const rootFileName of CATALOG_ROOT_FILES) {
+  for (const rootFileName of CATALOG_REQUIRED_ROOT_FILES) {
     fs.copyFileSync(
       path.join(sourceDirectory, rootFileName),
       path.join(targetDirectory, rootFileName)
+    );
+  }
+
+  for (const optionalRootFileName of CATALOG_OPTIONAL_ROOT_FILES) {
+    const optionalSourcePath = path.join(sourceDirectory, optionalRootFileName);
+    if (!fs.existsSync(optionalSourcePath)) {
+      continue;
+    }
+
+    fs.copyFileSync(
+      optionalSourcePath,
+      path.join(targetDirectory, optionalRootFileName)
     );
   }
 
@@ -243,7 +284,7 @@ function synchronizeCatalogCache({
   });
   writeGlobalCatalogState({
     globalCatalogDirectory,
-    sourceHash: computeCatalogSnapshotHash(sourceDirectory)
+    sourceHash: resolveCatalogSourceHash(sourceDirectory)
   });
 }
 
@@ -251,7 +292,7 @@ function inspectCatalogCache({
   globalCatalogDirectory,
   sourceDirectory
 }) {
-  const expectedSourceHash = computeCatalogSnapshotHash(sourceDirectory);
+  const expectedSourceHash = resolveCatalogSourceHash(sourceDirectory);
   const packageMetadata = readPackageMetadata();
   const globalCatalogState = fs.existsSync(globalCatalogDirectory)
     ? readGlobalCatalogState(globalCatalogDirectory)
@@ -430,6 +471,21 @@ export function inspectGlobalCatalog({
     globalPaths,
     sourceDirectory,
     catalogState,
+    registry: readRegistryFromCatalogDirectory(sourceDirectory)
+  };
+}
+
+export function readCatalogSourceRegistry({
+  repositoryUrl = DEFAULT_REPOSITORY_URL
+} = {}) {
+  const sourceDirectory = resolveCatalogSourceDirectory({ repositoryUrl });
+
+  return {
+    sourceDirectory,
+    catalogState: {
+      packageVersion: readPackageMetadata().version,
+      sourceHash: resolveCatalogSourceHash(sourceDirectory)
+    },
     registry: readRegistryFromCatalogDirectory(sourceDirectory)
   };
 }

@@ -5,13 +5,16 @@ import { assertSupportedAgentsProfile, initializeProjectAgentsFile } from "./age
 import { VasirCliError } from "./cli-error.js";
 import {
   ADD_REFERENCE_DOCS_REF,
+  ADOPT_REFERENCE_DOCS_REF,
   ADD_REQUEST_TROUBLESHOOTING_DOCS_REF,
   REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF
 } from "./docs-ref.js";
 import { ensureDirectoryAlias } from "./link-directory.js";
 import { buildProjectPaths } from "./path-layout.js";
+import { createTrackingProjectConfig, readProjectConfig, writeProjectConfig } from "./project-config.js";
 import {
   assertProjectSkillReplaceSafety,
+  createEmptyProjectInstallState,
   createProjectSkillInstallStateEntry,
   readProjectInstallState,
   writeProjectInstallState
@@ -21,6 +24,35 @@ import { listSkillFiles } from "./skill-metadata.js";
 function copyFileIntoProject({ sourceFilePath, targetFilePath }) {
   fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
   fs.copyFileSync(sourceFilePath, targetFilePath);
+}
+
+function listProjectSkillDirectoryNames(projectPaths) {
+  if (!fs.existsSync(projectPaths.projectSkillsDirectory)) {
+    return [];
+  }
+
+  return fs.readdirSync(projectPaths.projectSkillsDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((leftSkillName, rightSkillName) => leftSkillName.localeCompare(rightSkillName));
+}
+
+function writeTrackingPolicy({
+  projectPaths,
+  trackingMode,
+  trackedSkillNames
+}) {
+  if (trackingMode !== "all" && trackingMode !== "selected") {
+    return;
+  }
+
+  writeProjectConfig({
+    projectPaths,
+    projectConfig: createTrackingProjectConfig({
+      trackingMode,
+      selectedSkillNames: trackingMode === "selected" ? trackedSkillNames : []
+    })
+  });
 }
 
 function copySkillDirectory({
@@ -211,6 +243,11 @@ export function installSkillsIntoProject({
     projectPaths,
     projectInstallState
   });
+  writeTrackingPolicy({
+    projectPaths,
+    trackingMode,
+    trackedSkillNames: Object.keys(projectInstallState.skills)
+  });
 
   return {
     projectPaths,
@@ -231,6 +268,7 @@ export function removeSkillsFromProject({
     currentWorkingDirectory,
     projectRootDirectory
   });
+  const projectConfig = readProjectConfig({ projectPaths });
   const projectInstallState = readProjectInstallState({ projectPaths });
   const removedSkillNames = [];
   const missingSkillNames = [];
@@ -247,8 +285,12 @@ export function removeSkillsFromProject({
     delete projectInstallState.skills[skillName];
   }
 
+  const currentTrackingMode = projectConfig?.tracking?.mode ??
+    (projectInstallState.catalog?.trackingMode === "all" || projectInstallState.catalog?.trackingMode === "selected"
+      ? projectInstallState.catalog.trackingMode
+      : "selected");
   const switchedTrackingModeToSelected =
-    projectInstallState.catalog?.trackingMode === "all" && removedSkillNames.length > 0;
+    currentTrackingMode === "all" && removedSkillNames.length > 0;
 
   if (switchedTrackingModeToSelected) {
     projectInstallState.catalog.trackingMode = "selected";
@@ -258,12 +300,118 @@ export function removeSkillsFromProject({
     projectPaths,
     projectInstallState
   });
+  writeTrackingPolicy({
+    projectPaths,
+    trackingMode: switchedTrackingModeToSelected ? "selected" : currentTrackingMode,
+    trackedSkillNames: Object.keys(projectInstallState.skills)
+  });
 
   return {
     projectPaths,
     removedSkillNames,
     missingSkillNames,
     switchedTrackingModeToSelected
+  };
+}
+
+export function adoptProjectSkills({
+  registry,
+  catalogProvenance = null,
+  projectRootDirectory = null,
+  currentWorkingDirectory = process.cwd(),
+  platform = process.platform
+}) {
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory,
+    projectRootDirectory
+  });
+  const installedSkillNames = listProjectSkillDirectoryNames(projectPaths);
+  if (installedSkillNames.length === 0) {
+    throw new VasirCliError({
+      code: "ADOPT_SKILLS_MISSING",
+      message: `No project-local skills exist under ${projectPaths.projectSkillsDirectory}.`,
+      suggestion: "Run `vasir init` to install the full catalog, or `vasir add <skill>` to install a selected subset first.",
+      docsRef: ADOPT_REFERENCE_DOCS_REF
+    });
+  }
+
+  const skillEntriesByName = new Map(registry.skills.map((skillEntry) => [skillEntry.name, skillEntry]));
+  const adoptedSkillNames = [];
+  const skippedSkillNames = [];
+  const projectInstallState = createEmptyProjectInstallState();
+
+  for (const skillName of installedSkillNames) {
+    const skillEntry = skillEntriesByName.get(skillName);
+    if (!skillEntry) {
+      skippedSkillNames.push(skillName);
+      continue;
+    }
+
+    const targetSkillDirectory = path.join(projectPaths.projectSkillsDirectory, skillName);
+    const managedRelativeFilePaths = listSkillFiles(targetSkillDirectory);
+    projectInstallState.skills[skillName] = createProjectSkillInstallStateEntry({
+      targetSkillDirectory,
+      managedRelativeFilePaths,
+      provenance: {
+        installedAt: new Date().toISOString(),
+        installedByVersion: catalogProvenance?.packageVersion ?? null,
+        sourceHash: catalogProvenance?.sourceHash ?? null,
+        skillVersion: skillEntry.version ?? null,
+        sourcePath: skillEntry.path ?? null
+      }
+    });
+    adoptedSkillNames.push(skillName);
+  }
+
+  if (adoptedSkillNames.length === 0) {
+    throw new VasirCliError({
+      code: "ADOPT_SKILLS_UNKNOWN",
+      message: `No installed project-local skills match the current Vasir catalog in ${projectPaths.projectSkillsDirectory}.`,
+      suggestion: "Keep those custom directories unmanaged, or install a listed Vasir skill with `vasir add <skill>` before retrying `vasir adopt`.",
+      docsRef: ADOPT_REFERENCE_DOCS_REF,
+      context: {
+        installedSkillNames
+      }
+    });
+  }
+
+  projectInstallState.catalog = {
+    packageVersion: catalogProvenance?.packageVersion ?? null,
+    sourceHash: catalogProvenance?.sourceHash ?? null,
+    trackingMode:
+      adoptedSkillNames.length === registry.skills.length &&
+      registry.skills.every((skillEntry) => adoptedSkillNames.includes(skillEntry.name))
+        ? "all"
+        : "selected"
+  };
+
+  fs.mkdirSync(projectPaths.projectSkillsDirectory, { recursive: true });
+  ensureDirectoryAlias({
+    aliasPath: projectPaths.claudeSkillsAliasPath,
+    targetPath: projectPaths.projectSkillsDirectory,
+    platform
+  });
+  ensureDirectoryAlias({
+    aliasPath: projectPaths.codexSkillsAliasPath,
+    targetPath: projectPaths.projectSkillsDirectory,
+    platform
+  });
+
+  writeProjectInstallState({
+    projectPaths,
+    projectInstallState
+  });
+  writeTrackingPolicy({
+    projectPaths,
+    trackingMode: projectInstallState.catalog.trackingMode,
+    trackedSkillNames: adoptedSkillNames
+  });
+
+  return {
+    projectPaths,
+    adoptedSkillNames,
+    skippedSkillNames,
+    trackingMode: projectInstallState.catalog.trackingMode
   };
 }
 
@@ -277,21 +425,9 @@ export function listInstalledProjectSkills({
   });
   readProjectInstallState({ projectPaths });
 
-  if (!fs.existsSync(projectPaths.projectSkillsDirectory)) {
-    return {
-      projectPaths,
-      skillNames: []
-    };
-  }
-
-  const skillNames = fs.readdirSync(projectPaths.projectSkillsDirectory, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort((leftSkillName, rightSkillName) => leftSkillName.localeCompare(rightSkillName));
-
   return {
     projectPaths,
-    skillNames
+    skillNames: listProjectSkillDirectoryNames(projectPaths)
   };
 }
 

@@ -7,7 +7,7 @@ import { REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 
 const PROJECT_INSTALL_STATE_SCHEMA_VERSION = 3;
 
-function createEmptyProjectInstallState() {
+export function createEmptyProjectInstallState() {
   return {
     schemaVersion: PROJECT_INSTALL_STATE_SCHEMA_VERSION,
     catalog: null,

@@ -1,7 +1,12 @@
 const REPOSITORY_DOCS_BASE_URL = "https://github.com/erikhazzard/vasir/blob/main";
 
 export const COMMANDS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#commands`;
+export const STATUS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#status`;
+export const DOCTOR_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#doctor`;
+export const DIFF_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#diff`;
+export const REPAIR_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#repair`;
 export const ADD_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#add`;
+export const ADOPT_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#adopt`;
 export const REMOVE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#remove`;
 export const REPLACE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#replace`;
 export const AGENTS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#agents`;

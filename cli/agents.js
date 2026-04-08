@@ -415,7 +415,7 @@ export function assertSupportedAgentsProfile(profileName) {
   resolveAgentsTemplate(profileName);
 }
 
-function buildRepositoryContext({ projectRootDirectory, agentsText }) {
+export function inspectRepositoryContext({ projectRootDirectory, agentsText }) {
   const packageMetadata = readJsonFileIfPresent(path.join(projectRootDirectory, "package.json"));
   const packageSummary = packageMetadata && typeof packageMetadata === "object"
     ? {
@@ -546,20 +546,41 @@ function inferAgentsProfile({ projectRootDirectory, repositoryContext }) {
   };
 }
 
+export function inspectRecommendedAgentsProfile({
+  projectRootDirectory,
+  agentsText = ""
+}) {
+  const repositoryContext = inspectRepositoryContext({
+    projectRootDirectory,
+    agentsText
+  });
+  const inference = inferAgentsProfile({
+    projectRootDirectory,
+    repositoryContext
+  });
+
+  return {
+    repositoryContext,
+    inference,
+    recommendation: {
+      profileName: inference.profileName,
+      source: inference.profileName ? "inferred" : "default-generic",
+      reason: inference.reason
+    }
+  };
+}
+
 export async function resolveRecommendedAgentsProfile({
   projectRootDirectory,
   inputStream = process.stdin,
   outputStream = process.stdout,
   jsonOutput = false
 }) {
-  const repositoryContext = buildRepositoryContext({
+  const inspectedProfileRecommendation = inspectRecommendedAgentsProfile({
     projectRootDirectory,
     agentsText: ""
   });
-  const inference = inferAgentsProfile({
-    projectRootDirectory,
-    repositoryContext
-  });
+  const { inference } = inspectedProfileRecommendation;
 
   if (inference.profileName && inference.confident) {
     return {
@@ -813,7 +834,7 @@ function formatRoutingLines({ projectRootDirectory, agentsText }) {
   const profileHint = readAgentsProfileHint(agentsText);
   const inferredProfile = inferAgentsProfile({
     projectRootDirectory,
-    repositoryContext: buildRepositoryContext({
+    repositoryContext: inspectRepositoryContext({
       projectRootDirectory,
       agentsText
     })
@@ -1310,7 +1331,7 @@ export async function runAgents({
     outputStream,
     jsonOutput
   });
-  const repositoryContext = buildRepositoryContext({
+  const repositoryContext = inspectRepositoryContext({
     projectRootDirectory: projectPaths.projectRootDirectory,
     agentsText
   });

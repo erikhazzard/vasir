@@ -1,0 +1,11 @@
+{
+  "kind": "catalogManifest",
+  "schemaVersion": 1,
+  "packageVersion": "0.1.0",
+  "sourceHash": "08463306380edbf628fefae9090ff9f9e052a195ac980337af6d293a248d17f3",
+  "includedRoots": [
+    "registry.json",
+    ".agents/skills",
+    "templates"
+  ]
+}

@@ -27,6 +27,7 @@
     "bin/",
     "cli/",
     "registry.json",
+    ".vasir-catalog-manifest.json",
     ".agents/skills/",
     "templates/"
   ],

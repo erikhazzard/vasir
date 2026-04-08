@@ -212,6 +212,10 @@ test("init inside a repo installs and tracks the full catalog", async () => {
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  const projectConfig = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8")
+  );
+  assert.equal(projectConfig.tracking.mode, "all");
   const installState = JSON.parse(
     fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
   );
@@ -290,6 +294,180 @@ Use AbortController in async effects.`
   );
 });
 
+test("adopt snapshots an existing project-local skill tree without copying files", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.0.0
+---
+
+# React
+
+Use local state first.`
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "adopt", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "adopt");
+  assert.deepEqual(parsedOutput.adoptedSkills, ["react"]);
+  assert.deepEqual(parsedOutput.skippedSkills, []);
+  assert.equal(parsedOutput.trackingMode, "selected");
+  const projectConfig = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8")
+  );
+  assert.equal(projectConfig.tracking.mode, "selected");
+  assert.deepEqual(projectConfig.tracking.skillNames, ["react"]);
+  assert.equal(
+    fs.realpathSync(path.join(projectDirectory, ".claude", "skills")),
+    fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
+  );
+  assert.equal(
+    fs.realpathSync(path.join(projectDirectory, ".codex", "skills")),
+    fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
+  );
+
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.equal(installState.catalog.trackingMode, "selected");
+  assert.equal(installState.skills.react.provenance.sourcePath, ".agents/skills/react");
+
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.1.0
+---
+
+# React
+
+Prefer narrow component ownership.`
+  );
+  runGitCommand(repositoryDirectory, ["add", "."]);
+  runGitCommand(repositoryDirectory, ["commit", "-m", "update react skill after adopt"]);
+
+  const dryRunOutput = captureCommandWriters();
+  const dryRunStatusCode = await runCommandLine(["node", "vasir", "update", "--dry-run", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...dryRunOutput
+  });
+
+  assert.equal(dryRunStatusCode, 0);
+  const dryRunResult = JSON.parse(dryRunOutput.readStdout());
+  assert.deepEqual(dryRunResult.updatedSkills, ["react"]);
+});
+
+test("repair rebuilds repo metadata and aliases from an existing skill tree", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const projectDirectory = createTemporaryDirectory();
+  const repairOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.0.0
+---
+
+# React
+
+Use local state first.`
+  );
+
+  const repairStatusCode = await runCommandLine(["node", "vasir", "repair", "--json"], {
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...repairOutput
+  });
+
+  assert.equal(repairStatusCode, 0);
+  const repairResult = JSON.parse(repairOutput.readStdout());
+  assert.equal(repairResult.command, "repair");
+  assert.equal(repairResult.trackingMode, "selected");
+  assert.equal(repairResult.trackingSource, "installed-tree");
+  assert.equal(repairResult.rebuiltProjectConfig, true);
+  assert.equal(repairResult.rebuiltInstallState, true);
+  assert.deepEqual(repairResult.restoredSkills, []);
+  assert.equal(
+    fs.realpathSync(path.join(projectDirectory, ".claude", "skills")),
+    fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
+  );
+  assert.equal(
+    fs.realpathSync(path.join(projectDirectory, ".codex", "skills")),
+    fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
+  );
+  const projectConfig = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8")
+  );
+  assert.equal(projectConfig.tracking.mode, "selected");
+  assert.deepEqual(projectConfig.tracking.skillNames, ["react"]);
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.equal(installState.catalog.trackingMode, "selected");
+  assert.ok(installState.skills.react);
+});
+
+test("repair restores missing tracked skills from explicit repo config", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const repairOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  fs.rmSync(path.join(projectDirectory, ".agents", "skills", "react"), { recursive: true, force: true });
+
+  const repairStatusCode = await runCommandLine(["node", "vasir", "repair", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...repairOutput
+  });
+
+  assert.equal(repairStatusCode, 0);
+  const repairResult = JSON.parse(repairOutput.readStdout());
+  assert.equal(repairResult.command, "repair");
+  assert.equal(repairResult.trackingMode, "selected");
+  assert.equal(repairResult.trackingSource, "project-config");
+  assert.deepEqual(repairResult.restoredSkills, ["react"]);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+});
+
 test("update installs newly added catalog skills for repos tracking the full catalog", async () => {
   const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
@@ -352,6 +530,219 @@ Tune jump arcs before adding content.`
   assert.equal(updateStatusCode, 0);
   assert.match(updateOutput.readStdout(), /Installed platformer/);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "platformer", "SKILL.md")));
+});
+
+test("update follows explicit repo config when a selected tracked skill directory is missing", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const updateOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  const projectConfig = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8")
+  );
+  assert.equal(projectConfig.tracking.mode, "selected");
+  assert.deepEqual(projectConfig.tracking.skillNames, ["react"]);
+
+  fs.rmSync(path.join(projectDirectory, ".agents", "skills", "react"), { recursive: true, force: true });
+
+  const updateStatusCode = await runCommandLine(["node", "vasir", "update", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...updateOutput
+  });
+
+  assert.equal(updateStatusCode, 0);
+  const updateResult = JSON.parse(updateOutput.readStdout());
+  assert.deepEqual(updateResult.installedSkills, ["react"]);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+});
+
+test("diff shows the exact modified tracked files before update", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const diffOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.1.0
+---
+
+# React
+
+Use AbortController in async effects.
+Prefer narrow component ownership.`
+  );
+  runGitCommand(repositoryDirectory, ["add", "."]);
+  runGitCommand(repositoryDirectory, ["commit", "-m", "update react skill for diff"]);
+
+  const diffStatusCode = await runCommandLine(["node", "vasir", "diff", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...diffOutput
+  });
+
+  assert.equal(diffStatusCode, 0);
+  const diffResult = JSON.parse(diffOutput.readStdout());
+  assert.equal(diffResult.command, "diff");
+  assert.equal(diffResult.overallStatus, "changes");
+  assert.equal(diffResult.hasDiff, true);
+  assert.equal(diffResult.hasBlockedSkills, false);
+  assert.deepEqual(diffResult.requestedSkills, []);
+  assert.equal(diffResult.skills.length, 1);
+  assert.equal(diffResult.skills[0].skillName, "react");
+  assert.equal(diffResult.skills[0].status, "update");
+  assert.equal(diffResult.skills[0].fileChanges.length, 1);
+  assert.equal(diffResult.skills[0].fileChanges[0].status, "modified");
+  assert.equal(diffResult.skills[0].fileChanges[0].format, "text");
+  assert.match(diffResult.skills[0].fileChanges[0].projectRelativePath, /\.agents\/skills\/react\/SKILL\.md$/);
+  assert.match(diffResult.skills[0].fileChanges[0].unifiedDiff, /--- a\/\.agents\/skills\/react\/SKILL\.md/);
+  assert.match(diffResult.skills[0].fileChanges[0].unifiedDiff, /\+Use AbortController in async effects\./);
+  assert.match(diffResult.skills[0].fileChanges[0].unifiedDiff, /\+Prefer narrow component ownership\./);
+});
+
+test("diff shows newly added full-catalog skills before update", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const initOutput = captureCommandWriters();
+  const diffOutput = captureCommandWriters();
+
+  runGitCommand(projectDirectory, ["init"]);
+  runGitCommand(projectDirectory, ["config", "user.email", "test@example.com"]);
+  runGitCommand(projectDirectory, ["config", "user.name", "Test Runner"]);
+
+  const initStatusCode = await runCommandLine(["node", "vasir", "init"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...initOutput
+  });
+
+  assert.equal(initStatusCode, 0);
+
+  const nextRegistry = JSON.parse(fs.readFileSync(path.join(repositoryDirectory, "registry.json"), "utf8"));
+  nextRegistry.skills.push({
+    name: "platformer",
+    path: ".agents/skills/platformer",
+    entry: "SKILL.md",
+    description: "Tight jump arcs and collision feel",
+    category: "games",
+    tags: ["games"],
+    version: "1.0.0",
+    recommends: [],
+    files: ["SKILL.md"]
+  });
+  writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(nextRegistry, null, 2)}\n`);
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "platformer", "SKILL.md"),
+    `---
+name: platformer
+description: Tight jump arcs and collision feel.
+category: games
+tags: [games]
+recommends: []
+version: 1.0.0
+---
+
+# Platformer
+
+Tune jump arcs before adding content.`
+  );
+  runGitCommand(repositoryDirectory, ["add", "."]);
+  runGitCommand(repositoryDirectory, ["commit", "-m", "add platformer skill for diff"]);
+
+  const diffStatusCode = await runCommandLine(["node", "vasir", "diff", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...diffOutput
+  });
+
+  assert.equal(diffStatusCode, 0);
+  const diffResult = JSON.parse(diffOutput.readStdout());
+  assert.equal(diffResult.overallStatus, "changes");
+  assert.equal(diffResult.skills.length, 1);
+  assert.equal(diffResult.skills[0].skillName, "platformer");
+  assert.equal(diffResult.skills[0].status, "install");
+  assert.deepEqual(
+    diffResult.skills[0].fileChanges.map((fileChange) => fileChange.projectRelativePath),
+    [".agents/skills/platformer/SKILL.md"]
+  );
+});
+
+test("diff --exit-code returns shell-friendly nonzero output when tracked changes exist", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const diffOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
+    `---
+name: react
+description: React component boundaries and effect discipline.
+category: frontend
+tags: [react]
+recommends: []
+version: 1.1.0
+---
+
+# React
+
+Use AbortController in async effects.`
+  );
+
+  const diffStatusCode = await runCommandLine(["node", "vasir", "diff", "--json", "--exit-code"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...diffOutput
+  });
+
+  assert.equal(diffStatusCode, 1);
+  const diffResult = JSON.parse(diffOutput.readStdout());
+  assert.equal(diffResult.command, "diff");
+  assert.equal(diffResult.status, "success");
+  assert.equal(diffResult.hasDiff, true);
 });
 
 test("update --dry-run previews repo-local refreshes without mutating files", async () => {

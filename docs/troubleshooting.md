@@ -33,7 +33,8 @@ Recommended path:
 
 1. Run `vasir --help`.
 2. Compare your command against the supported surface in [docs/cli-reference.md](./cli-reference.md#commands).
-3. If you meant to refresh an existing project-local skill, use `vasir add <skill> --replace`.
+3. If you wanted a read-only inspection command, use `vasir status` or `vasir doctor`.
+4. If you meant to refresh an existing project-local skill, use `vasir add <skill> --replace`.
 
 Verification:
 
@@ -59,6 +60,31 @@ Verification:
 
 - `vasir add <skill>`, `vasir add all`, or `vasir remove <skill>` succeeds with a listed or installed skill name.
 
+## Status, Doctor, and Adopt
+
+Use this section when:
+
+- `vasir status` says a repo needs adoption
+- `vasir doctor` reports alias drift or blocked updates
+- a repo already has `.agents/skills/` but `vasir update` says it is not initialized
+
+Recommended path:
+
+1. Start with `vasir status` for the high-level state.
+2. Run `vasir context --json --debug` when you want the routed `AGENTS.md` paths, profile inference, and local timing evidence that Vasir is using.
+3. Run `vasir doctor` when you need the detailed repair checklist.
+4. Run `vasir repair` to rebuild repo metadata, repair aliases, and restore missing tracked skills.
+5. Use `vasir adopt` only when you explicitly want the older narrow “snapshot the current tree without copying files” workflow.
+6. Run `vasir diff` when you want the exact tracked file changes before mutating the repo.
+7. After repair, run `vasir update --dry-run` before `vasir update`.
+
+Verification:
+
+- `vasir status` reports `Repo tracked by Vasir`.
+- `.agents/vasir.json` exists and is valid JSON.
+- `.agents/vasir-install-state.json` exists and is valid JSON.
+- `.claude/skills` and `.codex/skills` resolve to `.agents/skills`.
+
 ## Remove and Local State
 
 Use this section when:
@@ -77,6 +103,7 @@ Verification:
 
 - `.agents/skills/<skill>` is gone.
 - `.claude/skills` and `.codex/skills` still resolve to `.agents/skills`.
+- `.agents/vasir.json` reflects the remaining tracked skill policy.
 - `.agents/vasir-install-state.json` no longer contains the removed skill entry.
 
 ## Global Catalog Problems
@@ -105,6 +132,7 @@ Verification:
 If you expected a repo-local skill refresh too, rerun `vasir update` from inside the target repo root or pass `--repo-root <path>`.
 - Repos initialized with `vasir init` or `vasir add all` track the full catalog, so `update` also installs newly added Vasir skills.
 - Repos initialized with `vasir add <specific skills>` track only that selected subset.
+- Run `vasir diff` first when you want to review exact tracked file changes before updating the repo.
 
 ## Replace Safety Errors
 
@@ -114,18 +142,21 @@ Use this section for:
 - `PROJECT_SKILL_UNTRACKED`
 - `PROJECT_SKILL_MODIFIED`
 - `INVALID_PROJECT_INSTALL_STATE`
+- `INVALID_PROJECT_CONFIG`
 
 Recommended path:
 
 1. Decide whether you want to keep the current project-local skill directory.
 2. If you want to preserve local edits, back them up first.
 3. If you want a fresh Vasir-managed copy, delete the project-local skill directory manually.
-4. If `.agents/vasir-install-state.json` is invalid and you no longer trust it, delete that file too.
-5. Rerun `vasir add <skill>` for a fresh install, or `vasir add <skill> --replace` only after the directory matches the last Vasir-managed snapshot.
+4. If `.agents/vasir-install-state.json` or `.agents/vasir.json` is invalid and you want Vasir to rebuild the repo metadata safely, run `vasir repair`.
+5. If `.agents/vasir-install-state.json` or `.agents/vasir.json` is invalid and you no longer trust the current tree, delete those files too.
+6. Rerun `vasir add <skill>` for a fresh install, or `vasir add <skill> --replace` only after the directory matches the last Vasir-managed snapshot.
 
 Verification:
 
 - The project-local skill directory contains only the files Vasir manages for that skill.
+- `.agents/vasir.json` is valid JSON if it exists.
 - `.agents/vasir-install-state.json` is valid JSON if it exists.
 - `vasir add <skill> --replace` succeeds only when no local divergence remains.
 
@@ -170,7 +201,8 @@ Recommended path:
 4. If you explicitly want to refresh the starter, rerun `vasir agents init <profile> --replace`.
 5. Use `vasir agents draft-purpose --write --model openai` for the opening paragraph and `vasir agents draft-routing --write` for Section 1.
 6. When validation fails on scoped lanes, either create the referenced local `AGENTS.md` files or collapse those rules back into the root file.
-7. Finish with `vasir agents validate`.
+7. `vasir context --json --debug` also reports routed scoped `AGENTS.md` paths that are still missing.
+8. Finish with `vasir agents validate`.
 
 Verification:
 

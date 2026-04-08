@@ -20,10 +20,16 @@ vasir --version
 
 | Command | Syntax | What it does |
 | --- | --- | --- |
+| `status` | `vasir status [--json] [--repo-root <path>]` | Inspect global and repo-local Vasir state without mutating files; plain `vasir` defaults here |
+| `context` | `vasir context [--json] [--debug] [--repo-root <path>]` | Emit a purely local repo handshake for LLMs: repo facts, relevant `AGENTS.md` files, recommended skills, and next commands |
+| `doctor` | `vasir doctor [--json] [--repo-root <path>]` | Diagnose drift, alias problems, adoption needs, and blocked skill updates |
+| `repair` | `vasir repair [--json] [--repo-root <path>]` | Repair repo-local Vasir metadata, aliases, and missing tracked skills without auto-upgrading current skill content |
+| `diff` | `vasir diff [skill...] [--json] [--exit-code] [--repo-root <path>]` | Review the exact tracked repo-local skill files that would change before `vasir update` |
 | `init` | `vasir init [--json] [--repo-root <path>]` | Sync the installed bundled catalog into `~/.agents/vasir`; inside a repo, also install and track the full catalog there |
 | `update` | `vasir update [--json] [--dry-run] [--repo-root <path>]` | Sync `~/.agents/vasir`; then refresh whatever that repo is tracking: the full catalog or a selected installed subset |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
+| `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
 | `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write a stack-specific `AGENTS.md` starter in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
@@ -33,6 +39,119 @@ vasir --version
 | `eval inspect` | `vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>]` | Inspect the latest or named saved eval artifact for a skill |
 | `eval rescore` | `vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>]` | Recompute a saved eval artifact with the current scorer |
 | `--version` | `vasir --version [--json]` | Print the installed CLI name and version |
+
+### `status`
+
+- Purpose: inspect-first, zero-risk visibility into what Vasir would do next.
+- Result:
+  - reports whether the global catalog is current, missing, outdated, or unhealthy
+  - reports whether the current repo is tracked, needs adoption, needs repair, or is not initialized
+  - reports tracked vs unmanaged local skills and the next safe action
+  - reports the repo config path when the repo is already tracked
+- Notes:
+  - Plain `vasir` defaults to `vasir status`.
+  - `status` never copies, deletes, or repairs files.
+  - Pass `--repo-root <path>` when you want to inspect an explicit subproject root.
+
+Examples:
+
+```bash
+vasir
+vasir status
+vasir status --json
+vasir status --repo-root packages/web
+```
+
+### `context`
+
+- Purpose: give humans and LLMs one local-only command that explains how to operate in the current repo.
+- Result:
+  - returns repo facts already on disk: repo root, package summary, top-level entries, and README excerpt
+  - returns the relevant root and routed scoped `AGENTS.md` files
+  - returns the repo's tracked skills, installed skills, explained recommended skills to load first, and the next safe Vasir commands
+  - returns an explicit execution contract saying the command is local-only and does not use a model, token, or network
+- Notes:
+  - `context` is read-only.
+  - `context` reads the bundled catalog or a local override source directly; it does not need the global cache under `~/.agents/vasir`.
+  - `context` is the intended LLM handshake command.
+  - `recommendedSkills[]` are structured objects with `skillName`, `score`, `reasons[]`, and `matchedSignals[]`.
+  - `recommendedSkillNames[]` is a convenience mirror of the selected recommendation list.
+  - `--debug` adds timing detail, routed path hints, profile inference evidence, and the top candidate recommendation set.
+  - Pass `--repo-root <path>` when you want to inspect an explicit subproject root.
+
+Examples:
+
+```bash
+vasir context
+vasir context --json
+vasir context --json --debug
+vasir context --repo-root packages/web
+```
+
+### `doctor`
+
+- Purpose: diagnose repo drift and operator-facing repair needs.
+- Result:
+  - checks the global cache state
+  - checks global and project alias health
+  - checks whether the repo needs adoption or install-state repair
+  - checks whether tracked skills are blocked from safe replacement
+- Notes:
+  - `doctor` is read-only.
+  - Use it when `status` says a repo needs attention or when `update` fails closed.
+
+Examples:
+
+```bash
+vasir doctor
+vasir doctor --json
+```
+
+### `repair`
+
+- Purpose: one-command recovery when the repo's Vasir metadata or alias structure drifted.
+- Result:
+  - repairs `.claude/skills` and `.codex/skills` to point at `.agents/skills` when that is safe
+  - rebuilds `.agents/vasir.json` when the repo's explicit tracking policy is missing or invalid
+  - rebuilds `.agents/vasir-install-state.json` when the install snapshot is missing or invalid
+  - restores missing tracked skills from the installed Vasir bundle
+- Notes:
+  - `repair` is repo-local only.
+  - `repair` preserves explicit repo intent when `.agents/vasir.json` is valid.
+  - `repair` does not auto-upgrade already-present skill content to newer Vasir versions; use `vasir diff` and `vasir update` for that.
+  - If a tracked skill has safe-to-detect local edits and the existing install snapshot is still valid, `repair` leaves that skill blocked instead of silently blessing the edits.
+
+Examples:
+
+```bash
+vasir repair
+vasir repair --json
+vasir repair --repo-root packages/web
+```
+
+### `diff`
+
+- Purpose: review exactly what `vasir update` would change in the current repo before mutating anything.
+- Result:
+  - compares the repo's tracked `.agents/skills/**` tree against the installed Vasir bundle or local override source
+  - shows pending new skills, modified tracked files, blocked updates, and already-current requested skills
+  - emits unified text diffs for modified text files and file-level summaries for added or removed files
+- Notes:
+  - `diff` is read-only.
+  - By default, `vasir diff` shows only pending tracked changes and blocked skills.
+  - Pass one or more skill names to review only specific tracked skills, including an already-current skill.
+  - `--exit-code` returns `1` when tracked changes or blocked skills exist, and `0` when the requested diff set is already current.
+  - Pass `--repo-root <path>` when you want to inspect an explicit subproject root.
+
+Examples:
+
+```bash
+vasir diff
+vasir diff react
+vasir diff --json
+vasir diff --exit-code
+vasir diff --repo-root packages/web
+```
 
 ### `init`
 
@@ -120,6 +239,27 @@ vasir add code__fixing-bugs testing__enforcing-mandate
 ```
 
 Text-mode success output also prints the resolved project skills directory so you can see exactly where Vasir wrote files.
+
+### `adopt`
+
+- Purpose: bring an existing `.agents/skills` tree under Vasir management without copying or overwriting files.
+- Result:
+  - rebuilds `.agents/vasir-install-state.json` from the current on-disk skill directories
+  - writes `.agents/vasir.json` as the explicit repo tracking contract
+  - repairs `.claude/skills` and `.codex/skills` to point at `.agents/skills`
+  - infers `trackingMode` from the adopted Vasir skill set
+- Notes:
+  - Use this when a repo already contains `.agents/skills` from an older workflow but Vasir does not recognize it as managed.
+  - Unknown local directories are left in place and reported as unmanaged; Vasir only adopts skill names that exist in the current catalog.
+  - `adopt` mutates only local tracking metadata and aliases. It does not copy from the global catalog and does not overwrite local skill files.
+
+Examples:
+
+```bash
+vasir adopt
+vasir adopt --json
+vasir adopt --repo-root packages/web
+```
 
 ### `remove`
 
@@ -363,17 +503,25 @@ Facts:
 
 ## JSON Output
 
-`--json` is supported by `init`, `update`, `list`, `add`, `remove`, and `eval run`.
+`--json` is supported by `status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `list`, `add`, `adopt`, `remove`, and `eval run`.
 
 Success envelope:
 
 - `command`
 - `status`
-- `globalCatalogDirectory` for `init`, `update`, `list`, and `add`
-- `projectRootDirectory`, `projectSkillsDirectory`, and `updatedSkills` for `update`
+- `schemaVersion`, `execution`, `catalog`, `repoFacts`, `agentsProfile`, `trackedSkills`, `recommendedSkillNames`, `recommendedSkills[]`, `relevantAgentsFiles[]`, `pendingSkillChanges`, `nextActions[]`, and `warnings[]` for `context`
+- `debug` for `context` when `--debug` is set
+- `globalCatalogDirectory` for `status`, `doctor`, `init`, `update`, `list`, `add`, and `adopt`
+- `overallStatus` plus `nextSteps[]` for `status`, `doctor`, `repair`, and `diff`
+- `projectConfigFilePath`, `repoStatus`, `trackingMode`, `managedSkills`, `installStateSkills`, and `unmanagedSkills` for `status`
+- `checks[]` and `issues[]` for `doctor`
+- `catalogSourceDirectory`, `trackingMode`, `trackingSource`, `rebuiltProjectConfig`, `rebuiltInstallState`, and `restoredSkills[]` for `repair`
+- `catalogSourceDirectory`, `trackingMode`, `requestedSkills`, `hasDiff`, `hasBlockedSkills`, and `skills[]` for `diff`
+- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, and `updatedSkills` for `update`
 - `skills` for `list`
-- `projectRootDirectory`, `projectSkillsDirectory`, `installedSkills`, and `replacedSkills` for `add`
-- `projectRootDirectory`, `projectSkillsDirectory`, `removedSkills`, and `missingSkills` for `remove`
+- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `installedSkills`, and `replacedSkills` for `add`
+- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `adoptedSkills`, and `skippedSkills` for `adopt`
+- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `removedSkills`, and `missingSkills` for `remove`
 
 `list --json` returns `skills[]` entries with:
 
@@ -476,6 +624,7 @@ Project-local:
 
 ```text
 .git/
+.agents/vasir.json
 .agents/vasir-install-state.json
 .agents/skills/<name>/
 .claude/skills -> .agents/skills
@@ -483,7 +632,8 @@ Project-local:
 ```
 
 Project-local skills are copied files that you own and can edit. They are never linked back to the global catalog.
-`.agents/vasir-install-state.json` is Vasir's local snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, prunes entries automatically when the matching skill directory is gone, and records catalog provenance such as the installed Vasir version, catalog hash, and per-skill source version so `vasir update --dry-run` can explain pending refreshes.
+`.agents/vasir.json` is the committed repo-level source of truth for what the repo wants Vasir to track: full catalog or an explicit selected subset.
+`.agents/vasir-install-state.json` is Vasir's operational snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, prunes entries automatically when the matching skill directory is gone, and records catalog provenance such as the installed Vasir version, catalog hash, and per-skill source version so `vasir update --dry-run` can explain pending refreshes.
 
 ## Advanced Override
 

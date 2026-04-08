@@ -170,6 +170,11 @@ test("help output documents json support across commands and the explicit replac
 
   assert.equal(statusCode, 0);
   assert.match(capturedOutput.readStdout(), /^vasir/m);
+  assert.match(capturedOutput.readStdout(), /vasir status \[--json\]/);
+  assert.match(capturedOutput.readStdout(), /vasir context \[--json\] \[--debug\] \[--repo-root <path>\]/);
+  assert.match(capturedOutput.readStdout(), /vasir doctor \[--json\]/);
+  assert.match(capturedOutput.readStdout(), /vasir repair \[--json\] \[--repo-root <path>\]/);
+  assert.match(capturedOutput.readStdout(), /vasir diff \[skill\.\.\.\] \[--json\] \[--exit-code\] \[--repo-root <path>\]/);
   assert.match(capturedOutput.readStdout(), /vasir init \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir update \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir list \[--json\]/);
@@ -177,6 +182,7 @@ test("help output documents json support across commands and the explicit replac
     capturedOutput.readStdout(),
     /vasir add <skill> \[skill...\] \[--json\] \[--replace\] \[--agents-profile <name>\]/
   );
+  assert.match(capturedOutput.readStdout(), /vasir adopt \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir remove <skill> \[skill...\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents init <profile> \[--json\] \[--replace\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
@@ -190,18 +196,26 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /--json/);
   assert.match(capturedOutput.readStdout(), /--replace/);
   assert.match(capturedOutput.readStdout(), /--repo-root <path>/);
+  assert.match(capturedOutput.readStdout(), /--exit-code/);
   assert.match(capturedOutput.readStdout(), /--dry-run/);
+  assert.match(capturedOutput.readStdout(), /--debug/);
   assert.match(capturedOutput.readStdout(), /--write/);
   assert.match(capturedOutput.readStdout(), /--trials <count>/);
   assert.match(capturedOutput.readStdout(), /--model openai, --model opus, --model mock/i);
+  assert.match(capturedOutput.readStdout(), /plain "vasir" defaults to "vasir status"/i);
+  assert.match(capturedOutput.readStdout(), /status is the inspect-first command/i);
+  assert.match(capturedOutput.readStdout(), /context is the repo-handshake command/i);
+  assert.match(capturedOutput.readStdout(), /doctor is the repair-oriented command/i);
+  assert.match(capturedOutput.readStdout(), /repair is the one-command recovery path/i);
+  assert.match(capturedOutput.readStdout(), /diff is the review command/i);
   assert.match(capturedOutput.readStdout(), /init inside a repo installs the full catalog into that repo/i);
   assert.match(capturedOutput.readStdout(), /refreshes the skills tracked by the current repo/i);
+  assert.match(capturedOutput.readStdout(), /adopt never copies or overwrites skill files/i);
   assert.match(capturedOutput.readStdout(), /mutates only the current repo/i);
   assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root/i);
   assert.match(capturedOutput.readStdout(), /agents validate fails closed/i);
   assert.match(capturedOutput.readStdout(), /auto-initializes the global catalog if needed/i);
   assert.match(capturedOutput.readStdout(), /remove mutates only the current repo root/i);
-  assert.doesNotMatch(capturedOutput.readStdout(), /vasir doctor/);
   assert.doesNotMatch(capturedOutput.readStdout(), /npx vasir/);
 });
 
@@ -351,22 +365,300 @@ test("--model requires a value", async () => {
   assert.equal(parsedError.code, "MODEL_FLAG_VALUE_REQUIRED");
 });
 
-test("doctor is not part of the public command surface", async () => {
+test("plain vasir defaults to read-only status output", async () => {
   const capturedOutput = captureCommandWriters();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
 
-  const statusCode = await runCommandLine(["node", "vasir", "doctor", "--json"], {
+  const statusCode = await runCommandLine(["node", "vasir"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
     ...capturedOutput
   });
 
-  assert.equal(statusCode, 1);
-  const parsedError = JSON.parse(capturedOutput.readStderr());
-  assert.equal(parsedError.command, "doctor");
-  assert.equal(parsedError.status, "error");
-  assert.equal(parsedError.code, "UNKNOWN_COMMAND");
-  assert.equal(
-    parsedError.docsRef,
-    `${DOCS_BASE_URL}/docs/troubleshooting.md#unknown-command-or-flag`
+  assert.equal(statusCode, 0);
+  assert.match(capturedOutput.readStdout(), /Status/);
+  assert.match(capturedOutput.readStdout(), /Global catalog not initialized yet|Global catalog would refresh/i);
+  assert.match(capturedOutput.readStdout(), /No repo detected/i);
+  assert.equal(capturedOutput.readStderr(), "");
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents")));
+});
+
+test("status supports structured json output for automation consumers", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "# Manual React\n");
+
+  const statusCode = await runCommandLine(["node", "vasir", "status", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "status");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.repoStatus, "adoption-required");
+  assert.equal(parsedOutput.projectConfigFilePath, path.join(projectDirectory, ".agents", "vasir.json"));
+  assert.deepEqual(parsedOutput.unmanagedSkills, ["react"]);
+  assert.ok(Array.isArray(parsedOutput.nextSteps));
+  assert.ok(parsedOutput.nextSteps.some((step) => step.includes("vasir repair")));
+});
+
+test("context returns a purely local repo handshake for llm consumers", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const contextOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({
+      name: "space-admin-console",
+      description: "Frontend console for operators",
+      dependencies: { react: "^19.0.0" },
+      scripts: { dev: "vite" }
+    }, null, 2)}\n`
   );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  writeFile(path.join(projectDirectory, "src", "components", "AGENTS.md"), "# Component Rules\n");
+
+  const contextStatusCode = await runCommandLine(["node", "vasir", "context", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...contextOutput
+  });
+
+  assert.equal(contextStatusCode, 0);
+  const parsedOutput = JSON.parse(contextOutput.readStdout());
+  assert.equal(parsedOutput.command, "context");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.schemaVersion, 2);
+  assert.equal(parsedOutput.execution.mode, "local");
+  assert.equal(parsedOutput.execution.usesModel, false);
+  assert.equal(parsedOutput.execution.usesNetwork, false);
+  assert.equal(parsedOutput.execution.prompts, false);
+  assert.equal(parsedOutput.repoDetected, true);
+  assert.equal(parsedOutput.repoStatus, "tracked");
+  assert.equal(parsedOutput.trackingMode, "selected");
+  assert.equal(parsedOutput.repoFacts.packageJson.name, "space-admin-console");
+  assert.equal(parsedOutput.agentsProfile.profileName, "frontend");
+  assert.equal(parsedOutput.agentsProfile.source, "AGENTS.md");
+  assert.deepEqual(parsedOutput.trackedSkills, ["react"]);
+  assert.deepEqual(parsedOutput.recommendedSkillNames, ["react"]);
+  assert.ok(Array.isArray(parsedOutput.recommendedSkills));
+  assert.ok(parsedOutput.recommendedSkills.some((skillRecommendation) => skillRecommendation.kind === "skillRecommendation"));
+  assert.ok(parsedOutput.recommendedSkills.some((skillRecommendation) => skillRecommendation.skillName === "react"));
+  assert.ok(
+    parsedOutput.recommendedSkills.some(
+      (skillRecommendation) =>
+        skillRecommendation.skillName === "react" &&
+        skillRecommendation.score > 0 &&
+        skillRecommendation.matchedSignals.length > 0
+    )
+  );
+  assert.ok(parsedOutput.relevantAgentsFiles.some((agentsFile) => agentsFile.repoRelativePath === "AGENTS.md"));
+  assert.ok(parsedOutput.relevantAgentsFiles.some((agentsFile) => agentsFile.repoRelativePath === "src/components/AGENTS.md"));
+  assert.equal(parsedOutput.pendingSkillChanges.kind, "pendingSkillChanges");
+  assert.ok(Array.isArray(parsedOutput.nextActions));
+  assert.ok(parsedOutput.nextActions.length > 0);
+  assert.equal(parsedOutput.nextActions[0].kind, "contextAction");
+  assert.deepEqual(parsedOutput.warnings, []);
+});
+
+test("context debug surfaces routing evidence and candidate recommendation detail", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const contextOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({
+      name: "space-admin-console",
+      description: "Frontend console for operators",
+      dependencies: { react: "^19.0.0" },
+      scripts: { dev: "vite" }
+    }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+
+  const contextStatusCode = await runCommandLine(["node", "vasir", "context", "--json", "--debug"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...contextOutput
+  });
+
+  assert.equal(contextStatusCode, 0);
+  const parsedOutput = JSON.parse(contextOutput.readStdout());
+  assert.equal(parsedOutput.debug.kind, "contextDebug");
+  assert.equal(parsedOutput.debug.agentsFileDiscovery.kind, "agentsFileDiscovery");
+  assert.ok(parsedOutput.debug.timingsMs.total >= 0);
+  assert.ok(parsedOutput.debug.agentsFileDiscovery.referencedPathHints.includes("/src/components/AGENTS.md"));
+  assert.equal(parsedOutput.debug.profileInference.kind, "profileInference");
+  assert.ok(Array.isArray(parsedOutput.debug.candidateSkillRecommendations));
+  assert.ok(parsedOutput.debug.candidateSkillRecommendations.some((skillRecommendation) => skillRecommendation.skillName === "react"));
+});
+
+test("context stays useful outside a repo and points to init", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const contextOutput = captureCommandWriters();
+
+  const contextStatusCode = await runCommandLine(["node", "vasir", "context", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...contextOutput
+  });
+
+  assert.equal(contextStatusCode, 0);
+  const parsedOutput = JSON.parse(contextOutput.readStdout());
+  assert.equal(parsedOutput.repoDetected, false);
+  assert.equal(parsedOutput.repoStatus, "no-repo");
+  assert.equal(parsedOutput.repoRootDirectory, null);
+  assert.equal(parsedOutput.nextActions[0].commandText, "vasir init");
+  assert.equal(parsedOutput.execution.usesModel, false);
+});
+
+test("context warns when root AGENTS.md is missing", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const contextOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({
+      name: "space-admin-console",
+      description: "Frontend console for operators",
+      dependencies: { react: "^19.0.0" }
+    }, null, 2)}\n`
+  );
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+  fs.rmSync(path.join(projectDirectory, "AGENTS.md"));
+
+  const contextStatusCode = await runCommandLine(["node", "vasir", "context", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...contextOutput
+  });
+
+  assert.equal(contextStatusCode, 0);
+  const parsedOutput = JSON.parse(contextOutput.readStdout());
+  assert.ok(parsedOutput.warnings.some((warning) => warning.code === "ROOT_AGENTS_MISSING"));
+  assert.equal(parsedOutput.relevantAgentsFiles[0].exists, false);
+});
+
+test("context warns when routed scoped AGENTS.md files are still missing", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+  const contextOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({
+      name: "space-admin-console",
+      description: "Frontend console for operators",
+      dependencies: { react: "^19.0.0" }
+    }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0);
+
+  const contextStatusCode = await runCommandLine(["node", "vasir", "context", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...contextOutput
+  });
+
+  assert.equal(contextStatusCode, 0);
+  const parsedOutput = JSON.parse(contextOutput.readStdout());
+  assert.ok(parsedOutput.relevantAgentsFiles.some((agentsFile) => agentsFile.repoRelativePath === "src/components/AGENTS.md"));
+  assert.ok(parsedOutput.warnings.some((warning) => warning.code === "SCOPED_AGENTS_MISSING"));
+});
+
+test("debug flag is rejected outside context", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "status", "--debug"], capturedOutput);
+
+  assert.equal(statusCode, 1);
+  assert.match(capturedOutput.readStderr(), /INVALID_COMMAND_FLAG/);
+  assert.match(capturedOutput.readStderr(), /--debug is only supported by `vasir context`/);
+});
+
+test("doctor reports repo drift and repair guidance in json mode", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md"), "# Manual React\n");
+
+  const statusCode = await runCommandLine(["node", "vasir", "doctor", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "doctor");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.overallStatus, "attention");
+  assert.ok(parsedOutput.issues.some((issue) => issue.code === "PROJECT_ADOPTION_REQUIRED"));
+  assert.ok(parsedOutput.nextSteps.some((step) => step.includes("vasir repair")));
 });
 
 test("text add output tells a beginner exactly where Vasir wrote project skills", async () => {
@@ -735,6 +1027,7 @@ test("add success supports json output for automation consumers", async () => {
   assert.equal(parsedOutput.command, "add");
   assert.equal(parsedOutput.status, "success");
   assert.equal(parsedOutput.projectRootDirectory, projectDirectory);
+  assert.equal(parsedOutput.projectConfigFilePath, path.join(projectDirectory, ".agents", "vasir.json"));
   assert.deepEqual(parsedOutput.installedSkills, ["react"]);
   assert.deepEqual(parsedOutput.replacedSkills, []);
 });
