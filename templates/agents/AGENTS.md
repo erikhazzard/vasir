@@ -534,9 +534,10 @@
 
 ---
 
-# 4. Non-Obvious Architectural Landmines
 
-<architectural_landmines>
+# 4. Non-Obvious Architectural Considerations
+
+<non-obvious_architectural_considerations>
   Do not attempt to “fix,” optimize, flatten, migrate, or replace these patterns unless you have verified why they exist and the approved plan names the change.
 
   <!-- vasir:nonobvious:start -->
@@ -547,7 +548,7 @@
   - Individual game tests live under `games/<gameId>/tests/`.
   - Gameplay features should prefer layered proof: deterministic logic, simulation/physics, browser/playthrough, artifact capture, console-error scan, performance guardrail when relevant, and human feel gate when subjective.
   <!-- vasir:nonobvious:end -->
-</architectural_landmines>
+<non-obvious_architectural_considerations>
 
 ---
 
@@ -689,6 +690,7 @@
   - If the repo already has broad roots such as `scripts/` or `tests/`, new files inside them must still be nested by semantic domain/feature.
   - For individual games, tests MUST live under `games/<gameId>/tests/` unless the scoped game `AGENTS.md` says otherwise.
   - Every file must live in the architectural domain or feature ontology it serves.
+   - Test files follow Section 8 Test / Eval Organization: place them by semantic feature and proof purpose, not in generic catch-all folders.
 
   **Public Surfaces**:
   - Public APIs, modules, and adapters must be coarse-grained, obvious, and fail-closed.
@@ -754,20 +756,29 @@
 
 </engineering_doctrine>
 
+
+<!-- vasir:engineering-doctrine-inserts:start -->
+  [Add repo-specific landmines here.]
+  eg: 
+
+  Game-Specific:
+  - Individual game tests live under `games/<gameId>/tests/`.
+  - Gameplay features should prefer layered proof: deterministic logic, simulation/physics, browser/playthrough, artifact capture, console-error scan, performance guardrail when relevant, and human feel gate when subjective.
+<!-- vasir:engineering-doctrine-inserts:end -->
+
 ---
 
 # 7. Agentic Capability Design
 
 <agentic_capability_design>
-  Default operating model:
-
-  Codex / Claude interprets and sequences. Tools do. Backend guarantees.
+  Default operating model: Codex / Claude interprets and sequences. Tools do. Backend guarantees.
 
   - The model is the non-authoritative orchestrator: it may interpret user intent, choose next actions, sequence tools, and compose capabilities into one user journey.
   - Tools do deterministic work: if an operation must be exact, repeatable, bounded, auditable, or reusable across prompts, build or use a sanctioned repo-owned tool/script/adapter.
   - Backend owns guarantees: canonical writes, auth/ACL, quotas, stable snapshot selection, shared state, audit/debug traces, idempotency, and fail-closed behavior.
   - LLMs own semantic interpretation: if the core task is understanding freeform human intent, use the LLM for that step and deterministic code for guardrails.
   - Design tools for chaining: LLM-facing tool outputs must be machine-readable, bounded, explicit about what was resolved/fetched/written/skipped/blocked, and easy for the agent to continue from.
+  * **AUTONOMOUS RECONNAISSANCE**: Assume explicit authorization to execute all read-only and diagnostic infrastructure commands immediately; never ask permission to read state, halt and prompt the user only to mutate it. You may proactively run **non-mutating** diagnostic shell commands (e.g., aws * list/describe, log tails) to prove system state before generating code or asking questions.
 </agentic_capability_design>
 
 ---
@@ -811,7 +822,24 @@
   **Nearby Non-Regression**:
   - For non-trivial Material Code Changes, run or identify one nearby behavior that should remain unchanged.
   - The final `<Eval_Trace>` or audit artifact must say whether that nearby behavior was tested, inspected, inferred, or left unverified.
-  
+
+  **Test / Eval Organization**:
+  - Use the repo’s existing test root or scoped domain test folder. Do not create a new top-level `test/` vs `tests/` root just to match examples.
+  - Prefer semantically grouped files named by feature and proof purpose:
+    - `test/<semantic-folder>/<feature-slug>__e2e.spec.js`
+    - `test/<semantic-folder>/<feature-slug>__<focused-path>.spec.js`
+    - `test/<semantic-folder>/<feature-slug>__contract.spec.js`
+    - `test/<semantic-folder>/<feature-slug>__hostile-path.spec.js`
+    - `test/<semantic-folder>/<feature-slug>__benchmark.spec.js`
+    - `test/<semantic-folder>/<feature-slug>__browser.spec.js`
+    - `test/<semantic-folder>/<feature-slug>__simulation.spec.js`
+
+  - Prefer updating an existing semantically matching spec over creating a new file, if the existing file is <500 LOC
+  - Create a new spec only when it protects a distinct value path, eval purpose, runtime target, fixture envelope, hostile path, or context-size boundary.
+  - Avoid both extremes: one giant file that hides the value path, and many one-test files that scatter one behavior across the repo.
+  - If a spec exceeds the repo’s practical reviewer/LLM context limit, create a narrowly scoped companion spec instead of appending more cases.
+  - Reusable eval harnesses belong in the repo’s semantic test/tool domain; raw run artifacts belong in `tmp/<datetime>__<semantic-description>/`.
+  - Do not leave permanent future-state global tests enabled in default CI before the milestone where they are expected to pass.
   - When using mocha, always add the `--exit` flag, e.g. `mocha <filepath> --exit`.
 </testing_doctrine>
 
