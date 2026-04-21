@@ -2,6 +2,8 @@
 
 ## How to use this template
 
+
+
 Copy the skeleton below into a new `SKILL.md`. Replace every `{{placeholder}}` and every `<!-- instruction -->` block with your actual content. Delete this "How to use" section and everything above the `---` frontmatter when you're done.
 
 ### What makes a skill work

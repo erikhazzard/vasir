@@ -460,7 +460,7 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "plan__writing-feature-wip",
+      "name": "plan__maintain-work-spec",
       "description": "Maintains a living FEATURE-WIP markdown file as the durable source of truth for any feature, project, or initiative across sessions. Creates, updates, and audits FEATURE-WIP__*.md docs with epistemic discipline, sourced facts, labeled inferences, explicit contracts, and bounded next actions. Triggers when starting a new feature, resuming work on an in-flight feature, consolidating decisions after a design review or PR, restoring context after context compact, capturing architectural context for handoff, or when the user \"update the WIP,\" \"where did we leave off,\" \"what's the status of,\" \"write up the feature doc,\" or \"plan the feature\" or \"let's spec it out\". Also triggers on requests to define milestones, acceptance criteria, contracts, invariants, scope boundaries, capacity estimates, spec, or decision logs. Produces structured, scannable docs optimized for both human review and LLM re-ingestion.",
       "category": "uncategorized",
       "tags": [],
@@ -469,7 +469,7 @@
       "files": [
         "SKILL.md"
       ],
-      "path": ".agents/skills/plan__writing-feature-wip",
+      "path": ".agents/skills/plan__maintain-work-spec",
       "entry": "SKILL.md"
     },
     {

@@ -1,36 +1,47 @@
 ---
-name: plan__writing-feature-wip
-description: Maintains a living FEATURE-WIP markdown file as the durable source of truth for any feature, project, or initiative across sessions. Creates, updates, and audits FEATURE-WIP__*.md docs with epistemic discipline, sourced facts, labeled inferences, explicit contracts, and bounded next actions. Triggers when starting a new feature, resuming work on an in-flight feature, consolidating decisions after a design review or PR, restoring context after context compact, capturing architectural context for handoff, or when the user "update the WIP," "where did we leave off," "what's the status of," "write up the feature doc," or "plan the feature" or "let's spec it out". Also triggers on requests to define milestones, acceptance criteria, contracts, invariants, scope boundaries, capacity estimates, spec, or decision logs. Produces structured, scannable docs optimized for both human review and LLM re-ingestion.
+name: plan__maintain-work-spec
+description: Creates or updates the durable Work Spec for Broad Feature Work and Planning-Only Work. The Work Spec is the canonical product + UX + engineering + scope + milestone + decision-state artifact for a unit of work. It captures the user/system unlock, current truth, constraints, milestone ladder, approved file/eval envelope, open blockers, and next action. It works in tandem with an eval-plan.md, and the proof-gate design is owned by eval__design-proof-gates. Triggers anytime we are spec'ing out new work, defining milestones, or updating work context files. 
 tools: Read, Grep, Glob, Edit, Write
 model: opus
 ---
 
-# Feature WIP Maintainer
+# Work Spec
+Work Spec = PRD + UX intent + engineering design constraints + milestone ladder + proof contract + decision log + current state
+This is not a brainstorm, not a scratchpad, not a PRD-only doc, and not a status update. It is the canonical spec for a unit of work.
 
-Maintain `docs/features/FEATURE-WIP__<feature-name>.md` as the durable source of truth.
+- This skill file owns and maintains `docs/work/<semantic-folders>/<feature-slug>/work-spec.md` as the durable source of truth.
+This skill file may reference the eval plan, summarize its current gate status, and list the eval-plan path.
+
+- The $eval__design-proof-gates skill owns and maintains the corresponding `docs/work/<semantic-folder>/<feature-slug>/eval-plan.md` 
+Keep `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md` linked and status-synchronized when it exists. Proof-gate design is authoritative only after `$eval__design-proof-gates` has run, or after an existing eval plan is cited as already covering the exact scope.
+
+
+work-spec.md = what we are building, why, scope, constraints, milestone state
+eval-plan.md = how we prove it is real
+
 
 ## Goal
 
-Turn messy, multi-window feature context into a **single, high-signal** WIP file that is:
+Turn messy, multi-window feature context into a **single, high-signal** Work Spec file that is:
 - **Human-friendly:** Quick to scan, stable structure
 - **LLM-friendly:** Explicit contracts, low ambiguity
 - **Reality-anchored:** Separates facts from assumptions
 
 ## When to Use
 
-- Create new `FEATURE-WIP__*.md`
-- Update existing WIP
+- Create a new `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`
+- Update existing Work Spec
 - Consolidate milestones, constraints, contracts
 - Establish feature "source of truth" across sessions
 
 ## Workflow 
 
-1. **Ingest inputs:** Current WIP + new material (PRs, tests, logs, decisions)
+1. **Ingest inputs:** Current Work Spec + new material (PRs, tests, logs, decisions)
 2. **Apply epistemic discipline:** Source everything or label `[UNVERIFIED]`
 3. **Centralize contracts:** Caps, ordering, privacy in Contracts section
 4. **Keep it compact:** ≤5 actions, ≤15 facts, ≤20 references
 5. **Update bookkeeping:** Last updated, change log
-6. **Output:** Write / modify the file, and then give me a short recap
+6. **Output:** Write or modify the Work Spec artifact, update linked eval-plan status if applicable, and return the Skill Result fields. Do not emit the root `<Recap>`; the calling agent owns the final human-facing response.
 
 ## Non-Negotiable Rules
 
@@ -45,7 +56,8 @@ Never renumber existing IDs:
 - Plans: `P-###`
 - Sources: `SRC-###`
 - Actions: `A1`…`A5`
-- Milestones: `M1`, `M2`, `M3.1`
+- Contracts/Invariants: `C-###`
+- Milestones: `<FEATURE-SLUG>__M1`, `<FEATURE-SLUG>__M2`, `<FEATURE-SLUG>__M3.1`
 
 ### Truth Labeling
 - `[FACT]` — sourced
@@ -53,10 +65,21 @@ Never renumber existing IDs:
 - `[PLAN]` — future intent
 - `[UNVERIFIED]` — no source (even if "obvious")
 
+## Milestone Namespace Rule
+
+Milestones must be globally unambiguous across durable Work Spec / eval artifacts.
+
+Rules:
+- Do not use naked `M1`, `M2`, `Phase 1`, or `Step 2` across files.
+- Prefix milestone IDs with the semantic feature/work slug. 
+  - Example: `REPLAY-PROJECTION__M1`,  `FRIEND-LIST-PRESENCE__M1`, `SPRITE-KIT-CATALOG__M2`, `REPLAY-PROJECTION__M3`.
+- Cross-file references must use the full prefixed ID.
+- If an agent encounters an ambiguous naked milestone reference, it must halt and ask for clarification or emit a Plan Delta naming the ambiguity.
+
 ## Template Structure
 
 ```markdown
-# FEATURE-WIP — <FEATURE_NAME>
+# WORK SPEC — <FEATURE_NAME>
 **Last updated:** YYYY-MM-DD  
 **Status:** Draft | In Progress | Blocked | Done  
 **Owners:** <humans/teams>  
@@ -76,7 +99,7 @@ Never renumber existing IDs:
 
 ## Doc Conventions (Do Not Delete)
 
-- **Stable structure:** Do not reorder or rename top-level sections `1..11`.
+- **Stable structure:** Do not reorder or rename top-level sections `1..8` or Appendix sections `A1..A5`.
 - **Stable IDs:** Never renumber existing IDs. Append new IDs only.
   - Facts: `F-###`
   - Unverified: `U-###`
@@ -85,7 +108,7 @@ Never renumber existing IDs:
   - Contracts/Invariants: `C-###`
   - Sources: `SRC-###`
   - Actions: `A1`…`A5`
-  - Milestones: `M1`, `M2`, `M3.1` (no duplicates)
+  - Milestones: `<FEATURE-SLUG>__M1`, `<FEATURE-SLUG>__M2`, `<FEATURE-SLUG>__M3.1` (no duplicates)
 - **Truth labeling:** If it’s not sourced, it must be `[UNVERIFIED]` even if it seems obvious.
 - **Contracts live in Section 4 only.** Elsewhere, reference `C-###` rather than restating rules.
 - **Keep it compact:** Next actions ≤ 5. Facts target ≤ 15 bullets. References target ≤ 20.
@@ -255,12 +278,12 @@ Include compact JSON examples where helpful.
 
 ### 5.1 Milestone index
 
-| ID | Goal + User Journey | State (Planned/In Progress/Done/Cut) | Acceptance criteria (tests + behavior) | Rollback shape | Complexity | Risk | Perf Impact | Cost Impact | Notes |
+| ID | Goal + User Journey | State (Proposed/Approved/In Progress/Objectively Green/Waiting Human/Blocked/Complete/Cut) | Acceptance criteria (tests + behavior) | Rollback shape | Complexity | Risk | Perf Impact | Cost Impact | Notes |
 |---|---|---|---|---|---|---|---|---|---|
-| M1 |  |   |   |   |   |   |   |   |   |
-| M2 |  |   |   |   |   |   |   |   |   |
+| <FEATURE-SLUG>__M1 |  |   |   |   |   |   |   |   |   |
+| <FEATURE-SLUG>__M2 |  |   |   |   |   |   |   |   |   |
 ...
-| Mn |  |   |   |   |   |   |   |   |   |
+| <FEATURE-SLUG>__Mn |  |   |   |   |   |   |   |   |   |
 
 
 ### 5.2 Milestone details (user journey first)
@@ -272,7 +295,7 @@ For a milestone and the subwork within a milestone to be done, the **value path*
 
 ---
 
-#### M1 — <title>
+#### <FEATURE-SLUG>__M1 — <title>
 
 - **Goal:** <capability unlocked>
 - **User journey:** Actor + entry + 3–5 steps + success (observable)
@@ -286,14 +309,19 @@ For a milestone and the subwork within a milestone to be done, the **value path*
 - **Context propagation checks:** reference `C-###`
 - **Acceptance criteria:** concrete tests + expected behavior
 
-#### Mn... — <title>
-Each additional milestone must follow format of M1
+#### <FEATURE-SLUG>__Mn... — <title>
+Each additional milestone must follow format of <FEATURE-SLUG>__M1
 
-<same fields as M1>
+<same fields as <FEATURE-SLUG>__M1>
 
 ---
 
 ## 6. Capacity & Cost (Napkin Math)
+For features that do not affect persistence, infra cost, external services, hot paths, storage, model/tool calls, or production load, write:
+- [FACT F-___] Capacity/cost impact is not applicable because <reason>. — (SRC-___)
+
+Do not perform the 100m-user Feynman estimate unless the feature changes production resource usage or an operator cost surface.
+
 ### 6.1. Infra Math
 * **Assumptions:** State the numbers (e.g., 10k CCU, 50 events/sec/user).
 * **Throughput:** Calculate required Read/Write OPS.
@@ -303,7 +331,8 @@ Each additional milestone must follow format of M1
 ### 6.2. Feynman Cost Estimate
 Conduct a Feynman Cost Estimate for the total production load cost by deconstructing the feature(s) into their fundamental cost drivers, use Fermi estimation to confidently approximate any missing values with stated assumptions, and calculate the final Total Net $/Month Increase.
 Assume 100m users, with 10mm DAUs. Scale all numbers around these assumptions.
-* **Total Additional Net $ per mont**: You must provide this number.
+* **Total Additional Net $ per month**: You must provide this number.
+
 
 --- 
 
@@ -384,10 +413,14 @@ This appendix can hold a full build spec when needed. It should expand on *mecha
 
 ### A4.5 Open Ended Comments / Notes
 - Any other notes / comments / feedback / guidance
+- This is a broad place to store any other relevant context.
 
 ```
 
 ## Quality Bar
+- Milestones use full prefixed IDs, not naked `M1` / `M2`.
+- Every milestone ends in an observable value state.
+- Every implementation-ready milestone references objective eval-plan gates or names the exact blocker.
 
 Before output:
 - Contracts appear ONLY in section 4
@@ -396,17 +429,18 @@ Before output:
 - Next actions ≤ 5
 - Contradictions in Open Questions, not smoothed over
 
+## Skill Result
+After writing or updating the Work Spec, report these fields to the calling agent:
 
-## Post Spec
-After writing the spec file and doing work, always give me your recap in exactly this format:
+- Work Spec path:
+- Eval plan path:
+- Eval plan coverage: [Missing | Existing covers exact scope | Needs `$eval__design-proof-gates` | Updated from eval skill result]
+- Feature slug:
+- Approval state:
+- Proposed milestone IDs:
+- Proof-of-Value State:
+- File target envelope:
+- Open blockers:
+- Recommended next action:
 
-**Checkpoint — [A# you just completed]** <FEATURE-WIP__filename (the filename you're working off if. If none, say "none")>
-- **Did:** <1 liner — what you built/changed, with file paths>
-- **User Journey Unlocks:** <1 liner — what user journey or capability now works>
-- **Tested:** <1 liner — what you verified and how>
-- **Plan impact:** <one of the following>
-  - ✅ **On track** — nothing changes
-  - ⚠️ **Adjust** — <what actions to add/remove/reorder and why>
-  - 🔴 **Replan** — <why the current plan is wrong, what changed>
-- **Need from me:** <blocking question (what you need from "me", the developer) + your suggestion, or "Nothing">
-- **Suggest next:** <what to do next and why — may be "update the WIP before continuing">
+The root AGENTS.md owns the final human-facing recap format.

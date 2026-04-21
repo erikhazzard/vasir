@@ -15,14 +15,12 @@ Use this only for advanced composition when the frontend profile is close but no
 * **Accessibility:** Interactive behavior must stay semantic and keyboard reachable.
 * **Performance:** Avoid unbounded rerender fan-out, bundle-size spikes, and layout thrash in hot interaction paths.
 
-## Suggested Landmines
-
+## Landmines
 * Data loading, hydration, and optimistic UI behavior may be intentionally asymmetric.
 * Some state must remain local to avoid whole-tree rerenders.
 * CSS ordering or token resolution may depend on a non-obvious build step.
 
-## Suggested Philosophy
-
-* Prefer explicit state ownership over hook soup.
-* Prefer intentional design systems over ad hoc one-off component styling.
-* Do not abstract shared UI until repetition proves a stable shape.
+# Philosophical Mandates
+- **AVOID USEEFFECT - SECOND-ORDER REACTIVE TRACING**: Never write a useEffect or async state mutation without first explicitly documenting its failure path. You must logically prove that transitioning into an error state will not infinitely re-trigger the exact effect that initiated the call.
+- **EXTERNAL QUARANTINE**: Assume any use of useEffect is a catastrophic hallucination unless it is strictly synchronizing a non-React external system (e.g., WebSockets, raw DOM).
+- **CONSENT INTERCEPTION**: All destructive mutations must yield to the global custom confirmation modal state; the API execution must be strictly blocked until explicit user consent is resolved.

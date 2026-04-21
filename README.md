@@ -6,6 +6,27 @@ Vasir is a curated library of skill files: dense markdown control surfaces that 
 
 The product is the markdown itself. The CLI exists to make the correct `.agents` / `.claude` / `.codex` filesystem shape boring and repeatable.
 
+## What Vasir Adds To A Repo
+
+Vasir adds two things to the repo you care about:
+
+1. `AGENTS.md`
+   This is the repo-specific spine. It tells the AI what this repo is, what matters here, how to route work, and what "good" means in this codebase.
+2. `.agents/skills/`
+   These are the reusable specialist playbooks. Each skill helps with a specific class of work like bug fixing, testing, frontend work, audits, or game systems.
+
+The power is in the combination:
+
+- `AGENTS.md` gives the AI repo-specific behavior.
+- `skills` give the AI reusable specialist depth.
+- Vasir makes sure both show up in the repo in a clean, updateable shape.
+
+If you are new to AI or agents, the simplest mental model is:
+
+- `AGENTS.md` is the repo's operating manual for AI.
+- `.agents/skills/` is the repo's library of specialist playbooks.
+- `vasir init` puts both into the repo.
+
 ## Quick Start
 
 Vasir is not published on npm yet. Install it directly from GitHub for now, and pin a tag or commit in production:
@@ -27,6 +48,26 @@ Prerequisites:
 
 - Node 18.17+
 
+If you just want to use this in an existing repo, the beginner path is:
+
+```bash
+cd /path/to/your-repo
+vasir init
+```
+
+That will:
+
+- install the full Vasir skill catalog into `.agents/skills/`
+- create `.agents/vasir.json` so the repo can stay in sync later
+- create `.agents/vasir-install-state.json` for safe updates
+- seed `AGENTS.md` if it does not already exist
+
+Then:
+
+1. open `AGENTS.md`
+2. replace the placeholder purpose/routing text with repo truth
+3. commit `AGENTS.md` and `.agents/`
+
 Verify first success:
 
 1. `vasir --version` prints the installed CLI version.
@@ -40,6 +81,12 @@ Verify first success:
 9. Optional: run `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, then `vasir agents validate`.
 
 `vasir init` is now the obvious repo path: inside a repo it installs the full catalog and marks that repo to keep tracking the full catalog on future `vasir update` runs.
+
+Important distinction:
+
+- `AGENTS.md` is not just a blank template. The value is the repo-specific version you end up with after editing it.
+- the skills are not repo-specific by default. They are reusable specialist playbooks copied into the repo.
+- Vasir works best when both are present: repo-specific `AGENTS.md` plus the right skill library.
 
 The zero-argument path is now read-only. `vasir` defaults to `vasir status`, so the safest inspect-first command is also the shortest one.
 
