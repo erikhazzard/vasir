@@ -1,13 +1,15 @@
 ---
 name: explaining__creating-interactive-articles
-description: Create S-tier fully offline, D3-first interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations
+description: Create S-tier fully offline, D3-first interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations; starts new requests with a targeted five-question alignment grill
 user_invocable: true
 ---
 # Interactive Technical Explanations
 
 Create **fully offline, web-based explanatory articles** for technical concepts. The output is prose plus figures, not a dashboard, coding tutorial, slide deck, app shell, or demo gallery. The article should help a reader build a correct mental model and predict behavior they could not predict before.
 
-The default mode is **generator-first**. Use the context already available, infer responsibly, state assumptions briefly, and proceed. Ask a question only when missing information would make the artifact technically wrong, unsafe, or impossible to scope. Never ask for information the user already gave.
+The default mode is **alignment-first, then generator-first**. Before creating, revising, auditing, or outlining an article, ask a short **alignment grill** of about five targeted questions based on the user's initial request. The questions should clarify the article itself: reader, prerequisite level, core learning target, misconception or risk, source truth, simplification boundary, and the interaction that will make the concept click. Pause for answers before doing the substantive work.
+
+Do not turn this into a long questionnaire. Ask five questions by default, depending on the context the user sends. Ask fewer only when the user already supplied an answer, explicitly says “no questions / proceed,” or the task is a tiny mechanical edit. Never ask for information the user already gave. Each question must include a recommended default or 2-3 concrete options so the user can accept, reject, or tweak instead of inventing the answer from scratch. After the user answers, proceed generator-first: infer responsibly, state remaining assumptions briefly, and build, outline, revise, or audit without re-litigating intake.
 
 **Reference files:**
 
@@ -82,7 +84,7 @@ Offline comes first. Never load D3 from a CDN. Inline D3 into the article when p
 
 This is a generator with internal rigor. Do the reasoning work, but do not force the user through every intermediate step unless the project is ambiguous or the user asks for collaboration.
 
-### Phase 0: Intake and Operating Assumptions
+### Phase 0: Alignment Grill and Operating Assumptions
 
 Classify the request:
 
@@ -92,6 +94,28 @@ Classify the request:
 - **Revise:** improve an existing article.
 - **Audit:** evaluate an existing explainer.
 
+Classify this internally. Do not make “what artifact do you want?” the first grill question for a normal new-article request; the point of the skill is to make the article. Default to **Build** unless the user asks for outline, prototype, revision, or audit.
+
+Before Phase 1, run the alignment grill unless the user explicitly opts out or already supplied the needed answers. The grill is not a generic form; tailor it to the exact concept, source material, article thesis, reader risk, and likely visualization strategy in the request.
+
+Use this five-question shape by default:
+
+1. **Reader and prerequisite:** clarify who the article is for and what they already know. Recommend a default audience based on the request.
+2. **Core learning target:** identify the one behavior, mechanism, or relationship the reader should be able to explain or predict afterward. Suggest the likely target if the request implies one.
+3. **Misconception or failure mode:** ask what wrong mental model, surprising behavior, or common mistake the article should correct. Offer 2-3 plausible misconceptions when possible.
+4. **Source truth and simplification boundary:** ask which sources, docs, papers, datasets, equations, or assumptions should govern the model, and what can be simplified. Recommend a grounding strategy when no source is provided.
+5. **Interactive explanation strategy:** ask what the central interactive figure should let the reader manipulate, predict, compare, or inspect. Recommend the strongest interaction concept based on the topic.
+
+Question quality rules:
+
+- Ask concrete, request-specific questions; avoid “any preferences?” and other empty prompts.
+- Every question must include a recommendation, proposed default, or short option set. Format it as: “My recommendation: X. Alternatives: A / B.”
+- Recommendations should be opinionated and concept-specific, not generic. Bad: “Default: general audience.” Good: “My recommendation: senior engineers who understand queues but have not internalized backpressure.”
+- Do not ask the user to confirm that they want an article, artifact, offline HTML, or D3 unless their request genuinely conflicts with the skill’s default deliverable.
+- Grill for alignment, not permission. Once the user answers, proceed without asking a second batch.
+- If answers conflict or omit a fact needed for correctness, ask one focused blocking follow-up; otherwise state remaining assumptions and continue.
+- If the user ignores the grill or says to proceed, use the defaults below and continue.
+
 If the user gives a brief prompt, use these defaults unless contradicted:
 
 - Audience: technically curious reader who is new to this exact concept.
@@ -99,8 +123,6 @@ If the user gives a brief prompt, use these defaults unless contradicted:
 - Output: one standalone `index.html` unless the concept clearly needs a series.
 - Scope: one core insight plus supporting mechanics, not an encyclopedia.
 - Visual implementation: D3 v7 for nontrivial figures, bundled offline.
-
-Ask at most one blocking question when needed. Otherwise state assumptions and continue.
 
 ### Phase 1: Source Grounding and Concept Model
 
@@ -262,6 +284,14 @@ After building, open the result in a browser when available. If browser preview 
 
 ## Output Format
 
+For a new request that has not passed intake, provide only the alignment grill:
+
+1. One short sentence that frames the questions as alignment before build.
+2. Exactly five numbered, request-specific questions unless prior context makes fewer appropriate.
+3. A short default fallback only when useful: “Anything unanswered will use the skill defaults.”
+
+Do not include an outline, plan, code, or artifact in the same response as the initial grill unless the user explicitly asked to skip questions.
+
 When delivering a completed article, provide:
 
 1. A one-sentence description of what was built.
@@ -342,9 +372,12 @@ Better: one slider that controls the parameter responsible for the misconception
 Bad: “Insight box.”
 Better: a strong sentence in the prose or a caption that directs attention.
 
+Bad: “I’ll assume X and build” after a new underspecified request.
+Better: five sharp alignment questions that lock audience, scope, source truth, learning target, and interaction constraints before work begins.
+
 ## Edge Case Handling
 
-**Vague request.** Infer audience and scope, state assumptions, and produce a compact plan or artifact. Ask only if the concept itself is unclear.
+**Vague request.** Run the alignment grill first. If the user does not answer or says to proceed, infer audience and scope, state assumptions, and produce a compact plan or artifact. Ask an extra blocking question only if the concept itself is unclear.
 
 **User supplies dense source material.** Extract the concept model first. Do not visualize every detail. Pick the one causal mechanism or abstraction that unlocks the rest.
 
