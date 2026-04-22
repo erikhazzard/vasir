@@ -1,34 +1,34 @@
 ---
 name: explaining__creating-interactive-articles
-description: Create fully offline, interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations
+description: Create S-tier fully offline, D3-first interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations
 user_invocable: true
 ---
-
-
 # Interactive Technical Explanations
-Creates **fully offline, web-based explanatory articles** for technical concepts. The output is prose plus figures, not a dashboard, coding tutorial, slide deck, or demo gallery. The article should help a reader build a correct mental model.
+
+Create **fully offline, web-based explanatory articles** for technical concepts. The output is prose plus figures, not a dashboard, coding tutorial, slide deck, app shell, or demo gallery. The article should help a reader build a correct mental model and predict behavior they could not predict before.
 
 The default mode is **generator-first**. Use the context already available, infer responsibly, state assumptions briefly, and proceed. Ask a question only when missing information would make the artifact technically wrong, unsafe, or impossible to scope. Never ask for information the user already gave.
 
 **Reference files:**
 
-* `references/article.md` HTML scaffold, fully offline delivery rules, layout patterns, state coordination, QA
-* `references/visuals.md` visualization, interaction, D3/vanilla implementation, accessibility, validation
-* `references/writing-style.md` required writing style for article prose, captions, prompts, headings, notes, and delivery summaries
+- `references/article.md` offline HTML scaffold, D3-ready article layout, state coordination, responsive patterns, QA
+- `references/visuals.md` D3 v7 visualization patterns, interaction recipes, chart choices, accessibility, validation
+- `references/writing-style.md` required writing style for article prose, captions, prompts, headings, notes, and delivery summaries
 
 ## Mission Standard
 
-An article succeeds when a reader can predict behavior they could not predict before. It is not enough for the page to be attractive or interactive.
+An article succeeds when a reader can predict behavior they could not predict before. It is not enough for the page to be attractive, animated, or interactive.
 
-Every artifact must satisfy seven standards:
+Every artifact must satisfy these standards:
 
 1. **Truthful model.** Claims, equations, generated data, and simulations are grounded in source material or clearly marked as simplified.
-2. **Narrative progression.** Sections appear in dependency order: concrete example, visible mechanism, abstraction, application, limitation.
+2. **Narrative progression.** Sections appear in dependency order: concrete case, visible mechanism, abstraction, application, limitation.
 3. **Interaction with a job.** Each interactive element supports prediction, manipulation, comparison, inspection, linking, or reflection.
 4. **Interesting defaults.** Every figure teaches before the reader touches anything.
-5. **Fully offline delivery.** No CDN, remote fonts, remote scripts, external image hosts, or runtime network requests.
-6. **Accessible, robust behavior.** Captions, keyboard-accessible controls, non-color-only encodings, reduced-motion handling, responsive layout, and no console errors.
-7. **Required writing style.** All prose follows `references/writing-style.md` without weakening truth, technical clarity, or figure comprehension.
+5. **D3-first visuals.** Use D3 v7 for nontrivial charts, scales, axes, layouts, transitions, brushing, Delaunay hover, data joins, and cross-chart dispatch.
+6. **Fully offline delivery.** No CDN, remote fonts, remote scripts, external image hosts, runtime API calls, or remote datasets.
+7. **Accessible, robust behavior.** Captions, keyboard-accessible controls, non-color-only encodings, reduced-motion handling, responsive layout, and no console errors.
+8. **Required writing style.** All prose follows `references/writing-style.md` without weakening truth, technical clarity, or figure comprehension.
 
 ## Articles, Not Dashboards
 
@@ -46,18 +46,37 @@ Avoid dashboard defaults unless there is a specific explanatory rationale:
 - Generic blue-purple palettes unrelated to the concept.
 - Emoji headers or decorative icons.
 - A sandbox at the top of the article before the reader knows what to look for.
+- Generic “insight,” “tip,” or “key takeaway” callout boxes.
 
 Rationale-based exception: a card, badge, or colored region is allowed only when it represents a concept-specific object or state in the explanation. Example: small “cells” in a memory-allocation article may be card-like because memory blocks are the content. A generic “Insight” card is not enough.
 
 ## Explanations, Not Coding Tutorials
 
-Do not show implementation code unless code itself is the concept being explained. Prefer equations, diagrams, state machines, timelines, tables, and interactive examples. Use pseudocode only when it clarifies a mechanism that prose and diagrams cannot, and keep it short.
+Do not show implementation code to the reader unless code itself is the concept being explained. Prefer equations, diagrams, state machines, timelines, tables, and interactive examples. Use pseudocode only when it clarifies a mechanism that prose and diagrams cannot, and keep it short.
+
+Internal implementation code is different. The page script **should use D3** when D3 improves the figure. Do not let the reader-facing “not a coding tutorial” rule suppress internal D3 implementation.
 
 Code policy:
 
-- **Allowed:** a 4-line recurrence, state transition, or algorithm sketch paired with a figure.
-- **Avoid:** framework boilerplate, D3 code, shader code, API calls, build steps, or implementation internals.
+- **Reader-facing allowed:** a 4-line recurrence, state transition, or algorithm sketch paired with a figure.
+- **Reader-facing avoid:** framework boilerplate, D3 implementation snippets, shader code, API calls, build steps, or implementation internals.
+- **Internal page scripts:** D3 v7 is the preferred tool for chart-heavy articles.
 - **Exception:** if the article is specifically about programming behavior, show the smallest code fragment that creates the phenomenon, then return to explanation.
+
+## D3 and Offline Policy
+
+D3 v7 is the default visualization library. Use it directly. Do not wrap it in a framework. D3 owns chart DOM.
+
+Use D3 for:
+
+- scales, axes, bins, stacks, groups, rollups, hierarchy, force layouts, geographic projections, color scales, and interpolation;
+- keyed data joins with `.join()`;
+- object-constant transitions;
+- `d3.dispatch` for linked views;
+- `d3.brush`, `d3.drag`, and Delaunay/Voronoi hover;
+- line, area, arc, pie, chord, treemap, pack, tree, partition, contour, and density generators.
+
+Offline comes first. Never load D3 from a CDN. Inline D3 into the article when practical, or bundle `lib/d3.v7.min.js` locally and package the whole project as a zip. Use vanilla JS only for simple HTML-only interactions or when the figure genuinely does not need D3. Do not silently downgrade a chart-heavy article to weak vanilla code because a CDN is unavailable.
 
 ## Process
 
@@ -79,6 +98,7 @@ If the user gives a brief prompt, use these defaults unless contradicted:
 - Style: follow `references/writing-style.md`: concrete mechanisms, old-to-new flow, plain force, no AI-default prose, no hype.
 - Output: one standalone `index.html` unless the concept clearly needs a series.
 - Scope: one core insight plus supporting mechanics, not an encyclopedia.
+- Visual implementation: D3 v7 for nontrivial figures, bundled offline.
 
 Ask at most one blocking question when needed. Otherwise state assumptions and continue.
 
@@ -153,7 +173,7 @@ Each figure spec must include:
 - **Misconception addressed:** if any.
 - **Interaction type:** slider, drag, hover, brush, linked view, scroll step, animation, prediction reveal, etc.
 - **Static gate:** why a static figure is insufficient. If static is enough, make it static.
-- **Technology choice:** SVG, Canvas, HTML/CSS, D3, or hybrid.
+- **Technology choice:** D3/SVG, D3/Canvas, D3/HTML, D3 hybrid, or static SVG/HTML for trivial figures.
 - **Accessibility fallback:** caption, keyboard path, description, data/model summary.
 - **Validation checks:** sanity checks, edge cases, and expected behavior at extremes.
 
@@ -171,6 +191,7 @@ System response: Path updates; overshoot appears when step crosses the basin.
 Intended insight: The gradient gives direction, but learning rate determines distance.
 Misconception: “Bigger learning rate is simply faster.”
 Static gate: Static path cannot show the parameter tradeoff across values.
+Technology: D3/SVG with scales, line generator, transition, and keyed path updates.
 Accessibility fallback: Keyboard slider, text summary of convergence/overshoot state.
 Validation: lr=0 stalls; lr≈safe converges; lr high oscillates or diverges.
 ```
@@ -182,10 +203,14 @@ Build from the plan. If the user asked for a complete artifact, do not stop afte
 Implementation rules:
 
 - Create the project in `tmp/project-name/` when that path is available. Otherwise use the current artifact directory and preserve the same internal structure.
-- Default to one standalone `index.html` with inline CSS, JS, SVG, data, and model definitions.
+- Default to one standalone `index.html` with inline CSS, JS, SVG, data, model definitions, and inlined D3 when feasible.
+- For larger projects, create `lib/d3.v7.min.js` as a local bundled dependency and package the full directory as a zip.
 - Use no CDN and no runtime network request.
 - Use no remote fonts. Use local/system font stacks.
-- Use D3 only if it is already available locally and can be inlined or bundled offline. If not, use vanilla SVG/Canvas/HTML.
+- Use D3 v7 for nontrivial charts and interactive figures.
+- Use `.join()` with key functions for object constancy when updating marks.
+- Use `d3.dispatch` or a tiny store for linked views and state coordination.
+- Use `ResizeObserver` for responsive redraws. Redraw text-heavy charts rather than scaling text with only `viewBox`.
 - Generated data must be deterministic with a seeded random generator.
 - Real data must include provenance and transformation notes.
 - Prose and figures should be written together. The prose tells the reader what to notice.
@@ -214,13 +239,14 @@ Before delivering, run this checklist. If a check cannot be performed, disclose 
 - The design language is specific to the concept. If the topic changed, visual choices would need to change.
 - Captions say what to notice, not merely what is present.
 - There is no generic AI ornamentation.
-- There is no implementation-code drift.
+- Reader-facing prose does not drift into implementation tutorial mode.
 - Prose follows `references/writing-style.md`: no grand openers, negation-pivot drama, hollow hype, generic transitions, fake profundity, decorative metaphor, summary endings, or fabricated concrete details.
 - Each section gives the reader a portable handle: a named mechanism, pattern, variable relationship, visual convention, or boundary they can use after reading.
 
 #### Runtime and Accessibility
 
 - Fully offline: no external script, style, font, image, data, or network request.
+- D3 is inlined or loaded from a bundled local file.
 - Opens without console errors.
 - Works at desktop width and about 400px width.
 - Controls are labeled and keyboard-accessible.
@@ -286,6 +312,20 @@ Apply it as a technical-explainer style, not as decorative essay cosplay:
 - **Support self-explanation.** Use small prompts like “What changed when the parameter crossed this point?”
 - **Reset cleanly.** Loops and simulations must return to a known state.
 
+## D3 Implementation Contract
+
+Every nontrivial chart should have:
+
+- margin convention;
+- named scales;
+- keyed joins;
+- one clear `render` or `update` function;
+- responsive redraw through `ResizeObserver`;
+- readable axes and labels;
+- direct labels where possible;
+- captions that interpret the figure;
+- D3 patterns from `references/visuals.md` for hover, brushes, drag, transitions, chart generators, hierarchy, binning, stacking, dispatch, and performance.
+
 ## Anti-Slop by Rationale
 
 Do not merely avoid bad patterns. Replace them with concept-specific choices.
@@ -303,11 +343,21 @@ Bad: “Insight box.”
 Better: a strong sentence in the prose or a caption that directs attention.
 
 ## Edge Case Handling
+
 **Vague request.** Infer audience and scope, state assumptions, and produce a compact plan or artifact. Ask only if the concept itself is unclear.
+
 **User supplies dense source material.** Extract the concept model first. Do not visualize every detail. Pick the one causal mechanism or abstraction that unlocks the rest.
+
 **Missing or uncertain source.** Research or ask. If neither is possible, mark the model provisional and avoid authoritative claims.
+
 **Conflicting interpretations.** Present the article around the stable core. Put disagreement in a limitation section or compare models if the disagreement is the point.
-**Programming concept.** Explain behavior, state, and invariants. Use minimal code only when code is the object of explanation.
+
+**Programming concept.** Explain behavior, state, and invariants. Use minimal code only when code is the object of explanation. Use internal D3 normally for figures.
+
 **Large real dataset.** Prefer summarized, transformed, or sampled data when the purpose is explanation. Keep the article offline. Document sampling and transformation.
+
+**D3 library unavailable.** Do not use a remote URL. Inline or bundle a local copy when available. If the environment truly lacks a D3 source, create the article with a local `lib/d3.v7.min.js` dependency clearly listed in the project and disclose that the library file must be supplied before offline runtime verification.
+
 **No browser available.** Run static checks, inspect generated code, and disclose that runtime interaction was not browser-verified.
+
 **User asks for a dashboard.** Build an article. If they truly need monitoring or decision-support UI, this is the wrong tool and suggest a dashboard workflow.

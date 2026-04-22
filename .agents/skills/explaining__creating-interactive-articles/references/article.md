@@ -1,40 +1,53 @@
 ---
 name: article
-description: Fully offline HTML scaffold, CSS foundation, article layout patterns, state coordination, and delivery QA for moonshine explanations
+description: Fully offline D3-ready HTML scaffold, CSS foundation, article layout patterns, state coordination, responsive rendering, and delivery QA for explanations
 ---
 
 # Article Structure
 
-Moonshine articles are self-contained, fully offline explanations. The HTML file should open from disk without a network connection and still render the article, figures, controls, data, styles, and scripts.
+Articles are self-contained, fully offline explanations. The HTML file should open from disk without a network connection and still render the article, D3 figures, controls, data, styles, and scripts.
+
+## Tech Stack
+
+Use self-contained HTML, CSS, JavaScript, SVG, Canvas, and **D3 v7**. No build tools, no frameworks, no remote resources.
+
+D3 is the primary visualization tool. Bundle it offline by either:
+
+- inlining D3 into `index.html`, or
+- loading `./lib/d3.v7.min.js` from the packaged project directory.
+
+Never load D3, KaTeX, TopoJSON, fonts, data, images, or styles from a CDN or remote URL.
 
 ## Output Location
 
-Default project layout:
+Default single-file project layout:
 
 ```text
-~/.agent/moonshine/project-name/
+tmp/explaining__creating-interactive-articles/project-name/
   index.html          # standalone article, all CSS/JS/data inline by default
+```
+
+D3-heavy or library-heavy project layout:
+
+```text
+tmp/explaining__creating-interactive-articles/project-name/
+  index.html
+  lib/d3.v7.min.js    # local only, package with the zip
+  data/source.csv     # optional local data, no remote fetches
 ```
 
 For a series:
 
 ```text
-~/.agent/moonshine/project-name/
+tmp/explaining__creating-interactive-articles/project-name/
   index.html          # series index, itself an article
   01-first-concept.html
   02-second-concept.html
+  lib/d3.v7.min.js    # shared local library if not inlined
+  data/               # optional local shared datasets
 ```
 
-For unusually large local data or vendored libraries, use local files only and package the whole project as a zip:
-
-```text
-~/.agent/moonshine/project-name/
-  index.html
-  data/source.csv     # local only, no fetch from remote URLs
-  lib/d3.v7.min.js    # local only, when legally available and necessary
-```
-
-Prefer a single HTML file. Use separate local files only when size or maintainability makes one file unreasonable.
+Prefer a single HTML file. Use separate local files only when size or maintainability makes one file unreasonable. If separate files are used, deliver the full directory as a zip.
 
 ## Fully Offline Rules
 
@@ -45,15 +58,16 @@ No article may depend on:
 - Remote images or iframes.
 - Runtime API calls.
 - Remote datasets.
-- Browser extensions or build tools.
+- Browser extensions.
+- Build tools.
 
-Use system font stacks. If D3, KaTeX, TopoJSON, or another library is necessary, inline it or load it from a local bundled file. If the local library is unavailable, use vanilla JavaScript, SVG, Canvas, HTML, CSS, or MathML instead.
+Use system font stacks. If D3, KaTeX, TopoJSON, d3-sankey, or another library is necessary, inline it or load it from a local bundled file. Do not replace a D3-worthy figure with weaker code only to avoid vendoring D3; bundle D3 instead.
 
 Self-contained means the reader can download the file or zip, disconnect from the internet, and read the article.
 
 ## HTML Scaffold
 
-Start from this scaffold. Adapt colors and visual language to the concept, but keep the article structure, readable typography, responsive behavior, and accessibility patterns.
+Start from this scaffold. Adapt colors and visual language to the concept, but keep the article structure, readable typography, responsive behavior, D3 state coordination, and accessibility patterns.
 
 ```html
 <!DOCTYPE html>
@@ -62,6 +76,8 @@ Start from this scaffold. Adapt colors and visual language to the concept, but k
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Explanation Title</title>
+<!-- D3 must be local or inlined. Never use a CDN. -->
+<script src="./lib/d3.v7.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 html { color-scheme: light; }
@@ -212,6 +228,23 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .assessment .answer { display: none; color: var(--text-2); }
 .assessment.revealed .answer { display: block; }
 
+.tip {
+  position: fixed;
+  z-index: 10;
+  max-width: 18rem;
+  padding: 0.45rem 0.6rem;
+  font-family: var(--heading-font);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--text);
+  background: var(--fig-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.08);
+  pointer-events: none;
+  opacity: 0;
+}
+
 svg { max-width: 100%; height: auto; display: block; }
 svg text { font-family: var(--heading-font); }
 svg .axis text { font-size: 11px; fill: var(--text-2); }
@@ -280,7 +313,7 @@ footer {
   </section>
 
   <footer>
-    <p>Sources, data provenance, simplifications, and credits. Built as a fully offline Moonshine article.</p>
+    <p>Sources, data provenance, simplifications, and credits. Built as a fully offline article.</p>
   </footer>
 </main>
 
@@ -288,29 +321,53 @@ footer {
 (() => {
   "use strict";
 
-  const state = { param: 0.5, reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches };
-  const bus = new EventTarget();
-
-  function emit(type, detail = {}) {
-    bus.dispatchEvent(new CustomEvent(type, { detail }));
+  if (!window.d3) {
+    throw new Error("D3 v7 must be bundled locally or inlined. Do not load D3 from a CDN.");
   }
 
-  function on(type, fn) {
-    bus.addEventListener(type, event => fn(event.detail));
-  }
+  const state = {
+    param: 0.5,
+    selected: new Set(),
+    hovered: null,
+    reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches
+  };
+
+  const dispatch = d3.dispatch("update", "select", "hover", "step");
 
   function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-  // Visualization modules go in IIFEs. Keep state changes explicit.
+  function createStore(initial) {
+    let current = { ...initial };
+    const bus = new EventTarget();
+    return {
+      get: () => current,
+      set(update, source = "unknown") {
+        current = { ...current, ...update };
+        bus.dispatchEvent(new CustomEvent("change", { detail: { state: current, source } }));
+      },
+      subscribe(fn) {
+        const handler = e => fn(e.detail.state, e.detail.source);
+        bus.addEventListener("change", handler);
+        return () => bus.removeEventListener("change", handler);
+      }
+    };
+  }
+
+  const store = createStore(state);
+
+  // Visualization modules go in IIFEs. Use D3 for scales, axes, joins, transitions, and interaction.
+  // Keep state changes explicit and avoid feedback loops by passing a source string.
 })();
 </script>
 </body>
 </html>
 ```
 
+For single-file delivery, replace `<script src="./lib/d3.v7.min.js"></script>` with an inline local copy of D3 v7 above the article script.
+
 ## CSS Foundation
 
-Use CSS custom properties throughout. Reference them from SVG via computed values or direct `var(...)` values where supported.
+Use CSS custom properties throughout. Reference them from D3-generated SVG via `var(...)` style attributes or by reading computed values when needed.
 
 Typography:
 
@@ -325,12 +382,15 @@ Color:
 - Color must have semantic purpose.
 - Never use color as the only channel for meaning.
 - Avoid default AI palettes unless the concept specifically supports them.
+- Use the same variable colors across prose, equations, and figures.
 
 Containers:
 
 - A `.figure` container is appropriate because an interactive figure is an object in the article.
 - Do not box every section or paragraph.
 - Avoid generic callout boxes. Use `.margin-note` or `.model-note` for necessary secondary context.
+
+Dark mode may be added when appropriate, but light mode is the stable default. If added, verify all chart colors, text, axes, focus outlines, and tooltip backgrounds in both modes.
 
 ## Article Anatomy
 
@@ -363,9 +423,11 @@ Weak caption:
 
 > Figure 2. Gradient descent with learning rate slider.
 
+The caption is editorial glue. It tells the reader what to notice, especially after interaction changes the figure.
+
 ## Assessment Moments
 
-Every Moonshine article should include at least one low-friction assessment-like moment. It should feel like active reading, not a school quiz.
+Every article should include at least one low-friction assessment-like moment. It should feel like active reading, not a school quiz.
 
 Patterns:
 
@@ -438,6 +500,7 @@ When pairing an equation with pseudocode:
 - Keep pseudocode minimal.
 - Color-code variables consistently across prose, equation, and figure.
 - Reserve fixed height for dynamic values to avoid layout jitter.
+- Use a light code background when color-coded variables need to remain readable.
 
 ## Hover Cross-References
 
@@ -451,9 +514,48 @@ Use `data-ref` attributes:
 
 The corresponding figure element uses the same `data-ref`. Hover, focus, and pointer interactions should dispatch the same highlight event.
 
+```js
+const dispatch = d3.dispatch("hover");
+
+d3.selectAll("[data-ref]")
+  .on("pointerenter focus", function () { dispatch.call("hover", this, this.dataset.ref); })
+  .on("pointerleave blur", function () { dispatch.call("hover", this, null); });
+
+dispatch.on("hover.refs", ref => {
+  d3.selectAll("[data-ref]").classed("is-highlighted", function () {
+    return ref && this.dataset.ref === ref;
+  });
+});
+```
+
 ## State Coordination
 
-Use no framework. A shared state object plus `EventTarget` is enough for most articles.
+Use no framework. D3 plus a shared state object is enough for most articles.
+
+For simple linked views, use `d3.dispatch`:
+
+```js
+const dispatch = d3.dispatch("select", "hover", "filter");
+const state = { selected: new Set(), hovered: null, param: 0.5 };
+
+// Chart A listens.
+dispatch.on("select.chartA", keys => {
+  state.selected = new Set(keys);
+  renderChartA();
+});
+
+// Chart B emits.
+brushGroup.on("brush end", event => {
+  if (!event.selection) {
+    dispatch.call("select", null, []);
+    return;
+  }
+  const keys = data.filter(d => inBrush(d, event.selection)).map(d => d.id);
+  dispatch.call("select", null, keys);
+});
+```
+
+For deeper state, use a tiny store:
 
 ```js
 function createStore(initial) {
@@ -476,22 +578,22 @@ function createStore(initial) {
 
 Avoid feedback loops by passing a `source` string and skipping updates that originated from the current chart.
 
-If D3 is inlined, `d3.dispatch` is also acceptable.
-
 ## Responsive Rendering
 
 Observe the figure container, not the window. Redraw charts with readable text at the new width. Do not rely only on `viewBox` for text-heavy charts, because it shrinks text.
 
 ```js
 const container = document.getElementById("fig-1");
-const ro = new ResizeObserver(entries => {
-  const width = Math.floor(entries[0].contentRect.width);
+const ro = new ResizeObserver(([entry]) => {
+  const width = Math.floor(entry.contentRect.width);
   if (width > 0) render(width);
 });
 ro.observe(container);
 ```
 
 Prevent ResizeObserver loops by observing a wrapper with CSS-determined width and by clearing/redrawing inside a fixed drawing area.
+
+Touch: use pointer events (`pointerenter`, `pointermove`, `pointerleave`, `pointerdown`) rather than mouse-only events.
 
 ## Viewport-Aware Simulation
 
@@ -515,7 +617,7 @@ Use a series only when one article would overload the reader. Each article must 
 Index page requirements:
 
 - Introductory prose that frames the series.
-- Small concept-specific visual element, such as a sparkline, matrix silhouette, timeline, or simplified figure.
+- Small concept-specific visual element, such as a sparkline, matrix silhouette, timeline, force-layout thumbnail, or simplified figure.
 - Article links with one-sentence learning outcomes.
 - No generic card grid unless the cards are the navigation object. Keep cards restrained.
 
@@ -527,6 +629,7 @@ Before delivery, verify or disclose:
 
 ```text
 Offline: no remote scripts/styles/fonts/images/data
+D3: inlined or local bundled file, no CDN
 Runtime: opens without console errors
 Responsive: desktop and ~400px width checked
 Accessibility: captions, labels, keyboard controls, non-color encodings
