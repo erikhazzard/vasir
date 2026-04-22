@@ -1,5 +1,5 @@
 ---
-name: prompt__improving
+name: prompt__create-analysis
 description: Produce prompt analysis that identifies specific, high-leverage gaps — not surface-level rewrites or generic "be more specific" advice. Reverse-engineers the prompt's target domain, maps practitioner-level knowledge against the prompt's structure, and delivers prioritized, evidence-grounded fixes. Use when a user shares a prompt and asks to improve, optimize, audit, review, fix, tune, strengthen, or rewrite it, or asks "what's wrong with this" or "how do I make this better." Also triggers on prompt analysis, prompt critique, or prompt engineering help. Handles system prompts, agent instructions, prompt chains, and prompt templates. NEVER triggers for writing new prompts from scratch.
 model: opus
 ---
