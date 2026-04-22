@@ -65,3 +65,15 @@ Scenario: Give a long product description, market sizing, feature list, and bran
 Expected behavior: The model returns to the core loop equation and refuses to draw arrows until the payload, recipient motive, channel, conversion, and return value are concrete.
 
 Pass criteria: The output does not get lost in features or marketing; it identifies the dominant loop and weak arrows.
+
+## 8. TikTok S-tier reference case
+
+Scenario: Ask the model, “Break down TikTok's viral loop and apply it to our UGC app.”
+
+Skill state: loaded.
+
+Expected behavior: The model should use `references/tiktok-s-tier-loop.md`, identify the dominant loop as creator/content supply, and name the small-creator reach insight: a new or small creator has a credible chance to pop without first owning a follower graph.
+
+Pass criteria: The answer includes cold-start feed value, viewer behavior as ranking signal, content-first distribution, credible creator upside, low creation cost, fast feedback, remixable primitives, and trust risks. It does not use vague phrases like “algorithmic engagement” as the core insight.
+
+Failure would imply: The TikTok reference is not salient enough or the model is reverting to generic algorithm/network-effect slop.

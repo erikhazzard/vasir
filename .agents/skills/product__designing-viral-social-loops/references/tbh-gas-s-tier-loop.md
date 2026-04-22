@@ -2,6 +2,18 @@
 
 This is a benchmark example, not a recipe. Use it to calibrate tightness and prevent generic “invite/share/network effect” slop.
 
+## Table of contents
+
+1. Transcribed loop
+2. Clean causal form
+3. Loop anatomy
+4. Why this is S-tier
+5. What not to copy blindly
+6. Structural translation template
+7. Slop detector using this benchmark
+8. Safety and trust notes
+
+
 ## Transcribed loop
 
 ```text
