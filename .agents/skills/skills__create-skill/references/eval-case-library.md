@@ -1,65 +1,49 @@
-# Skill Eval Case Library
+# Eval Case Library for Agent Skills
 
-Use this when the skill is important, broad, risky, collision-prone, or likely to decay. Skill evals answer one question: did the loaded skill change the model's decisions in the intended direction?
+Use this when designing eval cases for important, risky, broad, or collision-prone skills. Skill evals answer whether the loaded memory object transfers expertise and changes model decisions.
 
-## Minimal eval set
+## Core Eval Shapes
 
-| Eval type | Prompt / scenario | Expected behavior | Pass criteria | Failure implies |
-|---|---|---|---|---|
-| Baseline without skill | Give the base model a realistic task in the domain. | It shows the known bad default. | The failure is observable enough to justify a skill. | The skill may not be needed, or the failure model is wrong. |
-| With-skill behavior | Same task with the skill loaded. | It follows the replacement prior. | Output differs in the intended decision, not just wording. | The root manifest is not changing behavior. |
-| Should trigger | User asks for the repeated task class using natural language. | Skill loads or would be selected. | Description contains activity, artifact, and intent language. | Routing description is too narrow. |
-| Should not trigger | Adjacent but different task. | Skill stays quiet. | Boundary language prevents collision. | Routing is too broad. |
-| Ambiguous edge | User asks for something near the boundary. | Agent either invokes with a stated narrow scope or asks one decisive question. | No kitchen-sink behavior. | Boundary is unclear. |
+| Eval type | Prompt shape | Expected behavior | Failure implies |
+|---|---|---|---|
+| Baseline without skill | Ask for the target task with no skill. | Model follows the known bad default. | The skill may not be needed, or the failure model is wrong. |
+| With-skill behavior | Same task with the skill loaded. | Model applies the expertise payload and replacement prior. | Manifest is not strong enough or anchors are misplaced. |
+| Should trigger | User names the artifact, workflow, or expertise need. | Skill loads or would be selected. | Description undertriggers. |
+| Should not trigger | Adjacent topic without the recurring task class. | Skill stays quiet. | Description overtriggers. |
+| Borderline | Similar artifact but different intent. | Model asks one clarifying question or uses nearest boundary. | Routing boundary is vague. |
+| Collision | Prompt could match two adjacent skills. | Model chooses, merges, or defers according to boundary. | Catalog design is unclear. |
+| Attention drift | Long prompt with distractions before the key task. | Core principle and quick reference still shape output. | Anchors are too weak or buried. |
 
-## Important-skill additions
+## Pass Criteria Pattern
 
-| Eval type | Scenario | Pass criteria |
-|---|---|---|
-| Attention drift | Put the model 1,500-2,500 tokens into a long task and ask for a decision the skill should govern. | It still follows the core principle, quick reference, or anti-pattern anchor. |
-| Collision | Present a prompt that could match this skill and an adjacent skill. | It chooses the right skill or narrows the boundary explicitly. |
-| Extraction | Provide noisy AGENTS.md-style context and ask for a skill. | It preserves authority boundaries and extracts only reusable behavior-changing material. |
-| Minimality | Ask for a small metadata fix. | It does not emit a full manifest report. |
-| Authority labeling | Mix hard constraints, conventions, heuristics, and examples. | It labels them correctly and does not turn preferences into laws. |
-
-## Eval prompt templates
-
-### Baseline prior failure
+Each eval should include:
 
 ```text
-Create a {{skill/domain artifact}} for {{realistic recurring task}}. Keep it concise.
+Scenario:
+Skill state: baseline | loaded | ambiguous
+Expected behavior:
+Pass criteria:
+Failure would imply:
 ```
 
-Pass if the output reveals the base-model default the skill is meant to fix.
+## What to Measure
 
-### With-skill replacement prior
+Good skill evals check for changed decisions, not pretty prose.
 
-```text
-Using the {{skill name}} skill, create a {{skill/domain artifact}} for {{same task}}.
-```
+Look for:
+- the model names the expertise payload before drafting;
+- the model identifies the bad default prior;
+- the output uses the replacement instinct;
+- routing metadata includes activity, artifact, intent, and expertise need;
+- root content excludes inferable noise;
+- examples and anti-patterns anchor the highest-risk behavior;
+- output shape matches the user's requested mode.
 
-Pass if the output changes the actual design decision: routing, manifest shape, granularity, examples, placement, or authority labeling.
+## Minimum Eval Sets
 
-### Trigger positive
-
-```text
-I need to {{user-language task phrase}} for {{artifact/context}}.
-```
-
-Pass if the skill description should clearly activate.
-
-### Trigger negative
-
-```text
-I need help with {{nearby task that should belong elsewhere}}.
-```
-
-Pass if the skill should not activate.
-
-### Ambiguous boundary
-
-```text
-Can you improve this {{artifact}}? {{Include a clue that could point to two skills.}}
-```
-
-Pass if the model identifies the boundary and proceeds narrowly instead of invoking every adjacent doctrine.
+| Skill risk | Minimum set |
+|---|---|
+| Small metadata fix | Should trigger, should not trigger, revised description quality. |
+| Normal create/rewrite skill | Baseline, with-skill, should trigger, should not trigger, borderline. |
+| Broad or catalog-adjacent skill | Normal set plus collision and attention-drift. |
+| Safety/tooling skill | Normal set plus hostile misuse and tool-boundary cases. |

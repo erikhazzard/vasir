@@ -1,113 +1,91 @@
 # Skill Template
 
-Use this only when producing a complete skill or full rewrite. Delete optional sections that do not carry the skill's primary mechanism.
-
-## Table of Contents
-
-- Skill directory shape
-- Manifest skeleton
-- Component deletion guide
-
-```text
-skill-name/
-├── SKILL.md
-└── references/
-    └── optional-detail.md
-```
+Use this when producing a complete new skill or full rewrite. Delete optional sections that do not carry expertise, rewrite a default prior, route the skill, or shape the artifact.
 
 ```markdown
 ---
-name: {{activity-first-hyphenated-name}}
-description: {{Activity + artifact/domain. Use when {{specific intents, contexts, file types, or trigger phrases}}. Optional exclusion only if overtrigger risk is real.}}
+name: {{activity-first-skill-name}}
+description: {{What the skill does + when to use it + expertise need. Include artifact names, trigger phrases, user intents, and contexts.}}
 ---
 
-# {{Human Skill Title}}
+# {{Skill Title}}
 
-{{One sentence: the behavior this skill installs and why it matters.}}
+{{One sentence: the expertise capsule this skill provides and why it matters.}}
 
-{{Optional persona frame. Use only when competing concerns must be held simultaneously.}}
+You are a {{Domain}} Expert. You bring {{N}} lenses to every task:
 
-You are a {{domain}} expert. You bring {{2-3}} lenses to every problem:
+- **The {{lens-1}}** — {{what it notices that the base model misses}}.
+- **The {{lens-2}}** — {{what it protects against}}.
+- **The {{lens-3}}** — {{what failure it catches}}.
 
-- **The {{lens}}** — {{what it optimizes and what failure it catches}}.
-- **The {{lens}}** — {{what it optimizes and what failure it catches}}.
-- **The {{lens}}** — {{what it optimizes and what failure it catches}}.
-
-If any lens is missing, the system breaks: {{interaction rule}}.
+If any lens is missing, the skill fails: {{interaction rule naming what breaks}}.
 
 ## Core Principle
 
-{{The single prior rewrite that should survive attention drift.}}
+{{The one prior rewrite that should survive attention drift.}}
 
-## Prior Rewrite Map
+## Expertise Payload
 
-| Default prior | Why it fails | Replacement prior | Anchor |
-|---|---|---|---|
-| {{what model naturally does}} | {{specific failure}} | {{new instinct}} | {{principle/table/example/anti-pattern}} |
-
-## Quick Reference
-
-{{Decision table. Use this section for compact defaults, not prose summaries.}}
-
-| Context | Default decision |
+| Expertise type | What this skill encodes |
 |---|---|
-| {{situation}} | {{behavior}} |
+| Hard-won insight | {{...}} |
+| Hidden constraint | {{...}} |
+| Value hierarchy | {{...}} |
+| Tradeoff boundary | {{...}} |
+| Failure scar | {{...}} |
 
 ## Workflow
 
-{{Include only if order matters.}}
+### Pass 0 — {{Classify / diagnose}}
+{{What must be known before acting.}}
 
-### Pass 0 — {{classify / diagnose}}
-{{Gate or action.}}
+### Pass 1 — {{Primary expertise application}}
+{{The main behavior change.}}
 
-### Pass 1 — {{core work}}
-{{Gate or action.}}
+### Pass 2 — {{Artifact shaping}}
+{{How output should be formed.}}
 
-### Pass 2 — {{validation / closeout}}
-{{Gate or action.}}
+### Pass 3 — {{Validation / review}}
+{{How to know the skill's expertise was applied.}}
 
-## Patterns / Examples
+## Quick Reference
 
-{{Use contrastive examples or copy-ready patterns. Pattern matching beats abstract advice.}}
+| Situation | Default |
+|---|---|
+| {{situation}} | {{decision}} |
+| {{situation}} | {{decision}} |
+| {{situation}} | {{decision}} |
 
-### {{Bad default}} → {{Replacement}}
+## Contrastive Examples
 
-Bad:
+### {{High-risk behavior}}
 
-```text
-{{bad output}}
-```
+Bad: {{default model behavior}}
 
-Good:
-
-```text
-{{good output}}
-```
+Good: {{expert replacement behavior}}
 
 Why: {{what decision changed}}.
 
 ## Anti-Patterns
 
-- **{{Bad default}}**: {{why it fails}}. Instead: {{replacement behavior}}.
-- **{{Bad default}}**: {{why it fails}}. Instead: {{replacement behavior}}.
+- **{{Bad default}}**: {{why it fails}}. Instead: {{replacement instinct}}.
+- **{{Bad default}}**: {{why it fails}}. Instead: {{replacement instinct}}.
 
 ## Checklist
 
-- [ ] {{Testable decision-quality assertion}}.
-- [ ] {{Testable decision-quality assertion}}.
+- [ ] {{The expertise payload was applied.}}
+- [ ] {{The bad default prior was overridden.}}
+- [ ] {{The output artifact matches the requested mode.}}
 
 ## References
 
-- `references/{{file}}.md` — {{Read when this subset of triggered work needs deeper detail}}.
+- `references/{{topic}}.md` — {{when to read it}}
 ```
 
-## Component deletion guide
+## Template Use Rules
 
-| Section | Delete when |
-|---|---|
-| Persona frame | The skill is procedural or has only one quality axis. |
-| Prior Rewrite Map | The skill is tiny and the core principle plus anti-patterns already carry it. |
-| Workflow | Step order does not matter. |
-| Patterns / Examples | There is no stable example that would improve pattern matching. |
-| Checklist | It would only restate generic quality expectations. |
-| References | The root manifest already contains all detail needed on every trigger. |
+- Delete any section that does not change behavior for this skill.
+- Prefer tables and contrastive examples over long prose.
+- Keep runtime-specific fields out of frontmatter unless the user named a runtime that supports them.
+- Use references for detail that should not load on every trigger.
+- Do not add scripts or validators unless a repeated brittle operation is high-cost and machine-checkable.

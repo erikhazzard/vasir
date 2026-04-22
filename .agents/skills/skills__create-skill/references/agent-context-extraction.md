@@ -1,82 +1,62 @@
-# AGENTS.md / Agent Context Extraction
+# Agent Context Extraction
 
-Use this when converting large agent context, repo doctrine, or AGENTS.md rules into one or more skills. The goal is not to copy authority. The goal is to extract reusable behavior that belongs in a routed skill.
+Use this when extracting reusable skill material from AGENTS.md, repo instructions, large prompts, or existing agent doctrine.
 
-## Extraction boundary
+## Extraction Pipeline
 
-Keep these in AGENTS.md or repo context:
+Convert raw context into skill material through this pipeline:
 
-| Source material | Why it usually stays out of a skill |
+```text
+Raw rule
+→ source authority
+→ expertise payload
+→ decision it changes
+→ base-model failure it prevents
+→ generality level
+→ cheapest effective placement
+→ compressed wording
+```
+
+## Placement Decisions
+
+| Raw material | Best destination |
 |---|---|
-| Safety, privacy, destructive-operation bans | Higher-precedence global authority. |
-| Shared worktree custody | Repo/session operating contract. |
-| Approval, halt, recap, handoff formats | Orchestration contract, not reusable skill behavior. |
-| Directory routing and scoped AGENTS rules | Repo topology changes by project. |
-| Active work-spec state | Task memory, not general skill doctrine. |
-| Exact commands for one repo | Better discovered locally or kept in repo docs. |
+| Safety, destructive-operation bans, approval, custody | AGENTS.md or root operating contract, not skill. |
+| Repo routing, scoped file ownership, local paths | AGENTS.md unless it generalizes into skill behavior. |
+| Work-spec or eval-plan schemas | The relevant planning/eval skill. |
+| Reusable design doctrine | Skill root manifest if it changes nearly every triggered run. |
+| Detailed examples, templates, long rationale | `references/`. |
+| One-off task instruction | Nowhere; do not skillify. |
+| Inferable directory structure or style rule | Nowhere unless non-obvious and behavior-changing. |
+| Repeated brittle machine-checkable operation | Optional automation exception. |
 
-Good candidates for skills:
+## Distillation Table
 
-| Source material | Skill destination |
-|---|---|
-| Repeated planning artifact design | Planning/work-spec skill. |
-| Eval gate design patterns | Eval-design skill. |
-| Skill design doctrine | Skill-creation skill. |
-| Fileoverview/header custody doctrine | Documentation/code-context skill. |
-| Domain-specific hidden invariants | Scoped domain skill when reusable across tasks. |
+Use this table before drafting a skill from large context:
 
-## Distillation pipeline
-
-For each candidate rule, fill this table before writing skill prose.
-
-| Raw rule | Source authority | Decision changed | Base-model failure prevented | Generality | Placement |
+| Raw rule | Authority | Expertise payload | Bad default prevented | Placement | Final wording |
 |---|---|---|---|---|---|
-| {{quoted or summarized rule}} | hard / local / heuristic / example | {{what the agent would do differently}} | {{bad default}} | repo-only / domain-general / skill-general | description / root / reference / AGENTS / nowhere |
+| {{source text}} | hard / convention / heuristic / example | {{knowledge/tradeoff/scar}} | {{model failure}} | {{where it belongs}} | {{compressed rule}} |
 
-Delete the row if `Decision changed` is vague.
+## Keep Out of Skills by Default
 
-## Compression rules
+- root approval and halt protocols;
+- terminal recap formats owned by AGENTS.md;
+- mutable repo routing maps;
+- exhaustive directory trees;
+- broad style guides already enforced by tooling;
+- copied README prose;
+- time-sensitive facts;
+- project-specific secrets, credentials, or operational identifiers.
 
-- Preserve the constraint, not the source wording.
-- Replace long doctrine with a decision test.
-- Keep examples only when they anchor a pattern the model would otherwise miss.
-- Move detailed schemas into references unless every triggered run needs them.
-- Do not import root AGENTS ceremony into a skill just because it looks S-tier.
+## High-Value Extraction Targets
 
-## Example
+Extract these when they generalize:
 
-Raw AGENTS.md material:
-
-```text
-Every human-facing terminal message from an active agent work turn MUST include exactly one <Recap> block.
-```
-
-Extraction decision:
-
-| Field | Value |
-|---|---|
-| Source authority | Hard root-agent orchestration constraint. |
-| Decision changed | Whether the agent emits root terminal protocol. |
-| Base-model failure prevented | Ending work turns without a handoff record. |
-| Generality | Repo/orchestrator-specific. |
-| Placement | AGENTS.md, not skill. |
-
-Do not copy this into a skill-creation skill.
-
-Raw skill-design material:
-
-```text
-Encode only information that changes behavior.
-```
-
-Extraction decision:
-
-| Field | Value |
-|---|---|
-| Source authority | Skill-design hard constraint. |
-| Decision changed | Whether a manifest line is included. |
-| Base-model failure prevented | Bloated skill manifests full of generic advice. |
-| Generality | Skill-general. |
-| Placement | Root manifest core principle / quick reference. |
-
-This belongs in the skill.
+- hidden invariants that make obvious fixes wrong;
+- value hierarchies that decide tradeoffs;
+- failure scars that prevent repeated model mistakes;
+- local ontology that prevents category errors;
+- trigger boundaries that keep skills from colliding;
+- artifact shapes the model commonly mangles;
+- attention anchors that survive long-context drift.
