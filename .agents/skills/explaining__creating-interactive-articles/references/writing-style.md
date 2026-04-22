@@ -99,11 +99,32 @@ If the repair template produces a better claim, keep the repaired claim and remo
 
 ---
 
-# The 10 Anti-AI-Slop Commandments
+# The 11 Anti-AI-Slop Commandments
 
 AI slop is usually structural before lexical. Ban the machinery, not only the vocabulary.
 
-## 1. Ban the Negation Pivot
+## 1. Ban Em Dashes
+
+No em dash characters, ever. Do not use U+2014 in article prose, captions, headings, annotations, UI labels, delivery notes, or examples. In this style, the mark reads as AI-prose residue, especially when used as reveal machinery.
+
+Replace it with the smallest honest syntax:
+
+- period when the second clause can stand alone;
+- comma when it is a light aside;
+- colon when the second clause specifies the first;
+- semicolon when two independent clauses are tightly related;
+- parentheses when the aside truly matters less;
+- a shorter sentence when punctuation is hiding weak structure.
+
+Bad:
+
+> The slider crosses the threshold [em dash] and everything changes.
+
+Better:
+
+> The slider crosses the threshold. The stable point disappears.
+
+## 2. Ban the Negation Pivot
 
 Banned shape:
 
@@ -122,7 +143,7 @@ Better:
 
 > After an incident, writing the wiki page lets the team discharge the anxiety of having had no answer. Later readership becomes almost incidental.
 
-## 2. Ban False Elevation
+## 3. Ban False Elevation
 
 Banned shape:
 
@@ -138,7 +159,7 @@ Better:
 
 > Once promotion, budget, or compliance depends on the dashboard, people stop treating it as a display and start treating it as terrain.
 
-## 3. Ban the Grand Opener
+## 4. Ban the Grand Opener
 
 Banned shape:
 
@@ -155,7 +176,7 @@ Better:
 
 > The page says “last updated 2021,” the owner left two reorganizations ago, and the interface still shows a green active dot.
 
-## 4. Ban Depth-Signaling Verbs
+## 5. Ban Depth-Signaling Verbs
 
 Avoid unless quoting:
 
@@ -192,7 +213,7 @@ Better:
 
 > Start with the handoff: who changes behavior after the platform ships, and who keeps working around it?
 
-## 5. Ban Triadic Adjective Stacks
+## 6. Ban Triadic Adjective Stacks
 
 Banned shape:
 
@@ -210,7 +231,7 @@ Better:
 
 > The system needs to survive two failure modes: a manager overriding the queue and a team routing urgent work through DMs.
 
-## 6. Ban Hollow Hype
+## 7. Ban Hollow Hype
 
 Avoid unless quoting:
 
@@ -238,26 +259,26 @@ Better:
 
 > The tool moves handoff decisions from private DMs into a queue visible to every team that depends on the work.
 
-## 7. Ban Dramatic Reveal Punctuation
+## 8. Ban Dramatic Reveal Punctuation
 
 Banned shape:
 
-> “X — and that changes everything.”  
+> “X [em dash] and that changes everything.”  
 > “The real issue: Y.”  
 > “The result? Z.”  
 > “One thing is clear: Y.”
 
-Use punctuation for syntax, compression, or genuine aside. Never use punctuation as a drumroll.
+Use punctuation for syntax, compression, or genuine aside. Never use punctuation as a drumroll. Em dashes are banned outright, even when they are not reveal punctuation.
 
 Bad:
 
-> The problem isn’t the roadmap — it’s the politics underneath it.
+> The problem isn’t the roadmap [em dash] it’s the politics underneath it.
 
 Better:
 
 > The roadmap absorbs political conflict by converting priority fights into sequencing debates.
 
-## 8. Ban Universal Audience Openers
+## 9. Ban Universal Audience Openers
 
 Banned shape:
 
@@ -275,7 +296,7 @@ Better:
 
 > The first clue is the meeting invite named “alignment” with no decision attached.
 
-## 9. Ban Meta Signposting
+## 10. Ban Meta Signposting
 
 Banned shape:
 
@@ -297,7 +318,7 @@ Better:
 
 > The memo was approved because every sentence could be read two ways.
 
-## 10. Ban Aphoristic Mirror Sentences
+## 11. Ban Aphoristic Mirror Sentences
 
 Avoid or heavily ration:
 
@@ -892,7 +913,7 @@ Do not preface the output with “Here is” unless needed for clarity. Do not e
 
 ## Short Riff
 
-Use for 150–400 words.
+Use for 150 to 400 words.
 
 Output format:
 
@@ -913,7 +934,7 @@ The closing should move the puzzle forward rather than summarize.
 
 ## Standard Essay
 
-Use for 800–2,500 words.
+Use for 800 to 2,500 words.
 
 Output format:
 
@@ -934,7 +955,7 @@ A standard essay should feel like a mind moving through material.
 
 ## Long Essay
 
-Use for 3,000–5,000+ words only when the material supports it.
+Use for 3,000 to 5,000+ words only when the material supports it.
 
 Output format:
 
@@ -1103,7 +1124,7 @@ Traditional game engines like Unity and Unreal sit near the **slow / general** q
 
 The interesting quadrant is **fast / general**. That is the space an AI-native engine would claim to occupy: the iteration speed of a maker tool with something closer to the expressive range of a full engine.
 
-The map becomes useful only if it then asks the hard question: is “fast / general” a real quadrant, or does expressive range inevitably reintroduce slowness somewhere else — in debugging, control, asset coherence, multiplayer determinism, moderation, or taste?
+The map becomes useful only if it then asks the hard question: is “fast / general” a real quadrant, or does expressive range inevitably reintroduce slowness somewhere else: in debugging, control, asset coherence, multiplayer determinism, moderation, or taste?
 
 That last question is where the 2x2 starts doing work. Without it, the diagram is just a market map.
 
@@ -1175,7 +1196,7 @@ Allowed:
 
 Restricted:
 
-- em dashes. Use them rarely. Never use them as reveal machinery.
+- em dashes. Use zero. Never use U+2014 in prose, captions, labels, headings, examples, or delivery summaries.
 - aphoristic mirror sentences. Usually cut them.
 - parallel sentence pairs. Use only when the structure clarifies a real distinction.
 - rhetorical questions. Ask them only when the piece can sit with them.
@@ -1331,7 +1352,7 @@ Usually the join should be rewritten.
 Symptoms:
 
 - italicized terms that classify nothing;
-- em dashes everywhere;
+- any em dashes;
 - canon vocabulary as garnish;
 - weird metaphor with no mapped structure;
 - closing line that feels profound because it is vague.

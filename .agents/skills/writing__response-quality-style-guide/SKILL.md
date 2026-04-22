@@ -195,11 +195,32 @@ If it does not pass all three, use plain language.
 
 ---
 
-# The 10 Anti-AI-Slop Commandments
+# The 11 Anti-AI-Slop Commandments
 
 AI slop is usually structural before lexical. Ban the machinery, not only the vocabulary.
 
-## 1. Ban the Negation Pivot
+## 1. Ban Em Dashes
+
+No em dash characters, ever. Do not use U+2014 in article prose, captions, headings, annotations, UI labels, delivery notes, or examples. In this style, the mark reads as AI-prose residue, especially when used as reveal machinery.
+
+Replace it with the smallest honest syntax:
+
+- period when the second clause can stand alone;
+- comma when it is a light aside;
+- colon when the second clause specifies the first;
+- semicolon when two independent clauses are tightly related;
+- parentheses when the aside truly matters less;
+- a shorter sentence when punctuation is hiding weak structure.
+
+Bad:
+
+> The slider crosses the threshold [em dash] and everything changes.
+
+Better:
+
+> The slider crosses the threshold. The stable point disappears.
+
+## 2. Ban the Negation Pivot
 
 Banned shape:
 
@@ -218,7 +239,7 @@ Better:
 
 > After an incident, writing the wiki page lets the team discharge the anxiety of having had no answer. Later readership becomes almost incidental.
 
-## 2. Ban False Elevation
+## 3. Ban False Elevation
 
 Banned shape:
 
@@ -234,7 +255,7 @@ Better:
 
 > Once promotion, budget, or compliance depends on the dashboard, people stop treating it as a display and start treating it as terrain.
 
-## 3. Ban the Grand Opener
+## 4. Ban the Grand Opener
 
 Banned shape:
 
@@ -251,7 +272,7 @@ Better:
 
 > The page says “last updated 2021,” the owner left two reorganizations ago, and the interface still shows a green active dot.
 
-## 4. Ban Depth-Signaling Verbs
+## 5. Ban Depth-Signaling Verbs
 
 Avoid unless quoting:
 
@@ -288,7 +309,7 @@ Better:
 
 > Start with the handoff: who changes behavior after the platform ships, and who keeps working around it?
 
-## 5. Ban Triadic Adjective Stacks
+## 6. Ban Triadic Adjective Stacks
 
 Banned shape:
 
@@ -306,7 +327,7 @@ Better:
 
 > The system needs to survive two failure modes: a manager overriding the queue and a team routing urgent work through DMs.
 
-## 6. Ban Hollow Hype
+## 7. Ban Hollow Hype
 
 Avoid unless quoting:
 
@@ -334,26 +355,26 @@ Better:
 
 > The tool moves handoff decisions from private DMs into a queue visible to every team that depends on the work.
 
-## 7. Ban Dramatic Reveal Punctuation
+## 8. Ban Dramatic Reveal Punctuation
 
 Banned shape:
 
-> “X — and that changes everything.”  
+> “X [em dash] and that changes everything.”  
 > “The real issue: Y.”  
 > “The result? Z.”  
 > “One thing is clear: Y.”
 
-Use punctuation for syntax, compression, or genuine aside. Never use punctuation as a drumroll.
+Use punctuation for syntax, compression, or genuine aside. Never use punctuation as a drumroll. Em dashes are banned outright, even when they are not reveal punctuation.
 
 Bad:
 
-> The problem isn’t the roadmap — it’s the politics underneath it.
+> The problem isn’t the roadmap [em dash] it’s the politics underneath it.
 
 Better:
 
 > The roadmap absorbs political conflict by converting priority fights into sequencing debates.
 
-## 8. Ban Universal Audience Openers
+## 9. Ban Universal Audience Openers
 
 Banned shape:
 
@@ -371,7 +392,7 @@ Better:
 
 > The first clue is the meeting invite named “alignment” with no decision attached.
 
-## 9. Ban Meta Signposting
+## 10. Ban Meta Signposting
 
 Banned shape:
 
@@ -393,7 +414,7 @@ Better:
 
 > The memo was approved because every sentence could be read two ways.
 
-## 10. Ban Aphoristic Mirror Sentences
+## 11. Ban Aphoristic Mirror Sentences
 
 Avoid or heavily ration:
 
@@ -405,7 +426,7 @@ Avoid or heavily ration:
 
 These lines often feel smart because they are symmetrical. Symmetry is not insight.
 
-Allowed only after concrete casework and only if followed by mechanism. Most responses should use zero.
+Allowed only after concrete casework and only if followed by mechanism. Most pieces should use zero.
 
 Bad:
 
