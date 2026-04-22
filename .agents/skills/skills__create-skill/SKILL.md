@@ -1,11 +1,11 @@
 ---
 name: skills__create-skill
-
+description: Designs, rewrites, audits, and debugs reusable AI-agent skills and SKILL.md manifests by compressing expert judgment into routed behavior changes. Use when creating skills, fixing trigger descriptions, choosing skill names, pruning bloated manifests, extracting reusable behavior from AGENTS.md-style context, encoding hard-won insights, values, tradeoffs, taste, or non-obvious constraints, deciding skill granularity, or designing skill eval cases.
 ---
 
 # Designing Agent Skills
 
-A skill is a compact expertise capsule that installs a targeted rewrite of the model’s default prior. It compresses hard-won knowledge, values, tradeoffs, taste, non-obvious constraints, and failure scars into the smallest memory object that reliably changes behavior for a repeated task class.
+A skill is a compact expertise capsule that installs a targeted rewrite of the model's default prior. It compresses hard-won knowledge, values, tradeoffs, taste, non-obvious constraints, and failure scars into the smallest memory object that reliably changes behavior for a repeated task class.
 
 You are a Skill Design Architect. You bring four lenses to every skill:
 
@@ -18,13 +18,11 @@ If any lens is missing, the skill fails: expertise without prior surgery becomes
 
 ## Core Principle
 
-A skill is a compact expertise capsule that installs a temporary operating prior. It compresses hard-won knowledge, values, tradeoffs, taste, non-obvious constraints, and failure scars into the smallest memory object that reliably changes model behavior for a repeated task class.
-
 Do not ask, "What instructions should the model follow?" Ask:
 
 1. What expert judgment are we trying to transfer?
 2. What wrong default behavior will the model otherwise follow?
-3. What replacement instinct should the skill install?
+3. What targeted prior rewrite should the skill install?
 4. What is the smallest loaded memory object that makes that instinct survive real work?
 
 ## Substance vs Mechanism
@@ -57,20 +55,20 @@ Before writing or rewriting a skill, identify the expertise being compressed.
 
 If there is no expertise payload, there may still be a checklist, template, or documentation page, but probably not a skill.
 
-### 2. Expertise → Prior Rewrite Test
+### 2. Scar → Prior Rewrite → Anchor Test
 
-For each important rule, map the expertise to the behavior change.
+For each important piece of expertise, convert it into an attention anchor the model can actually follow.
 
 | Field | Meaning |
 |---|---|
-| **Expert knowledge** | The hard-won knowledge, value, tradeoff, or constraint being encoded. |
-| **Base-model prior** | What the model will naturally do without the skill. |
-| **Why that prior fails** | The specific damage caused by the default behavior. |
-| **Replacement prior** | The instinct the skill should install. |
-| **Attention anchor** | The rule, table, anti-pattern, checklist, or contrastive example that makes the replacement stick. |
+| **Scar / value / tradeoff** | The hard-won knowledge, value hierarchy, taste judgment, or failure scar being compressed. |
+| **Bad default prior** | What the model will naturally do without the skill. |
+| **Why it fails** | The specific damage caused by that default behavior. |
+| **Replacement instinct** | The targeted prior rewrite the skill should install. |
+| **Manifest anchor** | The core rule, anti-pattern, contrastive example, table, or checklist that makes the replacement stick. |
 | **Boundary** | When this rule should not apply. |
 
-If a major rule cannot name the prior it overrides, it probably does not belong in the root manifest.
+If a major rule cannot become a manifest anchor, it probably belongs in a reference file, AGENTS.md, a template, or nowhere.
 
 ### 3. Expertise Compression Test
 
@@ -80,7 +78,7 @@ If a line only sounds wise, repeats generic quality advice, or can be inferred f
 
 ### 4. Granularity Law
 
-One skill should own one routing cluster, one behavioral transformation, and one recurring artifact class.
+One skill should own one routing cluster, one prior-rewrite family, and one recurring artifact class.
 
 | Situation | Decision |
 |---|---|
@@ -96,7 +94,7 @@ One skill should own one routing cluster, one behavioral transformation, and one
 Every candidate rule must pass through this pipeline:
 
 ```text
-Candidate rule → expert judgment it carries → decision it changes → default failure it prevents → authority level → cheapest effective placement
+Candidate rule → scar/value/tradeoff → bad default prior → replacement instinct → attention anchor → authority level → cheapest effective placement
 ```
 
 | Placement | Use when |
@@ -154,9 +152,9 @@ Most important skills are hybrids, but one mechanism must be primary.
 
 ## Component Selection Matrix
 
-Include a manifest component only when its cognitive job is needed.
+Do not include manifest sections by habit. Choose each component by the cognitive failure it prevents.
 
-| Component | Use when | Cut when | Cognitive job |
+| Component | Use when | Cut when | Cognitive job / failure prevented |
 |---|---|---|---|
 | **Core Principle** | One sentence can prevent the dominant failure. | It repeats the title. | Survives attention drift. |
 | **Persona lenses** | Quality depends on competing concerns. | The task is procedural. | Forces multi-axis reasoning. |
@@ -221,7 +219,8 @@ For broad skills, use one row per major rule. Delete any row whose changed decis
 
 ### Pass 3 — Choose mechanism and components
 
-Pick the primary mechanism from the Skill Mechanism Matrix. Then choose only the components needed to carry that mechanism. Do not default to a full template.
+Pick the primary mechanism from the Skill Mechanism Matrix. Then choose only the components needed to carry that mechanism. 
+Do not default to a full template; every selected component must name the cognitive failure it prevents.
 
 ### Pass 4 — Design routing as classifier engineering
 

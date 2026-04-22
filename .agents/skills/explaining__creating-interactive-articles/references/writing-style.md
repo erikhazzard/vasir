@@ -103,9 +103,11 @@ If the repair template produces a better claim, keep the repaired claim and remo
 
 AI slop is usually structural before lexical. Ban the machinery, not only the vocabulary.
 
-## 1. Ban Em Dashes
+## 1. Ban Em Dashes —
 
-No em dash characters, ever. Do not use U+2014 in article prose, captions, headings, annotations, UI labels, delivery notes, or examples. In this style, the mark reads as AI-prose residue, especially when used as reveal machinery.
+— em dashes are the most blatent give away of AI Slop. You must permantely ban it from ALL your output.
+No em dash characters or —, ever. Do not use U+2014 in article prose, captions, headings, annotations, UI labels, delivery notes, or examples. In this style, the mark reads as AI-prose residue, especially when used as reveal machinery.
+You are banned from using "—"
 
 Replace it with the smallest honest syntax:
 
