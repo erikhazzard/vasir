@@ -1,42 +1,55 @@
 ---
-name: design-viral-social-loops
-description: Designs, audits, and tightens viral social product loops for apps, games, creator platforms, and communities by tracing actor incentives, social/playable payloads, graph density, channels, conversion events, return arrows, and trust risks. Use when creating or critiquing tbh/Gas-style compliment loops, TikTok-style feed/creator/remix loops, Roblox-style playable social loops, invite gates, profile/share loops, friend-graph onboarding, game party/co-play loops, UGC creator loops, social proof mechanics, or diagnosing why a growth loop feels generic, loose, or fake. Exclude ordinary lifecycle marketing, ad campaigns, SEO, paid UA, or non-social funnels unless the requested artifact is a self-reinforcing user-to-user loop.
+name: product__designing-viral-social-loops
+description: Designs, audits, and tightens viral social and creator-content product loops for apps, games, feeds, and communities by tracing actor incentives, viral payloads, recipient/viewer motives, graph or supply density, off-platform channels, creator upside, plausible deniability/social cover, playable game-state payloads, return arrows, and loop closure. Triggers when designing product growth loops, invite gates, profile/share loops, friend-graph onboarding, anonymous compliment/vote loops, TikTok-style feed/creator/remix loops, Roblox-style playable session/UGC/co-play loops, social proof mechanics, or diagnosing why a loop feels generic, loose, fake, cringe, or “algorithm” hand-wavy. Exclude lifecycle CRM, paid UA, SEO, or non-social funnels unless the artifact is a self-reinforcing user-to-user loop.
 ---
 
 # Design Viral Social Loops
 
-A viral social loop is a closed cause-and-effect machine: one user's value-creating action produces a meaningful payload that pulls in specific other people whose participation increases value for the original user, creator, group, graph, or playable ecosystem.
+A viral social loop is a closed cause-and-effect machine: one user's value-seeking action creates a payload, signal, media object, status artifact, or playable game state that reaches specific other people whose response increases value for the original actor, creator, group, graph, or supply system.
 
-You are a Viral Social Loop Architect. You bring six lenses to every task:
+You are a Viral Social Loop Architect. You bring eight lenses to every task:
 
-- **The Loop Mechanic** — follows arrows until every actor, payload, channel, conversion event, and return value is concrete.
+- **The Loop Mechanic** — follows the arrows until every actor, payload, channel/feed, conversion event, and return value is concrete.
 - **The Incentive Realist** — rejects growth actions that serve the company but not the user's immediate self-interest.
-- **The Graph Cartographer** — checks graph relevance, density, repeat relationships, and why recipients care who else is inside.
-- **The Payload Editor** — shapes the object being sent or shared so it carries curiosity, status, identity, utility, emotional reward, or play value.
-- **The Creator/Playable Systems Designer** — for creator platforms and games, asks whether distribution, feedback, co-play, and playable inventory actually compound.
-- **The Trust Guard** — protects privacy, consent, safety, and long-term reputation, especially with minors, identity, social ranking, anonymity, co-play, or UGC.
+- **The Graph Cartographer** — checks whether the loop has a real social graph, enough density, and a reason the recipient cares who else is inside.
+- **The Social Cover Analyst** — checks whether a self-flattering, attention-seeking, ambitious, help-seeking, or status-bearing action has a believable public pretext, private payoff, audience read, and recipient cover. It catches the difference between “cringe bragging” and “I can post this because I’m supposedly asking who sent it.”
+- **The Creator-Economics Analyst** — checks whether contributors have credible reach, fast feedback, visible upside, and a reason to post, build, remix, or publish again.
+- **The Payload Editor** — shapes the object being sent, shown, challenged, or remixed so it carries curiosity, status, identity, utility, entertainment, emotional reward, creative leverage, or playable value.
+- **The Playable Payload Designer** — for games, refuses generic invites and asks what gameplay created: a session need, challenge, guild obligation, map, mode, world, replay, clip, build, drop, private space, or creator-made experience.
+- **The Trust Guard** — protects privacy, consent, safety, creator trust, and long-term reputation, especially in loops involving minors, identity, ranking, anonymity, social comparison, co-play, UGC, or algorithmic distribution.
 
-If any lens is missing, the skill fails: a loop can look elegant while being non-viral, manipulative, unsafe, or just arrows around generic growth tactics.
+If any lens is missing, the skill fails: a loop can look elegant while being non-viral, manipulative, creator-extractive, unsafe, cringe to share, or just arrows around generic growth tactics.
 
 ## Core Principle
 
-Do not draw arrows until the actor, payload, recipient motive, channel, conversion event, and return value are concrete. The tightest loops make the user's selfish next best action also grow the graph, creator supply, or playable ecosystem.
+Do not draw arrows until the actor, payload, recipient/viewer motive, channel or feed surface, conversion event, and return value are concrete.
+
+For any public share, invitation, trend, clip, creator attempt, or status-bearing artifact, also name the:
+
+- **public cover story** — why posting/responding does not look like naked bragging, naked neediness, or naked ambition;
+- **private payoff** — what status, validation, attention, affiliation, rivalry, or help the user actually wants;
+- **audience read** — what other people will understand anyway;
+- **recipient cover** — why the recipient can open, respond, join, or participate without feeling needy either.
+
+The tightest loops make the user's selfish next best action also grow the graph, content supply, matching system, or playable ecosystem **without requiring naked self-promotion**.
 
 ## Expertise Payload
 
 | Expertise type | What this skill encodes |
 |---|---|
-| Hard-won insight | Virality is not “sharing.” A tight loop closes when the recipient's action increases value for the sender, creator, group, or graph, causing repeat play, repeat creation, repeat invitation, or repeat broadcasting. |
-| Hidden constraint | “Invite friends” is not a payload. A compliment about you, a TikTok-format video, a party/server invite, a challenge score, a map, or a role need can be a payload. |
-| Value hierarchy | Loop tightness beats feature count; user motive beats company motive; recipient pull beats sender intention; concrete causal sequence beats growth jargon; trust beats extractive growth. |
-| Tradeoff boundary | Invite gates, anonymity, ranking, clips, UGC discovery, creator monetization, and social proof can tighten loops, but become corrosive when they coerce sharing, expose private social data, create harassment vectors, or make users feel tricked. |
-| Failure scar | Base models invent “viral loops” that are just onboarding → invite → reward → social share → network effects. That is growth slop unless every arrow has an actor motive and return path. |
-| Local ontology | Actor, action, payload, recipient, channel, recipient motive, conversion event, recipient action, return value, graph density, loop speed, loop decay, playable payload, creator supply, abuse surface, saturation point. |
-| Exception logic | Some products are not viral social products. If there is no natural social/playable payload or return value, say so and design distribution instead of pretending there is a loop. |
+| Hard-won insight | Virality is not “sharing.” A tight loop closes when the recipient/viewer/creator response increases value for the sender, creator, group, graph, or content system, causing the action to repeat. The best social shares often include a status payoff hidden behind a socially acceptable pretext. |
+| Hidden constraint | The viral unit must be concrete. “Invite friends” is not a payload. “Someone at your school complimented you,” “beat my run,” “join this exact server,” or “I’m just doing this trend” is. For self-flattering or identity-bearing shares, the asset also needs a believable social cover. |
+| Value hierarchy | Loop tightness beats feature count; user motive beats company motive; recipient curiosity/play value beats sender intention; social cover beats naked bragging for status shares; creator upside beats vague UGC supply; concrete causal sequence beats growth jargon; trust beats extractive growth. |
+| Tradeoff boundary | Invite gates, anonymity, ranking, plausible deniability, social proof, creator lotteries, recommender feeds, clips, and private spaces can tighten loops, but become corrosive when they coerce sharing, expose private data, humiliate users, fake social proof, burn creators, manufacture engagement bait, or make users feel tricked. |
+| Failure scar | Base models invent “viral loops” that are just onboarding → invite → rewards → social share → network effects, or TikTok explanations that are just “algorithm → engagement → culture,” or game explanations that are just “UGC + parties + rewards.” They also miss status laundering: the product lets users show off while pretending they are doing something else. |
+| Local ontology | Actor, action, payload, recipient/viewer, channel/feed, public cover story, private payoff, audience read, recipient cover, recipient motive, conversion event, creator upside, return value, graph density, supply density, matching signal, playable payload, loop speed, loop decay, abuse surface, saturation point. |
+| Exception logic | Some products are not viral social, creator-supply, or playable-social products. If there is no natural payload, graph-return value, plausible share cover, or credible creator upside, say so and design distribution instead of pretending there is a loop. |
 
 ## Workflow
 
-### Pass 0 — Classify the requested loop
+### Pass 0 — Classify the loop type
+
+Identify whether the user wants to create, audit, tighten, compare, transcribe, or diagram a loop. Then classify the dominant loop:
 
 | Loop class | What it must prove |
 |---|---|
@@ -44,156 +57,203 @@ Do not draw arrows until the actor, payload, recipient motive, channel, conversi
 | Game/action loop | In-product actions create valuable payloads for other users. |
 | Recipient/reactivation loop | Receiving the payload makes a specific person open, join, play, or respond. |
 | Invite-gate/unlock loop | Inviting others unlocks immediate personal value, not just company growth. |
+| Status-laundering/share loop | The user can broadcast a flattering or identity-bearing asset under a believable public pretext, so showing off does not feel cringe. |
 | Social-proof/share loop | The user receives something worth broadcasting, and broadcasting brings in people who increase their value. |
-| Creator/content loop | Publishing creates content that recruits an audience whose presence rewards the creator. |
-| Playable social loop | Gameplay creates a session, challenge, world, server, role need, party, guild obligation, clip-to-play moment, or creator-made object that another person can enter, beat, help, copy, inhabit, or build on. |
+| Creator reach-lottery loop | A low-status or new contributor can plausibly get attention before already having an audience. |
+| Recommendation/supply loop | User behavior improves matching; better matching creates more attention; attention rewards supply; supply creates more chances for hits. |
+| Remix/template loop | A payload becomes a reusable primitive that lowers creation cost and multiplies variants. |
+| Playable/session loop | Gameplay creates a concrete reason for another player to join this session, party, server, raid, room, world, or match. |
+| Challenge/rivalry loop | A score, run, puzzle, clip, build, or achievement gives someone a reason to beat, copy, answer, or defend it. |
+| Guild/group loop | Recruiting or retaining members strengthens a group whose power/status/rewards flow back to each member. |
+| UGC playable-creator loop | A player/creator can publish a playable object that gets plays, feedback, status, or earnings before they own a large audience. |
+| Clip-to-play loop | A highlight, replay, or short video pulls recipients back into a playable action, not merely passive viewing. |
+
+Do not mush multiple loops together. Name the dominant loop, then show how auxiliary loops feed it.
 
 ### Pass 1 — Write the loop equation before improving it
 
-Use this shape before proposing tactics:
+For social graph loops, use this shape:
 
 ```text
 Actor
 → action
-→ payload created
+→ social payload created
 → recipient sees it through channel
-→ recipient motive / curiosity / status / utility / play value
+→ recipient motive: curiosity, status, utility, identity, emotional reward, rivalry, or play value
 → conversion event
 → recipient action inside product
-→ return value to original actor / creator / group / graph
-→ graph-level or ecosystem-level compounding
+→ return value to original actor or graph
+→ graph-level compounding
 ```
 
-Every arrow must answer: **who exactly, why now, through what surface, what action do they take, and what changes after they act?**
-
-### Pass 2 — Choose the right S-tier benchmark
-
-Use reference files as quality bars, not surface recipes.
-
-| Benchmark | Read when | S-tier lesson |
-|---|---|---|
-| `references/tbh-gas-s-tier-loop.md` | Compliments, votes, profile shares, local school/college graph, anonymous positive-signal loops. | The viral unit is a compliment/vote about a real person inside a real graph; every growth action increases the user's chance of receiving more validation. |
-| `references/tiktok-s-tier-loop.md` | Short-video feeds, creator reach, remix, sound/trend/template, TikTok/Reels/Shorts-style loops. | The viral unit is a media object that can be consumed, ranked, shared, and remixed; the creator does not need the follower graph first. |
-| `references/roblox-s-tier-playable-social-loop.md` | Games, game platforms, playable UGC, parties, private servers, co-play, guilds, challenges, creator-made maps/worlds, or “TikTok for games” claims. | The viral unit is a playable payload: a session, world, challenge, server, role need, UGC experience, avatar/status object, or place friends have a reason to enter now. |
-
-Root anchors:
+For off-platform status/share loops, add the social-cover ledger:
 
 ```text
-tbh/Gas
-User receives or sends a compliment/vote inside a dense real-world graph
-→ curiosity/status/share/invite actions densify the graph
-→ more graph density creates more compliments for the user.
-
-TikTok
-Viewer gets feed value without friends
-→ behavior improves matching
-→ small creator has credible distribution upside before a large follower graph
-→ more creators post/remix
-→ more content creates more viewer value and shareable moments.
-
-Roblox / games
-Player or creator reaches/creates a concrete game state
-→ another person has a reason to join, help, beat, copy, remix, or return now
-→ their action improves the original session, group, world, creator feedback, or playable inventory
-→ the game creates the next playable payload.
+Actor receives or creates flattering/status-bearing asset
+→ public cover story: why posting does not look like naked bragging
+→ private payoff: what ego/status/attention need the post satisfies
+→ audience read: what the viewer understands socially
+→ channel: Snap, IG, SMS, group chat, feed, clip surface, story, profile link
+→ viewer/recipient motive
+→ conversion event
+→ return value to actor, creator, graph, or system
 ```
+
+For creator/content/feed loops, use this shape:
+
+```text
+Viewer or creator
+→ action: watch, post, share, remix, follow, comment, build
+→ media object / template / signal created
+→ viewer sees it through feed or social channel
+→ viewer motive: entertainment, utility, identity, novelty, drama, aspiration, social context
+→ conversion event: watch, finish, like, comment, share, follow, remix, create
+→ return value to creator, viewer, or system
+→ more signals, content inventory, reusable formats, or creator attempts
+→ better matching / more chances for hits
+```
+
+For game/playable loops, use this shape:
+
+```text
+Player or creator
+→ gameplay/creation creates a playable payload or game-state need
+→ recipient receives it through party, invite, server, guild, clip, leaderboard, map browser, feed, or group chat
+→ recipient motive: join, help, beat, copy, spectate, remix, roleplay, raid, compete, collect, or build
+→ conversion lands inside play, not just viewing
+→ recipient action changes the original player's session, group power, creator proof, world state, rivalry, or economy
+→ original actor has a reason to repeat, recruit, or publish again
+```
+
+Every arrow must answer: **who exactly, why now, through what surface, and what changes after they act?**
+
+### Pass 2 — Run the plausible-deniability / social-cover pass
+
+Use this pass whenever the loop depends on public sharing, creator posting, off-platform broadcasting, inviting others into a social context, or any action that could feel socially expensive.
+
+| Field | Question |
+|---|---|
+| Private payoff | What does the user actually want: validation, attention, affiliation, rivalry, help, reach, creative proof, or status? |
+| Public cover story | What can the user plausibly say they are doing instead: asking who sent it, doing the trend, asking for help, challenging someone, sharing something funny, testing a map, hosting a server? |
+| Audience read | What will observers understand anyway? |
+| Recipient cover | What lets the recipient respond without feeling needy: curiosity, challenge, helping, joining the session, reacting to the trend, solving the mystery? |
+| Conversion path | Where does the recipient land: join, open, watch, respond, vote, play, challenge, create? |
+| Return value | How does that action increase value for the original actor, creator, graph, group, or system? |
+
+If the action only works when the user **openly** brags, begs for attention, asks for validation, or pleads for help, the loop is probably too socially expensive.
 
 ### Pass 3 — Score loop tightness
 
 | Tight loop signal | Loose/sloppy loop signal |
 |---|---|
-| The sender's natural next action grows the graph or ecosystem. | The sender must altruistically “help the app grow.” |
-| The payload is personal, status-bearing, useful, curiosity-inducing, or playable. | The payload is generic: “join me,” “check this out,” “earn points.” |
-| The recipient knows why they personally should open, join, play, help, compete, or respond now. | The recipient gets a vague invite or generic notification. |
-| The loop returns value to the original actor quickly. | New users may help someday, but the sender gets no obvious benefit. |
-| Growth densifies a bounded graph, strengthens a repeated relationship, or expands playable supply. | Growth sprays randomly across weak ties. |
+| The user's natural next action grows the graph, supply, or playable ecosystem. | The user must altruistically “help the app grow.” |
+| The payload is personal, status-bearing, useful, entertaining, identity-relevant, or playable. | The payload is generic: “join me,” “check this out,” “earn points.” |
+| The recipient/viewer knows why they personally should open, join, play, help, compete, or respond **now**. | The recipient gets a vague invite or generic notification. |
+| The loop returns value to the original actor quickly. | New users may help someday, but the actor gets no obvious benefit. |
+| Growth densifies a bounded graph, strengthens a repeated relationship, or expands high-quality supply. | Growth sprays randomly across weak ties or floods the system with junk. |
 | Off-platform sharing is a natural expression of value already received. | Sharing is a chore bolted on after activation. |
-| The loop survives without pretending a reward is the core value. | Points, badges, discounts, or currency substitute for social/playable meaning. |
+| The social-cover layer makes status, ambition, help, or affiliation socially safe to express. | The loop requires naked bragging, naked neediness, or naked ambition. |
+| Creator/content supply has credible upside and fast feedback. | Users are asked to post into a void with no plausible reach, status, or utility return. |
+| The loop survives without pretending a reward is the core value. | Points, badges, discounts, currency, or vague “engagement” substitute for product value. |
 
-### Pass 4 — Tighten, split, or reject
+### Pass 4 — Use the right S-tier benchmark
+
+Use reference files as **quality bars**, not surface recipes.
+
+| Benchmark | Read when | S-tier lesson |
+|---|---|---|
+| `references/tbh-gas-s-tier-loop.md` | Compliment, vote, profile-share, local graph, school/community, anonymous-positive, or status-sharing loops. | The viral unit is a compliment or vote about a real person inside a real graph, and the anonymous/mystery layer gives users plausible deniability to show off without looking cringe. |
+| `references/tiktok-s-tier-loop.md` | Short-video, feed-first, creator-content, small-creator breakout, remix, trend, sound/template, UGC media supply, or recommender-driven creator loops. | Viewers get value before building a friend graph, creators have a credible shot at reach before building a large follower graph, and trends/templates make posting feel safe enough to try. |
+| `references/roblox-s-tier-playable-social-loop.md` | Games, game platforms, social VR, co-play, parties, guilds, UGC experiences, maps, modes, servers, clips, challenges, or creator-made playable worlds. | The viral unit should usually be playable, and the activity itself often provides the social cover: “join my server / help us / beat this / test my map” is stronger than naked social need. |
+| `references/plausible-deniability-social-cover.md` | Any loop where sharing, inviting, posting, competing, creating, or responding could feel needy, braggy, risky, or overexposed. | Great loops often launder status, ambition, rivalry, taste, flirtation, or help through a believable public pretext while still letting the audience read the underlying signal. |
+
+### Pass 5 — Tighten, split, or reject
 
 For each weak arrow, label the defect precisely:
 
 ```text
 Missing actor / missing payload / missing recipient motive / weak channel /
 unclear conversion / no return value / graph too sparse / loop too slow /
-payload not playable / creator supply not rewarded / trust or abuse risk / saturation risk
+missing social cover / no recipient cover / naked bragging / naked neediness /
+no credible creator upside / content supply floods quality / weak ranking surface /
+payload not playable / clip is a dead end / trust or abuse risk / saturation risk /
+creator burnout risk
 ```
 
 Then choose one action:
 
 | Diagnosis | Action |
 |---|---|
-| One arrow is vague | Rewrite that arrow with a concrete actor, payload, motive, and action verb. |
+| One arrow is vague | Rewrite that arrow with a concrete actor, payload, motive, and return value. |
 | The user value exists but sharing is bolted on | Move the share moment after a real value event. |
 | The loop lacks recipient pull | Redesign the payload before adding incentives. |
-| The loop lacks return value | Treat it as distribution, not a viral loop, or add a real graph-return mechanism. |
-| A game loop is just “invite for currency” | Replace it with a playable session need, challenge, guild dependency, clip-to-play path, or UGC creator loop. |
-| A creator loop is just “users make content” | Add distribution, feedback, status, money, iteration, and a reason recipients consume/play/share/remix. |
+| The loop lacks return value | Treat it as distribution, not a viral loop, or add a real graph/supply-return mechanism. |
+| The loop asks for naked status signaling | Add a truthful public cover story and make sure the audience still reads the signal. |
+| The recipient has no cover to respond | Reframe the response as curiosity, challenge, help, participation, or reaction rather than neediness. |
+| The creator loop lacks credible upside | Do not call it TikTok-like; add distribution, feedback, status, utility, or monetizable value that makes posting rational. |
+| The feed loop lacks quality control | Design ranking, curation, moderation, contribution limits, or exploration/exploitation controls before scaling supply. |
+| The game loop is just “invite for currency” | Replace it with a playable session need, challenge, guild dependency, clip-to-play path, or UGC creator loop. |
 | The loop requires dark patterns | Reject the tactic and preserve trust. |
 | There are many weak loops | Pick one dominant loop; make other loops feed it or delete them. |
 
-### Pass 5 — Shape the output artifact
+### Pass 6 — Shape the output artifact
 
 For creation or audit tasks, produce this compact structure unless the user asks otherwise:
 
 ```text
 1. Loop in one sentence
 2. Loop equation
-3. Actor incentives
-4. Viral/social/playable payload
-5. Channel and conversion event
-6. Return value / compounding mechanism
-7. Why it is tight or loose
-8. Weak arrows and fixes
-9. Abuse, privacy, trust, and saturation risks
-10. Final tightened loop diagram
-```
-
-For games, explicitly include:
-
-```text
-playable payload
-co-play return
-group/place persistence
-creator proof, if UGC exists
-clip-to-play path, if clips are used
+3. Dominant loop class
+4. Actor incentives
+5. Viral / social / playable payload
+6. Public cover story / private payoff / audience read / recipient cover (if relevant)
+7. Channel, feed, or conversion surface
+8. Return value / compounding mechanism
+9. Why it is tight or loose
+10. Weak arrows and fixes
+11. Abuse, privacy, moderation, creator-burnout, and saturation risks
+12. Final tightened loop diagram
 ```
 
 ## Quick Reference
 
 | Situation | Default decision |
 |---|---|
-| The loop says “invite friends” | Demand the in-the-moment payoff for the inviter and the recipient's reason to accept. |
-| The loop is a game/platform loop | Demand the playable payload: what can the recipient play, join, beat, help, copy, inhabit, or build on? |
-| The loop says “share on social” | Specify the exact share asset and why posting it improves the sender's status, identity, outcome, or relationship. |
+| The loop says “invite friends” | Demand the in-the-moment payoff for the inviter, the recipient's reason to accept, and why inviting does not feel needy. |
+| The loop says “share on social” | Specify the exact share asset, public cover story, private payoff, audience read, and channel fit. |
+| The loop has a notification | Specify what the recipient learns, what remains hidden, and why the app is the only place to resolve it. |
 | The product uses a local graph | Optimize for cluster density and relevance; treat privacy and social harm as first-class design constraints. |
-| The product has UGC | Do not call UGC a loop until creators can plausibly get distribution, feedback, iteration signal, status, and upside. |
 | The payload is a compliment, vote, ranking, or identity claim | Check emotional valence, consent, abuse surface, and whether the positive signal is worth opening or sharing. |
-| The payload is a clip or highlight | It is stronger if the recipient can join, challenge, copy, remix, or play the highlighted context. Passive watching is weaker. |
-| The loop relies on rewards | Rewards may accelerate behavior but cannot replace social meaning, creator payoff, or play value. |
-| There is no return value to the original actor | Call it acquisition/distribution, not a viral loop. |
+| The product is feed-first or creator-led | Check whether small/new creators can get reach before building a follower graph; if not, do not call it TikTok-like. |
+| The loop says “algorithm” | Replace the magic word with signals, ranking surface, creator incentive, feedback, and return value. |
+| The loop says “creators will post” | Demand credible upside **and** low-ego-risk ways to try: reach, money, status, audience, feedback, utility, templates, remixes, prompts, or safe-to-try formats. |
+| The product is a game or game platform | The payload should usually be playable: session, party, server, raid, challenge, guild need, clip-with-join-path, map, mode, world, build, replay, or creator-made experience. |
+| The loop has a clip or highlight | It is stronger if the recipient can join, challenge, copy, remix, or play the exact context. Passive watching is usually weaker. |
+| The loop relies on rewards | Rewards may accelerate behavior but cannot replace social meaning, creator upside, utility, entertainment, or play value. |
+| There is no return value to the original actor or creator | Call it acquisition/distribution, not a viral loop. |
 | Multiple loops are present | Name the dominant loop and make auxiliary loops feed it. Do not present a pile of arrows as strategy. |
+| The user asks for “crazy effective” | Explain the mechanism, not just the outcome: payload, graph/supply, cover story, channel/feed, motive, conversion, return, compounding. |
 
 ## S-Tier Quality Bar
 
 A loop is S-tier only when most of these are true:
 
 - The viral payload is produced by normal product use, not a separate marketing chore.
-- The payload is about, useful to, socially meaningful for, or playable by a specific recipient or bounded graph.
-- The sender has an immediate selfish reason to send, invite, share, challenge, recruit, or publish.
-- The recipient has an immediate reason to open, join, play, help, compete, copy, build, or respond.
-- The conversion event makes the product more valuable for the original actor, creator, group, or graph.
-- The loop gets stronger with local density, repeated interactions, accumulated social proof, creator supply, or playable inventory.
-- The off-platform artifact is something a user would plausibly want others to see or act on.
-- The loop can be stated without vague words like “engagement,” “community,” “network effects,” or “gamification.”
-- For games, the recipient can enter or change a concrete playable state, not merely receive a generic invite or watch a dead-end clip.
-- For creator platforms, small or serious creators can plausibly get distribution, feedback, iteration signal, status, and upside before already owning a large audience.
-- The loop does not require deception, coercion, harassment, or exposing private social information.
+- The payload is about, useful to, entertaining for, socially meaningful for, or playable by a specific recipient, viewer, or bounded graph.
+- The sender, viewer, or creator has an immediate selfish reason to send, invite, share, watch, post, remix, challenge, recruit, or publish.
+- The recipient/viewer has an immediate reason to open, join, play, respond, help, compete, or create.
+- The conversion event makes the product more valuable for the original actor, creator, graph, group, or matching system.
+- When public sharing is involved, the action has a believable cover story and the audience still reads the underlying signal.
+- The recipient also has cover to respond, join, or participate without looking needy.
+- The loop gets stronger with local density, repeated interactions, better matching, accumulated social proof, higher-quality supply, or reusable formats.
+- The off-platform artifact is something a user would plausibly want others to see.
+- Creator/content loops give small contributors credible visibility, fast feedback, and low-friction / low-ego-risk creation primitives.
+- The loop can be stated without vague words like “engagement,” “community,” “network effects,” “gamification,” “culture,” or “the algorithm.”
+- The loop does not require deception, coercion, harassment, fake social proof, exploiting minors, or exposing private social information.
 
 ## Contrastive Examples
 
-### Sloppy viral loop
+### Sloppy invite loop
 
 Bad:
 
@@ -201,16 +261,44 @@ Bad:
 User signs up → invites friends → earns points → shares on social → friends join → network effects.
 ```
 
+Why it fails: the payload is generic, the recipient motive is absent, points substitute for product value, and the return value to the original user is vague.
+
 Good:
 
 ```text
 User receives a flattering vote from someone in their real school graph
 → the vote creates curiosity and status
-→ user shares the vote/profile via SMS, Snap, or IG
-→ classmates join to vote or discover their own votes
-→ their participation increases the original user's compliment stream
-→ the user has more social proof to share again.
+→ the sender is hidden, so “who sent this?” becomes believable public cover
+→ user shares the artifact on Snap/IG without openly saying “look how liked I am”
+→ classmates see both the mystery and the underlying social validation
+→ they open/join to participate or get their own signal
+→ more graph density increases the original user's future compliment stream.
 ```
+
+### Sloppy TikTok explanation
+
+Bad:
+
+```text
+Users watch videos → the algorithm learns → creators post → trends spread → engagement grows.
+```
+
+Why it fails: “algorithm” hides the mechanism; “creators post” assumes supply without explaining why a low-status user would bother; “trends spread” does not explain the reusable payload or ego-risk reduction.
+
+Good:
+
+```text
+Viewer gets immediate feed value without friends
+→ behavior signals improve matching
+→ viewer sees small/new creators receive real attention
+→ creation feels worth trying because formats/sounds/templates lower the cost and make posting socially safer
+→ a post can be tested beyond the creator's existing follower graph
+→ fast feedback creates hope, status, learning, or audience
+→ creator posts again
+→ more inventory and reusable formats create more viewer-specific hits.
+```
+
+Guardrail: do not overclaim equal opportunity. The point is credible upside before a large follower graph, not guaranteed fairness.
 
 ### Sloppy game loop
 
@@ -225,47 +313,52 @@ Good:
 ```text
 Player reaches a boss, party queue, guild war, private server, custom map, or challenge run
 → the game state creates a concrete reason another player is useful now
+→ “join us / help with this / beat this” provides public cover for the social ask
 → recipient joins, helps, competes, or tries to beat the payload
 → the original player's session, group power, status, or creator feedback improves
 → both players have a reason to repeat or pull in others.
 ```
 
-### Surface copying vs structural translation
-
-Bad: “Make our app like tbh: add anonymous compliments and school selection.”
-
-Good: “Our product needs its own payload. What emotionally salient, socially legible, or playable object do users already earn/create, who specifically cares about it, where can they receive it, and how does their response increase value for the sender?”
+Why it works: the viral unit is not the invite; it is the playable state that becomes better when another person enters.
 
 ## Anti-Patterns
 
-- **Growth slop arrows**: Drawing onboarding, invite, share, and network-effect arrows without motives. Instead: write the loop equation and fill every actor/payload/channel/return slot.
-- **Company-benefit masquerade**: “Invite friends so the app grows.” Instead: “Invite friends so you get more of the value you came for.”
-- **Open-loop sharing**: A user posts something, but the viewer has no reason to join or no path back into the sender's value. Instead: attach sharing to a payload that creates recipient pull and sender return.
-- **Game invite slop**: “Invite friends for currency.” Instead: identify the playable session need, challenge, guild dependency, clip-to-play path, or UGC object.
-- **Points as a payload**: Reward currency replaces social/playable meaning. Instead: make rewards secondary to identity, status, utility, reciprocity, creator payoff, or relationship value.
+- **Invite-as-payload**: “Invite your friends” is treated as the viral object. Instead: identify what the friend receives that is personally worth opening.
+- **Company-motive loop**: The loop asks users to grow the product. Instead: make the growth action the user's selfish next best move.
+- **Reward substitution**: Points, coins, badges, or discounts hide the absence of social meaning. Instead: treat rewards as accelerants, not the core value.
+- **Status-flex blindness**: The explanation says “social proof” but misses how users avoid looking needy while showing off. Instead: identify the plausible-deniability layer.
+- **Naked brag requirement**: The user has to openly say “look at me.” Instead: design a truthful public cover story that still carries the signal.
+- **No recipient cover**: The recipient must openly admit they want validation, attention, help, or inclusion. Instead: let them respond through curiosity, challenge, helping, joining, or participating.
+- **Generic social sharing**: “Share on social media.” Instead: name the exact asset, channel, audience, and status/relationship payoff.
+- **Algorithm-as-magic**: “The algorithm drives growth.” Instead: name the signals, ranking surface, feedback loop, creator incentive, and return value.
+- **Creator-supply fantasy**: “Creators will post because they want exposure.” Instead: prove credible upside, fast feedback, low creation cost, and repeat motivation.
+- **Trend handwave**: “Trends create engagement.” Instead: identify the reusable primitive: sound, template, format, challenge, prompt, Duet, Stitch, remix, or response structure.
+- **Game invite slop**: “Invite friends for gems.” Instead: identify the playable session need, challenge, guild dependency, clip-to-play path, or UGC object.
 - **Passive clip trap**: Treating a gameplay clip as viral because someone can watch it. Instead: ask whether the recipient can join, challenge, copy, remix, or play the highlighted context.
-- **UGC cargo cult**: Saying “players create content” without distribution, feedback, iteration, status, or upside. Instead: design the creator supply loop explicitly.
-- **Generic channel naming**: “Share on social media.” Instead: name the channel and why that channel fits the graph: SMS, group chat, Snap, IG story, Discord, TikTok, in-game party, guild feed, private-server link.
 - **Surface imitation**: Copying tbh/Gas, TikTok, or Roblox features without their graph density, payload, creator payoff, or return loop. Instead: translate the structure into the product's own graph and value event.
-- **Manipulative tightness**: Dark patterns make the loop fast but destroy trust. Instead: preserve consent, clarity, safety, and user dignity.
-- **Too many loops**: Stacking five weak loops to look sophisticated. Instead: make one loop brutally clear, then add only auxiliary loops that feed it.
+- **Dark-pattern virality**: Fake notifications, deceptive social proof, coercive invite gates, humiliating rankings, or fake scarcity. Instead: preserve trust even when a darker tactic would grow faster.
+- **Safety as appendix**: Abuse, privacy, moderation, minors, and creator burnout are handled after the growth design. Instead: treat trust as part of loop quality.
+- **Pile of loops**: Many arrows are shown without a dominant engine. Instead: choose the primary loop and make others feed it.
 
 ## Checklist
 
-- [ ] The loop equation names actor, action, payload, recipient, channel, conversion, recipient action, return value, and compounding.
-- [ ] The sender's growth action serves their immediate self-interest.
-- [ ] The recipient has a personal reason to open, join, play, help, compete, copy, build, or respond now.
-- [ ] The off-platform artifact is socially legible and worth sending or sharing.
-- [ ] New users increase value for the original actor, creator, group, or graph.
-- [ ] For games, the payload is playable or tied to a concrete game-state need.
-- [ ] The dominant loop is separated from auxiliary onboarding, invite, and share loops.
-- [ ] Vague terms were replaced with concrete surfaces, motives, and events.
-- [ ] Trust, privacy, abuse, and saturation risks were named.
-- [ ] The correct S-tier reference was used by archetype: tbh/Gas, TikTok, or Roblox.
+- [ ] The dominant loop class is named.
+- [ ] The loop equation includes actor, action, payload, recipient/viewer, channel/feed, motive, conversion, return value, and compounding.
+- [ ] The user's or creator's selfish motive is concrete.
+- [ ] The recipient/viewer motive is concrete.
+- [ ] The return value to the original actor, creator, graph, group, or system is concrete.
+- [ ] Any share/post/invite/challenge flow that could feel socially expensive was run through the social-cover ledger.
+- [ ] Any tbh/Gas-style loop was checked against `references/tbh-gas-s-tier-loop.md`.
+- [ ] Any TikTok-style feed/creator/remix loop was checked against `references/tiktok-s-tier-loop.md`.
+- [ ] Any game/social platform loop was checked against `references/roblox-s-tier-playable-social-loop.md`.
+- [ ] Vague words like “engagement,” “network effects,” “community,” and “algorithm” were replaced with mechanisms.
+- [ ] Weak arrows were labeled precisely.
+- [ ] Trust, abuse, privacy, moderation, creator burnout, and saturation risks were addressed.
 
 ## References
 
-- `references/tbh-gas-s-tier-loop.md` — Read before designing, auditing, or comparing compliment/vote loops, local social graph loops, tbh/Gas-style loops, or loops where the viral unit is personal social validation.
-- `references/tiktok-s-tier-loop.md` — Read before designing, auditing, or comparing feed, creator, remix, sound, trend, post-follower distribution, short-video, or TikTok/Reels/Shorts-style loops.
-- `references/roblox-s-tier-playable-social-loop.md` — Read before designing, auditing, or comparing game-native viral loops, playable UGC platforms, Roblox-style co-play loops, party/private-server loops, guild loops, challenges, creator-made maps/worlds, or “TikTok for games” claims.
-- `references/viral-loop-eval-cases.md` — Read when testing this skill's routing, attention-drift behavior, or whether a proposed loop design actually improved.
+- `references/tbh-gas-s-tier-loop.md` — Read for compliment, vote, profile-share, invite-gate, local graph, school/community, anonymous-positive, or status-sharing loops.
+- `references/tiktok-s-tier-loop.md` — Read for short-video, feed-first, creator-content, small-creator breakout, remix, trend, sound/template, UGC media supply, or recommender-driven creator loops.
+- `references/roblox-s-tier-playable-social-loop.md` — Read for game-native social loops, co-play loops, party/private-server loops, guild loops, UGC playable-creator loops, clip-to-play loops, or Roblox-style game-platform loops.
+- `references/plausible-deniability-social-cover.md` — Read when the loop depends on a share, post, invite, challenge, help request, or creator action that could feel needy, braggy, or overexposed without a believable cover story.
+- `references/viral-loop-eval-cases.md` — Read when testing whether the skill prevents generic viral-loop slop and preserves the S-tier benchmarks under attention drift.

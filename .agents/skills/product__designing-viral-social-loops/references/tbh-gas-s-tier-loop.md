@@ -1,6 +1,46 @@
 # tbh/Gas S-Tier Viral Social Loop Reference
 
-This is a benchmark example, not a recipe. Use it to calibrate tightness and prevent generic “invite/share/network effect” slop.
+Use this as the benchmark for compliment, vote, profile-share, invite-gate, and bounded local-graph loops.
+
+This is **not** a surface recipe.
+
+It is a quality bar for:
+
+```text
+bounded graph
+→ emotionally salient payload
+→ recipient curiosity
+→ plausible-deniability status share
+→ off-platform distribution
+→ new users join the same graph
+→ original user gets more of the value they came for
+```
+
+## The real one-sentence insight
+
+```text
+tbh/Gas did not just create flattering social proof.
+
+It turned anonymous positive signals inside a dense local graph into off-platform
+status artifacts with believable public cover.
+```
+
+The killer mechanic was not merely:
+
+```text
+receive compliment → share compliment
+```
+
+It was:
+
+```text
+receive anonymous positive signal
+→ “who sent this?” becomes believable cover
+→ user can show off without openly bragging
+→ viewers still understand the user was picked / liked / noticed
+→ viewers join/open to participate, resolve curiosity, or get their own validation
+→ more graph density creates more compliments for the original user
+```
 
 ## Transcribed loop
 
@@ -63,14 +103,48 @@ New user
 → recipients open or join to resolve curiosity and participate
 → they may compliment the original user back
 → time gate pushes the active user to invite others to keep playing
-→ user receives compliments
-→ user shares profile or received votes via SMS, Snap, or IG
-→ classmates see flattering social proof and a socially relevant prompt
-→ new users join the same local graph
+→ user receives compliments or votes
+→ anonymous / partially hidden sender creates “who sent this?” mystery
+→ user shares received vote or profile via SMS, Snap, or IG
+→ public cover story: I’m asking who sent this / what is this
+→ private payoff: everyone sees that I was picked, liked, or socially validated
+→ audience read: someone in our graph chose this person
+→ viewers join/open to participate or get their own validation
 → graph density increases
 → more people can vote, compliment, reciprocate, and share
-→ original user gets more compliments and more shareable proof
+→ original user gets more compliments and more shareable status proof
 ```
+
+## The social-cover ledger
+
+This is the part most generic explanations miss.
+
+| Field | tbh/Gas implementation |
+|---|---|
+| Private payoff | “I want people to see that I was picked, liked, desired, or complimented.” |
+| Public cover story | “Who sent this?” / “What is this?” / “Who voted for me?” |
+| Audience read | “Someone in our real graph chose this person.” |
+| Recipient cover | “I’m opening because I’m curious who sent it,” not “I’m opening because I desperately want validation.” |
+| Conversion path | Open app → join/select school → add friends → vote/compliment. |
+| Return value | More graph density creates more compliments and more shareable proof for the original user. |
+
+That is why the share worked on Snap and IG.
+
+Without the mystery layer, the post becomes:
+
+```text
+Look how liked I am.
+```
+
+Too naked.
+
+With the mystery layer, the post becomes:
+
+```text
+Who sent this?
+```
+
+Still flattering. Still legible. Now deniable enough to post.
 
 ## Loop anatomy
 
@@ -81,7 +155,8 @@ New user
 | Sender motive | Compliment others, keep playing, unlock via invites, potentially receive compliments back. | Sending is not charity; it can increase the sender's own future value. |
 | Recipient motive | “Someone in my graph said something positive about me.” | Curiosity and identity-relevance pull the recipient into the app. |
 | Broadcaster motive | Received votes/compliments make the user look liked, noticed, or socially validated. | Sharing is status expression, not a chore. |
-| Channel | SMS for direct reach; Snap/IG for off-platform graph broadcast. | The channel matches how teens already circulate social proof. |
+| Cover layer | Anonymity / partial information. | Lets the user show off without openly saying “look how wanted I am.” |
+| Channel | SMS for direct reach; Snap/IG for off-platform graph broadcast. | The channel matches where teens already perform identity and social proof. |
 | Conversion event | Open app, join, select school, add friends, vote/compliment. | The recipient becomes a participant, not just a viewer. |
 | Return value | More graph density produces more compliments for the original user. | New users improve the sender's own experience. |
 | Compounding mechanism | Local graph densification. | Growth becomes explosive inside a school/community cluster. |
@@ -89,36 +164,52 @@ New user
 ## Why this is S-tier
 
 1. **The viral unit is personal.** A compliment about you from your real graph is far stronger than a generic invite.
-2. **The sender, recipient, and broadcaster all have self-interested motives.** The app does not rely on users helping the company grow.
-3. **The product creates its own shareable artifact.** Received votes and profiles are naturally broadcastable because they are flattering and socially legible.
-4. **The graph is bounded and dense.** School/community context turns ordinary voting into identity-relevant social information.
-5. **The loop stacks without becoming ornamental.** Onboarding creates graph density; game actions create compliments; recipient notifications drive opens; share loops recruit more graph members.
-6. **The return arrow is clear.** New users do not merely increase vanity metrics; they increase the chance that the original user receives more compliments.
-7. **The loop has repeatable cadence.** Complimenting, receiving, inviting, and sharing can repeat daily without needing new content formats.
+2. **The graph is bounded and identity-relevant.** School/community context turns ordinary voting into socially loaded information.
+3. **The share artifact is generated by normal product use.** Users do not need to invent content to post.
+4. **The sender, recipient, and broadcaster all have self-interested motives.** The app does not rely on users helping the company grow.
+5. **The deniability layer solves the cringe problem.** Users can status-signal without naked bragging.
+6. **The audience still reads the signal.** Everyone understands what the user is really showing.
+7. **The return arrow is clear.** More users in the same graph increase the chance that the original user receives more compliments.
+8. **The loop stacks cleanly.** Onboarding creates graph density, compliments create notifications, mystery creates opens, and shares recruit more graph members.
 
-## What not to copy blindly
+## The transferable lessons
 
-Do not treat these as magic ingredients:
+Do not copy these surface ingredients blindly:
 
 ```text
-schools
+school selection
 anonymous voting
 compliments
 profile links
-Snap/IG sharing
+Snap/IG stories
 time gates
 ```
 
-They work only because they serve the deeper structure:
+Translate the deeper structure instead:
 
-```text
-bounded graph
-→ emotionally salient payload
-→ recipient curiosity
-→ off-platform social proof
-→ new users join the same graph
-→ increased value for the original user
-```
+### Lesson 1 — The graph must make the payload matter
+
+A compliment from random strangers is weak.
+
+A compliment from people in your real, bounded graph is strong.
+
+### Lesson 2 — The payload must already have emotional value
+
+The system should not need points or coupons to make the object interesting.
+
+### Lesson 3 — Partial information can create curiosity
+
+The right amount of hidden information can make the recipient open and the sender share.
+
+### Lesson 4 — The share should carry both signal and cover
+
+The audience must see the flattering signal.
+
+The sender must not have to say it directly.
+
+### Lesson 5 — More users must increase value for the original user
+
+If new users do not increase the sender's future validation, reciprocity, or utility, it is not this kind of loop.
 
 ## Structural translation template
 
@@ -129,7 +220,7 @@ When adapting the pattern, replace each tbh/Gas component with a product-native 
 | Compliment/vote | What positive, useful, scarce, or identity-relevant payload does normal product use create? |
 | High school graph | What bounded graph makes the payload matter: team, guild, league, cohort, workplace, neighborhood, fandom, friend group? |
 | “Someone voted for you” | What notification creates legitimate curiosity without deception? |
-| Share received vote | What artifact would a user be proud or motivated to show off-platform? |
+| Share received vote | What artifact would a user be proud or tempted to show off, and what truthful cover makes posting it feel socially safe? |
 | Invite to unlock | What immediate personal value does inviting unlock, and is the gate earned rather than coercive? |
 | More classmates join | How do new users increase value for the original user or graph? |
 
@@ -149,7 +240,9 @@ A tbh/Gas-tight loop says:
 ```text
 A user receives or creates a socially meaningful payload about a real person
 → the payload reaches someone who cares
-→ that person opens/joins to resolve curiosity, reciprocate, or participate
+→ hidden or partial information creates legitimate curiosity
+→ the user can share the artifact without naked bragging
+→ recipients open/join to resolve curiosity, reciprocate, or participate
 → their participation increases value for the original user or graph
 → the original user has a reason to repeat, invite, or share again.
 ```
