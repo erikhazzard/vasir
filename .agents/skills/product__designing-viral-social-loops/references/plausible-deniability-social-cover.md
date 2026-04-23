@@ -85,6 +85,11 @@ For any share, invite, post, challenge, clip, creator attempt, or status object,
 | Return value | How does that response improve the original actor's value, the graph, the group, the creator, or the system? |
 
 ## Taxonomy of social-cover mechanics
+Private payoff: I want to explore an identity, interest, or preference without publicly claiming it. 
+Public cover story: The feed showed me this / I was just browsing. 
+Audience read: This person is curious, not committed. 
+Recipient cover: Not applicable in most cases — this is often a private-consumption cover rather than a share cover. 
+Examples: Recommendation feeds, anonymous browsing modes, lurker patterns on identity-coded content.
 
 ### 1. Status laundering
 
