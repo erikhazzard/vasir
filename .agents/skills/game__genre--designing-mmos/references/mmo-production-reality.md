@@ -302,3 +302,22 @@ Do not ship AI questing if rewards are not conserved.
 Do not ship AI agents that can mutate shared world state without validation.
 Do not ship heavy personalization without a protected shared public canon.
 ```
+
+
+## Retention Research Production Filter
+
+Before implementing retention systems, require:
+
+| Question | Why |
+|---|---|
+| What need does it satisfy? | Prevents empty engagement mechanics. |
+| What happens if a player skips? | Detects captivity. |
+| What graph state is targeted? | Prevents content-only churn fixes. |
+| What telemetry distinguishes productive struggle from wheel-spinning? | Avoids bad adaptive difficulty. |
+| What social labor does this create? | Protects leaders, mentors, and brokers from burnout. |
+| What does the recommender optimize besides completion? | Prevents algorithmic monoculture. |
+| What does the player own afterward? | Builds identity and return value. |
+| What is the rollback if it creates anxiety or unhealthy compulsion? | Retention systems can silently damage trust. |
+
+Production rule:
+Do not launch retention mechanics without counter-metrics for autonomy, burnout, missed-day sentiment, return-after-break, and social graph health.

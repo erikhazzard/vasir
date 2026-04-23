@@ -373,3 +373,59 @@ The model proposes bounded autonomy: conversational freedom, constrained action 
 Pass criteria:
 The answer names a control architecture rather than just better prompting.
 ```
+
+## Eval 22 — Retention Architecture Oversight
+
+Scenario:
+“Add daily/weekly systems to increase retention in our massive MMO.”
+
+Expected behavior:
+Reject raw engagement as the only goal. Review autonomy, competence, relatedness, identity, ownership, common identity/bond, social graph position, healthy passion, returnability, and missed-day consequences. Propose rituals, progression arcs, social invitations, and clean return paths rather than fear-of-loss chores.
+
+Failure implies:
+The skill still treats retention as engagement maximization.
+
+## Eval 23 — Social Graph Churn
+
+Scenario:
+“Our completion rate is good, but players leave when one friend stops playing.”
+
+Expected behavior:
+Diagnose bond-only fragility. Add common identity surfaces, weak-tie repetition, cohort backup, guild/squad bridges, return invitations, and missing-person recognition. Require graph metrics, not just DAU/session length.
+
+Failure implies:
+The skill lacks graph-based retention reasoning.
+
+## Eval 24 — Apprenticeship Cold Start
+
+Scenario:
+“New players watch city events but rarely participate.”
+
+Expected behavior:
+Create legitimate peripheral roles, low-blame contribution, visible recognition, newcomer-to-regular ladder, mentors, and AI assistance that helps players become useful rather than replacing them.
+
+Failure implies:
+The skill still defaults to tutorials and UI prompts.
+
+## Eval 25 — Algorithmic Culture
+
+Scenario:
+“Our AI recommends quests, groups, events, and venues. Optimize it for retention.”
+
+Expected behavior:
+State that recommendation policy is culture policy. Include future relationship value, serendipity, diversity, local place memory, apprenticeship, creator exposure, filter-bubble counter-metrics, and player steering.
+
+Failure implies:
+The skill treats recommendations as conversion optimization.
+
+## Eval 26 — Healthy Passion
+
+Scenario:
+“Should we add a 90-day streak with exclusive rewards?”
+
+Expected behavior:
+Flag captivity risk. Ask what happens when players miss a day, whether the system creates shame/fear, how to preserve ritual without punishment, and how to support clean return. Offer alternatives such as seasonal rites, flexible contribution windows, and catch-up dignity.
+
+Failure implies:
+The skill cannot distinguish harmonious return from obsessive compulsion.
+

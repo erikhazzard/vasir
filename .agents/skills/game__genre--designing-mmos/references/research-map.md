@@ -53,3 +53,22 @@ source → what the source actually supports → what it does not prove → desi
 - `ai-native-mmo-worlds.md`
 - `mmo-calibration.md`
 - `mmo-pattern-library.md`
+
+## Retention Architecture Research Layer
+
+| Primitive | Primary sources | What evidence supports | What it does not prove | Design translation |
+|---|---|---|---|---|
+| Need satisfaction | Ryan/Rigby/Przybylski SDT/PENS | Autonomy, competence, and relatedness are central motivational lenses for games | Does not automatically tell which MMO feature to ship | Review every feature for need satisfaction, not just engagement |
+| Common identity / common bond | Kraut/Resnick/Ren online community design | Community attachment can come from group identity or personal bonds | Does not imply one attachment type is always superior | Build both world/faction/profession identity and small-group bonds |
+| Social graph retention | Kawale/Pal/Srivastava EQII churn; Shen brokerage/closure | Network position matters; brokerage and closure map different social capital | Does not prove a single universal churn formula | Design for missing-person value, weak-tie repetition, and cohort durability |
+| Apprenticeship | Lave/Wenger communities of practice | Newcomers learn by legitimate peripheral participation | Does not replace explicit UI/tutorials | Give new players real low-blame useful roles |
+| Adaptive mastery | DDA and productive persistence/wheel-spinning work | The same repeated failure can mean learning or stuckness | DDA alone does not create meaning | Diagnose stuckness type before changing difficulty |
+| Avatar/ownership | Avatar identification and psychological ownership literature | Self-representation and ownership can increase attachment | Does not justify pay-to-status or hostage ownership | Let player identity persist through avatar, home, tools, profession, maps, and authored history |
+| Team cognition | Shared mental models / transactive memory literature | Teams perform better when members share task models and know who knows what | Does not imply all coordination should be formalized | Build route, caller, expertise, backup, and post-failure model surfaces |
+| Commons governance | Ostrom common-pool resource principles | Robust commons require boundaries, monitoring, sanctions, conflict resolution, nested governance | Does not transfer mechanically to games without adaptation | Shared resources need player law, not just public/private/instanced toggles |
+| Reputation | Resnick/Tadelis/Jøsang trust and reputation systems | Reputation reduces information asymmetry among strangers | Global scores can distort behavior | Use contextual reputation tied to specific obligations |
+| Recommendation / serendipity | Beyond-accuracy recommender work | Diversity, novelty, serendipity matter beyond accuracy | Does not provide MMO culture policy by itself | Treat matchmaking and surfacing as culture design |
+| UGC ecology | UGC/editor surveys | UGC shifts games toward collaborative ecosystems | Does not solve curation or canon | AI lowers authoring friction; systems must validate, route, curate, and canonize |
+| Experience memory | Peak-end / meaningful games research | Remembered experience and meaning are not average fun | Does not mean every session needs melodrama | Design peaks, recovery, endings, and next-return hooks |
+| Healthy passion | Harmonious vs obsessive passion in games | Different engagement styles have different wellbeing implications | Does not make all high engagement harmful | Prefer life-compatible chosen return over captivity |
+

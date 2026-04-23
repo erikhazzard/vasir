@@ -508,3 +508,52 @@ Contract-based quest model; issuer authority; reward provenance; public/private/
 ### Metrics
 
 Quest contradiction rate; quest-source diversity; repeated social conversion after AI-routed tasks; steering/override frequency; public-canon drift reports; memory rate of generated content.
+
+
+## Playbook — Retention Architecture
+
+Use when designing dailies, seasons, social systems, onboarding, recommendations, AI quest surfacing, or any feature justified by retention.
+
+### Primary question
+
+What makes the player want to return because the world satisfies a durable human need, not because the system threatens loss?
+
+### Review sequence
+
+1. Name the need: autonomy, competence, relatedness, identity, ownership, meaning.
+2. Name the attachment type: common identity, common bond, or both.
+3. Map the social graph: isolated, one-bond dependent, clique-closed, broker, hidden glue, leader bottleneck, dormant.
+4. Add legitimate peripheral roles for newcomers.
+5. Diagnose challenge fit: under-challenge, productive struggle, wheel-spinning, social block, identity block, time block.
+6. Build team-cognition surfaces where groups coordinate.
+7. Define governance for scarce/shared resources.
+8. Define contextual reputation for repeated obligations.
+9. Treat algorithmic surfacing as culture policy.
+10. Shape peak, repair, ending, and next return.
+11. Check harmonious vs obsessive passion.
+
+### Do not ship if
+
+- missing a day creates shame or social exile;
+- the feature retains through fear rather than meaning;
+- new players remain spectators;
+- ranking only optimizes completion or session length;
+- a global reputation score replaces contextual trust;
+- social graph risk is invisible;
+- return paths are weaker than streak pressure.
+
+### Output artifact
+
+```text
+Need served:
+Attachment mode:
+Graph risk:
+Peripheral role:
+Challenge-fit logic:
+Ownership surface:
+Governance/reputation:
+Algorithmic policy:
+Memory arc:
+Health check:
+Metrics:
+```

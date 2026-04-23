@@ -204,3 +204,24 @@ Use this when LLMs, agentic NPCs, procedural questing, personalization, or gener
 | AI system can promise or grant state changes without world-law validation. | World-state hallucination. |
 | AI questing creates obligations with no provenance, authority, or reward conservation. | Infinite slop and trust collapse. |
 | Personalization changes public truth. | MMO comparability and shared memory break. |
+
+## Retention Architecture Extension
+
+Run this after the ordinary MMO social review.
+
+| Layer | Question |
+|---|---|
+| Need satisfaction | What autonomy, competence, relatedness, identity, ownership, or meaning does this feature satisfy? |
+| Attachment | Does it build common identity, common bond, or both? |
+| Social graph | Who becomes more connected, more central, more recognized, or more isolated? |
+| Apprenticeship | What low-blame useful role lets newcomers participate? |
+| Challenge fit | Does failure indicate productive struggle, wheel-spinning, social block, identity block, or time block? |
+| Team cognition | What shared model does the group need, and how does the system surface who knows what? |
+| Commons governance | If shared/scarce resources exist, what local rules, monitoring, sanction, and arbitration model sustains them? |
+| Reputation | What contextual proof helps strangers trust one another? |
+| Algorithmic exposure | What does the ranking/matching/surfacing function make culturally common? |
+| Memory arc | What is the peak, recovery, ending, and next-return hook? |
+| Health | Does the system create chosen return or fear-based compulsion? |
+
+A design is not S-tier if it is socially memorable but psychologically coercive, or psychologically satisfying but socially isolating.
+

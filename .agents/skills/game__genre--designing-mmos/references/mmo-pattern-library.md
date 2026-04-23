@@ -436,3 +436,76 @@ AI agents are conversationally rich but structurally uncontrolled.
 - **Damage:** incoherence, exploitability, dead content, trust collapse.
 - **Replacement:** bounded autonomy with role, duty, steering, execution rules, and memory tiers.
 - **Question:** what is this agent allowed to improvise, and what must be compiled through world law?
+
+## Retention Architecture Patterns
+
+### Need-satisfaction vacuum
+
+Players have tasks but no autonomy, competence, relatedness, identity, ownership, or meaning.
+
+Fix:
+Name the need the system serves. Remove chores that only inflate engagement. Add self-authored goals, mastery feedback, social recognition, ownership, and meaningful endings.
+
+Diagnostic:
+Would the player return if the reward were delayed?
+
+### Bond-only churn cascade
+
+Retention depends on one friend or one small clique.
+
+Fix:
+Add common identity: district, profession, faction, venue, ritual, public cause, alumni path, and weak-tie repetition.
+
+Diagnostic:
+If this player’s closest friend leaves, who else would notice?
+
+### Peripheral-role absence
+
+Newcomers can watch but cannot safely matter.
+
+Fix:
+Add legitimate low-blame roles that contribute to real activity.
+
+Diagnostic:
+What useful thing can a first-week player do for a veteran tonight?
+
+### Wheel-spinning disguised as challenge
+
+Players repeat attempts without understanding what to change.
+
+Fix:
+Detect stuckness type. Add mechanic-specific feedback, mentors, alternate representation, or changed challenge shape.
+
+Diagnostic:
+Is the next attempt smarter, or merely another pull?
+
+### Algorithmic monoculture
+
+Recommendation and matchmaking optimize completion until culture narrows.
+
+Fix:
+Optimize for relationship value, serendipity, diversity, apprenticeship, local place memory, and creator exposure.
+
+Diagnostic:
+What culture does the ranking function create by default?
+
+### Reputation flattening
+
+A global score compresses trust, skill, popularity, generosity, and wealth.
+
+Fix:
+Contextual reputation by obligation and outcome.
+
+Diagnostic:
+Trustworthy for what?
+
+### Captivity retention
+
+Players return from fear, shame, sunk cost, or social debt without exit.
+
+Fix:
+Replace fear-of-loss with ritual, flexible contribution, clean return, and meaningful obligation.
+
+Diagnostic:
+What happens if the player misses a day?
+

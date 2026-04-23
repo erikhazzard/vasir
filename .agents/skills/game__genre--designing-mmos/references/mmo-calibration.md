@@ -173,8 +173,6 @@ WoW did not decline because one tool killed community. It repeatedly substituted
 | Mythic+ turns dungeons into repeatable mastery. | Use timers only with expectation matching, route literacy, completion paths, and failure repair. |
 | WoW Token legitimizes gold/time exchange. | Keep monetized convenience out of earned-status and social-trust channels. |
 
-Source details for these claims live in `world-of-warcraft-source-spine.md`.
-
 ## Final Fantasy XIV Deep Calibration
 
 Use FFXIV as the calibration bar for **trust, story memory, returnability, low-pressure grouping, and identity outside combat**.

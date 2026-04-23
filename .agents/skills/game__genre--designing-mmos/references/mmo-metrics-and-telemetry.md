@@ -302,3 +302,29 @@ Track both bonding and bridging.
 - political war counts with no logistics participation;
 - many generated quests with low remembered consequence;
 - high personalization satisfaction with collapsing shared reference points.
+
+## Retention Architecture Telemetry
+
+Do not instrument retention only as DAU, session length, streaks, and conversion. Pair every engagement metric with a health and meaning counter-metric.
+
+| Concept | Signals | Counter-signal |
+|---|---|---|
+| Autonomy | self-authored goals, opt-in obligations, path diversity | forced chore completion, low perceived agency |
+| Competence | mastery progression, retry improvement, guide-free success | wheel-spinning, opaque failure, external dependency |
+| Relatedness | repeat useful contacts, thanks, invites, cohorts | anonymous completions, isolation after activity |
+| Common identity | faction/district/profession participation, ritual attendance | identity slogans without contribution |
+| Common bond | stable squads, return invites, pair recurrence | single-friend dependency |
+| Social graph retention | bridge count, missing-player pings, cohort survival | broker burnout, clique isolation |
+| Apprenticeship | peripheral-role uptake, apprentice-to-regular conversion | new-player spectatorship |
+| Challenge fit | productive retry curves, mentor uptake | repeated failure with no improvement |
+| Ownership | home/tool/map/profession updates, return-to-owned-space | hostage retention, loss anxiety |
+| Team cognition | plan agreement, role/caller clarity, post-wipe repair | blame chat, repeated same-mechanic confusion |
+| Commons governance | local rule compliance, dispute resolution time | monopoly, grief, operator-ticket load |
+| Reputation | contract completion, dispute rate, contextual vouches | popularity-gaming, laundering |
+| Algorithmic culture | serendipity acceptance, relationship value, creator exposure diversity | filter-bubble depth, venue/creator concentration |
+| Experience memory | post-session recap saves, shares, gratitude, return hook acceptance | reward collection with no recall |
+| Healthy passion | return-after-break, guilt-free skipping, positive sentiment | shame, fear of loss, compulsion language |
+
+Interpretation trap:
+A metric that rises while social trust, agency, or clean return falls is not MMO health. It is extraction or optimization debt.
+
