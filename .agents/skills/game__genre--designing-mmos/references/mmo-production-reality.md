@@ -243,3 +243,62 @@ What replaces the memory?
 What telemetry proves it?
 What is the fallback if it creates thin anonymity?
 ```
+
+## Sovereignty / Logistics Production Checks
+
+| System | Production check |
+|---|---|
+| Territorial control | Needs route graph, upkeep model, world-state authority, campaign history, treaty representation, and rollback logic. |
+| Coalition tools | Needs permission hierarchy, public/private treaty states, identity mapping, and archive surfaces. |
+| Supply systems | Needs observability for route usage, bottlenecks, convoy failure, and burden concentration. |
+| Map/intel layers | Needs annotation storage, permissioning, decay rules, and performance budgets. |
+
+Launch gate:
+
+```text
+Do not ship territorial control if holding land has no meaningful maintenance or map/intel support.
+```
+
+## Institution Lifecycle Production Checks
+
+| System | Production check |
+|---|---|
+| Guild/squad tooling | Must support delegation, overlap, dormancy, succession, and history, not just roster and ranks. |
+| Merger/reactivation tools | Need identity reconciliation, archive handling, role mapping, and communication surfaces. |
+| Alumni/dormancy | Need low-cost memory storage and re-entry paths. |
+
+Launch gate:
+
+```text
+Do not ship long-lived institutions without an explicit answer to “what happens when the leader disappears?”
+```
+
+## History / Ritual Production Checks
+
+| System | Production check |
+|---|---|
+| Chronicles / monuments | Need promotion thresholds, provenance, moderation/curation policy, and storage budgets. |
+| Historical maps | Need data pipeline from world events to player-facing layers. |
+| Ritual calendar | Needs scheduling, communication, recap surfaces, and tie-ins to places/institutions. |
+
+## AI-Native Production Checks
+
+AI-native systems need more than prompts.
+
+| Layer | Production requirement |
+|---|---|
+| Model role | Say whether the model drafts, converses, simulates, routes, or adjudicates. |
+| Grounding | Provide a queryable authoritative world model and constrained action interface. |
+| Memory | Separate ephemeral conversation context, relational memory, contract record, and canonical history. |
+| Control boundary | Define what the model may suggest versus what it may execute. |
+| Provenance | Every generated quest, reward, rumor, or law-adjacent artifact needs source labeling. |
+| Evaluation | Build replayable traces, contradiction detection, world-consistency checks, and author review surfaces. |
+| Cost model | Decide what is live-generated, cached, templated, or precomputed. |
+
+Launch gates:
+
+```text
+Do not ship AI questing if rewards are not conserved.
+Do not ship AI agents that can mutate shared world state without validation.
+Do not ship heavy personalization without a protected shared public canon.
+```

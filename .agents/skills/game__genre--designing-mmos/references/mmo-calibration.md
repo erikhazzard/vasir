@@ -225,3 +225,92 @@ FFXIV’s Worlds/Data Centers are not the model. Translate their social function
 | Housing wards | Scalable neighborhoods with recurring presence, not scarce topology. |
 | Duty roulette | Global access with recent-ally and cohort memory. |
 | Party Finder | Purpose-board with filters for schedule, tone, geography, role, and goal. |
+
+## EVE Calibration
+
+EVE sets the calibration bar for:
+
+- sovereignty as logistics and labor, not just war;
+- diplomacy and coalition behavior as real systems;
+- geography, staging, and route ownership as political facts;
+- noncombat roles as power infrastructure;
+- large-scale conflict becoming public history.
+
+Questions:
+
+- What must be moved, staged, or maintained to hold power here?
+- Which treaties, alignments, and neutralities are legible?
+- What routes and chokepoints matter politically?
+- What record survives the war besides the scoreboard?
+
+## Social Topology Calibration
+
+Shen’s EQII work and Ducheneaut’s third-place framing add a rule the pack should keep visible:
+
+```text
+Design both closure and brokerage.
+```
+
+Questions:
+
+- Where does trust accumulate?
+- Where do bridges form across groups?
+- Which spaces are actual third places rather than service kiosks?
+
+## Institution Lifecycle Calibration
+
+Poor & Skoric’s guild analysis and merger research imply a hard rule:
+
+```text
+Recruitment is not enough; groups must survive subgroup drift, succession, dormancy, and merger.
+```
+
+Questions:
+
+- What breaks when the founder leaves?
+- How does the group hibernate without dying?
+- How do two existing cultures merge without symbolic capture?
+
+## Authored-History Calibration
+
+Sandbox and persistent-world research add a memory rule:
+
+```text
+Players care more about history they helped author than lore they only consumed.
+```
+
+Questions:
+
+- What player action can become durable public history?
+- Which traces are local, institutional, public, or canonical?
+- Can returners read what happened while they were away?
+
+## Ritual Calibration
+
+Simpson’s ritual work adds a commitment rule:
+
+```text
+Shared emotional focus predicts community commitment better than material focus alone.
+```
+
+Questions:
+
+- What recurring public acts build belonging here?
+- Is this a chore loop or a civic ritual?
+- What commemorates victory, loss, return, or migration?
+
+## AI-Native Calibration
+
+Use NFX as a window-timing lens and recent LLM/game research as a design lens.
+
+The calibration rule is:
+
+```text
+LLMs remove authorial scarcity first; they do not remove the need for canon, law, provenance, comparability, and shared memory.
+```
+
+Questions:
+
+- Which old quest/NPC/authorship assumptions should be deleted?
+- What public truth must stay shared?
+- What should remain human-scarce and valuable?

@@ -424,3 +424,87 @@ Telemetry:
 - Use NPCs to reduce churn, not to erase social ladders.
 - Treat venues/events as world fabric, not fringe activity.
 - Assume skeptical players compare your MMO against the one they left.
+
+## Sovereignty / Territorial Control / Coalition Politics
+
+### Risks
+
+Territory is reduced to color-filling and point capture; wars have no maintenance burden; coalitions are invisible; labor and diplomacy are hidden under combat spectacle.
+
+### Knobs
+
+Staging systems; route and chokepoint ownership; upkeep and logistics costs; treaty states; coalition permissions; supply-line maps; public campaign records; industrial dependency; symbolic landmark value; victory conditions beyond kill counts.
+
+### Metrics
+
+Territory hold duration; supply-route traffic; treaty creation/breakage; coalition participation; staging reuse; noncombat contribution to territorial outcomes; revisit rate to campaign landmarks.
+
+## Map / Intel / Rendezvous
+
+### Risks
+
+Maps become navigation-only; scouting and planning move to Discord or third-party tools; rallying is ambiguous; route knowledge has no social value.
+
+### Knobs
+
+Personal/squad/guild/public layers; annotations; temporary tactical markers; route templates; verified vs unverified intel; conflict overlays; historical layers; shared coordinate language; intel decay.
+
+### Metrics
+
+Shared-map usage; time-to-rally; route-plan reuse; scout report adoption; historical layer views; off-client map dependence.
+
+## Institution Lifecycle / Mergers / Reactivation
+
+### Risks
+
+Groups recruit but do not integrate; leaders become bottlenecks; strong subgroups fracture the institution; mergers create culture wars; dormancy equals deletion.
+
+### Knobs
+
+Onboarding-to-play pathways; role overlap; officer delegation; alumni status; dormancy mode; reactivation tools; merger charter mapping; split-friendly substructures; succession handoff.
+
+### Metrics
+
+New-member time-to-first-play; subgroup overlap; leader concentration; dormant-group reactivation; merger retention; officer churn.
+
+## Player-Authored History / Monuments / Public Records
+
+### Risks
+
+Major events vanish after rewards; players cannot point to what happened; operator-authored lore crowds out player-made history.
+
+### Knobs
+
+Battle records; treaty ledgers; local rumor boards; memorial objects; world chronicle promotions; provenance tags; district history surfaces; “what happened here?” interactables.
+
+### Metrics
+
+Chronicle views; memorial revisits; player-created archive activity; named-location recall; returner use of historical recaps.
+
+## Ritual Calendar / Civic Events
+
+### Risks
+
+Cadence becomes chores; festivals feel cosmetic and disconnected from institutions or places; returners have no ritual re-entry.
+
+### Knobs
+
+Initiation rites; returner festivals; memorial days; campaign openings/closings; market days; guild anniversaries; public parades; recurring place-bound traditions.
+
+### Metrics
+
+Attendance repeat rate; institution joins after ritual; returner activation after ritual windows; place-based repeat attendance; screenshot/archive activity.
+
+## AI-Native Questing / Agents / Personalized World Response
+
+### Risks
+
+Generated content overwhelms canon; AI can promise impossible state changes; every player gets a private world; NPCs become impressive but socially irrelevant or untrustworthy.
+
+### Knobs
+
+Contract-based quest model; issuer authority; reward provenance; public/private/canonical memory policy; bounded-autonomy agents; steering controls; grounded execution layer; side-content personalization with public-canon protection; human-usefulness preservation.
+
+### Metrics
+
+Quest contradiction rate; quest-source diversity; repeated social conversion after AI-routed tasks; steering/override frequency; public-canon drift reports; memory rate of generated content.

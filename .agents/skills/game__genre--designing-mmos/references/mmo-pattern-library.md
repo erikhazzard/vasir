@@ -337,3 +337,102 @@ Diagnostic question: **Would a skeptical refugee’s first week prove or disprov
 - **Replacement:** keep return rhythm but rotate social formats, institution needs, identity rewards, and world-state rituals.
 
 Diagnostic question: **Is this a comforting ritual or a solved checklist?**
+
+## Brokerage Starvation
+
+A world produces tight groups but too few bridges between them.
+
+- **Bad default:** celebrate strong guild cohesion and ignore weak ties.
+- **Damage:** clique capture, bad newcomer permeability, stagnant culture, brittle politics.
+- **Replacement:** markets, festivals, diplomacy, mentorship, public works, multi-group objectives, third places.
+- **Question:** where does someone meet the next useful person outside their current group?
+
+## Closure Vacuum
+
+A world produces lots of contacts but too little durable trust.
+
+- **Bad default:** rely on queues, public events, and broad social surfaces only.
+- **Damage:** everyone is friendly but disposable.
+- **Replacement:** squads, crews, statics, recurring neighborhood groups, craft teams, seasonal councils.
+- **Question:** where does a weak tie become a durable “we”?
+
+## Sovereignty Without Logistics
+
+Territory exists, but the game ignores staging, supply, labor, and diplomacy.
+
+- **Bad default:** control points, territory colors, and scoreboards.
+- **Damage:** politics feels fake; land has no maintenance story.
+- **Replacement:** staging, route ownership, supply pressure, industrial support, treaty surfaces, public history.
+- **Question:** what must be moved, built, defended, or negotiated to hold this space?
+
+## Institution Senescence
+
+A group can recruit but cannot age.
+
+- **Bad default:** roster, ranks, guild chat, bank.
+- **Damage:** officer burnout, subgroup fracture, lost succession, dead shells.
+- **Replacement:** overlap design, delegation, alumni/dormancy, merger/split surfaces, reactivation tooling.
+- **Question:** what happens when the founder disappears for 90 days?
+
+## Map Wallpaper
+
+The map tells players where things are, but not how people coordinate.
+
+- **Bad default:** minimap plus travel UI.
+- **Damage:** scouting, rallying, route identity, and territorial memory move off-client.
+- **Replacement:** annotations, rally markers, intel decay, historical overlays, route plans, permission layers.
+- **Question:** can this map coordinate a campaign, not just a commute?
+
+## Authored-History Vacuum
+
+Players change the world, but nothing visible persists.
+
+- **Bad default:** only rewards and logs persist.
+- **Damage:** events feel disposable, political life feels fake, returners cannot read the world’s past.
+- **Replacement:** chronicles, monuments, local records, battle markers, treaty archives, historical maps.
+- **Question:** what can a player point to a month later and say “we did that”?
+
+## Ritual Famine
+
+The world has cadence but no civic life.
+
+- **Bad default:** dailies, weeklies, and reset timers are treated as social glue.
+- **Damage:** obligation without belonging, solved checklists, emotional flatness.
+- **Replacement:** anniversaries, campaign openings, returner rites, guild initiations, commemorations, market days, venue calendars.
+- **Question:** what recurring public act makes this feel like a society rather than a schedule?
+
+## AI Slop Abundance
+
+LLMs flood the world with cheap text, cheap jobs, and cheap dialogue.
+
+- **Bad default:** “more generated content” as the success metric.
+- **Damage:** incoherence, forgettability, reward inflation, canon dilution, authorial tastelessness.
+- **Replacement:** generation inside world law, provenance, scarcity policy, memory budgets, and curation ladders.
+- **Question:** what became scarce after content stopped being scarce?
+
+## World-State Hallucination
+
+Conversation and world truth are treated as the same layer.
+
+- **Bad default:** whatever the agent says becomes reality.
+- **Damage:** broken promises, contradictory canon, exploitability, loss of trust.
+- **Replacement:** proposal → validation → execution → recording. Dialogue is free; state change is governed.
+- **Question:** who or what adjudicates this utterance into truth?
+
+## Quest Widget Nostalgia
+
+Quest design keeps pre-LLM assumptions after authorial scarcity collapses.
+
+- **Bad default:** NPC with exclamation mark, fixed task, fixed reward.
+- **Damage:** the game misses the AI-native opportunity to treat obligations as world contracts.
+- **Replacement:** issuer authority, feasibility, negotiation, adjudication, provenance, historical trace.
+- **Question:** who else in this world should be able to ask for work — and why not?
+
+## Unbounded Agent Autonomy
+
+AI agents are conversationally rich but structurally uncontrolled.
+
+- **Bad default:** agents can say, promise, and do anything within prompt reach.
+- **Damage:** incoherence, exploitability, dead content, trust collapse.
+- **Replacement:** bounded autonomy with role, duty, steering, execution rules, and memory tiers.
+- **Question:** what is this agent allowed to improvise, and what must be compiled through world law?

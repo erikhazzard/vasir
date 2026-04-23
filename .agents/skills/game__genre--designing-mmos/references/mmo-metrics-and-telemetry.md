@@ -245,3 +245,60 @@ Use these when testing returnability, story onboarding, low-pressure grouping, a
 - High venue attendance can hide off-client discovery dependence.
 - High patch return can hide formula fatigue.
 - High politeness can hide social thinness.
+
+## Social Topology Metrics
+
+Track both bonding and bridging.
+
+| Concept | Example metrics |
+|---|---|
+| Weak ties | repeated low-commitment encounters, preferred-stranger recurrence, market repeat-customer rate |
+| Strong ties | squad/static repeat rate, closure density, event attendance stability |
+| Brokerage | cross-group event participation, mentor-to-guild conversion, market/diplomacy bridge roles |
+| Third-place health | dwell after utility completion, regular reappearance, mixed-motive activity in one place |
+
+## Institution Lifecycle Metrics
+
+| Stage | Example metrics |
+|---|---|
+| Founding | first-30-day survival, first event hosted, member-to-player conversion |
+| Growth | newcomer time-to-first-play, subgroup formation, role coverage |
+| Maturity | leader concentration, event reliability, cross-subgroup overlap |
+| Strain | officer churn, cancellation rate, subgroup exit cascades |
+| Dormancy / return | dormancy duration, reactivation success, alumni reconnection |
+| Merger | merged-group retention, charter acceptance, cross-roster play density |
+
+## Sovereignty / Logistics Metrics
+
+| Claim | Counter-metrics |
+|---|---|
+| Territorial system works | hold duration + supply burden; conquest frequency + maintenance labor; war scale + route participation; front clarity + coalition participation |
+| Politics are alive | treaty creation, neutrality, betrayal events, coalition reformation, not just kill counts |
+| Geography matters | chokepoint recurrence, staging-point usage, convoy route volume, rerouting under threat |
+
+## History / Ritual Metrics
+
+| Concept | Example metrics |
+|---|---|
+| Authored history | archive creation, monument interaction, historical recap views, named-place recall |
+| Ritual health | attendance repeat rate, emotional recall, institution joins post-ritual, returner activation after commemorations |
+| Memory survival | fraction of major events with visible traces 7/30/90 days later |
+
+## AI-Native Metrics
+
+| Concept | Example metrics |
+|---|---|
+| World coherence | contradiction rate, impossible promises, invalid quest issuance, canonical drift incidents |
+| Quest provenance | issuer mix, reward-source validity, adjudication success, cancellation/invalidation rate |
+| Social value of AI | % of AI-issued or AI-routed content that leads to human-human interaction, repeat grouping, or institutional conversion |
+| Personalization risk | fraction of content visible only to one player, public-canon divergence complaints, comparability breaks |
+| Agent control | override/steering rate, failed execution rate, memory retrieval quality, stale-memory incidents |
+| Content remembrance | which generated quests/events players can still recall after 1/7/30 days |
+
+## Metric traps to flag
+
+- high concurrent attendance with low repeat-social conversion;
+- strong guild retention with low cross-group permeability;
+- political war counts with no logistics participation;
+- many generated quests with low remembered consequence;
+- high personalization satisfaction with collapsing shared reference points.

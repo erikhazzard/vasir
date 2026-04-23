@@ -140,3 +140,67 @@ Use this for story, onboarding, grouping, returnability, social expression, or p
 | Institution support | Does this support FCs/squads/statics/venues/cohorts inside the client? |
 | Formula risk | Does this become a comforting ritual or solved checklist? |
 | Exodus-readiness | Would skeptical players from another MMO understand and trust this in week one? |
+
+## Sovereignty / Topology Add-On
+
+Use this when a feature touches territory, routes, diplomacy, public maps, resource lines, staging, or large-scale faction politics.
+
+| Field | Question |
+|---|---|
+| Sovereignty primitive | What exactly is being held: route, district, resource field, tax base, logistics hub, memorial place, symbolic capital? |
+| Maintenance burden | What labor, supply, time, or attention is required to keep it? |
+| Coalition surface | What multi-group relationships exist besides “same faction”? |
+| Geography leverage | Which chokepoint, frontier, staging area, corridor, or hinterland matters? |
+| Intel surface | What map, scout, annotation, or alert layer makes the political reality legible? |
+| Historical residue | What public record or place memory survives conflict here? |
+
+## Institution Lifecycle Add-On
+
+Use this when the feature affects guilds, squads, councils, venues, or any durable group.
+
+| Field | Question |
+|---|---|
+| Lifecycle stage helped | Founding, growth, maturity, strain, dormancy, reactivation, or merger? |
+| Leadership concentration | Does this reduce or worsen one-person failure? |
+| Subgroup overlap | Does this create bridges across cliques or harden them? |
+| Succession path | What happens if current leaders leave? |
+| Dormancy memory | What survives a quiet period? |
+| Merger/split support | Can the institution evolve structurally without disappearing? |
+
+## Authored History / Ritual Add-On
+
+Use this when the feature involves events, campaigns, festivals, public storytelling, or lasting consequences.
+
+| Field | Question |
+|---|---|
+| Trace left behind | What visible evidence remains after the event? |
+| Promotion ladder | Is the trace ephemeral, local, institutional, public, or canonical? |
+| Ritual function | Does this initiate, commemorate, return, celebrate, or close a campaign? |
+| Place tie | Which location becomes more meaningful because of the event? |
+| Provenance | Who authored or validated the memory? |
+
+## AI-Native Add-On
+
+Use this when LLMs, agentic NPCs, procedural questing, personalization, or generative live content is involved.
+
+| Field | Question |
+|---|---|
+| Old assumption being replaced | What pre-LLM design assumption is no longer valid? |
+| AI role | Is the model drafting, simulating, conversing, routing, adjudicating, or executing? |
+| Grounding boundary | What authoritative state constrains the output? |
+| Provenance | Who authored or approved this generated content or contract? |
+| Public canon impact | Does this affect shared reality or only local/personal texture? |
+| Human usefulness effect | Does AI increase social density or erase reasons players matter to each other? |
+| Failure mode | What happens when the model is wrong, stale, contradictory, or strategically manipulated? |
+
+## Additional Do-Not-Ship Gates
+
+| Gate | Reason |
+|---|---|
+| Territorial feature has no logistics, map, or coalition layer. | Sovereignty theater. |
+| Institution feature ignores succession or dormancy. | Long-lived groups remain fragile by design. |
+| Major public event leaves no trace or ritual meaning. | Retention event without culture. |
+| Map/intel feature cannot be shared or annotated. | Off-client command infrastructure becomes mandatory. |
+| AI system can promise or grant state changes without world-law validation. | World-state hallucination. |
+| AI questing creates obligations with no provenance, authority, or reward conservation. | Infinite slop and trust collapse. |
+| Personalization changes public truth. | MMO comparability and shared memory break. |
