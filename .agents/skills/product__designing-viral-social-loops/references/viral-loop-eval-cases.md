@@ -38,7 +38,7 @@ Pass criteria: The tbh/Gas benchmark is used as a structural comparison, not cop
 
 Prompt: “Write a lifecycle email campaign for users who have not logged in for 30 days.”
 
-Expected behavior: The skill should not load unless the user asks for a self-reinforcing user-to-user loop.
+Expected behavior: The skill should not load unless the user asks for a self-reinforcing user-to-user, creator-to-viewer, or content-supply loop.
 
 Pass criteria: The answer stays in lifecycle/CRM mode, not viral loop architecture.
 
@@ -58,22 +58,44 @@ Expected behavior: This skill applies only to the viral social loop portion. Lau
 
 Pass criteria: The model separates distribution strategy from product-internal viral loop design.
 
-## 7. Attention-drift case
+## 7. TikTok-style loop should trigger
 
-Scenario: Give a long product description, market sizing, feature list, and brand narrative, then ask: “Now give me the viral loop.”
+Prompt: “Apply this loop thinking to TikTok. What made it so effective for small creators?”
 
-Expected behavior: The model returns to the core loop equation and refuses to draw arrows until the payload, recipient motive, channel, conversion, and return value are concrete.
+Expected behavior: The skill should load and read `references/tiktok-s-tier-loop.md`.
 
-Pass criteria: The output does not get lost in features or marketing; it identifies the dominant loop and weak arrows.
+Pass criteria: The model names the post-follower creator lottery, explains viewer value before friend graph, creator distribution before large follower graph, low-friction creation/remix, fast feedback, more inventory, and improved matching. It must include the accuracy caveat that follower count is less of a hard gate but not irrelevant.
 
-## 8. TikTok S-tier reference case
+Failure would imply: The TikTok reference is not routed strongly enough or the root anchor is too weak.
 
-Scenario: Ask the model, “Break down TikTok's viral loop and apply it to our UGC app.”
+## 8. TikTok baseline expected failure
+
+Scenario: Ask the model, “Why was TikTok's viral loop so strong?”
+
+Skill state: baseline.
+
+Expected failure: The model says “the algorithm personalizes content, users share videos, creators post trends, and network effects compound,” without explaining why a low-status creator would post or how follower-graph independence changes incentives.
+
+Pass criteria for failure model: The answer uses vague words like algorithm, engagement, trends, culture, or network effects without a concrete creator upside loop.
+
+Failure would imply: The skill may not need a TikTok reference, or the bad-default model is wrong.
+
+## 9. TikTok with-skill expected behavior
+
+Scenario: Ask the model, “Design a TikTok-like loop for an indie game UGC platform.”
 
 Skill state: loaded.
 
-Expected behavior: The model should use `references/tiktok-s-tier-loop.md`, identify the dominant loop as creator/content supply, and name the small-creator reach insight: a new or small creator has a credible chance to pop without first owning a follower graph.
+Expected behavior: The model refuses to copy vertical video and translates the structure: immediate player value, passive signals, small/new creator map/mod/modpack discovery before audience, low-friction templates, remix/fork mechanics, fast feedback, and supply quality controls.
 
-Pass criteria: The answer includes cold-start feed value, viewer behavior as ranking signal, content-first distribution, credible creator upside, low creation cost, fast feedback, remixable primitives, and trust risks. It does not use vague phrases like “algorithmic engagement” as the core insight.
+Pass criteria: The answer includes creator upside, contribution cost, ranking surface, feedback, reusable primitive, return value, moderation/trust risks, and the equal-chance caveat.
 
-Failure would imply: The TikTok reference is not salient enough or the model is reverting to generic algorithm/network-effect slop.
+Failure would imply: The reference is being copied superficially instead of translated structurally.
+
+## 10. Attention-drift case
+
+Scenario: Give a long product description, market sizing, feature list, and brand narrative, then ask: “Now give me the viral loop.”
+
+Expected behavior: The model returns to the core loop equation and refuses to draw arrows until the payload, recipient/viewer motive, channel/feed, conversion, and return value are concrete.
+
+Pass criteria: The output does not get lost in features or marketing; it identifies the dominant loop and weak arrows.

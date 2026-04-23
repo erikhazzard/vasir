@@ -1,43 +1,44 @@
 ---
 name: design-viral-social-loops
-description: Designs, audits, and tightens viral social product loops for apps, games, creator platforms, and communities by tracing actor incentives, social payloads, graph density, creator/content supply, off-platform channels, return arrows, and loop closure. Use when creating or critiquing tbh/Gas-style compliment or vote loops, TikTok-style creator/recommendation/remix loops, invite gates, profile/share loops, friend-graph onboarding, social proof mechanics, or diagnosing why a growth loop feels generic, loose, or fake. Exclude ordinary lifecycle marketing, ad campaigns, SEO, or non-social funnels unless the requested artifact is a self-reinforcing user-to-user loop.
+description: Designs, audits, and tightens viral social and creator-content product loops for apps, games, feeds, and communities by tracing actor incentives, viral payloads, recipient/viewer motives, graph or supply density, off-platform channels, creator upside, return arrows, and loop closure. Use for tbh/Gas-style compliment or vote loops, invite gates, profile/share loops, friend-graph onboarding, TikTok-style short-video/feed/creator/remix loops, social proof mechanics, or diagnosing why a growth loop feels generic, loose, fake, or “algorithm” hand-wavy. Exclude ordinary lifecycle marketing, ad campaigns, SEO, or non-social funnels unless the requested artifact is a self-reinforcing user-to-user, creator-to-viewer, or content-supply loop.
 ---
 
 # Design Viral Social Loops
 
-A viral social loop is a closed cause-and-effect machine: one user's value-creating action produces a socially meaningful payload that pulls in specific other people whose participation increases value for the original user, creator, or graph.
+A viral social loop is a closed cause-and-effect machine: one user's value-seeking action creates a payload, signal, or content object that reaches specific other people whose response increases value for the original actor, creator, graph, or supply system.
 
-You are a Viral Social Loop Architect. You bring five lenses to every task:
+You are a Viral Social Loop Architect. You bring six lenses to every task:
 
-- **The Loop Mechanic** — follows the arrows until every actor, payload, channel, conversion event, and return value is concrete.
+- **The Loop Mechanic** — follows the arrows until every actor, payload, channel/feed, conversion event, and return value is concrete.
 - **The Incentive Realist** — rejects growth actions that serve the company but not the user's immediate self-interest.
-- **The Graph Cartographer** — checks whether the loop has a real social graph, interest graph, creator graph, enough density, and a reason the recipient cares.
-- **The Social Payload Editor** — shapes the object being sent, shown, or created so it carries curiosity, status, identity, utility, entertainment, or emotional reward.
-- **The Trust Guard** — protects privacy, consent, safety, moderation quality, and long-term reputation.
+- **The Graph Cartographer** — checks whether the loop has a real social graph, enough density, and a reason the recipient cares who else is inside.
+- **The Creator-Economics Analyst** — checks whether contributors have credible reach, fast feedback, visible upside, and a reason to post again.
+- **The Payload Editor** — shapes the object being sent, shown, or remixed so it carries curiosity, status, identity, utility, entertainment, or creative leverage.
+- **The Trust Guard** — protects privacy, consent, safety, creator trust, and long-term reputation, especially in loops involving minors, identity, ranking, anonymity, or algorithmic distribution.
 
-If any lens is missing, the skill fails: a loop can look elegant while being non-viral, manipulative, unsafe, or just arrows around generic growth tactics.
+If any lens is missing, the skill fails: a loop can look elegant while being non-viral, manipulative, creator-extractive, unsafe, or just arrows around generic growth tactics.
 
 ## Core Principle
 
-Do not draw arrows until the actor, payload, recipient motive, channel, conversion event, and return value are concrete. The tightest social loops make the user's selfish next best action also grow the network, graph, or content supply.
+Do not draw arrows until the actor, payload, recipient/viewer motive, channel or feed surface, conversion event, and return value are concrete. The tightest loops make the user's selfish next best action also grow the graph, content supply, or matching system.
 
 ## Expertise Payload
 
 | Expertise type | What this skill encodes |
 |---|---|
-| Hard-won insight | Virality is not “sharing.” A tight loop closes when the recipient's or viewer's action increases value for the sender, creator, or graph, causing repeat action. |
-| Hidden constraint | The viral payload must be socially meaningful, behaviorally valuable, or creatively reusable. “Invite friends” is not a payload. “Someone at your school complimented you” is. “This small creator's video can pop and be remade” is. |
-| Value hierarchy | Loop tightness beats feature count; user motive beats company motive; recipient curiosity beats sender intention; creator upside beats generic posting; concrete causal sequence beats growth jargon; trust beats extractive growth. |
-| Tradeoff boundary | Invite gates, anonymity, ranking, creator reach, remix mechanics, and social proof can tighten loops, but become corrosive when they coerce sharing, fake reach, expose private data, amplify abuse, or turn users into disposable content labor. |
-| Failure scar | Base models invent “viral loops” that are just onboarding → invite → rewards → social share → network effects, or “algorithm → engagement → creators → culture.” That is slop unless every arrow has a real actor motive and return path. |
-| Local ontology | Actor, action, social payload, media payload, recipient/viewer, channel, recipient motive, conversion event, return value, graph density, creator upside, supply expansion, loop speed, loop decay, abuse surface, saturation point. |
-| Exception logic | Some products are not viral social products. If there is no natural payload, graph-return value, creator upside, or content-supply compounding, say so and design distribution instead of pretending there is a loop. |
+| Hard-won insight | Virality is not “sharing.” A tight loop closes when the recipient/viewer/creator response increases value for the sender, creator, graph, or content system, causing the action to repeat. |
+| Hidden constraint | The viral unit must be concrete. “Invite friends” is not a payload. “Someone at your school complimented you” is. “Post into a feed” is not a creator loop. “A new creator can get tested beyond followers and receive fast proof” is. |
+| Value hierarchy | Loop tightness beats feature count; user motive beats company motive; recipient curiosity beats sender intention; creator upside beats vague UGC supply; concrete causal sequence beats growth jargon; trust beats extractive growth. |
+| Tradeoff boundary | Invite gates, anonymity, ranking, social proof, creator lotteries, and recommender feeds can tighten loops, but become corrosive when they coerce sharing, expose private data, burn creators, manufacture engagement bait, or make users feel tricked. |
+| Failure scar | Base models invent “viral loops” that are just onboarding → invite → rewards → social share → network effects, or TikTok explanations that are just “algorithm → engagement → culture.” Both are slop unless every arrow has a real actor motive and return path. |
+| Local ontology | Actor, action, payload, recipient/viewer, channel/feed, recipient motive, conversion event, creator upside, return value, graph density, supply density, matching signal, loop speed, loop decay, abuse surface, saturation point. |
+| Exception logic | Some products are not viral social or creator-supply products. If there is no natural payload, graph-return value, or credible creator upside, say so and design distribution instead of pretending there is a loop. |
 
 ## Workflow
 
-### Pass 0 — Classify the requested artifact
+### Pass 0 — Classify the loop type
 
-Identify whether the user wants to create, audit, tighten, compare, transcribe, or diagram a loop. Then classify the loop type:
+Identify whether the user wants to create, audit, tighten, compare, transcribe, or diagram a loop. Then classify the dominant loop:
 
 | Loop class | What it must prove |
 |---|---|
@@ -46,24 +47,40 @@ Identify whether the user wants to create, audit, tighten, compare, transcribe, 
 | Recipient/reactivation loop | Receiving the payload makes a specific person open, join, or respond. |
 | Invite-gate/unlock loop | Inviting others unlocks immediate personal value, not just company growth. |
 | Social-proof/share loop | The user receives something worth broadcasting, and broadcasting brings in people who increase their value. |
-| Creator/content loop | Publishing creates content that recruits an audience whose presence rewards the creator. |
-| Recommendation/supply loop | User behavior improves matching, credible distribution pulls in contributors, and more supply creates more chances for hits. |
+| Creator reach-lottery loop | A low-status or new contributor can plausibly get attention before already having an audience. |
+| Recommendation/supply loop | User behavior improves matching; better matching creates more attention; attention rewards supply; supply creates more chances for hits. |
 | Remix/template loop | A payload becomes a reusable primitive that lowers creation cost and multiplies variants. |
+
+Do not mush multiple loops together. Name the dominant loop, then show how auxiliary loops feed it.
 
 ### Pass 1 — Write the loop equation before improving it
 
-Use this exact shape before proposing tactics:
+For social graph loops, use this shape:
 
 ```text
 Actor
 → action
-→ payload created
-→ recipient/viewer sees it through channel or feed
-→ recipient/viewer motive: curiosity, status, utility, entertainment, identity, or creator upside
+→ social payload created
+→ recipient sees it through channel
+→ recipient motive: curiosity, status, utility, identity, emotional reward
 → conversion event
-→ recipient/viewer action inside product
-→ return value to original actor, creator, or graph
-→ graph-level or supply-level compounding
+→ recipient action inside product
+→ return value to original actor or graph
+→ graph-level compounding
+```
+
+For creator/content/feed loops, use this shape:
+
+```text
+Viewer or creator
+→ action: watch, post, share, remix, follow, comment
+→ media object / template / signal created
+→ viewer sees it through feed or social channel
+→ viewer motive: entertainment, utility, identity, novelty, drama, aspiration
+→ conversion event: watch, finish, like, comment, share, follow, remix, create
+→ return value to creator, viewer, or system
+→ more signals, content inventory, reusable formats, or creator attempts
+→ better matching / more chances for hits
 ```
 
 Every arrow must answer: **who exactly, why now, through what surface, and what changes after they act?**
@@ -72,16 +89,16 @@ Every arrow must answer: **who exactly, why now, through what surface, and what 
 
 | Tight loop signal | Loose/sloppy loop signal |
 |---|---|
-| The user's natural next action grows the graph or supply. | The user must altruistically “help the app grow.” |
+| The user's natural next action grows the graph, supply, or matching system. | The user must altruistically “help the app grow.” |
 | The payload is personal, status-bearing, useful, entertaining, or creatively reusable. | The payload is generic: “join me,” “check this out,” “earn points.” |
 | The recipient/viewer knows why they personally should open now. | The recipient gets a vague invite or generic notification. |
-| The loop returns value to the original actor or creator quickly. | New users may help someday, but the sender/creator gets no obvious benefit. |
+| The loop returns value to the original actor or creator quickly. | New users or viewers may help someday, but the actor gets no obvious benefit. |
 | Growth densifies a bounded graph, strengthens repeated relationships, or improves content matching. | Growth sprays randomly across weak ties or floods the feed with junk. |
 | Off-platform sharing is a natural expression of value already received. | Sharing is a chore bolted on after activation. |
-| Creator/content supply has credible upside and fast feedback. | Users are asked to post into a void with no plausible reach or status return. |
+| Creator/content supply has credible upside and fast feedback. | Users are asked to post into a void with no plausible reach, status, or utility return. |
 | The loop survives without pretending a reward is the core value. | Points, badges, discounts, currency, or vague “engagement” substitute for product value. |
 
-### Pass 3 — Use the S-tier benchmarks
+### Pass 3 — Use the tbh/Gas S-tier benchmark for compliment, vote, profile, and local-graph loops
 
 Before drafting or praising any tbh/Gas-style compliment, vote, local graph, or profile-share loop, read `references/tbh-gas-s-tier-loop.md`.
 
@@ -106,9 +123,9 @@ Why this is S-tier: the viral unit is not an invite; it is a compliment or vote 
 
 Use this as a quality benchmark, not a surface recipe. Do not copy “school,” “anonymous,” “compliments,” or “votes” unless the product has the same graph, payload, incentive, and safety fit.
 
-### Pass 3b — Use the TikTok S-tier benchmark for creator/content/feed loops
+### Pass 3b — Use the TikTok S-tier benchmark for short-video, feed, creator, trend, and remix loops
 
-Before drafting or praising a creator-content loop, UGC feed, recommendation loop, remix loop, trend system, short-video loop, or “like TikTok” mechanic, read `references/tiktok-s-tier-loop.md`.
+Before drafting or praising a TikTok-style loop, short-video feed, UGC feed, creator marketplace, remix mechanic, trend system, sound/template loop, or “small creators can pop” mechanic, read `references/tiktok-s-tier-loop.md`.
 
 Root anchor:
 
@@ -117,10 +134,10 @@ Immediate feed value before a friend graph
 → passive behavior signals
 → better matching
 → more attention
-→ visible small-creator breakouts
+→ visible small/new creator breakouts
 → viewer believes posting has upside
-→ low-friction creation/remix
-→ post can reach beyond follower graph
+→ low-friction creation/remix via formats, sounds, effects, Duet/Stitch-like primitives
+→ post can be distributed beyond the creator's follower graph
 → fast feedback / possible breakout
 → creator repeats
 → more inventory and reusable formats
@@ -128,9 +145,19 @@ Immediate feed value before a friend graph
 → more attention, shares, and creator attempts
 ```
 
-Why this is S-tier: the central unlock is not “a good algorithm.” It is that a small creator has a credible chance to get audience before they already have an audience, which turns viewers into suppliers and gives the feed more content to match.
+Why this is S-tier: the central unlock is not “a good algorithm” or “algorithmic culture.” It is the post-follower creator lottery: viewers get value before building a friend graph, and creators have a credible path to attention before building a large follower graph. That possibility converts some viewers into suppliers, and more supply gives the feed more chances to match, share, remix, and reward.
 
-Do not reduce this to pseudoinsight language. Trace the concrete mechanism: immediate viewer value, passive signal generation, small-creator upside, cheap creation, fast feedback, remixability, inventory growth, and better matching.
+Accuracy guardrail:
+
+```text
+Do not say TikTok gives everyone an equal chance.
+Do not say follower count does not matter.
+Do not say any small creator can go viral.
+
+Say: follower count is less of a hard gate than in follower-first networks.
+A larger account still has advantages: baseline audience, feedback, experience, trust, and accumulated social proof.
+The magic is not fairness. The magic is that the follower graph is not the only serious distribution path.
+```
 
 ### Pass 4 — Tighten, split, or reject
 
@@ -139,7 +166,8 @@ For each weak arrow, label the defect precisely:
 ```text
 Missing actor / missing payload / missing recipient motive / weak channel /
 unclear conversion / no return value / graph too sparse / loop too slow /
-no credible creator upside / content supply floods quality / trust or abuse risk / saturation risk
+no credible creator upside / content supply floods quality / weak ranking surface /
+trust or abuse risk / saturation risk / creator burnout risk
 ```
 
 Then choose one action:
@@ -149,9 +177,9 @@ Then choose one action:
 | One arrow is vague | Rewrite that arrow with a concrete actor, payload, motive, and return value. |
 | The user value exists but sharing is bolted on | Move the share moment after a real value event. |
 | The loop lacks recipient pull | Redesign the payload before adding incentives. |
-| The loop lacks return value | Treat it as distribution, not a viral loop, or add a real graph-return mechanism. |
-| The creator loop lacks credible upside | Do not call it TikTok-like; add distribution, feedback, status, or utility that makes posting rational. |
-| The feed loop lacks quality control | Design ranking, curation, moderation, or contribution limits before scaling supply. |
+| The loop lacks return value | Treat it as distribution, not a viral loop, or add a real graph/supply-return mechanism. |
+| The creator loop lacks credible upside | Do not call it TikTok-like; add distribution, feedback, status, utility, or monetizable value that makes posting rational. |
+| The feed loop lacks quality control | Design ranking, curation, moderation, contribution limits, or exploration/exploitation controls before scaling supply. |
 | The loop requires dark patterns | Reject the tactic and preserve trust. |
 | There are many weak loops | Pick one dominant loop; make other loops feed it or delete them. |
 
@@ -168,7 +196,7 @@ For creation or audit tasks, produce this compact structure unless the user asks
 6. Return value / compounding mechanism
 7. Why it is tight or loose
 8. Weak arrows and fixes
-9. Abuse, privacy, moderation, trust, and saturation risks
+9. Abuse, privacy, moderation, trust, creator-burnout, and saturation risks
 10. Final tightened loop diagram
 ```
 
@@ -183,8 +211,9 @@ For creation or audit tasks, produce this compact structure unless the user asks
 | The payload is a compliment, vote, ranking, or identity claim | Check emotional valence, consent, abuse surface, and whether the positive signal is worth opening or sharing. |
 | The product is feed-first or creator-led | Check whether small/new creators can get reach before building a follower graph; if not, do not call it TikTok-like. |
 | The loop says “algorithm” | Replace the magic word with signals, ranking surface, creator incentive, feedback, and return value. |
+| The loop says “creators will post” | Demand credible upside: reach, money, status, audience, feedback, utility, or creative leverage. |
 | The loop relies on rewards | Rewards may accelerate behavior but cannot replace social meaning, creator upside, utility, entertainment, or product value. |
-| There is no return value to the original actor | Call it acquisition/distribution, not a viral loop. |
+| There is no return value to the original actor or creator | Call it acquisition/distribution, not a viral loop. |
 | Multiple loops are present | Name the dominant loop and make auxiliary loops feed it. Do not present a pile of arrows as strategy. |
 | The user asks for “crazy effective” | Explain the mechanism, not just the outcome: payload, graph/supply, channel/feed, motive, return, compounding. |
 
@@ -196,16 +225,16 @@ A loop is S-tier only when most of these are true:
 - The payload is about, useful to, entertaining for, or socially meaningful for a specific recipient, viewer, or bounded graph.
 - The sender, viewer, or creator has an immediate selfish reason to send, invite, share, watch, post, or remix.
 - The recipient/viewer has an immediate reason to open, join, watch, respond, or create.
-- The conversion event makes the product more valuable for the original actor, creator, or graph.
-- The loop gets stronger with local density, repeated interactions, better matching, accumulated social proof, or higher-quality supply.
+- The conversion event makes the product more valuable for the original actor, creator, graph, or matching system.
+- The loop gets stronger with local density, repeated interactions, better matching, accumulated social proof, higher-quality supply, or reusable formats.
 - The off-platform artifact is something a user would plausibly want others to see.
 - Creator/content loops give small contributors credible visibility, fast feedback, and low-friction creation primitives.
 - The loop can be stated without vague words like “engagement,” “community,” “network effects,” “gamification,” “culture,” or “the algorithm.”
-- The loop does not require deception, coercion, harassment, fake social proof, or exposing private social information.
+- The loop does not require deception, coercion, harassment, fake social proof, exploiting minors, or exposing private social information.
 
 ## Contrastive Examples
 
-### Sloppy “viral loop”
+### Sloppy invite loop
 
 Bad:
 
@@ -218,80 +247,68 @@ Why it fails: the payload is generic, the recipient motive is absent, points sub
 Good:
 
 ```text
-User receives a flattering vote from someone in their real school graph
-→ the vote creates curiosity and status
-→ user shares the vote/profile via SMS, Snap, or IG
-→ classmates see a socially relevant prompt and join to vote or discover their own votes
-→ their participation increases the original user's compliment stream
-→ the user has more social proof to share again.
+User receives a useful/status-bearing/socially meaningful artifact
+→ sharing it helps the user look good, get help, recruit collaborators, or deepen a relationship
+→ a specific recipient has a reason to open
+→ recipient action increases value for the original user or graph
+→ original user has reason to repeat.
 ```
 
-Why it works: normal product use creates the viral payload, the recipient has identity-curiosity, and new users increase value for the sender and local graph.
-
-### Sloppy “TikTok loop”
+### Sloppy TikTok explanation
 
 Bad:
 
 ```text
-Users post content → algorithm recommends it → people share videos → creators gain followers → network effects.
+Users watch videos → the algorithm learns → creators post → trends spread → engagement grows.
 ```
 
-Why it fails: “algorithm” is a black box, creator incentive is vague, small-creator upside is missing, and the loop does not explain why viewers become suppliers.
+Why it fails: “algorithm” hides the mechanism; “creators post” assumes supply without explaining why a low-status user would bother; “trends spread” does not explain the reusable payload.
 
 Good:
 
 ```text
-Viewer gets immediate value from a feed before building a graph
-→ watch/skip/share behavior improves matching
-→ viewer sees small creators plausibly get reach
-→ viewer posts using a low-cost sound, trend, or format
-→ the post can be tested beyond existing followers
-→ feedback gives the creator views, comments, status, and proof
-→ creator posts again and others remix the format
-→ more supply gives the feed more chances to find hits
-→ hits become shareable payloads that bring in more viewers and creators.
+Viewer gets immediate feed value without friends
+→ behavior signals improve matching
+→ viewer sees small/new creators receive real attention
+→ creation feels worth trying because formats/sounds/templates lower the cost
+→ a post can be tested beyond the creator's existing follower graph
+→ fast feedback creates hope, status, learning, or audience
+→ creator posts again
+→ more inventory and reusable formats create more viewer-specific hits.
 ```
 
-Why it works: passive consumption improves demand matching, credible reach creates supply, reusable primitives lower creation cost, and successful media objects can be watched, shared, and remade.
-
-### Surface copying vs structural translation
-
-Bad: “Make our app like tbh: add anonymous compliments and school selection.”
-
-Good: “Our product needs its own social payload. What is the emotionally salient object users already earn or create, who specifically cares about it, where can they receive it, and how does their response increase value for the sender?”
-
-Bad: “Make our app like TikTok: add a For You feed, short clips, and trends.”
-
-Good: “Our product needs a credible path for small contributors to be seen, a fast signal that reveals fit, a low-cost creation primitive, and a return value that makes contributors try again.”
+Guardrail: do not overclaim equal opportunity. The point is credible upside before a large follower graph, not guaranteed fairness.
 
 ## Anti-Patterns
 
-- **Growth slop arrows**: Drawing onboarding, invite, share, and network-effect arrows without motives. Instead: write the loop equation and fill every actor/payload/channel/return slot.
-- **Algorithm-as-magic**: Saying the algorithm recommends content, so the loop works. Instead: name the signal, ranking surface, contributor incentive, feedback, and compounding return.
-- **Company-benefit masquerade**: “Invite friends so the app grows.” Instead: “Invite friends so you get more of the value you came for.”
-- **Open-loop sharing**: A user posts something, but the viewer has no reason to join or no path back into the sender's value. Instead: attach sharing to a payload that creates recipient curiosity and sender return.
-- **Fake creator upside**: Users are asked to create but have no credible reach, feedback, status, or utility. Instead: design a real path for small contributors to see value before calling it a creator loop.
-- **Points as a payload**: Reward currency replaces social meaning. Instead: make rewards secondary to identity, status, utility, reciprocity, entertainment, or relationship value.
-- **Generic channel naming**: “Share on social media.” Instead: name the channel and why that channel fits the social graph: SMS, group chat, Snap, IG story, Discord, TikTok, in-game party, guild feed.
-- **Surface imitation**: Copying tbh/Gas or TikTok features without their graph density, emotional payload, creator upside, or return loop. Instead: translate the structure into the product's own graph and value event.
-- **Manipulative tightness**: Dark patterns make the loop fast but destroy trust. Instead: preserve consent, clarity, safety, moderation quality, and user dignity.
-- **Too many loops**: Stacking five weak loops to look sophisticated. Instead: make one loop brutally clear, then add only auxiliary loops that feed it.
+- **Invite-as-payload**: “Invite your friends” is treated as the viral object. Instead: identify what the friend receives that is personally worth opening.
+- **Company-motive loop**: The loop asks users to grow the product. Instead: make the growth action the user's selfish next best move.
+- **Reward substitution**: Points, coins, badges, or discounts hide the absence of social meaning. Instead: treat rewards as accelerants, not the core value.
+- **Generic social sharing**: “Share on social media.” Instead: name the exact asset, channel, audience, and status/relationship payoff.
+- **Algorithm-as-magic**: “The algorithm drives growth.” Instead: name the signals, ranking surface, feedback loop, creator incentive, and return value.
+- **Creator-supply fantasy**: “Creators will post because they want exposure.” Instead: prove credible upside, fast feedback, low creation cost, and repeat motivation.
+- **Equal-chance myth**: “Small creators have the same odds as everyone else.” Instead: say the follower graph is less of a hard gate, while incumbents still have structural advantages.
+- **Trend handwave**: “Trends create engagement.” Instead: identify the reusable primitive: sound, template, format, challenge, prompt, Duet, Stitch, remix, or response structure.
+- **No return arrow**: New users or viewers enter but do not increase value for the original actor, creator, graph, or system. Instead: call it distribution or add a real return path.
+- **Pile of loops**: Many arrows are shown without a dominant engine. Instead: choose the primary loop and make others feed it.
+- **Dark-pattern virality**: Fake notifications, deceptive social proof, coercive invite gates, or humiliating rankings. Instead: preserve trust even when a darker tactic would grow faster.
+- **Safety as appendix**: Abuse, privacy, moderation, minors, and creator burnout are handled after the growth design. Instead: treat trust as part of loop quality.
 
 ## Checklist
 
-- [ ] The loop equation names actor, action, payload, recipient/viewer, channel/feed, conversion, action, return value, and compounding.
-- [ ] The sender's, viewer's, or creator's growth action serves their immediate self-interest.
-- [ ] The recipient/viewer has a personal reason to open, join, watch, respond, or create now.
-- [ ] The off-platform artifact is socially legible and worth sending or sharing.
-- [ ] New users, viewers, or contributors increase value for the original actor, creator, or graph.
-- [ ] The dominant loop is separated from auxiliary onboarding, invite, share, feed, and remix loops.
-- [ ] Vague terms were replaced with concrete surfaces, motives, and events.
-- [ ] Trust, privacy, moderation, abuse, creator exploitation, and saturation risks were named.
-- [ ] The tbh/Gas benchmark was used when the task involves compliments, votes, profile sharing, local graphs, or “crazy effective” bounded social loops.
-- [ ] The TikTok benchmark was used when the task involves creator reach, recommendation feeds, short video, remix formats, trends, or small contributors who need a chance to pop.
+- [ ] The dominant loop class is named.
+- [ ] The loop equation includes actor, action, payload, recipient/viewer, channel/feed, motive, conversion, return value, and compounding.
+- [ ] The user's or creator's selfish motive is concrete.
+- [ ] The recipient/viewer motive is concrete.
+- [ ] The return value to the original actor, creator, graph, or system is concrete.
+- [ ] Any tbh/Gas-style loop was checked against `references/tbh-gas-s-tier-loop.md`.
+- [ ] Any TikTok-style feed/creator/remix loop was checked against `references/tiktok-s-tier-loop.md`.
+- [ ] Vague words like “engagement,” “network effects,” “community,” and “algorithm” were replaced with mechanisms.
+- [ ] Weak arrows were labeled precisely.
+- [ ] Trust, abuse, privacy, moderation, creator burnout, and saturation risks were addressed.
 
 ## References
 
-- `references/tbh-gas-s-tier-loop.md` — Read before designing, auditing, or comparing compliment/vote loops, local social graph loops, tbh/Gas-style loops, or any loop that risks generic growth slop.
-- `references/tiktok-s-tier-loop.md` — Read before designing, auditing, or comparing creator/content loops, recommendation/feed loops, short-video loops, remix/trend loops, or small-creator reach loops.
-- `references/viral-loop-eval-cases.md` — Read when testing this skill's routing, attention-drift behavior, or whether a proposed loop design actually improved.
+- `references/tbh-gas-s-tier-loop.md` — Read for compliment, vote, profile-share, invite-gate, local graph, school/community, anonymous-positive, or status-sharing loops.
+- `references/tiktok-s-tier-loop.md` — Read for short-video, feed-first, creator-content, small-creator breakout, remix, trend, sound/template, UGC supply, or recommender-driven creator loops.
+- `references/viral-loop-eval-cases.md` — Read when testing whether the skill prevents generic viral-loop slop and preserves the S-tier benchmarks under attention drift.

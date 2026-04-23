@@ -263,6 +263,24 @@ Do not force a full report when the user asked for a routing fix, name, audit, o
 
 ## Quick Reference
 
+### Skill header
+
+When the user asks for a skill header, emit only the portable `SKILL.md` frontmatter block and where it belongs.
+
+The header goes at the very top of `SKILL.md`, before any markdown body:
+
+```yaml
+---
+name: activity-first-lowercase-name
+description: 1-2 liner Classifier text explaining what the skill does, the artifact/domain it applies to. 1-2liner of "Triggers when/on..." the trigger boundary.
+---
+```
+Header rules:
+
+- Include only name and description unless the user names a runtime that supports more fields.
+- name must be lowercase, hyphenated, activity-first, specific, and 64 characters or fewer.
+- description is routing text, not marketing copy: [what it does] + [expertise need / trigger contexts] + [exclusion boundary if needed].
+
 ### Routing metadata defaults
 
 | Field | Default |
