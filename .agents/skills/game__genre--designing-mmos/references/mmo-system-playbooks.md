@@ -255,3 +255,172 @@ Search with seller identity; recurring stalls; live high-touch trade lanes; comm
 ### Metrics
 
 Repeat customers; seller recognition; commission completion; live-lane usage; price discovery; seller concentration; market hub dwell; bargain/barter conversion; local trade diversity.
+
+## WoW-Style Access Tools: LFD / LFR / Browser Systems
+
+### Risks
+
+Access solves real exclusion and population problems but can make people interchangeable. Dungeon Finder-like systems can delete assembly memory, local reputation, route talk, and leader initiative. Raid Finder-like systems can provide story access while weakening guild need, organized teaching, awe, and prestige clarity.
+
+### Knobs
+
+Purpose tags: story, first-time, learning, blind, completion, farm, speed, push. Role/build intent. Route preview. Ready check that includes expectation consent. Recent ally and leader follow. Play-again prompt after successful or repaired failure. Post-run escalation: “join this recurring learning group,” “follow this leader,” “schedule next run.” Difficulty-mode framing that separates access, learning, organized clears, and prestige.
+
+### Metrics
+
+Queue time + repeat grouping; completion + play-again; role fill + support-role churn; story-mode completion + organized-group escalation; wipe count + retry; leaver rate by tag; recent-ally conversion; leader follow; prestige confusion complaints.
+
+### Design rule
+
+```text
+Access is good. Access without continuity creates disposable strangers.
+```
+
+## WoW-Style Mythic+ / Timed Small-Group Mastery
+
+### Risks
+
+Timers turn mistakes into time theft. Rating filters can become pre-emptive exclusion. Key ownership can create hostage dynamics. Tanks inherit route leadership and blame. Healers inherit survivability blame. Off-meta utility is ignored until a route needs it. Learning becomes socially expensive.
+
+### Knobs
+
+Completion vs push vs farm vs learning tags. Route preview and route consent. Encounter literacy inside the client. Key protection or non-hostage progression. Post-failure replay/retry options. Role-burden indicators. Social credit for teaching and stable groups. Untimed mastery or low-pressure practice modes. Class/spec diversity support that rewards real utility rather than fake quotas.
+
+### Metrics
+
+Run volume + leaver rate; timed success + first-failure disband; tank/healer participation + role blame; rating filter use + off-meta rejection; route preview usage + wipe reduction; completion-mode uptake; replay after failure; preferred-stranger yield.
+
+### Design rule
+
+```text
+Timed mastery is high-value, but only when expectation matching and repair exist before the clock weaponizes blame.
+```
+
+## WoW-Style World Rewrite / Cataclysm-Like Modernization
+
+### Risks
+
+A world rewrite can improve onboarding and quest flow while erasing beloved places, old routes, jokes, landmarks, memories, and veteran identity. Players can experience mechanical improvement as cultural deletion.
+
+### Knobs
+
+Legacy monuments. Optional history layers. “Before/after” maps. Veteran route names preserved as local labels. Returning-player tours. Old dungeon/zone memory callbacks. Seasonal events that revisit old versions symbolically. Archive cosmetics/titles that mark participation without preserving broken mechanics.
+
+### Metrics
+
+New-player route success + veteran sentiment; old-place reference rate; history-layer usage; legacy monument visits; return after rewrite; place-name continuity in chat; “erasure” complaint clusters.
+
+### Design rule
+
+```text
+Preserve harmless memory while changing harmful or obsolete mechanics.
+```
+
+## WoW Token / Boost / Carry Economy
+
+### Risks
+
+Legal gold exchange may reduce illicit RMT and help time-poor players, but money can leak into prestige when gold buys carries, rare goods, crafted advantages, or achievement-adjacent proof. Boosts can restore friend compatibility or launder status depending on design.
+
+### Knobs
+
+Separate earned achievements from purchased convenience. Show achievement context/history, not just ownership. Keep top prestige non-transferable or provenance-rich. Make catch-up restore friend compatibility without claiming mastery. Track carry-market effects. Keep economic wealth distinct from execution status and social trust.
+
+### Metrics
+
+Token volume; gold price volatility; carry advertising; prestige reward context; suspicion language; boost uptake + first-group failure; catch-up time to friend play; earned-reward participation; economic inflation near prestige goods.
+
+### Design rule
+
+```text
+If money can become gold and gold can become social proof, money has entered the prestige channel.
+```
+
+## WoW Classic Nostalgia Translation
+
+### Risks
+
+Modern teams either dismiss nostalgia as irrational or copy old friction literally. Both miss the signal. Classic demand often points at missing social residue: repeated faces, public routes, class usefulness, manual assembly, elite quests, guild need, and place memory.
+
+### Knobs
+
+Rebuild social function with modern UX: occasional group-needed public goals, class/service identity, public staging, bounded locality, repeated cohorts, route memory, guild/squad escalation, visible helpers, profession identity, and prestige clarity. Avoid copying roster hostage, opaque mechanics, wasted travel, and grind pain unless the friction buys a specific relationship or memory.
+
+### Metrics
+
+Repeated faces before endgame; first-assist conversion; elite/public goal grouping; class-service recognition; route callouts; guild/squad joins after public activity; nostalgia sentiment mapped to concrete missing systems.
+
+### Design rule
+
+```text
+Classic nostalgia is usually a complaint about missing social residue, not a request for obsolete pain.
+```
+
+## Playbook: FFXIV-Style Returnability and Story Culture
+
+Use this when designing story-first onboarding, roulettes, duty support, statics, purpose-tagged groups, social-expression systems, or MMO exodus-readiness.
+
+### What players are trying to do
+
+- experience a coherent story;
+- avoid being judged before they understand the game;
+- play with friends despite progression gaps;
+- become known through more than combat;
+- try group content without humiliation;
+- return after breaks;
+- find groups that match their intent;
+- inhabit the world through fashion, housing, events, screenshots, performance, and collections.
+
+### Core knobs
+
+| Knob | Use |
+|---|---|
+| Story spine | Shared chronology and social vocabulary. |
+| First-time markers | Convert ignorance into protected context. |
+| Roulettes / veteran rewards | Keep old story content populated. |
+| Commendations | Tiny gratitude and role-recognition channel. |
+| Duty Support | Prevent mandatory story-grouping churn. |
+| Purpose-tagged group board | Declare story/learning/prog/farm/speed/social intent before commitment. |
+| Mode ladder | Separate story, learning, mastery, and prestige. |
+| One-character multi-role identity | Preserve social graph while letting players flex. |
+| Social-expression stack | Glamour, plates, housing, emotes, collections, events, crafting identity. |
+| Return briefings | Restore context after patch or absence. |
+| Event/venue calendar | Move player-run culture into the world fabric. |
+
+### Failure modes
+
+| Failure | Symptom | Fix |
+|---|---|---|
+| MSQ gate debt | Friends cannot play together tonight. | Sidecar current-world content, sync, recaps, mentor bridges. |
+| Social thinness | Everyone is polite; no one is remembered. | Recent allies, play-again, recurring learning groups, venue/event routes. |
+| NPC bypass | Players use NPCs and never learn stranger contact. | Human replay rewards, roulette bridges, optional mentor duties. |
+| FC/static split | Real play happens outside guild shell. | Official squads/statics, calendars, role needs, substitution pools. |
+| Formula fatigue | Patch returns feel like a checklist. | Rotate social formats and identity rewards while preserving reentry rhythm. |
+| Job flattening | Roles are readable but jobs lack social identity. | Distinct utility, visible expertise, role-specific accomplishments. |
+| Culture outsourcing | Discord/sites host the actual institutions. | In-client event board, strategy sharing, recurring group tools, venue directories. |
+
+### Feature template
+
+```text
+Feature:
+Story/identity memory:
+Low-pressure contact:
+Expectation declaration:
+Access/learning/mastery/prestige split:
+Return path after absence:
+Identity outside combat:
+Institution supported:
+What might become formula fatigue:
+Telemetry:
+```
+
+### Design defaults
+
+- Mark first-timers and reward patience.
+- Separate story access from prestige.
+- Let players leave and return.
+- Make group purpose explicit.
+- Give noncombat identity surfaces.
+- Use NPCs to reduce churn, not to erase social ladders.
+- Treat venues/events as world fabric, not fringe activity.
+- Assume skeptical players compare your MMO against the one they left.

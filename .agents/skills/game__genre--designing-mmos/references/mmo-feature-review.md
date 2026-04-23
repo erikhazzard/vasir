@@ -92,3 +92,51 @@ Use this add-on when a feature touches travel, trade, public dungeons, death, cl
 | Camp/place memory | What named camp, route, market, or staging point will players remember? |
 | Etiquette surface | What local norm will players invent, and can the UI make the good version easier? |
 | Luclin risk | Is this Bazaar/Nexus-style convenience: useful, but socially destructive if shipped without replacement memory? |
+
+## World of Warcraft Social-Residue Add-On
+
+Use this add-on when the feature resembles LFD, LFR, cross-realm/cross-cohort population, Cataclysm-like world rewrites, Mythic+-like timed mastery, token/boost economies, seasonal resets, or add-on/log policy.
+
+| Field | Question |
+|---|---|
+| Access solved | What real exclusion, wait, population, or scheduling problem does this solve? |
+| Residue removed | What names, routes, places, guild need, role reputation, leader initiative, weak tie, or prestige clarity disappears? |
+| Replacement memory | What recent-ally, leader-follow, play-again, cohort, profession, route, or institution surface replaces it? |
+| Meaning split | Does this create multiple versions of the same content with unclear social meaning? |
+| Timer pressure | Does failure become time theft? Who absorbs blame? |
+| Data policy | Does the base UI teach role-critical information, or do add-ons/logs become mandatory law? |
+| Prestige leakage | Can money/gold/carries enter an earned-status channel? |
+| Returnability | Does a missed week, patch, or season become social exile? |
+
+WoW add-on rule:
+
+```text
+Do not analyze WoW decline monocausally. Analyze social substitution: real problem solved, social residue removed, replacement memory missing or present.
+```
+
+## Additional WoW Do-Not-Ship Gates
+
+| Gate | Reason |
+|---|---|
+| Access tool has no social aftercare. | WoW-style disposable-stranger decay. |
+| Difficulty modes blur access, learning, and prestige. | LFR-style meaning split and achievement distrust. |
+| Timed content launches without expectation tags, route literacy, or completion mode. | Mythic+-style timer blame becomes default culture. |
+| Monetized gold/boost path reaches prestige without provenance. | Token-to-prestige leakage. |
+| World rewrite has no memory bridges. | Cataclysm-style modernization feels like erasure. |
+
+## FFXIV Feature Review Add-On
+
+Use this for story, onboarding, grouping, returnability, social expression, or player-run culture.
+
+| Field | Question |
+|---|---|
+| Story memory | What shared reference or emotional chronology does this create? |
+| Trust effect | Does this build or spend operator trust? |
+| Returnability | Can a player leave and return to this system without shame or confusion? |
+| Low-pressure contact | Does this create safe contact before obligation? |
+| Purpose declaration | Are group expectations visible before commitment? |
+| Mode separation | Is this access, learning, mastery, prestige, farm, or social? |
+| Noncombat identity | Can a player be known here without combat performance? |
+| Institution support | Does this support FCs/squads/statics/venues/cohorts inside the client? |
+| Formula risk | Does this become a comforting ritual or solved checklist? |
+| Exodus-readiness | Would skeptical players from another MMO understand and trust this in week one? |

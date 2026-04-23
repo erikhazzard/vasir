@@ -141,3 +141,87 @@ convenience is allowed only with replacement memory
 ```
 
 Never replace an emergent player-usefulness loop with central convenience unless the new system deliberately preserves recognition, profession identity, place memory, or repeated contact.
+
+## World of Warcraft Social-Residue Addendum
+
+WoW must be read twice: first as the mass-scale proof, then as the optimization-decay warning.
+
+Default WoW diagnosis:
+
+```text
+WoW did not decline because one tool killed community. It repeatedly substituted optimized access, speed, and seasonal execution for older player-usefulness loops without always shipping replacement memory.
+```
+
+| WoW layer | Greatness signal | Decline scar | Design translation |
+|---|---|---|---|
+| Public solo | Players could level mostly alone while still feeling surrounded by audience, comparison, faction, economy, and future allies. | Fast leveling and queueable content can turn the world into pregame. | Public solo must install social etiquette, place memory, first assists, professions, and weak ties before endgame. |
+| Dungeon access | Roles, travel, assembly, and repeated tanks/healers created social memory. | LFD-like access can make strangers disposable. | Automated grouping needs social aftercare: purpose tags, recent allies, leader follow, play-again, route expectations, and repair. |
+| Raid access | Raids created awe, guild need, rosters, loot norms, and prestige. | LFR-like access can flatten prestige and bypass institutions. | Separate story access, learning paths, organized-play escalation, and earned-status channels. |
+| World continuity | Old Azeroth gave players shared route and place memory. | Cataclysm-like rewrites can delete inherited memory. | Preserve harmless memory while modernizing broken content. |
+| Population smoothing | Cross-realm tech can make dead zones alive. | Transient strangers can feel like phantoms. | Dense worlds need repeated locality, not only population. |
+| Timed mastery | Mythic+-like systems make small-group PvE endlessly relevant. | Timers, ratings, meta comps, and key ownership can weaponize mistakes. | Provide expectation matching, route literacy, completion modes, failure repair, and non-hostage progression. |
+| Data ecosystem | Add-ons/logs extend mastery and community knowledge. | External tools become mandatory and prosecution surfaces. | Base UI must carry role-critical information; deep analytics should support repair. |
+| Token/boost economy | Legal exchange can reduce illicit RMT friction and support time-poor players. | Money→gold→carry/status can contaminate prestige. | Separate money, gold, skill, achievement history, and trust. |
+
+## WoW Single-World Translation Rows
+
+| Legacy WoW lesson | Single-world translation |
+|---|---|
+| LFD/LFR improve access. | Add social aftercare: role/purpose tags, leader follow, recent allies, play-again, learning-to-organized escalation, and prestige separation. |
+| Cross-realm zones improve population. | In a no-server world, population is available; the challenge is repeated locality and recognition. |
+| Cataclysm modernized old content. | Evolve places with memory bridges, not memory deletion. |
+| Mythic+ turns dungeons into repeatable mastery. | Use timers only with expectation matching, route literacy, completion paths, and failure repair. |
+| WoW Token legitimizes gold/time exchange. | Keep monetized convenience out of earned-status and social-trust channels. |
+
+Source details for these claims live in `world-of-warcraft-source-spine.md`.
+
+## Final Fantasy XIV Deep Calibration
+
+Use FFXIV as the calibration bar for **trust, story memory, returnability, low-pressure grouping, and identity outside combat**.
+
+### What FFXIV proves
+
+| System | Signal |
+|---|---|
+| 1.0 → ARR recovery | A live-world failure can be repaired if the operator preserves memory, accepts the wound, and repeatedly proves competence. |
+| MSQ | Story can create shared chronology, emotional vocabulary, and common social references. |
+| Free trial / onboarding runway | A game can let players test deeply before demanding payment or serious commitment. |
+| Duty Finder + roulettes | Automated grouping can be low-pressure when first-time status, veteran incentives, and light recognition exist. |
+| Duty Support | Mandatory story grouping can be softened with NPCs, but this needs porous bridges back to human contact. |
+| Party Finder | Declared purpose prevents moral surprise. |
+| Normal/Savage/Ultimate split | Story access, learning, mastery, and prestige should be separated. |
+| One character / many jobs | Identity continuity and role empathy can coexist. |
+| Glamour/plates/housing/Gpose/emotes | Social identity can exist outside combat throughput. |
+| FCs/statics/linkshells/venues | A guild is not enough; MMO institutions need multiple sizes and purposes. |
+| 2021 WoW exodus moment | A rival’s decline matters only if your world is ready to receive skeptical players. |
+
+### What FFXIV does not prove
+
+| Bad inference | Better interpretation |
+|---|---|
+| “Nice community wins.” | Politeness works when supported by low-pressure grouping, expectation clarity, story framing, and mode separation. |
+| “Solo story is the answer.” | Solo-capable access should feed a porous social ladder. |
+| “NPC dungeons replace players.” | NPCs prevent churn; players create memory. |
+| “Copy the patch formula.” | Stable cadence builds trust but can become formula fatigue. |
+| “FFXIV beat WoW because WoW failed.” | FFXIV had built trust, runway, culture, and story reputation before the exodus moment. |
+
+### FFXIV/WoW exodus calibration
+
+Do not say “everyone left WoW.” Say:
+
+```text
+In 2021, WoW dissatisfaction, Blizzard-wide trust issues, content drought discourse, and streamer migration created a visible search moment. FFXIV was ready to receive that moment because it had repaired trust, a generous trial, Shadowbringers word-of-mouth, Endwalker anticipation, low-pressure grouping, and social identity surfaces.
+```
+
+### No-server world translation
+
+FFXIV’s Worlds/Data Centers are not the model. Translate their social function:
+
+| FFXIV function | Single-world replacement |
+|---|---|
+| Home World culture | Neighborhood, region, cohort, venue district, profession hub, event front. |
+| Data Center reputation | Language/time/activity cohort. |
+| Community Finder | In-client institution and event discovery. |
+| Housing wards | Scalable neighborhoods with recurring presence, not scarce topology. |
+| Duty roulette | Global access with recent-ally and cohort memory. |
+| Party Finder | Purpose-board with filters for schedule, tone, geography, role, and goal. |

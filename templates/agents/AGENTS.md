@@ -487,14 +487,19 @@
   </constraint>
 
   <constraint>
+    No Hidden Side-Effect Dependencies.
+    If a module needs the environment, it must be passed in (DI), rather than reaching for a global process.env deep in the logic.
+  </constraint>
+
+  <constraint>
     Communication Exception — Direct Answer First
-    When the user asks for diagnosis, explanation, review findings, root cause, incident analysis, or a factual answer, answer directly first.  Do not lead with planning ceremony unless the user is asking for implementation planning.
-    Default order for diagnosis/debug/review:
-    1. direct answer or likely root cause;
-    2. key evidence;
-    3. next action;
-    4. required Recap only if this was an agent work turn.
-    Planning sections are supporting structure, not a substitute for answering the question.
+      When the user asks for diagnosis, explanation, review findings, root cause, incident analysis, or a factual answer, answer directly first.  Do not lead with planning ceremony unless the user is asking for implementation planning.
+      Default order for diagnosis/debug/review:
+      1. direct answer or likely root cause;
+      2. key evidence;
+      3. next action;
+      4. required Recap only if this was an agent work turn.
+      Planning sections are supporting structure, not a substitute for answering the question.
   </constraint>
 
 
@@ -1102,15 +1107,41 @@
 # 14. Multi-Agent Swarm Protocols
 
 <swarm_protocols>
-  Role Boundaries:
-  - You may only execute tasks within your assigned domain.
-  - If a dependency belongs to another agent/domain, do not mock it to keep moving.
-  - Output `[ESCALATION_REQUEST: Target Domain]`, then `[SYSTEM_HALT]`, with a `<Recap>` naming the missing dependency.
+  Subagent spawning rules:
+    - Default: Do not spawn a subagent.
+    - Spawn a subagent only for bounded parallel work, clearly distinct specialization, or strict context isolation.
+    - Any subagent task other than mechanical retrieval MUST use the highest available reasoning/thinking-effort tier (xhigh / max or exact equivalent).
+    - Mechanical retrieval only (list/search/open/read/collect) MAY use normal/default effort.
+    - If unsure whether to spawn a subagent, do not spawn one.
+    - If unsure whether a subagent task is purely mechanical retrieval, default to xhigh / max.
 
-  Handoff Ledger:
-  - When passing control to another agent, do not pass raw conversational history.
-  - Compress state into a strict `<Handoff_Ledger>`.
-  - Output this block immediately before the mandatory `<Recap>` block.
+  Default topology:
+    - Prefer single-writer, multi-agent-intelligence systems.
+    - Subagents should contribute intelligence (search, critique, review, test design, simulation, routing, synthesis help) while the primary agent owns repository writes and final synthesis.
+    - Unstructured peer swarms are forbidden unless the approved plan explicitly names why manager/worker or generator/verifier is insufficient.
+
+  Context transfer modes:
+    - Collaborator lane: share the relevant work spec, plan, todo state, artifact paths, and local priors needed to execute the task coherently.
+    - Verifier lane: start from clean context. Provide the artifact under review, the exact scope boundary, and the proof gate; do not pass the author's scratchpad, conclusions, or long trajectory by default.
+
+  Role Boundaries:
+    - You may only execute tasks within your assigned domain.
+    - If a dependency belongs to another agent/domain, do not mock it to keep moving.
+    - Output `[ESCALATION_REQUEST: Target Domain]`, then `[SYSTEM_HALT]`, with a `<Recap>` naming the missing dependency.
+
+   Shared-state discipline:
+    - Agents must assume no implicit shared state. 
+    - Shared plans, todo lists, work-spec paths, eval artifacts, and inter-agent messages must be explicit and durable.
+    - Managers should communicate goals, constraints, and proof gates, and avoid over-prescribing local implementation when they lack the child agent's direct codebase context.
+
+   Escalation helpers:
+    - When consulting a stronger or specialist agent, default to passing a fork of the current context unless verifier-lane isolation applies.
+    - The helper should answer broadly, surface overlooked issues, and request missing evidence instead of speculating across absent context.
+
+  Handoff Rules:
+    - Manager/worker receivers treat the `<Handoff_Ledger>` as ground truth for scope, ownership, artifact paths, and next action.
+    - Reviewer/tester/red-team receivers treat the `<Handoff_Ledger>` as scope metadata, not correctness truth; findings must be re-derived from the artifact and gate.
+    - The main/writer agent is responsible for reconciling verifier findings with broader user context to avoid looping, out-of-scope changes, or false fixes.
 
   <Handoff_Ledger>
     <Target_Agent>[Name of next agent]</Target_Agent>

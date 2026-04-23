@@ -186,3 +186,62 @@ Metric rule:
 ```text
 If convenience improves throughput, verify that recognition did not fall.
 ```
+
+## World of Warcraft Social-Residue Metrics
+
+Use these when reviewing access tools, queue systems, layered populations, timed progression, tokenized economies, world rewrites, or Classic-vs-retail nostalgia claims.
+
+| Concept | Signals | Counter-signals |
+|---|---|---|
+| Access without social aftercare | Queue success plus repeat-party prompts, recent-ally conversion, role-intent clarity, learning-mode success. | Completion rises while repeat grouping, thanks, guild inquiry, and preferred-stranger formation fall. |
+| Dungeon finder social residue | Same-party requeue, commend/follow after run, leader/friendly-player recall, apology/retry after wipe. | Fast queues plus silence, kicks, no repeat contact, and role-blame churn. |
+| Raid finder spectacle access | First-clear accessibility, learning progression, story completion, low-pressure role practice. | Raid identity flattens, prestige confusion rises, or access mode teaches bad habits for harder modes. |
+| Cross-realm / no-server population smoothing | Alive spaces, stable local cohorts, recurring names by geography/profession/activity. | Population is technically full but socially placeless; players never re-encounter recognizable strangers. |
+| Mythic+ pressure | Group completion by key type, route literacy, post-failure requeue, role retention, non-timer completion modes. | Abandon-on-first-mistake, meta comp collapse, tank/healer anxiety, route blame, timer-induced toxicity. |
+| Add-on/log dependency | Base UI success for ordinary roles, new-player competence without external tools, learning from official recap. | Mandatory add-ons, external route sheets, log gatekeeping, hidden-mechanic superstition. |
+| Token/boost/prestige leakage | Clear separation between paid convenience, gold wealth, carried achievement, earned mastery, and social trust. | Players cannot tell whether status came from skill, time, money, carry, or guild support. |
+| World rewrite memory | Preserved landmarks, old-to-new callouts, veteran memory bridges, newcomer clarity. | Efficient new world but erased place folklore; veterans experience improvement as loss. |
+| Seasonal treadmill | Re-engagement after skipped season, friend catch-up time, old-system retirement clarity. | Missed season becomes exile; players return to chores instead of friends. |
+
+Metric rule:
+
+```text
+For every WoW-style optimization, pair throughput with social-residue counters.
+```
+
+Examples:
+
+```text
+Queue time + repeat-party rate
+Raid access + prestige clarity
+Population density + recurring-name rate
+Timed completion + post-failure retry
+Token volume + prestige-legibility sentiment
+Patch reactivation + time-to-play-with-friends
+World rewrite adoption + preserved-place memory
+```
+
+## FFXIV Metrics Addendum
+
+Use these when testing returnability, story onboarding, low-pressure grouping, and social expression.
+
+| Claim | Primary metric | Counter-metric |
+|---|---|---|
+| Story onboarding works | MSQ continuation, first-dungeon completion, recap use, first-week return. | Time until player can meaningfully play with friends; story-skip pressure; drop-off at known quest walls. |
+| Duty Support helps | NPC-duty completion, reduced story dungeon abandonment. | Human group conversion after NPC clears; roulette participation; first human duty anxiety/churn. |
+| Roulettes create healthy contact | Old-content fill rate, veteran participation, first-time clear support. | Repeat grouping, commendation rate, post-duty play-again, veteran resentment, speedrun pressure on sprouts. |
+| Community is welcoming | New-player retention, first-time completion, commendations. | Recognition depth: friend adds, linkshell/FC joins, repeat allies, learning-group continuation. |
+| Party Finder works | Fill time by purpose tag, clear rate by tag, tag accuracy. | Disband after first failure, mismatched expectation reports, blacklist/refusal patterns. |
+| Returnability works | Time from login after absence to current meaningful play. | Chore wall, reactivation failure, friends played-with within first session, catch-up abandonment. |
+| Identity outside combat works | Glamour/plate/housing/event participation, profile views, visitor counts. | Identity concentration in combat logs/gear only; venue/event discovery outside client. |
+| Patch cadence works | Patch return rate, completion of new content. | Formula fatigue: early drop-off, skipped systems, “checklist” sentiment, low social novelty. |
+| Exodus readiness works | Trial-to-resident conversion, new-wave capacity stability, newcomer social conversion. | First-week confusion, comparison complaints, queue/congestion trust loss, tourist churn. |
+
+### Metric traps
+
+- High Duty Finder completion can hide disposable strangers.
+- High free-trial registration can hide conversion failure.
+- High MSQ completion can hide friend-exile debt.
+- High venue attendance can hide off-client discovery dependence.
+- High patch return can hide formula fatigue.
+- High politeness can hide social thinness.

@@ -152,3 +152,78 @@ Single-world rule:
 ```text
 Scale supplies bodies; locality supplies memory; dependency supplies names.
 ```
+
+## WoW Cross-Realm Translation for a No-Server World
+
+WoW’s cross-realm and connected-realm systems were designed around a realm topology problem: low-population places and fragmented social pools. In a truly massive no-server world, the population problem changes form.
+
+The single-world problem is not “can we find enough players?” It is:
+
+```text
+Can the world make any of these players familiar, useful, accountable, or locally meaningful again?
+```
+
+| WoW-era problem | Single-world version | Design response |
+|---|---|---|
+| Dead leveling zones | Dense but socially meaningless public traffic. | Region cohorts, repeated route overlap, local objective chains, first-assist memory. |
+| Cross-realm strangers | Global strangers who may never repeat. | Recent allies, preferred strangers, leader follow, profession/service history, event cohorts. |
+| Realm reputation loss | No natural bounded social memory. | Neighborhoods, fronts, guild/squad chapters, local markets, recurring schedules, route identity. |
+| Queueable content from anywhere | Access without place. | Staging rituals, post-run continuity, purpose tags, and durable group escalation. |
+| Connected-realm guild reach | Massive recruitment pool but weak locality. | Guild shell + squads + regional chapters + event crews + profession cells. |
+
+Single-world WoW rule:
+
+```text
+Do not celebrate that everyone can play with everyone until the design explains how anyone becomes someone.
+```
+
+## WoW Social-Residue Check for Scale Systems
+
+Before shipping a scale/convenience feature, list the social residue it might remove:
+
+- repeated faces;
+- known tanks/healers/leaders;
+- route staging;
+- city idling;
+- profession service identity;
+- guild/squad need;
+- local market conversation;
+- prestige clarity;
+- faction/region belonging;
+- failure repair opportunities.
+
+Then ship the replacement memory surface in the same feature, not later.
+
+## FFXIV Translation for a No-Server World
+
+FFXIV’s Worlds/Data Centers created some community boundaries, but the lesson for a truly massive world is not to copy that topology. Translate the functions.
+
+| FFXIV function | Massive single-world translation |
+|---|---|
+| Home World familiarity | Neighborhood, region, event front, profession hub, venue district, cohort. |
+| Data Center culture | Language/time/activity cohort and purpose-tag filters. |
+| Limsa/Ul'dah/Gridania social staging | Multiple regional stages with regulars, routes, services, and performance spaces. |
+| Housing wards | Scalable neighborhoods with recurring presence and social memory, not scarce server plots. |
+| Community Finder | In-client community/event/venue finder tied to world geography and schedules. |
+| Cross-world linkshell | Cohort chat that can be attached to places, events, professions, and recurring groups. |
+| Party Finder | Massive-world purpose board with locality, schedule, goal, and tone filters. |
+| Roulettes | Global content health system with recent-ally and first-time memory. |
+| Duty Support | Anti-churn story access that feeds back into optional human contact. |
+
+### Single-world risk
+
+A no-server world can accidentally produce the worst version of FFXIV data-center travel: everyone is technically reachable, but no one repeats.
+
+Counter with:
+
+```text
+neighborhood identity
+event cohorts
+profession districts
+venue calendars
+squad/static registries
+recent allies
+local chat layers
+region histories
+public stages
+```

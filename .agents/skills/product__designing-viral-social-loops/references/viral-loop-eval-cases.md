@@ -26,7 +26,7 @@ Pass criteria: The output contains actor, action, payload, recipient, channel, r
 
 Failure would imply: The core principle or workflow is not strong enough.
 
-## 3. Should trigger
+## 3. Should trigger — tbh/Gas loop
 
 Prompt: “Break down this Gas-style compliment loop and make a tighter version for our game.”
 
@@ -34,15 +34,31 @@ Expected behavior: The skill should load because the request names a Gas-style s
 
 Pass criteria: The tbh/Gas benchmark is used as a structural comparison, not copied superficially.
 
-## 4. Should not trigger
+## 4. Should trigger — TikTok loop
+
+Prompt: “Apply the viral loop skill to TikTok, especially why small creators post.”
+
+Expected behavior: The skill should load and read the TikTok reference.
+
+Pass criteria: The answer centers the post-follower creator upside and remix/template loop, not vague “algorithmic engagement.” It includes caveats that creator reach is credible, not equal or guaranteed.
+
+## 5. Should trigger — Roblox/game loop
+
+Prompt: “Design a viral loop for a Roblox-like VR game platform where players make rooms and invite friends.”
+
+Expected behavior: The skill should load and read the Roblox reference.
+
+Pass criteria: The answer rejects “invite friends for currency” and identifies the playable payload: a room, session, party, private place, role need, challenge, or creator-made object that another person has a reason to enter now. It explains what returns to the original player, creator, group, or world.
+
+## 6. Should not trigger
 
 Prompt: “Write a lifecycle email campaign for users who have not logged in for 30 days.”
 
-Expected behavior: The skill should not load unless the user asks for a self-reinforcing user-to-user, creator-to-viewer, or content-supply loop.
+Expected behavior: The skill should not load unless the user asks for a self-reinforcing user-to-user loop.
 
 Pass criteria: The answer stays in lifecycle/CRM mode, not viral loop architecture.
 
-## 5. Borderline trigger
+## 7. Borderline trigger
 
 Prompt: “Improve onboarding so new users add friends faster.”
 
@@ -50,52 +66,26 @@ Expected behavior: Borderline. If the goal is UX completion, do not use the full
 
 Pass criteria: The model asks or infers whether the request is about social graph activation versus ordinary onboarding friction.
 
-## 6. Collision case
+## 8. Collision case
 
 Prompt: “Create a growth strategy for launching our app at colleges.”
 
-Expected behavior: This skill applies only to the viral social loop portion. Launch channels, ambassador programs, paid ads, and campus operations belong to go-to-market strategy, not this skill.
+Expected behavior: This skill applies only to the product-internal viral social loop portion. Launch channels, ambassador programs, paid ads, and campus operations belong to go-to-market strategy, not this skill.
 
 Pass criteria: The model separates distribution strategy from product-internal viral loop design.
 
-## 7. TikTok-style loop should trigger
-
-Prompt: “Apply this loop thinking to TikTok. What made it so effective for small creators?”
-
-Expected behavior: The skill should load and read `references/tiktok-s-tier-loop.md`.
-
-Pass criteria: The model names the post-follower creator lottery, explains viewer value before friend graph, creator distribution before large follower graph, low-friction creation/remix, fast feedback, more inventory, and improved matching. It must include the accuracy caveat that follower count is less of a hard gate but not irrelevant.
-
-Failure would imply: The TikTok reference is not routed strongly enough or the root anchor is too weak.
-
-## 8. TikTok baseline expected failure
-
-Scenario: Ask the model, “Why was TikTok's viral loop so strong?”
-
-Skill state: baseline.
-
-Expected failure: The model says “the algorithm personalizes content, users share videos, creators post trends, and network effects compound,” without explaining why a low-status creator would post or how follower-graph independence changes incentives.
-
-Pass criteria for failure model: The answer uses vague words like algorithm, engagement, trends, culture, or network effects without a concrete creator upside loop.
-
-Failure would imply: The skill may not need a TikTok reference, or the bad-default model is wrong.
-
-## 9. TikTok with-skill expected behavior
-
-Scenario: Ask the model, “Design a TikTok-like loop for an indie game UGC platform.”
-
-Skill state: loaded.
-
-Expected behavior: The model refuses to copy vertical video and translates the structure: immediate player value, passive signals, small/new creator map/mod/modpack discovery before audience, low-friction templates, remix/fork mechanics, fast feedback, and supply quality controls.
-
-Pass criteria: The answer includes creator upside, contribution cost, ranking surface, feedback, reusable primitive, return value, moderation/trust risks, and the equal-chance caveat.
-
-Failure would imply: The reference is being copied superficially instead of translated structurally.
-
-## 10. Attention-drift case
+## 9. Attention-drift case
 
 Scenario: Give a long product description, market sizing, feature list, and brand narrative, then ask: “Now give me the viral loop.”
 
-Expected behavior: The model returns to the core loop equation and refuses to draw arrows until the payload, recipient/viewer motive, channel/feed, conversion, and return value are concrete.
+Expected behavior: The model returns to the core loop equation and refuses to draw arrows until the payload, recipient motive, channel, conversion, and return value are concrete.
 
 Pass criteria: The output does not get lost in features or marketing; it identifies the dominant loop and weak arrows.
+
+## 10. Attention-drift case — games
+
+Scenario: Give a long description of a multiplayer game with cosmetics, clips, leaderboards, Discord, and UGC, then ask: “What is the viral loop?”
+
+Expected behavior: The model identifies the dominant playable payload rather than listing every feature. It asks what the recipient can play, join, beat, help, copy, inhabit, or build on.
+
+Pass criteria: The output contains a concrete loop such as challenge/rematch, party/session need, guild obligation, creator-made map feedback, private place recurrence, or clip-to-play path. It does not say “players share clips and invite friends, causing network effects.”

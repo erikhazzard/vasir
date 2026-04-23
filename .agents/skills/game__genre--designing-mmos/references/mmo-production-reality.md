@@ -147,7 +147,7 @@ Classic EQ-inspired systems are expensive when they depend on live recovery, con
 
 | System | Production check |
 |---|---|
-| Player services | Needs request routing, reputation, compensation, abuse-resistant spam limits, and fallback when no provider exists. |
+| Player services | Needs request routing, reputation, compensation, spam limits, and fallback when no provider exists. |
 | Public camps | Needs spawn cadence, claim/sharing UI, dispute telemetry, train/recovery rules, and clear contested/cooperative labeling. |
 | Death recovery | Needs bounded loss, recovery timer, rescue path, support edge cases, and clear rollback/fallback for stuck states. |
 | Travel services | Needs route graph, last-mile design, load-aware staging hubs, service discovery, and non-blocking fallback. |
@@ -158,4 +158,88 @@ Launch gate:
 
 ```text
 Do not ship a convenience replacement for an emergent player-usefulness loop until telemetry exists to detect recognition loss.
+```
+
+## World of Warcraft Social-Substitution Production Checks
+
+WoW-style modernization features are tempting because they solve obvious production and population problems. The production risk is that they remove social residue while the dashboard shows wins.
+
+| Feature | Production win | Hidden social cost | Required launch companion |
+|---|---|---|---|
+| Automated group finder | Queue time, content usage, role fill. | Disposable strangers, no leader identity, no route conversation, cheap leaving. | Purpose tags, role/build intent, recent allies, play-again, leader follow, post-failure retry. |
+| Raid finder / story-mode raid | More players see content. | Guild need and prestige meaning weaken. | Difficulty framing, learning-to-organized pathway, distinct reward/provenance, recurring raid communities. |
+| Cross-cohort population smoothing | Areas feel populated. | Players feel like phantoms to each other. | Cohorts, region memory, repeated-contact surfacing, local event fronts, known leader/profession surfaces. |
+| World rewrite | New-player flow, content modernization. | Veteran memory deletion. | Legacy monuments, history layers, route-name preservation, veteran callbacks, return tours. |
+| Timed repeatable dungeons | Evergreen small-group content. | Meta filtering, role blame, leaver culture. | Completion/push/learning modes, route preview, key protection/fallback, failure replay, role-burden telemetry. |
+| Token / paid gold exchange | RMT reduction, subscription flexibility, revenue. | Prestige-channel contamination. | Earned-status provenance, carry-market telemetry, non-transferable prestige, clear money/gold/skill separation. |
+| Seasonal reset / borrowed power | Recurring engagement. | Captivity, missed-time exile, identity amnesia. | Friend-sync catch-up, preserved history, reentry path, season ritual framing, optional compression. |
+| Add-on/log openness | Expert mastery and community tools. | Mandatory external competence, prosecution culture. | Base UI role-critical clarity, opt-in deep logs, repair-oriented summaries, automation boundaries. |
+
+Production rule:
+
+```text
+If the prototype saves time by deleting a social step, the launch checklist must include the replacement memory surface.
+```
+
+## WoW-Style Launch Gates
+
+| Gate | Reason |
+|---|---|
+| Finder has purpose tags before rewards are tuned. | Incentives will harden speed norms immediately. |
+| Role/build intent is visible before commitment. | Legal play becomes socially illegal after the first failure. |
+| Recent ally and play-again exist before automated grouping scales. | Disposable-stranger culture forms quickly. |
+| Difficulty modes have distinct meaning and provenance. | Access and prestige blur if rewards/history are unclear. |
+| Timed content has a non-push path. | The timer becomes the default moral standard. |
+| Token/boost design has prestige-channel analysis. | Money leaks into status through indirect routes. |
+| Add-on/log policy is decided before high-end content ships. | External tools become default law. |
+| World rewrites ship with memory bridges. | Players treat modernization as erasure. |
+| Seasonal resets preserve identity and friend compatibility. | Returnability damage compounds across seasons. |
+
+## Rollout Pattern: Convenience With Replacement Memory
+
+```text
+1. Name the old friction being removed.
+2. Name the social residue it carried: names, routes, leaders, guild need, market identity, prestige clarity, role reputation, weak ties.
+3. Ship the convenience only with an explicit replacement surface.
+4. Instrument both throughput and residue.
+5. Hold rollout if throughput rises while recognition, repeat contact, or institution conversion falls.
+```
+
+## FFXIV Production Addendum
+
+FFXIV-style systems are expensive because they are not just features; they are trust infrastructure.
+
+| System | Production cost to respect |
+|---|---|
+| Story spine | Writing, localization, cinematics, VO, quest tooling, recap tooling, spoiler control, patch continuity. |
+| Duty Support | Encounter scripting, NPC behavior, duty redesign, maintenance whenever mechanics change. |
+| Roulettes | Reward economy, role balance, old-content tuning, anti-speedrun pressure, telemetry. |
+| Purpose-tagged group board | Taxonomy, filters, templates, moderation of misleading tags, UX clarity. |
+| Social expression | Art pipeline, UI customization, storage, rendering, profile visibility choices, public-surface review costs. |
+| Housing/venues | World capacity, instancing/neighborhood policy, event discovery, permissions, visitor routing, screenshots/archives. |
+| Returnability | Patch summaries, catch-up economy, UI guidance, reentry quests, friend-sync content. |
+| Exodus-readiness | Capacity headroom, queue policy, communication templates, trial controls, onboarding surge support. |
+
+### Hard-to-retrofit primitives
+
+- first-time status and veteran reward logic;
+- recent ally memory;
+- purpose-tag schema;
+- recap system;
+- event/venue calendar;
+- group mode taxonomy;
+- identity profile framework;
+- returner dashboard;
+- telemetry for friend-compatibility and social conversion.
+
+### Rollout gates
+
+Do not ship FFXIV-like systems without answering:
+
+```text
+What is the social function?
+What old friction/social contact does this remove?
+What replaces the memory?
+What telemetry proves it?
+What is the fallback if it creates thin anonymity?
 ```

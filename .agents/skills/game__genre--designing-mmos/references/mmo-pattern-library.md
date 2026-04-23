@@ -208,3 +208,132 @@ A convenience feature replaces an emergent player-usefulness loop but fails to p
 - **Damage:** player services, regional hubs, route stories, merchant identity, and repeated contacts vanish.
 - **Replacement:** convenience plus replacement memory: seller history, service reputation, last-mile routes, local hubs, commissions, recent allies, guide/porter roles.
 - **Question:** what relationship did this convenience remove, and how does the replacement remember people?
+
+## WoW Social-Residue Loss
+
+A system solves access, speed, or population but deletes the names, places, roles, routes, guild needs, or prestige meanings that old friction accidentally produced.
+
+- **Bad default:** judge modernization by minutes saved, completion rate, or population density.
+- **Damage:** disposable strangers, hollow cities, guild optionality, world-as-pregame, and prestige confusion.
+- **Replacement:** before removing friction, list the social residue it carried and ship replacement memory with the convenience.
+- **Question:** what did the old inconvenience make players remember, and where does that memory live now?
+
+## Access Without Social Aftercare
+
+A queue, finder, teleport, or browser can find bodies but cannot by itself create relationships.
+
+- **Bad default:** treat finding a group as the full social problem.
+- **Damage:** strangers become content-fillers; role blame and leaving become cheap; learning has no continuity.
+- **Replacement:** purpose tags, route expectations, story/learning/speed/farm/prog labels, recent allies, leader follow, play-again prompts, commendation memory, replay after failure.
+- **Question:** after this run, can a good stranger become a preferred stranger?
+
+## Difficulty-Mode Meaning Split
+
+Multiple versions of the same content improve access but split the social meaning of the clear.
+
+- **Bad default:** add more difficulties and let item level sort prestige.
+- **Damage:** players “saw the raid” but did not join the same institution, learn the same norms, or share the same achievement meaning.
+- **Replacement:** label each mode culturally: story access, learning, normal organized, heroic mastery, mythic prestige, seasonal push; keep rewards and history legible.
+- **Question:** what does a clear mean, and can players tell which meaning they are seeing?
+
+## Timer-Theft Pressure
+
+A timed group objective turns one player’s mistake into everyone else’s lost time or downgraded reward.
+
+- **Bad default:** add a timer for mastery and assume pressure creates skill.
+- **Damage:** tanks/leaders absorb blame, off-meta players are filtered, learning becomes socially expensive, and leaving becomes rational.
+- **Replacement:** declared push/completion/learning modes, route preview, key protection or non-hostage progression, post-failure replay scaffolds, role-burden transparency.
+- **Question:** when someone fails, does the timer produce coaching, abandonment, or prosecution?
+
+## World-Rewrite Memory Deletion
+
+A patch modernizes old places but deletes the routes, jokes, landmarks, and personal history players used to anchor identity.
+
+- **Bad default:** treat old content as obsolete content to replace.
+- **Damage:** players experience improvement as loss; world continuity breaks; nostalgia becomes opposition to future change.
+- **Replacement:** monuments, legacy names, optional history layers, veteran callbacks, preserved screenshots/maps, returning-player tours, explicit continuity framing.
+- **Question:** what harmless memory can survive even if the mechanics must change?
+
+## Token-to-Prestige Leakage
+
+Money becomes gold, gold buys services, and services produce prestige-adjacent proof.
+
+- **Bad default:** evaluate tokens only as RMT reduction or subscription flexibility.
+- **Damage:** players distrust whether status, rare goods, carries, achievements, or economic power were earned.
+- **Replacement:** separate purchased convenience, gold wealth, earned execution, non-transferable prestige, and social trust history.
+- **Question:** can money reach a status channel players believe should be earned?
+
+## Classic Nostalgia Misread
+
+Players ask for an older game because they miss the social residue, not necessarily the inconvenience.
+
+- **Bad default:** either dismiss nostalgia as irrational or copy old friction literally.
+- **Damage:** modern design misses the real complaint, or reintroduces pain without the original community function.
+- **Replacement:** identify which old loop created repeated faces, route memory, class usefulness, market talk, guild need, or prestige clarity; rebuild that function with modern UX.
+- **Question:** what social function is nostalgia pointing at?
+
+## FFXIV Pattern Addendum
+
+### Trust Repair as World Memory
+
+- **Bad default:** treat a failed live system as something to patch quietly.
+- **Damage:** players remember the failure but the operator refuses to integrate the memory.
+- **Replacement:** acknowledge the failure, preserve harmless identity, create a world/story bridge, and prove repair through cadence.
+
+Diagnostic question: **What proof shows the operator learned?**
+
+### Story Gate Debt
+
+- **Bad default:** because story is good, make all meaningful play sit behind the full chronology.
+- **Damage:** friends cannot play together tonight; newcomers experience story as exile from the current world.
+- **Replacement:** preserve story-first play but add synced side paths, spoiler-safe current activities, recaps, and mentor-supported bridges.
+
+Diagnostic question: **Can a behind player meaningfully play with current friends without destroying story memory?**
+
+### Polite Automation
+
+- **Bad default:** queue people together and assume low toxicity means good social design.
+- **Damage:** players complete content peacefully but forget each other instantly.
+- **Replacement:** add first-time signals, role clarity, commendations, recent allies, play-again prompts, and purpose-tag escalation.
+
+Diagnostic question: **Did the queue create a remembered stranger or only a cleared instance?**
+
+### Purpose-Tagged Obligation
+
+- **Bad default:** let group intent be discovered in chat or after failure.
+- **Damage:** players punish each other for mismatched expectations.
+- **Replacement:** make purpose explicit before commitment: story, first-time, blind, learning, prog, clear, farm, speed, parse, social, venue.
+
+Diagnostic question: **Which expectation would surprise someone only after the wipe?**
+
+### Mode Separation
+
+- **Bad default:** make one difficulty mode serve story, learning, farm, and prestige.
+- **Damage:** incompatible motives collide; prestige either gatekeeps story or story access devalues prestige.
+- **Replacement:** separate access, learning, mastery, and prestige channels.
+
+Diagnostic question: **What social meaning does this mode carry?**
+
+### Identity Outside Combat
+
+- **Bad default:** combat performance is the main way to become known.
+- **Damage:** social players become decoration; throughput and logs overdominate identity.
+- **Replacement:** add glamour, portraits, housing, events, collections, crafting signatures, performance, screenshots, titles, and hosting identity.
+
+Diagnostic question: **Can a player be known without being high-performance?**
+
+### Exodus-Readiness
+
+- **Bad default:** wait for a competitor to stumble, then market aggressively.
+- **Damage:** skeptical visitors arrive and confirm that the world cannot onboard or absorb them.
+- **Replacement:** build trust, onboarding runway, social warmth, comparison legibility, culture, and capacity response before the wave.
+
+Diagnostic question: **Would a skeptical refugee’s first week prove or disprove your world’s promise?**
+
+### Formula Fatigue
+
+- **Bad default:** repeat the patch cadence that players trust until it becomes invisible.
+- **Damage:** players respect the game but no longer feel surprise, need, or new social roles.
+- **Replacement:** keep return rhythm but rotate social formats, institution needs, identity rewards, and world-state rituals.
+
+Diagnostic question: **Is this a comforting ritual or a solved checklist?**
