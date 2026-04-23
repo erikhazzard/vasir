@@ -1,6 +1,6 @@
 ---
-name: design-viral-social-loops
-description: Designs, audits, and tightens viral social and creator-content product loops for apps, games, feeds, and communities by tracing actor incentives, viral payloads, recipient/viewer motives, graph or supply density, off-platform channels, creator upside, return arrows, and loop closure. Use for tbh/Gas-style compliment or vote loops, invite gates, profile/share loops, friend-graph onboarding, TikTok-style short-video/feed/creator/remix loops, social proof mechanics, or diagnosing why a growth loop feels generic, loose, fake, or “algorithm” hand-wavy. Exclude ordinary lifecycle marketing, ad campaigns, SEO, or non-social funnels unless the requested artifact is a self-reinforcing user-to-user, creator-to-viewer, or content-supply loop.
+name: product__designing-viral-social-loops
+description: Designs, audits, and tightens viral social and creator-content product loops for apps, games, feeds, and communities by tracing actor incentives, viral payloads, recipient/viewer motives, graph or supply density, off-platform channels, creator upside, return arrows, and loop closure. Triggers when designing product growth loops, invite gates, profile/share loops, friend-graph onboarding, TikTok-style short-video/feed/creator/remix loops, social proof mechanics, or diagnosing why a growth loop feels generic, loose, fake, or “algorithm” hand-wavy.
 ---
 
 # Design Viral Social Loops
