@@ -42,7 +42,7 @@ Path rules:
 * `<semantic-domain>` is the product/system area, such as `payments`, `matchmaking`, `realtime-netcode`, `agent-tools`, `infra`, `auth`, or `observability`.
 * `<YYYY-MM-DD>` is the incident start date in the repo/team’s canonical timezone when known.
 * `<incident-slug>` is a short kebab-case symptom or mechanism slug.
-* Do not include severity, owner, or status in the path because those can change.
+* Do not include severity or status in the path because those can change.
 * Optional sanitized evidence excerpts may live under:
 
 ```text
@@ -216,7 +216,7 @@ Every corrective action must have:
 
 * action ID;
 * type: `Prevent`, `Detect`, or `Mitigate`;
-* owner or `TBD`;
+* owner (this is a post LLM world, so the *code* owns the code; what's the most relevant code / files / doc / test that should be "owning" this action?)
 * priority;
 * due date or `TBD`;
 * exact verification.
@@ -394,10 +394,10 @@ This is the section that turns a one-off bug into an engineering learning loop.
 
 ## 12) Corrective Actions
 
-| ID | Action | Type | Owner | Priority | Due date | Verification |
+| ID | Action | Type | Priority | Due date | Verification |
 | --- | --- | --- | --- | --- | --- | --- |
-| CA-001 |  | Prevent / Detect / Mitigate |  | P0 / P1 / P2 | YYYY-MM-DD / TBD | exact test / alert / gate |
-| CA-002 |  | Prevent / Detect / Mitigate |  | P0 / P1 / P2 | YYYY-MM-DD / TBD | exact test / alert / gate |
+| CA-001 |  | Prevent / Detect / Mitigate |  P0 / P1 / P2 | YYYY-MM-DD / TBD | exact test / alert / gate |
+| CA-002 |  | Prevent / Detect / Mitigate |  P0 / P1 / P2 | YYYY-MM-DD / TBD | exact test / alert / gate |
 
 Every action should be specific, owned when possible, prioritized, and verifiable.
 
@@ -451,7 +451,7 @@ manual approval boundary was not enforced by backend
 `Why this class recurs` should explain the system pressure:
 
 ```text
-This recurs because two systems can both appear authoritative unless freshness, ordering, and ownership are explicit.
+This recurs because two systems can both appear authoritative unless freshness, and ordering are explicit.
 ```
 
 ---
@@ -488,7 +488,7 @@ Return this compact result after writing or updating the postmortem:
   <Root_Cause_Confidence>High | Medium | Low</Root_Cause_Confidence>
   <Evidence_State>[sufficient | partial | blocked]</Evidence_State>
   <Corrective_Actions>[CA-001, CA-002, or None]</Corrective_Actions>
-  <Open_Blockers>[missing evidence, owner, system doc, verification, or None]</Open_Blockers>
+  <Open_Blockers>[missing evidence, system doc, verification, or None]</Open_Blockers>
   <Recommended_Next_Action>[one concrete next action]</Recommended_Next_Action>
 </Postmortem_Result>
 ```

@@ -1,6 +1,6 @@
 ---
-name: agents__creating-folder-agents
-description: Write per-subsystem constraint documents that prevent AI coding agents from producing plausible-but-broken code. Use when defining hard-no rules, architectural gotchas, performance boundaries, or cultural style overrides for a specific folder or module — especially hot paths, netcode, deterministic systems, or anywhere standard AI defaults silently fail. Triggers on "write rules for this folder," "AGENTS.md section for [subsystem]," "constrain the agent for our [X]," "document the gotchas in [module]," or any request to scope AI coding behavior to a specific part of the codebase. 
+name: agents__write-folder-agents
+description: Writes folder-scoped AGENTS.md rules for AI coding agents by extracting subsystem invariants, unsafe defaults, architectural traps, and local guardrails that generic coding behavior will miss. Use when documenting per-folder constraints, hard-no rules, performance or determinism limits, architectural boundaries, gotchas, or style overrides for a specific module or subsystem, especially hot paths, netcode, simulation, concurrency, rendering, or memory-sensitive code; not for repo-wide AGENTS.md files, generic coding standards, or ordinary API documentation.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

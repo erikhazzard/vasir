@@ -1,6 +1,6 @@
 ---
 name: optimizing-node-backend
-description: Audits Node.js backend code for performance, cost, resource saturation, correctness-under-concurrency, and failure-mode risk. Covers event-loop/hot-path latency, Valkey/Redis-compatible usage, DynamoDB access patterns, memory/GC, concurrency correctness, and observability/resilience. Produces a severity-ranked, evidence-calibrated audit with assumptions, falsifiers, and verification signals. Strictly audit-only, does not rewrite code or apply patches. Triggers when working on valkey or redis code, dynamodb, optimizing code, audit, reviewing performance, find bottlenecks, explain latency/timeouts, reduce cost, review Valkey/DynamoDB usage, or assess scalability under load.
+description: Audits Node.js backend services for latency, scalability, cost, concurrency correctness, and failure-mode risk, especially event-loop hot paths, Valkey/Redis usage, DynamoDB access patterns, memory/GC, saturation, and observability under load. Triggers on performance reviews, bottleneck hunts, timeout/throughput analysis, cache or database pattern audits, and capacity-risk assessment
 ---
 # Optimizing Node Backend — Audit Skill
 

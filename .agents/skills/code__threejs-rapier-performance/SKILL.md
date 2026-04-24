@@ -1,6 +1,6 @@
 ---
 name: code__threejs-rapier-performance
-description: Enforces deterministic, measurement-driven mobile-web performance architecture before writing or editing any Three.js + Rapier code or assets — features, fixes, refactors, shaders, materials, scene graph, cameras, controls, postprocessing, loading, streaming, workers, physics, colliders, joints, character controllers, and build-pipeline changes. Validates game form, target device matrix, frame/latency/memory/load budgets, asset pipeline, render strategy, Rapier cost model, worker/off-main-thread decisions, Low/Medium/High quality tiers with device auto-select and user override, observability, proof, and deterministic replay safety. Use whenever starting any change touching threejs, rapier, mobile perf, rendering, loading, memory, fps, stutter, jank, WebGL, WebGPU, glTF, KTX2, meshopt, colliders, or CCD.
+description: Enforces deterministic, measurement-driven mobile-web performance architecture for Three.js + Rapier before code or asset changes, covering render and physics budgets, frame stability, loading/streaming, memory, quality tiers, off-main-thread decisions, and proof via observability. Use for any change touching Three.js, Rapier, WebXR/WebGL/WebGPU rendering, shaders, scene graph, cameras, controls, physics, colliders/controllers, glTF/KTX2/meshopt assets, or fps, jank, stutter, and load-time issues.
 ---
 
 Before writing code or changing assets, adopt this as law.

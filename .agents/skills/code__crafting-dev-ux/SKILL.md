@@ -1,7 +1,6 @@
 ---
 name: code__crafting-dev-ux
 description: Design every internal API, module, function, config surface, error type, event/message shape, and CLI so it’s trivially easy to use correctly and hard to use incorrectly — for both human developers and LLMs. Dev UX includes interface shape *and* the surrounding system, findability, first-success, workflow/debuggability, migration UX, governance/enforcement, and DX feedback loops.
-use_when: Use BEFORE writing/modifying any interface surface (exports, signatures, schemas, CLI commands, error models, events, internal SDKs).
 ---
 
 # Dev UX Skill
