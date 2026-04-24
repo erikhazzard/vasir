@@ -1,0 +1,3 @@
+# Ensure symlinks are preserved across platforms
+.claude/skills symlink=true
+.codex/skills symlink=true

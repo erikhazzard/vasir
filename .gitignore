@@ -19,3 +19,7 @@ keys.json
 *.log
 
 tmp
+
+# Tool-local config (don't commit)
+.claude/settings.local.json
+.codex/config.local.toml
