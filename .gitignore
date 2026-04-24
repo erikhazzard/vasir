@@ -17,3 +17,5 @@ keys.json
 
 # Logs
 *.log
+
+tmp
