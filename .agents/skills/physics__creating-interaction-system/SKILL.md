@@ -1,6 +1,6 @@
 ---
 name: physics__creating-interaction-system
-description: Design deterministic physics-based object interaction systems in Three.js/WebXR using Rapier so grab, hold, manipulate, throw, collide, and impact feel weighty, authored, readable, performant, and satisfying without sacrificing determinism, browser/XR runtime reality, or stack-native implementation quality. Covers one-hand and two-hand interaction, throwing, expressive force-based telekinesis, hybrid physical character response, momentum-based damage, penetration/sticking, and impact payoff. Aesthetic north star Blade & Sorcery. Technical authority stack-native Three.js/WebXR/Rapier behavior and deterministic engine constraints, not undocumented internals from reference games. Triggers when working on physics for threejs / webxr / rapier games.
+description: Designs deterministic, weighty object-interaction systems in Three.js/WebXR with Rapier under browser/XR and engine constraints, covering grab, hold, manipulate, throw, one- and two-hand interaction, telekinesis, collision response, impact payoff, sticking/penetration, and momentum-based damage. Use when creating or tuning physical interaction feel in stack-native Three.js/WebXR/Rapier code; not for generic non-interaction physics or undocumented behavior copied from reference games.
 ---
 
 # Deterministic Physics Interaction Feel for Three.js/WebXR/Rapier
