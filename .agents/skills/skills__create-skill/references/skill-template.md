@@ -2,6 +2,8 @@
 
 Use this when producing a complete new skill or full rewrite. Delete optional sections that do not carry expertise, rewrite a default prior, route the skill, or shape the artifact.
 
+NOTE: For the persona, use the prompt__writing-persona skill to craft an s-tier persona.
+
 ```markdown
 ---
 name: {{activity-first-skill-name}}

@@ -111,18 +111,21 @@
   Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake file targets, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. If an exact file target or eval cannot be known without implementation discovery, say so explicitly and define the narrowest safe discovery envelope instead of inventing paths.
 
   For **Broad Feature Work**:
-    1. Invoke `$plan__maintain-work-spec`.
-    2. Invoke `$eval__design-proof-gates`, unless the Work Spec / eval Skill Result identifies an existing eval plan that already covers the exact requested scope.
-    3. Ensure durable artifacts exist:
+    1. Perform read-only discovery and apply Section 0.ii.a Alignment Before Meaningful Build.
+    2. Invoke `$plan__maintain-work-spec`.
+    3. If the Work Spec Skill Result reports material Open blockers, ask only the unresolved net-new questions in one batch, output the mandatory `<Recap>`, then `[SYSTEM_HALT]`.
+    4. Invoke `$eval__design-proof-gates`, unless read-only discovery or the Work Spec Skill Result identifies an existing eval plan that already covers the exact requested scope.
+    5. Ensure durable artifacts exist:
       - Work Spec: `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`
       - Eval Plan: `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md`
-    4. Use the Skill Result fields, not copied Work Spec prose, to populate the mandatory `<Plan>`.
-    5. Output the mandatory `<Plan>` block.
-    6. Output the mandatory `<Recap>` block.
-    7. Output `[SYSTEM_HALT]`.
-    8. Wait for explicit human approval before product-code implementation.
+    6. Use the Skill Result fields, not copied Work Spec prose, to populate the mandatory `<Plan>`.
+    7. Output the mandatory `<Plan>` block.
+    8. Output the mandatory `<Recap>` block.
+    9. Output `[SYSTEM_HALT]`.
+    10. Wait for explicit human approval before product-code implementation.
 
   For **Planning-Only Work**:
+  - If the requested output creates or updates durable planning state, perform read-only discovery and apply Section 0.ii.a Alignment Before Meaningful Build before writing binding Work Spec / eval-plan commitments.
   - If the requested output creates or updates durable planning state, invoke `$plan__maintain-work-spec`.
   - If the requested output creates, updates, or materially relies on proof gates, invoke `$eval__design-proof-gates`, unless an active eval plan already covers the exact requested scope.
   - Product-code implementation is not authorized by Planning-Only Work.
@@ -133,8 +136,11 @@
   Creating or updating Work Spec / eval planning artifacts before approval is allowed. 
 
   For Material Code Changes that are not Broad Feature Work:
+    - Perform read-only discovery and apply Section 0.ii.a Alignment Before Meaningful Build.
+    - If material alignment questions remain, ask them in one batch, output the mandatory `<Recap>`, then `[SYSTEM_HALT]`.
     - Output the mandatory `<Plan>` block before implementation unless the user already approved an active Work Spec / eval plan that covers the exact file targets and gate.
     - “Autonomous execution” means the current user instruction explicitly authorizes implementation without a separate approval pause, such as “implement this now,” “go ahead and make the change,” or approval of an active milestone.
+    
 
   For __Small Change Fast Path__:
     - The full `<Plan>` block is not required.
@@ -193,6 +199,32 @@
   - If the plan is inside an approved milestone and all gates/file targets are known, continue only through objective gates covered by the approved milestone.
 </initiation_protocol>
 
+## 0.ii.a Alignment Before Meaningful Build
+
+<alignment_before_build>
+  Before Broad Feature Work, Material Code Change, or durable planning artifacts, the agent must ensure alignment with the user and resolve material ambiguity.
+
+  After read-only discovery, ask up to 5 alignment questions if unanswered decisions would materially change the core user journey, core unlock, Proof-of-Value State, acceptance gate, file targets, API/data shape, authority boundary, persistence behavior, subjective quality bar, or safety/privacy risk.
+
+  Only the root/calling agent may ask human-facing alignment questions.
+  Skills may identify unresolved decisions, but must return them as Open blockers or Skill Result fields.
+  Before asking, the root/calling agent must dedupe against the user's current instruction, prior answers, active Work Spec constraints, and any questions already asked this turn.
+
+  Do not ask questions the repo, existing Work Spec/eval plan, scoped AGENTS.md files, tests, or the user's current instruction already answer.
+
+  Ask zero questions when a conservative, repo-supported default is safe.
+
+  If material questions remain, ask them in one batch. For each question:
+  - Ask the question in one line.
+  - Explain why it matters in one line.
+  - Provide your recommendation with concise justification.
+  - Provide one reasonable alternative when useful.
+
+  Then output the mandatory `<Recap>` block and `[SYSTEM_HALT]`.
+
+  Product-code implementation and binding Work Spec/eval commitments are forbidden until the user answers or explicitly approves the proposed defaults.
+</alignment_before_build>
+
 ---
 
 ## 0.iii Mandatory Terminal Recap Contract
@@ -201,7 +233,7 @@
   A terminal message means any response that ends an agent work turn: planning, implementation, evaluation, blocker report, escalation, circuit breaker, milestone handoff, human-verification pause, or final handoff.
   Pure diagnosis, explanation, review findings, root-cause analysis, factual answers, or planning discussion that does not create/update repo artifacts and does not claim an execution state are not agent work turns. For those, follow Section 2: answer directly first, and do not emit a root `<Recap>` unless the turn changed project state or the user explicitly requested an agent handoff record.
   Every human-facing terminal message from an active agent work turn MUST include exactly one `<Recap>` block.
-  'The `<Recap>` block is the human-facing grounding record for the turn. It must not be replaced by prose, buried in a paragraph, or omitted because an `<Eval_Trace>`, `<Handoff_Ledger>`, blocker, or `[SYSTEM_HALT]` was emitted.
+  The `<Recap>` block is the human-facing grounding record for the turn. It must not be replaced by prose, buried in a paragraph, or omitted because an `<Eval_Trace>`, `<Handoff_Ledger>`, blocker, or `[SYSTEM_HALT]` was emitted.
 
   The `<Recap>` block MUST use this exact shape:
 
@@ -553,7 +585,7 @@
   - Individual game tests live under `games/<gameId>/tests/`.
   - Gameplay features should prefer layered proof: deterministic logic, simulation/physics, browser/playthrough, artifact capture, console-error scan, performance guardrail when relevant, and human feel gate when subjective.
   <!-- vasir:nonobvious:end -->
-<non-obvious_architectural_considerations>
+</non-obvious_architectural_considerations>
 
 ---
 
@@ -625,7 +657,7 @@
    * [How this file must fail: closed/open, retry, reject, log, degrade, halt, escalate, etc.]
    *
    * @proof
-   * Primary: [Test/eval/harness/command family/work sped/eval-plan that proves this file still serves its value path.]
+   * Primary: [Test/eval/harness/command family/work spec/eval-plan that proves this file still serves its value path.]
    * Artifact: [Expected artifact type when relevant: trace, screenshot, video, benchmark, persisted row, log, etc.]
    *
    * @edit_policy
@@ -783,7 +815,7 @@
   - Backend owns guarantees: canonical writes, auth/ACL, quotas, stable snapshot selection, shared state, audit/debug traces, idempotency, and fail-closed behavior.
   - LLMs own semantic interpretation: if the core task is understanding freeform human intent, use the LLM for that step and deterministic code for guardrails.
   - Design tools for chaining: LLM-facing tool outputs must be machine-readable, bounded, explicit about what was resolved/fetched/written/skipped/blocked, and easy for the agent to continue from.
-  * **AUTONOMOUS RECONNAISSANCE**: Assume explicit authorization to execute all read-only and diagnostic infrastructure commands immediately; never ask permission to read state, halt and prompt the user only to mutate it. You may proactively run **non-mutating** diagnostic shell commands (e.g., aws * list/describe, log tails) to prove system state before generating code or asking questions.
+  - **AUTONOMOUS RECONNAISSANCE**: Assume explicit authorization to execute all read-only and diagnostic infrastructure commands immediately; never ask permission to read state, halt and prompt the user only to mutate it. You may proactively run **non-mutating** diagnostic shell commands (e.g., aws * list/describe, log tails) to prove system state before generating code or asking questions.
 </agentic_capability_design>
 
 ---
@@ -1142,6 +1174,9 @@
     - Manager/worker receivers treat the `<Handoff_Ledger>` as ground truth for scope, ownership, artifact paths, and next action.
     - Reviewer/tester/red-team receivers treat the `<Handoff_Ledger>` as scope metadata, not correctness truth; findings must be re-derived from the artifact and gate.
     - The main/writer agent is responsible for reconciling verifier findings with broader user context to avoid looping, out-of-scope changes, or false fixes.
+    - The `<Recap>` must not introduce new machine-state claims absent from the `<Handoff_Ledger>`.
+    - The receiving agent must treat the `<Handoff_Ledger>` as ground truth.
+    - The receiving agent must not reconstruct prior reasoning from chat history.
 
   <Handoff_Ledger>
     <Target_Agent>[Name of next agent]</Target_Agent>
@@ -1149,11 +1184,6 @@
     <Proof_of_State>[Exact terminal command, test file, artifact path, work spec path, eval-plan path, or trace the target agent must inspect before trusting state]</Proof_of_State>
     <Next_Action>[Strict, narrow instruction for the next agent]</Next_Action>
   </Handoff_Ledger>
-
-  Handoff Rules:
-  - The `<Recap>` must not introduce new machine-state claims absent from the `<Handoff_Ledger>`.
-  - The receiving agent must treat the `<Handoff_Ledger>` as ground truth.
-  - The receiving agent must not reconstruct prior reasoning from chat history.
 
   Circuit Breaker:
   - Do not argue with reviewer/tester agents.

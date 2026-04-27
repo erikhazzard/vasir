@@ -1,14 +1,7 @@
 ---
 name: eval__design-proof-gates
-description: Designs falsifiable value-path proof gates and durable eval-plan.md artifacts. Decomposes an unlock into required truths, derives the right classes of gates, chooses same-run orchestration when compound claims must hold concurrently, and specifies target environments, observers, payloads, artifacts, CI policy, stop conditions, and missing-harness specs. Does not implement product code, execute proof, or replace root AGENTS.md approval/recap rules.
+description: Designs falsifiable proof gates and eval-plan.md artifacts that decompose an unlock into the truths it must prove. Triggers on validating a value path, planning measurement-first probes for perf/realtime/scale claims, or any "how do we know this works" moment before implementation.
 model: opus
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Write
-  - Edit
-  - Bash
 ---
 
 # Eval Proof-Gate Designer
@@ -116,6 +109,10 @@ The gate should be as close as possible to the final value extraction path. Pref
 18. **Derive gate classes from the claim.** Do not rely on canned domain examples. Decompose the actual unlock into required truths, generate the gate classes that could falsify each truth, then include only the smallest sufficient set.
 19. **Every included gate must kill a plausible lie.** For each gate, name what false confidence it prevents. If a gate cannot catch a plausible way the value could be broken, remove it.
 20. **Every excluded obvious gate needs a reason.** If a reasonable reviewer would expect security, persistence, performance, visual, network, replay, or failure proof, either include the gate or explicitly exclude it with the reason.
+21. **Measurable claims require measurement-first gates.** If the claim uses or implies speed, latency, responsiveness, smoothness, throughput, fanout, queueing, convergence, scale, capacity, or "works under N", design a programmatic measurement gate before subjective/manual acceptance. The gate must name the measured actor action, observer, time source or sequence/correlation identifier, sample window, budget or budget-assumption, workload dimensions, artifact, and failure threshold.
+22. **Separate product observers from diagnostic probes.** Browser/manual/human observation may prove product integration, render correctness, or subjective feel, but it is not enough to prove a backend/protocol/performance bottleneck when a lower-overhead probe can measure the same value path. If no direct probe is possible, the eval plan must say why and mark the proof lower confidence or blocked.
+23. **Counts are not capacity proof.** A scale gate that only proves N connections/items/actors reached a count is incomplete unless the claim is only "can open N". Capacity gates must also measure the value behavior under load, such as latency, update gaps, stale age, error rate, queue depth, resource use, or authoritative state correctness.
+24. **Load dimensions must be explicit.** For any scale/performance/realtime gate, separate connected-idle count, active/moving/work-producing count, operation/event cadence, payload size, locality/density, churn/fault model, ramp/steady-state duration, target environment, and machine/topology constraints when relevant. A single ambiguous "N users" number is not a falsifiable scale claim.
 
 ---
 
@@ -208,6 +205,8 @@ For each required truth, answer:
 - **State:** what data/world/session/account/object must exist?
 - **Time:** must the truth hold instantly, eventually, over a steady-state window, after restart, after reconnect, after retry, or across versions?
 - **Scale:** must it hold for one item, N items, high concurrency, large payloads, long sessions, or high event rate?
+- **Measurement:** if the truth is about speed, latency, smoothness, throughput, capacity, convergence, or responsiveness, what exact quantity proves or falsifies it, what budget applies, and what sample/window is enough?
+- **Observer overhead:** does the chosen observer materially change the thing being measured? If yes, what lower-overhead protocol/API/worker/synthetic probe can measure the same value path?
 - **Failure:** what invalid, missing, duplicate, out-of-order, delayed, partial, unavailable, or malicious condition matters?
 - **Perception:** does the user need to see, feel, trust, understand, or judge it?
 - **Authority:** what source of evidence is canonical: browser state, server state, database row, packet, metric, trace, audit log, screenshot/video, or human acceptance?
@@ -241,6 +240,7 @@ After generating candidate classes, select the smallest sufficient proof set:
 
 - Always include the terminal value-path gate when a real terminal path exists.
 - Include an orchestrated compound gate when required truths must be true concurrently.
+- Include a programmatic measurement/probe gate whenever the claim is measurable and a subjective, browser, screenshot, or manual observer would otherwise be the primary evidence.
 - Include supporting gates only when they isolate a high-risk dependency, make failures diagnosable, or are required by root/Work Spec policy.
 - Include a hostile gate for non-trivial Material Code Changes unless explicitly waived with reason.
 - Include a subjective gate for subjective product quality; automation can supply evidence but cannot accept it.
@@ -256,6 +256,35 @@ Every skill invocation must include a compact synthesis table before the final g
 | <truth> | <weak proof that could lie> | <class> | yes/no | <why> |
 
 This table is mandatory even when the final eval plan is inline only. It is how the caller sees that the model generated the right class of gates instead of copying a canned example.
+
+### 6.5 Measurement-First Probe Rule
+
+When a claim is measurable, first ask: "What is the smallest non-subjective actor/observer pair that can measure the value directly?"
+
+Examples of measurable claim signals:
+
+- "movement is smooth", "presence is live", "remote player updates quickly", "state converges";
+- "supports 1k/10k/100k", "handles high concurrency", "scales", "fanout is bounded";
+- "fast", "responsive", "low latency", "no jank", "keeps up", "doesn't fall behind";
+- "queue drains", "worker keeps pace", "snapshot/resync is bounded", "join is fast".
+
+For those claims, the eval design must include or explicitly reject a direct measurement gate with:
+
+- **Probe actors:** the minimum actor pair or set needed to express the value path, such as writer/reader, sender/receiver, producer/consumer, requester/worker, publisher/subscriber, or player A/player B.
+- **Sequence/correlation:** monotonic sequence IDs, operation IDs, run IDs, trace IDs, logical ticks, or timestamp discipline that lets the observer match cause to effect without relying on visual inference.
+- **Budget:** sourced threshold, user-provided SLO, prior benchmark baseline, or explicitly labeled planning assumption/blocker. Do not hide an unsourced threshold as fact.
+- **Workload ladder:** at least a control/baseline rung plus the target-load rung when the claim is "under load"; add intermediate rungs when needed to identify the knee of the curve.
+- **Load shape:** connected-idle count, active work-producing count, operation cadence, locality/density, payload size, churn/fault model, and steady-state duration as applicable.
+- **Diagnostic attribution:** server/client stage timings, queue depth, event-loop delay, resource ceilings, packet/frame counts, or equivalent stage evidence when the likely next action depends on knowing where time is spent.
+- **Artifact:** raw samples plus summary, not only a screenshot or prose note.
+
+If the eval plan uses browser/manual observation for a measurable claim, classify it as one of:
+
+- **integration observer** — proves the product route/render/identity path still works while the measurement probe owns the SLO;
+- **subjective observer** — proves human feel/taste/trust and requires human acceptance;
+- **primary measurement observer** — allowed only when the browser/UI itself is the performance boundary under test, and the plan must explain why a lower-overhead probe would not prove the value.
+
+Do not let "it feels janky" remain the only acceptance gate when the underlying claim can be measured as latency, update gap, stale age, throughput, backlog, or error budget.
 
 ---
 
@@ -280,6 +309,7 @@ Choose the smallest stack that can falsify the value claim in the target environ
 - **Backend/API:** contract gate + durable side-effect proof + auth/validation hostile case.
 - **UI:** browser flow + console/page-error scan + screenshot/trace.
 - **Game/realtime:** deterministic state gate + simulation or bot workload + real browser/render artifact + network/state convergence proof.
+- **Measurable realtime/performance:** direct protocol/API/synthetic probe + baseline/target workload ladder + stage-timing/resource attribution + optional browser/product observer.
 - **Agent workflow:** golden transcript + tool payload schema + forbidden-action assertion.
 - **Persistence/network:** read-after-write + idempotency + partial-failure trace.
 - **Performance:** controlled workload + sample count/duration + budget + error-rate ceiling + resource artifact.
@@ -322,6 +352,11 @@ For realtime multiplayer and netcode gates, include the relevant subset:
 - authoritative server tick/update rate;
 - concurrent connection count;
 - bot input model and movement bounds;
+- probe actor pair or observer set for measuring action-to-observation latency;
+- sequence IDs, operation IDs, run IDs, logical ticks, or timestamp discipline for correlating sent action to observed update;
+- latency, update-gap, stale-age, drop/duplicate/reorder, and convergence budgets when movement or state smoothness is the claim;
+- baseline and target-load rungs when the claim is "under load";
+- explicit split between idle connected actors and active moving/work-producing actors;
 - world seed/map/session ID;
 - spawn rules;
 - websocket or transport frame expectations;
@@ -899,6 +934,26 @@ S-tier:
 One coordinator creates the workload actors, drives realistic bounded behavior, injects the approved churn or hostile condition, opens any required real observer client, correlates server metrics, client telemetry, transport evidence, and user-visible artifacts under one run ID, and passes only if the claimed scale, latency, correctness, convergence, and rendered experience all hold during the same steady-state window.
 ```
 
+### 15.3.1 Measurable realtime/performance gates need direct probes
+
+Bad:
+
+```text
+Open two tabs, run the load script, and see if movement looks smooth.
+```
+
+Good:
+
+```text
+Two instrumented clients exchange sequenced actions through the real protocol while a controlled background workload runs; the receiver records action-to-observation latency, inter-arrival gaps, stale age, drops/reorder, and raw samples for the same run ID.
+```
+
+S-tier:
+
+```text
+A coordinator runs baseline and target-load rungs, drives a realistic work-producing background load, has probe A emit sequenced actions at a fixed cadence, has probe B observe through the same production protocol boundary, captures server/client stage timing and resource signals, and passes only if p95/p99 latency, max silent gap, stale-age share, error/drop/reorder ceilings, and workload shape all match the declared SLO for that rung. Browser/video artifacts may support product integration or subjective feel, but they do not replace the direct measurement gate unless the UI/browser is itself the measured bottleneck.
+```
+
 ### 15.4 Subjective gates must have explicit human acceptance boundaries
 
 Bad:
@@ -1016,6 +1071,7 @@ PAYLOAD:         fixture/seed/request/world state named       ☐
 ARTIFACT:        fresh artifact required for every gate       ☐
 HARNESS:         existing vs missing stated honestly          ☐
 COMPOUND:        concurrent value claims use same-run proof   ☐
+MEASURED:        measurable claims have direct probe gates     ☐
 SUBJECTIVE:      human gates need artifacts + acceptance      ☐
 CI POLICY:       no future failing tests in default CI        ☐
 STOP RULE:       every failure has halt/repair route          ☐

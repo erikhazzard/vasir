@@ -12,7 +12,6 @@ This skill creates or rewrites `AGENTS.md` files for a specific folder or subsys
 - The user wants folder-specific rules, hard-no constraints, gotchas, verification steps, or local coding conventions for AI agents.
 - The user wants only a section for a folder-scoped `AGENTS.md` rather than a whole file.
 
-
 # Domain Context: [Insert Subsystem Name, e.g., Authoritative State Sync]
 
 ## 1. Domain Boundarie
@@ -35,11 +34,8 @@ Example:
 * **Silent Failures:** [e.g., If a UDP packet drops, do NOT write a retry loop. The `SnapshotManager` handles extrapolation automatically. Writing a retry will cause state desync.]
 * **Data Quirks:** [e.g., The `player_id` in this folder is NOT the database UUID; it is the volatile session integer.]
 
-## 4. Cultural "Vibes" for this Domain
-Does this specific folder have a different coding style than the rest of the app?
-Example:
-* **Error Handling:** [e.g., Always return a `[data, error]` tuple; never throw exceptions in this hot path.]
-* **Abstractions:** [e.g., We prefer raw, inline, procedural loops for cache locality. Never create new interfaces or factories here. ]
+## 4. Cultural Philosophies / Mandates for this Domain
+Does this specific folder have a different coding style than the rest of the app or the root Agents.md??
 
 ## 5. The Verification Trajectory
 Force the auto-regressive loop to start correctly.

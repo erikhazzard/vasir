@@ -225,6 +225,7 @@ Do not default to a full template; every selected component must name the cognit
 ### Pass 4 — Design routing as classifier engineering
 
 The description is classifier text, not marketing copy.
+It should be a one sentence description of what it is; and a one sentence of what it triggers on. Aim for density.
 
 ```text
 [activity verb + artifact/domain] + [specific contexts/user intents] + [expertise need] + [trigger phrases or file types] + [optional exclusion boundary]
