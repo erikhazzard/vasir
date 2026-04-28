@@ -1,5 +1,5 @@
 ---
-name: optimizing-node-backend
+name: audit__optimizing-node-backend
 description: Audits Node.js backend services for latency, scalability, cost, concurrency correctness, and failure-mode risk, especially event-loop hot paths, Valkey/Redis usage, DynamoDB access patterns, memory/GC, saturation, and observability under load. Triggers on performance reviews, bottleneck hunts, timeout/throughput analysis, cache or database pattern audits, and capacity-risk assessment
 ---
 # Optimizing Node Backend — Audit Skill

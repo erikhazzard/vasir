@@ -1,5 +1,5 @@
 ---
-name: game__genre-designing-mmos
+name: game__genre--designing-mmos
 description: Designs and reviews massive single-world MMO/MMORPG systems with no player-facing servers or realms by tracing how mechanics create locality, player dependency, institutions, logistics, sovereignty, persistent memory, authored history, and durable retention at scale. Use for world-fabric and feature reviews across public-solo and group play, guilds, squads, coalitions, economies, cities, skilling, progression, maps/intel, institution lifecycle, comparative MMO calibration, and AI-native MMO design where LLMs change questing, NPCs, simulation, personalization, and recommendations; not for generic single-player RPG design or realm topology planning.
 ---
 

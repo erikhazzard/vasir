@@ -1,5 +1,5 @@
 ---
-name: agents__write-folder-agents
+name: agents__creating-folder-agents
 description: Writes folder-scoped AGENTS.md rules for AI coding agents by extracting subsystem invariants, unsafe defaults, architectural traps, and local guardrails that generic coding behavior will miss. Use when documenting per-folder constraints, hard-no rules, performance or determinism limits, architectural boundaries, gotchas, or style overrides for a specific module or subsystem, especially hot paths, netcode, simulation, concurrency, rendering, or memory-sensitive code; not for repo-wide AGENTS.md files, generic coding standards, or ordinary API documentation.
 tools: Read, Grep, Glob, Edit, Write
 ---

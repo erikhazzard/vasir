@@ -48,7 +48,7 @@
 # 0. The Unlock Mandate
 
 <unlock_mandate>
-  Everything you do must be explicitly justified as either a User Journey Unlock or an Engineering System Unlock. The unlock is the observable value state the work creates, not the mechanism used to create it.
+  Everything you do must be explicitly justified as either a User Journey Unlock or an Engineering System Unlock. The unlock is the observable Proof-of-Value State the work creates: the terminal player, user, business, or engineering truth that makes the work worth shipping, not a UX flow, infrastructure shape, dashboard category, or implementation mechanism.
 
   If you cannot articulate the unlock, do not keep writing code just because the next mechanical step is obvious. Reframe the work around the value it is supposed to create.
 
@@ -107,7 +107,7 @@
 ## 0.ii Mandatory Initiation Protocol: Invert the Build
 
 <initiation_protocol>
-  Your primary goal is to pathfind from the declared Proof-of-Value State down to the underlying machine logic. You will never build bottom-up. You will never propose generic infrastructure.
+  Your primary goal is to pathfind from the declared Proof-of-Value State down to the underlying machine logic: actor → first entrypoint → required payload/context → terminal state. You will never build bottom-up or propose generic infrastructure before the terminal truth and its proof are explicit.
   Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake file targets, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. If an exact file target or eval cannot be known without implementation discovery, say so explicitly and define the narrowest safe discovery envelope instead of inventing paths.
 
   For **Broad Feature Work**:
@@ -160,7 +160,7 @@
     </Approved_Context>
 
     <Proof_of_Value_State>
-      Terminal State: [precise runtime behavior, UI render state, persisted record, packet, benchmark threshold, screenshot/video artifact, trace, query result, or tool output that proves value exists]
+      Terminal State: [actor, first entrypoint, required payload/context, and precise final runtime behavior, UI render state, persisted record, packet, benchmark threshold, screenshot/video artifact, trace, query result, or tool output that proves value exists]
       Gate: [exact pass/fail condition]
       Eval Tool: [smallest real command, harness, benchmark, browser check, screenshot/video capture, simulation, or test that proves/falsifies the gate]
       Target Env: [real runtime the user cares about; if no remote/runtime target is required, use the closest local repo environment that exercises the value path]
@@ -402,7 +402,7 @@
   - `$handoff__final-quality-gate`
     Audits final feature readiness before completion.
 
-  - `$code__audit`
+  - `$code__auditing`
     Reviews implementation quality, scope discipline, invariants, and proof coverage.
 
   Broad Feature Work:
@@ -829,9 +829,9 @@
   - If you cannot write a deterministic eval for the value path, treat that as a design flaw and change the interface/architecture until it is testable, or explicitly document the exception in the work spec/eval plan.
 
   **Value Path Tests**:
-  - Test the value path, not just code paths.
-  - One user journey integration test can protect more than 100 unit tests.
-  - Do not chase coverage percentages as a substitute for proof.
+  - Test the value path from raw actor action to terminal player/user/business/engineering truth, not just code paths or technical connectivity.
+  - A test is not E2E unless it proves the final data, state, render, packet, metric, operator view, or tool output that extracts the value; Client → API → DB alone is not sufficient.
+  - Map obvious actor assumptions to an integration gate, or mark them as assumptions/risks; one journey integration test can protect more than 100 unit tests, and coverage percentage is not proof.
   - Do not leave permanent future-state global tests enabled in default CI before the milestone where they are expected to pass. Future-state global proofs may live as eval-plan contracts, non-default harnesses, skipped-with-explicit-reason tests, or milestone-gated checks until the implementation scope reaches them.
 
   **Real Targets**:
@@ -1006,7 +1006,7 @@
     - terminal response MUST make the next action obvious.
 
   ## End-to-End Reality Check
-  Before handoff, explicitly trace the final value extraction path.
+  Before handoff, explicitly trace the final value extraction path, including the actor origin, first entrypoint, required payload/context, boundary hops, and terminal value artifact.
 
   A feature is not complete merely because implementation tests pass. The agent must show the terminal “so what” artifact:
   - exact player/user action that now works;
@@ -1121,7 +1121,7 @@
   - approved Work Spec milestones are complete or explicitly deferred,
   - objective eval gates passed with fresh artifacts,
   - subjective gates were accepted by the human where applicable,
-  - `$code__audit` ran or was explicitly blocked,
+  - `$code__auditing` ran or was explicitly blocked,
   - test audit found no unguarded value path,
   - docs/context sync is complete,
   - fileoverview headers are current,

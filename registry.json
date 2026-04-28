@@ -5,7 +5,7 @@
   "skills": [
     {
       "name": "agents__creating-folder-agents",
-      "description": "Write per-subsystem constraint documents that prevent AI coding agents from producing plausible-but-broken code. Use when defining hard-no rules, architectural gotchas, performance boundaries, or cultural style overrides for a specific folder or module — especially hot paths, netcode, deterministic systems, or anywhere standard AI defaults silently fail. Triggers on \"write rules for this folder,\" \"AGENTS.md section for [subsystem],\" \"constrain the agent for our [X],\" \"document the gotchas in [module],\" or any request to scope AI coding behavior to a specific part of the codebase.",
+      "description": "Writes folder-scoped AGENTS.md rules for AI coding agents by extracting subsystem invariants, unsafe defaults, architectural traps, and local guardrails that generic coding behavior will miss. Use when documenting per-folder constraints, hard-no rules, performance or determinism limits, architectural boundaries, gotchas, or style overrides for a specific module or subsystem, especially hot paths, netcode, simulation, concurrency, rendering, or memory-sensitive code; not for repo-wide AGENTS.md files, generic coding standards, or ordinary API documentation.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -18,7 +18,7 @@
     },
     {
       "name": "architecture__critiquing-design",
-      "description": "After producing any architecture or multi-step design, you MUST run an internal “Zoom-Out Brake Pedal” review before finalizing your response.  Triggers on any architecutre proposal, any mediumish to large feature, anything with background worker/queue, any proposed multi-step client protocols, any new infrastructure \"for scale\"",
+      "description": "Mandatory zoom-out review before finalizing any architecture, medium/large feature design, multi-step protocol, queue/worker/cache/datastore/service addition, or infrastructure justified by \"scale,\" \"decoupling,\" \"resilience,\" or \"future-proofing.\" Also triggers on any design with multiple states that can diverge.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -27,6 +27,56 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/architecture__critiquing-design",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "art-direction__defining-game-art",
+      "description": "Routes and directs game-art work across reusable art-direction references, especially premium 2D RPG pixel art and stylized 3D hero-action art. Use when creating, critiquing, or specifying game characters, environments, weapons, VFX, animation, maps, asset pipelines, or art quality bars; load the matching subfolder reference for Sea-of-Stars-adjacent 2D pixel RPG work or Overwatch-adjacent 3D hero-action work.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "2d__sea-of-stars/README.md",
+        "2d__sea-of-stars/references/08-prompt-template-and-concrete-examples.md",
+        "2d__sea-of-stars/references/animation-motion-quality-bar.md",
+        "2d__sea-of-stars/references/character-sprite-quality-bar.md",
+        "2d__sea-of-stars/references/lighting-fx-scene-integration.md",
+        "2d__sea-of-stars/references/pipeline-authoring-and-automation.md",
+        "2d__sea-of-stars/references/style-language-examples-and-source-positioning.md",
+        "2d__sea-of-stars/references/validation-rubrics-and-review-protocols.md",
+        "2d__sea-of-stars/references/world-tilemap-map-quality-bar.md",
+        "3d__overwatch/README.md",
+        "3d__overwatch/references/01-research-and-source-positioning.md",
+        "3d__overwatch/references/02-hero-character-quality-bar.md",
+        "3d__overwatch/references/03-weapons-abilities-vfx-quality-bar.md",
+        "3d__overwatch/references/04-skins-cosmetics-live-service-quality-bar.md",
+        "3d__overwatch/references/05-maps-environments-modes-quality-bar.md",
+        "3d__overwatch/references/06-animation-camera-presentation-quality-bar.md",
+        "3d__overwatch/references/07-pipeline-validation-review-protocols.md",
+        "3d__overwatch/references/08-manual-prompt-probes.md",
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/art-direction__defining-game-art",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "audit__optimizing-node-backend",
+      "description": "Audits Node.js backend services for latency, scalability, cost, concurrency correctness, and failure-mode risk, especially event-loop hot paths, Valkey/Redis usage, DynamoDB access patterns, memory/GC, saturation, and observability under load. Triggers on performance reviews, bottleneck hunts, timeout/throughput analysis, cache or database pattern audits, and capacity-risk assessment",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/dynamodb.md",
+        "references/evaluation-suite.md",
+        "references/node-runtime.md",
+        "references/reliability-observability.md",
+        "references/valkey.md",
+        "references/verification.md"
+      ],
+      "path": ".agents/skills/audit__optimizing-node-backend",
       "entry": "SKILL.md"
     },
     {
@@ -57,7 +107,7 @@
     },
     {
       "name": "code__enforcing-principles",
-      "description": "Enforces the engineering constitution before writing or editing any code in the repo — features, fixes, refactors, tests, scripts, migrations, infra, no exceptions. Validates user-journey framing, pipeline semantics, deterministic integration tests, failure handling, observability, safe migrations, and tail-latency proof under 10M+ msg/sec with iOS client constraints. Use when starting any code change to ensure compliance with repo-wide engineering standards and architectural guardrails. Additionally triggers on mentions of code quality or code principles",
+      "description": "Mandatory pre-code protocol for concrete repo changes. Forces repo-grounded current-state mapping, user-journey framing, explicit system contracts, deterministic integration tests, failure/observability/performance proofs, safe rollouts, and disciplined migrations across backend, iOS, and infra surfaces. Use for any concrete code change or code-quality review tied to a real repo diff. Do not use for abstract philosophy with no proposed repo change.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -79,6 +129,19 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/code__fixing-bugs",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "code__threejs-rapier-performance",
+      "description": "Enforces deterministic, measurement-driven mobile-web performance architecture for Three.js + Rapier before code or asset changes, covering render and physics budgets, frame stability, loading/streaming, memory, quality tiers, off-main-thread decisions, and proof via observability. Use for any change touching Three.js, Rapier, WebXR/WebGL/WebGPU rendering, shaders, scene graph, cameras, controls, physics, colliders/controllers, glTF/KTX2/meshopt assets, or fps, jank, stutter, and load-time issues.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/code__threejs-rapier-performance",
       "entry": "SKILL.md"
     },
     {
@@ -122,7 +185,7 @@
     },
     {
       "name": "design__designing-end-screen",
-      "description": "Design high-quality post-match and results screens for mobile games. Covers the universal 4-phase animated sequence (outcome burst, stat reveal, rewards cascade, social/next action), 12 patterns from top games (Candy Crush, Clash Royale, Brawl Stars, Subway Surfers, CoD Mobile, Royal Match), and a flexible template data contract for platform-level implementation. Use when designing end-of-match UI, victory/defeat screens, score displays, replay prompts, share cards, progression bars, or play-again CTAs. Trigger when designing the game over / victory / post match screen",
+      "description": "Design high-quality post-match and results screens for mobile games. Covers the universal 4-phase animated sequence (outcome burst, stat reveal, rewards cascade, social/next action), share artifact design (Wordle grid pattern, transport selection, spoiler safety), and return hooks. Triggers when designing the game over / victory / post match / results / score screen, share card, end-of-round summary, or any screen shown after a session ends.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -212,8 +275,23 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "exec__writing-feature-wip",
-      "description": "Writes files or appends content to files as part of feature development workflows. Creates new documents, updates existing files, and maintains work-in-progress artifacts. Use when modifying feature files, creating new documents during a workflow, or appending incremental progress to existing WIP files.",
+      "name": "eval__design-proof-gates",
+      "description": "Designs falsifiable proof gates and eval-plan.md artifacts that decompose an unlock into the truths it must prove. Triggers on validating a value path, planning measurement-first probes for perf/realtime/scale claims, or any \"how do we know this works\" moment before implementation.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/eval-plan-template.md",
+        "references/gold-standard-proof-gate-examples.md"
+      ],
+      "path": ".agents/skills/eval__design-proof-gates",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "eval__implement-proof-gate",
+      "description": "Builds the missing runnable eval harness for an already-approved objective proof gate. Use after Work Spec / eval planning when a milestone has a concrete objective gate but no command, test, browser check, simulation, benchmark, replay, packet capture, or artifact-producing harness yet. This skill implements proof only; it must not implement product behavior or weaken the approved gate.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -221,7 +299,24 @@
       "files": [
         "SKILL.md"
       ],
-      "path": ".agents/skills/exec__writing-feature-wip",
+      "path": ".agents/skills/eval__implement-proof-gate",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "explaining__creating-interactive-articles",
+      "description": "Create S-tier fully offline, D3-first interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations; starts new requests with a targeted five-question alignment grill",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "lib/README.md",
+        "references/article.md",
+        "references/visuals.md",
+        "references/writing-style.md"
+      ],
+      "path": ".agents/skills/explaining__creating-interactive-articles",
       "entry": "SKILL.md"
     },
     {
@@ -421,6 +516,53 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "game__genre--designing-mmos",
+      "description": "Designs and reviews massive single-world MMO/MMORPG systems with no player-facing servers or realms by tracing how mechanics create locality, player dependency, institutions, logistics, sovereignty, persistent memory, authored history, and durable retention at scale. Use for world-fabric and feature reviews across public-solo and group play, guilds, squads, coalitions, economies, cities, skilling, progression, maps/intel, institution lifecycle, comparative MMO calibration, and AI-native MMO design where LLMs change questing, NPCs, simulation, personalization, and recommendations; not for generic single-player RPG design or realm topology planning.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/adaptive-mastery-and-scaffolding.md",
+        "references/ai-native-mmo-worlds.md",
+        "references/algorithmic-culture-and-social-routing.md",
+        "references/apprenticeship-and-mastery-ladders.md",
+        "references/cartography-rendezvous-and-intel.md",
+        "references/classic-everquest-lessons.md",
+        "references/classic-everquest-source-spine.md",
+        "references/commons-governance-and-player-law.md",
+        "references/creator-ecology-and-ugc-compounding.md",
+        "references/eval-cases.md",
+        "references/eve-online-lessons.md",
+        "references/evidence-based-social-design.md",
+        "references/experience-memory-and-meaning.md",
+        "references/final-fantasy-xiv-lessons.md",
+        "references/healthy-retention-and-passion.md",
+        "references/institution-lifecycle.md",
+        "references/massive-world-fabric.md",
+        "references/mmo-calibration.md",
+        "references/mmo-feature-review.md",
+        "references/mmo-metrics-and-telemetry.md",
+        "references/mmo-pattern-library.md",
+        "references/mmo-production-reality.md",
+        "references/mmo-system-playbooks.md",
+        "references/motivation-and-need-satisfaction.md",
+        "references/network-topology-and-social-capital.md",
+        "references/player-authored-history.md",
+        "references/psychological-ownership-and-avatar-identity.md",
+        "references/reputation-markets-and-trust.md",
+        "references/research-map.md",
+        "references/ritual-calendar.md",
+        "references/runescape-classic-lessons.md",
+        "references/social-graph-retention.md",
+        "references/team-cognition-and-transactive-memory.md",
+        "references/world-of-warcraft-lessons.md"
+      ],
+      "path": ".agents/skills/game__genre--designing-mmos",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "game__tuning-economy-progression",
       "description": "Designs, implements, tunes, and debugs game economy and progression systems in JavaScript. Covers difficulty curves, XP curves, unlock trees, currency systems, loot rarity tables, difficulty scaling, idle/clicker math, reward schedules, and prestige mechanics. Focuses on systems thinking, player psychology, and tuning guidance. Use when balancing game economies, designing progression systems, tuning difficulty curves, debugging reward schedules, or implementing currency and unlock systems.",
       "category": "uncategorized",
@@ -431,6 +573,89 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/game__tuning-economy-progression",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-ai__architecting-ai",
+      "description": "Production game-AI design skill for creating S-tier agent, bot, NPC, director, and autoplay/testing AI specs. Triggers when working on game AI Bot related AI behavior and ai / bot NPCs.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "MANIFEST.md",
+        "README.md",
+        "SKILL.md",
+        "checklists/architecture_questionnaire.md",
+        "checklists/final_review.md",
+        "checklists/runtime_llm_gate.md",
+        "examples/ai_spec_template.md",
+        "examples/bad_vs_good.md",
+        "examples/territory_bot_spec.md",
+        "modules/README.md",
+        "modules/autoplay_testing.md",
+        "modules/combat_shooter.md",
+        "modules/companion_social.md",
+        "modules/racing_chase.md",
+        "modules/simulation_economy.md",
+        "modules/sports_vr.md",
+        "modules/strategy_tactics.md",
+        "modules/territory_arena.md",
+        "references/ai_design_contract.md",
+        "references/architecture_selection.md",
+        "references/director_layer.md",
+        "references/player_perception_fairness.md",
+        "references/primitive_discovery.md",
+        "references/pseudocode_patterns.md",
+        "references/source_inspiration.md",
+        "references/testing_observability.md"
+      ],
+      "path": ".agents/skills/game-ai__architecting-ai",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-onboarding__designing-game-onboarding",
+      "description": "Designs and audits S-tier platformer onboarding sequences by converting player learning into moment-by-moment playable situations, using Mega Man X's opening highway as the gold-star benchmark. Use when creating or critiquing first levels, first five/ten/fifteen minutes, tutorial-free onboarding, movement/combat introductions, boss-select setup, sequel onboarding, or player-learning beat maps for 2D or 3D platformers; not for general plot summaries, art direction, or unrelated level design.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/eval-cases.md",
+        "references/hades-first-run-gold-star.md",
+        "references/megaman-x-highway-gold-star.md",
+        "references/onboarding-beat-canvas.md",
+        "references/plants-vs-zombies-day-world-gold-star.md",
+        "references/review-rubric.md"
+      ],
+      "path": ".agents/skills/game-onboarding__designing-game-onboarding",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "handoff__final-quality-gate",
+      "description": "Final SHIP / NO-SHIP / BLOCKED gate for approved feature work and material code changes. Invokes code__auditing and testing__auditing, verifies Proof-of-Value, artifacts, scope, docs/context, subjective acceptance, and remaining delta before any agent may claim final completion.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/handoff__final-quality-gate",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "ops__maintain-incident-postmortem",
+      "description": "Creates or updates durable incident postmortems under docs/incidents/<semantic-domain>/<YYYY-MM-DD>__<incident-slug>/postmortem.md. Turns incident notes, logs, PRs, timelines, fixes, and follow-up evidence into a source-backed causal record optimized for future responders and LLM re-ingestion. Captures user impact, proof of cause, ruled-out hypotheses, fast path next time, recurrence pattern, corrective actions, and verification state.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/ops__maintain-incident-postmortem",
       "entry": "SKILL.md"
     },
     {
@@ -447,21 +672,24 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "plan__creating-milestones",
-      "description": "Creates test-driven milestones for complex features. Focuses on user journeys, experience invariants, and integration test coverage. Breaks large features into verifiable increments with clear acceptance criteria. Use when planning multi-step feature implementations, defining milestone boundaries, establishing test coverage targets, or structuring work into shippable increments.",
+      "name": "physics__creating-interaction-system",
+      "description": "Designs deterministic, weighty object-interaction systems in Three.js/WebXR with Rapier under browser/XR and engine constraints, covering grab, hold, manipulate, throw, one- and two-hand interaction, telekinesis, collision response, impact payoff, sticking/penetration, and momentum-based damage. Use when creating or tuning physical interaction feel in stack-native Three.js/WebXR/Rapier code; not for generic non-interaction physics or undocumented behavior copied from reference games.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "references/interaction-patterns.md",
+        "references/runtime-contract.md",
+        "references/tuning-and-tests.md"
       ],
-      "path": ".agents/skills/plan__creating-milestones",
+      "path": ".agents/skills/physics__creating-interaction-system",
       "entry": "SKILL.md"
     },
     {
       "name": "plan__maintain-work-spec",
-      "description": "Maintains a living FEATURE-WIP markdown file as the durable source of truth for any feature, project, or initiative across sessions. Creates, updates, and audits FEATURE-WIP__*.md docs with epistemic discipline, sourced facts, labeled inferences, explicit contracts, and bounded next actions. Triggers when starting a new feature, resuming work on an in-flight feature, consolidating decisions after a design review or PR, restoring context after context compact, capturing architectural context for handoff, or when the user \"update the WIP,\" \"where did we leave off,\" \"what's the status of,\" \"write up the feature doc,\" or \"plan the feature\" or \"let's spec it out\". Also triggers on requests to define milestones, acceptance criteria, contracts, invariants, scope boundaries, capacity estimates, spec, or decision logs. Produces structured, scannable docs optimized for both human review and LLM re-ingestion.",
+      "description": "Creates or updates the durable Work Spec for Broad Feature Work and Planning-Only Work. The Work Spec is the canonical product + UX + engineering + scope + milestone + decision-state artifact for a unit of work. It captures the user/system unlock, current truth, constraints, milestone ladder, approved file/eval envelope, open blockers, and next action. It works in tandem with an eval-plan.md, and the proof-gate design is owned by eval__design-proof-gates. Triggers anytime we are spec'ing out new work, defining milestones, or updating work context files.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -473,8 +701,27 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "prompt__improving",
-      "description": "Produce prompt analysis that identifies specific, high-leverage gaps — not surface-level rewrites or generic \"be more specific\" advice. Reverse-engineers the prompt's target domain, maps practitioner-level knowledge against the prompt's structure, and delivers prioritized, evidence-grounded fixes. Use when a user shares a prompt and asks to improve, optimize, audit, review, fix, tune, strengthen, or rewrite it, or asks \"what's wrong with this\" or \"how do I make this better.\" Also triggers on prompt analysis, prompt critique, or prompt engineering help. Handles system prompts, agent instructions, prompt chains, and prompt templates. NEVER triggers for writing new prompts from scratch.",
+      "name": "product__designing-viral-social-loops",
+      "description": "Designs and audits self-reinforcing social, creator-supply, and playable-social loops by tracing incentives, payloads, graph density, conversion surfaces, creator upside, and leakage. Triggers on designing or iterating on product or distributino loops,playable UGC or co-play loops, invite/share or challenge mechanics, social-proof loops, or diagnosing why a growth loop feels generic, cringe, loose, or non-defensible.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/plausible-deniability-social-cover.md",
+        "references/roblox-s-tier-playable-social-loop.md",
+        "references/tbh-gas-s-tier-loop.md",
+        "references/tiktok-s-tier-loop.md",
+        "references/viral-loop-eval-cases.md",
+        "references/virality-network-effects-density-and-expertise.md"
+      ],
+      "path": ".agents/skills/product__designing-viral-social-loops",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "prompt__create-analysis",
+      "description": "Analyzes an existing prompt to find the highest-leverage gaps, missing domain assumptions, and priority fixes instead of giving generic rewrite advice. Triggers on specific requests to improve a prompt or prompt chain",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -482,7 +729,7 @@
       "files": [
         "SKILL.md"
       ],
-      "path": ".agents/skills/prompt__improving",
+      "path": ".agents/skills/prompt__create-analysis",
       "entry": "SKILL.md"
     },
     {
@@ -500,7 +747,7 @@
     },
     {
       "name": "prompt__perform-root-casuse-analysis",
-      "description": "Perform deep root cause analysis after a bug fix, focusing on meta and systemic causes rather than surface-level mechanism recaps. Use this skill whenever a fix has been applied and the user wants to understand why the bug happened, prevent the class of issue from recurring, or improve LLM agent operating rules. Triggers include post-fix analysis, post-mortem, root cause analysis, RCA, \"why did this break\", \"how do we prevent this\", incident review, bug retrospective, failure analysis, agent policy update after a fix, defense-in-depth planning, or any request to convert a bug fix into guardrails, lint rules, test strategies, or agent behavior changes. Also use when the user asks to analyze contributing factors, identify systemic engineering process gaps, or generate \"lessons learned\" artifacts from a resolved issue. Produces structured output covering mechanism anchors, evidence maps, meta/meta-meta causes, defense-in-depth action tables, and concrete LLM agent policy patches.",
+      "description": "Performs post-fix root cause analysis that traces a resolved bug to deeper mechanism, process, testing, or agent-policy failures and turns the incident into prevention layers. Triggers on RCA, postmortems, incident reviews, lessons learned, “why did this break,” or “how do we prevent this again” after a fix already exists, including requests for guardrails, test strategy, lint rules, or agent-policy updates.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -526,7 +773,7 @@
     },
     {
       "name": "prompt__writing-persona",
-      "description": "Apply research-backed prompt engineering techniques to improve LLM's output quality. Use this skill whenever the user asks LLM to write, optimize, or review prompts for LLMs, or when the user wants help getting better results from AI models. Also trigger when the user mentions \"prompt engineering,\" \"system prompts,\" \"prompt optimization,\" \"better prompts,\" \"improve my prompt,\" \"expert prompting,\" or discusses techniques like EmotionPrompt, persona framing, or self-efficacy signals. Use this skill even when the user is indirectly trying to improve how they communicate with LLMs, such as asking \"how do I get LLM to try harder\" or \"why are my prompts not working.\"",
+      "description": "Writes or rewrites LLM prompts using persona framing and other behavior-shaping prompt techniques to materially improve output quality. Triggers on requests about prompt engineering, better prompts, system prompts, expert framing, improving how to ask an LLM, or getting a model to “try harder”; not on audit-only prompt critique when no rewrite is wanted.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -551,17 +798,32 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "skills__creating",
-      "description": "Designs, rewrites, audits, and debugs reusable agent skills and SKILL.md manifests. Produces routing-aware metadata, lean manifests, supporting-file layouts, deterministic validators, and eval suites. Use when creating a new skill, improving an existing one, fixing trigger quality, choosing names or frontmatter, reviewing AGENTS.md or other agent context files, reducing manifest bloat, or capturing non-obvious repository constraints the agent cannot infer from code, AST, or file structure.",
+      "name": "skills__create-analysis",
+      "description": "Produce skill analysis that identifies specific, high-leverage gaps. Only triggers when user / agent explictly requests a skill to be analyzed.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/skills__create-analysis",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "skills__create-skill",
+      "description": "Designs, rewrites, audits, and debugs reusable AI-agent skills and SKILL.md manifests by compressing expert judgment into routed behavior changes. Use when creating skills, fixing trigger descriptions, choosing skill names, pruning bloated manifests, extracting reusable behavior from AGENTS.md-style context, encoding hard-won insights, values, tradeoffs, taste, or non-obvious constraints, deciding skill granularity, or designing skill eval cases.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
+        "references/agent-context-extraction.md",
+        "references/eval-case-library.md",
         "references/skill-template.md"
       ],
-      "path": ".agents/skills/skills__creating",
+      "path": ".agents/skills/skills__create-skill",
       "entry": "SKILL.md"
     },
     {
@@ -593,6 +855,23 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "threejs__improve-performance",
+      "description": "Diagnose, profile, and maximize runtime performance in Three.js + Rapier. Find the real bottleneck, fix it in priority order, and preserve determinism, correctness, and gameplay semantics unless the user explicitly allows a trade. Covers low FPS, frame pacing and stutter, GPU bottlenecks, draw-call pressure, shader compile hitches, texture bandwidth and VRAM pressure, shadows and post-processing cost, JS/GC churn, worker handoff overhead, Rapier broadphase/narrowphase/solver cost, collider authoring, event/query overhead, resource disposal leaks, load/decode/parse stalls, and regression-proof perf budgets.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/observability-and-instrumentation.md",
+        "references/perf-regression-and-acceptance-tests.md",
+        "references/rapier-optimization-playbook.md",
+        "references/rendering-optimization-playbook.md"
+      ],
+      "path": ".agents/skills/threejs__improve-performance",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "ui__revamping-game-shell-ui",
       "description": "Revamps any Idavoll game’s shell UI (HUD/menus/results/overlays) using vanilla DOM + @idavoll/game-ui-kit while preserving deterministic kernel + replay boundaries. Use when the user asks to redesign UI, change HUD/menu/results layout, migrate to the UI kit, restyle a game UI to match the design system, or fix UI breakage without touching gameplay determinism. Enforces “kernel vs shell” boundaries, stable UI kit entrypoints only, iframe-safe mobile-first layout, safe-area/thumb-zone rules, input safety (real interactive elements), semantic intents drained on simulation ticks, and required verification commands.",
       "category": "uncategorized",
@@ -603,6 +882,32 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/ui__revamping-game-shell-ui",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "whitepaper__analyze-mmo-whitepaper",
+      "description": "This analyzes an MMO whitepaper and produces insights. Only called manually.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/whitepaper__analyze-mmo-whitepaper",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "writing__response-quality-style-guide",
+      "description": "Enforces grounded, concrete, reader-disciplined prose across responses. Suppresses AI slop, fake profundity, padded phrasing, weak structure, decorative abstraction, and dead compliance. Triggers / activates broadly for explanatory, analytical, strategic, critical, or written responses; escalates into concept-coining, cross-domain framing, and hidden-game analysis when the task benefits from original conceptual work.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/writing__response-quality-style-guide",
       "entry": "SKILL.md"
     }
   ]

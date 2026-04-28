@@ -1,11 +1,6 @@
----
-name: direct-sea-of-stars-art
-description: Directs, critiques, and specifies Sea-of-Stars-adjacent premium 2D RPG pixel art for character sprites, tilemaps/world maps, animation, lighting/FX, and automated sprite/tile pipelines. Use for art specs, quality bars, critique, rewrites, generation prompts, validation rubrics, or pipeline requirements; excludes literal cloning, asset-copying, UI-only work, and non-pixel/realistic 3D art direction.
----
+# Sea of Stars Art Direction Reference
 
-# Sea of Stars Art Direction Skill
-
-This skill installs a premium 2D RPG pixel-art direction prior: **make assets read like authored, iconic, gameplay-first pixel art integrated into a living scene, not like rendered images reduced to pixels.**
+This reference installs a premium 2D RPG pixel-art direction prior: **make assets read like authored, iconic, gameplay-first pixel art integrated into a living scene, not like rendered images reduced to pixels.**
 
 Use this skill as a specialist under a broader art-direction router when the target is Sea-of-Stars-adjacent in *class of craft*: expressive chibi characters, readable tile/world art, disciplined pixel clusters, rich scene lighting, charming animation, and modern presentation that never blurs the pixel language.
 

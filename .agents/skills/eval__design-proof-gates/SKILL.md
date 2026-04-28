@@ -139,7 +139,7 @@ Do not use this skill when:
 - the user only wants to run an already-known command;
 - the approved eval plan already contains the exact runnable gate and the task is to implement the missing harness — use `$eval__implement-proof-gate`;
 - the task is final feature handoff — use `$handoff__final-quality-gate`;
-- the task is implementation audit after code exists — use `$code__audit`.
+- the task is implementation audit after code exists — use `$code__auditing`.
 
 Borderline rule:
 

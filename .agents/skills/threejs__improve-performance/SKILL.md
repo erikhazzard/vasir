@@ -1,5 +1,5 @@
 ---
-name: threejs__improve-performance 
+name: threejs__improve-performance
 description: Diagnose, profile, and maximize runtime performance in Three.js + Rapier. Find the real bottleneck, fix it in priority order, and preserve determinism, correctness, and gameplay semantics unless the user explicitly allows a trade. Covers low FPS, frame pacing and stutter, GPU bottlenecks, draw-call pressure, shader compile hitches, texture bandwidth and VRAM pressure, shadows and post-processing cost, JS/GC churn, worker handoff overhead, Rapier broadphase/narrowphase/solver cost, collider authoring, event/query overhead, resource disposal leaks, load/decode/parse stalls, and regression-proof perf budgets.
 ---
 

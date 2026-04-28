@@ -1,5 +1,5 @@
 ---
-name: game-ai__architect
+name: game-ai__architecting-ai
 description: Production game-AI design skill for creating S-tier agent, bot, NPC, director, and autoplay/testing AI specs. Triggers when working on game AI Bot related AI behavior and ai / bot NPCs.
 ---
 

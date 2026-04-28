@@ -984,4 +984,4 @@ Generated content needs **extra communication** because it lacks hand-tuned visu
 - **Annotate output with difficulty/rarity for the juice layer.** If the generation system tags a room as "boss arena," the game-juice system can add environmental effects (fog, particles, camera changes).
 - **Procedural variation must be readable.** If the player can't perceive the difference between generated variants, the variation is wasted. Focus on changes that affect silhouette, color, behavior, or spatial layout — not sub-pixel differences.
 
-See the `game__juice` skill for feedback implementation patterns.
+See the `game__adding-juice` skill for feedback implementation patterns.
