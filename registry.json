@@ -5,7 +5,7 @@
   "skills": [
     {
       "name": "agents__creating-folder-agents",
-      "description": "Writes folder-scoped AGENTS.md rules for AI coding agents by extracting subsystem invariants, unsafe defaults, architectural traps, and local guardrails that generic coding behavior will miss. Use when documenting per-folder constraints, hard-no rules, performance or determinism limits, architectural boundaries, gotchas, or style overrides for a specific module or subsystem, especially hot paths, netcode, simulation, concurrency, rendering, or memory-sensitive code; not for repo-wide AGENTS.md files, generic coding standards, or ordinary API documentation.",
+      "description": "Creates or rewrites folder-scoped AGENTS.md files by qualifying the subtree, extracting repo-verified local contracts, and instantiating templates/agents/AGENTS__folder.md as the canonical artifact shape. Use when deciding whether a per-folder AGENTS.md should exist, creating one, updating one, or converting rough folder notes into a delta-shaped local contract; not for repo-wide AGENTS.md, generic coding standards, ordinary API docs, or one-off workflow runbooks.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -611,6 +611,19 @@
         "references/testing_observability.md"
       ],
       "path": ".agents/skills/game-ai__architecting-ai",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-design__ensuring-design-coherence",
+      "description": "Extract and pressure-test a game's or feature's actual fantasy, core loop, and design pillars. Triggers on designing game loops, improving gameplay, and diagnosising why a game doesn't feel good.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game-design__ensuring-design-coherence",
       "entry": "SKILL.md"
     },
     {
