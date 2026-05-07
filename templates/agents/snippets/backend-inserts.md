@@ -317,3 +317,15 @@ mocha <filepath> --exit
 * Do not add long-lived dual-write or dual-read paths unless the approved Work Spec explicitly requires migration/rollback compatibility.
 * Soft ban on `schemaVersion` and versioning.
 * Do not bake versions into route paths, filenames, Redis keys, S3 prefixes, or durable identifiers unless [SOURCE CUT OFF HERE — complete this condition before committing].
+
+
+---
+
+## 13. Autonomus / Persistence
+You may run long running scripts / evals / etc. However, you may not leave a process running unbounded sitting silently for hours when you expect the result should return quickly. 
+
+When running any long service / test flow:
+* Start processes with a tracked PID/session
+* Poll at bounded intervals
+* If no useful output after ~5 minutes, inspect process state
+* If test / script exceed its expected duration, kill it and report artifact

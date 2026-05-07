@@ -108,16 +108,16 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   writeFile(path.join(projectDirectory, "src", "components", "Button.tsx"), "export function Button() { return null; }\n");
   const addResult = runCommand(
     binaryPath,
-    ["add", "design__building-frontend"],
+    ["add", "code__writing-code-frontend"],
     projectDirectory,
     addEnvironmentVariables
   );
   assert.equal(addResult.status, 0, addResult.stderr);
-  assert.match(addResult.stdout, /Installed design__building-frontend/);
+  assert.match(addResult.stdout, /Installed code__writing-code-frontend/);
   assert.match(addResult.stdout, /Project skills ready at/);
   assert.match(addResult.stdout, /Repo config ready at/);
   assert.match(addResult.stdout, /AGENTS starter ready at \(frontend, inferred\)/);
-  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "design__building-frontend", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "code__writing-code-frontend", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "vasir.json")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
   assert.match(
@@ -134,18 +134,18 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.equal(parsedContext.execution.usesModel, false);
   assert.equal(parsedContext.execution.usesNetwork, false);
   assert.equal(parsedContext.repoStatus, "tracked");
-  assert.ok(parsedContext.recommendedSkillNames.includes("design__building-frontend"));
-  assert.ok(parsedContext.recommendedSkills.some((skillRecommendation) => skillRecommendation.skillName === "design__building-frontend"));
+  assert.ok(parsedContext.recommendedSkillNames.includes("code__writing-code-frontend"));
+  assert.ok(parsedContext.recommendedSkills.some((skillRecommendation) => skillRecommendation.skillName === "code__writing-code-frontend"));
   assert.equal(parsedContext.debug.kind, "contextDebug");
 
   const validateResult = runCommand(binaryPath, ["agents", "validate", "--json"], projectDirectory, addEnvironmentVariables);
   assert.equal(validateResult.status, 1);
   assert.match(validateResult.stderr, /AGENTS_VALIDATION_FAILED/);
 
-  const removeResult = runCommand(binaryPath, ["remove", "design__building-frontend"], projectDirectory, addEnvironmentVariables);
+  const removeResult = runCommand(binaryPath, ["remove", "code__writing-code-frontend"], projectDirectory, addEnvironmentVariables);
   assert.equal(removeResult.status, 0, removeResult.stderr);
-  assert.match(removeResult.stdout, /Removed design__building-frontend/);
-  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "design__building-frontend")));
+  assert.match(removeResult.stdout, /Removed code__writing-code-frontend/);
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "skills", "code__writing-code-frontend")));
 
   const evalResult = runCommand(
     binaryPath,

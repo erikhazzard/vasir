@@ -1,6 +1,6 @@
 ---
-name: design__building-frontend
-description: Builds production-grade frontend UI with BEM naming, strict class budgets, tokenized styling, and intentional aesthetics. Prohibits Tailwind and utility-class soup. Covers component architecture, responsive layouts, design token systems, and accessible markup. Use when creating web components, pages, or applications that require high design quality and maintainable CSS architecture.
+name: design__implementing-frontend-css-html
+description: Rules for implementing design for html / css. Triggers when writing CSS or HTML tags
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -527,3 +527,7 @@ Request: "Build a notification toast component."
 - Semantic color tokens (`--color-success/warning/danger`) mean theming only requires overriding `:root`.
 - Enter/exit use different easings (out for enter, in-out for exit) for physical feel.
 - To extend: add `--tone-info` modifier with a new color token. Add `ui-toast__action` element for inline CTAs. The contract doesn't break.
+
+
+### References 
+- `references/shadows.md` — **Read before writing any `box-shadow` or `filter: drop-shadow` rule.** Defines the two-stack model, dark-mode catch-light inversion, and the `ui-surface` primitive. Raw shadow values outside this primitive are forbidden.

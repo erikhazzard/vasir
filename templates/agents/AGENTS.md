@@ -706,6 +706,7 @@
 
   **One Clear Path**: Prefer one clear path.
   - Make a decision.
+  - Choose one path and name why it wins; if the evidence is incomplete, pick the smallest reversible path that preserves the unlock and state the assumption instead of blending options.
   - Provide exactly one solution for the approved unlock.
   - No feature flags, deprecated fallbacks, alternate modes, or side-by-side implementations unless the approved plan names them as the product requirement.
   - When replacing an implementation, you may keep temporary compatibility paths only when required by rollout, rollback, protocol, persistence, or client-version safety, and name the removal condition; otherwise, delete the old path in the same change unless doing so violates an approved migration plan.
