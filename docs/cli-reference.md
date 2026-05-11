@@ -31,7 +31,7 @@ vasir --version
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
 | `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
-| `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write a stack-specific `AGENTS.md` starter in the current repo root |
+| `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter with a stack-specific snippet in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
 | `agents validate` | `vasir agents validate [--json] [--repo-root <path>]` | Fail closed when `AGENTS.md` still contains scaffold placeholders or broken repo routes |
@@ -216,7 +216,7 @@ vasir list
 - Result:
   - `.agents/skills/<name>/...` is created in the resolved repo root.
   - `.claude/skills` and `.codex/skills` are repaired as aliases to `.agents/skills`.
-  - `AGENTS.md` is copied into the repo root if it does not already exist, using an inferred stack-specific starter when the repo shape is obvious, or the canonical blank template when it is not.
+  - `AGENTS.md` is copied into the repo root if it does not already exist, using the canonical template plus an inferred stack snippet when the repo shape is obvious, or the canonical template alone when it is not.
 - Notes:
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.
@@ -225,7 +225,7 @@ vasir list
   - `vasir add all` marks the repo to keep tracking the full catalog on later `vasir update` runs.
   - `vasir add <specific skills>` marks the repo to keep tracking only those installed skills on later `vasir update` runs.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
-  - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` when you want to override inference and force a specific AGENTS starter.
+  - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` when you want to override inference and force a specific AGENTS profile snippet.
   - If you pass `--agents-profile` and `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
   - `all` cannot be combined with specific skill names in the same command.
 
@@ -291,7 +291,7 @@ vasir remove
 
 ### `agents init`
 
-- Purpose: write a stack-specific `AGENTS.md` starter into the resolved repo root.
+- Purpose: write the canonical `AGENTS.md` starter into the resolved repo root with stack-specific snippet content composed in.
 - Result:
   - `AGENTS.md` exists in the resolved repo root.
   - The file has the guessed project name filled in.

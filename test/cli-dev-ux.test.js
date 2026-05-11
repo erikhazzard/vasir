@@ -68,52 +68,59 @@ function createFixtureRepository() {
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
-<!-- vasir:routing:start -->
-* **[Example] Core Area:** If touching \`/src/\`, you must first read that directory's local \`AGENTS.md\`.
-<!-- vasir:routing:end -->
+  <!-- vasir:routing:start -->
+  * **[Example] Core Area:** If touching \`/src/\`, you must first read that directory's local \`AGENTS.md\`.
+  <!-- vasir:routing:end -->
+
+## Shared Source Structure
+
+This line must survive stack-profile composition.
+
+<!-- vasir:engineering-doctrine-inserts:start -->
+[Add profile-specific snippets here.]
+<!-- vasir:engineering-doctrine-inserts:end -->
 `
   );
   writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "profiles", "frontend.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:frontend -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+    path.join(repositoryDirectory, "templates", "agents", "snippets", "frontend-inserts.md"),
+    `# Frontend Inserts
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this frontend repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
-## 1. Topography & Routing Protocol (The Map)
 <!-- vasir:routing:start -->
 * **UI Surface:** If touching \`/src/components/\`, you must first read that directory's local \`AGENTS.md\`.
 <!-- vasir:routing:end -->
+<!-- vasir:engineering-doctrine-inserts:start -->
+Use local UI state first.
+<!-- vasir:engineering-doctrine-inserts:end -->
 `
   );
   writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "profiles", "backend.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:backend -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+    path.join(repositoryDirectory, "templates", "agents", "snippets", "backend-inserts.md"),
+    `# Backend Inserts
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
 <!-- vasir:routing:start -->
 * **API Surface:** If touching \`/src/api/\`, you must first read that directory's local \`AGENTS.md\`.
 <!-- vasir:routing:end -->
+<!-- vasir:engineering-doctrine-inserts:start -->
+Keep retry paths idempotent.
+<!-- vasir:engineering-doctrine-inserts:end -->
 `
   );
   writeFile(
-    path.join(repositoryDirectory, "templates", "agents", "profiles", "ios.md"),
-    `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:ios -->
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+    path.join(repositoryDirectory, "templates", "agents", "snippets", "ios-inserts.md"),
+    `# iOS Inserts
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
 <!-- vasir:routing:start -->
 * **App Lifecycle:** If touching \`/ios/App/\`, you must first read that directory's local \`AGENTS.md\`.
 <!-- vasir:routing:end -->
+<!-- vasir:engineering-doctrine-inserts:start -->
+Do not block the main thread.
+<!-- vasir:engineering-doctrine-inserts:end -->
 `
   );
   writeFile(
@@ -718,6 +725,8 @@ test("agents init writes a stack-specific starter with the project name and purp
   assert.match(agentsText, /<!-- vasir:profile:frontend -->/);
   assert.match(agentsText, /\*\*Last Updated:\*\* \d{4}-\d{2}-\d{2} - update alongside major architectural PRs/);
   assert.match(agentsText, /Replace this block first\./);
+  assert.match(agentsText, /This line must survive stack-profile composition\./);
+  assert.match(agentsText, /Use local UI state first\./);
 });
 
 test("add can install skills and seed a stack-specific AGENTS starter in one command", async () => {

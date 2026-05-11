@@ -69,10 +69,66 @@ function createFixtureRepository() {
   };
 
   writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
-  writeFile(path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"), "# Project Agents\n");
-  writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "frontend.md"), "# Frontend Agents\n");
-  writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "backend.md"), "# Backend Agents\n");
-  writeFile(path.join(repositoryDirectory, "templates", "agents", "profiles", "ios.md"), "# iOS Agents\n");
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"),
+    `# AGENTS.md: [Project Name] Root Manifest
+<!-- vasir:profile:generic -->
+
+**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **[Example] Core Area:** If touching \`/src/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
+
+<!-- vasir:engineering-doctrine-inserts:start -->
+[Add profile-specific snippets here.]
+<!-- vasir:engineering-doctrine-inserts:end -->
+`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "snippets", "frontend-inserts.md"),
+    `# Frontend Inserts
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this frontend repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **UI Surface:** If touching \`/src/components/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
+<!-- vasir:engineering-doctrine-inserts:start -->
+Use local UI state first.
+<!-- vasir:engineering-doctrine-inserts:end -->
+`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "snippets", "backend-inserts.md"),
+    `# Backend Inserts
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **API Surface:** If touching \`/src/api/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
+<!-- vasir:engineering-doctrine-inserts:start -->
+Keep retry paths idempotent.
+<!-- vasir:engineering-doctrine-inserts:end -->
+`
+  );
+  writeFile(
+    path.join(repositoryDirectory, "templates", "agents", "snippets", "ios-inserts.md"),
+    `# iOS Inserts
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+<!-- vasir:routing:start -->
+* **App Lifecycle:** If touching \`/ios/App/\`, you must first read that directory's local \`AGENTS.md\`.
+<!-- vasir:routing:end -->
+<!-- vasir:engineering-doctrine-inserts:start -->
+Do not block the main thread.
+<!-- vasir:engineering-doctrine-inserts:end -->
+`
+  );
   writeFile(
     path.join(repositoryDirectory, ".agents", "skills", "react", "SKILL.md"),
     `---

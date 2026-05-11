@@ -7,7 +7,7 @@
 > 3. Create scoped `AGENTS.md` files for any domain named in Section 1, or collapse those rules back into this root file.
 > 4. Confirm the skill names in Section 0.vii exist in this repo/tooling environment.
 > 5. Delete every line that is not true in this repo.
-> 6. If this repo is mostly backend, frontend, game-client, or iOS code, rerun `vasir agents init <profile> --replace` for a better starter.
+> 6. If this was generated from a stack profile, treat the inserted snippet as starter doctrine; this file remains the structural source of truth.
 
 **Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 

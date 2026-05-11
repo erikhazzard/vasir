@@ -8,6 +8,13 @@ import { buildRegistry } from "../registry/build.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS_ROOT = path.join(REPO_ROOT, ".agents", "skills");
+const AGENTS_TEMPLATE_SNIPPETS_ROOT = path.join(REPO_ROOT, "templates", "agents", "snippets");
+
+const AGENTS_SNIPPET_MARKER_PAIRS = Object.freeze([
+  ["<!-- vasir:purpose:start -->", "<!-- vasir:purpose:end -->"],
+  ["<!-- vasir:routing:start -->", "<!-- vasir:routing:end -->"],
+  ["<!-- vasir:engineering-doctrine-inserts:start -->", "<!-- vasir:engineering-doctrine-inserts:end -->"]
+]);
 
 function walkFiles(directoryPath) {
   const discoveredFiles = [];
@@ -99,6 +106,38 @@ test("built-in eval suites live with their owning skills and include guidelines"
       assert.ok(
         hardCheckCount > 0,
         `suite cases must define at least one hard check: ${relativeSuitePath}#${caseDefinition.id}`
+      );
+    }
+  }
+});
+
+test("agent template snippets own profile-specific insertion blocks", () => {
+  assert.ok(!fs.existsSync(path.join(REPO_ROOT, "templates", "agents", "profiles")), "profiles/ must not return; profile selection composes from snippets/");
+
+  const snippetFilePaths = fs.readdirSync(AGENTS_TEMPLATE_SNIPPETS_ROOT, { withFileTypes: true })
+    .filter((directoryEntry) => directoryEntry.isFile() && directoryEntry.name.endsWith(".md"))
+    .map((directoryEntry) => path.join(AGENTS_TEMPLATE_SNIPPETS_ROOT, directoryEntry.name))
+    .sort();
+  assert.ok(snippetFilePaths.length > 0, "expected AGENTS profile snippets");
+
+  for (const snippetFilePath of snippetFilePaths) {
+    const relativeSnippetPath = path.relative(REPO_ROOT, snippetFilePath).replace(/\\/g, "/");
+    const snippetText = fs.readFileSync(snippetFilePath, "utf8");
+
+    for (const [startMarker, endMarker] of AGENTS_SNIPPET_MARKER_PAIRS) {
+      assert.equal(
+        (snippetText.match(new RegExp(startMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length,
+        1,
+        `${relativeSnippetPath} must contain exactly one ${startMarker}`
+      );
+      assert.equal(
+        (snippetText.match(new RegExp(endMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length,
+        1,
+        `${relativeSnippetPath} must contain exactly one ${endMarker}`
+      );
+      assert.ok(
+        snippetText.indexOf(startMarker) < snippetText.indexOf(endMarker),
+        `${relativeSnippetPath} must place ${startMarker} before ${endMarker}`
       );
     }
   }

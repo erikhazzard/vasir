@@ -1,12 +1,17 @@
 # iOS Inserts
 
-Use this only for advanced composition when the iOS profile is close but not exact.
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this iOS repository in 2-3 repo-specific sentences. Replace this block first. State the main user experience, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
 
-## Suggested Routing Examples
+<!-- vasir:routing:start -->
+* **App Lifecycle:** If touching `/ios/App/`, startup, or backgrounding code, read the platform manifest before changing lifecycle behavior.
+* **Networking / Sync:** If touching `/ios/Sync/`, `/ios/Networking/`, or cache layers, read the sync manifest before changing offline or retry behavior.
+* **UI Modules:** If touching `/ios/UI/`, feature screens, or design-system components, read the screen or UI manifest before editing layout or navigation.
+* **Cold Storage:** Do not read `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
 
-* If touching `/ios/App/` or app lifecycle code, read the platform manifest before changing startup or background behavior.
-* If touching networking, caching, or sync, read the offline/sync manifest before changing request flows.
-* If touching UI modules, read the design-system or screen-specific manifest before editing layout or navigation.
+<!-- vasir:engineering-doctrine-inserts:start -->
 
 ## Suggested Global Constraints
 
@@ -26,3 +31,4 @@ Use this only for advanced composition when the iOS profile is close but not exa
 * Prefer predictable lifecycle handling over clever background magic.
 * Prefer measured UI smoothness and memory discipline over abstraction-heavy convenience layers.
 * Do not "clean up" platform quirks until you have verified the original failure mode they guard against.
+<!-- vasir:engineering-doctrine-inserts:end -->

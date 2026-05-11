@@ -1,5 +1,18 @@
 # Backend Inserts
 
+<!-- vasir:purpose:start -->
+**Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
+<!-- vasir:purpose:end -->
+
+<!-- vasir:routing:start -->
+* **API Surface:** If touching `/src/api/` or `/app/api/`, read the API manifest before changing request or response behavior.
+* **Async Work:** If touching `/src/jobs/`, `/src/workers/`, or queue consumers, read the worker manifest before changing retry or delivery behavior.
+* **Data Layer:** If touching `/db/`, `/migrations/`, or raw SQL paths, read the data manifest before editing queries or schemas.
+* **Cold Storage:** Do not read `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
+
+<!-- vasir:engineering-doctrine-inserts:start -->
+
 ## 1. Backend Runtime Canon
 
 - Runtime: Node 22 LTS.
@@ -329,3 +342,4 @@ When running any long service / test flow:
 * Poll at bounded intervals
 * If no useful output after ~5 minutes, inspect process state
 * If test / script exceed its expected duration, kill it and report artifact
+<!-- vasir:engineering-doctrine-inserts:end -->

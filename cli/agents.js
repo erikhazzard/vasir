@@ -17,14 +17,16 @@ const PURPOSE_START_MARKER = "<!-- vasir:purpose:start -->";
 const PURPOSE_END_MARKER = "<!-- vasir:purpose:end -->";
 const ROUTING_START_MARKER = "<!-- vasir:routing:start -->";
 const ROUTING_END_MARKER = "<!-- vasir:routing:end -->";
+const ENGINEERING_DOCTRINE_INSERTS_START_MARKER = "<!-- vasir:engineering-doctrine-inserts:start -->";
+const ENGINEERING_DOCTRINE_INSERTS_END_MARKER = "<!-- vasir:engineering-doctrine-inserts:end -->";
 const PURPOSE_PLACEHOLDER_FRAGMENT = "Replace this block first.";
 const LAST_UPDATED_PLACEHOLDER = "[YYYY-MM-DD - update alongside major architectural PRs]";
 const DEFAULT_AGENTS_TEMPLATE = path.join("templates", "agents", "AGENTS.md");
 
-const AGENTS_PROFILE_TEMPLATES = Object.freeze({
-  backend: path.join("templates", "agents", "profiles", "backend.md"),
-  frontend: path.join("templates", "agents", "profiles", "frontend.md"),
-  ios: path.join("templates", "agents", "profiles", "ios.md")
+const AGENTS_PROFILE_SNIPPETS = Object.freeze({
+  backend: path.join("templates", "agents", "snippets", "backend-inserts.md"),
+  frontend: path.join("templates", "agents", "snippets", "frontend-inserts.md"),
+  ios: path.join("templates", "agents", "snippets", "ios-inserts.md")
 });
 
 const AGENTS_PROFILE_LABELS = Object.freeze({
@@ -245,6 +247,46 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function createMarkedBlockPattern({ startMarker, endMarker }) {
+  return new RegExp(
+    `(^[\\t ]*)${escapeRegExp(startMarker)}\\r?\\n([\\s\\S]*?)\\r?\\n[\\t ]*${escapeRegExp(endMarker)}`,
+    "m"
+  );
+}
+
+function indentBlockLines(blockText, indent) {
+  if (!indent) {
+    return blockText;
+  }
+
+  return blockText
+    .split(/\r?\n/)
+    .map((lineText) => lineText.length > 0 ? `${indent}${lineText}` : lineText)
+    .join("\n");
+}
+
+function formatMarkedBlockReplacement({ blockMatch, startMarker, endMarker, replacementText }) {
+  const markerIndent = blockMatch[1] ?? "";
+  const indentedReplacement = indentBlockLines(replacementText, markerIndent);
+  return `${markerIndent}${startMarker}\n${indentedReplacement}\n${markerIndent}${endMarker}`;
+}
+
+function readTemplateBlock({ templateText, startMarker, endMarker, templateFilePath }) {
+  const blockPattern = createMarkedBlockPattern({ startMarker, endMarker });
+  const blockMatch = templateText.match(blockPattern);
+
+  if (!blockMatch) {
+    throw new VasirCliError({
+      code: "AGENTS_TEMPLATE_BLOCK_MISSING",
+      message: `AGENTS template block is missing from ${templateFilePath}`,
+      suggestion: "Restore the Vasir template markers, then rerun the AGENTS command.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  return blockMatch[2];
+}
+
 function toPosixPath(value) {
   return String(value ?? "").split(path.sep).join("/");
 }
@@ -390,13 +432,14 @@ function resolveAgentsTemplate(profileName) {
   if (profileName === null || profileName === undefined || profileName === "") {
     return {
       profile: "generic",
-      templateRelativePath: DEFAULT_AGENTS_TEMPLATE
+      templateRelativePath: DEFAULT_AGENTS_TEMPLATE,
+      snippetRelativePath: null
     };
   }
 
   const normalizedProfileName = profileName.toLowerCase();
-  const templateRelativePath = AGENTS_PROFILE_TEMPLATES[normalizedProfileName];
-  if (!templateRelativePath) {
+  const snippetRelativePath = AGENTS_PROFILE_SNIPPETS[normalizedProfileName];
+  if (!snippetRelativePath) {
     throw new VasirCliError({
       code: "AGENTS_PROFILE_UNKNOWN",
       message: `Unknown AGENTS profile: ${profileName}`,
@@ -407,7 +450,8 @@ function resolveAgentsTemplate(profileName) {
 
   return {
     profile: normalizedProfileName,
-    templateRelativePath
+    templateRelativePath: DEFAULT_AGENTS_TEMPLATE,
+    snippetRelativePath
   };
 }
 
@@ -636,10 +680,104 @@ export async function resolveRecommendedAgentsProfile({
   };
 }
 
-function renderAgentsTemplate({ templateText, projectName, currentDate }) {
-  return templateText
-    .replace(/\[Project Name\]/g, projectName)
-    .replace(LAST_UPDATED_PLACEHOLDER, `${currentDate} - update alongside major architectural PRs`);
+function replaceTemplateBlock({ templateText, startMarker, endMarker, replacementText, templateFilePath }) {
+  const blockPattern = createMarkedBlockPattern({ startMarker, endMarker });
+  const blockMatch = templateText.match(blockPattern);
+
+  if (!blockMatch) {
+    throw new VasirCliError({
+      code: "AGENTS_TEMPLATE_BLOCK_MISSING",
+      message: `AGENTS template block is missing from ${templateFilePath}`,
+      suggestion: "Restore the Vasir template markers, then rerun the AGENTS command.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  return templateText.replace(
+    blockPattern,
+    () => formatMarkedBlockReplacement({
+      blockMatch,
+      startMarker,
+      endMarker,
+      replacementText
+    })
+  );
+}
+
+function renderAgentsTemplate({
+  templateText,
+  projectName,
+  currentDate,
+  profile,
+  profileSnippetText = null,
+  templateFilePath = DEFAULT_AGENTS_TEMPLATE,
+  snippetFilePath = null
+}) {
+  let renderedTemplate = templateText
+    .replace(/\[Project Name\]/g, () => projectName)
+    .replace(LAST_UPDATED_PLACEHOLDER, () => `${currentDate} - update alongside major architectural PRs`);
+
+  if (profile && profile !== "generic") {
+    const profileMarkerPattern = /<!--\s*vasir:profile:[a-z0-9-]+\s*-->/i;
+    if (!profileMarkerPattern.test(renderedTemplate)) {
+      throw new VasirCliError({
+        code: "AGENTS_TEMPLATE_BLOCK_MISSING",
+        message: `AGENTS profile marker is missing from ${templateFilePath}`,
+        suggestion: "Restore the Vasir profile marker, then rerun the AGENTS command.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    renderedTemplate = renderedTemplate.replace(
+      profileMarkerPattern,
+      `<!-- vasir:profile:${profile} -->`
+    );
+  }
+
+  if (!profileSnippetText) {
+    return renderedTemplate;
+  }
+
+  const purposeReplacement = readTemplateBlock({
+    templateText: profileSnippetText,
+    startMarker: PURPOSE_START_MARKER,
+    endMarker: PURPOSE_END_MARKER,
+    templateFilePath: snippetFilePath ?? templateFilePath
+  });
+  const routingReplacement = readTemplateBlock({
+    templateText: profileSnippetText,
+    startMarker: ROUTING_START_MARKER,
+    endMarker: ROUTING_END_MARKER,
+    templateFilePath: snippetFilePath ?? templateFilePath
+  });
+  const doctrineReplacement = readTemplateBlock({
+    templateText: profileSnippetText,
+    startMarker: ENGINEERING_DOCTRINE_INSERTS_START_MARKER,
+    endMarker: ENGINEERING_DOCTRINE_INSERTS_END_MARKER,
+    templateFilePath: snippetFilePath ?? templateFilePath
+  });
+
+  renderedTemplate = replaceTemplateBlock({
+    templateText: renderedTemplate,
+    startMarker: PURPOSE_START_MARKER,
+    endMarker: PURPOSE_END_MARKER,
+    replacementText: purposeReplacement,
+    templateFilePath
+  });
+  renderedTemplate = replaceTemplateBlock({
+    templateText: renderedTemplate,
+    startMarker: ROUTING_START_MARKER,
+    endMarker: ROUTING_END_MARKER,
+    replacementText: routingReplacement,
+    templateFilePath
+  });
+  return replaceTemplateBlock({
+    templateText: renderedTemplate,
+    startMarker: ENGINEERING_DOCTRINE_INSERTS_START_MARKER,
+    endMarker: ENGINEERING_DOCTRINE_INSERTS_END_MARKER,
+    replacementText: doctrineReplacement,
+    templateFilePath
+  });
 }
 
 function createAgentsTemplateMissingError(templateFilePath) {
@@ -890,11 +1028,21 @@ export function initializeProjectAgentsFile({
   if (!fs.existsSync(templateFilePath)) {
     throw createAgentsTemplateMissingError(templateFilePath);
   }
+  const snippetFilePath = resolvedTemplate.snippetRelativePath
+    ? path.join(globalCatalogDirectory, resolvedTemplate.snippetRelativePath)
+    : null;
+  if (snippetFilePath && !fs.existsSync(snippetFilePath)) {
+    throw createAgentsTemplateMissingError(snippetFilePath);
+  }
 
   const renderedTemplate = renderAgentsTemplate({
     templateText: fs.readFileSync(templateFilePath, "utf8"),
+    profileSnippetText: snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null,
     projectName: guessProjectName(projectRootDirectory),
-    currentDate
+    currentDate,
+    profile: resolvedTemplate.profile,
+    templateFilePath,
+    snippetFilePath
   });
   fs.writeFileSync(agentsFilePath, renderedTemplate);
 
@@ -932,10 +1080,10 @@ export function validateProjectAgentsFile({ projectRootDirectory }) {
 }
 
 function replaceRoutingPlaceholder({ agentsText, routingLines }) {
-  const routingPattern = new RegExp(
-    `${escapeRegExp(ROUTING_START_MARKER)}\\n([\\s\\S]*?)\\n${escapeRegExp(ROUTING_END_MARKER)}`,
-    "m"
-  );
+  const routingPattern = createMarkedBlockPattern({
+    startMarker: ROUTING_START_MARKER,
+    endMarker: ROUTING_END_MARKER
+  });
   const routingMatch = agentsText.match(routingPattern);
 
   if (!routingMatch) {
@@ -950,15 +1098,20 @@ function replaceRoutingPlaceholder({ agentsText, routingLines }) {
 
   return agentsText.replace(
     routingPattern,
-    `${ROUTING_START_MARKER}\n${routingLines.join("\n")}\n${ROUTING_END_MARKER}`
+    () => formatMarkedBlockReplacement({
+      blockMatch: routingMatch,
+      startMarker: ROUTING_START_MARKER,
+      endMarker: ROUTING_END_MARKER,
+      replacementText: routingLines.join("\n")
+    })
   );
 }
 
 function replacePurposePlaceholder({ agentsText, purposeText }) {
-  const purposePattern = new RegExp(
-    `${escapeRegExp(PURPOSE_START_MARKER)}\\n([\\s\\S]*?)\\n${escapeRegExp(PURPOSE_END_MARKER)}`,
-    "m"
-  );
+  const purposePattern = createMarkedBlockPattern({
+    startMarker: PURPOSE_START_MARKER,
+    endMarker: PURPOSE_END_MARKER
+  });
   const purposeMatch = agentsText.match(purposePattern);
 
   if (!purposeMatch) {
@@ -971,7 +1124,7 @@ function replacePurposePlaceholder({ agentsText, purposeText }) {
     });
   }
 
-  if (!purposeMatch[1].includes(PURPOSE_PLACEHOLDER_FRAGMENT)) {
+  if (!purposeMatch[2].includes(PURPOSE_PLACEHOLDER_FRAGMENT)) {
     throw new VasirCliError({
       code: "AGENTS_PURPOSE_ALREADY_EDITED",
       message: "AGENTS.md already has a custom purpose block.",
@@ -981,7 +1134,7 @@ function replacePurposePlaceholder({ agentsText, purposeText }) {
     });
   }
 
-  return agentsText.replace(purposePattern, `**Purpose:** ${purposeText}`);
+  return agentsText.replace(purposePattern, () => `${purposeMatch[1] ?? ""}**Purpose:** ${purposeText}`);
 }
 
 function parsePurposeDraftResponse(responseText) {
