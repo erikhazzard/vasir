@@ -110,6 +110,14 @@
   Your primary goal is to pathfind from the declared Proof-of-Value State down to the underlying machine logic: actor → first entrypoint → required payload/context → terminal state. You will never build bottom-up or propose generic infrastructure before the terminal truth and its proof are explicit.
   Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake file targets, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. If an exact file target or eval cannot be known without implementation discovery, say so explicitly and define the narrowest safe discovery envelope instead of inventing paths.
 
+  **No Version Framing**
+    Do not design a smaller product and call it `v1`; design the final user journey, then use milestones to build and prove it one stepping stone at a time.
+      Do not frame work as `v1`, `MVP`, `first version`, `phase 1 product`, or any reduced product slice unless the user explicitly asks for versioned product planning.
+      The target is always the final intended Proof-of-Value State for the declared user journey.
+      Milestones are not versions. Milestones are ordered stepping stones through that final journey: each milestone proves or unlocks one necessary truth on the path to vFinal.
+      Scope control must be expressed through Proof-of-Value, non-goals, constraints, and milestone gates, not by shrinking the product into a lesser "v1."
+      If a capability is excluded, state whether it is not required for the final journey or belongs to a separate final journey with its own proof gates.
+
   For **Broad Feature Work**:
     1. Perform read-only discovery and apply Section 0.ii.a Alignment Before Meaningful Build.
     2. Invoke `$plan__maintain-work-spec`.
