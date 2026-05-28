@@ -186,6 +186,22 @@ Examples:
 
 Otherwise prefer observable outputs and public reads.
 
+### No tombstone tests
+
+Do not add or preserve tests whose primary oracle is that a removed artifact stayed absent. This applies across UI, API, backend, data, infra, and internal code: removed buttons/pages/copy/classes, endpoints/routes/handlers, jobs/workers, events/messages, DB fields/tables/indexes, cache keys, config/flags, enum values, log/metric names, module boundaries, function calls, or implementation paths.
+
+When removing functionality, delete obsolete tests or rewrite them around the surviving/replacement value path. Do not memorialize the removed surface unless absence is itself the approved product, security, privacy, or compatibility contract.
+
+Allowed absence assertions must protect a named positive contract:
+- unauthorized action unavailable
+- PII/secrets not exposed
+- destructive or privileged mutation blocked
+- duplicate event/job/write not emitted
+- retired public endpoint returns the specified 404/410 behavior
+- deprecated input rejected at a public compatibility boundary
+
+Every negative assertion must state the positive contract it protects and the user/system harm it prevents. If it cannot, remove the assertion.
+
 ### Production bugs become deterministic regression tests first
 Never “fix and hope.”
 Reproduce at the boundary where the failure escaped, then fix under that guard.
@@ -449,6 +465,7 @@ What is still not guarded or intentionally deferred.
 - Keeping migration flags or dual paths without removal ownership
 - Fixing a production bug without a reproducing regression test
 - Writing a test whose removal would not meaningfully reduce confidence
+- Writing tombstone tests that only prove removed UI/API/backend/data/implementation artifacts stayed absent
 
 ---
 

@@ -864,6 +864,12 @@
   - Map obvious actor assumptions to an integration gate, or mark them as assumptions/risks; one journey integration test can protect more than 100 unit tests, and coverage percentage is not proof.
   - Do not leave permanent future-state global tests enabled in default CI before the milestone where they are expected to pass. Future-state global proofs may live as eval-plan contracts, non-default harnesses, skipped-with-explicit-reason tests, or milestone-gated checks until the implementation scope reaches them.
 
+  **No Tombstone Tests**:
+  - Do not add or preserve tests whose primary oracle is that a removed artifact stayed absent. This applies across UI, API, backend, data, infra, and internal code: removed buttons/pages/copy/classes, endpoints/routes/handlers, jobs/workers, events/messages, DB fields/tables/indexes, cache keys, config/flags, enum values, log/metric names, module boundaries, function calls, or implementation paths.
+  - When removing functionality, delete or rewrite obsolete tests around the surviving value path; do not memorialize the removed surface unless absence is the approved product, security, privacy, or compatibility contract.
+  - Absence assertions are allowed only when they protect a named contract: unauthorized action unavailable, PII/secrets not exposed, destructive or privileged mutation blocked, duplicate event/job/write not emitted, retired public endpoint returning the specified 404/410 behavior, or deprecated input rejected at a public compatibility boundary.
+  - Every negative assertion must name the positive contract it protects and the user/system harm it prevents. If it cannot, remove the assertion.
+
   **Real Targets**:
   - Prefer real services, real browser/runtime checks, real simulation harnesses, sandbox APIs, or recorded/replayed fixtures with documented tradeoffs.
   - Avoid mocks that erase the failure mode.

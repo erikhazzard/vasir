@@ -156,6 +156,20 @@ test("root AGENTS template treats touchpoints as reconnaissance, not approval bo
   assert.doesNotMatch(agentsTemplateText, /file targets exceed the approved envelope/);
 });
 
+test("testing doctrine forbids tombstone absence tests", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const testingSkillText = fs.readFileSync(
+    path.join(REPO_ROOT, ".agents", "skills", "testing__enforcing-mandate", "SKILL.md"),
+    "utf8"
+  );
+
+  assert.match(agentsTemplateText, /No Tombstone Tests/);
+  assert.match(agentsTemplateText, /Every negative assertion must name the positive contract it protects/);
+  assert.match(agentsTemplateText, /endpoints\/routes\/handlers, jobs\/workers, events\/messages, DB fields\/tables\/indexes/);
+  assert.match(testingSkillText, /No tombstone tests/);
+  assert.match(testingSkillText, /Writing tombstone tests that only prove removed UI\/API\/backend\/data\/implementation artifacts stayed absent/);
+});
+
 test("local markdown links resolve", () => {
   const documentPathsToCheck = [
     "README.md",

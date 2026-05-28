@@ -235,6 +235,7 @@ Use exactly these sections, in this order:
    - Use real serialization, real async boundaries, and real error paths where the risk lives
    - If the risky boundary is mocked away, it does not count as the required integration test
    - If no existing harness covers the risky boundary, extend or create one
+   - Do not add tombstone tests whose main oracle is that removed UI/API/backend/data/implementation artifacts are absent, unless absence is a named product, security, privacy, or compatibility contract.
 
    Example test name:
    - `it("dedupes replayed charge requests by chargeId and preserves per-account ordering", async () => { ... })`
