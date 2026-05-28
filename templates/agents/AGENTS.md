@@ -979,7 +979,7 @@
     - pass/fail comparison against the declared gate,
     - remaining delta,
     - timestamp,
-    - read-only git identifier when available.
+    - git identifier when available.
   - The terminal `<Eval_Trace>` MUST name the audit artifact path.
   - The audit artifact satisfies the command-level raw-output requirement for successful, non-borderline evals.
 
