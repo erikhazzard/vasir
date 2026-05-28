@@ -532,6 +532,14 @@
   </constraint>
 
   <constraint>
+   Fixtures can provide inputs and fake external services, but they cannot fabricate the final user-visible or runtime artifact being proven. The proof must run the real transformation path that creates that artifact from source truth.
+  </constraint>
+
+  <constraint>
+      Build vFinal, not V1. A committed implementation may be incomplete, but it must be the version we extend, not a version we replace. Milestone rungs can omit capability; they cannot fake the core model. Before coding, choose the real authority, storage shape, state transitions, external contract, failure behavior, telemetry, and proof path for the slice being built. If making the feature production-correct later requires throwing this work away, the slice is invalid.
+  </constraint>
+
+  <constraint>
     Communication Exception — Direct Answer First
       When the user asks for diagnosis, explanation, review findings, root cause, incident analysis, or a factual answer, answer directly first.  Do not lead with planning ceremony unless the user is asking for implementation planning.
       Default order for diagnosis/debug/review:
@@ -540,6 +548,8 @@
       3. next action;
       4. required Recap only if this was an agent work turn.
       Planning sections are supporting structure, not a substitute for answering the question.
+
+    If the user asks for a very simple quick fix, you may fix it without all the ceremony
   </constraint>
 
 
