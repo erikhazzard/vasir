@@ -281,7 +281,7 @@
   - After the initial Broad Feature Work plan, `Recommendation:` MUST propose approving or revising the Work Spec / milestone ladder / eval plan, and `Needs:` MUST name the exact approval or correction required.
   - If a `<Handoff_Ledger>` is emitted, `<Next_Step_Proposal>` MUST agree with `<Handoff_Ledger>/<Next_Action>`.
   - If the work is complete at 10/10, `Recommendation:` MUST name the safest handoff, review, release, or monitoring action; `Needs:` MUST be `None` unless a human release decision remains.
-  - It MUST NOT offer a menu of options, suggest destructive git operations, recommend vague investigation, or invent optional polish unless that is the declared remaining delta.
+  - It MUST NOT offer a menu of options, recommend vague investigation, or invent optional polish unless that is the declared remaining delta.
 
   Progress rubric:
   - 0/10: Unlock or Proof-of-Value State is missing.
@@ -497,9 +497,12 @@
 # 2. Immutable Global Constraints
 
 <fatal_constraints>
-  <constraint>
-    Hands Off Mutating Git:
-    Agents are strictly forbidden from issuing or suggesting write/destructive git commands, including `commit`, `reset`, `push`, `checkout`, `merge`, `rebase`, `clean`, or destructive branch operations. Read-only git commands are allowed.
+  <constraint id="forward-only-git">
+    Forward-Only Git:
+    Read-only git commands are always allowed for inspection. `git add -A` and `git commit` are allowed when committing current workspace progress. Commits may include unrelated existing changes. Do not block on perfect authorship separation; preserve the work and move the repo forward.
+    Before committing, run `git status --short` and inspect the staged diff summary. The commit message should be a generated 1-2 line summary of what the commit contains, based on the staged diff.
+    Destructive, discard, or history-rewrite commands remain forbidden unless the user explicitly requests the exact operation. This includes `git reset`, `git restore`, `git checkout -- <path>`, `git clean`, `git rebase`, `git commit --amend`, force-push, destructive branch deletion, and any command whose purpose is to discard or rewrite existing work.
+
   </constraint>
 
   <constraint>
@@ -1109,24 +1112,28 @@
 # 12. CLI & Command Discipline
 
 <cli_discipline>
-  Naked CLI:
-  - Commands must be literal and runnable in the current repo.
-  - Do not output placeholder env vars, fake paths, or illustrative commands.
-  - Do not add destructive auto-confirm flags such as `--yes`, `--force`, or equivalents unless the user explicitly requested that exact operation.
-  - `--dry-run` is allowed only when dry-run output is the intended verification artifact, not as a substitute for executing an approved change.
-  - If a command requires an unknown literal value, halt and ask for that value.
+  Literal CLI:
+    - Every command you run or present as runnable must be literal, complete, and executable from the current repo.
+    - Do not output placeholder env vars, fake paths, illustrative values, or example-only commands as executable instructions.
+    - If a command requires an unknown literal value, halt and ask for that value.
+    - Do not add destructive, scope-expanding, or auto-confirm flags such as `--yes`, `--force`, or equivalents unless the user explicitly requested that exact operation.
+    - `--dry-run` is allowed only when dry-run output is the intended verification artifact, not as a substitute for executing an approved change.
 
   Zero-Config Defaults:
-  - Do not use inline env vars or CLI flags to override default behavior unless explicitly labeled as a troubleshooting override.
-  - Prefer repo-owned config modules and scripts.
+    - Do not use inline env vars or CLI flags to override default behavior unless explicitly labeled as a troubleshooting override.
+    - Prefer repo-owned config modules and scripts.
 
   Anti-Pedagogy:
-  - Never write illustrative examples, fake dry-runs, or placeholder CLI commands as if they are executable.
-  - Assume every command you output may be pasted directly into a shell.
+    - In operational instructions, never write illustrative examples, fake dry-runs, or placeholder CLI commands as if they are executable.
+    - Assume every command you output may be pasted directly into a shell.
 
-  Read-Only Git:
-  - Read-only git commands are allowed for inspection.
-  - Mutating git commands are forbidden by Section 2.
+  Forward-Only Git:
+    - Read-only git commands are always allowed for inspection.
+    - `git add -A` and `git commit` are allowed when committing current workspace progress.
+    - Commits may include unrelated existing changes. Do not block on perfect authorship separation; preserve the work and move the repo forward.
+    - Before committing, run `git status --short` and inspect the staged diff summary.
+    - Commit messages should be generated 1-2 line summaries of what the staged diff contains.
+    - Destructive, discard, or history-rewrite git commands are forbidden
 </cli_discipline>
 
 ---
