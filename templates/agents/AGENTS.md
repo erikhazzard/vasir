@@ -70,7 +70,7 @@
   - Every requirement must have a reason attached to the unlock.
   - Question any requirement that does not serve the unlock, even if it came from the user.
   - If a requirement conflicts with the unlock, name the conflict and propose the smallest correction.
-  - If the request lacks a clear unlock, infer the most likely unlock from repo context only when it would not materially change file targets, architecture, data shape, authority boundaries, or eval gates.
+  - If the request lacks a clear unlock, infer the most likely unlock from repo context only when it would not materially change the change envelope, architecture, data shape, authority boundaries, or eval gates.
   - If multiple plausible unlocks would lead to materially different implementations, halt and ask for the smallest clarifying decision.
   - Never use “future compounding value” as permission for scope creep. Compounding value may shape the chosen design, but the implementation must still satisfy only the approved scope and Proof-of-Value State.
 </unlock_mandate>
@@ -108,7 +108,7 @@
 
 <initiation_protocol>
   Your primary goal is to pathfind from the declared Proof-of-Value State down to the underlying machine logic: actor → first entrypoint → required payload/context → terminal state. You will never build bottom-up or propose generic infrastructure before the terminal truth and its proof are explicit.
-  Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake file targets, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. If an exact file target or eval cannot be known without implementation discovery, say so explicitly and define the narrowest safe discovery envelope instead of inventing paths.
+  Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake touchpoints, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. If exact touchpoints or evals cannot be known without implementation discovery, say so explicitly and define the narrowest safe change envelope instead of inventing paths.
 
   **No Version Framing**
     Do not design a smaller product and call it `v1`; design the final user journey, then use milestones to build and prove it one stepping stone at a time.
@@ -146,7 +146,7 @@
   For Material Code Changes that are not Broad Feature Work:
     - Perform read-only discovery and apply Section 0.ii.a Alignment Before Meaningful Build.
     - If material alignment questions remain, ask them in one batch, output the mandatory `<Recap>`, then `[SYSTEM_HALT]`.
-    - Output the mandatory `<Plan>` block before implementation unless the user already approved an active Work Spec / eval plan that covers the exact file targets and gate.
+    - Output the mandatory `<Plan>` block before implementation unless the user already approved an active Work Spec / eval plan that covers the change envelope and gate.
     - “Autonomous execution” means the current user instruction explicitly authorizes implementation without a separate approval pause, such as “implement this now,” “go ahead and make the change,” or approval of an active milestone.
     
 
@@ -177,11 +177,20 @@
 
     <Scope_Envelope>
       Milestones: [full prefixed milestone IDs, or "Not milestone-based"]
-      Existing files allowed to edit:
-      - [exact paths]
+      Expected initial touchpoints:
+      - [best-known files/directories from read-only discovery; not an exhaustive allowlist]
 
-      New files allowed to create:
-      - [exact paths or narrow creation envelopes]
+      Approved change envelope:
+      - [what implementation may change without another approval: the journey/system boundary, directly affected code/tests/docs, and any repo-pattern touchpoints needed to pass the same gate]
+
+      Autonomous expansion rule:
+      - [when implementation-discovered files may be edited without pausing; default: allowed when required to complete/prove the same approved Unlock and gate, with no contract/safety/dependency/deployment/product-decision change]
+
+      Escalation triggers:
+      - [changes that require Plan_Delta: Proof-of-Value State/gate, product behavior outside the declared journey, public API/data/persistence/auth/permission contract, source of truth, dependency footprint, deployment/infra/secrets, destructive operation, or uncovered subjective product decision]
+
+      New file creation envelope:
+      - [semantic envelopes: directory, filename pattern, purpose, and maximum count when useful]
 
       Planning/eval artifact allowance:
       - `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`
@@ -191,7 +200,7 @@
 
     <Key_Invariants_and_Risks>
       Invariants: [Work Spec `C-###` refs, eval-plan refs, or concise inline list when no Work Spec exists]
-      Assumptions: [only assumptions that affect scope, file targets, data shape, authority boundaries, or eval gates]
+      Assumptions: [only assumptions that affect scope, change envelope, data shape, authority boundaries, or eval gates]
       Hostile/negative path: [required hostile-path proof or "Not applicable — reason"]
       Largest known risk: [single biggest way this plan could be wrong]
     </Key_Invariants_and_Risks>
@@ -204,7 +213,7 @@
   After outputting `</Plan>`:
   - If the plan is the initial Work Spec / milestone proposal for Broad Feature Work, output `<Recap>`, then `[SYSTEM_HALT]`.
   - If the plan is for unapproved Material Code Changes, output `<Recap>`, then `[SYSTEM_HALT]`.
-  - If the plan is inside an approved milestone and all gates/file targets are known, continue only through objective gates covered by the approved milestone.
+  - If the plan is inside an approved milestone and the gate/change envelope is known, continue only through objective gates covered by the approved milestone.
 </initiation_protocol>
 
 ## 0.ii.a Alignment Before Meaningful Build
@@ -212,7 +221,7 @@
 <alignment_before_build>
   Before Broad Feature Work, Material Code Change, or durable planning artifacts, the agent must ensure alignment with the user and resolve material ambiguity.
 
-  After read-only discovery, ask up to 5 alignment questions if unanswered decisions would materially change the core user journey, core unlock, Proof-of-Value State, acceptance gate, file targets, API/data shape, authority boundary, persistence behavior, subjective quality bar, or safety/privacy risk.
+  After read-only discovery, ask up to 5 alignment questions if unanswered decisions would materially change the core user journey, core unlock, Proof-of-Value State, acceptance gate, change envelope, API/data shape, authority boundary, persistence behavior, subjective quality bar, or safety/privacy risk.
 
   Only the root/calling agent may ask human-facing alignment questions.
   Skills may identify unresolved decisions, but must return them as Open blockers or Skill Result fields.
@@ -285,7 +294,7 @@
 
   Progress rubric:
   - 0/10: Unlock or Proof-of-Value State is missing.
-  - 2/10: Unlock, Proof-of-Value State, file targets, and approval state are defined.
+  - 2/10: Unlock, Proof-of-Value State, change envelope, and approval state are defined.
   - 4/10: A failing value-path test, repro, benchmark, screenshot/video target, simulation gate, browser check, or measurable gate exists.
   - 6/10: Implementation is complete and relevant local checks pass, but target-environment eval is not fully proven.
   - 8/10: Target-environment eval passes the core gate, but docs/spec sync, subjective review, edge cases, polish, or handoff proof remains.
@@ -352,27 +361,26 @@
 
 ---
 
-## 0.vi Plan Amendment Protocol
+## 0.vi Change Envelope Protocol
 
-<plan_amendment_protocol>
-  After approval, if execution reveals that an unlisted file must be touched to preserve the Unlock, the agent may not silently modify it.
+<change_envelope_protocol>
+  Approval binds the Unlock, Proof-of-Value State, gate, and contract boundaries. File lists are reconnaissance, not permission.
 
-  The agent must output:
+  During implementation, the agent may edit implementation-discovered files without pausing when all are true:
+  - the edit is required to complete or prove the same approved Unlock and gate;
+  - the edit stays within the approved change envelope;
+  - the edit follows existing repo ownership/routing rules, including scoped `AGENTS.md`;
+  - the edit does not cross an escalation trigger named in `<Scope_Envelope>`.
 
-  <Plan_Amendment>
-    <Reason>[Why the original file target list was insufficient]</Reason>
-    <New_File_Targets>[Exact additional existing files, or a narrow creation envelope with directory, filename pattern, purpose, and maximum count]</New_File_Targets>
-    <Risk>[What could go wrong if this amendment is accepted]</Risk>
-    <Verification>[How the amended scope will be proven]</Verification>
-  </Plan_Amendment>
+  Do not halt just because a necessary file was absent from the initial touchpoints list. Edit it, then record the implementation-discovered touchpoint and why it stayed inside the approved envelope in `<Recap>/<Context_Sync>`, the Work Spec/eval plan when their contracts change, or the final handoff ledger.
 
-  Then halt for approval unless the new file is inside an already-approved creation envelope.
+  Halt with `<Plan_Delta>` only when the discovered change would alter the approved gate, cross a contract/safety/dependency/deployment/source-of-truth boundary, create a new product decision, require destructive operations, or exceed the approved new-file creation envelope.
 
-  If the new target is inside an already-approved creation envelope:
-  - update the Work Spec / eval plan if the milestone contract changes,
-  - name the change in `<Recap>/<Context_Sync>`,
-  - continue only if the proof gate remains unchanged or stronger.
-</plan_amendment_protocol>
+  If expansion stays inside the envelope:
+  - continue implementation,
+  - update the Work Spec / eval plan if milestone contracts or gate language changed,
+  - name the discovered touchpoints in the next terminal `<Recap>` or final handoff.
+</change_envelope_protocol>
 
 ---
 
@@ -427,7 +435,7 @@
     - Approval state
     - Proposed or active milestone IDs
     - Proof-of-Value State
-    - File target envelope
+    - Change envelope
     - Open blockers
     - Recommended next action
 
@@ -444,14 +452,14 @@
 ## 0.viii Plan Delta Protocol
 
 <plan_delta_protocol>
-  Use `<Plan_Delta>` when prior approval exists or may exist, but current repo truth, skill output, scope, gates, file targets, or context-compaction state differs from the approved plan.
+  Use `<Plan_Delta>` when prior approval exists or may exist, but current repo truth, skill output, change envelope, gates, contract boundaries, or context-compaction state differs from the approved plan.
 
   `<Plan_Delta>` is not a replacement for a full `<Plan>`. It must name only what changed and what decision is required.
 
   <Plan_Delta>
     <Prior_State>[Approved Work Spec / eval path, milestone ID, gate, or "Approval unclear after context compaction"]</Prior_State>
     <Delta>[The smallest factual change from the prior state]</Delta>
-    <Affected_File_Targets>[Exact files/envelopes affected, or "None"]</Affected_File_Targets>
+    <Affected_Change_Envelope>[The envelope or boundary affected, or "None"]</Affected_Change_Envelope>
     <Affected_Gates>[Exact proof/eval gates affected, or "None"]</Affected_Gates>
     <Risk>[What could go wrong if accepted]</Risk>
     <Needed_Decision>[Exact approval, correction, or rejection needed]</Needed_Decision>
@@ -1063,7 +1071,7 @@
   The agent MUST pause when:
   - a subjective gate requires human judgment,
   - the initial work spec has not been approved,
-  - file targets exceed the approved envelope,
+  - scope expansion crosses an escalation trigger in the approved change envelope,
   - an eval fails twice for the same or similar reason,
   - the implementation reveals a product decision not covered by the work spec,
   - credentials/tools/environment are unavailable,

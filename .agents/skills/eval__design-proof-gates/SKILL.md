@@ -832,7 +832,7 @@ Output this XML block exactly:
   <Existing_Harnesses>[count and names, or None found]</Existing_Harnesses>
   <Missing_Harnesses>[count and names, or None]</Missing_Harnesses>
   <CI_Policy>[short summary]</CI_Policy>
-  <File_Target_Envelope>[eval-plan path, missing harness creation envelopes, or Unknown]</File_Target_Envelope>
+  <Change_Envelope>[eval-plan path, missing harness creation envelopes, or Unknown]</Change_Envelope>
   <Open_Blockers>[None or exact missing dependency]</Open_Blockers>
   <Recommended_Next_Action>[single concrete next action]</Recommended_Next_Action>
 </Proof_Gate_Design>

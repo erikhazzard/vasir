@@ -30,8 +30,8 @@ A passing handoff means the next excellent engineer or agent can inspect the app
 5. **Fresh means current code.** Stale screenshots, old traces, cached benchmark output, and pre-change logs do not prove completion.
 6. **Binding blockers stay blocking.** A `NO-SHIP`, P0, failed gate, missing subjective acceptance, or unaccepted delta blocks PASS unless concrete evidence disproves it or the human explicitly accepts the risk.
 7. **Subjective quality is human-owned.** Feel, fun, visual taste, animation quality, and readability require artifact-backed human acceptance.
-8. **No destructive operations.** Do not suggest or run mutating git commands, data deletion, credential guessing, or destructive cleanup.
-9. **Unknown after read-only discovery means BLOCKED.** Do not invent file targets, eval tools, audit results, or approvals.
+8. **No destructive operations.** Do not suggest or run destructive git commands, data deletion, credential guessing, or destructive cleanup.
+9. **Unknown after read-only discovery means BLOCKED.** Do not invent touchpoints, eval tools, audit results, or approvals.
 10. **Blunt, compact, actionable.** Prefer a precise NO-SHIP over a fragile PASS.
 
 ---
@@ -119,9 +119,9 @@ Run these checks in order.
 
 ### 1. Scope & Approval
 
-PASS only if changed files, product decisions, evals, and docs are inside the approved scope or approved creation envelopes.
+PASS only if changed files, product decisions, evals, and docs are inside the approved change envelope or approved creation envelopes.
 
-Fail or block on: skipped scoped `AGENTS.md`, unapproved file targets, unapproved product decisions, silent plan amendments, destructive operations, or missing approval.
+Fail or block on: skipped scoped `AGENTS.md`, changes outside the approved envelope, unapproved product decisions, unrecorded scope expansion, destructive operations, or missing approval.
 
 ### 2. Proof-of-Value
 

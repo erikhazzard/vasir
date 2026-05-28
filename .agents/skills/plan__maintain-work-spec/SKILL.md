@@ -439,7 +439,7 @@ After writing or updating the Work Spec, report these fields to the calling agen
 - Approval state:
 - Proposed milestone IDs:
 - Proof-of-Value State:
-- File target envelope:
+- Change envelope:
 - Open blockers:
 - Recommended next action:
 

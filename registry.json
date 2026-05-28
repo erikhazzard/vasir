@@ -452,6 +452,19 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "game__genre--building-auto-battler-tactics",
+      "description": "Designs autobattlers; use for autochess / autobattler games.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game__genre--building-auto-battler-tactics",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "game__genre--building-endless-runner",
       "description": "Builds and improves endless/auto-runner games in JavaScript for mobile (iOS). Covers scroll engines, speed ramping, lane switching, obstacle generation with solvability guarantees, ground/segment recycling, near-miss detection, magnet pickups, shield/revive systems, distance-as-score, and session psychology. Targets Temple Run, Subway Surfers, and Canabalt style games. Use when creating runners from scratch, fixing unfair obstacle spawning, adding pickups/power-ups, tuning difficulty curves, or making a runner feel polished and addictive.",
       "category": "uncategorized",
@@ -657,6 +670,19 @@
         "references/review-rubric.md"
       ],
       "path": ".agents/skills/game-onboarding__designing-game-onboarding",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-proof__auditing-first-playable-comprehension",
+      "description": "Audits whether a Studio or Idavoll first playable reaches Time to First Meaningful Choice fast enough to count as play. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game-proof__auditing-first-playable-comprehension",
       "entry": "SKILL.md"
     },
     {

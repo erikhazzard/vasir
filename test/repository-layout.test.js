@@ -143,6 +143,19 @@ test("agent template snippets own profile-specific insertion blocks", () => {
   }
 });
 
+test("root AGENTS template treats touchpoints as reconnaissance, not approval boundaries", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+
+  assert.match(agentsTemplateText, /Expected initial touchpoints:/);
+  assert.match(agentsTemplateText, /Approved change envelope:/);
+  assert.match(agentsTemplateText, /Autonomous expansion rule:/);
+  assert.match(agentsTemplateText, /Escalation triggers:/);
+  assert.match(agentsTemplateText, /File lists are reconnaissance, not permission\./);
+  assert.doesNotMatch(agentsTemplateText, /Existing files allowed to edit:/);
+  assert.doesNotMatch(agentsTemplateText, /Plan Amendment Protocol/);
+  assert.doesNotMatch(agentsTemplateText, /file targets exceed the approved envelope/);
+});
+
 test("local markdown links resolve", () => {
   const documentPathsToCheck = [
     "README.md",
