@@ -605,6 +605,7 @@
 
 <non-obvious_architectural_considerations>
   Do not attempt to “fix,” optimize, flatten, migrate, or replace these patterns unless you have verified why they exist and the approved plan names the change.
+  Source file: `AGENTS__non-obvious.md`. Edit that file, then run `vasir agents sync`; this generated block is refreshed from that file.
 
   <!-- vasir:nonobvious:start -->
   [Add repo-specific landmines here.]

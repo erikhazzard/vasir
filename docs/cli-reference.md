@@ -31,6 +31,7 @@ vasir --version
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
 | `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
+| `agents sync` | `vasir agents sync [backend\|frontend\|ios] [--json] [--dry-run] [--repo-root <path>]` | Reconcile the repo-root `AGENTS.md` from the canonical template, local repo context, and `AGENTS__non-obvious.md` |
 | `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter with a stack-specific snippet in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
@@ -162,8 +163,8 @@ vasir diff --repo-root packages/web
 - Notes:
   - Vasir copies the catalog from the installed package bundle by default.
   - Inside a repo, `init` is the pit-of-success command when you want “just give this repo everything and keep it current.”
+  - If the global cache is dirty or contains manual files, `init` moves it aside to `~/.agents/vasir.dirty-backup.<timestamp>` and rebuilds a clean cache.
   - Pass `--repo-root <path>` when you want to initialize a nested package or subproject explicitly.
-  - If the existing global cache is dirty or invalid, the command fails closed.
 
 Examples:
 
@@ -187,7 +188,8 @@ vasir init --repo-root packages/web
   - `vasir add all` also marks a repo as full-catalog tracking.
   - `vasir remove <skill>` from a full-catalog repo switches that repo back to selected-subset tracking so the removed skill does not come back unexpectedly.
   - Local edits to a managed skill still fail closed, the same way `vasir add <skill> --replace` does.
-  - `--dry-run` shows which repo-local skills would update, which are already current, and which are blocked by local edits without mutating the cache or repo.
+  - If the global cache is dirty or contains manual files, `update` moves it aside to `~/.agents/vasir.dirty-backup.<timestamp>` and rebuilds a clean cache.
+  - `--dry-run` shows which repo-local skills would update, which are already current, which are blocked by local edits, and whether the global cache would be quarantined, without mutating the cache or repo.
 
 Example:
 
@@ -287,7 +289,30 @@ vasir remove
 
 ## Agents
 
-`vasir agents` exists for one job: make the repo-root `AGENTS.md` obvious to scaffold and obvious to customize.
+`vasir agents` exists for one job: make the repo-root `AGENTS.md` obvious to create, refresh, and validate.
+
+### `agents sync`
+
+- Purpose: the one-command AGENTS path for normal repos.
+- Result:
+  - renders `AGENTS.md` from the current canonical template and the inferred or explicit stack profile
+  - fills the purpose paragraph from deterministic local repo context without a model call
+  - generates Section 1 routing from existing repo directories
+  - injects repo-owned non-obvious constraints from `AGENTS__non-obvious.md`
+  - validates the generated result before writing it
+- Notes:
+  - Use `vasir agents sync --dry-run` to preview without writing.
+  - Use `vasir agents sync frontend`, `backend`, or `ios` when inference is wrong.
+  - If `AGENTS__non-obvious.md` is missing, sync creates it. Existing `.agents/non-obvious.md` sidecars are moved to the root file, and legacy manual `AGENTS.md` files are migrated by seeding the root file from the old non-obvious block.
+  - Skill catalog updates remain separate: use `vasir update` for tracked `.agents/skills/**` content.
+
+Examples:
+
+```bash
+vasir agents sync
+vasir agents sync --dry-run
+vasir agents sync frontend
+```
 
 ### `agents init`
 
@@ -355,7 +380,8 @@ vasir agents draft-routing --write
   - Succeeds cleanly when `AGENTS.md` no longer contains known placeholders, write-back markers, or broken repo routes.
   - Fails closed with structured issue details when scaffold markers are still present or a routed directory is missing its scoped `AGENTS.md`.
 - Notes:
-  - This is the last step after `agents init`, `agents draft-purpose --write`, and `agents draft-routing --write`.
+  - `agents sync` runs this check automatically.
+  - This is still useful after manual edits or lower-level `agents init`, `agents draft-purpose --write`, and `agents draft-routing --write` flows.
   - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a local `AGENTS.md`.
 
 Examples:

@@ -14,6 +14,7 @@ const REGISTRY_PATH = path.join(REPO_ROOT, "registry.json");
 const PACKAGE_JSON_PATH = path.join(REPO_ROOT, "package.json");
 const CATALOG_MANIFEST_PATH = path.join(REPO_ROOT, CATALOG_MANIFEST_FILE_NAME);
 const HASHED_CATALOG_ROOTS = Object.freeze(["registry.json", ".agents/skills", "templates"]);
+const IGNORED_CATALOG_FILE_NAMES = new Set([".DS_Store"]);
 
 const REGISTRY_HEADER = {
   version: "0.1.0",
@@ -36,6 +37,10 @@ function toRepoPath(absolutePath) {
 function walkFiles(dir) {
   const output = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (IGNORED_CATALOG_FILE_NAMES.has(entry.name)) {
+      continue;
+    }
+
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       output.push(...walkFiles(fullPath));

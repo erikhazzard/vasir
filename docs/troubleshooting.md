@@ -116,18 +116,17 @@ Use this section for:
 
 Recommended path:
 
-1. Inspect `~/.agents/vasir`.
-2. If you intentionally edited that cache, either clean it or move it aside.
+1. Run `vasir update --dry-run` to preview whether Vasir would quarantine and rebuild the cache.
+2. Run `vasir init` or `vasir update`. Vasir moves the dirty cache aside to `~/.agents/vasir.dirty-backup.<timestamp>` and rebuilds `~/.agents/vasir` from the installed bundle.
 3. If you set `VASIR_REPOSITORY_URL`, confirm it points at a local directory or `file:///...` URL with `registry.json`, `.agents/skills/`, and `templates/`.
-4. If the cache is broken or incomplete, delete or rename it.
-5. Rerun `vasir init`.
 
 Verification:
 
 - `~/.agents/vasir/registry.json` exists and is parseable.
 - `~/.agents/vasir/.agents/skills/` exists.
 - `~/.agents/vasir/templates/` exists.
-- `vasir update` succeeds without a dirty-catalog error.
+- If a dirty cache existed, a sibling `~/.agents/vasir.dirty-backup.<timestamp>` directory contains the previous cache contents.
+- `vasir update` succeeds.
 
 If you expected a repo-local skill refresh too, rerun `vasir update` from inside the target repo root or pass `--repo-root <path>`.
 - Repos initialized with `vasir init` or `vasir add all` track the full catalog, so `update` also installs newly added Vasir skills.
@@ -195,14 +194,11 @@ Use this section for:
 
 Recommended path:
 
-1. Start from the pit-of-success command: `vasir add <skill>`.
-2. If Vasir inferred the wrong starter, rerun with `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios`.
-3. If `AGENTS.md` already exists and you want to keep it, do not rerun a write command with `--replace`.
-4. If you explicitly want to refresh the starter, rerun `vasir agents init <profile> --replace`.
-5. Use `vasir agents draft-purpose --write --model openai` for the opening paragraph and `vasir agents draft-routing --write` for Section 1.
-6. When validation fails on scoped lanes, either create the referenced local `AGENTS.md` files or collapse those rules back into the root file.
-7. `vasir context --json --debug` also reports routed scoped `AGENTS.md` paths that are still missing.
-8. Finish with `vasir agents validate`.
+1. Preview with `vasir agents sync --dry-run`.
+2. Run `vasir agents sync`.
+3. If Vasir inferred the wrong profile, rerun with `vasir agents sync backend`, `vasir agents sync frontend`, or `vasir agents sync ios`.
+4. Keep repo-specific landmines in `AGENTS__non-obvious.md`; `AGENTS.md` is regenerated from it.
+5. Use `vasir agents init`, `draft-purpose`, `draft-routing`, and `validate` only when you intentionally need the lower-level primitives.
 
 Verification:
 

@@ -15,6 +15,8 @@ export const CATALOG_MANIFEST_FILE_NAME = ".vasir-catalog-manifest.json";
 const CATALOG_REQUIRED_ROOT_FILES = Object.freeze(["registry.json"]);
 const CATALOG_OPTIONAL_ROOT_FILES = Object.freeze([CATALOG_MANIFEST_FILE_NAME]);
 const GLOBAL_CATALOG_STATE_FILE_NAME = ".vasir-catalog-state.json";
+const GLOBAL_CATALOG_DIRTY_BACKUP_LABEL = "dirty-backup";
+const IGNORED_CATALOG_FILE_NAMES = new Set([".DS_Store"]);
 const ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES = new Set([
   ...new Set(CATALOG_DIRECTORY_PATHS.map((directoryPath) => directoryPath.split("/")[0])),
   ...CATALOG_REQUIRED_ROOT_FILES,
@@ -23,6 +25,16 @@ const ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES = new Set([
 ]);
 
 export const DEFAULT_REPOSITORY_URL = null;
+
+function compareCatalogPathText(leftValue, rightValue) {
+  if (leftValue < rightValue) {
+    return -1;
+  }
+  if (leftValue > rightValue) {
+    return 1;
+  }
+  return 0;
+}
 
 function normalizeLocalCatalogSourcePath(repositoryUrl) {
   if (!repositoryUrl) {
@@ -97,12 +109,21 @@ function readCatalogSnapshotEntries(catalogDirectory) {
     });
   }
 
+  function readSortedDirectoryEntries(directoryPath) {
+    return fs.readdirSync(directoryPath, { withFileTypes: true })
+      .sort((leftEntry, rightEntry) => compareCatalogPathText(leftEntry.name, rightEntry.name));
+  }
+
   for (const rootDirectoryPathFragment of CATALOG_DIRECTORY_PATHS) {
     const rootDirectoryPath = path.join(catalogDirectory, rootDirectoryPathFragment);
-    const directoryEntries = fs.readdirSync(rootDirectoryPath, { withFileTypes: true });
+    const rootSnapshotEntries = [];
 
     function walk(currentDirectoryPath, currentRelativeDirectoryPath) {
-      for (const directoryEntry of fs.readdirSync(currentDirectoryPath, { withFileTypes: true })) {
+      for (const directoryEntry of readSortedDirectoryEntries(currentDirectoryPath)) {
+        if (IGNORED_CATALOG_FILE_NAMES.has(directoryEntry.name)) {
+          continue;
+        }
+
         const entryAbsolutePath = path.join(currentDirectoryPath, directoryEntry.name);
         const entryRelativePath = path.join(currentRelativeDirectoryPath, directoryEntry.name).replace(/\\/g, "/");
 
@@ -112,7 +133,7 @@ function readCatalogSnapshotEntries(catalogDirectory) {
         }
 
         if (directoryEntry.isFile()) {
-          snapshotEntries.push({
+          rootSnapshotEntries.push({
             absolutePath: entryAbsolutePath,
             relativePath: entryRelativePath
           });
@@ -120,7 +141,11 @@ function readCatalogSnapshotEntries(catalogDirectory) {
       }
     }
 
-    for (const directoryEntry of directoryEntries) {
+    for (const directoryEntry of readSortedDirectoryEntries(rootDirectoryPath)) {
+      if (IGNORED_CATALOG_FILE_NAMES.has(directoryEntry.name)) {
+        continue;
+      }
+
       const entryAbsolutePath = path.join(rootDirectoryPath, directoryEntry.name);
       const entryRelativePath = path.join(rootDirectoryPathFragment, directoryEntry.name).replace(/\\/g, "/");
 
@@ -130,15 +155,21 @@ function readCatalogSnapshotEntries(catalogDirectory) {
       }
 
       if (directoryEntry.isFile()) {
-        snapshotEntries.push({
+        rootSnapshotEntries.push({
           absolutePath: entryAbsolutePath,
           relativePath: entryRelativePath
         });
       }
     }
+
+    snapshotEntries.push(
+      ...rootSnapshotEntries.sort((leftEntry, rightEntry) =>
+        compareCatalogPathText(leftEntry.relativePath, rightEntry.relativePath)
+      )
+    );
   }
 
-  return snapshotEntries.sort((leftEntry, rightEntry) => leftEntry.relativePath.localeCompare(rightEntry.relativePath));
+  return snapshotEntries;
 }
 
 function computeCatalogSnapshotHash(catalogDirectory) {
@@ -250,7 +281,10 @@ function copyCatalogSnapshot({
     fs.cpSync(
       sourceDirectoryPath,
       targetDirectoryPath,
-      { recursive: true }
+      {
+        recursive: true,
+        filter: (sourcePath) => !IGNORED_CATALOG_FILE_NAMES.has(path.basename(sourcePath))
+      }
     );
   }
 }
@@ -273,6 +307,46 @@ function listUnexpectedCatalogRootEntries(globalCatalogDirectory) {
     .sort();
 }
 
+function createDirtyGlobalCatalogError({
+  globalCatalogDirectory,
+  unexpectedRootEntries = []
+}) {
+  return new VasirCliError({
+    code: "GLOBAL_CATALOG_DIRTY",
+    message: `Global catalog cache has local changes and cannot be refreshed safely: ${globalCatalogDirectory}`,
+    suggestion:
+      "Run `vasir init` or `vasir update` to let Vasir move the dirty cache aside and rebuild it from the installed bundle.",
+    context: unexpectedRootEntries.length > 0
+      ? { unexpectedRootEntries }
+      : {},
+    docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
+  });
+}
+
+function buildDirtyCatalogBackupPath(globalCatalogDirectory) {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const baseBackupPath = `${globalCatalogDirectory}.${GLOBAL_CATALOG_DIRTY_BACKUP_LABEL}.${timestamp}`;
+  let backupPath = baseBackupPath;
+  let suffix = 2;
+
+  while (fs.existsSync(backupPath)) {
+    backupPath = `${baseBackupPath}.${suffix}`;
+    suffix += 1;
+  }
+
+  return backupPath;
+}
+
+function quarantineDirtyCatalogCache(globalCatalogDirectory) {
+  if (!fs.existsSync(globalCatalogDirectory)) {
+    return null;
+  }
+
+  const backupPath = buildDirtyCatalogBackupPath(globalCatalogDirectory);
+  fs.renameSync(globalCatalogDirectory, backupPath);
+  return backupPath;
+}
+
 function synchronizeCatalogCache({
   globalCatalogDirectory,
   sourceDirectory
@@ -290,7 +364,8 @@ function synchronizeCatalogCache({
 
 function inspectCatalogCache({
   globalCatalogDirectory,
-  sourceDirectory
+  sourceDirectory,
+  allowDirty = false
 }) {
   const expectedSourceHash = resolveCatalogSourceHash(sourceDirectory);
   const packageMetadata = readPackageMetadata();
@@ -307,36 +382,23 @@ function inspectCatalogCache({
     }
   }
 
-  if (
+  const managedSnapshotChanged =
     fs.existsSync(globalCatalogDirectory) &&
     globalCatalogState?.sourceHash &&
     actualTargetHash !== null &&
-    actualTargetHash !== globalCatalogState.sourceHash
-  ) {
-    throw new VasirCliError({
-      code: "GLOBAL_CATALOG_DIRTY",
-      message: `Global catalog cache has local changes and cannot be refreshed safely: ${globalCatalogDirectory}`,
-      suggestion:
-        "Move aside or delete `~/.agents/vasir` if you want Vasir to rebuild the cache from the installed bundle or local override source, then rerun the command.",
-      docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
-    });
-  }
-
+    actualTargetHash !== globalCatalogState.sourceHash;
   const unexpectedRootEntries = listUnexpectedCatalogRootEntries(globalCatalogDirectory);
-  if (unexpectedRootEntries.length > 0) {
-    throw new VasirCliError({
-      code: "GLOBAL_CATALOG_DIRTY",
-      message: `Global catalog cache has local changes and cannot be refreshed safely: ${globalCatalogDirectory}`,
-      suggestion:
-        "Move aside or delete `~/.agents/vasir` if you want Vasir to rebuild the cache from the installed bundle or local override source, then rerun the command.",
-      context: {
-        unexpectedRootEntries
-      },
-      docsRef: GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF
+  const dirty = managedSnapshotChanged || unexpectedRootEntries.length > 0;
+
+  if (dirty && !allowDirty) {
+    throw createDirtyGlobalCatalogError({
+      globalCatalogDirectory,
+      unexpectedRootEntries
     });
   }
 
   const needsSynchronization =
+    dirty ||
     !fs.existsSync(globalCatalogDirectory) ||
     globalCatalogState?.sourceHash !== expectedSourceHash ||
     actualTargetHash !== expectedSourceHash;
@@ -344,7 +406,14 @@ function inspectCatalogCache({
   return {
     packageVersion: packageMetadata.version,
     sourceHash: expectedSourceHash,
-    needsSynchronization
+    needsSynchronization,
+    needsQuarantine: dirty,
+    dirtyReason: dirty
+      ? unexpectedRootEntries.length > 0
+        ? "unexpected-root-entries"
+        : "managed-snapshot-changed"
+      : null,
+    unexpectedRootEntries
   };
 }
 
@@ -354,8 +423,14 @@ function ensureCatalogCacheCurrent({
 }) {
   const catalogState = inspectCatalogCache({
     globalCatalogDirectory,
-    sourceDirectory
+    sourceDirectory,
+    allowDirty: true
   });
+  let quarantinedCatalogDirectory = null;
+
+  if (catalogState.needsQuarantine) {
+    quarantinedCatalogDirectory = quarantineDirtyCatalogCache(globalCatalogDirectory);
+  }
 
   if (catalogState.needsSynchronization) {
     synchronizeCatalogCache({
@@ -364,7 +439,10 @@ function ensureCatalogCacheCurrent({
     });
   }
 
-  return catalogState;
+  return {
+    ...catalogState,
+    quarantinedCatalogDirectory
+  };
 }
 
 function readRegistryFromCatalogDirectory(catalogDirectory) {
@@ -430,22 +508,13 @@ export function synchronizeGlobalCatalog({
     sourceDirectory
   });
 
-  if (catalogState.needsSynchronization) {
-    synchronizeCatalogCache({
-      globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-      sourceDirectory
-    });
-  }
   assertGlobalCatalogLooksValid(globalPaths.globalCatalogDirectory);
   repairGlobalAliases({ globalPaths, platform });
 
   return {
     globalPaths,
     sourceDirectory,
-    catalogState: {
-      packageVersion: catalogState.packageVersion,
-      sourceHash: catalogState.sourceHash
-    }
+    catalogState
   };
 }
 
@@ -453,13 +522,15 @@ export function inspectGlobalCatalog({
   homeDirectory,
   repositoryUrl = DEFAULT_REPOSITORY_URL,
   platform = process.platform,
-  spawnSyncImplementation = null
+  spawnSyncImplementation = null,
+  allowDirty = false
 } = {}) {
   const globalPaths = buildGlobalPaths({ homeDirectory });
   const sourceDirectory = resolveCatalogSourceDirectory({ repositoryUrl });
   const catalogState = inspectCatalogCache({
     globalCatalogDirectory: globalPaths.globalCatalogDirectory,
-    sourceDirectory
+    sourceDirectory,
+    allowDirty
   });
 
   assertCatalogDirectoryLooksValid({

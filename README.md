@@ -78,7 +78,7 @@ Verify first success:
 6. `.agents/skills/` now exists in that repo and contains the full Vasir catalog.
 7. `.agents/vasir.json` now exists in that repo and records the repo's explicit Vasir tracking policy.
 8. The same command also seeds `AGENTS.md` in your repo root, inferring a stronger profile when the repo shape is obvious.
-9. Optional: run `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, then `vasir agents validate`.
+9. Optional: run `vasir agents sync` to reconcile `AGENTS.md` from the current template, local repo context, and preserved non-obvious repo guidance.
 
 `vasir init` is now the obvious repo path: inside a repo it installs the full catalog and marks that repo to keep tracking the full catalog on future `vasir update` runs.
 

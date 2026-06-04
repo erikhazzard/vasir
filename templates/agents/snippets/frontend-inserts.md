@@ -41,7 +41,6 @@ Hard requirements:
 - Similar actions must look similar; dangerous, disabled, selected, loading, and completed states must look meaningfully different.
 - A screenshot at the target viewport should reveal state, primary action, and consequence without reading body text.
 
-
 ---
 
 # RENDERED USER JOURNEY PROOF MANDATE

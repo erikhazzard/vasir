@@ -2,9 +2,9 @@
 
 Use this page when you want a filled example to adapt, not just the blank template.
 
-For the fastest starting point, run `vasir add <skill>` and let Vasir seed `AGENTS.md`, or force a specific starter with `vasir add <skill> --agents-profile backend|frontend|ios`. If you only want the manifest starter, run `vasir agents init backend`, `vasir agents init frontend`, or `vasir agents init ios`, then follow with `vasir agents draft-purpose --write --model openai`, `vasir agents draft-routing --write`, and `vasir agents validate`. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). The shared manifest structure lives in [templates/agents/AGENTS.md](../templates/agents/AGENTS.md), and stack-specific content lives in [templates/agents/snippets/](../templates/agents/snippets/).
+For the fastest starting point, run `vasir agents sync`. It infers the profile, renders the current template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result. Use `vasir agents sync frontend|backend|ios` when you need an explicit profile. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). The shared manifest structure lives in [templates/agents/AGENTS.md](../templates/agents/AGENTS.md), and stack-specific content lives in [templates/agents/snippets/](../templates/agents/snippets/).
 
-Copy the structure below into your repo root `AGENTS.md`, then replace the routed skills and verification commands with the ones that match your project.
+Use the structure below as a rendered example. In normal repos, edit `AGENTS__non-obvious.md` for repo-specific constraints and rerun `vasir agents sync` to regenerate `AGENTS.md`.
 
 ```markdown
 # AGENTS.md

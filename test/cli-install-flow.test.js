@@ -1328,7 +1328,36 @@ test("add --replace refuses to delete unexpected local files inside a project sk
   assert.match(replaceCommandOutput.readStderr(), /PROJECT_SKILL_MODIFIED/);
 });
 
-test("update fails closed when the global catalog is dirty", async () => {
+test("init quarantines a dirty global catalog cache and rebuilds it", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+  const globalCatalogDirectory = path.join(homeDirectory, ".agents", "vasir");
+
+  runGitCommand(projectDirectory, ["init"]);
+  runGitCommand(projectDirectory, ["config", "user.email", "test@example.com"]);
+  runGitCommand(projectDirectory, ["config", "user.name", "Test Runner"]);
+  writeFile(path.join(globalCatalogDirectory, ".gitignore"), "manual cache content\n");
+
+  const initStatusCode = await runCommandLine(["node", "vasir", "init", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(initStatusCode, 0);
+  const initResult = JSON.parse(capturedOutput.readStdout());
+  assert.equal(initResult.command, "init");
+  assert.equal(initResult.status, "success");
+  assert.match(initResult.quarantinedGlobalCatalogDirectory, /vasir\.dirty-backup\./);
+  assert.ok(fs.existsSync(path.join(globalCatalogDirectory, "registry.json")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(initResult.quarantinedGlobalCatalogDirectory, ".gitignore")));
+});
+
+test("update previews and repairs a dirty global catalog cache without manual cleanup", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const currentWorkingDirectory = createTemporaryDirectory();
@@ -1345,6 +1374,20 @@ test("update fails closed when the global catalog is dirty", async () => {
   const globalCatalogDirectory = path.join(homeDirectory, ".agents", "vasir");
   writeFile(path.join(globalCatalogDirectory, "LOCAL_OVERRIDE.md"), "dirty\n");
 
+  const dryRunOutput = captureCommandWriters();
+  const dryRunStatusCode = await runCommandLine(["node", "vasir", "update", "--dry-run", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory,
+    repositoryUrl,
+    ...dryRunOutput
+  });
+
+  assert.equal(dryRunStatusCode, 0);
+  const dryRunResult = JSON.parse(dryRunOutput.readStdout());
+  assert.equal(dryRunResult.globalCatalogStatus, "would-quarantine-and-sync");
+  assert.equal(dryRunResult.wouldQuarantineGlobalCatalog, true);
+  assert.ok(fs.existsSync(path.join(globalCatalogDirectory, "LOCAL_OVERRIDE.md")));
+
   const updateOutput = captureCommandWriters();
   const updateStatusCode = await runCommandLine(["node", "vasir", "update"], {
     homeDirectory,
@@ -1353,6 +1396,12 @@ test("update fails closed when the global catalog is dirty", async () => {
     ...updateOutput
   });
 
-  assert.equal(updateStatusCode, 1);
-  assert.match(updateOutput.readStderr(), /local changes/i);
+  assert.equal(updateStatusCode, 0);
+  assert.match(updateOutput.readStdout(), /Global catalog updated/);
+  assert.ok(fs.existsSync(path.join(globalCatalogDirectory, "registry.json")));
+  assert.ok(!fs.existsSync(path.join(globalCatalogDirectory, "LOCAL_OVERRIDE.md")));
+  assert.ok(
+    fs.readdirSync(path.join(homeDirectory, ".agents"))
+      .some((entryName) => entryName.startsWith("vasir.dirty-backup."))
+  );
 });

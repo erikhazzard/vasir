@@ -171,6 +171,23 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "design__building-frontend-interfaces",
+      "description": "Opinionated design-engineering skill for building, reviewing, and polishing web interfaces. Use for UI components, frontend code, forms, controls, animations, touch/mobile UX, accessibility, keyboard navigation, typography, layout, dark mode, marketing pages, docs, performance, virtualization, loading states, and visual polish.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "components-forms.md",
+        "craft-rules.md",
+        "mobile-accessibility.md",
+        "motion-performance.md"
+      ],
+      "path": ".agents/skills/design__building-frontend-interfaces",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "design__designing-cli",
       "description": "Designs distinctive, production-grade terminal UIs that balance aesthetics with pragmatism. Covers layout composition, color palettes for terminal environments, progress indicators, table formatting, interactive prompts, and output hierarchy. Use when building CLI tools, formatting terminal output, designing interactive prompts, or creating dashboard-style terminal interfaces.",
       "category": "uncategorized",

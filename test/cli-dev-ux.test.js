@@ -76,6 +76,14 @@ function createFixtureRepository() {
 
 This line must survive stack-profile composition.
 
+## 4. Non-Obvious Architectural Considerations
+
+<non-obvious_architectural_considerations>
+<!-- vasir:nonobvious:start -->
+[Add repo-specific landmines here.]
+<!-- vasir:nonobvious:end -->
+</non-obvious_architectural_considerations>
+
 <!-- vasir:engineering-doctrine-inserts:start -->
 [Add profile-specific snippets here.]
 <!-- vasir:engineering-doctrine-inserts:end -->
@@ -191,6 +199,7 @@ test("help output documents json support across commands and the explicit replac
   );
   assert.match(capturedOutput.readStdout(), /vasir adopt \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir remove <skill> \[skill...\] \[--json\]/);
+  assert.match(capturedOutput.readStdout(), /vasir agents sync \[profile\] \[--json\] \[--dry-run\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents init <profile> \[--json\] \[--replace\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-routing \[--json\] \[--write\]/);
@@ -219,6 +228,7 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /refreshes the skills tracked by the current repo/i);
   assert.match(capturedOutput.readStdout(), /adopt never copies or overwrites skill files/i);
   assert.match(capturedOutput.readStdout(), /mutates only the current repo/i);
+  assert.match(capturedOutput.readStdout(), /agents sync is the one-command AGENTS path/i);
   assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root/i);
   assert.match(capturedOutput.readStdout(), /agents validate fails closed/i);
   assert.match(capturedOutput.readStdout(), /auto-initializes the global catalog if needed/i);
@@ -925,6 +935,244 @@ test("agents draft-routing can replace the Section 1 placeholder with repo-aware
   assert.match(agentsText, /<!-- vasir:routing:start -->/);
   assert.match(agentsText, /\/src\/components\//);
   assert.doesNotMatch(agentsText, /\[Example\]/);
+});
+
+test("agents sync reconciles a legacy manual AGENTS file and migrates non-obvious repo context", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.jsx"), "export function Button() { return null; }\n");
+  writeFile(path.join(projectDirectory, "src", "styles", "tokens.css"), ":root {}\n");
+  writeFile(
+    path.join(projectDirectory, "AGENTS.md"),
+    `# 0. Old Manual Manifest
+
+<routing_topography>
+Old routing text with no Vasir markers.
+</routing_topography>
+
+# 4. Non-Obvious Architectural Considerations
+
+<non-obvious_architectural_considerations>
+Launcher default-game policy lives in Promotions, not Games.
+</non-obvious_architectural_considerations>
+
+Existing files allowed to edit:
+`
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "agents");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.subcommand, "sync");
+  assert.equal(parsedOutput.profile, "frontend");
+  assert.equal(parsedOutput.profileSource, "inferred");
+  assert.equal(parsedOutput.mode, "refreshed");
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.nonobviousSource, "migrated-from-agents");
+  assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "AGENTS__non-obvious.md"));
+  assert.equal(parsedOutput.wroteNonobviousFile, true);
+  assert.equal(parsedOutput.wouldWriteNonobviousFile, false);
+
+  const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  assert.match(agentsText, /# AGENTS\.md: space-admin-console Root Manifest/);
+  assert.match(agentsText, /<!-- vasir:profile:frontend -->/);
+  assert.match(agentsText, /Launcher default-game policy lives in Promotions, not Games\./);
+  assert.match(agentsText, /If touching `\/src\/components\/`, use this root `AGENTS\.md`/);
+  assert.doesNotMatch(agentsText, /Existing files allowed to edit/);
+  assert.doesNotMatch(agentsText, /EDIT THESE FIRST/);
+  assert.doesNotMatch(agentsText, /vasir:purpose:start/);
+  assert.doesNotMatch(agentsText, /vasir:routing:start/);
+  assert.doesNotMatch(agentsText, /\[Example\]/);
+  assert.equal(
+    fs.readFileSync(path.join(projectDirectory, "AGENTS__non-obvious.md"), "utf8"),
+    "Launcher default-game policy lives in Promotions, not Games.\n"
+  );
+
+  const capturedValidateOutput = captureCommandWriters();
+  const validateStatusCode = await runCommandLine(["node", "vasir", "agents", "validate", "--json"], {
+    currentWorkingDirectory: projectDirectory,
+    ...capturedValidateOutput
+  });
+
+  assert.equal(validateStatusCode, 0);
+});
+
+test("agents sync creates an empty non-obvious source file from generated placeholder text", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "AGENTS.md"),
+    `# AGENTS.md: generated Root Manifest
+
+# 4. Non-Obvious Architectural Considerations
+
+<non-obvious_architectural_considerations>
+  Do not attempt to "fix," optimize, flatten, migrate, or replace these patterns unless you have verified why they exist and the approved plan names the change.
+
+  <!-- vasir:nonobvious:start -->
+  None recorded yet.
+  <!-- vasir:nonobvious:end -->
+</non-obvious_architectural_considerations>
+`
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.nonobviousSource, "created-empty-file");
+  assert.equal(parsedOutput.wroteNonobviousFile, true);
+  assert.equal(
+    fs.readFileSync(path.join(projectDirectory, "AGENTS__non-obvious.md"), "utf8"),
+    "None recorded yet.\n"
+  );
+
+  const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  assert.doesNotMatch(agentsText, /Do not attempt to "fix,[\s\S]*Do not attempt to "fix,/);
+});
+
+test("agents sync migrates the old .agents/non-obvious.md source file to the root sidecar", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, ".agents", "non-obvious.md"),
+    "Legacy source must move out of the installed skill directory.\n"
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.nonobviousSource, "migrated-from-legacy-file");
+  assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "AGENTS__non-obvious.md"));
+  assert.equal(parsedOutput.legacyNonobviousFilePath, path.join(projectDirectory, ".agents", "non-obvious.md"));
+  assert.equal(parsedOutput.wroteNonobviousFile, true);
+  assert.equal(parsedOutput.removedLegacyNonobviousFile, true);
+  assert.equal(
+    fs.readFileSync(path.join(projectDirectory, "AGENTS__non-obvious.md"), "utf8"),
+    "Legacy source must move out of the installed skill directory.\n"
+  );
+  assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "non-obvious.md")));
+
+  const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  assert.match(agentsText, /Legacy source must move out of the installed skill directory\./);
+});
+
+test("agents sync uses AGENTS__non-obvious.md as the source over generated AGENTS text", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.jsx"), "export function Button() { return null; }\n");
+  writeFile(
+    path.join(projectDirectory, "AGENTS__non-obvious.md"),
+    "Production auth state is owned by AppShell; route components may only consume it.\n"
+  );
+  writeFile(
+    path.join(projectDirectory, "AGENTS.md"),
+    `# 0. Old Generated Manifest
+<!-- vasir:profile:frontend -->
+
+# 4. Non-Obvious Architectural Considerations
+
+<non-obvious_architectural_considerations>
+<!-- vasir:nonobvious:start -->
+Old generated block that should be replaced.
+<!-- vasir:nonobvious:end -->
+</non-obvious_architectural_considerations>
+`
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "agents");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.subcommand, "sync");
+  assert.equal(parsedOutput.nonobviousSource, "file");
+  assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "AGENTS__non-obvious.md"));
+  assert.equal(parsedOutput.wroteNonobviousFile, false);
+
+  const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  assert.match(agentsText, /Production auth state is owned by AppShell/);
+  assert.doesNotMatch(agentsText, /Old generated block that should be replaced/);
+});
+
+test("agents sync dry-run previews AGENTS reconciliation without writing", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "components", "Button.jsx"), "export function Button() { return null; }\n");
+  writeFile(path.join(homeDirectory, ".agents", "vasir", ".DS_Store"), "dirty global cache artifact\n");
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--dry-run", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "agents");
+  assert.equal(parsedOutput.subcommand, "sync");
+  assert.equal(parsedOutput.dryRun, true);
+  assert.equal(parsedOutput.changed, true);
+  assert.equal(parsedOutput.wroteAgentsFile, false);
+  assert.equal(parsedOutput.nonobviousSource, "would-create-empty-file");
+  assert.equal(parsedOutput.wroteNonobviousFile, false);
+  assert.equal(parsedOutput.wouldWriteNonobviousFile, true);
+  assert.equal(parsedOutput.mode, "created");
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS__non-obvious.md")));
 });
 
 test("agents validate fails closed on leftover scaffold markers and passes once the file is clean", async () => {

@@ -343,7 +343,7 @@ function inspectProjectSurface({
     : [];
   const configuredSkillNames =
     projectConfig?.tracking?.mode === "all"
-      ? registry?.skills.map((skillEntry) => skillEntry.name) ?? []
+      ? registry?.skills.map((skillEntry) => skillEntry.name) ?? managedSkillNames
       : projectConfig?.tracking?.mode === "selected"
         ? [...projectConfig.tracking.skillNames]
         : managedSkillNames;
@@ -1360,6 +1360,7 @@ Usage:
   vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>] Copy skills into the current repo root at .agents/skills
   vasir adopt [--json] [--repo-root <path>]        Bring an existing .agents/skills tree under Vasir management without copying files
   vasir remove <skill> [skill...] [--json] [--repo-root <path>] Remove project-local skills from the current repo root
+  vasir agents sync [profile] [--json] [--dry-run] [--repo-root <path>] Reconcile AGENTS.md from the canonical template and AGENTS__non-obvious.md
   vasir agents init <profile> [--json] [--replace] [--repo-root <path>] Write AGENTS.md from the canonical template plus a stack snippet
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
@@ -1381,14 +1382,16 @@ Notes:
   diff is the review command: it shows the exact tracked skill files that would change before you run update.
   init outside a repo mutates only the global catalog under ~/.agents/vasir.
   init inside a repo installs the full catalog into that repo and marks it for full-catalog updates.
+  init/update automatically quarantine dirty global cache contents to ~/.agents/vasir.dirty-backup.<timestamp> before rebuilding.
   update mutates the global catalog under ~/.agents/vasir and refreshes the skills tracked by the current repo.
-  update --dry-run shows the global refresh and repo-local skill changes without mutating either location.
+  update --dry-run shows the global refresh, dirty-cache quarantine, and repo-local skill changes without mutating either location.
   add mutates only the current repo root (nearest parent with .git, or the current directory if none exists).
   adopt never copies or overwrites skill files; it snapshots the existing .agents/skills tree into .agents/vasir.json and .agents/vasir-install-state.json.
   Pass --repo-root <path> to target an explicit repo root, including monorepo subprojects.
   Use "vasir add all" to install every catalog skill into the current repo.
   add auto-initializes the global catalog if needed.
   add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios overrides profile inference.
+  agents sync is the one-command AGENTS path: it infers or accepts a profile, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
   agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
@@ -1641,27 +1644,36 @@ async function runInit({
   if (!repoTargeted) {
     if (!jsonOutput) {
       const ui = createCommandUi({ stream: outputStream });
+      const renderedLines = [
+        ui.formatStatusLine({
+          kind: "ok",
+          text: "Global catalog ready"
+        }),
+        ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
+      ];
+      if (catalogState.quarantinedCatalogDirectory) {
+        renderedLines.push(
+          ui.formatField("quarantined", ui.formatPath(catalogState.quarantinedCatalogDirectory))
+        );
+      }
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "Repo setup",
+          detail: "Run `vasir init` inside a repo to install and track the full catalog there."
+        })
+      );
       stdoutWriter(
         ui.renderPanel({
           title: "Init",
-          lines: [
-            ui.formatStatusLine({
-              kind: "ok",
-              text: "Global catalog ready"
-            }),
-            ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory)),
-            ui.formatStatusLine({
-              kind: "info",
-              text: "Repo setup",
-              detail: "Run `vasir init` inside a repo to install and track the full catalog there."
-            })
-          ]
+          lines: renderedLines
         })
       );
     }
 
     return {
       globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+      quarantinedGlobalCatalogDirectory: catalogState.quarantinedCatalogDirectory ?? null,
       projectInitialized: false,
       projectConfigFilePath: resolvedProjectPaths.projectConfigFilePath,
       trackingMode: null
@@ -1778,6 +1790,14 @@ async function runInit({
       })
     ];
 
+    if (catalogState.quarantinedCatalogDirectory) {
+      renderedLines.splice(
+        2,
+        0,
+        ui.formatField("quarantined", ui.formatPath(catalogState.quarantinedCatalogDirectory))
+      );
+    }
+
     for (const installedSkillName of installedSkills) {
       renderedLines.push(
         ui.formatStatusLine({
@@ -1855,6 +1875,7 @@ async function runInit({
 
   return {
     globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    quarantinedGlobalCatalogDirectory: catalogState.quarantinedCatalogDirectory ?? null,
     projectInitialized,
     projectRootDirectory: managedProjectSkills.projectPaths.projectRootDirectory,
     projectConfigFilePath: managedProjectSkills.projectPaths.projectConfigFilePath,
@@ -2204,7 +2225,7 @@ function runStatus({
       : globalState.globalCatalogStatus === "outdated"
         ? "Run `vasir update` to refresh the global catalog cache to the installed Vasir version."
         : globalState.globalCatalogStatus === "error"
-          ? "Fix the reported global catalog problem first, then rerun `vasir status` or `vasir doctor`."
+          ? "Run `vasir init` or `vasir update` to let Vasir quarantine the dirty global cache and rebuild it."
           : null,
     ...projectState.nextSteps
   ].filter(Boolean));
@@ -2801,7 +2822,7 @@ function runDoctor({
       : globalState.globalCatalogStatus === "outdated"
         ? "Run `vasir update` to refresh the global catalog cache."
         : globalState.globalCatalogStatus === "error"
-          ? "Repair the global catalog cache under `~/.agents/vasir`, then rerun `vasir doctor`."
+          ? "Run `vasir init` or `vasir update` to let Vasir quarantine the dirty global cache and rebuild it."
           : null,
     ...projectState.nextSteps,
     projectState.syncPlan?.blockedSkillPlans.length
@@ -3228,7 +3249,8 @@ function runUpdate({
         homeDirectory,
         repositoryUrl,
         platform,
-        spawnSyncImplementation
+        spawnSyncImplementation,
+        allowDirty: true
       })
     : null;
   const synchronizedCatalog = dryRunRequested
@@ -3300,14 +3322,22 @@ function runUpdate({
     const renderedLines = [
       ui.formatStatusLine({
         kind: dryRunRequested
-          ? globalCatalogInspection.catalogState.needsSynchronization ? "info" : "ok"
+          ? globalCatalogInspection.catalogState.needsQuarantine || globalCatalogInspection.catalogState.needsSynchronization ? "info" : "ok"
           : "ok",
         text: dryRunRequested
-          ? globalCatalogInspection.catalogState.needsSynchronization ? "Global catalog would refresh" : "Global catalog already current"
+          ? globalCatalogInspection.catalogState.needsQuarantine
+            ? "Global catalog would quarantine dirty cache and refresh"
+            : globalCatalogInspection.catalogState.needsSynchronization ? "Global catalog would refresh" : "Global catalog already current"
           : "Global catalog updated"
       }),
       ui.formatField("path", ui.formatPath(globalPaths.globalCatalogDirectory))
     ];
+
+    if (!dryRunRequested && catalogState.quarantinedCatalogDirectory) {
+      renderedLines.push(
+        ui.formatField("quarantined", ui.formatPath(catalogState.quarantinedCatalogDirectory))
+      );
+    }
 
     if (syncPlan.planEntries.length > 0) {
       renderedLines.push(
@@ -3378,6 +3408,12 @@ function runUpdate({
   return {
     dryRun: dryRunRequested,
     globalCatalogDirectory: globalPaths.globalCatalogDirectory,
+    quarantinedGlobalCatalogDirectory: dryRunRequested
+      ? null
+      : catalogState.quarantinedCatalogDirectory ?? null,
+    wouldQuarantineGlobalCatalog: dryRunRequested
+      ? Boolean(globalCatalogInspection.catalogState.needsQuarantine)
+      : false,
     projectRootDirectory: managedProjectSkills.projectPaths.projectRootDirectory,
     projectConfigFilePath: managedProjectSkills.projectPaths.projectConfigFilePath,
     projectSkillsDirectory: managedProjectSkills.projectPaths.projectSkillsDirectory,
@@ -3393,7 +3429,9 @@ function runUpdate({
       code: planEntry.error.code
     })),
     globalCatalogStatus: dryRunRequested
-      ? globalCatalogInspection.catalogState.needsSynchronization ? "would-sync" : "current"
+      ? globalCatalogInspection.catalogState.needsQuarantine
+        ? "would-quarantine-and-sync"
+        : globalCatalogInspection.catalogState.needsSynchronization ? "would-sync" : "current"
       : "updated"
   };
 }
@@ -3917,11 +3955,14 @@ async function runSelectedCommand({
     });
   }
 
-  if (dryRunRequested && commandName !== "update") {
+  if (
+    dryRunRequested &&
+    !(commandName === "update" || (commandName === "agents" && commandArguments[0] === "sync"))
+  ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--dry-run is only supported by `vasir update`.",
-      suggestion: "Use `vasir update --dry-run` when you want to preview repo-local refreshes without mutating files.",
+      message: "--dry-run is only supported by `vasir update` and `vasir agents sync`.",
+      suggestion: "Use `vasir update --dry-run` for skill refresh previews, or `vasir agents sync --dry-run` for AGENTS.md previews.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }
@@ -4117,6 +4158,7 @@ async function runSelectedCommand({
       agentsArguments: commandArguments,
       replaceExistingAgentsFile: replaceExistingSkills,
       writeGeneratedOutput,
+      dryRunRequested,
       modelArguments,
       homeDirectory,
       currentWorkingDirectory,

@@ -27,12 +27,10 @@ Rules:
 
 Fastest path:
 
-1. Run `vasir add <skill>`. Vasir now seeds `AGENTS.md` automatically, and `--agents-profile backend|frontend|ios` is the override when you want to force a stronger starter.
-2. If you only want the AGENTS starter, run `vasir agents init backend|frontend|ios`.
-3. Open the generated repo-root `AGENTS.md`.
-4. Rewrite the `Purpose` block and replace the Section 1 routing examples, or run `vasir agents draft-purpose --write --model openai` plus `vasir agents draft-routing --write`.
-5. Create any scoped `AGENTS.md` files that Section 1 points at, or collapse those rules back into the root file.
-6. Finish with `vasir agents validate`.
+1. Run `vasir agents sync`. It infers the profile, renders the current canonical template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result.
+2. Use `vasir agents sync frontend|backend|ios` when inference needs an explicit profile.
+3. Use `vasir agents sync --dry-run` to preview without writing.
+4. Run `vasir add <skill>` or `vasir update` separately when the repo-local skill catalog itself needs to change.
 
 If you want to edit the source templates directly, use the table below and stop there.
 
@@ -48,9 +46,8 @@ If you want to edit the source templates directly, use the table below and stop 
 
 ## Recommended Workflow
 
-1. Pick the closest profile with `vasir agents init backend|frontend|ios`.
-2. Let Vasir compose [AGENTS.md](./AGENTS.md) with the matching snippet.
-3. Replace placeholders with verified repo truth.
-4. Delete any line that is not true in that repo.
-5. Only edit the shared [AGENTS.md](./AGENTS.md) when the section structure itself should change.
-6. Edit the matching snippet only when the stack-specific doctrine should change.
+1. Run `vasir agents sync --dry-run`.
+2. Run `vasir agents sync` when the preview is right.
+3. Add repo-specific landmines in `AGENTS__non-obvious.md`.
+4. Only edit the shared [AGENTS.md](./AGENTS.md) when the section structure itself should change.
+5. Edit the matching snippet only when the stack-specific doctrine should change.

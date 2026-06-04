@@ -79,6 +79,7 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   );
   assert.match(helpResult.stdout, /vasir adopt \[--json\]/);
   assert.match(helpResult.stdout, /vasir remove <skill> \[skill...\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir agents sync \[profile\] \[--json\] \[--dry-run\]/);
   assert.match(helpResult.stdout, /vasir agents init <profile> \[--json\] \[--replace\]/);
   assert.match(helpResult.stdout, /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
   assert.match(helpResult.stdout, /vasir agents draft-routing \[--json\] \[--write\]/);

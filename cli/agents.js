@@ -4,7 +4,7 @@ import process from "node:process";
 
 import { VasirCliError } from "./cli-error.js";
 import { AGENTS_REFERENCE_DOCS_REF } from "./docs-ref.js";
-import { readGlobalRegistry } from "./global-catalog.js";
+import { readCatalogSourceRegistry, readGlobalRegistry } from "./global-catalog.js";
 import { buildProjectPaths } from "./path-layout.js";
 import { createCommandUi } from "./ui/command-output.js";
 import { interactiveSelect } from "./ui/interactive-select.js";
@@ -17,9 +17,15 @@ const PURPOSE_START_MARKER = "<!-- vasir:purpose:start -->";
 const PURPOSE_END_MARKER = "<!-- vasir:purpose:end -->";
 const ROUTING_START_MARKER = "<!-- vasir:routing:start -->";
 const ROUTING_END_MARKER = "<!-- vasir:routing:end -->";
+const NONOBVIOUS_START_MARKER = "<!-- vasir:nonobvious:start -->";
+const NONOBVIOUS_END_MARKER = "<!-- vasir:nonobvious:end -->";
+const NONOBVIOUS_SOURCE_RELATIVE_PATH = "AGENTS__non-obvious.md";
+const LEGACY_NONOBVIOUS_SOURCE_RELATIVE_PATH = ".agents/non-obvious.md";
 const ENGINEERING_DOCTRINE_INSERTS_START_MARKER = "<!-- vasir:engineering-doctrine-inserts:start -->";
 const ENGINEERING_DOCTRINE_INSERTS_END_MARKER = "<!-- vasir:engineering-doctrine-inserts:end -->";
 const PURPOSE_PLACEHOLDER_FRAGMENT = "Replace this block first.";
+const NONOBVIOUS_PLACEHOLDER_FRAGMENT = "[Add repo-specific landmines here.]";
+const EMPTY_NONOBVIOUS_TEXT = "None recorded yet.";
 const LAST_UPDATED_PLACEHOLDER = "[YYYY-MM-DD - update alongside major architectural PRs]";
 const DEFAULT_AGENTS_TEMPLATE = path.join("templates", "agents", "AGENTS.md");
 
@@ -271,6 +277,11 @@ function formatMarkedBlockReplacement({ blockMatch, startMarker, endMarker, repl
   return `${markerIndent}${startMarker}\n${indentedReplacement}\n${markerIndent}${endMarker}`;
 }
 
+function formatMarkedBlockFinalization({ blockMatch, replacementText }) {
+  const markerIndent = blockMatch[1] ?? "";
+  return indentBlockLines(replacementText, markerIndent);
+}
+
 function readTemplateBlock({ templateText, startMarker, endMarker, templateFilePath }) {
   const blockPattern = createMarkedBlockPattern({ startMarker, endMarker });
   const blockMatch = templateText.match(blockPattern);
@@ -287,6 +298,12 @@ function readTemplateBlock({ templateText, startMarker, endMarker, templateFileP
   return blockMatch[2];
 }
 
+function readMarkedBlockIfPresent({ agentsText, startMarker, endMarker }) {
+  const blockPattern = createMarkedBlockPattern({ startMarker, endMarker });
+  const blockMatch = agentsText.match(blockPattern);
+  return blockMatch?.[2] ?? null;
+}
+
 function toPosixPath(value) {
   return String(value ?? "").split(path.sep).join("/");
 }
@@ -294,6 +311,18 @@ function toPosixPath(value) {
 function formatDisplayPath(relativePath) {
   const normalizedPath = toPosixPath(relativePath).replace(/^\/+/, "").replace(/\/+$/, "");
   return normalizedPath.length === 0 ? "/" : `/${normalizedPath}/`;
+}
+
+function buildProjectRelativeFilePath(projectRootDirectory, relativeFilePath) {
+  return path.join(projectRootDirectory, ...relativeFilePath.split("/"));
+}
+
+function buildNonobviousSourceFilePath(projectRootDirectory) {
+  return buildProjectRelativeFilePath(projectRootDirectory, NONOBVIOUS_SOURCE_RELATIVE_PATH);
+}
+
+function buildLegacyNonobviousSourceFilePath(projectRootDirectory) {
+  return buildProjectRelativeFilePath(projectRootDirectory, LEGACY_NONOBVIOUS_SOURCE_RELATIVE_PATH);
 }
 
 function sanitizePathToken(token) {
@@ -438,6 +467,14 @@ function resolveAgentsTemplate(profileName) {
   }
 
   const normalizedProfileName = profileName.toLowerCase();
+  if (normalizedProfileName === "generic") {
+    return {
+      profile: "generic",
+      templateRelativePath: DEFAULT_AGENTS_TEMPLATE,
+      snippetRelativePath: null
+    };
+  }
+
   const snippetRelativePath = AGENTS_PROFILE_SNIPPETS[normalizedProfileName];
   if (!snippetRelativePath) {
     throw new VasirCliError({
@@ -780,6 +817,221 @@ function renderAgentsTemplate({
   });
 }
 
+function removeScaffoldEditBlock(agentsText) {
+  return agentsText.replace(
+    /^> EDIT THESE FIRST\r?\n(?:> .*\r?\n)+\r?\n?/m,
+    ""
+  );
+}
+
+function finalizeMarkedBlock({ agentsText, startMarker, endMarker, replacementText }) {
+  const blockPattern = createMarkedBlockPattern({ startMarker, endMarker });
+  const blockMatch = agentsText.match(blockPattern);
+
+  if (!blockMatch) {
+    throw new VasirCliError({
+      code: "AGENTS_TEMPLATE_BLOCK_MISSING",
+      message: `AGENTS template block is missing ${startMarker}`,
+      suggestion: "Restore the Vasir template markers in the source template, then rerun `vasir agents sync`.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  return agentsText.replace(
+    blockPattern,
+    () => formatMarkedBlockFinalization({
+      blockMatch,
+      replacementText
+    })
+  );
+}
+
+function isPurposePlaceholderText(purposeText) {
+  return (
+    purposeText.includes(PURPOSE_PLACEHOLDER_FRAGMENT) ||
+    purposeText.includes("[Describe this ")
+  );
+}
+
+function extractExistingPurposeText(agentsText) {
+  if (!agentsText) {
+    return null;
+  }
+
+  const markedPurposeText = readMarkedBlockIfPresent({
+    agentsText,
+    startMarker: PURPOSE_START_MARKER,
+    endMarker: PURPOSE_END_MARKER
+  });
+  const markedPurposeMatch = markedPurposeText?.match(/^\s*\*\*Purpose:\*\*\s*(.+)$/m);
+  if (markedPurposeMatch && !isPurposePlaceholderText(markedPurposeMatch[1])) {
+    return normalizeInlineText(markedPurposeMatch[1]);
+  }
+
+  const purposeLineMatch = agentsText.match(/^\*\*Purpose:\*\*\s*(.+)$/m);
+  if (purposeLineMatch && !isPurposePlaceholderText(purposeLineMatch[1])) {
+    return normalizeInlineText(purposeLineMatch[1]);
+  }
+
+  return null;
+}
+
+function readFirstReadmeSentence(readmeExcerpt) {
+  const normalizedReadmeText = normalizeInlineText(readmeExcerpt ?? "");
+  if (normalizedReadmeText.length === 0) {
+    return null;
+  }
+
+  const sentenceMatch = normalizedReadmeText.match(/^(.+?[.!?])(?:\s|$)/);
+  return normalizeInlineText(sentenceMatch?.[1] ?? normalizedReadmeText.slice(0, 220));
+}
+
+function createLocalPurposeDraft({ repositoryContext, profileName }) {
+  const projectName = repositoryContext.projectName || "This repository";
+  const packageDescription = normalizeInlineText(repositoryContext.packageJson?.description ?? "");
+  const readmeSentence = readFirstReadmeSentence(repositoryContext.readmeExcerpt);
+  const sourceDescription = packageDescription || readmeSentence;
+  const openingSentence = sourceDescription
+    ? `${projectName}: ${sourceDescription.replace(/[.!?]+$/, "")}.`
+    : `${projectName} is a ${profileName === "generic" ? "software" : profileName} repository.`;
+
+  const profileGuidance = {
+    backend: {
+      correctness: "Correctness means requests, jobs, persistence, retries, and failure behavior match the real production contract.",
+      optimization: "Agents should optimize for clear authority boundaries, observable failure paths, deterministic tests, and production-shaped integrations."
+    },
+    frontend: {
+      correctness: "Correctness means the primary screens render, route, fetch, mutate, and recover from failure in the real app environment.",
+      optimization: "Agents should optimize for visible user journeys, stable state and data flow, accessible controls, and rendered proof."
+    },
+    ios: {
+      correctness: "Correctness means app lifecycle, navigation, native UI, networking, and local state behave correctly on the target runtime.",
+      optimization: "Agents should optimize for native user journeys, explicit lifecycle boundaries, resilient sync, and device-backed proof."
+    },
+    generic: {
+      correctness: "Correctness means the repository's core workflows run through their real entrypoints and fail in predictable, observable ways.",
+      optimization: "Agents should optimize for production-shaped changes, explicit ownership, narrow scope, and proof through the real value path."
+    }
+  };
+  const guidance = profileGuidance[profileName] ?? profileGuidance.generic;
+
+  return `${openingSentence} ${guidance.correctness} ${guidance.optimization}`;
+}
+
+function extractXmlTagBlockText({ agentsText, tagName }) {
+  const tagPattern = new RegExp(
+    `<${escapeRegExp(tagName)}>\\s*\\r?\\n([\\s\\S]*?)\\r?\\n\\s*</${escapeRegExp(tagName)}>`,
+    "i"
+  );
+  const tagMatch = agentsText.match(tagPattern);
+  return tagMatch?.[1] ?? null;
+}
+
+function isNonobviousPlaceholderText(nonobviousText) {
+  const normalizedNonobviousText = normalizeInlineText(nonobviousText);
+  return (
+    normalizedNonobviousText.length === 0 ||
+    normalizedNonobviousText === normalizeInlineText(EMPTY_NONOBVIOUS_TEXT) ||
+    nonobviousText.includes(NONOBVIOUS_PLACEHOLDER_FRAGMENT)
+  );
+}
+
+function extractExistingNonobviousText(agentsText) {
+  if (!agentsText) {
+    return null;
+  }
+
+  const markedNonobviousText = readMarkedBlockIfPresent({
+    agentsText,
+    startMarker: NONOBVIOUS_START_MARKER,
+    endMarker: NONOBVIOUS_END_MARKER
+  });
+  if (markedNonobviousText !== null) {
+    return isNonobviousPlaceholderText(markedNonobviousText) ? null : markedNonobviousText.trim();
+  }
+
+  const taggedNonobviousText = extractXmlTagBlockText({
+    agentsText,
+    tagName: "non-obvious_architectural_considerations"
+  });
+  if (taggedNonobviousText && !isNonobviousPlaceholderText(taggedNonobviousText)) {
+    return taggedNonobviousText.trim();
+  }
+
+  return null;
+}
+
+function resolveNonobviousContext({
+  projectRootDirectory,
+  existingAgentsText,
+  dryRun
+}) {
+  const nonobviousFilePath = buildNonobviousSourceFilePath(projectRootDirectory);
+  const legacyNonobviousFilePath = buildLegacyNonobviousSourceFilePath(projectRootDirectory);
+
+  if (fs.existsSync(nonobviousFilePath)) {
+    const sourceText = fs.readFileSync(nonobviousFilePath, "utf8").trim();
+    return {
+      nonobviousFilePath,
+      nonobviousText: isNonobviousPlaceholderText(sourceText) ? EMPTY_NONOBVIOUS_TEXT : sourceText,
+      nonobviousSource: isNonobviousPlaceholderText(sourceText) ? "empty-file" : "file",
+      pendingNonobviousFileText: null,
+      legacyNonobviousFilePath: null,
+      wroteNonobviousFile: false,
+      wouldWriteNonobviousFile: false,
+      removedLegacyNonobviousFile: false,
+      wouldRemoveLegacyNonobviousFile: false
+    };
+  }
+
+  if (fs.existsSync(legacyNonobviousFilePath)) {
+    const legacySourceText = fs.readFileSync(legacyNonobviousFilePath, "utf8").trim();
+    return {
+      nonobviousFilePath,
+      nonobviousText: isNonobviousPlaceholderText(legacySourceText) ? EMPTY_NONOBVIOUS_TEXT : legacySourceText,
+      nonobviousSource: dryRun ? "would-migrate-from-legacy-file" : "migrated-from-legacy-file",
+      pendingNonobviousFileText: isNonobviousPlaceholderText(legacySourceText) ? EMPTY_NONOBVIOUS_TEXT : legacySourceText,
+      legacyNonobviousFilePath,
+      wroteNonobviousFile: !dryRun,
+      wouldWriteNonobviousFile: dryRun,
+      removedLegacyNonobviousFile: !dryRun,
+      wouldRemoveLegacyNonobviousFile: dryRun
+    };
+  }
+
+  const legacyNonobviousText = extractExistingNonobviousText(existingAgentsText);
+  if (legacyNonobviousText) {
+    return {
+      nonobviousFilePath,
+      nonobviousText: legacyNonobviousText,
+      nonobviousSource: dryRun ? "would-migrate-from-agents" : "migrated-from-agents",
+      pendingNonobviousFileText: legacyNonobviousText,
+      legacyNonobviousFilePath: null,
+      wroteNonobviousFile: !dryRun,
+      wouldWriteNonobviousFile: dryRun,
+      removedLegacyNonobviousFile: false,
+      wouldRemoveLegacyNonobviousFile: false
+    };
+  }
+
+  return {
+    nonobviousFilePath,
+    nonobviousText: EMPTY_NONOBVIOUS_TEXT,
+    nonobviousSource: dryRun ? "would-create-empty-file" : "created-empty-file",
+    pendingNonobviousFileText: EMPTY_NONOBVIOUS_TEXT,
+    legacyNonobviousFilePath: null,
+    wroteNonobviousFile: !dryRun,
+    wouldWriteNonobviousFile: dryRun,
+    removedLegacyNonobviousFile: false,
+    wouldRemoveLegacyNonobviousFile: false
+  };
+}
+
+function writeNonobviousSourceFile({ nonobviousFilePath, nonobviousText }) {
+  fs.mkdirSync(path.dirname(nonobviousFilePath), { recursive: true });
+  fs.writeFileSync(nonobviousFilePath, `${nonobviousText.trim()}\n`);
+}
+
 function createAgentsTemplateMissingError(templateFilePath) {
   return new VasirCliError({
     code: "AGENTS_TEMPLATE_MISSING",
@@ -849,11 +1101,15 @@ function findAgentsPathValidationIssues({ agentsText, projectRootDirectory }) {
 
   for (const [lineIndex, lineText] of agentsText.split(/\r?\n/).entries()) {
     const trimmedLine = lineText.trim();
-    if (trimmedLine.startsWith("## ")) {
-      inRoutingSection = trimmedLine.startsWith("## 1. Topography & Routing Protocol");
+    if (/^#{1,6}\s+/.test(trimmedLine)) {
+      inRoutingSection = /^#{1,6}\s+1\.\s+Topography & Routing Protocol/.test(trimmedLine);
     }
 
     if (trimmedLine.length === 0) {
+      continue;
+    }
+
+    if (!inRoutingSection) {
       continue;
     }
 
@@ -968,6 +1224,18 @@ function findRoutingLanes({ projectRootDirectory, profileHint }) {
   return sortedLanes;
 }
 
+function formatRoutingLineForLane({ lane, requiresScopedAgentsFile = true }) {
+  if (lane.coldStorage) {
+    return `* **${lane.label}:** Do not read \`${lane.displayPath}\` unless explicitly instructed by the user.`;
+  }
+
+  const contextInstruction = requiresScopedAgentsFile
+    ? "you must first read that directory's local `AGENTS.md`"
+    : "use this root `AGENTS.md`";
+
+  return `* **${lane.label}:** If touching \`${lane.displayPath}\`, ${contextInstruction} ${lane.detail}`;
+}
+
 function formatRoutingLines({ projectRootDirectory, agentsText }) {
   const profileHint = readAgentsProfileHint(agentsText);
   const inferredProfile = inferAgentsProfile({
@@ -985,12 +1253,34 @@ function formatRoutingLines({ projectRootDirectory, agentsText }) {
 
   return {
     effectiveProfileHint,
-    routingLines: lanes.map((lane) => {
+    lanes,
+    routingLines: lanes.map((lane) => formatRoutingLineForLane({
+      lane,
+      requiresScopedAgentsFile: true
+    }))
+  };
+}
+
+function formatSynchronizedRoutingLines({ projectRootDirectory, agentsText }) {
+  const routingDraft = formatRoutingLines({
+    projectRootDirectory,
+    agentsText
+  });
+
+  return {
+    ...routingDraft,
+    routingLines: routingDraft.lanes.map((lane) => {
       if (lane.coldStorage) {
-        return `* **${lane.label}:** Do not read \`${lane.displayPath}\` unless explicitly instructed by the user.`;
+        return formatRoutingLineForLane({
+          lane,
+          requiresScopedAgentsFile: true
+        });
       }
 
-      return `* **${lane.label}:** If touching \`${lane.displayPath}\`, you must first read that directory's local \`AGENTS.md\` ${lane.detail}`;
+      return formatRoutingLineForLane({
+        lane,
+        requiresScopedAgentsFile: fs.existsSync(path.join(projectRootDirectory, lane.relativePath, "AGENTS.md"))
+      });
     })
   };
 }
@@ -1065,17 +1355,189 @@ export function validateProjectAgentsFile({ projectRootDirectory }) {
   }
 
   const agentsText = fs.readFileSync(agentsFilePath, "utf8");
-  const issues = [
+  const issues = validateAgentsText({
+    agentsText,
+    projectRootDirectory
+  });
+
+  return {
+    agentsFilePath,
+    issues
+  };
+}
+
+function validateAgentsText({ agentsText, projectRootDirectory }) {
+  return [
     ...findAgentsValidationIssues(agentsText),
     ...findAgentsPathValidationIssues({
       agentsText,
       projectRootDirectory
     })
   ];
+}
+
+function renderSynchronizedAgentsText({
+  globalCatalogDirectory,
+  projectRootDirectory,
+  existingAgentsText,
+  profileName = null,
+  nonobviousText = EMPTY_NONOBVIOUS_TEXT,
+  currentDate = new Date().toISOString().slice(0, 10)
+}) {
+  const existingProfileName = existingAgentsText ? readAgentsProfileHint(existingAgentsText) : null;
+  const inspectedProfileRecommendation = inspectRecommendedAgentsProfile({
+    projectRootDirectory,
+    agentsText: existingAgentsText ?? ""
+  });
+  const requestedProfileName =
+    profileName ??
+    (existingProfileName && existingProfileName !== "generic" ? existingProfileName : null) ??
+    inspectedProfileRecommendation.recommendation.profileName ??
+    null;
+  const resolvedTemplate = resolveAgentsTemplate(requestedProfileName);
+  const templateFilePath = path.join(globalCatalogDirectory, resolvedTemplate.templateRelativePath);
+  if (!fs.existsSync(templateFilePath)) {
+    throw createAgentsTemplateMissingError(templateFilePath);
+  }
+
+  const snippetFilePath = resolvedTemplate.snippetRelativePath
+    ? path.join(globalCatalogDirectory, resolvedTemplate.snippetRelativePath)
+    : null;
+  if (snippetFilePath && !fs.existsSync(snippetFilePath)) {
+    throw createAgentsTemplateMissingError(snippetFilePath);
+  }
+
+  const repositoryContext = inspectRepositoryContext({
+    projectRootDirectory,
+    agentsText: existingAgentsText ?? ""
+  });
+  const purposeText = extractExistingPurposeText(existingAgentsText) ?? createLocalPurposeDraft({
+    repositoryContext,
+    profileName: resolvedTemplate.profile
+  });
+  const purposeSource = extractExistingPurposeText(existingAgentsText) ? "preserved" : "generated";
+
+  const renderedTemplate = renderAgentsTemplate({
+    templateText: fs.readFileSync(templateFilePath, "utf8"),
+    profileSnippetText: snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null,
+    projectName: repositoryContext.projectName,
+    currentDate,
+    profile: resolvedTemplate.profile,
+    templateFilePath,
+    snippetFilePath
+  });
+  const synchronizedRouting = formatSynchronizedRoutingLines({
+    projectRootDirectory,
+    agentsText: existingAgentsText ?? renderedTemplate
+  });
+
+  let synchronizedAgentsText = removeScaffoldEditBlock(renderedTemplate);
+  synchronizedAgentsText = finalizeMarkedBlock({
+    agentsText: synchronizedAgentsText,
+    startMarker: PURPOSE_START_MARKER,
+    endMarker: PURPOSE_END_MARKER,
+    replacementText: `**Purpose:** ${purposeText}`
+  });
+  synchronizedAgentsText = finalizeMarkedBlock({
+    agentsText: synchronizedAgentsText,
+    startMarker: ROUTING_START_MARKER,
+    endMarker: ROUTING_END_MARKER,
+    replacementText: synchronizedRouting.routingLines.join("\n")
+  });
+  synchronizedAgentsText = replaceTemplateBlock({
+    templateText: synchronizedAgentsText,
+    startMarker: NONOBVIOUS_START_MARKER,
+    endMarker: NONOBVIOUS_END_MARKER,
+    replacementText: nonobviousText,
+    templateFilePath
+  });
+
+  return {
+    synchronizedAgentsText,
+    profile: resolvedTemplate.profile,
+    profileSource: profileName
+      ? "argument"
+      : existingProfileName && existingProfileName !== "generic"
+        ? "existing"
+        : inspectedProfileRecommendation.recommendation.profileName
+          ? inspectedProfileRecommendation.recommendation.source
+          : "default-generic",
+    purposeSource,
+    routingProfile: synchronizedRouting.effectiveProfileHint,
+    routingLines: synchronizedRouting.routingLines
+  };
+}
+
+export function synchronizeProjectAgentsFile({
+  globalCatalogDirectory,
+  projectRootDirectory,
+  profileName = null,
+  dryRun = false
+}) {
+  const agentsFilePath = path.join(projectRootDirectory, "AGENTS.md");
+  const agentsFileExists = fs.existsSync(agentsFilePath);
+  const existingAgentsText = agentsFileExists ? fs.readFileSync(agentsFilePath, "utf8") : null;
+  const nonobviousContext = resolveNonobviousContext({
+    projectRootDirectory,
+    existingAgentsText,
+    dryRun
+  });
+  const synchronizedAgents = renderSynchronizedAgentsText({
+    globalCatalogDirectory,
+    projectRootDirectory,
+    existingAgentsText,
+    profileName,
+    nonobviousText: nonobviousContext.nonobviousText
+  });
+  const validationIssues = validateAgentsText({
+    agentsText: synchronizedAgents.synchronizedAgentsText,
+    projectRootDirectory
+  });
+
+  if (validationIssues.length > 0) {
+    throw createAgentsValidationError({
+      agentsFilePath,
+      issues: validationIssues
+    });
+  }
+
+  const agentsFileChanged = existingAgentsText !== synchronizedAgents.synchronizedAgentsText;
+  const changed = agentsFileChanged || Boolean(nonobviousContext.pendingNonobviousFileText);
+  if (nonobviousContext.pendingNonobviousFileText && !dryRun) {
+    writeNonobviousSourceFile({
+      nonobviousFilePath: nonobviousContext.nonobviousFilePath,
+      nonobviousText: nonobviousContext.pendingNonobviousFileText
+    });
+    if (
+      nonobviousContext.legacyNonobviousFilePath &&
+      fs.existsSync(nonobviousContext.legacyNonobviousFilePath)
+    ) {
+      fs.unlinkSync(nonobviousContext.legacyNonobviousFilePath);
+    }
+  }
+  if (agentsFileChanged && !dryRun) {
+    fs.writeFileSync(agentsFilePath, synchronizedAgents.synchronizedAgentsText);
+  }
 
   return {
     agentsFilePath,
-    issues
+    mode: !agentsFileExists ? "created" : agentsFileChanged ? "refreshed" : changed ? "refreshed" : "unchanged",
+    changed,
+    wroteAgentsFile: agentsFileChanged && !dryRun,
+    dryRun,
+    profile: synchronizedAgents.profile,
+    profileSource: synchronizedAgents.profileSource,
+    purposeSource: synchronizedAgents.purposeSource,
+    nonobviousSource: nonobviousContext.nonobviousSource,
+    nonobviousFilePath: nonobviousContext.nonobviousFilePath,
+    wroteNonobviousFile: nonobviousContext.wroteNonobviousFile,
+    wouldWriteNonobviousFile: nonobviousContext.wouldWriteNonobviousFile,
+    legacyNonobviousFilePath: nonobviousContext.legacyNonobviousFilePath,
+    removedLegacyNonobviousFile: nonobviousContext.removedLegacyNonobviousFile,
+    wouldRemoveLegacyNonobviousFile: nonobviousContext.wouldRemoveLegacyNonobviousFile,
+    routingProfile: synchronizedAgents.routingProfile,
+    routingLines: synchronizedAgents.routingLines,
+    issues: []
   };
 }
 
@@ -1231,6 +1693,7 @@ export async function runAgents({
   agentsArguments,
   replaceExistingAgentsFile = false,
   writeGeneratedOutput = false,
+  dryRunRequested = false,
   modelArguments = [],
   homeDirectory,
   currentWorkingDirectory = process.cwd(),
@@ -1251,19 +1714,103 @@ export async function runAgents({
       code: "AGENTS_SUBCOMMAND_REQUIRED",
       message: "An AGENTS subcommand is required.",
       suggestion:
-        "Use `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
+        "Use `vasir agents sync`, `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
 
-  if (!["init", "draft-purpose", "draft-routing", "validate"].includes(agentsSubcommand)) {
+  if (!["sync", "init", "draft-purpose", "draft-routing", "validate"].includes(agentsSubcommand)) {
     throw new VasirCliError({
       code: "UNKNOWN_AGENTS_SUBCOMMAND",
       message: `Unknown AGENTS subcommand: ${agentsSubcommand}`,
       suggestion:
-        "Use `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
+        "Use `vasir agents sync`, `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
+  }
+
+  if (agentsSubcommand === "sync") {
+    const requestedProfile = agentsArguments[1] ?? null;
+    if (agentsArguments.length > 2) {
+      throw new VasirCliError({
+        code: "AGENTS_SYNC_TOO_MANY_ARGUMENTS",
+        message: "`vasir agents sync` accepts at most one optional profile argument.",
+        suggestion: "Use `vasir agents sync`, `vasir agents sync frontend`, `vasir agents sync backend`, or `vasir agents sync ios`.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    if (replaceExistingAgentsFile) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "--replace is not supported by `vasir agents sync`.",
+        suggestion: "`vasir agents sync` already reconciles AGENTS.md without using an overwrite flag.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    if (writeGeneratedOutput) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "--write is not supported by `vasir agents sync`.",
+        suggestion: "`vasir agents sync` writes by default; use `--dry-run` to preview without writing.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    if (modelArguments.length > 0) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "--model is not supported by `vasir agents sync`.",
+        suggestion: "`vasir agents sync` uses deterministic local repo context instead of a model call.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    const catalogSource = readCatalogSourceRegistry({
+      repositoryUrl
+    });
+    const projectPaths = buildProjectPaths({
+      currentWorkingDirectory,
+      projectRootDirectory
+    });
+    const agentsSync = synchronizeProjectAgentsFile({
+      globalCatalogDirectory: catalogSource.sourceDirectory,
+      projectRootDirectory: projectPaths.projectRootDirectory,
+      profileName: requestedProfile,
+      dryRun: dryRunRequested
+    });
+
+    if (!jsonOutput) {
+      const ui = createCommandUi({ stream: outputStream });
+      stdoutWriter(
+        ui.renderPanel({
+          title: "Agents Sync",
+          lines: [
+            ui.formatStatusLine({
+              kind: agentsSync.changed ? dryRunRequested ? "info" : "ok" : "info",
+              text: agentsSync.changed
+                ? dryRunRequested ? "Would sync AGENTS.md" : "Synced AGENTS.md"
+                : "AGENTS.md already current"
+            }),
+            ui.formatField("path", ui.formatPath(agentsSync.agentsFilePath)),
+            ui.formatField("profile", `${agentsSync.profile} (${agentsSync.profileSource})`),
+            ui.formatField("purpose", agentsSync.purposeSource),
+            ui.formatField("routing", `${agentsSync.routingLines.length} lane${agentsSync.routingLines.length === 1 ? "" : "s"} (${agentsSync.routingProfile})`),
+            ui.formatField("non-obvious", agentsSync.nonobviousSource),
+            ui.formatField("non-obvious source", ui.formatPath(agentsSync.nonobviousFilePath)),
+            ui.formatField("validation", "passed")
+          ]
+        })
+      );
+    }
+
+    return {
+      subcommand: "sync",
+      catalogSourceDirectory: catalogSource.sourceDirectory,
+      projectRootDirectory: projectPaths.projectRootDirectory,
+      ...agentsSync
+    };
   }
 
   if (agentsSubcommand === "init") {
