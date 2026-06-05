@@ -1,4 +1,4 @@
- ---
+---
 name: plan__prepare-summary
 description: Used to summarize a workspec plan before executing
 tools: Read, Grep, Glob, Edit, Write
