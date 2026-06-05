@@ -1,6 +1,6 @@
 ---
 name: design__building-frontend-interfaces
-description: "Opinionated design-engineering skill for building, reviewing, and polishing web interfaces. Use for UI components, frontend code, forms, controls, animations, touch/mobile UX, accessibility, keyboard navigation, typography, layout, dark mode, marketing pages, docs, performance, virtualization, loading states, and visual polish."
+description: Opionioated design engineeirng guidelines. Use when building or designing frontend UIs
 ---
 
 # Polished Interface Engineering
