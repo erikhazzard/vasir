@@ -477,7 +477,7 @@
 
   AGENTS taxonomy:
   - Root `AGENTS.md`: repo-wide operating contract.
-  - Nested root `AGENTS.md`: generated app/package root contract in a monorepo. Use `vasir agents sync --scope <path>` for folders like `apps/web`, `frontend`, `backend`, or `services/api` when they behave as their own project root.
+  - Nested root `AGENTS.md`: generated app/package root contract in a monorepo. Use `vasir agents sync --scope <path>` when a folder behaves as its own project root.
   - Folder `AGENTS.md`: hand-authored local steering map for one subtree. It combines context, instructions, and folder-specific non-obvious constraints. Do not generate it with `vasir agents sync --scope`.
 
   Routing Rules:
