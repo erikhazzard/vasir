@@ -28,9 +28,10 @@ Rules:
 Fastest path:
 
 1. Run `vasir agents sync`. It infers the profile, renders the current canonical template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result.
-2. Use `vasir agents sync frontend|backend|ios` when inference needs an explicit profile.
-3. Use `vasir agents sync --dry-run` to preview without writing.
-4. Run `vasir add <skill>` or `vasir update` separately when the repo-local skill catalog itself needs to change.
+2. Use `vasir agents sync --profile frontend|backend|ios` when inference needs an explicit profile.
+3. Use `vasir agents sync --scope frontend --profile frontend` when a folder needs its own scoped AGENTS root.
+4. Use `vasir agents sync --dry-run` to preview without writing.
+5. Run `vasir add <skill>` or `vasir update` separately when the repo-local skill catalog itself needs to change.
 
 If you want to edit the source templates directly, use the table below and stop there.
 

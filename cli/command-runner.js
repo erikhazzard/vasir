@@ -1360,11 +1360,11 @@ Usage:
   vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>] Copy skills into the current repo root at .agents/skills
   vasir adopt [--json] [--repo-root <path>]        Bring an existing .agents/skills tree under Vasir management without copying files
   vasir remove <skill> [skill...] [--json] [--repo-root <path>] Remove project-local skills from the current repo root
-  vasir agents sync [profile] [--json] [--dry-run] [--repo-root <path>] Reconcile AGENTS.md from the canonical template and AGENTS__non-obvious.md
+  vasir agents sync [--scope <path>] [--profile <name>] [--json] [--dry-run] [--repo-root <path>] Reconcile AGENTS.md from the canonical template and AGENTS__non-obvious.md
   vasir agents init <profile> [--json] [--replace] [--repo-root <path>] Write AGENTS.md from the canonical template plus a stack snippet
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
-  vasir agents validate [--json] [--repo-root <path>] Fail closed when AGENTS.md still contains scaffold placeholders
+  vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Fail closed when AGENTS.md still contains scaffold placeholders
   vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run the built-in baseline vs treatment eval for a skill
   vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>] Inspect the latest or named eval artifact for a skill
   vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>] Rescore an existing eval artifact with the current scorer
@@ -1391,7 +1391,7 @@ Notes:
   Use "vasir add all" to install every catalog skill into the current repo.
   add auto-initializes the global catalog if needed.
   add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios overrides profile inference.
-  agents sync is the one-command AGENTS path: it infers or accepts a profile, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
+  agents sync is the one-command AGENTS path: it infers or accepts a profile, can target a scoped folder, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
   agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
@@ -1460,6 +1460,8 @@ function parseCommandInvocation(argumentVector) {
   let jsonOutput = false;
   let helpRequested = false;
   let agentsProfileName = null;
+  let agentsScopeArgument = null;
+  let agentsSyncProfileName = null;
   let dryRunRequested = false;
   let exitCodeRequested = false;
   let modelArguments = [];
@@ -1538,6 +1540,38 @@ function parseCommandInvocation(argumentVector) {
       continue;
     }
 
+    if (rawArgument === "--profile") {
+      const profileArgument = rawArguments[argumentIndex + 1];
+      if (!profileArgument || profileArgument.startsWith("--")) {
+        throw new VasirCliError({
+          code: "AGENTS_SYNC_PROFILE_FLAG_VALUE_REQUIRED",
+          message: "`--profile` requires one of: backend, frontend, ios.",
+          suggestion: "Use `vasir agents sync --profile frontend`, `--profile backend`, or `--profile ios`.",
+          docsRef: COMMANDS_REFERENCE_DOCS_REF
+        });
+      }
+
+      agentsSyncProfileName = profileArgument;
+      argumentIndex += 1;
+      continue;
+    }
+
+    if (rawArgument === "--scope") {
+      const scopeArgument = rawArguments[argumentIndex + 1];
+      if (!scopeArgument || scopeArgument.startsWith("--")) {
+        throw new VasirCliError({
+          code: "AGENTS_SYNC_SCOPE_FLAG_VALUE_REQUIRED",
+          message: "`--scope` requires a folder path.",
+          suggestion: "Use `vasir agents sync --scope frontend` or `vasir agents sync --scope packages/web --profile frontend`.",
+          docsRef: COMMANDS_REFERENCE_DOCS_REF
+        });
+      }
+
+      agentsScopeArgument = scopeArgument;
+      argumentIndex += 1;
+      continue;
+    }
+
     if (rawArgument === "--write") {
       writeGeneratedOutput = true;
       continue;
@@ -1605,6 +1639,8 @@ function parseCommandInvocation(argumentVector) {
     debugRequested,
     jsonOutput,
     agentsProfileName,
+    agentsScopeArgument,
+    agentsSyncProfileName,
     dryRunRequested,
     exitCodeRequested,
     modelArguments,
@@ -3874,6 +3910,8 @@ async function runSelectedCommand({
   commandName,
   commandArguments,
   agentsProfileName,
+  agentsScopeArgument,
+  agentsSyncProfileName,
   debugRequested,
   dryRunRequested,
   exitCodeRequested,
@@ -3916,6 +3954,30 @@ async function runSelectedCommand({
       message: "--agents-profile is only supported by `vasir add`.",
       suggestion: "Use `vasir add <skill> --agents-profile <backend|frontend|ios>` when you want one-command skill install plus AGENTS scaffolding.",
       docsRef: REPLACE_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (
+    agentsSyncProfileName !== null &&
+    !(commandName === "agents" && commandArguments[0] === "sync")
+  ) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--profile is only supported by `vasir agents sync`.",
+      suggestion: "Use `vasir agents sync --profile frontend`, or omit it and let Vasir infer the profile.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (
+    agentsScopeArgument !== null &&
+    !(commandName === "agents" && ["sync", "validate"].includes(commandArguments[0]))
+  ) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--scope is only supported by `vasir agents sync` and `vasir agents validate`.",
+      suggestion: "Use `vasir agents sync --scope frontend` to write a scoped AGENTS file, or `vasir agents validate --scope frontend` to check it.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }
 
@@ -4156,6 +4218,8 @@ async function runSelectedCommand({
   if (commandName === "agents") {
     return runAgents({
       agentsArguments: commandArguments,
+      agentsScopePath: agentsScopeArgument,
+      agentsSyncProfileName,
       replaceExistingAgentsFile: replaceExistingSkills,
       writeGeneratedOutput,
       dryRunRequested,
@@ -4256,6 +4320,8 @@ export async function runCommandLine(
       commandName,
       commandArguments: invocation.commandArguments,
       agentsProfileName: invocation.agentsProfileName,
+      agentsScopeArgument: invocation.agentsScopeArgument,
+      agentsSyncProfileName: invocation.agentsSyncProfileName,
       debugRequested: invocation.debugRequested,
       dryRunRequested: invocation.dryRunRequested,
       exitCodeRequested: invocation.exitCodeRequested,

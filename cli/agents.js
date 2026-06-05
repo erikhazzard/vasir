@@ -325,6 +325,59 @@ function buildLegacyNonobviousSourceFilePath(projectRootDirectory) {
   return buildProjectRelativeFilePath(projectRootDirectory, LEGACY_NONOBVIOUS_SOURCE_RELATIVE_PATH);
 }
 
+function isPathInsideDirectory({ parentDirectory, candidateDirectory }) {
+  const relativePath = path.relative(parentDirectory, candidateDirectory);
+  return relativePath.length === 0 || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
+function resolveAgentsScopeDirectory({ baseProjectRootDirectory, agentsScopePath }) {
+  if (!agentsScopePath) {
+    return {
+      targetProjectRootDirectory: baseProjectRootDirectory,
+      agentsScope: null
+    };
+  }
+
+  const targetProjectRootDirectory = path.isAbsolute(agentsScopePath)
+    ? path.resolve(agentsScopePath)
+    : path.resolve(baseProjectRootDirectory, agentsScopePath);
+
+  if (!isPathInsideDirectory({
+    parentDirectory: baseProjectRootDirectory,
+    candidateDirectory: targetProjectRootDirectory
+  })) {
+    throw new VasirCliError({
+      code: "AGENTS_SCOPE_OUTSIDE_REPO",
+      message: `AGENTS scope must stay inside the target repo: ${agentsScopePath}`,
+      suggestion: "Use `vasir agents sync --scope frontend` with a folder under the current repo root.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (!fs.existsSync(targetProjectRootDirectory)) {
+    throw new VasirCliError({
+      code: "AGENTS_SCOPE_NOT_FOUND",
+      message: `AGENTS scope does not exist: ${targetProjectRootDirectory}`,
+      suggestion: "Create the folder first, then rerun `vasir agents sync --scope <folder>`.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (!fs.statSync(targetProjectRootDirectory).isDirectory()) {
+    throw new VasirCliError({
+      code: "AGENTS_SCOPE_NOT_DIRECTORY",
+      message: `AGENTS scope must be a directory: ${targetProjectRootDirectory}`,
+      suggestion: "Pass a folder path such as `--scope frontend` or `--scope packages/web`.",
+      docsRef: AGENTS_REFERENCE_DOCS_REF
+    });
+  }
+
+  return {
+    targetProjectRootDirectory,
+    agentsScope: toPosixPath(path.relative(baseProjectRootDirectory, targetProjectRootDirectory)) || "."
+  };
+}
+
 function sanitizePathToken(token) {
   return token.replace(/[),.;:]+$/g, "");
 }
@@ -1691,6 +1744,8 @@ async function resolveDraftModel({
 
 export async function runAgents({
   agentsArguments,
+  agentsScopePath = null,
+  agentsSyncProfileName = null,
   replaceExistingAgentsFile = false,
   writeGeneratedOutput = false,
   dryRunRequested = false,
@@ -1730,15 +1785,26 @@ export async function runAgents({
   }
 
   if (agentsSubcommand === "sync") {
-    const requestedProfile = agentsArguments[1] ?? null;
+    const positionalProfile = agentsArguments[1] ?? null;
     if (agentsArguments.length > 2) {
       throw new VasirCliError({
         code: "AGENTS_SYNC_TOO_MANY_ARGUMENTS",
-        message: "`vasir agents sync` accepts at most one optional profile argument.",
-        suggestion: "Use `vasir agents sync`, `vasir agents sync frontend`, `vasir agents sync backend`, or `vasir agents sync ios`.",
+        message: "`vasir agents sync` accepts flags for scope/profile, plus one legacy optional profile argument.",
+        suggestion: "Use `vasir agents sync --scope frontend --profile frontend`, or omit `--profile` and let Vasir infer it.",
         docsRef: AGENTS_REFERENCE_DOCS_REF
       });
     }
+
+    if (positionalProfile && agentsSyncProfileName) {
+      throw new VasirCliError({
+        code: "AGENTS_SYNC_PROFILE_CONFLICT",
+        message: "`vasir agents sync` received both a positional profile and `--profile`.",
+        suggestion: "Use `vasir agents sync --profile frontend`; the positional profile form is kept only for compatibility.",
+        docsRef: AGENTS_REFERENCE_DOCS_REF
+      });
+    }
+
+    const requestedProfile = agentsSyncProfileName ?? positionalProfile;
 
     if (replaceExistingAgentsFile) {
       throw new VasirCliError({
@@ -1774,15 +1840,22 @@ export async function runAgents({
       currentWorkingDirectory,
       projectRootDirectory
     });
+    const scopeResolution = resolveAgentsScopeDirectory({
+      baseProjectRootDirectory: projectPaths.projectRootDirectory,
+      agentsScopePath
+    });
     const agentsSync = synchronizeProjectAgentsFile({
       globalCatalogDirectory: catalogSource.sourceDirectory,
-      projectRootDirectory: projectPaths.projectRootDirectory,
+      projectRootDirectory: scopeResolution.targetProjectRootDirectory,
       profileName: requestedProfile,
       dryRun: dryRunRequested
     });
 
     if (!jsonOutput) {
       const ui = createCommandUi({ stream: outputStream });
+      const scopeLine = scopeResolution.agentsScope
+        ? [ui.formatField("scope", scopeResolution.agentsScope)]
+        : [];
       stdoutWriter(
         ui.renderPanel({
           title: "Agents Sync",
@@ -1794,6 +1867,7 @@ export async function runAgents({
                 : "AGENTS.md already current"
             }),
             ui.formatField("path", ui.formatPath(agentsSync.agentsFilePath)),
+            ...scopeLine,
             ui.formatField("profile", `${agentsSync.profile} (${agentsSync.profileSource})`),
             ui.formatField("purpose", agentsSync.purposeSource),
             ui.formatField("routing", `${agentsSync.routingLines.length} lane${agentsSync.routingLines.length === 1 ? "" : "s"} (${agentsSync.routingProfile})`),
@@ -1808,7 +1882,9 @@ export async function runAgents({
     return {
       subcommand: "sync",
       catalogSourceDirectory: catalogSource.sourceDirectory,
-      projectRootDirectory: projectPaths.projectRootDirectory,
+      baseProjectRootDirectory: projectPaths.projectRootDirectory,
+      projectRootDirectory: scopeResolution.targetProjectRootDirectory,
+      agentsScope: scopeResolution.agentsScope,
       ...agentsSync
     };
   }
@@ -1902,8 +1978,12 @@ export async function runAgents({
       currentWorkingDirectory,
       projectRootDirectory
     });
+    const scopeResolution = resolveAgentsScopeDirectory({
+      baseProjectRootDirectory: projectPaths.projectRootDirectory,
+      agentsScopePath
+    });
     const validation = validateProjectAgentsFile({
-      projectRootDirectory: projectPaths.projectRootDirectory
+      projectRootDirectory: scopeResolution.targetProjectRootDirectory
     });
     const agentsFilePath = validation.agentsFilePath;
     const agentsText = fs.readFileSync(agentsFilePath, "utf8");
@@ -1978,8 +2058,12 @@ export async function runAgents({
       currentWorkingDirectory,
       projectRootDirectory
     });
+    const scopeResolution = resolveAgentsScopeDirectory({
+      baseProjectRootDirectory: projectPaths.projectRootDirectory,
+      agentsScopePath
+    });
     const validation = validateProjectAgentsFile({
-      projectRootDirectory: projectPaths.projectRootDirectory
+      projectRootDirectory: scopeResolution.targetProjectRootDirectory
     });
 
     if (validation.issues.length > 0) {
@@ -1991,6 +2075,9 @@ export async function runAgents({
 
     if (!jsonOutput) {
       const ui = createCommandUi({ stream: outputStream });
+      const scopeLine = scopeResolution.agentsScope
+        ? [ui.formatField("scope", scopeResolution.agentsScope)]
+        : [];
       stdoutWriter(
         ui.renderPanel({
           title: "Agents Validate",
@@ -1999,6 +2086,7 @@ export async function runAgents({
               kind: "ok",
               text: "AGENTS.md is free of known scaffold markers and broken repo routes"
             }),
+            ...scopeLine,
             ui.formatField("path", ui.formatPath(validation.agentsFilePath))
           ]
         })
@@ -2007,6 +2095,9 @@ export async function runAgents({
 
     return {
       subcommand: "validate",
+      baseProjectRootDirectory: projectPaths.projectRootDirectory,
+      projectRootDirectory: scopeResolution.targetProjectRootDirectory,
+      agentsScope: scopeResolution.agentsScope,
       agentsFilePath: validation.agentsFilePath,
       issues: []
     };

@@ -199,11 +199,11 @@ test("help output documents json support across commands and the explicit replac
   );
   assert.match(capturedOutput.readStdout(), /vasir adopt \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir remove <skill> \[skill...\] \[--json\]/);
-  assert.match(capturedOutput.readStdout(), /vasir agents sync \[profile\] \[--json\] \[--dry-run\]/);
+  assert.match(capturedOutput.readStdout(), /vasir agents sync \[--scope <path>\] \[--profile <name>\] \[--json\] \[--dry-run\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents init <profile> \[--json\] \[--replace\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-routing \[--json\] \[--write\]/);
-  assert.match(capturedOutput.readStdout(), /vasir agents validate \[--json\]/);
+  assert.match(capturedOutput.readStdout(), /vasir agents validate \[--scope <path>\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval rescore <skill> \[run-id\] \[--json\]/);
@@ -364,6 +364,34 @@ test("--agents-profile is rejected outside the add command", async () => {
   assert.equal(statusCode, 1);
   const parsedError = JSON.parse(capturedOutput.readStderr());
   assert.equal(parsedError.command, "list");
+  assert.equal(parsedError.status, "error");
+  assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
+});
+
+test("--scope is rejected outside scoped agents commands", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "status", "--scope", "frontend", "--json"], {
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "status");
+  assert.equal(parsedError.status, "error");
+  assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
+});
+
+test("--profile is rejected outside agents sync", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "validate", "--profile", "frontend", "--json"], {
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "agents");
   assert.equal(parsedError.status, "error");
   assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
 });
@@ -1138,6 +1166,90 @@ Old generated block that should be replaced.
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
   assert.match(agentsText, /Production auth state is owned by AppShell/);
   assert.doesNotMatch(agentsText, /Old generated block that should be replaced/);
+});
+
+test("agents sync writes a scoped AGENTS root with inferred profile and local non-obvious source", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(path.join(projectDirectory, "frontend", "package.json"), `${JSON.stringify({
+    name: "frontend",
+    dependencies: { react: "^19.0.0" }
+  }, null, 2)}\n`);
+  writeFile(path.join(projectDirectory, "frontend", "src", "components", "Button.jsx"), "export function Button() { return null; }\n");
+  writeFile(
+    path.join(projectDirectory, "frontend", "AGENTS__non-obvious.md"),
+    "Frontend auth state is hydrated before routes render.\n"
+  );
+
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--scope", "frontend", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "agents");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.subcommand, "sync");
+  assert.equal(parsedOutput.baseProjectRootDirectory, projectDirectory);
+  assert.equal(parsedOutput.projectRootDirectory, path.join(projectDirectory, "frontend"));
+  assert.equal(parsedOutput.agentsScope, "frontend");
+  assert.equal(parsedOutput.profile, "frontend");
+  assert.equal(parsedOutput.profileSource, "inferred");
+  assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "frontend", "AGENTS__non-obvious.md"));
+
+  const scopedAgentsText = fs.readFileSync(path.join(projectDirectory, "frontend", "AGENTS.md"), "utf8");
+  assert.match(scopedAgentsText, /<!-- vasir:profile:frontend -->/);
+  assert.match(scopedAgentsText, /Frontend auth state is hydrated before routes render\./);
+  assert.match(scopedAgentsText, /Use local UI state first\./);
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+
+  const capturedValidateOutput = captureCommandWriters();
+  const validateStatusCode = await runCommandLine(["node", "vasir", "agents", "validate", "--scope", "frontend", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedValidateOutput
+  });
+  assert.equal(validateStatusCode, 0);
+  const parsedValidateOutput = JSON.parse(capturedValidateOutput.readStdout());
+  assert.equal(parsedValidateOutput.subcommand, "validate");
+  assert.equal(parsedValidateOutput.agentsScope, "frontend");
+  assert.equal(parsedValidateOutput.projectRootDirectory, path.join(projectDirectory, "frontend"));
+});
+
+test("agents sync --profile forces the scoped AGENTS profile", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(path.join(projectDirectory, "services", "api", "README.md"), "# API\n");
+
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "agents", "sync", "--scope", "services/api", "--profile", "backend", "--json"],
+    {
+      homeDirectory,
+      currentWorkingDirectory: projectDirectory,
+      repositoryUrl,
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.profile, "backend");
+  assert.equal(parsedOutput.profileSource, "argument");
+  assert.equal(parsedOutput.agentsScope, "services/api");
+
+  const scopedAgentsText = fs.readFileSync(path.join(projectDirectory, "services", "api", "AGENTS.md"), "utf8");
+  assert.match(scopedAgentsText, /<!-- vasir:profile:backend -->/);
+  assert.match(scopedAgentsText, /Keep retry paths idempotent\./);
 });
 
 test("agents sync dry-run previews AGENTS reconciliation without writing", async () => {

@@ -31,11 +31,11 @@ vasir --version
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
 | `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
-| `agents sync` | `vasir agents sync [backend\|frontend\|ios] [--json] [--dry-run] [--repo-root <path>]` | Reconcile the repo-root `AGENTS.md` from the canonical template, local repo context, and `AGENTS__non-obvious.md` |
+| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile a root or scoped `AGENTS.md` from the canonical template, local context, and `AGENTS__non-obvious.md` |
 | `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter with a stack-specific snippet in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
-| `agents validate` | `vasir agents validate [--json] [--repo-root <path>]` | Fail closed when `AGENTS.md` still contains scaffold placeholders or broken repo routes |
+| `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Fail closed when a root or scoped `AGENTS.md` still contains scaffold placeholders or broken repo routes |
 | `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment eval for a skill |
 | `eval inspect` | `vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>]` | Inspect the latest or named saved eval artifact for a skill |
 | `eval rescore` | `vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>]` | Recompute a saved eval artifact with the current scorer |
@@ -289,7 +289,7 @@ vasir remove
 
 ## Agents
 
-`vasir agents` exists for one job: make the repo-root `AGENTS.md` obvious to create, refresh, and validate.
+`vasir agents` exists for one job: make root and scoped `AGENTS.md` files obvious to create, refresh, and validate.
 
 ### `agents sync`
 
@@ -301,8 +301,11 @@ vasir remove
   - injects repo-owned non-obvious constraints from `AGENTS__non-obvious.md`
   - validates the generated result before writing it
 - Notes:
+  - By default, sync targets the resolved repo root.
+  - Use `--scope <path>` when a folder should get its own scoped AGENTS root, such as `frontend/AGENTS.md`.
+  - Use `--profile frontend`, `--profile backend`, or `--profile ios` when inference is wrong or when the scope is too generic.
   - Use `vasir agents sync --dry-run` to preview without writing.
-  - Use `vasir agents sync frontend`, `backend`, or `ios` when inference is wrong.
+  - The legacy positional profile form, such as `vasir agents sync frontend`, still works, but new scripts should use `--profile`.
   - If `AGENTS__non-obvious.md` is missing, sync creates it. Existing `.agents/non-obvious.md` sidecars are moved to the root file, and legacy manual `AGENTS.md` files are migrated by seeding the root file from the old non-obvious block.
   - Skill catalog updates remain separate: use `vasir update` for tracked `.agents/skills/**` content.
 
@@ -311,7 +314,10 @@ Examples:
 ```bash
 vasir agents sync
 vasir agents sync --dry-run
-vasir agents sync frontend
+vasir agents sync --profile frontend
+vasir agents sync --scope frontend
+vasir agents sync --scope packages/web --profile frontend
+vasir agents sync --scope services/api --profile backend
 ```
 
 ### `agents init`
@@ -381,6 +387,7 @@ vasir agents draft-routing --write
   - Fails closed with structured issue details when scaffold markers are still present or a routed directory is missing its scoped `AGENTS.md`.
 - Notes:
   - `agents sync` runs this check automatically.
+  - Use `--scope <path>` to validate a scoped AGENTS root such as `frontend/AGENTS.md`.
   - This is still useful after manual edits or lower-level `agents init`, `agents draft-purpose --write`, and `agents draft-routing --write` flows.
   - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a local `AGENTS.md`.
 
@@ -388,6 +395,7 @@ Examples:
 
 ```bash
 vasir agents validate
+vasir agents validate --scope frontend
 vasir agents validate --json
 ```
 
