@@ -4,7 +4,7 @@
 > EDIT THESE FIRST
 > 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
 > 2. Replace the routing block in Section 1 with real repo lanes, or run `vasir agents draft-routing --write`.
-> 3. Create scoped `AGENTS.md` files for any domain named in Section 1, or collapse those rules back into this root file.
+> 3. For any domain named in Section 1, use the right local AGENTS shape: nested root for app/package roots, folder steering map for ordinary subtrees, or collapse the rules back into this root file.
 > 4. Confirm the skill names in Section 0.vii exist in this repo/tooling environment.
 > 5. Delete every line that is not true in this repo.
 > 6. If this was generated from a stack profile, treat the inserted snippet as starter doctrine; this file remains the structural source of truth.
@@ -164,7 +164,7 @@
       Work Spec: [path or "Not required — reason"]
       Eval Plan: [path or "Not required — reason"]
       Current Approval State: [Needs human approval | Approved milestone | Small Change Fast Path]
-      Scoped AGENTS.md files read: [paths or "Root only"]
+      Applicable AGENTS.md files read: [paths or "Root only"]
     </Approved_Context>
 
     <Proof_of_Value_State>
@@ -227,7 +227,7 @@
   Skills may identify unresolved decisions, but must return them as Open blockers or Skill Result fields.
   Before asking, the root/calling agent must dedupe against the user's current instruction, prior answers, active Work Spec constraints, and any questions already asked this turn.
 
-  Do not ask questions the repo, existing Work Spec/eval plan, scoped AGENTS.md files, tests, or the user's current instruction already answer.
+  Do not ask questions the repo, existing Work Spec/eval plan, applicable AGENTS.md files, tests, or the user's current instruction already answer.
 
   Ask zero questions when a conservative, repo-supported default is safe.
 
@@ -310,14 +310,14 @@
 
   1. Safety, data integrity, privacy, destructive-operation bans, and shared-worktree custody.
   2. The user's explicit current-turn instruction.
-  3. Scoped `AGENTS.md` files for the touched domain.
+  3. Applicable nested root or folder `AGENTS.md` files for the touched domain.
   4. This root `AGENTS.md`.
   5. The human-approved Work Spec / eval plan for the active task.
   6. Skill output and skill-local workflow guidance.
   7. Engineering doctrine and style preferences.
   8. Optional polish, examples, or documentation niceties.
 
-  The approved Work Spec / eval plan is binding inside the active scope, but it cannot override safety, the user's current-turn instruction, scoped `AGENTS.md`, or this root file.
+  The approved Work Spec / eval plan is binding inside the active scope, but it cannot override safety, the user's current-turn instruction, applicable `AGENTS.md` files, or this root file.
 
   If two same-level constraints conflict, choose the path that best preserves the declared Unlock and Proof-of-Value State.
 
@@ -369,7 +369,7 @@
   During implementation, the agent may edit implementation-discovered files without pausing when all are true:
   - the edit is required to complete or prove the same approved Unlock and gate;
   - the edit stays within the approved change envelope;
-  - the edit follows existing repo ownership/routing rules, including scoped `AGENTS.md`;
+  - the edit follows existing repo ownership/routing rules, including applicable `AGENTS.md` files;
   - the edit does not cross an escalation trigger named in `<Scope_Envelope>`.
 
   Do not halt just because a necessary file was absent from the initial touchpoints list. Edit it, then record the implementation-discovered touchpoint and why it stayed inside the approved envelope in `<Recap>/<Context_Sync>`, the Work Spec/eval plan when their contracts change, or the final handoff ledger.
@@ -440,7 +440,7 @@
     - Recommended next action
 
   Skill Result conflicts:
-  - If a skill result conflicts with safety, the user’s current instruction, scoped `AGENTS.md`, or this root file, the higher-precedence rule wins.
+  - If a skill result conflicts with safety, the user’s current instruction, applicable `AGENTS.md` files, or this root file, the higher-precedence rule wins.
   - If a skill result conflicts with an already-approved Work Spec / eval plan, halt with a Plan Delta unless the current turn explicitly approves the change.
   - If a required Skill Result field is missing, treat the skill as incomplete and do not proceed to product-code implementation.
 
@@ -473,29 +473,36 @@
 # 1. Topography & Routing Protocol
 
 <routing_topography>
-  This root file contains global rules. For domain-specific logic, agents MUST read the scoped `AGENTS.md` files before modifying code in those directories.
+  This root file contains repo-wide operating rules. Domain-specific steering belongs in the nearest applicable local `AGENTS.md`.
+
+  AGENTS taxonomy:
+  - Root `AGENTS.md`: repo-wide operating contract.
+  - Nested root `AGENTS.md`: generated app/package root contract in a monorepo. Use `vasir agents sync --scope <path>` for folders like `apps/web`, `frontend`, `backend`, or `services/api` when they behave as their own project root.
+  - Folder `AGENTS.md`: hand-authored local steering map for one subtree. It combines context, instructions, and folder-specific non-obvious constraints. Do not generate it with `vasir agents sync --scope`.
 
   Routing Rules:
   - Do not vacuum the repo. Load context surgically, starting from the value path.
-  - If multiple scoped `AGENTS.md` files apply, read all of them from root to leaf.
-  - The most specific scoped file wins when same-level rules conflict.
-  - If a scoped file is missing for a domain named in this map, output a blocked `<Recap>` or collapse the intended rules into this root file before editing.
+  - Before editing a subtree, read applicable `AGENTS.md` files from root to leaf.
+  - The most specific local file wins when same-level rules conflict.
+  - If a domain named in this map lacks the local AGENTS file it depends on, either create/update the correct folder steering map, use `vasir agents sync --scope <path>` for a nested app/package root, or collapse those rules back into this root file before editing.
+  - Folder AGENTS must steer work: what to read, what to modify, what to avoid, what to preserve, and how to prove changes. If a folder AGENTS line would not change agent behavior, delete it.
 
   Before broad search or implementation, identify:
     - target folder(s);
     - entrypoint involved;
     - nearest value-path test/eval;
-    - nearest scoped AGENTS.md;
+    - nearest applicable AGENTS.md;
     - active Work Spec / eval memory if this is ongoing work.
 
   ## Repo Context - Start Here
   <!-- vasir:routing:start -->
   [Replace with repo-specific routing. Do not leave example routes in committed project files.]
 
-  - `src/server/**` → `src/server/AGENTS.md`
-  - `src/client/**` → `src/client/AGENTS.md`
-  - `games/<gameId>/**` → `games/<gameId>/AGENTS.md`
-  - `docs/work/**` → Root only unless a scoped docs/work `AGENTS.md` exists.
+  - `apps/web/**` → nested root `apps/web/AGENTS.md` if `apps/web` is its own app root.
+  - `src/server/**` → folder steering map `src/server/AGENTS.md` if server code has local entrypoints, invariants, proof commands, or non-obvious constraints.
+  - `src/client/**` → folder steering map `src/client/AGENTS.md` if client code has local entrypoints, invariants, proof commands, or non-obvious constraints.
+  - `games/<gameId>/**` → folder steering map `games/<gameId>/AGENTS.md`.
+  - `docs/work/**` → Root only unless a folder steering map exists for the work-spec system.
   <!-- vasir:routing:end -->
 
 </routing_topography>
@@ -756,7 +763,7 @@
   **Folders & Ontology**:
   - Do not create new generic dumping grounds like `utils/`, `helpers/`, `misc/`, or catch-all test folders.
   - If the repo already has broad roots such as `scripts/` or `tests/`, new files inside them must still be nested by semantic domain/feature.
-  - For individual games, tests MUST live under `games/<gameId>/tests/` unless the scoped game `AGENTS.md` says otherwise.
+  - For individual games, tests MUST live under `games/<gameId>/tests/` unless the game folder `AGENTS.md` says otherwise.
   - Every file must live in the architectural domain or feature ontology it serves.
    - Test files follow Section 8 Test / Eval Organization: place them by semantic feature and proof purpose, not in generic catch-all folders.
 
@@ -1110,7 +1117,7 @@
   - Active Work Spec file.
   - Active eval plan.
   - Nearest README/spec for changed subsystem, if any.
-  - Nearest scoped `AGENTS.md`, if routing/local invariants changed.
+  - Nearest applicable `AGENTS.md`, if routing/local invariants changed.
   - Modified fileoverview headers.
   - Any generated or changed test/eval harness docs.
 

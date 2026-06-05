@@ -31,11 +31,11 @@ vasir --version
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
 | `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
-| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile a root or scoped `AGENTS.md` from the canonical template, local context, and `AGENTS__non-obvious.md` |
+| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile a root or nested root `AGENTS.md` from the canonical template, local context, and `AGENTS__non-obvious.md` |
 | `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter with a stack-specific snippet in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
-| `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Fail closed when a root or scoped `AGENTS.md` still contains scaffold placeholders or broken repo routes |
+| `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Fail closed when a root or nested root `AGENTS.md` still contains scaffold placeholders or broken repo routes |
 | `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment eval for a skill |
 | `eval inspect` | `vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>]` | Inspect the latest or named saved eval artifact for a skill |
 | `eval rescore` | `vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>]` | Recompute a saved eval artifact with the current scorer |
@@ -68,7 +68,7 @@ vasir status --repo-root packages/web
 - Purpose: give humans and LLMs one local-only command that explains how to operate in the current repo.
 - Result:
   - returns repo facts already on disk: repo root, package summary, top-level entries, and README excerpt
-  - returns the relevant root and routed scoped `AGENTS.md` files
+  - returns the relevant root, nested root, and routed folder `AGENTS.md` files
   - returns the repo's tracked skills, installed skills, explained recommended skills to load first, and the next safe Vasir commands
   - returns an explicit execution contract saying the command is local-only and does not use a model, token, or network
 - Notes:
@@ -289,11 +289,13 @@ vasir remove
 
 ## Agents
 
-`vasir agents` exists for one job: make root and scoped `AGENTS.md` files obvious to create, refresh, and validate.
+`vasir agents` exists for one generated path: make root and nested root `AGENTS.md` files obvious to create, refresh, and validate.
+
+Folder `AGENTS.md` files are different. They are hand-authored steering maps for ordinary subtrees. Do not generate them with `vasir agents sync --scope`; use the installed `agents__creating-folder-agents` skill or edit the folder file directly.
 
 ### `agents sync`
 
-- Purpose: the one-command AGENTS path for normal repos.
+- Purpose: the one-command generated AGENTS path for normal repos and nested app/package roots.
 - Result:
   - renders `AGENTS.md` from the current canonical template and the inferred or explicit stack profile
   - fills the purpose paragraph from deterministic local repo context without a model call
@@ -302,7 +304,7 @@ vasir remove
   - validates the generated result before writing it
 - Notes:
   - By default, sync targets the resolved repo root.
-  - Use `--scope <path>` when a folder should get its own scoped AGENTS root, such as `frontend/AGENTS.md`.
+  - Use `--scope <path>` when a folder is a nested app/package root, such as `frontend/AGENTS.md` or `apps/web/AGENTS.md`.
   - Use `--profile frontend`, `--profile backend`, or `--profile ios` when inference is wrong or when the scope is too generic.
   - Use `vasir agents sync --dry-run` to preview without writing.
   - The legacy positional profile form, such as `vasir agents sync frontend`, still works, but new scripts should use `--profile`.
@@ -365,12 +367,12 @@ vasir agents draft-purpose --write --model openai
 
 - Purpose: inspect the current repo and draft a repo-aware Section 1 routing block for `AGENTS.md`.
 - Result:
-  - Prints a set of scoped routing lanes based on the actual repo directories.
+  - Prints a set of local AGENTS routing lanes based on the actual repo directories.
   - When `--write` is set, replaces the writable routing block in Section 1.
 - Notes:
   - Uses deterministic repo signals such as top-level directories and common stack lanes.
-  - Drafted lanes point at real directories first, then expect a local `AGENTS.md` inside those directories if the lane truly needs scoped rules.
-  - `--write` keeps the routing markers in place until you finalize Section 1. `agents validate` will keep failing until you remove those markers and either create the referenced scoped `AGENTS.md` files or collapse the rules back into the root file.
+  - Drafted lanes point at real directories first, then expect a local `AGENTS.md` inside those directories if the lane truly needs local steering rules.
+  - `--write` keeps the routing markers in place until you finalize Section 1. `agents validate` will keep failing until you remove those markers and either create the referenced local `AGENTS.md` files or collapse the rules back into the root file.
 
 Examples:
 
@@ -384,12 +386,12 @@ vasir agents draft-routing --write
 - Purpose: catch leftover scaffold markers and broken repo routes before you treat `AGENTS.md` as finished.
 - Result:
   - Succeeds cleanly when `AGENTS.md` no longer contains known placeholders, write-back markers, or broken repo routes.
-  - Fails closed with structured issue details when scaffold markers are still present or a routed directory is missing its scoped `AGENTS.md`.
+  - Fails closed with structured issue details when scaffold markers are still present or a routed directory is missing its required local `AGENTS.md`.
 - Notes:
   - `agents sync` runs this check automatically.
-  - Use `--scope <path>` to validate a scoped AGENTS root such as `frontend/AGENTS.md`.
+  - Use `--scope <path>` to validate a generated nested root AGENTS file such as `frontend/AGENTS.md`.
   - This is still useful after manual edits or lower-level `agents init`, `agents draft-purpose --write`, and `agents draft-routing --write` flows.
-  - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a local `AGENTS.md`.
+  - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a required local `AGENTS.md`.
 
 Examples:
 

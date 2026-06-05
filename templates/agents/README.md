@@ -15,6 +15,12 @@ Vasir has three layers:
 2. `templates/agents/AGENTS.md` is the repo-root operating contract. It owns the shared structure, precedence rules, planning/eval requirements, and the sections that reference skills.
 3. `templates/agents/snippets/*-inserts.md` is the profile selection layer. Snippets decide which stack-specific purpose, routing, and doctrine content gets inserted for `backend`, `frontend`, or `ios`.
 
+AGENTS files have three jobs:
+
+- Root `AGENTS.md`: repo-wide operating contract, generated from this template.
+- Nested root `AGENTS.md`: generated app/package root contract in a monorepo, created with `vasir agents sync --scope <path>`.
+- Folder `AGENTS.md`: hand-authored local steering map for one subtree. Do not generate it with `vasir agents sync --scope`.
+
 Rules:
 
 - Do not duplicate skill instructions in `AGENTS.md`; route to skills instead.
@@ -29,9 +35,10 @@ Fastest path:
 
 1. Run `vasir agents sync`. It infers the profile, renders the current canonical template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result.
 2. Use `vasir agents sync --profile frontend|backend|ios` when inference needs an explicit profile.
-3. Use `vasir agents sync --scope frontend --profile frontend` when a folder needs its own scoped AGENTS root.
+3. Use `vasir agents sync --scope frontend --profile frontend` when a folder is a nested app/package root.
 4. Use `vasir agents sync --dry-run` to preview without writing.
-5. Run `vasir add <skill>` or `vasir update` separately when the repo-local skill catalog itself needs to change.
+5. Author ordinary folder AGENTS directly as steering maps, or use the installed `agents__creating-folder-agents` skill.
+6. Run `vasir add <skill>` or `vasir update` separately when the repo-local skill catalog itself needs to change.
 
 If you want to edit the source templates directly, use the table below and stop there.
 

@@ -228,7 +228,8 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /refreshes the skills tracked by the current repo/i);
   assert.match(capturedOutput.readStdout(), /adopt never copies or overwrites skill files/i);
   assert.match(capturedOutput.readStdout(), /mutates only the current repo/i);
-  assert.match(capturedOutput.readStdout(), /agents sync is the one-command AGENTS path/i);
+  assert.match(capturedOutput.readStdout(), /agents sync is the one-command generated AGENTS path/i);
+  assert.match(capturedOutput.readStdout(), /Folder AGENTS files are hand-authored steering maps/i);
   assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root/i);
   assert.match(capturedOutput.readStdout(), /agents validate fails closed/i);
   assert.match(capturedOutput.readStdout(), /auto-initializes the global catalog if needed/i);
@@ -368,7 +369,7 @@ test("--agents-profile is rejected outside the add command", async () => {
   assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
 });
 
-test("--scope is rejected outside scoped agents commands", async () => {
+test("--scope is rejected outside agents sync and validate", async () => {
   const capturedOutput = captureCommandWriters();
 
   const statusCode = await runCommandLine(["node", "vasir", "status", "--scope", "frontend", "--json"], {
@@ -633,7 +634,7 @@ test("context warns when root AGENTS.md is missing", async () => {
   assert.equal(parsedOutput.relevantAgentsFiles[0].exists, false);
 });
 
-test("context warns when routed scoped AGENTS.md files are still missing", async () => {
+test("context warns when routed local AGENTS.md files are still missing", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -669,7 +670,7 @@ test("context warns when routed scoped AGENTS.md files are still missing", async
   assert.equal(contextStatusCode, 0);
   const parsedOutput = JSON.parse(contextOutput.readStdout());
   assert.ok(parsedOutput.relevantAgentsFiles.some((agentsFile) => agentsFile.repoRelativePath === "src/components/AGENTS.md"));
-  assert.ok(parsedOutput.warnings.some((warning) => warning.code === "SCOPED_AGENTS_MISSING"));
+  assert.ok(parsedOutput.warnings.some((warning) => warning.code === "LOCAL_AGENTS_MISSING"));
 });
 
 test("debug flag is rejected outside context", async () => {
@@ -1168,7 +1169,7 @@ Old generated block that should be replaced.
   assert.doesNotMatch(agentsText, /Old generated block that should be replaced/);
 });
 
-test("agents sync writes a scoped AGENTS root with inferred profile and local non-obvious source", async () => {
+test("agents sync writes a nested root AGENTS file with inferred profile and local non-obvious source", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -1203,10 +1204,10 @@ test("agents sync writes a scoped AGENTS root with inferred profile and local no
   assert.equal(parsedOutput.profileSource, "inferred");
   assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "frontend", "AGENTS__non-obvious.md"));
 
-  const scopedAgentsText = fs.readFileSync(path.join(projectDirectory, "frontend", "AGENTS.md"), "utf8");
-  assert.match(scopedAgentsText, /<!-- vasir:profile:frontend -->/);
-  assert.match(scopedAgentsText, /Frontend auth state is hydrated before routes render\./);
-  assert.match(scopedAgentsText, /Use local UI state first\./);
+  const nestedRootAgentsText = fs.readFileSync(path.join(projectDirectory, "frontend", "AGENTS.md"), "utf8");
+  assert.match(nestedRootAgentsText, /<!-- vasir:profile:frontend -->/);
+  assert.match(nestedRootAgentsText, /Frontend auth state is hydrated before routes render\./);
+  assert.match(nestedRootAgentsText, /Use local UI state first\./);
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
 
   const capturedValidateOutput = captureCommandWriters();
@@ -1223,7 +1224,7 @@ test("agents sync writes a scoped AGENTS root with inferred profile and local no
   assert.equal(parsedValidateOutput.projectRootDirectory, path.join(projectDirectory, "frontend"));
 });
 
-test("agents sync --profile forces the scoped AGENTS profile", async () => {
+test("agents sync --profile forces the nested root AGENTS profile", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -1247,9 +1248,9 @@ test("agents sync --profile forces the scoped AGENTS profile", async () => {
   assert.equal(parsedOutput.profileSource, "argument");
   assert.equal(parsedOutput.agentsScope, "services/api");
 
-  const scopedAgentsText = fs.readFileSync(path.join(projectDirectory, "services", "api", "AGENTS.md"), "utf8");
-  assert.match(scopedAgentsText, /<!-- vasir:profile:backend -->/);
-  assert.match(scopedAgentsText, /Keep retry paths idempotent\./);
+  const nestedRootAgentsText = fs.readFileSync(path.join(projectDirectory, "services", "api", "AGENTS.md"), "utf8");
+  assert.match(nestedRootAgentsText, /<!-- vasir:profile:backend -->/);
+  assert.match(nestedRootAgentsText, /Keep retry paths idempotent\./);
 });
 
 test("agents sync dry-run previews AGENTS reconciliation without writing", async () => {
@@ -1335,7 +1336,7 @@ test("agents validate fails closed on leftover scaffold markers and passes once 
   assert.deepEqual(parsedOutput.issues, []);
 });
 
-test("agents validate fails when a routed lane points at a directory without a scoped AGENTS file", async () => {
+test("agents validate fails when a routed lane points at a directory without a required local AGENTS file", async () => {
   const projectDirectory = createTemporaryDirectory();
   const capturedInvalidOutput = captureCommandWriters();
 
@@ -1362,7 +1363,7 @@ test("agents validate fails when a routed lane points at a directory without a s
   const parsedError = JSON.parse(capturedInvalidOutput.readStderr());
   assert.equal(parsedError.command, "agents");
   assert.equal(parsedError.code, "AGENTS_VALIDATION_FAILED");
-  assert.ok(parsedError.context.issues.some((issue) => issue.code === "SCOPED_AGENTS_MISSING"));
+  assert.ok(parsedError.context.issues.some((issue) => issue.code === "LOCAL_AGENTS_MISSING"));
 
   writeFile(
     path.join(projectDirectory, "src", "components", "AGENTS.md"),

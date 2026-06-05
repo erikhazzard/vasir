@@ -49,7 +49,7 @@ $EDITOR AGENTS__non-obvious.md
 vasir agents sync
 ```
 
-## Root And Scoped AGENTS
+## Root, Nested Root, And Folder AGENTS
 
 Use the repo root for repo-wide rules.
 
@@ -58,16 +58,17 @@ vasir agents sync
 vasir agents sync --profile frontend
 ```
 
-Use `--scope` when a subfolder needs its own agent root. This is the monorepo path for folders like `frontend/`, `backend/`, `packages/web/`, or `services/api/`.
+Nested root AGENTS are generated root contracts for app/package folders. Use `--scope` only when a subfolder is a nested app/package root, such as `frontend/`, `backend/`, `apps/web/`, `packages/web/`, or `services/api/`.
 
 ```bash
 vasir agents sync --scope frontend --profile frontend
 vasir agents sync --scope backend --profile backend
+vasir agents sync --scope apps/web --profile frontend
 vasir agents sync --scope packages/web --profile frontend
 vasir agents sync --scope services/api --profile backend
 ```
 
-Scoped sync writes the sidecar and generated AGENTS file inside that folder.
+Nested root sync writes the sidecar and generated AGENTS file inside that folder.
 
 ```text
 frontend/
@@ -84,6 +85,18 @@ When the folder name or contents make the stack obvious, omit `--profile`.
 ```bash
 vasir agents sync --scope frontend
 ```
+
+Folder AGENTS are different. They are authored directly as local steering maps: what the folder owns, where work enters, what agents tend to break, which local constraints matter, how to prove changes, and where deeper maps take over.
+
+```text
+src/server/
+  AGENTS.md
+
+games/chess/
+  AGENTS.md
+```
+
+Do not use `vasir agents sync --scope` for ordinary folder steering maps. Use the installed `agents__creating-folder-agents` skill or edit the folder `AGENTS.md` directly.
 
 Use `--repo-root` when the managed Vasir project root itself changes. That affects skills, config, and install state, not only a nested AGENTS file.
 

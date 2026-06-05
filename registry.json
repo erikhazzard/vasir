@@ -5,7 +5,7 @@
   "skills": [
     {
       "name": "agents__creating-folder-agents",
-      "description": "Creates or rewrites folder-scoped AGENTS.md files by qualifying the subtree, extracting repo-verified local contracts, and instantiating this skill's embedded folder-contract shape. Use when deciding whether a per-folder AGENTS.md should exist, creating one, updating one, or converting rough folder notes into a delta-shaped local contract; not for repo-wide AGENTS.md, generic coding standards, ordinary API reference, or one-off task plans.",
+      "description": "Creates, rewrites, audits, or declines folder AGENTS.md files as local steering maps for one subtree. Use when a folder needs durable agent orientation, local instructions, and folder-specific non-obvious constraints; not for repo-root AGENTS, nested app/package root generation, generic coding standards, ordinary API reference, or one-off task plans.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

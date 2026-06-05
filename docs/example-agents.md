@@ -2,7 +2,7 @@
 
 Use this page when you want a filled example to adapt, not just the blank template.
 
-For the fastest starting point, run `vasir agents sync`. It infers the profile, renders the current template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result. Use `vasir agents sync --profile frontend|backend|ios` when you need an explicit profile, or `vasir agents sync --scope frontend --profile frontend` for a scoped folder. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). The shared manifest structure lives in [templates/agents/AGENTS.md](../templates/agents/AGENTS.md), and stack-specific content lives in [templates/agents/snippets/](../templates/agents/snippets/).
+For the fastest starting point, run `vasir agents sync`. It infers the profile, renders the current template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result. Use `vasir agents sync --profile frontend|backend|ios` when you need an explicit profile, or `vasir agents sync --scope frontend --profile frontend` for a nested app/package root. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). The shared manifest structure lives in [templates/agents/AGENTS.md](../templates/agents/AGENTS.md), and stack-specific content lives in [templates/agents/snippets/](../templates/agents/snippets/).
 
 Use the structure below as a rendered example. In normal repos, edit `AGENTS__non-obvious.md` for repo-specific constraints and rerun `vasir agents sync` to regenerate `AGENTS.md`.
 
@@ -56,7 +56,7 @@ If a command fails, read it, diagnose the root cause, and fix the real failure b
 
 ### Operational Constraints
 - No destructive git commands.
-- Do not edit outside the scoped lane.
+- Do not edit outside the declared lane.
 - Update docs and tests in the same turn when public behavior changes.
 
 ## Recency Anchor

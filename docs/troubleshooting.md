@@ -204,7 +204,7 @@ Verification:
 
 - `AGENTS.md` exists at the repo root.
 - The file no longer contains scaffold text like `EDIT THESE FIRST`, `[Project Name]`, or `[Example]`.
-- Any routed directory in Section 1 exists and owns a local `AGENTS.md`, or that route has been removed.
+- Any routed directory in Section 1 exists and owns the required local `AGENTS.md`, or that route has been removed.
 
 ## Eval Errors
 

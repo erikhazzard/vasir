@@ -18,7 +18,7 @@
 - Runtime: Node 22 LTS.
 - Language: plain JavaScript. No TypeScript.
 - Modules: ESM with `.js` files only. Do not create `.mjs`.
-- Local dev: no Docker unless a scoped infra rule explicitly says otherwise.
+- Local dev: no Docker unless a local infra rule explicitly says otherwise.
 - Local start command: `npm run start` must start the API server and all long-lived worker lanes.
 - When adding `src/workers/<lane>/run.js`, wire it into `scripts/start.js`.
 - Use native `fetch` where applicable.
@@ -40,7 +40,7 @@ Applies to:
 - cloud services;
 - auth/session providers;
 - filesystem boundaries where repo policy defines an adapter;
-- browser/runtime bridges where scoped `AGENTS.md` defines one.
+- browser/runtime bridges where an applicable `AGENTS.md` defines one.
 
 Rules:
 
@@ -58,13 +58,13 @@ Rules:
 
 ## 3. Performance Doctrine — Quantified Hot-Path Budget
 
-Assume production-scale load unless the scoped `AGENTS.md` narrows it.
+Assume production-scale load unless an applicable `AGENTS.md` narrows it.
 
 Default planning lens:
 
 - Assume at least `1,000,000` sustained events/messages/requests per relevant hot-path class where applicable.
 - Spikes may be materially higher.
-- p95 latency budgets must come from repo specs, production SLOs, or scoped `AGENTS.md`.
+- p95 latency budgets must come from repo specs, production SLOs, or an applicable `AGENTS.md`.
 - If latency-budget sources disagree, use the strictest target and name the discrepancy.
 - A hot path is any per-frame, per-message, per-request, per-presence-update, per-stream-entry, per-worker-item, or high-fanout read/write path.
 
@@ -187,7 +187,7 @@ Rules:
 * Prefer `UNLINK` over `DEL` for off-path cleanup.
 * Lua scripts are allowed only when they collapse RTTs without changing semantics or hiding failure modes.
 * Do not perform cross-slot multi-key operations.
-* Multi-key operations are allowed only when the scoped `AGENTS.md` explicitly allows the pattern and the keys are intentionally colocated.
+* Multi-key operations are allowed only when an applicable `AGENTS.md` explicitly allows the pattern and the keys are intentionally colocated.
 * Do not pin hot keyspaces to one hash slot with constant hash tags.
 * Hot keyspaces must not be pinned to one hash slot through constant `{tenant}` / `{scope}` tags.
 * Use partition-first hash tags with stable partition counts for scalable read models.

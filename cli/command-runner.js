@@ -1091,7 +1091,7 @@ function collectContextAgentsFiles({
 
     relevantAgentsFiles.push(
       createContextAgentsFileRecord({
-        scope: "scoped",
+        scope: "local",
         path: absoluteAgentsFilePath,
         repoRelativePath: toRepoRelativePath({
           projectRootDirectory,
@@ -1360,7 +1360,7 @@ Usage:
   vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>] Copy skills into the current repo root at .agents/skills
   vasir adopt [--json] [--repo-root <path>]        Bring an existing .agents/skills tree under Vasir management without copying files
   vasir remove <skill> [skill...] [--json] [--repo-root <path>] Remove project-local skills from the current repo root
-  vasir agents sync [--scope <path>] [--profile <name>] [--json] [--dry-run] [--repo-root <path>] Reconcile AGENTS.md from the canonical template and AGENTS__non-obvious.md
+  vasir agents sync [--scope <path>] [--profile <name>] [--json] [--dry-run] [--repo-root <path>] Reconcile root or nested root AGENTS.md from the canonical template and AGENTS__non-obvious.md
   vasir agents init <profile> [--json] [--replace] [--repo-root <path>] Write AGENTS.md from the canonical template plus a stack snippet
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
@@ -1391,7 +1391,8 @@ Notes:
   Use "vasir add all" to install every catalog skill into the current repo.
   add auto-initializes the global catalog if needed.
   add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios overrides profile inference.
-  agents sync is the one-command AGENTS path: it infers or accepts a profile, can target a scoped folder, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
+  agents sync is the one-command generated AGENTS path: it infers or accepts a profile, can target a nested app/package root with --scope, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
+  Folder AGENTS files are hand-authored steering maps for ordinary subtrees; do not generate them with agents sync --scope.
   agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
@@ -2523,11 +2524,11 @@ async function runContext({
         : []
     ),
     ...relevantAgentsFiles
-      .filter((agentsFile) => agentsFile.scope === "scoped" && !agentsFile.exists)
+      .filter((agentsFile) => agentsFile.scope === "local" && !agentsFile.exists)
       .map((agentsFile) =>
         createContextWarning({
-          code: "SCOPED_AGENTS_MISSING",
-          message: "Root AGENTS.md references a scoped AGENTS.md file that does not exist yet.",
+          code: "LOCAL_AGENTS_MISSING",
+          message: "Root AGENTS.md references a required local AGENTS.md file that does not exist yet.",
           detail: agentsFile.repoRelativePath
         })
       ),
@@ -3976,7 +3977,7 @@ async function runSelectedCommand({
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
       message: "--scope is only supported by `vasir agents sync` and `vasir agents validate`.",
-      suggestion: "Use `vasir agents sync --scope frontend` to write a scoped AGENTS file, or `vasir agents validate --scope frontend` to check it.",
+      suggestion: "Use `vasir agents sync --scope frontend` to write a nested root AGENTS file, or `vasir agents validate --scope frontend` to check it.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }

@@ -1127,7 +1127,7 @@ function createAgentsValidationError({ agentsFilePath, issues }) {
     code: "AGENTS_VALIDATION_FAILED",
     message: `AGENTS.md still contains scaffold or repo-truth issues. ${issueSummary}`,
     suggestion:
-      "Edit the flagged lines, create any missing scoped AGENTS.md files, or rerun `vasir agents init <profile> --replace`, then rerun `vasir agents validate`.",
+      "Edit the flagged lines, create any missing required local AGENTS.md files, or rerun `vasir agents init <profile> --replace`, then rerun `vasir agents validate`.",
     context: {
       agentsFilePath,
       issues
@@ -1190,13 +1190,13 @@ function findAgentsPathValidationIssues({ agentsText, projectRootDirectory }) {
         trimmedLine.includes("local `AGENTS.md`") &&
         fs.statSync(resolvedToken.absolutePath).isDirectory()
       ) {
-        const scopedAgentsFilePath = path.join(resolvedToken.absolutePath, "AGENTS.md");
-        if (!fs.existsSync(scopedAgentsFilePath)) {
+        const localAgentsFilePath = path.join(resolvedToken.absolutePath, "AGENTS.md");
+        if (!fs.existsSync(localAgentsFilePath)) {
           issues.push({
-            code: "SCOPED_AGENTS_MISSING",
+            code: "LOCAL_AGENTS_MISSING",
             lineNumber: lineIndex + 1,
             message:
-              `Scoped AGENTS lane is referenced at ${resolvedToken.token}, but /${toPosixPath(path.relative(projectRootDirectory, scopedAgentsFilePath))} does not exist yet.`,
+              `Local AGENTS lane is referenced at ${resolvedToken.token}, but /${toPosixPath(path.relative(projectRootDirectory, localAgentsFilePath))} does not exist yet.`,
             lineText: trimmedLine
           });
         }
@@ -1277,12 +1277,12 @@ function findRoutingLanes({ projectRootDirectory, profileHint }) {
   return sortedLanes;
 }
 
-function formatRoutingLineForLane({ lane, requiresScopedAgentsFile = true }) {
+function formatRoutingLineForLane({ lane, requiresLocalAgentsFile = true }) {
   if (lane.coldStorage) {
     return `* **${lane.label}:** Do not read \`${lane.displayPath}\` unless explicitly instructed by the user.`;
   }
 
-  const contextInstruction = requiresScopedAgentsFile
+  const contextInstruction = requiresLocalAgentsFile
     ? "you must first read that directory's local `AGENTS.md`"
     : "use this root `AGENTS.md`";
 
@@ -1309,7 +1309,7 @@ function formatRoutingLines({ projectRootDirectory, agentsText }) {
     lanes,
     routingLines: lanes.map((lane) => formatRoutingLineForLane({
       lane,
-      requiresScopedAgentsFile: true
+      requiresLocalAgentsFile: true
     }))
   };
 }
@@ -1326,13 +1326,13 @@ function formatSynchronizedRoutingLines({ projectRootDirectory, agentsText }) {
       if (lane.coldStorage) {
         return formatRoutingLineForLane({
           lane,
-          requiresScopedAgentsFile: true
+          requiresLocalAgentsFile: true
         });
       }
 
       return formatRoutingLineForLane({
         lane,
-        requiresScopedAgentsFile: fs.existsSync(path.join(projectRootDirectory, lane.relativePath, "AGENTS.md"))
+        requiresLocalAgentsFile: fs.existsSync(path.join(projectRootDirectory, lane.relativePath, "AGENTS.md"))
       });
     })
   };
@@ -1790,7 +1790,7 @@ export async function runAgents({
       throw new VasirCliError({
         code: "AGENTS_SYNC_TOO_MANY_ARGUMENTS",
         message: "`vasir agents sync` accepts flags for scope/profile, plus one legacy optional profile argument.",
-        suggestion: "Use `vasir agents sync --scope frontend --profile frontend`, or omit `--profile` and let Vasir infer it.",
+        suggestion: "Use `vasir agents sync --scope frontend --profile frontend` for a nested app/package root, or omit `--profile` and let Vasir infer it.",
         docsRef: AGENTS_REFERENCE_DOCS_REF
       });
     }

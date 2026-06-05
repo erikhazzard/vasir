@@ -156,6 +156,31 @@ test("root AGENTS template treats touchpoints as reconnaissance, not approval bo
   assert.doesNotMatch(agentsTemplateText, /file targets exceed the approved envelope/);
 });
 
+test("AGENTS taxonomy separates generated roots from folder steering maps", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const templateReadmeText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "README.md"), "utf8");
+  const rootReadmeText = fs.readFileSync(path.join(REPO_ROOT, "README.md"), "utf8");
+  const cliReferenceText = fs.readFileSync(path.join(REPO_ROOT, "docs", "cli-reference.md"), "utf8");
+  const folderAgentsSkillText = fs.readFileSync(
+    path.join(REPO_ROOT, ".agents", "skills", "agents__creating-folder-agents", "SKILL.md"),
+    "utf8"
+  );
+
+  for (const documentText of [agentsTemplateText, templateReadmeText, rootReadmeText, cliReferenceText]) {
+    assert.match(documentText, /Nested root `AGENTS\.md`|nested root `AGENTS\.md`|Nested root AGENTS|nested root AGENTS/);
+    assert.match(documentText, /Folder `AGENTS\.md`|Folder AGENTS|folder AGENTS/);
+  }
+
+  assert.match(agentsTemplateText, /Folder AGENTS must steer work/);
+  assert.match(rootReadmeText, /Do not use `vasir agents sync --scope` for ordinary folder steering maps/);
+  assert.match(cliReferenceText, /Folder `AGENTS\.md` files are different/);
+  assert.match(folderAgentsSkillText, /Folder AGENTS are local steering maps/);
+  assert.match(folderAgentsSkillText, /No sidecar\. No root template\. No `vasir agents sync --scope`/);
+  assert.match(folderAgentsSkillText, /Do not use `AGENTS__non-obvious\.md` for folder steering maps/);
+  assert.doesNotMatch(folderAgentsSkillText, /local contract/i);
+  assert.doesNotMatch(folderAgentsSkillText, /folder-scoped/i);
+});
+
 test("testing doctrine forbids tombstone absence tests", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
   const testingSkillText = fs.readFileSync(
