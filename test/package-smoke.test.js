@@ -121,10 +121,9 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "code__writing-code-frontend", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "vasir.json")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
-  assert.match(
-    fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"),
-    /<!-- vasir:profile:frontend -->/
-  );
+  assert.doesNotMatch(fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"), /vasir:profile/);
+  const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
+  assert.equal(projectConfig.agents.profile, "frontend");
 
   const contextResult = runCommand(binaryPath, ["context", "--json", "--debug"], projectDirectory, addEnvironmentVariables);
   assert.equal(contextResult.status, 0, contextResult.stderr);

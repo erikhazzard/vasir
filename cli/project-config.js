@@ -5,11 +5,13 @@ import { VasirCliError } from "./cli-error.js";
 import { COMMANDS_REFERENCE_DOCS_REF } from "./docs-ref.js";
 
 const PROJECT_CONFIG_SCHEMA_VERSION = 1;
+const SUPPORTED_AGENTS_PROFILE_NAMES = new Set(["backend", "frontend", "ios", "generic"]);
 
 export function createEmptyProjectConfig() {
   return {
     schemaVersion: PROJECT_CONFIG_SCHEMA_VERSION,
-    tracking: null
+    tracking: null,
+    agents: null
   };
 }
 
@@ -47,6 +49,33 @@ function normalizeTrackingPolicy(rawTrackingPolicy) {
   throw new Error("Unexpected tracking policy mode.");
 }
 
+function normalizeAgentsPolicy(rawAgentsPolicy) {
+  if (rawAgentsPolicy === null || rawAgentsPolicy === undefined) {
+    return null;
+  }
+
+  if (typeof rawAgentsPolicy !== "object" || Array.isArray(rawAgentsPolicy)) {
+    throw new Error("Unexpected agents policy shape.");
+  }
+
+  if (rawAgentsPolicy.profile === null || rawAgentsPolicy.profile === undefined || rawAgentsPolicy.profile === "") {
+    return null;
+  }
+
+  if (typeof rawAgentsPolicy.profile !== "string") {
+    throw new Error("Unexpected agents profile shape.");
+  }
+
+  const normalizedProfile = rawAgentsPolicy.profile.toLowerCase();
+  if (!SUPPORTED_AGENTS_PROFILE_NAMES.has(normalizedProfile)) {
+    throw new Error("Unexpected agents profile value.");
+  }
+
+  return {
+    profile: normalizedProfile
+  };
+}
+
 function normalizeProjectConfig(parsedProjectConfig) {
   if (
     !parsedProjectConfig ||
@@ -62,7 +91,8 @@ function normalizeProjectConfig(parsedProjectConfig) {
 
   return {
     schemaVersion: PROJECT_CONFIG_SCHEMA_VERSION,
-    tracking: normalizeTrackingPolicy(parsedProjectConfig.tracking)
+    tracking: normalizeTrackingPolicy(parsedProjectConfig.tracking),
+    agents: normalizeAgentsPolicy(parsedProjectConfig.agents)
   };
 }
 
@@ -101,11 +131,17 @@ export function writeProjectConfig({ projectPaths, projectConfig }) {
 
 export function createTrackingProjectConfig({
   trackingMode,
-  selectedSkillNames = []
+  selectedSkillNames = [],
+  existingProjectConfig = null,
+  agentsProfileName
 }) {
   if (trackingMode !== "all" && trackingMode !== "selected") {
     throw new Error(`Unsupported tracking mode: ${trackingMode}`);
   }
+
+  const agentsPolicy = agentsProfileName === undefined
+    ? existingProjectConfig?.agents ?? null
+    : normalizeAgentsPolicy({ profile: agentsProfileName });
 
   return {
     schemaVersion: PROJECT_CONFIG_SCHEMA_VERSION,
@@ -119,6 +155,20 @@ export function createTrackingProjectConfig({
             mode: "selected",
             skillNames: [...new Set(selectedSkillNames)]
               .sort((leftSkillName, rightSkillName) => leftSkillName.localeCompare(rightSkillName))
-          }
+          },
+    agents: agentsPolicy
+  };
+}
+
+export function createProjectConfigWithAgentsProfile({
+  projectConfig = null,
+  agentsProfileName
+}) {
+  const normalizedProjectConfig = projectConfig ?? createEmptyProjectConfig();
+
+  return {
+    schemaVersion: PROJECT_CONFIG_SCHEMA_VERSION,
+    tracking: normalizedProjectConfig.tracking ?? null,
+    agents: normalizeAgentsPolicy({ profile: agentsProfileName })
   };
 }

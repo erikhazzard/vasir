@@ -143,17 +143,32 @@ test("agent template snippets own profile-specific insertion blocks", () => {
   }
 });
 
-test("root AGENTS template treats touchpoints as reconnaissance, not approval boundaries", () => {
+test("root AGENTS template treats touchpoints as lane evidence, not approval boundaries", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const exampleAgentsText = fs.readFileSync(path.join(REPO_ROOT, "docs", "example-agents.md"), "utf8");
 
-  assert.match(agentsTemplateText, /Expected initial touchpoints:/);
-  assert.match(agentsTemplateText, /Approved change envelope:/);
-  assert.match(agentsTemplateText, /Autonomous expansion rule:/);
-  assert.match(agentsTemplateText, /Escalation triggers:/);
-  assert.match(agentsTemplateText, /File lists are reconnaissance, not permission\./);
+  assert.doesNotMatch(agentsTemplateText, /vasir:profile/);
+  assert.doesNotMatch(agentsTemplateText, /Last Updated/);
+  assert.doesNotMatch(agentsTemplateText, /update alongside major architectural PRs/);
+  assert.match(agentsTemplateText, /<Lane_Contract>/);
+  assert.match(agentsTemplateText, /Work source of truth:/);
+  assert.match(agentsTemplateText, /Repo evidence read:/);
+  assert.match(agentsTemplateText, /Likely starting points:/);
+  assert.match(agentsTemplateText, /Active lane:/);
+  assert.match(agentsTemplateText, /Neighboring lanes to avoid:/);
+  assert.match(agentsTemplateText, /Senior-engineer latitude:/);
+  assert.match(agentsTemplateText, /Boundary report triggers:/);
+  assert.match(agentsTemplateText, /Treat discovered paths as orientation evidence, not edit permission\./);
+  assert.match(agentsTemplateText, /File lists are orientation evidence, not permission\./);
   assert.doesNotMatch(agentsTemplateText, /Existing files allowed to edit:/);
   assert.doesNotMatch(agentsTemplateText, /Plan Amendment Protocol/);
+  assert.doesNotMatch(agentsTemplateText, /Escalation triggers:/);
+  assert.doesNotMatch(agentsTemplateText, /ESCALATION_REQUEST/);
+  assert.doesNotMatch(agentsTemplateText, /Approved change envelope:/);
   assert.doesNotMatch(agentsTemplateText, /file targets exceed the approved envelope/);
+  assert.doesNotMatch(exampleAgentsText, /Which exact files and systems will be touched/);
+  assert.doesNotMatch(exampleAgentsText, /Do not edit outside the declared lane/);
+  assert.doesNotMatch(exampleAgentsText, /approved change boundary/);
 });
 
 test("AGENTS taxonomy separates generated roots from folder steering maps", () => {
@@ -179,6 +194,27 @@ test("AGENTS taxonomy separates generated roots from folder steering maps", () =
   assert.match(folderAgentsSkillText, /Do not use `AGENTS__non-obvious\.md` for folder steering maps/);
   assert.doesNotMatch(folderAgentsSkillText, /local contract/i);
   assert.doesNotMatch(folderAgentsSkillText, /folder-scoped/i);
+});
+
+test("root AGENTS and handoff gate block proof exhaust and script bloat", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const handoffSkillText = fs.readFileSync(
+    path.join(REPO_ROOT, ".agents", "skills", "handoff__final-quality-gate", "SKILL.md"),
+    "utf8"
+  );
+
+  assert.match(agentsTemplateText, /Durable Artifact Admission:/);
+  assert.match(agentsTemplateText, /Every new durable file must graduate into production code, canonical test\/eval, reusable tool, folder steering map, or active work doc/);
+  assert.match(agentsTemplateText, /Anything else is temporary proof and must stay in `tmp\/\*\*` or be deleted before completion/);
+  assert.match(agentsTemplateText, /Package Script Admission:/);
+  assert.match(agentsTemplateText, /`package\.json` scripts are a stable developer and CI interface, not a proof log/);
+  assert.match(agentsTemplateText, /task, bug, milestone, date, or proof-specific checks/);
+
+  assert.match(handoffSkillText, /Repo Shape & Command Surface/);
+  assert.match(handoffSkillText, /<Artifact_Ledger>/);
+  assert.match(handoffSkillText, /<Package_Script_Changes>/);
+  assert.match(handoffSkillText, /temporary proof outside `tmp\/\*\*`/);
+  assert.match(handoffSkillText, /package scripts named for a bug, task, milestone, date, incident, proof rung, or temporary scenario/);
 });
 
 test("testing doctrine forbids tombstone absence tests", () => {

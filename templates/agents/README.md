@@ -34,7 +34,7 @@ Rules:
 Fastest path:
 
 1. Run `vasir agents sync`. It infers the profile, renders the current canonical template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result.
-2. Use `vasir agents sync --profile frontend|backend|ios` when inference needs an explicit profile.
+2. Use `vasir agents sync --profile frontend|backend|ios|generic` when inference needs an explicit profile.
 3. Use `vasir agents sync --scope frontend --profile frontend` when a folder is a nested app/package root.
 4. Use `vasir agents sync --dry-run` to preview without writing.
 5. Author ordinary folder AGENTS directly as steering maps, or use the installed `agents__creating-folder-agents` skill.

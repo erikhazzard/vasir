@@ -771,6 +771,19 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "plan__prepare-goal",
+      "description": "N/A, ONLY CALLED MANUALLY",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__prepare-goal",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "plan__prepare-summary",
       "description": "Used to summarize a workspec plan before executing",
       "category": "uncategorized",
@@ -781,6 +794,19 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/plan__prepare-summary",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "plan__question-spec",
+      "description": "Use immediately before implementing a work spec",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__question-spec",
       "entry": "SKILL.md"
     },
     {

@@ -2,7 +2,7 @@
 
 Use this page when you want a filled example to adapt, not just the blank template.
 
-For the fastest starting point, run `vasir agents sync`. It infers the profile, renders the current template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result. Use `vasir agents sync --profile frontend|backend|ios` when you need an explicit profile, or `vasir agents sync --scope frontend --profile frontend` for a nested app/package root. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). The shared manifest structure lives in [templates/agents/AGENTS.md](../templates/agents/AGENTS.md), and stack-specific content lives in [templates/agents/snippets/](../templates/agents/snippets/).
+For the fastest starting point, run `vasir agents sync`. It infers the profile, renders the current template, fills purpose/routing from local repo context, injects `AGENTS__non-obvious.md`, and validates the result. Use `vasir agents sync --profile frontend|backend|ios|generic` when you need an explicit profile, or `vasir agents sync --scope frontend --profile frontend` for a nested app/package root. For the source templates, see [templates/agents/README.md](../templates/agents/README.md). The shared manifest structure lives in [templates/agents/AGENTS.md](../templates/agents/AGENTS.md), and stack-specific content lives in [templates/agents/snippets/](../templates/agents/snippets/).
 
 Use the structure below as a rendered example. In normal repos, edit `AGENTS__non-obvious.md` for repo-specific constraints and rerun `vasir agents sync` to regenerate `AGENTS.md`.
 
@@ -14,7 +14,7 @@ Use the structure below as a rendered example. In normal repos, edit `AGENTS__no
 Before proposing any code modification, you MUST state:
 
 1. **The Unlock**: What user journey or engineering system does this change serve?
-2. **The Scope**: Which exact files and systems will be touched?
+2. **The Lane**: Which repo evidence was read, what work lane is active, and which neighboring lanes must be protected?
 3. **The Constraint Check**: Why does this change not violate any Global Invariant?
 
 ## Phase 2: Global Invariants
@@ -56,7 +56,7 @@ If a command fails, read it, diagnose the root cause, and fix the real failure b
 
 ### Operational Constraints
 - No destructive git commands.
-- Do not edit outside the declared lane.
+- Stay in the active work lane. File lists are orientation, not permission; touch implementation-discovered files required to complete and prove the lane while protecting unrelated parallel work.
 - Update docs and tests in the same turn when public behavior changes.
 
 ## Recency Anchor

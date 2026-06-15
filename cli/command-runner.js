@@ -924,6 +924,12 @@ function readAgentsProfileHintFromFile(agentsFilePath) {
   return agentsText.match(/<!--\s*vasir:profile:([a-z0-9-]+)\s*-->/i)?.[1] ?? null;
 }
 
+function readAgentsProfileHintFromProject({ projectPaths, agentsFilePath }) {
+  const projectConfig = readProjectConfig({ projectPaths });
+
+  return projectConfig?.agents?.profile ?? readAgentsProfileHintFromFile(agentsFilePath);
+}
+
 function createContextAction({
   argv,
   reason,
@@ -1390,7 +1396,7 @@ Notes:
   Pass --repo-root <path> to target an explicit repo root, including monorepo subprojects.
   Use "vasir add all" to install every catalog skill into the current repo.
   add auto-initializes the global catalog if needed.
-  add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios overrides profile inference.
+  add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios|generic overrides profile inference.
   agents sync is the one-command generated AGENTS path: it infers or accepts a profile, can target a nested app/package root with --scope, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
   Folder AGENTS files are hand-authored steering maps for ordinary subtrees; do not generate them with agents sync --scope.
   agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
@@ -1530,8 +1536,8 @@ function parseCommandInvocation(argumentVector) {
       if (!agentsProfileArgument || agentsProfileArgument.startsWith("--")) {
         throw new VasirCliError({
           code: "AGENTS_PROFILE_FLAG_VALUE_REQUIRED",
-          message: "`--agents-profile` requires one of: backend, frontend, ios.",
-          suggestion: "Use `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios`.",
+          message: "`--agents-profile` requires one of: backend, frontend, ios, generic.",
+          suggestion: "Use `--agents-profile backend`, `--agents-profile frontend`, `--agents-profile ios`, or `--agents-profile generic`.",
           docsRef: REPLACE_REFERENCE_DOCS_REF
         });
       }
@@ -1546,8 +1552,8 @@ function parseCommandInvocation(argumentVector) {
       if (!profileArgument || profileArgument.startsWith("--")) {
         throw new VasirCliError({
           code: "AGENTS_SYNC_PROFILE_FLAG_VALUE_REQUIRED",
-          message: "`--profile` requires one of: backend, frontend, ios.",
-          suggestion: "Use `vasir agents sync --profile frontend`, `--profile backend`, or `--profile ios`.",
+          message: "`--profile` requires one of: backend, frontend, ios, generic.",
+          suggestion: "Use `vasir agents sync --profile frontend`, `--profile backend`, `--profile ios`, or `--profile generic`.",
           docsRef: COMMANDS_REFERENCE_DOCS_REF
         });
       }
@@ -2475,15 +2481,17 @@ async function runContext({
   debugTimings.repoContextInspection = durationInMilliseconds(phaseStartTime);
 
   const repositoryContext = inspectedProfileRecommendation.repositoryContext;
-  const profileHint = repositoryContext.profileHint === "generic"
-    ? null
-    : repositoryContext.profileHint;
+  const configuredProfileHint = repoInspection.projectConfig?.agents?.profile ?? null;
+  const legacyProfileHint = repositoryContext.profileHint ?? null;
+  const profileHint = configuredProfileHint ?? legacyProfileHint;
   const recommendedAgentsProfile = profileHint
     ? {
         kind: "agentsProfileRecommendation",
         profileName: profileHint,
-        source: "AGENTS.md",
-        reason: "Root AGENTS.md already declares the repo's intended starter profile."
+        source: configuredProfileHint ? ".agents/vasir.json" : "legacy AGENTS.md",
+        reason: configuredProfileHint
+          ? "Repo config declares the intended AGENTS starter profile."
+          : "Root AGENTS.md has a legacy profile marker that will be migrated on sync."
       }
     : {
         kind: "agentsProfileRecommendation",
@@ -3007,6 +3015,7 @@ function runRepair({
     projectPaths,
     projectConfig: createTrackingProjectConfig({
       trackingMode: repairTrackingPolicy.trackingMode,
+      existingProjectConfig: projectState.projectConfigError ? null : projectState.projectConfig,
       selectedSkillNames:
         repairTrackingPolicy.trackingMode === "selected"
           ? desiredSkillNames
@@ -3037,6 +3046,7 @@ function runRepair({
       projectPaths,
       projectConfig: createTrackingProjectConfig({
         trackingMode: repairTrackingPolicy.trackingMode,
+        existingProjectConfig: projectState.projectConfigError ? null : projectState.projectConfig,
         selectedSkillNames:
           repairTrackingPolicy.trackingMode === "selected"
             ? desiredSkillNames
@@ -3574,7 +3584,10 @@ async function runAdd({
   const effectiveAgentsProfile = installResult.wroteAgentsFile
     ? installResult.agentsProfile
     : agentsSelection.source === "existing"
-      ? readAgentsProfileHintFromFile(projectAgentsFilePath) ?? "custom"
+      ? readAgentsProfileHintFromProject({
+          projectPaths: installResult.projectPaths,
+          agentsFilePath: projectAgentsFilePath
+        }) ?? "custom"
       : installResult.agentsProfile;
 
   if (!jsonOutput) {
@@ -3953,7 +3966,7 @@ async function runSelectedCommand({
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
       message: "--agents-profile is only supported by `vasir add`.",
-      suggestion: "Use `vasir add <skill> --agents-profile <backend|frontend|ios>` when you want one-command skill install plus AGENTS scaffolding.",
+      suggestion: "Use `vasir add <skill> --agents-profile <backend|frontend|ios|generic>` when you want one-command skill install plus AGENTS scaffolding.",
       docsRef: REPLACE_REFERENCE_DOCS_REF
     });
   }
@@ -3965,7 +3978,7 @@ async function runSelectedCommand({
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
       message: "--profile is only supported by `vasir agents sync`.",
-      suggestion: "Use `vasir agents sync --profile frontend`, or omit it and let Vasir infer the profile.",
+      suggestion: "Use `vasir agents sync --profile frontend`, `--profile generic`, or omit it and let Vasir infer the profile.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }

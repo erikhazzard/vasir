@@ -56,6 +56,7 @@ Use the repo root for repo-wide rules.
 ```bash
 vasir agents sync
 vasir agents sync --profile frontend
+vasir agents sync --profile generic
 ```
 
 Nested root AGENTS are generated root contracts for app/package folders. Use `--scope` only when a subfolder is a nested app/package root, such as `frontend/`, `backend/`, `apps/web/`, `packages/web/`, or `services/api/`.

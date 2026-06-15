@@ -196,7 +196,7 @@ Recommended path:
 
 1. Preview with `vasir agents sync --dry-run`.
 2. Run `vasir agents sync`.
-3. If Vasir inferred the wrong profile, rerun with `vasir agents sync --profile backend`, `vasir agents sync --profile frontend`, or `vasir agents sync --profile ios`.
+3. If Vasir inferred the wrong profile, rerun with `vasir agents sync --profile backend`, `vasir agents sync --profile frontend`, `vasir agents sync --profile ios`, or `vasir agents sync --profile generic`.
 4. Keep repo-specific landmines in `AGENTS__non-obvious.md`; `AGENTS.md` is regenerated from it.
 5. Use `vasir agents init`, `draft-purpose`, `draft-routing`, and `validate` only when you intentionally need the lower-level primitives.
 

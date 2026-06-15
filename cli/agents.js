@@ -6,6 +6,11 @@ import { VasirCliError } from "./cli-error.js";
 import { AGENTS_REFERENCE_DOCS_REF } from "./docs-ref.js";
 import { readCatalogSourceRegistry, readGlobalRegistry } from "./global-catalog.js";
 import { buildProjectPaths } from "./path-layout.js";
+import {
+  createProjectConfigWithAgentsProfile,
+  readProjectConfig,
+  writeProjectConfig
+} from "./project-config.js";
 import { createCommandUi } from "./ui/command-output.js";
 import { interactiveSelect } from "./ui/interactive-select.js";
 import { resolveEvalEnvironmentVariables } from "./eval/keys-file.js";
@@ -26,7 +31,6 @@ const ENGINEERING_DOCTRINE_INSERTS_END_MARKER = "<!-- vasir:engineering-doctrine
 const PURPOSE_PLACEHOLDER_FRAGMENT = "Replace this block first.";
 const NONOBVIOUS_PLACEHOLDER_FRAGMENT = "[Add repo-specific landmines here.]";
 const EMPTY_NONOBVIOUS_TEXT = "None recorded yet.";
-const LAST_UPDATED_PLACEHOLDER = "[YYYY-MM-DD - update alongside major architectural PRs]";
 const DEFAULT_AGENTS_TEMPLATE = path.join("templates", "agents", "AGENTS.md");
 
 const AGENTS_PROFILE_SNIPPETS = Object.freeze({
@@ -114,6 +118,30 @@ const ROUTING_LANE_DEFINITIONS = Object.freeze([
     patterns: ["src/styles", "styles", "design-system", "src/design-system"],
     detail: "before introducing new tokens, styling primitives, or layout conventions.",
     profiles: ["frontend"],
+    priority: 84
+  },
+  {
+    id: "game-source",
+    label: "Game Source",
+    patterns: ["games"],
+    detail: "before changing game specs, kernels, shells, simulations, or game-local proof.",
+    profiles: ["generic", "frontend"],
+    priority: 91
+  },
+  {
+    id: "local-tooling",
+    label: "Local Tooling",
+    patterns: ["tools"],
+    detail: "before changing CLI, generators, templates, DevHub, or repo-local automation.",
+    profiles: ["generic"],
+    priority: 86
+  },
+  {
+    id: "shared-packages",
+    label: "Shared Packages",
+    patterns: ["packages"],
+    detail: "before changing workspace package APIs, SDK contracts, or shared runtime behavior.",
+    profiles: ["generic"],
     priority: 84
   },
   {
@@ -510,6 +538,32 @@ function readAgentsProfileHint(agentsText) {
   return profileMatch?.[1] ?? null;
 }
 
+function readConfiguredAgentsProfileName({ projectRootDirectory }) {
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory: projectRootDirectory,
+    projectRootDirectory
+  });
+  const projectConfig = readProjectConfig({ projectPaths });
+
+  return projectConfig?.agents?.profile ?? null;
+}
+
+function writeConfiguredAgentsProfileName({ projectRootDirectory, profileName }) {
+  const projectPaths = buildProjectPaths({
+    currentWorkingDirectory: projectRootDirectory,
+    projectRootDirectory
+  });
+  const existingProjectConfig = readProjectConfig({ projectPaths });
+
+  writeProjectConfig({
+    projectPaths,
+    projectConfig: createProjectConfigWithAgentsProfile({
+      projectConfig: existingProjectConfig,
+      agentsProfileName: profileName
+    })
+  });
+}
+
 function resolveAgentsTemplate(profileName) {
   if (profileName === null || profileName === undefined || profileName === "") {
     return {
@@ -533,7 +587,7 @@ function resolveAgentsTemplate(profileName) {
     throw new VasirCliError({
       code: "AGENTS_PROFILE_UNKNOWN",
       message: `Unknown AGENTS profile: ${profileName}`,
-      suggestion: "Use one of: backend, frontend, ios.",
+      suggestion: "Use one of: backend, frontend, ios, generic.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
@@ -605,6 +659,14 @@ function inferAgentsProfile({ projectRootDirectory, repositoryContext }) {
 
   function hasTopLevelMatch(matchPredicate) {
     return topLevelNames.some((entryName) => matchPredicate(entryName));
+  }
+
+  if (hasDirectory("games") && (hasDirectory("tools") || hasDirectory("packages"))) {
+    return {
+      profileName: null,
+      confident: false,
+      reason: "Game workspaces with local tooling or shared packages are mixed repos; use the generic AGENTS profile unless a repo config overrides it."
+    };
   }
 
   if (hasDependency("react", "next", "vite", "astro", "svelte", "vue", "@types/react")) {
@@ -797,32 +859,13 @@ function replaceTemplateBlock({ templateText, startMarker, endMarker, replacemen
 function renderAgentsTemplate({
   templateText,
   projectName,
-  currentDate,
   profile,
   profileSnippetText = null,
   templateFilePath = DEFAULT_AGENTS_TEMPLATE,
   snippetFilePath = null
 }) {
   let renderedTemplate = templateText
-    .replace(/\[Project Name\]/g, () => projectName)
-    .replace(LAST_UPDATED_PLACEHOLDER, () => `${currentDate} - update alongside major architectural PRs`);
-
-  if (profile && profile !== "generic") {
-    const profileMarkerPattern = /<!--\s*vasir:profile:[a-z0-9-]+\s*-->/i;
-    if (!profileMarkerPattern.test(renderedTemplate)) {
-      throw new VasirCliError({
-        code: "AGENTS_TEMPLATE_BLOCK_MISSING",
-        message: `AGENTS profile marker is missing from ${templateFilePath}`,
-        suggestion: "Restore the Vasir profile marker, then rerun the AGENTS command.",
-        docsRef: AGENTS_REFERENCE_DOCS_REF
-      });
-    }
-
-    renderedTemplate = renderedTemplate.replace(
-      profileMarkerPattern,
-      `<!-- vasir:profile:${profile} -->`
-    );
-  }
+    .replace(/\[Project Name\]/g, () => projectName);
 
   if (!profileSnippetText) {
     return renderedTemplate;
@@ -1213,6 +1256,10 @@ function findRoutingLanes({ projectRootDirectory, profileHint }) {
   const seenLanePaths = new Set();
 
   for (const laneDefinition of ROUTING_LANE_DEFINITIONS) {
+    if (profileHint === "generic" && !laneDefinition.profiles.includes("generic")) {
+      continue;
+    }
+
     const matchedDirectory = laneDefinition.patterns.find((candidatePath) => directoryPaths.includes(candidatePath));
     if (!matchedDirectory || seenLanePaths.has(matchedDirectory)) {
       continue;
@@ -1289,8 +1336,8 @@ function formatRoutingLineForLane({ lane, requiresLocalAgentsFile = true }) {
   return `* **${lane.label}:** If touching \`${lane.displayPath}\`, ${contextInstruction} ${lane.detail}`;
 }
 
-function formatRoutingLines({ projectRootDirectory, agentsText }) {
-  const profileHint = readAgentsProfileHint(agentsText);
+function formatRoutingLines({ projectRootDirectory, agentsText, profileName = null }) {
+  const profileHint = profileName ?? readAgentsProfileHint(agentsText);
   const inferredProfile = inferAgentsProfile({
     projectRootDirectory,
     repositoryContext: inspectRepositoryContext({
@@ -1298,7 +1345,7 @@ function formatRoutingLines({ projectRootDirectory, agentsText }) {
       agentsText
     })
   }).profileName;
-  const effectiveProfileHint = profileHint === "generic" ? inferredProfile ?? "generic" : profileHint ?? inferredProfile ?? "generic";
+  const effectiveProfileHint = profileHint ?? inferredProfile ?? "generic";
   const lanes = findRoutingLanes({
     projectRootDirectory,
     profileHint: effectiveProfileHint
@@ -1314,10 +1361,11 @@ function formatRoutingLines({ projectRootDirectory, agentsText }) {
   };
 }
 
-function formatSynchronizedRoutingLines({ projectRootDirectory, agentsText }) {
+function formatSynchronizedRoutingLines({ projectRootDirectory, agentsText, profileName = null }) {
   const routingDraft = formatRoutingLines({
     projectRootDirectory,
-    agentsText
+    agentsText,
+    profileName
   });
 
   return {
@@ -1342,8 +1390,7 @@ export function initializeProjectAgentsFile({
   globalCatalogDirectory,
   projectRootDirectory,
   profileName = null,
-  ifExists = "error",
-  currentDate = new Date().toISOString().slice(0, 10)
+  ifExists = "error"
 }) {
   const resolvedTemplate = resolveAgentsTemplate(profileName);
   const agentsFilePath = path.join(projectRootDirectory, "AGENTS.md");
@@ -1382,12 +1429,15 @@ export function initializeProjectAgentsFile({
     templateText: fs.readFileSync(templateFilePath, "utf8"),
     profileSnippetText: snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null,
     projectName: guessProjectName(projectRootDirectory),
-    currentDate,
     profile: resolvedTemplate.profile,
     templateFilePath,
     snippetFilePath
   });
   fs.writeFileSync(agentsFilePath, renderedTemplate);
+  writeConfiguredAgentsProfileName({
+    projectRootDirectory,
+    profileName: resolvedTemplate.profile
+  });
 
   return {
     agentsFilePath,
@@ -1402,7 +1452,7 @@ export function validateProjectAgentsFile({ projectRootDirectory }) {
     throw new VasirCliError({
       code: "AGENTS_FILE_MISSING",
       message: `AGENTS.md does not exist at ${agentsFilePath}`,
-      suggestion: "Run `vasir agents init <backend|frontend|ios>` first, then rerun `vasir agents validate`.",
+      suggestion: "Run `vasir agents init <backend|frontend|ios|generic>` first, then rerun `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
@@ -1434,8 +1484,8 @@ function renderSynchronizedAgentsText({
   projectRootDirectory,
   existingAgentsText,
   profileName = null,
-  nonobviousText = EMPTY_NONOBVIOUS_TEXT,
-  currentDate = new Date().toISOString().slice(0, 10)
+  configuredProfileName = null,
+  nonobviousText = EMPTY_NONOBVIOUS_TEXT
 }) {
   const existingProfileName = existingAgentsText ? readAgentsProfileHint(existingAgentsText) : null;
   const inspectedProfileRecommendation = inspectRecommendedAgentsProfile({
@@ -1444,7 +1494,8 @@ function renderSynchronizedAgentsText({
   });
   const requestedProfileName =
     profileName ??
-    (existingProfileName && existingProfileName !== "generic" ? existingProfileName : null) ??
+    configuredProfileName ??
+    existingProfileName ??
     inspectedProfileRecommendation.recommendation.profileName ??
     null;
   const resolvedTemplate = resolveAgentsTemplate(requestedProfileName);
@@ -1474,14 +1525,14 @@ function renderSynchronizedAgentsText({
     templateText: fs.readFileSync(templateFilePath, "utf8"),
     profileSnippetText: snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null,
     projectName: repositoryContext.projectName,
-    currentDate,
     profile: resolvedTemplate.profile,
     templateFilePath,
     snippetFilePath
   });
   const synchronizedRouting = formatSynchronizedRoutingLines({
     projectRootDirectory,
-    agentsText: existingAgentsText ?? renderedTemplate
+    agentsText: existingAgentsText ?? renderedTemplate,
+    profileName: resolvedTemplate.profile
   });
 
   let synchronizedAgentsText = removeScaffoldEditBlock(renderedTemplate);
@@ -1510,11 +1561,13 @@ function renderSynchronizedAgentsText({
     profile: resolvedTemplate.profile,
     profileSource: profileName
       ? "argument"
-      : existingProfileName && existingProfileName !== "generic"
-        ? "existing"
-        : inspectedProfileRecommendation.recommendation.profileName
-          ? inspectedProfileRecommendation.recommendation.source
-          : "default-generic",
+      : configuredProfileName
+        ? "config"
+        : existingProfileName
+          ? "legacy-agents"
+          : inspectedProfileRecommendation.recommendation.profileName
+            ? inspectedProfileRecommendation.recommendation.source
+            : "default-generic",
     purposeSource,
     routingProfile: synchronizedRouting.effectiveProfileHint,
     routingLines: synchronizedRouting.routingLines
@@ -1525,11 +1578,16 @@ export function synchronizeProjectAgentsFile({
   globalCatalogDirectory,
   projectRootDirectory,
   profileName = null,
-  dryRun = false
+  dryRun = false,
+  persistProfileConfig = false
 }) {
   const agentsFilePath = path.join(projectRootDirectory, "AGENTS.md");
   const agentsFileExists = fs.existsSync(agentsFilePath);
   const existingAgentsText = agentsFileExists ? fs.readFileSync(agentsFilePath, "utf8") : null;
+  const existingProfileName = existingAgentsText ? readAgentsProfileHint(existingAgentsText) : null;
+  const configuredProfileName = persistProfileConfig
+    ? readConfiguredAgentsProfileName({ projectRootDirectory })
+    : null;
   const nonobviousContext = resolveNonobviousContext({
     projectRootDirectory,
     existingAgentsText,
@@ -1540,6 +1598,7 @@ export function synchronizeProjectAgentsFile({
     projectRootDirectory,
     existingAgentsText,
     profileName,
+    configuredProfileName,
     nonobviousText: nonobviousContext.nonobviousText
   });
   const validationIssues = validateAgentsText({
@@ -1555,7 +1614,16 @@ export function synchronizeProjectAgentsFile({
   }
 
   const agentsFileChanged = existingAgentsText !== synchronizedAgents.synchronizedAgentsText;
-  const changed = agentsFileChanged || Boolean(nonobviousContext.pendingNonobviousFileText);
+  const shouldPersistProfileConfig =
+    persistProfileConfig &&
+    (profileName !== null || configuredProfileName !== null || existingProfileName !== null);
+  const profileConfigChanged =
+    shouldPersistProfileConfig &&
+    configuredProfileName !== synchronizedAgents.profile;
+  const changed =
+    agentsFileChanged ||
+    Boolean(nonobviousContext.pendingNonobviousFileText) ||
+    profileConfigChanged;
   if (nonobviousContext.pendingNonobviousFileText && !dryRun) {
     writeNonobviousSourceFile({
       nonobviousFilePath: nonobviousContext.nonobviousFilePath,
@@ -1571,12 +1639,19 @@ export function synchronizeProjectAgentsFile({
   if (agentsFileChanged && !dryRun) {
     fs.writeFileSync(agentsFilePath, synchronizedAgents.synchronizedAgentsText);
   }
+  if (profileConfigChanged && !dryRun) {
+    writeConfiguredAgentsProfileName({
+      projectRootDirectory,
+      profileName: synchronizedAgents.profile
+    });
+  }
 
   return {
     agentsFilePath,
     mode: !agentsFileExists ? "created" : agentsFileChanged ? "refreshed" : changed ? "refreshed" : "unchanged",
     changed,
     wroteAgentsFile: agentsFileChanged && !dryRun,
+    wroteProjectConfigProfile: profileConfigChanged && !dryRun,
     dryRun,
     profile: synchronizedAgents.profile,
     profileSource: synchronizedAgents.profileSource,
@@ -1769,7 +1844,7 @@ export async function runAgents({
       code: "AGENTS_SUBCOMMAND_REQUIRED",
       message: "An AGENTS subcommand is required.",
       suggestion:
-        "Use `vasir agents sync`, `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
+        "Use `vasir agents sync`, `vasir agents init <backend|frontend|ios|generic>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
@@ -1779,7 +1854,7 @@ export async function runAgents({
       code: "UNKNOWN_AGENTS_SUBCOMMAND",
       message: `Unknown AGENTS subcommand: ${agentsSubcommand}`,
       suggestion:
-        "Use `vasir agents sync`, `vasir agents init <backend|frontend|ios>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
+        "Use `vasir agents sync`, `vasir agents init <backend|frontend|ios|generic>`, `vasir agents draft-purpose`, `vasir agents draft-routing`, or `vasir agents validate`.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
@@ -1790,7 +1865,7 @@ export async function runAgents({
       throw new VasirCliError({
         code: "AGENTS_SYNC_TOO_MANY_ARGUMENTS",
         message: "`vasir agents sync` accepts flags for scope/profile, plus one legacy optional profile argument.",
-        suggestion: "Use `vasir agents sync --scope frontend --profile frontend` for a nested app/package root, or omit `--profile` and let Vasir infer it.",
+        suggestion: "Use `vasir agents sync --scope frontend --profile frontend` for a nested app/package root, `--profile generic` for mixed repos, or omit `--profile` and let Vasir infer it.",
         docsRef: AGENTS_REFERENCE_DOCS_REF
       });
     }
@@ -1848,7 +1923,8 @@ export async function runAgents({
       globalCatalogDirectory: catalogSource.sourceDirectory,
       projectRootDirectory: scopeResolution.targetProjectRootDirectory,
       profileName: requestedProfile,
-      dryRun: dryRunRequested
+      dryRun: dryRunRequested,
+      persistProfileConfig: scopeResolution.agentsScope === null
     });
 
     if (!jsonOutput) {

@@ -62,9 +62,7 @@ function createFixtureRepository() {
   writeFile(
     path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"),
     `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:generic -->
 
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
@@ -505,7 +503,7 @@ test("context returns a purely local repo handshake for llm consumers", async ()
   assert.equal(parsedOutput.trackingMode, "selected");
   assert.equal(parsedOutput.repoFacts.packageJson.name, "space-admin-console");
   assert.equal(parsedOutput.agentsProfile.profileName, "frontend");
-  assert.equal(parsedOutput.agentsProfile.source, "AGENTS.md");
+  assert.equal(parsedOutput.agentsProfile.source, ".agents/vasir.json");
   assert.deepEqual(parsedOutput.trackedSkills, ["react"]);
   assert.deepEqual(parsedOutput.recommendedSkillNames, ["react"]);
   assert.ok(Array.isArray(parsedOutput.recommendedSkills));
@@ -761,11 +759,13 @@ test("agents init writes a stack-specific starter with the project name and purp
   const agentsFilePath = path.join(projectDirectory, "AGENTS.md");
   const agentsText = fs.readFileSync(agentsFilePath, "utf8");
   assert.match(agentsText, /# AGENTS\.md: space-admin-console Root Manifest/);
-  assert.match(agentsText, /<!-- vasir:profile:frontend -->/);
-  assert.match(agentsText, /\*\*Last Updated:\*\* \d{4}-\d{2}-\d{2} - update alongside major architectural PRs/);
+  assert.doesNotMatch(agentsText, /vasir:profile/);
+  assert.doesNotMatch(agentsText, /Last Updated/);
   assert.match(agentsText, /Replace this block first\./);
   assert.match(agentsText, /This line must survive stack-profile composition\./);
   assert.match(agentsText, /Use local UI state first\./);
+  const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
+  assert.equal(projectConfig.agents.profile, "frontend");
 });
 
 test("add can install skills and seed a stack-specific AGENTS starter in one command", async () => {
@@ -797,7 +797,9 @@ test("add can install skills and seed a stack-specific AGENTS starter in one com
   assert.equal(parsedOutput.wroteAgentsFile, true);
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
-  assert.match(agentsText, /<!-- vasir:profile:frontend -->/);
+  assert.doesNotMatch(agentsText, /vasir:profile/);
+  const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
+  assert.equal(projectConfig.agents.profile, "frontend");
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
 });
 
@@ -873,10 +875,9 @@ test("add infers a stronger AGENTS profile when the repo shape is obvious", asyn
   assert.equal(parsedOutput.agentsProfile, "frontend");
   assert.equal(parsedOutput.agentsProfileSource, "inferred");
   assert.equal(parsedOutput.wroteAgentsFile, true);
-  assert.match(
-    fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"),
-    /<!-- vasir:profile:frontend -->/
-  );
+  assert.doesNotMatch(fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"), /vasir:profile/);
+  const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
+  assert.equal(projectConfig.agents.profile, "frontend");
 });
 
 test("agents draft-purpose can replace the untouched purpose placeholder with a repo-aware draft", async () => {
@@ -1019,7 +1020,7 @@ Existing files allowed to edit:
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
   assert.match(agentsText, /# AGENTS\.md: space-admin-console Root Manifest/);
-  assert.match(agentsText, /<!-- vasir:profile:frontend -->/);
+  assert.doesNotMatch(agentsText, /vasir:profile/);
   assert.match(agentsText, /Launcher default-game policy lives in Promotions, not Games\./);
   assert.match(agentsText, /If touching `\/src\/components\/`, use this root `AGENTS\.md`/);
   assert.doesNotMatch(agentsText, /Existing files allowed to edit/);
@@ -1039,6 +1040,68 @@ Existing files allowed to edit:
   });
 
   assert.equal(validateStatusCode, 0);
+});
+
+test("agents sync preserves explicit generic profile for game workspaces with frontend dependencies", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(
+    path.join(projectDirectory, "package.json"),
+    `${JSON.stringify({
+      name: "idavoll-games",
+      dependencies: { react: "^19.0.0", vite: "^8.0.0" }
+    }, null, 2)}\n`
+  );
+  writeFile(path.join(projectDirectory, "src", "ui", "devhub.js"), "export const devhub = true;\n");
+  writeFile(path.join(projectDirectory, "games", "g_sample", "AGENTS.md"), "# Sample Game Map\n");
+  writeFile(path.join(projectDirectory, "tools", "idv", "data", "game-template", "AGENTS.md"), "# Template Map\n");
+  writeFile(path.join(projectDirectory, "packages", "game-sdk", "AGENTS.md"), "# SDK Map\n");
+  writeFile(path.join(projectDirectory, "docs", "AGENTS.md"), "# Docs Map\n");
+  writeFile(
+    path.join(projectDirectory, "AGENTS.md"),
+    `# AGENTS.md: idavoll-games Root Manifest
+
+**Purpose:** idavoll-games owns deterministic browser games, local Idavoll tooling, and shared game runtime packages.
+
+<non-obvious_architectural_considerations>
+Games cannot call platform APIs directly.
+</non-obvious_architectural_considerations>
+`
+  );
+  const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "agents");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.subcommand, "sync");
+  assert.equal(parsedOutput.profile, "generic");
+  assert.equal(parsedOutput.profileSource, "default-generic");
+  assert.equal(parsedOutput.routingProfile, "generic");
+  assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/games/`")));
+  assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/tools/`")));
+  assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/packages/`")));
+  assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/docs/`")));
+  assert.ok(!parsedOutput.routingLines.some((line) => line.includes("`/src/ui/`")));
+
+  const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  assert.doesNotMatch(agentsText, /vasir:profile/);
+  assert.match(agentsText, /idavoll-games owns deterministic browser games/);
+  assert.match(agentsText, /Games cannot call platform APIs directly\./);
+  assert.match(agentsText, /Game Source/);
+  assert.match(agentsText, /Local Tooling/);
+  assert.match(agentsText, /Shared Packages/);
+  assert.match(agentsText, /Public Docs/);
+  assert.doesNotMatch(agentsText, /Use local UI state first\./);
+  assert.doesNotMatch(agentsText, /React \*\*19\.2\*\*/);
 });
 
 test("agents sync creates an empty non-obvious source file from generated placeholder text", async () => {
@@ -1136,7 +1199,6 @@ test("agents sync uses AGENTS__non-obvious.md as the source over generated AGENT
   writeFile(
     path.join(projectDirectory, "AGENTS.md"),
     `# 0. Old Generated Manifest
-<!-- vasir:profile:frontend -->
 
 # 4. Non-Obvious Architectural Considerations
 
@@ -1205,7 +1267,7 @@ test("agents sync writes a nested root AGENTS file with inferred profile and loc
   assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "frontend", "AGENTS__non-obvious.md"));
 
   const nestedRootAgentsText = fs.readFileSync(path.join(projectDirectory, "frontend", "AGENTS.md"), "utf8");
-  assert.match(nestedRootAgentsText, /<!-- vasir:profile:frontend -->/);
+  assert.doesNotMatch(nestedRootAgentsText, /vasir:profile/);
   assert.match(nestedRootAgentsText, /Frontend auth state is hydrated before routes render\./);
   assert.match(nestedRootAgentsText, /Use local UI state first\./);
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
@@ -1249,7 +1311,7 @@ test("agents sync --profile forces the nested root AGENTS profile", async () => 
   assert.equal(parsedOutput.agentsScope, "services/api");
 
   const nestedRootAgentsText = fs.readFileSync(path.join(projectDirectory, "services", "api", "AGENTS.md"), "utf8");
-  assert.match(nestedRootAgentsText, /<!-- vasir:profile:backend -->/);
+  assert.doesNotMatch(nestedRootAgentsText, /vasir:profile/);
   assert.match(nestedRootAgentsText, /Keep retry paths idempotent\./);
 });
 
@@ -1318,7 +1380,6 @@ test("agents validate fails closed on leftover scaffold markers and passes once 
     path.join(projectDirectory, "AGENTS.md"),
     `# AGENTS.md: Clean Root Manifest
 
-**Last Updated:** 2026-03-21 - update alongside major architectural PRs
 **Purpose:** This repository ships a clean AGENTS manifest for deterministic local agent work.
 `
   );
@@ -1345,7 +1406,6 @@ test("agents validate fails when a routed lane points at a directory without a r
     path.join(projectDirectory, "AGENTS.md"),
     `# AGENTS.md: Clean Root Manifest
 
-**Last Updated:** 2026-03-21 - update alongside major architectural PRs
 **Purpose:** This repository ships a clean AGENTS manifest for deterministic local agent work.
 
 ## 1. Topography & Routing Protocol (The Map)

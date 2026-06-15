@@ -72,9 +72,7 @@ function createFixtureRepository() {
   writeFile(
     path.join(repositoryDirectory, "templates", "agents", "AGENTS.md"),
     `# AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:generic -->
 
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->

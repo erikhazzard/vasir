@@ -40,17 +40,21 @@ function listProjectSkillDirectoryNames(projectPaths) {
 function writeTrackingPolicy({
   projectPaths,
   trackingMode,
-  trackedSkillNames
+  trackedSkillNames,
+  agentsProfileName
 }) {
   if (trackingMode !== "all" && trackingMode !== "selected") {
     return;
   }
 
+  const existingProjectConfig = readProjectConfig({ projectPaths });
   writeProjectConfig({
     projectPaths,
     projectConfig: createTrackingProjectConfig({
       trackingMode,
-      selectedSkillNames: trackingMode === "selected" ? trackedSkillNames : []
+      selectedSkillNames: trackingMode === "selected" ? trackedSkillNames : [],
+      existingProjectConfig,
+      agentsProfileName
     })
   });
 }
@@ -246,7 +250,8 @@ export function installSkillsIntoProject({
   writeTrackingPolicy({
     projectPaths,
     trackingMode,
-    trackedSkillNames: Object.keys(projectInstallState.skills)
+    trackedSkillNames: Object.keys(projectInstallState.skills),
+    agentsProfileName: agentsInitialization.profile ?? undefined
   });
 
   return {

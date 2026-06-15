@@ -98,6 +98,8 @@ Before verdict, establish this bundle through read-only discovery. If a field ca
   <Fresh_Artifacts>[current-code artifact paths]</Fresh_Artifacts>
   <Changed_Files>[exact changed source/test/docs/context files]</Changed_Files>
   <Scoped_AGENTS_Read>[paths or "Root only"]</Scoped_AGENTS_Read>
+  <Artifact_Ledger>[new durable files classified, temporary proof under tmp/**, or "No new files"]</Artifact_Ledger>
+  <Package_Script_Changes>[added/changed package.json scripts with six-month justification, or "None"]</Package_Script_Changes>
   <Code_Audit>[code__auditing source or "Not required — reason"]</Code_Audit>
   <Testing_Audit>[testing__auditing source or "Not required — reason"]</Testing_Audit>
 </Handoff_Evidence>
@@ -153,13 +155,19 @@ PASS only if WIP, eval plan, README/specs, scoped `AGENTS.md`, fileoverview head
 
 Fail or block on: behavior changed but context did not, stale fileoverview, missing milestone status, missing artifact references, or impossible `<Recap>/<Context_Sync>` truth.
 
-### 6. Subjective Gates
+### 6. Repo Shape & Command Surface
+
+PASS only if every new durable file is classified as production code, canonical test/eval, reusable tool, folder steering map, or active work doc, and every added or changed `package.json` script names a reusable six-month developer or CI command.
+
+Fail or block on: temporary proof outside `tmp/**`, milestone/task/incident/proof-journey files committed as durable source, one-off harnesses not folded into canonical tests/evals/tools, or package scripts named for a bug, task, milestone, date, incident, proof rung, or temporary scenario.
+
+### 7. Subjective Gates
 
 PASS only if required human judgment has explicit artifact-backed acceptance.
 
 BLOCKED on missing human acceptance. Do not convert subjective quality into automated PASS.
 
-### 7. Remaining Delta
+### 8. Remaining Delta
 
 PASS only if remaining delta is `None` or every delta is explicitly accepted as deferred by the human.
 
@@ -218,10 +226,11 @@ Use `- None.` only when there are no blockers.
 | 4 | `code__auditing` | PASS/FAIL/BLOCKED/N/A | verdict/blockers | production-readiness risk | exact closure |
 | 5 | `testing__auditing` | PASS/FAIL/BLOCKED/N/A | verdict/guards | unguarded regression risk | exact closure |
 | 6 | Docs / Context Sync | PASS/FAIL/BLOCKED | updated/checked paths | stale project memory risk | exact closure |
-| 7 | Fileoverview / Local Docs | PASS/FAIL/BLOCKED/N/A | files/findings | future maintenance risk | exact closure |
-| 8 | Subjective Gates | PASS/FAIL/BLOCKED/N/A | artifacts/acceptance | product-quality mismatch risk | exact closure |
-| 9 | Safety / Data / Git Constraints | PASS/FAIL/BLOCKED | findings | data/safety/repo risk | exact closure |
-| 10 | Remaining Delta | PASS/FAIL/BLOCKED | delta list | hidden work risk | exact closure |
+| 7 | Repo Shape & Command Surface | PASS/FAIL/BLOCKED | artifact ledger/script diff | proof exhaust and command bloat risk | exact closure |
+| 8 | Fileoverview / Local Docs | PASS/FAIL/BLOCKED/N/A | files/findings | future maintenance risk | exact closure |
+| 9 | Subjective Gates | PASS/FAIL/BLOCKED/N/A | artifacts/acceptance | product-quality mismatch risk | exact closure |
+| 10 | Safety / Data / Git Constraints | PASS/FAIL/BLOCKED | findings | data/safety/repo risk | exact closure |
+| 11 | Remaining Delta | PASS/FAIL/BLOCKED | delta list | hidden work risk | exact closure |
 
 Every Evidence cell must cite a real file, artifact, command result, audit result, or human acceptance. No placeholders.
 

@@ -31,8 +31,8 @@ vasir --version
 | `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
 | `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
-| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile a root or nested root `AGENTS.md` from the canonical template, local context, and `AGENTS__non-obvious.md` |
-| `agents init` | `vasir agents init <backend\|frontend\|ios> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter with a stack-specific snippet in the current repo root |
+| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios\|generic>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile a root or nested root `AGENTS.md` from the canonical template, local context, and `AGENTS__non-obvious.md` |
+| `agents init` | `vasir agents init <backend\|frontend\|ios\|generic> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
 | `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Fail closed when a root or nested root `AGENTS.md` still contains scaffold placeholders or broken repo routes |
@@ -227,7 +227,7 @@ vasir list
   - `vasir add all` marks the repo to keep tracking the full catalog on later `vasir update` runs.
   - `vasir add <specific skills>` marks the repo to keep tracking only those installed skills on later `vasir update` runs.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
-  - Pass `--agents-profile backend`, `--agents-profile frontend`, or `--agents-profile ios` when you want to override inference and force a specific AGENTS profile snippet.
+  - Pass `--agents-profile backend`, `--agents-profile frontend`, `--agents-profile ios`, or `--agents-profile generic` when you want to override inference and force a specific AGENTS profile.
   - If you pass `--agents-profile` and `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
   - `all` cannot be combined with specific skill names in the same command.
 
@@ -247,7 +247,7 @@ Text-mode success output also prints the resolved project skills directory so yo
 - Purpose: bring an existing `.agents/skills` tree under Vasir management without copying or overwriting files.
 - Result:
   - rebuilds `.agents/vasir-install-state.json` from the current on-disk skill directories
-  - writes `.agents/vasir.json` as the explicit repo tracking contract
+  - writes `.agents/vasir.json` as the explicit repo tracking and AGENTS profile contract
   - repairs `.claude/skills` and `.codex/skills` to point at `.agents/skills`
   - infers `trackingMode` from the adopted Vasir skill set
 - Notes:
@@ -297,7 +297,8 @@ Folder `AGENTS.md` files are different. They are hand-authored steering maps for
 
 - Purpose: the one-command generated AGENTS path for normal repos and nested app/package roots.
 - Result:
-  - renders `AGENTS.md` from the current canonical template and the inferred or explicit stack profile
+  - renders `AGENTS.md` from the current canonical template and the inferred or explicit profile
+  - stores explicit root profile intent in `.agents/vasir.json`, not in generated `AGENTS.md`
   - fills the purpose paragraph from deterministic local repo context without a model call
   - generates Section 1 routing from existing repo directories
   - injects repo-owned non-obvious constraints from `AGENTS__non-obvious.md`
@@ -305,7 +306,7 @@ Folder `AGENTS.md` files are different. They are hand-authored steering maps for
 - Notes:
   - By default, sync targets the resolved repo root.
   - Use `--scope <path>` when a folder is a nested app/package root, such as `frontend/AGENTS.md` or `apps/web/AGENTS.md`.
-  - Use `--profile frontend`, `--profile backend`, or `--profile ios` when inference is wrong or when the scope is too generic.
+  - Use `--profile frontend`, `--profile backend`, `--profile ios`, or `--profile generic` when inference is wrong or when the scope is mixed.
   - Use `vasir agents sync --dry-run` to preview without writing.
   - The legacy positional profile form, such as `vasir agents sync frontend`, still works, but new scripts should use `--profile`.
   - If `AGENTS__non-obvious.md` is missing, sync creates it. Existing `.agents/non-obvious.md` sidecars are moved to the root file, and legacy manual `AGENTS.md` files are migrated by seeding the root file from the old non-obvious block.
@@ -317,6 +318,7 @@ Examples:
 vasir agents sync
 vasir agents sync --dry-run
 vasir agents sync --profile frontend
+vasir agents sync --profile generic
 vasir agents sync --scope frontend
 vasir agents sync --scope packages/web --profile frontend
 vasir agents sync --scope services/api --profile backend
@@ -324,14 +326,14 @@ vasir agents sync --scope services/api --profile backend
 
 ### `agents init`
 
-- Purpose: write the canonical `AGENTS.md` starter into the resolved repo root with stack-specific snippet content composed in.
+- Purpose: write the canonical `AGENTS.md` starter into the resolved repo root with selected profile content composed in.
 - Result:
   - `AGENTS.md` exists in the resolved repo root.
   - The file has the guessed project name filled in.
   - The file has a loud `EDIT THESE FIRST` block at the top.
   - The `Purpose` block and Section 1 routing block are still safe placeholders until you replace them manually or via `draft-purpose --write` and `draft-routing --write`.
 - Notes:
-  - Supported profiles are `backend`, `frontend`, and `ios`.
+  - Supported profiles are `backend`, `frontend`, `ios`, and `generic`.
   - The repo root is the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
   - If `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
 
@@ -668,7 +670,7 @@ Project-local:
 ```
 
 Project-local skills are copied files that you own and can edit. They are never linked back to the global catalog.
-`.agents/vasir.json` is the committed repo-level source of truth for what the repo wants Vasir to track: full catalog or an explicit selected subset.
+`.agents/vasir.json` is the committed repo-level source of truth for what the repo wants Vasir to track and which root AGENTS profile it should preserve.
 `.agents/vasir-install-state.json` is Vasir's operational snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, prunes entries automatically when the matching skill directory is gone, and records catalog provenance such as the installed Vasir version, catalog hash, and per-skill source version so `vasir update --dry-run` can explain pending refreshes.
 
 ## Advanced Override

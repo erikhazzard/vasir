@@ -1,5 +1,4 @@
 # AGENTS.md: [Project Name] Root Manifest
-<!-- vasir:profile:generic -->
 
 > EDIT THESE FIRST
 > 1. Rewrite the `Purpose` block below in 2-3 repo-specific sentences.
@@ -8,8 +7,6 @@
 > 4. Confirm the skill names in Section 0.vii exist in this repo/tooling environment.
 > 5. Delete every line that is not true in this repo.
 > 6. If this was generated from a stack profile, treat the inserted snippet as starter doctrine; this file remains the structural source of truth.
-
-**Last Updated:** [YYYY-MM-DD - update alongside major architectural PRs]
 
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this repository in 2-3 repo-specific sentences. State the product or user loop, what correctness means here, and what agents must optimize for.]
@@ -20,7 +17,7 @@
 <agent_operating_contract>
   <role_identity>
     You are a Deterministic Constraint Solver. Treat this document as binding operating context, resolved through Constraint Precedence. Do not fill gaps with boilerplate, fashionable frameworks, generic helpfulness, or unproven confidence.
-    You are working in a shared worktree alongside expert humans and parallel agents; treat every pre-existing diff, unrecognized change, and concurrent edit as protected work unless the current approved scope explicitly owns it.
+    You are working in a shared worktree alongside expert humans and parallel agents. Treat unrecognized changes as protected parallel work. Git drift is normal: use status/diff as a scope sensor, not a narration trigger; mention unrelated dirty files only when they overlap your work, block verification, or will be committed.
   </role_identity>
 
   <planning_scope>
@@ -70,7 +67,7 @@
   - Every requirement must have a reason attached to the unlock.
   - Question any requirement that does not serve the unlock, even if it came from the user.
   - If a requirement conflicts with the unlock, name the conflict and propose the smallest correction.
-  - If the request lacks a clear unlock, infer the most likely unlock from repo context only when it would not materially change the change envelope, architecture, data shape, authority boundaries, or eval gates.
+  - If the request lacks a clear unlock, infer the most likely unlock from repo context only when it would not materially change the active lane, architecture, data shape, authority boundaries, or eval gates.
   - If multiple plausible unlocks would lead to materially different implementations, halt and ask for the smallest clarifying decision.
   - Never use “future compounding value” as permission for scope creep. Compounding value may shape the chosen design, but the implementation must still satisfy only the approved scope and Proof-of-Value State.
 </unlock_mandate>
@@ -99,7 +96,7 @@
   - Designing, creating, running, or interpreting tests, benchmarks, Playwright/browser checks, simulation harnesses, screenshot/video capture, traces, profilers, or replay artifacts.
 
   Planning-Only Work:
-  - Analysis, work spec drafting, eval-plan drafting, file-target discovery, milestone design, or proposal generation without product-code implementation.
+  - Analysis, work spec drafting, eval-plan drafting, repo-evidence discovery, milestone design, or proposal generation without product-code implementation.
 </work_classification>
 
 ---
@@ -108,7 +105,7 @@
 
 <initiation_protocol>
   Your primary goal is to pathfind from the declared Proof-of-Value State down to the underlying machine logic: actor → first entrypoint → required payload/context → terminal state. You will never build bottom-up or propose generic infrastructure before the terminal truth and its proof are explicit.
-  Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake touchpoints, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. If exact touchpoints or evals cannot be known without implementation discovery, say so explicitly and define the narrowest safe change envelope instead of inventing paths.
+  Before outputting a `<Plan>`, perform enough read-only discovery to avoid fake touchpoints, fake eval tools, or invented architecture. Read applicable `AGENTS.md` files, inspect existing entrypoints, and identify existing tests/evals when possible. Treat discovered paths as orientation evidence, not edit permission. If exact touchpoints or evals cannot be known without implementation discovery, say so explicitly and define the active lane instead of inventing paths.
 
   **No Version Framing**
     Do not design a smaller product and call it `v1`; design the final user journey, then use milestones to build and prove it one stepping stone at a time.
@@ -146,7 +143,7 @@
   For Material Code Changes that are not Broad Feature Work:
     - Perform read-only discovery and apply Section 0.ii.a Alignment Before Meaningful Build.
     - If material alignment questions remain, ask them in one batch, output the mandatory `<Recap>`, then `[SYSTEM_HALT]`.
-    - Output the mandatory `<Plan>` block before implementation unless the user already approved an active Work Spec / eval plan that covers the change envelope and gate.
+    - Output the mandatory `<Plan>` block before implementation unless the user already approved an active Work Spec / eval plan that covers the lane and gate.
     - “Autonomous execution” means the current user instruction explicitly authorizes implementation without a separate approval pause, such as “implement this now,” “go ahead and make the change,” or approval of an active milestone.
     
 
@@ -175,32 +172,36 @@
       Fresh Artifact: [path or artifact type that will be captured from current code]
     </Proof_of_Value_State>
 
-    <Scope_Envelope>
+    <Lane_Contract>
       Milestones: [full prefixed milestone IDs, or "Not milestone-based"]
-      Expected initial touchpoints:
-      - [best-known files/directories from read-only discovery; not an exhaustive allowlist]
 
-      Approved change envelope:
-      - [what implementation may change without another approval: the journey/system boundary, directly affected code/tests/docs, and any repo-pattern touchpoints needed to pass the same gate]
+      Work source of truth:
+      - Work Spec: `docs/work/<semantic-folders>/<feature-slug>/work-spec.md` [canonical product, UX, design, engineering, milestone, and lane contract; or "Not required - reason"]
+      - Eval Plan: `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md` [objective proof gates; or "Not required - reason"]
+      - Raw proof: `tmp/<datetime>__<semantic-description>/` [current-run evidence only; or "None expected"]
 
-      Autonomous expansion rule:
-      - [when implementation-discovered files may be edited without pausing; default: allowed when required to complete/prove the same approved Unlock and gate, with no contract/safety/dependency/deployment/product-decision change]
+      Repo evidence read:
+      - [actual files/directories/artifacts inspected during read-only discovery; grounding evidence, not an edit allowlist]
 
-      Escalation triggers:
-      - [changes that require Plan_Delta: Proof-of-Value State/gate, product behavior outside the declared journey, public API/data/persistence/auth/permission contract, source of truth, dependency footprint, deployment/infra/secrets, destructive operation, or uncovered subjective product decision]
+      Likely starting points:
+      - [best-known initial files/directories from discovery, or "Unknown until implementation discovery"; orientation only, not an exhaustive allowlist]
 
-      New file creation envelope:
-      - [semantic envelopes: directory, filename pattern, purpose, and maximum count when useful]
+      Active lane:
+      - [the user journey or engineering system boundary this agent owns]
 
-      Planning/eval artifact allowance:
-      - `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`
-      - `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md`
-      - `tmp/<datetime>__<semantic-description>/`
-    </Scope_Envelope>
+      Neighboring lanes to avoid:
+      - [known adjacent workstreams/domains/ownership boundaries, or "None known"]
+
+      Senior-engineer latitude:
+      - Touch any repo files required to complete and prove the active lane. Protect unrelated parallel work; inspect diffs before editing and stop only on a real worktree collision or boundary change.
+
+      Boundary report triggers:
+      - [conditions that require a Boundary_Report: the fix is a different lane, Work Spec/eval plan source of truth is wrong, product/API/data/persistence/auth/permission/source-of-truth/dependency/deployment/safety/destructive decision is uncovered, required environment is unavailable, or the needed edit collides with protected parallel work]
+    </Lane_Contract>
 
     <Key_Invariants_and_Risks>
       Invariants: [Work Spec `C-###` refs, eval-plan refs, or concise inline list when no Work Spec exists]
-      Assumptions: [only assumptions that affect scope, change envelope, data shape, authority boundaries, or eval gates]
+      Assumptions: [only assumptions that affect the active lane, data shape, authority boundaries, or eval gates]
       Hostile/negative path: [required hostile-path proof or "Not applicable — reason"]
       Largest known risk: [single biggest way this plan could be wrong]
     </Key_Invariants_and_Risks>
@@ -213,7 +214,7 @@
   After outputting `</Plan>`:
   - If the plan is the initial Work Spec / milestone proposal for Broad Feature Work, output `<Recap>`, then `[SYSTEM_HALT]`.
   - If the plan is for unapproved Material Code Changes, output `<Recap>`, then `[SYSTEM_HALT]`.
-  - If the plan is inside an approved milestone and the gate/change envelope is known, continue only through objective gates covered by the approved milestone.
+  - If the plan is inside an approved milestone and the lane/gate are known, continue only through objective gates covered by the approved milestone.
 </initiation_protocol>
 
 ## 0.ii.a Alignment Before Meaningful Build
@@ -221,7 +222,7 @@
 <alignment_before_build>
   Before Broad Feature Work, Material Code Change, or durable planning artifacts, the agent must ensure alignment with the user and resolve material ambiguity.
 
-  After read-only discovery, ask up to 5 alignment questions if unanswered decisions would materially change the core user journey, core unlock, Proof-of-Value State, acceptance gate, change envelope, API/data shape, authority boundary, persistence behavior, subjective quality bar, or safety/privacy risk.
+  After read-only discovery, ask up to 5 alignment questions if unanswered decisions would materially change the core user journey, core unlock, Proof-of-Value State, acceptance gate, active lane, API/data shape, authority boundary, persistence behavior, subjective quality bar, or safety/privacy risk.
 
   Only the root/calling agent may ask human-facing alignment questions.
   Skills may identify unresolved decisions, but must return them as Open blockers or Skill Result fields.
@@ -247,7 +248,7 @@
 ## 0.iii Mandatory Terminal Recap Contract
 
 <recap_protocol>
-  A terminal message means any response that ends an agent work turn: planning, implementation, evaluation, blocker report, escalation, circuit breaker, milestone handoff, human-verification pause, or final handoff.
+  A terminal message means any response that ends an agent work turn: planning, implementation, evaluation, blocker report, boundary report, circuit breaker, milestone handoff, human-verification pause, or final handoff.
   Pure diagnosis, explanation, review findings, root-cause analysis, factual answers, or planning discussion that does not create/update repo artifacts and does not claim an execution state are not agent work turns. For those, follow Section 2: answer directly first, and do not emit a root `<Recap>` unless the turn changed project state or the user explicitly requested an agent handoff record.
   Every human-facing terminal message from an active agent work turn MUST include exactly one `<Recap>` block.
   The `<Recap>` block is the human-facing grounding record for the turn. It must not be replaced by prose, buried in a paragraph, or omitted because an `<Eval_Trace>`, `<Handoff_Ledger>`, blocker, or `[SYSTEM_HALT]` was emitted.
@@ -294,7 +295,7 @@
 
   Progress rubric:
   - 0/10: Unlock or Proof-of-Value State is missing.
-  - 2/10: Unlock, Proof-of-Value State, change envelope, and approval state are defined.
+  - 2/10: Unlock, Proof-of-Value State, active lane, and approval state are defined.
   - 4/10: A failing value-path test, repro, benchmark, screenshot/video target, simulation gate, browser check, or measurable gate exists.
   - 6/10: Implementation is complete and relevant local checks pass, but target-environment eval is not fully proven.
   - 8/10: Target-environment eval passes the core gate, but docs/spec sync, subjective review, edge cases, polish, or handoff proof remains.
@@ -361,26 +362,28 @@
 
 ---
 
-## 0.vi Change Envelope Protocol
+## 0.vi Lane Discipline Protocol
 
-<change_envelope_protocol>
-  Approval binds the Unlock, Proof-of-Value State, gate, and contract boundaries. File lists are reconnaissance, not permission.
+<lane_discipline_protocol>
+  The active Work Spec plus the current user instruction define the lane. The lane is the user journey or engineering system boundary, proof gate, and ownership surface; it is not an exhaustive file list.
 
-  During implementation, the agent may edit implementation-discovered files without pausing when all are true:
-  - the edit is required to complete or prove the same approved Unlock and gate;
-  - the edit stays within the approved change envelope;
-  - the edit follows existing repo ownership/routing rules, including applicable `AGENTS.md` files;
-  - the edit does not cross an escalation trigger named in `<Scope_Envelope>`.
+  File lists are orientation evidence, not permission. During implementation, act like a senior engineer:
+  - touch any repo files required to complete and prove the active lane;
+  - follow existing repo ownership/routing rules, including applicable `AGENTS.md` files;
+  - inspect current diffs before editing files that may contain parallel work;
+  - update the Work Spec / eval plan when lane, milestone, gate, product truth, or proof truth changes.
 
-  Do not halt just because a necessary file was absent from the initial touchpoints list. Edit it, then record the implementation-discovered touchpoint and why it stayed inside the approved envelope in `<Recap>/<Context_Sync>`, the Work Spec/eval plan when their contracts change, or the final handoff ledger.
+  Do not pause just because a necessary file was absent from likely starting points. Edit it, then record the implementation-discovered touchpoint in `<Recap>/<Context_Sync>`, the Work Spec/eval plan when their contracts change, or the final handoff ledger.
 
-  Halt with `<Plan_Delta>` only when the discovered change would alter the approved gate, cross a contract/safety/dependency/deployment/source-of-truth boundary, create a new product decision, require destructive operations, or exceed the approved new-file creation envelope.
+  Stop and output `<Boundary_Report>` only when current repo truth shows one of these is true:
+  - the real fix belongs to a different lane;
+  - the Work Spec or eval plan source of truth is wrong;
+  - the implementation reveals a product/API/data/persistence/auth/permission/source-of-truth/dependency/deployment/safety/destructive decision not covered by the lane;
+  - the required edit collides with protected parallel work;
+  - required credentials, tools, or environment are unavailable.
 
-  If expansion stays inside the envelope:
-  - continue implementation,
-  - update the Work Spec / eval plan if milestone contracts or gate language changed,
-  - name the discovered touchpoints in the next terminal `<Recap>` or final handoff.
-</change_envelope_protocol>
+  If the work stays in lane, continue implementation.
+</lane_discipline_protocol>
 
 ---
 
@@ -394,7 +397,7 @@
     - approval and halt behavior;
     - constraint precedence;
     - proof/eval requirements;
-    - final human-facing `<Plan>`, `<Eval_Trace>`, `<Handoff_Ledger>`, `<Plan_Delta>`, and `<Recap>` formats.
+    - final human-facing `<Plan>`, `<Eval_Trace>`, `<Handoff_Ledger>`, `<Boundary_Report>`, and `<Recap>` formats.
 
   Skill prompts own:
   - their internal workflow;
@@ -435,13 +438,13 @@
     - Approval state
     - Proposed or active milestone IDs
     - Proof-of-Value State
-    - Change envelope
+    - Active lane
     - Open blockers
     - Recommended next action
 
   Skill Result conflicts:
   - If a skill result conflicts with safety, the user’s current instruction, applicable `AGENTS.md` files, or this root file, the higher-precedence rule wins.
-  - If a skill result conflicts with an already-approved Work Spec / eval plan, halt with a Plan Delta unless the current turn explicitly approves the change.
+  - If a skill result conflicts with an already-approved Work Spec / eval plan, halt with a Boundary Report unless the current turn explicitly resolves the conflict.
   - If a required Skill Result field is missing, treat the skill as incomplete and do not proceed to product-code implementation.
 
   Milestone autonomy, subjective gates, missing evals, circuit breakers, and final handoff are governed by Sections 9, 10, 13, and 14.
@@ -449,24 +452,25 @@
 
 ---
 
-## 0.viii Plan Delta Protocol
+## 0.viii Boundary Report Protocol
 
-<plan_delta_protocol>
-  Use `<Plan_Delta>` when prior approval exists or may exist, but current repo truth, skill output, change envelope, gates, contract boundaries, or context-compaction state differs from the approved plan.
+<boundary_report_protocol>
+  Use `<Boundary_Report>` when current repo truth, skill output, lane ownership, gates, contract boundaries, protected parallel work, or context-compaction state differs from the active Work Spec / eval plan or current user instruction.
 
-  `<Plan_Delta>` is not a replacement for a full `<Plan>`. It must name only what changed and what decision is required.
+  `<Boundary_Report>` is not a replacement for a full `<Plan>`. It names the real boundary encountered, the evidence, and the decision required.
 
-  <Plan_Delta>
-    <Prior_State>[Approved Work Spec / eval path, milestone ID, gate, or "Approval unclear after context compaction"]</Prior_State>
-    <Delta>[The smallest factual change from the prior state]</Delta>
-    <Affected_Change_Envelope>[The envelope or boundary affected, or "None"]</Affected_Change_Envelope>
+  <Boundary_Report>
+    <Prior_Lane>[Active Work Spec / eval path, milestone ID, gate, or "Lane unclear after context compaction"]</Prior_Lane>
+    <Boundary>[The smallest factual boundary reached]</Boundary>
+    <Evidence>[Specific repo evidence proving the boundary]</Evidence>
+    <Affected_Work_Source>[Work Spec / eval plan / AGENTS.md / "None"]</Affected_Work_Source>
     <Affected_Gates>[Exact proof/eval gates affected, or "None"]</Affected_Gates>
     <Risk>[What could go wrong if accepted]</Risk>
     <Needed_Decision>[Exact approval, correction, or rejection needed]</Needed_Decision>
-  </Plan_Delta>
+  </Boundary_Report>
 
-  After outputting `<Plan_Delta>`, output the mandatory `<Recap>` block and halt unless the current user instruction explicitly approves the delta.
-</plan_delta_protocol>
+  After outputting `<Boundary_Report>`, output the mandatory `<Recap>` block and halt unless the current user instruction explicitly resolves the boundary.
+</boundary_report_protocol>
 
 ---
 
@@ -590,9 +594,9 @@
   Root lifecycle rules:
   - Active Work Spec / eval artifacts are bounded context memory, not audit logs.
   - For ongoing work, load the active Work Spec / eval memory before broad repo reads.
-  - Keep Work Spec / eval artifacts synchronized with feature scope, milestone state, eval gates, file-target envelopes, and remaining delta.
+  - Keep Work Spec / eval artifacts synchronized with active lane, milestone state, eval gates, implementation-discovered touchpoints, and remaining delta.
   - Update active Work Spec / eval memory after intake, approval, each milestone, discovered invariant/risk/product decision, and eval failures that reveal repo truth.
-  - If prior approval is unclear after context compaction, treat the work as not approved and emit a Plan Delta instead of product-code changes.
+  - If prior approval or lane ownership is unclear after context compaction, treat the work as not approved and emit a Boundary Report instead of product-code changes.
 
   Work Spec schema ownership:
   - `$plan__maintain-work-spec` owns Work Spec structure, stable IDs, source labeling, doc-health lint, and compactness rules.
@@ -603,6 +607,11 @@
   - `tmp/**` is allowed only for raw eval output, videos, screenshots, logs, traces, benchmark JSON, generated one-off diagnostics, and audit proof.
   - Do not place durable source logic, reusable test harnesses, product code, or canonical docs in `tmp/**`.
   - Reusable eval harnesses belong in the repo’s semantic src/test/tool domain, not in `tmp/**`.
+
+  Durable Artifact Admission:
+  - Every new durable file must graduate into production code, canonical test/eval, reusable tool, folder steering map, or active work doc.
+  - Anything else is temporary proof and must stay in `tmp/**` or be deleted before completion.
+  - Do not commit files named after the agent task, milestone, incident, or proof journey unless they graduate into a reusable repo-owned surface.
 </work_artifacts>
 
 ---
@@ -1085,7 +1094,7 @@
   The agent MUST pause when:
   - a subjective gate requires human judgment,
   - the initial work spec has not been approved,
-  - scope expansion crosses an escalation trigger in the approved change envelope,
+  - the implementation crosses into a different lane or changes the lane source of truth,
   - an eval fails twice for the same or similar reason,
   - the implementation reveals a product decision not covered by the work spec,
   - credentials/tools/environment are unavailable,
@@ -1144,6 +1153,11 @@
   Zero-Config Defaults:
     - Do not use inline env vars or CLI flags to override default behavior unless explicitly labeled as a troubleshooting override.
     - Prefer repo-owned config modules and scripts.
+
+  Package Script Admission:
+    - `package.json` scripts are a stable developer and CI interface, not a proof log.
+    - Add a script only when it names a reusable six-month command.
+    - Route task, bug, milestone, date, or proof-specific checks through direct commands, `tmp/**` artifacts, or existing runners with flags, fixtures, scenarios, or test names.
 
   Anti-Pedagogy:
     - In operational instructions, never write illustrative examples, fake dry-runs, or placeholder CLI commands as if they are executable.
@@ -1207,14 +1221,14 @@
   Role Boundaries:
     - You may only execute tasks within your assigned domain.
     - If a dependency belongs to another agent/domain, do not mock it to keep moving.
-    - Output `[ESCALATION_REQUEST: Target Domain]`, then `[SYSTEM_HALT]`, with a `<Recap>` naming the missing dependency.
+    - Output `<Boundary_Report>`, then `[SYSTEM_HALT]`, with a `<Recap>` naming the missing dependency and target domain.
 
    Shared-state discipline:
     - Agents must assume no implicit shared state. 
     - Shared plans, todo lists, work-spec paths, eval artifacts, and inter-agent messages must be explicit and durable.
     - Managers should communicate goals, constraints, and proof gates, and avoid over-prescribing local implementation when they lack the child agent's direct codebase context.
 
-   Escalation helpers:
+   Boundary helpers:
     - When consulting a stronger or specialist agent, default to passing a fork of the current context unless verifier-lane isolation applies.
     - The helper should answer broadly, surface overlooked issues, and request missing evidence instead of speculating across absent context.
 
