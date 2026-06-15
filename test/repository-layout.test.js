@@ -217,6 +217,14 @@ test("root AGENTS and handoff gate block proof exhaust and script bloat", () => 
   assert.match(handoffSkillText, /package scripts named for a bug, task, milestone, date, incident, proof rung, or temporary scenario/);
 });
 
+test("root AGENTS ties commits to verified Work Spec milestones", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+
+  assert.match(agentsTemplateText, /When a verified Work Spec milestone is complete, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message/);
+  assert.doesNotMatch(agentsTemplateText, /`git add -A` and `git commit` are allowed when committing current workspace progress/);
+  assert.doesNotMatch(agentsTemplateText, /Commit messages should be generated 1-2 line summaries/);
+});
+
 test("testing doctrine forbids tombstone absence tests", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
   const testingSkillText = fs.readFileSync(

@@ -518,8 +518,7 @@
 <fatal_constraints>
   <constraint id="forward-only-git">
     Forward-Only Git:
-    Read-only git commands are always allowed for inspection. `git add -A` and `git commit` are allowed when committing current workspace progress. Commits may include unrelated existing changes. Do not block on perfect authorship separation; preserve the work and move the repo forward.
-    Before committing, run `git status --short` and inspect the staged diff summary. The commit message should be a generated 1-2 line summary of what the commit contains, based on the staged diff.
+    Read-only git commands are always allowed for inspection. When a verified Work Spec milestone is complete, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message. Commits may include unrelated existing changes. Do not block on perfect authorship separation; preserve the work and move the repo forward.
     Destructive, discard, or history-rewrite commands remain forbidden unless the user explicitly requests the exact operation. This includes `git reset`, `git restore`, `git checkout -- <path>`, `git clean`, `git rebase`, `git commit --amend`, force-push, destructive branch deletion, and any command whose purpose is to discard or rewrite existing work.
 
   </constraint>
@@ -1165,10 +1164,8 @@
 
   Forward-Only Git:
     - Read-only git commands are always allowed for inspection.
-    - `git add -A` and `git commit` are allowed when committing current workspace progress.
+    - When a verified Work Spec milestone is complete, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message.
     - Commits may include unrelated existing changes. Do not block on perfect authorship separation; preserve the work and move the repo forward.
-    - Before committing, run `git status --short` and inspect the staged diff summary.
-    - Commit messages should be generated 1-2 line summaries of what the staged diff contains.
     - Destructive, discard, or history-rewrite git commands are forbidden
 </cli_discipline>
 
