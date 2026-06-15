@@ -17,12 +17,12 @@
 
 - Runtime: Node 22 LTS.
 - Language: plain JavaScript. No TypeScript.
-- Modules: ESM with `.js` files only. Do not create `.mjs`.
+- Backend profile default: ESM in `.js` files. Follow stronger repo-local module or file-extension conventions when present.
 - Local dev: no Docker unless a local infra rule explicitly says otherwise.
 - Local start command: `npm run start` must start the API server and all long-lived worker lanes.
 - When adding `src/workers/<lane>/run.js`, wire it into `scripts/start.js`.
 - Use native `fetch` where applicable.
-- Use Mocha for backend tests.
+- Backend profile default: Mocha for backend tests. Follow stronger repo-local test-runner conventions when present.
 
 ---
 
@@ -49,8 +49,8 @@ Rules:
 - Redis/Valkey, DynamoDB, S3, SQS, external APIs, and cloud services must be accessed through `src/adapters/*` or an existing repo-owned boundary.
 - Do not hand-roll Redis keys; use `src/keys.js`.
 - Do not create new Redis clients outside `src/db/redis-factory.js` or `src/db/redis-factory-shared.js`.
-- Do not read `process.env` outside `src/env.js`.
-- New env constants used by more than one module must be defined once in `src/env.js` and imported.
+- Do not read `process.env` outside the repo-owned config boundary; backend profile default is `src/env.js`.
+- New env constants used by more than one module must be defined once in the repo-owned config boundary and imported.
 - If an adapter lacks a needed capability, extend the adapter minimally and prove it with integration tests.
 - Do not mock/stub I/O in value-path tests unless the Work Spec/eval plan explicitly documents why real or local parity is impossible.
 
@@ -244,7 +244,7 @@ When adding or changing:
 * externally reachable endpoints;
 * cloud dependencies.
 
-The same approved scope must include:
+The same active lane must include:
 
 * infrastructure declaration/update;
 * IAM/permission update where applicable;
@@ -263,7 +263,7 @@ Examples:
 Rules:
 
 * Local stubs that do not enforce production permissions do not count as proof of production readiness.
-* When backend application code introduces or changes a cloud dependency, update the matching infrastructure contract in the same approved scope.
+* When backend application code introduces or changes a cloud dependency, update the matching infrastructure contract in the same active lane.
 
 Before editing infrastructure, read:
 

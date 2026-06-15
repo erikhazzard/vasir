@@ -217,12 +217,40 @@ test("root AGENTS and handoff gate block proof exhaust and script bloat", () => 
   assert.match(handoffSkillText, /package scripts named for a bug, task, milestone, date, incident, proof rung, or temporary scenario/);
 });
 
-test("root AGENTS ties commits to verified Work Spec milestones", () => {
+test("root AGENTS ties commits to objectively green Work Spec rungs", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
 
-  assert.match(agentsTemplateText, /When a verified Work Spec milestone is complete, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message/);
+  assert.match(agentsTemplateText, /Active lane = current user instruction \+ active Work Spec milestone\/rung \+ proof gate \+ owning subsystem/);
+  assert.match(agentsTemplateText, /When a Work Spec milestone rung is Objectively Green, update Work Spec\/eval status, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message/);
+  assert.match(agentsTemplateText, /A rung with a subjective gate is not commit-ready until the human accepts the artifact/);
   assert.doesNotMatch(agentsTemplateText, /`git add -A` and `git commit` are allowed when committing current workspace progress/);
   assert.doesNotMatch(agentsTemplateText, /Commit messages should be generated 1-2 line summaries/);
+  assert.doesNotMatch(agentsTemplateText, /When a verified Work Spec milestone is complete/);
+  assert.doesNotMatch(agentsTemplateText, /declared scope/);
+  assert.doesNotMatch(agentsTemplateText, /approved scope/);
+  assert.doesNotMatch(agentsTemplateText, /active scope/);
+});
+
+test("root AGENTS keeps generic JS and game test doctrine profile-aware", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const backendSnippetText = fs.readFileSync(
+    path.join(REPO_ROOT, "templates", "agents", "snippets", "backend-inserts.md"),
+    "utf8"
+  );
+
+  assert.match(agentsTemplateText, /For JavaScript repos without a stronger local convention, prefer plain JavaScript with ESM in `\.js` files/);
+  assert.match(agentsTemplateText, /read env and write logs only through the repo's established config and logger boundaries/);
+  assert.match(agentsTemplateText, /use the nearest game folder `AGENTS\.md` or established repo convention for test placement/);
+  assert.match(agentsTemplateText, /absent a local convention, prefer `games\/<gameId>\/tests\/`/);
+  assert.match(backendSnippetText, /Backend profile default: ESM in `\.js` files\. Follow stronger repo-local module or file-extension conventions when present/);
+  assert.match(backendSnippetText, /Backend profile default: Mocha for backend tests\. Follow stronger repo-local test-runner conventions when present/);
+  assert.match(backendSnippetText, /Do not read `process\.env` outside the repo-owned config boundary; backend profile default is `src\/env\.js`/);
+  assert.doesNotMatch(agentsTemplateText, /For Javascript, write plain JavaScript with ESM in `\.js` files only: No `\.mjs`/);
+  assert.doesNotMatch(agentsTemplateText, /For individual games, tests MUST live under `games\/<gameId>\/tests\/`/);
+  assert.doesNotMatch(agentsTemplateText, /Game-Specific:\n  - Individual game tests live under `games\/<gameId>\/tests\/`/);
+  assert.doesNotMatch(backendSnippetText, /Modules: ESM with `\.js` files only\. Do not create `\.mjs`/);
+  assert.doesNotMatch(backendSnippetText, /Use Mocha for backend tests/);
+  assert.doesNotMatch(backendSnippetText, /approved scope/);
 });
 
 test("testing doctrine forbids tombstone absence tests", () => {
