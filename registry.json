@@ -609,7 +609,7 @@
     },
     {
       "name": "game__orchestrating-playable-build",
-      "description": "Orchestrates broad game build, finish, polish, release-ready, and first-playable implementation work by routing our game design, genre, art, UI, juice, performance, and proof skills into one evidence-backed build lane. Use when the user wants a playable game or major game upgrade delivered end to end; do not use for pure pre-code design, a narrow bug fix, or isolated art/UI advice.",
+      "description": "Orchestrates broad game build, finish, polish, release-ready, and first-playable implementation work by routing our game design, genre, art, UI, juice, performance, and runtime checks around a human play verdict. Use when the user wants a playable game or major game upgrade delivered end to end; do not use for pure pre-code design, a narrow bug fix, or isolated art/UI advice.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -705,7 +705,7 @@
     },
     {
       "name": "game-proof__auditing-first-playable-comprehension",
-      "description": "Audits whether a Studio or Idavoll first playable reaches Time to First Meaningful Choice fast enough to count as play. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.",
+      "description": "Judges whether a Studio or Idavoll first playable works and feels good in the opening seconds. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

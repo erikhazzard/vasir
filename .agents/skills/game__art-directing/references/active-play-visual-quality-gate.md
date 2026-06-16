@@ -1,168 +1,176 @@
-# Active-Play Visual Quality Gate
+# Active-Play Visual Slap Review
 
 Use this reference when judging whether a playable game actually looks and reads
-like an authored game during play. This is not a post-match results screen
-rubric. Score active gameplay after the first meaningful act, not a title
-screen, result screen, modal, or isolated asset showroom.
+like a real authored game during play. This is not a post-match results,
+marketing, title-screen, or asset-showroom rubric.
 
 ## Core Principle
 
-Visual quality is proven in the frame where the player must decide. A screenshot
-is good only if it makes the next player action easier to understand while
-carrying a coherent visual language.
+Visual quality is proven in the frame where the player has to decide. The human
+QA question is simple:
 
-Do not score provider usage, asset count, or polish vocabulary. Score what the
-player can parse and what the game can sustain.
+```text
+Can I instantly tell what matters, what I can do, what changed, and why I would
+keep playing?
+```
 
-## Required Evidence
+If the answer is no, the visual pass does not slap yet. Notes explain the
+reason; they do not overrule the human read.
 
-Minimum evidence for this gate:
+## What To Look At
 
-- one active-play desktop screenshot
-- one active-play mobile screenshot when mobile is in scope
-- the player, a current objective, and at least one threat, reward, or decision surface visible
-- artifact path or screenshot name for each score
-- browser/runtime evidence if visual changes can affect performance
+Use real active-play material:
 
-Invalid evidence:
+- one desktop active-play frame at actual game scale;
+- one mobile active-play frame when mobile is in scope;
+- player, objective, and at least one threat, reward, or decision surface;
+- a short clip or frame sequence when motion, VFX, hit feedback, or camera movement matters;
+- a live run or runtime sanity check when visual density may hurt feel.
 
-- title screen, start menu, result screen, or marketing hero
+Default mobile in scope for web/mobile games unless the user or game explicitly
+says desktop-only.
+
+Stop the review if the material is:
+
+- title screen, start menu, result screen, death/result/share screen, or marketing hero
 - static scene before the player can act
-- screenshot after debug tools obscure the play surface
+- debug overlay obscuring the play surface
 - isolated character/model render with no gameplay context
-- claims based only on "it uses generated assets" or "it has postprocessing"
+- screenshot that hides controls, objective, threat/reward, or decision state
+- claims based only on "generated assets", postprocessing, or asset count
 
-## Scoring Scale
+## First-Glance Slap Test
 
-Use 0-3. Half points are allowed only when evidence is mixed.
+Before judging, look at the active frame for one second and answer without
+reading code or a design doc:
 
-| Score | Meaning |
+```text
+First-glance read:
+- I am:
+- I should:
+- I should care because:
+- The biggest visual confusion is:
+- Would I keep playing from this frame?: yes/no
+```
+
+If "I should" or "I should care because" is unclear, the verdict cannot be
+`SLAPS`. If "Would I keep playing" is no, the verdict cannot be `SLAPS`.
+
+## Slap Verdicts
+
+| Verdict | Meaning |
 |---|---|
-| 0 | Placeholder or unproven. The player cannot reliably parse the game state. |
-| 1 | Styled prototype. The theme is visible, but readability or authored language is weak. |
-| 2 | Ship-quality active play. The frame is readable, coherent, and intentionally authored. |
-| 3 | Showcase active play. The frame is memorable, highly readable, and visually specific without waste. |
+| `SLAPS` | The active frame is readable, authored, and makes the next action more tempting. |
+| `CLOSE` | The game has a real visual direction, but one visible blocker hurts desire or clarity. |
+| `DOES NOT SLAP` | The frame feels confusing, generic, dead, unreadable, or not worth another try. |
+| `BLOCKED` | Valid active-play material is missing or stale. |
 
-## Categories
+## Judgment Areas
 
-1. Core-loop readability
-   - 0: Cannot tell what to do next.
-   - 1: The objective exists but depends on text/debug state or guessing.
-   - 2: Verb, objective, danger/reward, and next action are legible at a glance.
-   - 3: The frame teaches the loop visually, even without instructions.
+1. Next-action readability
+   - Can a human tell what to do next without instructions?
+   - Are verb, objective, danger/reward, and pressure visible at actual scale?
 
 2. Player/threat/reward hierarchy
-   - 0: Player, threats, rewards, or goals blend together.
-   - 1: Hierarchy is mostly color or size only.
-   - 2: Player, threat, reward, and objective have distinct value, shape, motion, or placement roles.
-   - 3: Hierarchy survives motion, clutter, mobile size, and effect bursts.
+   - Do player, threat, reward, objective, and interactables separate by value,
+     shape, placement, motion, or scale?
+   - Does the hierarchy survive clutter, mobile scale, and effects?
 
-3. Shape language and silhouette
-   - 0: Default primitives or interchangeable silhouettes dominate.
-   - 1: Some authored forms exist, but categories reuse the same silhouette.
-   - 2: Shape families encode player/friend/threat/reward/environment roles.
-   - 3: The game has a reusable silhouette grammar that can scale to more content.
+3. Authored visual identity
+   - Does the frame look designed, not assembled from defaults?
+   - Are silhouettes, materials, colors, and props part of a reusable grammar?
+   - Intentional abstract geometry is valid; default primitives with no semantic
+     system are not.
 
-4. Semantic color and value system
-   - 0: Palette is arbitrary or one-note.
-   - 1: Theme colors exist, but gameplay meaning is inconsistent.
-   - 2: Colors and values carry stable semantic roles and work without color alone.
-   - 3: Palette, value ramps, and forbidden combinations create strong state communication.
+4. Feedback and motion readability
+   - Does the frame or clip show that input, hit, collect, fail, combo, progress,
+     or danger feedback clarifies play?
+   - Do VFX and camera work make the next decision clearer instead of hiding it?
 
-5. World and environment support
-   - 0: Empty plane, sparse arena, box skyline, or decorative noise.
-   - 1: Theme props exist but do not support scale, route, danger, or decision making.
-   - 2: Foreground/midground/background and prop kits support readability and fantasy.
-   - 3: Environment communicates rules, mood, route, and stakes without stealing focus.
+5. HUD, mobile fit, and accessibility
+   - Is state visible without covering the play path?
+   - Are touch zones, safe areas, text, contrast, and reduced-motion posture
+     credible on the smallest target viewport?
 
-6. Motion, feedback, and VFX clarity
-   - 0: No visible feedback or random effects.
-   - 1: Effects exist but are generic, late, or hide important state.
-   - 2: Feedback is event-driven and clarifies input, hit, collect, fail, progress, or combo.
-   - 3: Motion and VFX create strong feel while preserving the next decision.
+6. Runtime sustainability
+   - Does the visual density create visible jank, input lag, unreadable blur, or
+     thermal/perf risk that hurts feel?
+   - Is the look sustainable, or only pretty in a still?
 
-7. UI/HUD integration
-   - 0: Debug text, generic stat cards, clipped labels, or missing state.
-   - 1: HUD reports state but feels detached or covers play.
-   - 2: HUD is compact, genre-specific, state-driven, and safe on mobile.
-   - 3: UI and world share visual language and transitions without reducing clarity.
+## Hard Blockers
 
-8. Mobile fit and accessibility
-   - 0: Text/control overlap, unsafe areas, tiny targets, or unreadable contrast.
-   - 1: Mostly fits but lacks proof under smallest target viewport or reduced-motion needs.
-   - 2: Safe areas, touch zones, contrast, text fit, and reduced-motion posture are covered.
-   - 3: Mobile framing improves the game instead of merely squeezing desktop layout.
+Any blocker prevents `SLAPS` no matter how polished the screenshot looks:
 
-9. Performance and resource discipline
-   - 0: No runtime evidence after visual changes.
-   - 1: Informal "seems fine" or only desktop proof.
-   - 2: Build/browser proof plus renderer or frame-budget evidence for changed surfaces.
-   - 3: Before/after or budget-aware diagnostics show the visual language is sustainable.
+- no valid active-play material;
+- no clear first-glance next action;
+- player, threat, reward, objective, or interactables blend together;
+- motion/VFX claims rely on a still screenshot for a motion-heavy game;
+- mobile is in scope but the mobile frame is missing, cropped, or unreadable;
+- render-cost changes create visible jank or have no sanity check when cost is
+  plausibly high;
+- the only attractive material is a menu, result, death, share, or showroom
+  screen.
 
-## Thresholds
+The point is not to grade missing material. The point is to avoid calling a
+game visually good when the active frame does not help play.
 
-Ship-quality active play:
+- Results/death/share/menu screenshots may support a separate results-screen
+  review, but they cannot raise the active-play verdict.
 
-- every category is at least 2, or the final answer names the exact blocker
-- average score is at least 2.2
-- no automatic failure remains
-- screenshots are active-play artifacts, not menus/results/showrooms
+## Core-Loop Profiles
 
-Showcase active play:
+Pick the closest profile before judging. Use it to weight the repair.
 
-- at least five categories score 3
-- no category below 2
-- average score is at least 2.7
-- performance/resource evidence supports the visual density
-
-## Automatic Failures
-
-Any of these prevents a ship-quality or showcase visual claim:
-
-- the active frame does not show what the player can do next
-- player/threat/reward are not visually separable
-- default primitives, flat arenas, or repeated boxes dominate the screenshot
-- VFX, bloom, darkness, particles, or camera shake hide missing authored form
-- HUD is mostly debug text or generic dashboard cards
-- UI overlaps the play path, clips text, or fails mobile safe areas
-- screenshot evidence is from title/results/showroom instead of active play
-- visual changes lack browser/runtime proof when they touch render cost
+| Loop | What must slap visually |
+|---|---|
+| Action combat | Player location, enemy intent, safe/unsafe space, hit feedback, and VFX occlusion. |
+| Turn-based tactics | Board state, legal options, threat previews, consequences, and selected unit focus. |
+| Deckbuilder/card | Card affordances, resource math, target state, combo feedback, and hand/read area. |
+| Survivor/auto-battler | Player/swarm separation, pickup/reward visibility, density control, build feedback. |
+| Exploration/physics | Terrain affordances, hazards, material rules, route choices, and interaction cues. |
+| Hybrid | Name primary and secondary loop; primary loop wins conflicts. |
 
 ## Repair Order
 
-Fix failures in this order:
+Fix the single biggest "does not slap" reason first:
 
-1. Make the next player action readable.
-2. Separate player, threat, reward, and objective by value/shape/placement.
-3. Establish shape language and semantic color roles.
-4. Replace primitive-dominant visible surfaces with authored forms.
-5. Make feedback event-driven and proportional.
-6. Integrate HUD state without covering play.
-7. Add density, lighting, materials, and effects only after readability holds.
-8. Prove mobile fit and runtime cost.
+1. Make the next player action obvious.
+2. Separate player, threat, reward, objective, and interactables.
+3. Make feedback event-driven and readable.
+4. Replace default-looking surfaces with authored visual grammar.
+5. Integrate HUD/state without covering play.
+6. Check mobile fit where relevant.
+7. Check runtime cost when visual density could hurt feel.
+8. Add style, lighting, particles, and detail only after the frame reads.
+
+Do not add beauty around confusion. Do not praise a frame that does not make a
+human want another attempt.
 
 ## Report Format
 
 ```text
-Active-play visual gate:
-- Evidence:
-  - Desktop active-play screenshot:
-  - Mobile active-play screenshot:
-  - Runtime/performance evidence:
-- Scores:
-  - Core-loop readability: X/3 - evidence:
-  - Player/threat/reward hierarchy: X/3 - evidence:
-  - Shape language and silhouette: X/3 - evidence:
-  - Semantic color and value system: X/3 - evidence:
-  - World and environment support: X/3 - evidence:
-  - Motion, feedback, and VFX clarity: X/3 - evidence:
-  - UI/HUD integration: X/3 - evidence:
-  - Mobile fit and accessibility: X/3 - evidence:
-  - Performance and resource discipline: X/3 - evidence:
-- Average:
-- Automatic failures remaining:
-- Highest-leverage visual repair:
+Active-play visual slap review:
+- Verdict: SLAPS / CLOSE / DOES NOT SLAP / BLOCKED
+- First-glance read:
+  - I am:
+  - I should:
+  - I should care because:
+  - Biggest visual confusion:
+  - Would I keep playing from this frame?:
+- Material:
+  - Desktop active-play frame:
+  - Mobile active-play frame:
+  - Motion/feedback clip:
+  - Runtime sanity check:
+- Core-loop profile:
+- Judgment:
+  - Next-action readability:
+  - Player/threat/reward hierarchy:
+  - Authored visual identity:
+  - Feedback and motion readability:
+  - HUD, mobile fit, and accessibility:
+  - Runtime sustainability:
+- Hard blockers:
+- Single biggest reason it does or does not slap:
+- Next repair pass:
 ```
-
-If the gate fails, do not call the game visually finished. State the exact next
-repair pass instead.

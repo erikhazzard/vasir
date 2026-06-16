@@ -5,7 +5,7 @@ import path from "node:path";
 function parseArgs(argv) {
   const args = {
     url: "http://127.0.0.1:5173",
-    out: "artifacts/browser-proof",
+    out: "artifacts/browser-surface-check",
     selector: "canvas",
     mobile: false,
     frames: 45,
@@ -51,7 +51,7 @@ function printHelp() {
 
 Options:
   --url URL                    Browser target. Default http://127.0.0.1:5173
-  --out DIR                    Artifact directory. Default artifacts/browser-proof
+  --out DIR                    Artifact directory. Default artifacts/browser-surface-check
   --selector SELECTOR          Canvas selector. Default canvas
   --mobile                     Use a mobile viewport and touch-capable context
   --frames N                   Animation frames to wait before sampling. Default 45

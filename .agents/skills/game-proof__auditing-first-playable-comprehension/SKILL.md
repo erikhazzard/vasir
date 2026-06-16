@@ -1,57 +1,55 @@
 ---
 name: game-proof__auditing-first-playable-comprehension
-description: Audits whether a Studio or Idavoll first playable reaches Time to First Meaningful Choice fast enough to count as play. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.
+description: Judges whether a Studio or Idavoll first playable works and feels good in the opening seconds. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.
 ---
 
-# First Fun Proof Gate
+# First Fun Judgment
 
 ## Core Principle
 
-The first playable is not proven by launching, rendering, or reaching a result screen. It is proven when fresh browser evidence shows the player reaches a **first meaningful choice or interaction** fast enough to enter play.
+A first playable earns completion when a human QA pass can watch the opening and
+say: "I get what the toy is, I acted, the game answered, something changed, and
+I want another try."
 
-Use `TTFMC` as the hard proxy for Time to Fun:
+The first slice must show one loop:
 
 ```text
-TTFMC = Time from first playable frame to first meaningful choice / interaction.
-Target: <= 5s for all first playables.
-Preferred: <= 2s for direct-control, arcade, hyper-casual, runner, timing, and most games by default.
+act -> answer -> consequence -> better next attempt
 ```
 
-This skill proves the earliest falsifiable substrate of fun: a player does something intentional, the game responds, state changes, and the player learns what to try next.
+Timing can expose dead input or a passive start. Timing cannot make a boring toy
+good.
 
-## Non-Negotiable Metrics
+## Human QA Slap Test
 
-No timestamp, no PASS. A valid first-fun proof must report these values from a fresh artifact:
+You are the QA human for the first active slice. Do not hide behind "subjective"
+when the opening is visible enough to judge.
 
-| Metric | Target | Strategy / tactics / setup target | Hard rule |
-|---|---:|---:|---|
-| Time to Agency | `<= 2s` | The first actionable surface is visually invited, not guessed. |
-| Time to First Meaningful Choice / Interaction | `<= 2s` preferred, `<= 5s` max | `<= 5s` | Waiting, watching, reading, Start, Continue, and closing modals do not count. |
-| Feedback latency | `<= 100ms`, target `<= 50ms` | `<= 100ms` for selection/preview feedback | The player sees that input landed immediately. |
-| Consequence latency | `<= 1s` | `<= 3s`, or `<= 8s` only with clear preview/lock-in | Integrated state changes because of the choice. |
-| First loop closure | `<= 10s` preferred, `<= 15s` max | `<= 15s` max | The player sees progress, danger, reward, failure pressure, or a changed tactical situation. |
+Watch or play the first 15 seconds and answer:
 
-If a genre genuinely needs slower setup, the spec must justify it and the artifact must prove anticipation, agency, and clarity during the delay. Otherwise slower setup is a FAIL, not a creative exception.
+1. Do I know what I can do without reading a manual?
+2. Does the first input feel acknowledged immediately?
+3. Did my action create a visible, integrated consequence?
+4. Do I understand at least one better next attempt?
+5. Would I voluntarily play another 30 seconds?
 
-## Skill Spine
+If the answer to 5 is no, the verdict cannot be `SLAPS`. Name the single biggest
+reason the toy does not slap yet.
 
-This skill compresses these game-design traditions into one audit:
+## Timing Sanity
 
-| Tradition | What it contributes here |
-|---|---|
-| Raph Koster, pattern learning | Fun starts when the player begins learning an interactive pattern. |
-| Sid Meier / interesting choices | A choice matters when options differ, trade off, and produce consequences. |
-| Salen and Zimmerman / meaningful play | Action must create discernible and integrated outcomes. |
-| MDA | Mechanics are only acceptable if the first seconds create the intended player experience. |
-| Jesse Schell / lenses | Judge from the player's lived experience, not the feature list. |
-| Tracy Fullerton / playcentric design | Validate the playable through observed play, not author declaration. |
-| Valve-style playtest discipline | Use measurable player-experience goals because "fun" is too fuzzy to assert. |
-| Nicole Lazzaro / keys to fun | Early interaction should create challenge, curiosity, excitement, mastery, or social/emotional response. |
-| Steve Swink / game feel | Input response lives in milliseconds; dead feedback kills the loop. |
-| Don Norman / affordances and signifiers | The first action must be invited by the surface, not discovered by accident. |
-| First-session analytics practice | Track first core action, first reward/result, and repeat-loop intent, not only launch. |
+Timing matters because dead input and slow agency kill feel. It is not a
+substitute for judgment. A fast, boring toy still fails.
 
-Do not cite these traditions ceremonially in a handoff. Use them to make the verdict harder to fake.
+Use these numbers only when they affect feel:
+
+- The first actionable surface should appear within 5 seconds, usually within 2.
+- The first input should get visible feedback inside 100ms, ideally inside one frame.
+- The first consequence should land before the player wonders whether anything happened.
+- The first 10 to 15 seconds should create progress, danger, reward, failure pressure, or a changed tactical situation.
+
+If a genre needs slower setup, the opening still owes the player anticipation,
+agency, and clarity during the wait.
 
 ## Trigger Boundary
 
@@ -60,15 +58,15 @@ Use this skill when:
 - a Studio or Idavoll first playable has been implemented or materially changed;
 - initialization, first playable, vertical slice, publish readiness, or final handoff is about to be claimed;
 - the game might be passive, confusing, self-playing, over-automated, tutorial-dependent, results-only, or unclear in the first seconds;
-- proof artifacts exist or can be freshly captured: screenshots, timeline, video, input trace, deterministic sim output, replay, or browser QA.
+- fresh play material exists or can be captured: screenshots, clip, input trace, deterministic sim output, replay, or browser QA.
 
 Do not use this skill for:
 
-- pre-code ideation before a runnable artifact exists; use `game__directing` and `game__building-core-loop`;
+- pre-code ideation before a runnable game exists; use `game__directing` and `game__building-core-loop`;
 - broad system design; use the relevant genre/system skill;
 - platformer curriculum design; use `game-onboarding__designing-game-onboarding`;
 - broad visual redesign; use `game__art-directing`, `design__designing-game-ui-for-idavoll`, or `ui__revamping-game-shell-ui`;
-- final release certification after first-fun proof exists; use `handoff__final-quality-gate`.
+- final release certification after first-fun judgment exists; use `handoff__final-quality-gate`.
 
 ## Definitions
 
@@ -104,17 +102,6 @@ Invalid examples:
 - press a button whose consequence is only a hidden counter;
 - reach a result screen produced by forced fast-results mode.
 
-## Expertise Payload
-
-| Expertise type | What this skill encodes |
-|---|---|
-| Hard-won insight | Generated games often fail before the first system matters: they do not create a meaningful act in the first seconds. |
-| Hidden constraint | A first playable can be machine-green and still have no first-fun substrate. |
-| Value hierarchy | TTFMC and action-consequence proof beat launch proof, result proof, visual polish, and feature count. |
-| Tradeoff boundary | Complex genres may start with a pick, placement, or build choice instead of direct movement; they still owe the player a fast meaningful commitment. |
-| Failure scar | Results-only timelines let agents claim a game works after skipping the only part that matters: play. |
-| Taste judgment | The first act should let the player predict, try, see consequence, and want another attempt. |
-
 ## Workflow
 
 ### Pass 0 - Extract The Intended First Fun
@@ -144,13 +131,14 @@ Then classify the first-fun shape:
 | Idle / management | first allocation, upgrade, priority, timing, or automation toggle that changes future output |
 | Narrative | first story choice that visibly changes state, route, tone, risk, relationship, or next option |
 
-If the expected act is not identifiable, return `FAIL - no defined first meaningful choice`.
+If the expected act is not identifiable, return `DOES NOT SLAP - no defined first meaningful choice`.
 
-### Pass 1 - Capture A Timestamped Evidence Packet
+### Pass 1 - Watch The First Active Slice
 
-Use the closest available browser, QA, replay, screenshot, or timeline command. The proof must cover real player-facing time, not only internal sim output.
+Use the closest available browser, QA, replay, screenshot, or clip command. Judge
+real player-facing time, not only internal sim output.
 
-Capture or inspect timestamps for:
+Track these beats when they affect the verdict:
 
 | Timestamp | Required observation |
 |---|---|
@@ -171,50 +159,59 @@ Consequence latency = T_consequence - T_input
 First loop closure = T_payoff - T0
 ```
 
-If the only available artifact is loading, splash, modal, autoplay, forced fast-results, or results frames, return `FAIL - invalid proof artifact`.
+If the only available material shows the actual opening and it is loading,
+splash, modal, autoplay, forced fast-results, or results-only play, return
+`DOES NOT SLAP - no active play`. If the capture is incomplete, return
+`BLOCKED - no active-play material`.
 
-### Browser Proof Harness
+### Optional Broken-Surface Harness
 
 When a browser target is available and the project does not already provide a
-better game-specific proof command, use the packaged harness to capture a
-baseline artifact:
+better game-specific runtime command, use the packaged harness to capture a
+broken-surface check:
 
 ```bash
-node <this-skill-dir>/scripts/inspect-game-canvas.mjs --url http://127.0.0.1:5173 --out artifacts/browser-proof --key KeyW
-node <this-skill-dir>/scripts/inspect-game-canvas.mjs --url http://127.0.0.1:5173 --out artifacts/browser-proof --mobile --drag-selector "#touch-stick"
+node <this-skill-dir>/scripts/inspect-game-canvas.mjs --url http://127.0.0.1:5173 --out artifacts/browser-surface-check --key KeyW
+node <this-skill-dir>/scripts/inspect-game-canvas.mjs --url http://127.0.0.1:5173 --out artifacts/browser-surface-check --mobile --drag-selector "#touch-stick"
 ```
 
 Use project-specific selectors, keys, or diagnostics when the defaults do not
-match the game. The harness can prove canvas visibility, nonblank readback,
+match the game. The harness can detect canvas visibility, nonblank readback,
 console/page errors, screenshots, basic input attempts, and diagnostics deltas.
-It cannot prove first fun by itself. A valid PASS still needs the timestamped
-TTFMC ledger below: first meaningful act, feedback, state consequence, learned
-pattern, and next intent.
+Treat this as a janitorial check:
 
-### Pass 2 - Fill The First Fun Ledger
+Use the harness result only as `no blocker`, `blocker found`, or `unavailable`.
 
-Use this ledger. Do not replace it with prose.
+Do not put a green harness result in the headline. It has near-zero correlation
+with whether the toy works or feels good. Mention it only if it found a blocker
+or the user asked for runtime details.
+
+### Pass 2 - Write The First Fun Verdict
+
+Use this shape. It is intentionally small so the human judgment cannot get
+buried under a fake audit.
 
 ```text
-First Fun Ledger:
-- T0 first playable frame: <timestamp + artifact path/frame>
-- Time to Agency: <seconds> target <2s or 5s> verdict PASS/FAIL
-- TTFMC: <seconds> target <2s or 5s> verdict PASS/FAIL
-- First meaningful act: <exact player action or choice>
-- Choice alternatives: <what else could the player plausibly do?>
-- Immediate feedback: <visible response + latency>
-- State consequence: <what integrated state changed + latency>
-- First loop closure: <timestamp + progress/danger/reward/failure/chosen payoff>
-- Learned pattern: <what the player can infer for the next attempt>
-- Next intent: <why the player would keep playing or retry>
-- Artifact validity: <fresh browser/mobile proof, not results-only>
+First Fun Judgment:
+- Verdict: SLAPS / DOES NOT SLAP / BLOCKED
+- Would I play another 30 seconds?: yes/no/blocked - <why>
+- First meaningful act:
+- What the game does back:
+- What changed that matters:
+- Better next attempt the player can infer:
+- Single biggest reason it does not slap yet:
+- Timing notes only if they affect feel:
+- Broken-surface checks only if they found a blocker:
+- Fresh play material used for the judgment:
 ```
 
-Hard rule: if `Choice alternatives`, `State consequence`, or `Learned pattern` is empty, the first act is not meaningful.
+Hard rule: if `Would I play another 30 seconds?`, `What the game does back`,
+`What changed that matters`, or `Better next attempt` is empty, do not call it
+`SLAPS`.
 
-### Pass 3 - Judge Choice Quality
+### Pass 3 - Judge The First Act
 
-Run these four tests:
+Run these quick checks:
 
 | Test | Pass condition |
 |---|---|
@@ -222,8 +219,12 @@ Run these four tests:
 | Discernible outcome test | The player can see what happened immediately after acting. |
 | Integrated outcome test | The action changes real game state, not only animation or text. |
 | One-more-try test | The first result suggests a better next attempt, not just "continue". |
+| Human slap test | A human QA reviewer would voluntarily play another 30 seconds from this first slice. |
 
-For execution-heavy games, timing/aim/gesture quality can be the choice. For strategy-heavy games, the first commitment can be a discrete option. For auto-resolving games, the meaningful choice must happen before automation and automation must visibly prove the commitment.
+For execution-heavy games, timing, aim, or gesture quality can be the choice.
+For strategy-heavy games, the first commitment can be a discrete option. For
+auto-resolving games, the meaningful choice must happen before automation, and
+automation must visibly prove the commitment.
 
 ### Pass 4 - Classify Failure And Repair Order
 
@@ -239,7 +240,7 @@ Use the first failing label:
 | Hidden consequence | State changes without readable cause. | Show delta, transition, source, target, and before/after. |
 | Pattern vacuum | Player cannot infer what to try next. | Add near-miss, preview, result cause, or changed hypothesis. |
 | Automation theft | Auto-combat/auto-run resolves before player commitment matters. | Expose draft/placement/setup choice and prove it in the outcome. |
-| Asset meaning failure | Art, sprites, cards, units, or UI obscure identity/role/state. | Fix visual identity/layering before claiming first-fun proof. |
+| Asset meaning failure | Art, sprites, cards, units, or UI obscure identity/role/state. | Fix visual identity/layering before claiming first-fun. |
 
 Repair order is strict: first meaningful act -> immediate feedback -> integrated consequence -> learned pattern -> result/restart -> juice/polish. Do not polish a passive start.
 
@@ -247,25 +248,24 @@ Repair order is strict: first meaningful act -> immediate feedback -> integrated
 
 Return exactly one verdict:
 
-- `PASS`: fresh artifacts prove TTFMC within target, immediate feedback, integrated consequence, learned pattern, and next intent.
-- `FAIL`: artifacts exist and show any hard failure.
-- `BLOCKED`: artifacts are missing, stale, inaccessible, or subjective human acceptance is required for the claimed bar.
+- `SLAPS`: the first slice makes a human want another try, backed by immediate feedback, integrated consequence, and a better next attempt.
+- `DOES NOT SLAP`: the first slice is visible and shows a hard failure.
+- `BLOCKED`: the game cannot be played or inspected enough for a human QA verdict.
 
-Do not turn BLOCKED into PASS because build, tests, selectors, sim diffs, or QA launch checks passed. Machine green is not first-fun green.
+Do not turn `BLOCKED` into `SLAPS` because build, tests, selectors, sim diffs,
+or QA launch checks passed. Machine green is not first-fun green. Do not turn
+`DOES NOT SLAP` into `BLOCKED` when the opening is visible and the toy plainly
+does not slap.
 
-## Minimum Proof Gates
+## Only Things That Matter
 
-| Gate | Pass condition |
-|---|---|
-| Time to Agency | First actionable surface is visually invited within target; no guessing or passive opening. |
-| TTFMC | `<= 5s` hard target; `<= 2s` preferred for direct-control and hyper-casual games. |
-| First act | The first act is invited, intentional, and not merely wait/tap-through/continue. |
-| Choice quality | At least two plausible options/timings/targets/gestures/picks exist, or execution timing/aim is the choice. |
-| Feedback latency | First visible response within 100ms, target 50ms or one frame. |
-| Consequence | Integrated state visibly changes because of the act within the genre latency budget. |
-| First loop closure | By 10-15s, the player has seen progress, danger, reward, failure pressure, score meaning, or changed tactical situation. |
-| Pattern learning | The player can state one next hypothesis after the act or first payoff. |
-| Artifact validity | Fresh browser/mobile artifact shows the act and consequence; results-only proof is invalid. |
+These are the only things that matter:
+
+- the player can act quickly without guessing;
+- the game answers the act;
+- the act changes something visible and integrated;
+- the player can infer a better next attempt;
+- the material comes from real play, not loading, menu, autoplay, or results.
 
 ## Contrastive Examples
 
@@ -293,45 +293,46 @@ Good: the player buys a Guard, places it front row, sees enemy intent retarget, 
 
 Why: auto-combat is acceptable only after a readable player commitment.
 
-### Results-Only Proof
+### Results-Only Capture
 
 Bad: `npm run qa:play:video` captures only a results modal and the handoff claims the game is coherent.
 
-Good: the artifact starts at first playable frame, shows the first meaningful act, immediate feedback, state consequence, later payoff, and result/restart.
+Good: the clip starts at first playable frame, shows the first meaningful act, immediate feedback, state consequence, later payoff, and result/restart.
 
-Why: result screens cannot prove the player entered play.
+Why: result screens cannot show that the player entered play.
 
 ## Handoff Shape
 
-Use this section when the skill gates a turn:
+Use this section in the handoff:
 
 ```text
-First Fun Proof:
-- Verdict: PASS | FAIL | BLOCKED
-- Time to Agency: <seconds>
-- TTFMC: <seconds> target <2s or 5s>
-- First meaningful act: <action/choice>
-- Feedback latency: <ms>
-- Consequence latency: <seconds>
-- State consequence: <visible integrated change>
-- First loop closure: <seconds + payoff/threat/result>
-- Learned pattern / next intent: <one sentence>
-- Fresh artifacts: <paths and timestamps/frames>
-- Failed/blocked gate: <single highest-priority repair, or none>
+First Fun Judgment:
+- Verdict: SLAPS | DOES NOT SLAP | BLOCKED
+- Would I play another 30 seconds?: <yes/no/blocked + why>
+- First meaningful act:
+- What the game does back:
+- What changed that matters:
+- Better next attempt the player can infer:
+- Single biggest reason it does not slap yet:
+- Timing notes only if they affect feel:
+- Broken-surface checks only if they found a blocker:
+- Fresh play material used for the judgment:
 ```
 
-If the verdict is `FAIL` or `BLOCKED`, do not claim complete. Use "candidate first playable", "machine green without first-fun proof", or "blocked on fresh first-fun artifact" as appropriate.
+If the verdict is `DOES NOT SLAP` or `BLOCKED`, do not claim complete. Use
+"candidate first playable", "does not slap yet", or "blocked on fresh first-fun
+material" as appropriate.
 
-## Skill Eval Cases
+## Routing Cases
 
 - Baseline failure: without this skill, an agent can cite build, selector QA, sim diffs, and a results overlay while the first playable has no meaningful act in the first seconds.
-- With-skill behavior: a new game handoff includes TTFMC, first meaningful act, feedback latency, state consequence, learned pattern, and fresh artifact paths before claiming complete.
+- With-skill behavior: a new game handoff leads with whether a human would play another 30 seconds, then names the first act, the response, the consequence, the better next attempt, and the play material used for that judgment.
 - Should trigger: "The game runs but I cannot tell what is going on."
 - Should trigger: "Why is this not a game?"
-- Should trigger: "Prove the first playable is actually fun enough to start."
+- Should trigger: "Show me whether the first playable is actually fun enough to start."
 - Should trigger: "It starts randomly and my characters just die."
 - Should trigger: "Where is the first meaningful choice?"
 - Should not trigger: "Design the whole game direction before implementation" because `game__directing` and `game__building-core-loop` come first.
-- Should not trigger: "Make the HUD prettier" unless first-fun proof or comprehension is the requested outcome.
-- Collision boundary: for auto-battlers, use `game__genre--building-auto-battler-tactics` for the system; use this skill to prove the first commitment reaches the player quickly and reads in artifacts.
-- Attention-drift case: if the agent is late in a long turn and only remembers one rule, it must remember this: `TTFMC <= 5s, first act meaningful, artifact shows action -> feedback -> consequence -> learned pattern`.
+- Should not trigger: "Make the HUD prettier" unless first-fun judgment or comprehension is the requested outcome.
+- Collision boundary: for auto-battlers, use `game__genre--building-auto-battler-tactics` for the system; use this skill to judge whether the first commitment reaches the player quickly and reads in play material.
+- Attention-drift case: if the agent is late in a long turn and only remembers one rule, it must remember this: `Would I play another 30 seconds?` must be yes, backed by action -> feedback -> consequence -> better next attempt.
