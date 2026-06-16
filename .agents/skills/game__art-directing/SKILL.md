@@ -75,6 +75,14 @@ These audiences sometimes conflict. When they do, in-game readability wins — b
 
 ## Required Workflow For Any Request
 
+### Reference Gate - Active-Play Visual Quality
+
+Load `references/active-play-visual-quality-gate.md` before judging active
+gameplay screenshots, claiming a visual pass is ship-quality/showcase, reviewing
+whether a game still looks like a prototype, or finalizing a broad art direction
+handoff. This gate is for live play frames, not post-match results screens. Keep
+`design__designing-end-screen` focused on results screens.
+
 ### Pass 0 — Diagnose the game (always first)
 
 Before any visual specification, establish:
@@ -696,6 +704,10 @@ All colors as hex values. All timings as frame counts or milliseconds. All sizes
 ---
 
 ## The Art Direction Checklist (Ship Gate)
+
+When a playable artifact exists, run the Active-Play Visual Quality Gate before
+calling the visual pass done. The checklist below defines the system; the gate
+scores whether that system survives in actual play evidence.
 
 ### Core Loop Alignment
 - [ ] Core loop type diagnosed and visual priority matrix column selected

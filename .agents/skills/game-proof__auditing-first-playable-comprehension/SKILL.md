@@ -173,6 +173,24 @@ First loop closure = T_payoff - T0
 
 If the only available artifact is loading, splash, modal, autoplay, forced fast-results, or results frames, return `FAIL - invalid proof artifact`.
 
+### Browser Proof Harness
+
+When a browser target is available and the project does not already provide a
+better game-specific proof command, use the packaged harness to capture a
+baseline artifact:
+
+```bash
+node <this-skill-dir>/scripts/inspect-game-canvas.mjs --url http://127.0.0.1:5173 --out artifacts/browser-proof --key KeyW
+node <this-skill-dir>/scripts/inspect-game-canvas.mjs --url http://127.0.0.1:5173 --out artifacts/browser-proof --mobile --drag-selector "#touch-stick"
+```
+
+Use project-specific selectors, keys, or diagnostics when the defaults do not
+match the game. The harness can prove canvas visibility, nonblank readback,
+console/page errors, screenshots, basic input attempts, and diagnostics deltas.
+It cannot prove first fun by itself. A valid PASS still needs the timestamped
+TTFMC ledger below: first meaningful act, feedback, state consequence, learned
+pattern, and next intent.
+
 ### Pass 2 - Fill The First Fun Ledger
 
 Use this ledger. Do not replace it with prose.
