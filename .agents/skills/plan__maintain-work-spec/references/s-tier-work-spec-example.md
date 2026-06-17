@@ -14,6 +14,8 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 
 # WORK SPEC - Arena FPS Weapon Feel Pass
 
+**Human Read:** We are trying to make the starter rifle feel immediate, readable, and controllable so that the first combat loop earns enough trust for players to want another fight instead of blaming muddy controls. The active rung is `ARENA-FPS-WEAPON-FEEL__M3` because rifle feel, hit readability, recoil, and enemy reaction need to be proven together in one same-run browser clip. The next proof is the M3 Playwright clip plus hit-readability screenshot, benchmark table, and tuning-safety tests. Main risk: flashy feedback splits into parallel effects that look loud but break readability or deterministic tuning. Decision needed: human feel review after the clip is captured.
+
 **Last updated:** 2026-06-16  
 **Status:** In Progress  
 **Active rung:** `ARENA-FPS-WEAPON-FEEL__M3` - Rifle feel and hit readability - In Progress  
@@ -42,6 +44,7 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 ## Doc Conventions (Do Not Delete)
 
 - **Stable IDs:** Never renumber existing IDs. Append new IDs only.
+- **Human Read first:** The first field under the title is `Human Read`; it uses the `so that` ladder and names the active rung, next proof, main risk, and decision needed.
 - **Detail budget:** Milestone rungs carry product, UX, design, engineering, and proof context. Header/current truth/open questions/source refs stay active and compact.
 - **Active rung:** The header names the active rung; Section 5 owns the actual rung content.
 - **Rung commits:** Completed rungs record the short commit hash plus commit subject. Active/proposed rungs say `Pending` until proof, Work Spec sync, eval status sync, and commit are done.

@@ -23,6 +23,8 @@ eval-plan.md = how we prove it is real
 
 Spend the Work Spec detail budget on milestone rungs. Each rung is a self-contained build packet with enough product intent, UX/design taste, engineering boundary, contracts, and proof context for a senior engineer or agent to execute well.
 
+Every Work Spec starts with a `Human Read`: one plain-language scan line that says the direct outcome, the one-level-higher "so that" outcome, active rung, next proof, main risk, and decision needed. It is an index into the spec, not a second source of truth.
+
 The header names the active rung; it does not duplicate the rung. Cut bloat from stale changelogs, stale facts, resolved questions, old source refs, and completed proof narration, not from the rungs.
 
 When creating a Work Spec, materially restructuring one, or rewriting a milestone ladder, load `references/s-tier-work-spec-example.md` before editing. For status-only updates, small typo fixes, or one-line source/status sync, this reference is optional.
@@ -53,6 +55,11 @@ Turn messy, multi-window feature context into a **single, high-signal** Work Spe
 8. **Output:** Write or modify the Work Spec artifact, update linked eval-plan status if applicable, and return the Skill Result fields. Do not emit the root `<Recap>`; the calling agent owns the final human-facing response.
 
 ## Non-Negotiable Rules
+
+### Human Read
+- The first field under the Work Spec title is `**Human Read:**`.
+- Use this shape: `We are trying to <direct product outcome> so that <one-level-higher product/business/user outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.`
+- Keep it to one tight paragraph. It summarizes the current read for humans; it does not replace the milestone ladder, contracts, or proof details.
 
 ### Stable Structure
 Do not reorder sections.
@@ -113,6 +120,8 @@ Rules:
 
 ```markdown
 # WORK SPEC — <FEATURE_NAME>
+**Human Read:** We are trying to <direct product outcome> so that <one-level-higher product/business/user outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.
+
 **Last updated:** YYYY-MM-DD  
 **Status:** Draft | In Progress | Blocked | Done
 **Active rung:** <FEATURE-SLUG>__M# - <name> - <state or "None yet">
@@ -150,6 +159,7 @@ Rules:
   - Milestones: `<FEATURE-SLUG>__M1`, `<FEATURE-SLUG>__M2`, `<FEATURE-SLUG>__M3.1` (no duplicates)
 - **Truth labeling:** If it’s not sourced, it must be `[UNVERIFIED]` even if it seems obvious.
 - **Contracts live in Section 4 only.** Elsewhere, reference `C-###` rather than restating rules.
+- **Human Read first:** The first field under the title is `Human Read`. It uses the `so that` ladder and names the active rung, next proof, main risk, and decision needed.
 - **No stopgaps:** The no-stopgap rule lives as a Section 4 contract. Do not add a repeated no-stopgap field to each rung.
 - **Input coverage:** For specs created from multi-item user input, preserve a compact Input Coverage Ledger until the user accepts the spec. The ledger maps user asks to rungs/contracts/open questions/non-goals without converting asks into `[FACT]` boilerplate.
 - **Taste-critical work:** Rungs that change feel, UX, visuals, copy, game design, interaction, or developer ergonomics must name the reference bar, `must feel` / `must not feel` delta, proof artifact, and human-review rejection criteria. Section 1.B is not enough; each taste-critical rung needs its own rung-specific taste delta and rejection criteria.
@@ -526,6 +536,7 @@ This appendix can hold a full build spec when needed. It should expand on *mecha
 - Milestones use full prefixed IDs, not naked `M1` / `M2`.
 - Multi-item user intake has an Input Coverage Ledger until spec acceptance; no user item disappears into generic boilerplate.
 - Every milestone rung is a self-contained build packet, not a one-line task.
+- The first field under the Work Spec title is `Human Read`, and it uses the `so that` ladder to connect direct outcome to the one-level-higher outcome.
 - Every milestone rung names the user, developer, or engineering journey it unlocks.
 - Taste-critical rungs elevate taste by naming rung-specific reference bar, taste delta, proof artifact, and rejection criteria; they do not hide subjective judgment behind vague "polish" language or rely only on the global Design / UX Bar.
 - Browser-rendered user-facing rungs are not accepted on unit tests, DOM assertions, snapshots, or static markup alone; they record real app browser artifacts plus console/network status.

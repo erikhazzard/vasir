@@ -155,6 +155,12 @@ test("work spec skill includes a golden milestone-rung example", () => {
   assert.match(workSpecSkillText, /Canvas\/game rungs also need a nonblank, correctly framed, interacting\/moving check/);
 
   assert.match(workSpecExampleText, /# S-Tier Work Spec Example/);
+  assert.match(workSpecSkillText, /# WORK SPEC — <FEATURE_NAME>\n\*\*Human Read:\*\*/);
+  assert.match(workSpecSkillText, /The first field under the Work Spec title is `\*\*Human Read:\*\*`/);
+  assert.match(workSpecSkillText, /so that <one-level-higher product\/business\/user outcome>/);
+  assert.match(workSpecSkillText, /names the active rung, next proof, main risk, and decision needed/);
+  assert.match(workSpecExampleText, /# WORK SPEC - Arena FPS Weapon Feel Pass\n\n\*\*Human Read:\*\*/);
+  assert.match(workSpecExampleText, /so that the first combat loop earns enough trust/);
   assert.match(workSpecSkillText, /Core Product Outcome Unlock/);
   assert.match(workSpecSkillText, /one-level-higher product\/business outcome/);
   assert.match(workSpecExampleText, /Core Product Outcome Unlock/);
