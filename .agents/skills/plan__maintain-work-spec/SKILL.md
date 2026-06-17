@@ -44,12 +44,13 @@ Turn messy, multi-window feature context into a **single, high-signal** Work Spe
 ## Workflow 
 
 1. **Ingest inputs:** Current Work Spec + new material (PRs, tests, logs, decisions).
-2. **Find the active rung:** Identify the current milestone rung, latest completed rung commit, next user/developer journey proof, evidence artifacts, blockers, and next commit point.
-3. **Apply epistemic discipline:** Source active claims or label `[UNVERIFIED]`.
-4. **Centralize contracts:** Authority, ordering, privacy, safety, performance, data-shape, and failure rules live in Section 4.
-5. **Spend tokens on rungs:** Keep header/current-truth/open-question sections compact; make each milestone rung long enough to execute with product, UX, design, engineering, and proof context.
-6. **Archive history:** Move superseded decisions, old source refs, completed proof narration, and resolved questions to Appendix instead of leaving them in active sections.
-7. **Output:** Write or modify the Work Spec artifact, update linked eval-plan status if applicable, and return the Skill Result fields. Do not emit the root `<Recap>`; the calling agent owns the final human-facing response.
+2. **Preserve multi-item intake:** If the user provides a list of asks, create or update the Input Coverage Ledger before synthesis. Do not let user items disappear into generic Work Spec prose.
+3. **Find the active rung:** Identify the current milestone rung, latest completed rung commit, next user/developer journey proof, evidence artifacts, blockers, and next commit point.
+4. **Apply epistemic discipline:** Source active claims or label `[UNVERIFIED]`.
+5. **Centralize contracts:** Authority, ordering, privacy, safety, performance, data-shape, and failure rules live in Section 4.
+6. **Spend tokens on rungs:** Keep header/current-truth/open-question sections compact; make each milestone rung long enough to execute with product, UX, design, engineering, and proof context.
+7. **Archive history:** Move superseded decisions, old source refs, completed proof narration, and resolved questions to Appendix instead of leaving them in active sections.
+8. **Output:** Write or modify the Work Spec artifact, update linked eval-plan status if applicable, and return the Skill Result fields. Do not emit the root `<Recap>`; the calling agent owns the final human-facing response.
 
 ## Non-Negotiable Rules
 
@@ -73,11 +74,28 @@ Never renumber existing IDs:
 - `[PLAN]` — future intent
 - `[UNVERIFIED]` — no source (even if "obvious")
 
+### Input Coverage
+- When creating or materially restructuring a Work Spec from multi-item user input, preserve an Input Coverage Ledger until the user accepts the spec.
+- Every user-provided item must map to exactly one disposition: `Included`, `Merged`, `Deferred`, `Blocked`, `Open question`, or `Non-goal`.
+- The ledger points each item to the rung, contract, open question, non-goal, or appendix context where it lives. Nothing may disappear by being summarized.
+- Do not turn user asks into `[FACT]` entries. User asks are intake, not repo truth.
+
 ### Detail Budget
 - Milestone rungs are allowed to be juicy. They may contain design briefs, UX mandates, engineering boundaries, dev journey notes, implementation lane guidance, "not in this rung" lists, and "done when" language.
 - Header, Current State, Open Questions, Source References, and Change Log must stay compact and active. If a detail does not affect the active rung, next rung, blocker, or durable contract, move it to Appendix.
 - Stable IDs do not mean active-section immortality. Never renumber IDs, but superseded IDs may move to Appendix with a replacement pointer.
 - Resolved open questions leave Section 7. Old changelog entries leave the header. Completed milestone proof narration collapses to the rung's `Proof` and `Done` fields.
+
+### Taste-Critical Work
+- If a rung changes feel, UX, visuals, copy, game design, interaction, or developer ergonomics, the rung must name the reference bar, the `must feel` / `must not feel` delta, the artifact that proves the result, and the human-review rejection criteria.
+- Taste is not treated as purely objective, but it must be inspectable. Use screenshots, clips, interactive captures, before/after tables, or review notes so a human can accept or reject the result against the stated bar.
+
+### Browser-Rendered Proof
+- If a rung changes browser-rendered user-facing behavior, the rung must include an actual browser artifact from the running app route or playable scenario: Playwright/browser screenshot, video, trace, or before/after capture.
+- Browser-rendered user-facing behavior includes visible UI, layout, copy-in-context, animation, interaction, canvas/game feel, responsive state, and browser-facing error state.
+- Unit tests, DOM assertions, component snapshots, and static markup are not enough by themselves. Record the artifact path, route/scenario, viewport(s), and console/network error status.
+- Prefer Playwright when available. If the repo uses another browser harness, use that, but the artifact must come from the real app surface, not isolated fake markup when the route/scenario exists.
+- Canvas/game rungs also need a nonblank, correctly framed, interacting/moving check; "page loaded" is not proof.
 
 ## Milestone Namespace Rule
 
@@ -131,6 +149,9 @@ Rules:
 - **Truth labeling:** If it’s not sourced, it must be `[UNVERIFIED]` even if it seems obvious.
 - **Contracts live in Section 4 only.** Elsewhere, reference `C-###` rather than restating rules.
 - **No stopgaps:** The no-stopgap rule lives as a Section 4 contract. Do not add a repeated no-stopgap field to each rung.
+- **Input coverage:** For specs created from multi-item user input, preserve a compact Input Coverage Ledger until the user accepts the spec. The ledger maps user asks to rungs/contracts/open questions/non-goals without converting asks into `[FACT]` boilerplate.
+- **Taste-critical work:** Rungs that change feel, UX, visuals, copy, game design, interaction, or developer ergonomics must name the reference bar, `must feel` / `must not feel` delta, proof artifact, and human-review rejection criteria.
+- **Browser-rendered proof:** Browser-rendered user-facing rungs must record a Playwright/browser artifact from the actual route or playable scenario, plus viewport(s) and console/network error status. Unit tests and DOM assertions do not count as visual proof by themselves.
 - **Detail budget:** Milestone rungs carry the rich product/UX/design/engineering/proof context. Header/current truth/open questions/source refs stay active and compact.
 - **Active rung:** The header names the active rung; do not duplicate its content in a separate active-rung section.
 - **Rung commits:** Completed rungs record the short commit hash plus commit subject. Active/proposed rungs say `Pending` until proof, Work Spec sync, eval status sync, and commit are done.
@@ -138,6 +159,23 @@ Rules:
 - **History:** Superseded decisions, old source refs, resolved questions, and completed proof narration move to Appendix.
 - **Random context:** Use Appendix A5 for quarantined notes that may matter later but do not belong in the active lane.
 - **Keep it compact outside rungs:** Next actions <= 5. Active facts target <= 12 bullets. Active references target <= 15.
+
+---
+
+## Input Coverage Ledger (Required For Multi-Item Intake Until Accepted)
+
+Use this section when creating or materially restructuring a Work Spec from a user's list of asks. Remove or archive it after the user accepts the spec and the items are safely represented in rungs/contracts/open questions/non-goals.
+
+| # | User item | Disposition | Where it lives | Notes |
+| --- | --- | --- | --- | --- |
+| 1 | <plain-language item from user> | Included / Merged / Deferred / Blocked / Open question / Non-goal | <rung / C-### / UQ-### / Section 2 / A5> | <why> |
+| 2 | <plain-language item from user> | ... | ... | ... |
+
+Rules:
+- Preserve the user's wording enough that coverage can be audited.
+- If several asks merge into one rung, keep separate ledger rows and point them to the same rung.
+- If an item is not being built, say whether it is deferred, blocked, open, or a non-goal.
+- Do not reclassify user asks as `[FACT]`; source-backed repo truth still belongs in Section 3.
 
 ---
 
@@ -168,9 +206,11 @@ List the top 5 things a reasonable user would assume are true, but which enginee
 ### 1.B Design / UX Bar
 
 - **Experience target:** <what this should feel like or enable>
+- **Reference bar:** <specific product, local artifact, clip, screenshot, design system, prior implementation, or "None yet - must be established in rung X">
 - **Must feel:** <3-5 taste/UX/design qualities>
 - **Must not feel:** <3-5 failure qualities>
-- **Reference points:** <optional references, inspiration, prior art, or local artifacts; label as reference targets, not copied implementation>
+- **Human-review rejection criteria:** <what would make a reviewer reject the feel/UX/visual/copy/dev-ergonomics result>
+- **Reference points:** <optional inspiration or prior art; label as reference targets, not copied implementation>
 
 ---
 
@@ -342,11 +382,11 @@ For a milestone and the subwork within a milestone to be done, the **value path*
 - **Goal:** <capability unlocked>
 - **User / dev / engineering journey:** Actor + entry + 3–5 steps + success (observable)
 - **Rung size:** S/M/L/XL - summary judgment. Include Complexity, Risk, Perf Impact, and Cost Impact; use `N/A - <reason>` where an axis truly does not apply.
-- **Rung design brief:** product intent, UX/design taste, engineering shape, reference feel, or implementation philosophy needed to execute well
+- **Rung design brief:** product intent, reference bar, must-feel / must-not-feel deltas, taste constraints, rejection criteria, engineering shape, or implementation philosophy needed to execute well
 - **Mandates / best practices:** the rung-specific musts, must-nots, and taste constraints that a senior engineer should preserve
 - **Implementation lane:** owned systems/surfaces; evidence, not an allowlist
 - **Experience invariants:** reference the relevant `C-###` (do not restate)
-- **Evidence artifacts:** screenshot/clip/log/benchmark/table paths for this rung, or `Pending - <what will be captured>`. Use Markdown links when the artifact is durable in-repo; use backticked paths for short-lived `tmp/...` artifacts. If a `tmp/...` artifact may expire, include a one-sentence evidence summary that survives the file.
+- **Evidence artifacts:** screenshot/clip/log/benchmark/table paths for this rung, or `Pending - <what will be captured>`. For browser-rendered user-facing changes, include Playwright/browser screenshot, video, trace, or before/after capture from the actual route/playable scenario, viewport(s), and console/network error status. For canvas/game changes, include a nonblank/framed/interacting check. Use Markdown links when the artifact is durable in-repo; use backticked paths for short-lived `tmp/...` artifacts. If a `tmp/...` artifact may expire, include a one-sentence evidence summary that survives the file.
 - **Rung commit:** `<short-sha>` - <commit subject> for completed rungs; `Pending - commit after proof, Work Spec sync, and eval status sync` for active/proposed rungs
 - **Not in this rung:** what this rung intentionally does NOT do
 - **Obviousness checks (top assumptions -> proof or defer):**
@@ -402,8 +442,11 @@ Assume 100m users, with 10mm DAUs. Scale all numbers around these assumptions.
 - Active references concise (target ≤ 15 bullets): ✅/❌
 - Recent Change Log ≤ 3 active entries: ✅/❌
 - Milestone rungs are the richest section: ✅/❌
+- Taste-critical rungs name reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria: ✅/❌/N/A
+- Browser-rendered user-facing rungs have real route/scenario artifact, viewport(s), console/network status, and canvas/game nonblank/interacting proof when applicable: ✅/❌/N/A
 - Rung evidence artifacts are recorded or explicitly pending: ✅/❌
 - No-stopgap contract is satisfied or contradiction is called out: ✅/❌
+- Every user-provided item is mapped in the Input Coverage Ledger: ✅/❌/N/A
 - All [FACT] have (SRC-###): ✅/❌
 - No duplicate milestone IDs: ✅/❌
 - Contracts centralized (no scattered caps/contracts elsewhere): ✅/❌
@@ -479,8 +522,11 @@ This appendix can hold a full build spec when needed. It should expand on *mecha
 
 ## Quality Bar
 - Milestones use full prefixed IDs, not naked `M1` / `M2`.
+- Multi-item user intake has an Input Coverage Ledger until spec acceptance; no user item disappears into generic boilerplate.
 - Every milestone rung is a self-contained build packet, not a one-line task.
 - Every milestone rung names the user, developer, or engineering journey it unlocks.
+- Taste-critical rungs elevate taste by naming the reference bar, taste delta, proof artifact, and rejection criteria; they do not hide subjective judgment behind vague "polish" language.
+- Browser-rendered user-facing rungs are not accepted on unit tests, DOM assertions, snapshots, or static markup alone; they record real app browser artifacts plus console/network status.
 - Every implementation-ready milestone references eval-plan proof, artifact-backed human review, missing-harness work, or the exact blocker.
 - The Work Spec has one no-stopgap contract in Section 4; rungs do not repeat a no-stopgap field.
 - Every rung records evidence artifact pointer(s) or `Pending`; short-lived `tmp/...` artifacts are acceptable only with a compact evidence summary that survives expiry.
@@ -505,6 +551,7 @@ After writing or updating the Work Spec, report these fields to the calling agen
 - Feature slug:
 - Approval state:
 - Active rung:
+- Input coverage state:
 - Rung commit state:
 - Evidence artifacts:
 - Proposed milestone IDs:

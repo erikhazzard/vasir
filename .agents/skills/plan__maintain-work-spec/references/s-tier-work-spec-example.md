@@ -47,8 +47,30 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 - **Evidence artifacts:** Each rung records screenshot, clip, log, or benchmark-table proof pointers. `tmp/...` artifacts may expire; keep the evidence summary in the rung.
 - **Contracts live in Section 4 only.** Milestones reference `C-###`.
 - **No stopgaps:** The no-stopgap rule lives in Section 4. Do not repeat it as a field in every rung.
+- **Input coverage:** Because this example started from a multi-item ask, the Input Coverage Ledger stays visible until the spec is accepted.
+- **Taste-critical work:** Feel-changing rungs name the reference bar, must-feel/must-not-feel delta, proof artifact, and human-review rejection criteria.
+- **Browser-rendered proof:** Browser/game rungs record Playwright/browser artifacts from the actual playable scenario, including viewport(s), console/network status, and nonblank/interacting canvas proof.
 - **History:** Move superseded decisions, old source refs, resolved questions, and completed proof narration to Appendix.
 - **Random context:** Use Appendix A5 for quarantined notes that may matter later but do not belong in active sections.
+
+---
+
+## Input Coverage Ledger (Required For Multi-Item Intake Until Accepted)
+
+This example assumes the user said: "Spec out the starter rifle feel pass: click response, hit marker, recoil, enemy reaction, tuning constants, a before/after screenshot, a benchmark table, and don't add inventory or progression."
+
+| # | User item | Disposition | Where it lives | Notes |
+| --- | --- | --- | --- | --- |
+| 1 | Click response should feel immediate | Included | `ARENA-FPS-WEAPON-FEEL__M3`, C-001, C-007 | Proved by click-to-first-feedback timing and browser clip. |
+| 2 | Hit marker/readability | Included | `ARENA-FPS-WEAPON-FEEL__M2`, `ARENA-FPS-WEAPON-FEEL__M3`, C-002 | M2 establishes basic read; M3 proves it inside the full rifle loop. |
+| 3 | Recoil / camera punch | Included | `ARENA-FPS-WEAPON-FEEL__M3`, C-004, C-021 | Recoil is allowed only while target readability and 60fps hold. |
+| 4 | Enemy reaction on hit | Included | `ARENA-FPS-WEAPON-FEEL__M3`, C-003 | Must source from `targetHit`, not a parallel animation trigger. |
+| 5 | Named tuning constants | Included | `ARENA-FPS-WEAPON-FEEL__M3`, C-006 | Developer journey unlock for future tuning. |
+| 6 | Before/after screenshot and benchmark table | Included | `ARENA-FPS-WEAPON-FEEL__M3` evidence artifacts | Stored under `tmp/<date>__arena-fps-rifle-feel-m3/`; summary survives expiry. |
+| 7 | Do not add inventory/progression | Non-goal | Section 2 | Explicitly outside starter rifle feel lane. |
+| 8 | Designer tuning UI | Deferred | `ARENA-FPS-WEAPON-FEEL__M4` | Depends on M3 feel acceptance. |
+
+Do not convert these user asks into `[FACT]` entries. The ledger preserves intake; Section 3 records source-backed repo truth.
 
 ---
 
@@ -91,8 +113,10 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 ### 1.4 Design / UX Bar
 
 - **Experience target:** Fast arena rifle: punchy, bright, readable, skillful.
+- **Reference bar:** Local baseline clip `tmp/2026-06-15__rifle-hit-marker-m2/hit-marker-before-after.png` plus fast arena-shooter rifle readability as a taste reference, not copied implementation.
 - **Must feel:** immediate, controlled, percussive, readable, recoverable.
 - **Must not feel:** delayed, mushy, floaty, camera-hostile, visually noisy.
+- **Human-review rejection criteria:** Reject if a reviewer cannot tell hit vs miss within the first reaction beat, recoil hides the target longer than recovery, camera punch feels random, or the player cannot predict when control returns.
 - **Reference points:** Arena shooter readability and hero-shooter hit feedback are taste references only; do not infer exact internals from reference games.
 
 ---
@@ -219,7 +243,7 @@ Size is a summary of judgment surface and blast radius, not a calendar estimate.
 
 **Rung commit:** Pending - commit after proof, Work Spec sync, and eval status sync.
 
-**Evidence artifacts:** Pending - capture `tmp/<date>__arena-fps-rifle-feel-m3/rifle-feedback-before-after.png`, `tmp/<date>__arena-fps-rifle-feel-m3/rifle-feel-review.mp4`, `tmp/<date>__arena-fps-rifle-feel-m3/frame-budget-before-after.md`, and `tmp/<date>__arena-fps-rifle-feel-m3/console.log`. Because these are temporary, the completed rung must keep the accepted feel summary and the before/after benchmark numbers in this section.
+**Evidence artifacts:** Pending - capture Playwright/browser proof from the seeded playable route `/arena-fps?scenario=rifle-feel-m3`: `tmp/<date>__arena-fps-rifle-feel-m3/playwright-desktop-before-after.png`, `tmp/<date>__arena-fps-rifle-feel-m3/playwright-mobile-before-after.png`, `tmp/<date>__arena-fps-rifle-feel-m3/rifle-feel-review.mp4`, `tmp/<date>__arena-fps-rifle-feel-m3/frame-budget-before-after.md`, and `tmp/<date>__arena-fps-rifle-feel-m3/browser-console-network.md`. Browser proof must note desktop/mobile viewport sizes, console/network error status, and nonblank/framed/interacting canvas checks. Because these are temporary, the completed rung must keep the accepted feel summary and the before/after benchmark numbers in this section.
 
 **Rung size:** M - Complexity M: rifle loop, camera feedback, target reaction, tuning constants, and seeded browser proof all need coordinated judgment; Risk M: core first-weapon feel and readability can regress, but there is no data migration, auth, or shared backend state; Perf Impact M: touches frame-loop feedback and camera impulses, so 60fps proof is required; Cost Impact N/A - client/runtime feel pass only, no infra, external-service, model/tool-call, or storage delta.
 
@@ -230,6 +254,10 @@ Size is a summary of judgment surface and blast radius, not a calendar estimate.
 **Engineering unlock:** Fire input, hit events, recoil/camera response, and target feedback become separate but synchronized pieces of one testable feedback loop.
 
 **Rung design brief:**
+- Reference bar: M2 before/after hit-readability artifact plus fast arena rifle feel; this rung must elevate from "I saw a hit marker" to "I felt a powerful, readable shot I can control."
+- Must-feel delta: more immediate, more percussive, more legible, and more recoverable than M2.
+- Must-not-feel delta: no added mush, random shake, target occlusion, or "screenshake equals power" shortcut.
+- Rejection criteria: reject the clip if hit vs miss is unclear within the first reaction beat, recoil obscures tracking, camera punch feels disconnected from shot direction, or named constants do not explain how to tune the feel.
 - Fantasy: fast arena rifle, not tactical sim and not slow military recoil.
 - Moment loop: acquire target -> fire -> immediate weapon response -> hit read -> enemy reaction -> controlled aim recovery.
 - First three seconds must communicate: immediacy, force, readable damage, and recoverable control.
@@ -242,6 +270,7 @@ Size is a summary of judgment surface and blast radius, not a calendar estimate.
 - Camera shake is brief, directional, and never destroys target readability.
 - Enemy reaction clarifies hit direction/state without hiding the target.
 - Human feel review accepts the clip; tests prove timing and technical health.
+- Browser proof comes from the actual seeded playable scenario, not isolated markup or a component-only snapshot.
 
 **Implementation lane:**
 - Rifle fire loop.
@@ -383,7 +412,10 @@ The appendix is real. It holds history and random context so the active sections
 # What This Example Is Teaching
 
 - Work Specs are not shorter by being less rigorous.
+- Multi-item user asks need an Input Coverage Ledger until spec acceptance, so concrete asks do not disappear into generic sections.
 - Milestone rungs should be rich enough to execute.
+- Taste-critical rungs elevate taste by naming the reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria.
+- Browser-rendered user-facing rungs need real route/playable-scenario artifacts; unit tests and DOM assertions are not visual proof by themselves.
 - User journey, developer journey, and engineering unlock language beats mechanical "objective green" phrasing.
 - No-stopgap belongs in Section 4 as one global contract, not as repeated rung boilerplate.
 - The eval plan owns detailed proof mechanics; the Work Spec names the proof purpose and current proof state.
