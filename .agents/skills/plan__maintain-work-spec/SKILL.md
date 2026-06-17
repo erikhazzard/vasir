@@ -59,6 +59,9 @@ Turn messy, multi-window feature context into a **single, high-signal** Work Spe
 ### Human Read
 - The first field under the Work Spec title is `**Human Read:**`.
 - Use this shape: `We are trying to <direct product outcome> so that <one-level-higher product/business/user outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.`
+- The `so that` clause must climb one level above the immediate workflow. It should name the downstream product, customer, business, safety, trust, revenue, retention, or operational outcome created by the direct outcome. Do not merely restate the workflow in nicer words.
+- Weak: `We are trying to make incidents easier to scan so that operators can triage incidents confidently.`
+- Strong: `We are trying to make incidents easier to scan so that Harbor Pulse reduces time-to-mitigation and customer-impact uncertainty during live incidents.`
 - Keep it to one tight paragraph. It summarizes the current read for humans; it does not replace the milestone ladder, contracts, or proof details.
 
 ### Stable Structure
@@ -120,7 +123,7 @@ Rules:
 
 ```markdown
 # WORK SPEC — <FEATURE_NAME>
-**Human Read:** We are trying to <direct product outcome> so that <one-level-higher product/business/user outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.
+**Human Read:** We are trying to <direct product outcome> so that <downstream product/customer/business/safety/trust/revenue/retention/operational outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.
 
 **Last updated:** YYYY-MM-DD  
 **Status:** Draft | In Progress | Blocked | Done

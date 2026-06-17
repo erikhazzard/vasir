@@ -14,7 +14,7 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 
 # WORK SPEC - Arena FPS Weapon Feel Pass
 
-**Human Read:** We are trying to make the starter rifle feel immediate, readable, and controllable so that the first combat loop earns enough trust for players to want another fight instead of blaming muddy controls. The active rung is `ARENA-FPS-WEAPON-FEEL__M3` because rifle feel, hit readability, recoil, and enemy reaction need to be proven together in one same-run browser clip. The next proof is the M3 Playwright clip plus hit-readability screenshot, benchmark table, and tuning-safety tests. Main risk: flashy feedback splits into parallel effects that look loud but break readability or deterministic tuning. Decision needed: human feel review after the clip is captured.
+**Human Read:** We are trying to make the starter rifle feel immediate, readable, and controllable so that first-session combat earns enough trust and appetite for mastery to carry players into another fight. The active rung is `ARENA-FPS-WEAPON-FEEL__M3` because rifle feel, hit readability, recoil, and enemy reaction need to be proven together in one same-run browser clip. The next proof is the M3 Playwright clip plus hit-readability screenshot, benchmark table, and tuning-safety tests. Main risk: flashy feedback splits into parallel effects that look loud but break readability or deterministic tuning. Decision needed: human feel review after the clip is captured.
 
 **Last updated:** 2026-06-16  
 **Status:** In Progress  
@@ -26,7 +26,7 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 **Stakeholders:** Players, game designers, gameplay engineers, QA
 
 **Purpose:** Make the starter rifle feel immediate, powerful, readable, and controllable without turning the game into a tactical sim. This pass defines the product feel target, engineering lane, and proof needed for a shippable first weapon-feel slice.
-**Core Product Outcome Unlock:** The first combat loop earns enough trust and satisfaction that players want another fight instead of blaming the controls or missing the hit feedback.
+**Core Product Outcome Unlock:** First-session combat earns enough trust and appetite for mastery that players choose another fight instead of churning on muddy controls or unreadable hit feedback.
 **Core User Journey Unlock:** A player fires the starter rifle at a moving enemy and immediately understands shot timing, recoil, hit confirmation, enemy reaction, and when they can correct aim.
 **Core Developer Journey Unlock:** A future gameplay engineer can tune rifle feel through named constants and focused tests without reverse-engineering animation timing, camera response, and hit feedback coupling.
 **Core Engineering Unlock:** Weapon feedback becomes a deterministic, testable loop with separated fire timing, hit events, camera impulse, enemy reaction, and feedback rendering boundaries.
