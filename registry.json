@@ -672,6 +672,45 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "game-assets__generating-images",
+      "description": "Generates, persists, and wires bitmap game assets for Idavoll and Studio games including backgrounds, sprites, icons, portraits, item art, card art, UI textures, transparent cutouts, and reference images. Use when a creator asks for raster game art or when implementation needs new bitmap assets, prefer Codex-native image generation when available, use the Studio source image command only as a thin fallback, and avoid backend prompt routing or metadata image flows.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game-assets__generating-images",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-creation__selecting-initial-template",
+      "description": "Selects the initial Idavoll game creation template and orchestrates the first-playable skill stack for new games. Use during create-game initialization, first-playable scaffolding, or local starter-template selection; keeps template, genre, art/UI, juice, and proof judgment inside Codex skills rather than Studio backend/frontend routing.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game-creation__selecting-initial-template",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game-creation__writing-game-spec",
+      "description": "Writes and revises the canonical README__game-spec.md for Studio game creation. Use when a Studio game has no README__game-spec.md, the creator asks to make a new game, or an existing game spec is too vague to support template selection and first-playable implementation.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game-creation__writing-game-spec",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "game-design__ensuring-design-coherence",
       "description": "Extract and pressure-test a game's or feature's actual fantasy, core loop, and design pillars. Triggers on designing game loops, improving gameplay, and diagnosising why a game doesn't feel good.",
       "category": "uncategorized",
