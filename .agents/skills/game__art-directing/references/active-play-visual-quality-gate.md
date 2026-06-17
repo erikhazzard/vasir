@@ -1,17 +1,18 @@
 # Active-Play Visual Slap Review
 
-Use this reference when judging whether a playable game actually looks and reads
-like a real authored game during play. This is not a post-match results,
-marketing, title-screen, or asset-showroom rubric.
+Use this reference when judging whether a playable game actually looks, moves,
+and reads like a real authored game during play. This is not a post-match
+results, marketing, title-screen, still-screenshot, or asset-showroom rubric.
 
 ## Core Principle
 
-Visual quality is proven in the frame where the player has to decide. The human
-QA question is simple:
+Visual quality is judged in the decision moment and the response immediately
+after it. A beautiful still can fail if the input answer, motion, camera,
+feedback, or consequence feels dead. The human QA question is simple:
 
 ```text
-Can I instantly tell what matters, what I can do, what changed, and why I would
-keep playing?
+Can I instantly tell what matters, what I can do, what changed when I acted, and
+why I would keep playing?
 ```
 
 If the answer is no, the visual pass does not slap yet. Notes explain the
@@ -23,6 +24,7 @@ Use real active-play material:
 
 - one desktop active-play frame at actual game scale;
 - one mobile active-play frame when mobile is in scope;
+- one before/input/after sequence for the first meaningful act;
 - player, objective, and at least one threat, reward, or decision surface;
 - a short clip or frame sequence when motion, VFX, hit feedback, or camera movement matters;
 - a live run or runtime sanity check when visual density may hurt feel.
@@ -37,32 +39,37 @@ Stop the review if the material is:
 - debug overlay obscuring the play surface
 - isolated character/model render with no gameplay context
 - screenshot that hides controls, objective, threat/reward, or decision state
+- still-only material for a game whose feel depends on motion, impact, camera,
+  timing, or state-change feedback
 - claims based only on "generated assets", postprocessing, or asset count
 
-## First-Glance Slap Test
+## Active-Play Slap Test
 
-Before judging, look at the active frame for one second and answer without
-reading code or a design doc:
+Before judging, inspect the active play sequence without reading code or a
+design doc:
 
 ```text
-First-glance read:
+Active-play read:
 - I am:
 - I should:
 - I should care because:
+- When I act, the game visually answers by:
+- What changed after the action:
 - The biggest visual confusion is:
-- Would I keep playing from this frame?: yes/no
+- Would I keep playing from this moment?: yes/no
 ```
 
-If "I should" or "I should care because" is unclear, the verdict cannot be
-`SLAPS`. If "Would I keep playing" is no, the verdict cannot be `SLAPS`.
+If "I should", "I should care because", "When I act", or "What changed" is
+unclear, the verdict cannot be `SLAPS`. If "Would I keep playing" is no, the
+verdict cannot be `SLAPS`.
 
 ## Slap Verdicts
 
 | Verdict | Meaning |
 |---|---|
-| `SLAPS` | The active frame is readable, authored, and makes the next action more tempting. |
+| `SLAPS` | The active sequence is readable, authored, and makes the next action more tempting. |
 | `CLOSE` | The game has a real visual direction, but one visible blocker hurts desire or clarity. |
-| `DOES NOT SLAP` | The frame feels confusing, generic, dead, unreadable, or not worth another try. |
+| `DOES NOT SLAP` | The moment feels confusing, generic, dead, unreadable, or not worth another try. |
 | `BLOCKED` | Valid active-play material is missing or stale. |
 
 ## Judgment Areas
@@ -77,13 +84,13 @@ If "I should" or "I should care because" is unclear, the verdict cannot be
    - Does the hierarchy survive clutter, mobile scale, and effects?
 
 3. Authored visual identity
-   - Does the frame look designed, not assembled from defaults?
+   - Does the sequence look designed, not assembled from defaults?
    - Are silhouettes, materials, colors, and props part of a reusable grammar?
    - Intentional abstract geometry is valid; default primitives with no semantic
      system are not.
 
 4. Feedback and motion readability
-   - Does the frame or clip show that input, hit, collect, fail, combo, progress,
+   - Does the sequence show that input, hit, collect, fail, combo, progress,
      or danger feedback clarifies play?
    - Do VFX and camera work make the next decision clearer instead of hiding it?
 
@@ -102,7 +109,9 @@ If "I should" or "I should care because" is unclear, the verdict cannot be
 Any blocker prevents `SLAPS` no matter how polished the screenshot looks:
 
 - no valid active-play material;
-- no clear first-glance next action;
+- no clear next action in the active-play read;
+- no visible before/input/after read for the first meaningful act when motion or
+  feedback matters;
 - player, threat, reward, objective, or interactables blend together;
 - motion/VFX claims rely on a still screenshot for a motion-heavy game;
 - mobile is in scope but the mobile frame is missing, cropped, or unreadable;
@@ -112,7 +121,7 @@ Any blocker prevents `SLAPS` no matter how polished the screenshot looks:
   screen.
 
 The point is not to grade missing material. The point is to avoid calling a
-game visually good when the active frame does not help play.
+game visually good when the active moment does not help play.
 
 - Results/death/share/menu screenshots may support a separate results-screen
   review, but they cannot raise the active-play verdict.
@@ -141,25 +150,28 @@ Fix the single biggest "does not slap" reason first:
 5. Integrate HUD/state without covering play.
 6. Check mobile fit where relevant.
 7. Check runtime cost when visual density could hurt feel.
-8. Add style, lighting, particles, and detail only after the frame reads.
+8. Add style, lighting, particles, and detail only after the active moment reads.
 
-Do not add beauty around confusion. Do not praise a frame that does not make a
-human want another attempt.
+Do not add beauty around confusion. Do not praise a frame or clip that does not
+make a human want another attempt.
 
 ## Report Format
 
 ```text
 Active-play visual slap review:
 - Verdict: SLAPS / CLOSE / DOES NOT SLAP / BLOCKED
-- First-glance read:
+- Active-play read:
   - I am:
   - I should:
   - I should care because:
+  - When I act, the game visually answers by:
+  - What changed after the action:
   - Biggest visual confusion:
-  - Would I keep playing from this frame?:
+  - Would I keep playing from this moment?:
 - Material:
   - Desktop active-play frame:
   - Mobile active-play frame:
+  - Before/input/after sequence:
   - Motion/feedback clip:
   - Runtime sanity check:
 - Core-loop profile:

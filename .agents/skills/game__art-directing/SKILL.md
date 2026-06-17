@@ -78,10 +78,10 @@ These audiences sometimes conflict. When they do, in-game readability wins — b
 ### Reference - Active-Play Visual Slap
 
 Load `references/active-play-visual-quality-gate.md` before judging active
-gameplay screenshots, claiming active-play visuals are ready, reviewing
+gameplay screenshots or clips, claiming active-play visuals are ready, reviewing
 whether a game still looks like a prototype, or finalizing a broad art direction
-handoff. This is a human QA review: does the active frame make the next action
-clearer, the toy more desirable, and one more attempt more tempting?
+handoff. This is a human QA review: does the active play sequence make the next
+action clearer, the toy more desirable, and one more attempt more tempting?
 
 The active-play review supersedes screenshot/attract/death/results guidance
 when judging active play. If the material is title, menu, death, result, share,
@@ -712,7 +712,7 @@ All colors as hex values. All timings as frame counts or milliseconds. All sizes
 
 When a playable game exists, run the Active-Play Visual Slap Review before
 calling the visual pass done. The checklist below defines the system; the review
-judges whether that system survives the human active-frame read.
+judges whether that system survives the human active-play read.
 
 ### Core Loop Alignment
 - [ ] Core loop type diagnosed and visual priority matrix column selected

@@ -1,6 +1,6 @@
 ---
 name: game-proof__auditing-first-playable-comprehension
-description: Judges whether a Studio or Idavoll first playable works and feels good in the opening seconds. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.
+description: Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment: input, response, consequence, and desire to continue. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.
 ---
 
 # First Fun Judgment
@@ -19,6 +19,17 @@ act -> answer -> consequence -> better next attempt
 
 Timing can expose dead input or a passive start. Timing cannot make a boring toy
 good.
+
+The verdict starts with the lived play moment, not the spec, timestamp table,
+or harness result:
+
+```text
+I <did this input/choice>; the game <answered this way>; <this state changed>;
+next I wanted to <try this>.
+```
+
+If that sentence cannot be written from actual play material, the first
+playable does not slap yet or the review is blocked.
 
 ## Human QA Slap Test
 
@@ -104,11 +115,13 @@ Invalid examples:
 
 ## Workflow
 
-### Pass 0 - Extract The Intended First Fun
+### Pass 0 - Find The Intended Toy Without Blocking
 
-Read `README__game-spec.md` first. If it is missing and the task is not spec work, return `BLOCKED - missing README__game-spec.md`.
+Read `README__game-spec.md` if it exists. Missing spec is not a blocker. A
+runnable game can still be judged from the visible surface, controls, source,
+route name, package metadata, or the first playable frame.
 
-Extract:
+Extract what is available:
 
 - one-line promise;
 - target platform/orientation;
@@ -120,9 +133,13 @@ Extract:
 - scoring, failure, result, and restart rules;
 - acceptance criteria.
 
+If intent is unclear after seeing the first visible game surface, continue the
+review and judge the actual opening. Do not invent a promise to make the game
+sound coherent.
+
 Then classify the first-fun shape:
 
-| Shape | What can satisfy TTFMC |
+| Shape | What can satisfy the first meaningful act |
 |---|---|
 | Direct-control / hyper-casual | first tap, swipe, hold, drag, aim, release, dodge, jump, flap, slice, redirect, or timing act |
 | Puzzle | first board move with visible board consequence |
@@ -131,40 +148,78 @@ Then classify the first-fun shape:
 | Idle / management | first allocation, upgrade, priority, timing, or automation toggle that changes future output |
 | Narrative | first story choice that visibly changes state, route, tone, risk, relationship, or next option |
 
-If the expected act is not identifiable, return `DOES NOT SLAP - no defined first meaningful choice`.
+If the expected act is not identifiable from the spec or from the playable
+surface, return `DOES NOT SLAP - no readable first meaningful act`.
 
-### Pass 1 - Watch The First Active Slice
+### Pass 1 - Play Or Watch One Real Act
 
 Use the closest available browser, QA, replay, screenshot, or clip command. Judge
-real player-facing time, not only internal sim output.
+real player-facing time, not only internal sim output. A still screenshot can
+show a blocker, but it cannot earn `SLAPS` for a game where input response,
+motion, collision, camera, or feedback matters.
 
-Track these beats when they affect the verdict:
-
-| Timestamp | Required observation |
-|---|---|
-| `T0` | first playable frame |
-| `T_actionable` | first moment the available action/choice is visually invited |
-| `T_input` | first real player input or choice |
-| `T_feedback` | first visible response to input |
-| `T_consequence` | first visible integrated state change |
-| `T_payoff` | first progress, danger, reward, failure pressure, win/loss clue, or changed hypothesis |
-
-Compute:
+Record the play moment before writing any verdict:
 
 ```text
-Time to Agency = T_actionable - T0
-TTFMC = T_input - T0
-Feedback latency = T_feedback - T_input
-Consequence latency = T_consequence - T_input
-First loop closure = T_payoff - T0
+Observed play moment:
+- Before input: what the player sees and thinks they can do
+- Input/choice: the exact key, tap, drag, pick, placement, aim, timing, or route
+- Immediate answer: the visible/audio/motion response
+- Consequence: what integrated game state changed
+- Next desire: what a human would try next and why
+- One-sentence read: I <acted>; the game <answered>; <state changed>; next I wanted <...>.
 ```
+
+If no real input or choice is available in the opening, return
+`DOES NOT SLAP - no playable act`. If the capture is too incomplete to judge,
+return `BLOCKED - no active-play material`.
 
 If the only available material shows the actual opening and it is loading,
 splash, modal, autoplay, forced fast-results, or results-only play, return
-`DOES NOT SLAP - no active play`. If the capture is incomplete, return
-`BLOCKED - no active-play material`.
+`DOES NOT SLAP - no active play`.
 
-### Optional Broken-Surface Harness
+### Pass 2 - Write The First Fun Verdict
+
+Use this shape. It is intentionally small so the human judgment cannot get
+buried under a fake audit.
+
+```text
+First Fun Judgment:
+- Verdict: SLAPS / DOES NOT SLAP / BLOCKED
+- Play moment: I <acted>; the game <answered>; <state changed>; next I wanted <...>.
+- Would I play another 30 seconds?: yes/no/blocked - <why>
+- First meaningful act:
+- What the game does back:
+- What changed that matters:
+- Better next attempt the player can infer:
+- Single biggest reason it does not slap yet:
+- Timing notes only if they affected feel:
+- Broken-surface checks only if they found a blocker:
+- Fresh play material used for the judgment:
+```
+
+Hard rule: if `Play moment`, `Would I play another 30 seconds?`, `What the game
+does back`, `What changed that matters`, or `Better next attempt` is empty, do
+not call it `SLAPS`.
+
+### Pass 3 - Add Timing Notes Only When Feel Requires It
+
+Timing notes are supporting detail. Use them only to explain dead input, slow
+agency, delayed consequence, or a first loop that takes too long to create
+pressure, reward, danger, or curiosity.
+
+When timing matters, record only the beats that change the verdict:
+
+- first visible playable surface;
+- first invited action;
+- first input or choice;
+- first visible response;
+- first integrated consequence;
+- first payoff, pressure, or changed hypothesis.
+
+Do not let timing math replace the play moment sentence.
+
+### Pass 4 - Optional Broken-Surface Check
 
 When a browser target is available and the project does not already provide a
 better game-specific runtime command, use the packaged harness to capture a
@@ -186,30 +241,7 @@ Do not put a green harness result in the headline. It has near-zero correlation
 with whether the toy works or feels good. Mention it only if it found a blocker
 or the user asked for runtime details.
 
-### Pass 2 - Write The First Fun Verdict
-
-Use this shape. It is intentionally small so the human judgment cannot get
-buried under a fake audit.
-
-```text
-First Fun Judgment:
-- Verdict: SLAPS / DOES NOT SLAP / BLOCKED
-- Would I play another 30 seconds?: yes/no/blocked - <why>
-- First meaningful act:
-- What the game does back:
-- What changed that matters:
-- Better next attempt the player can infer:
-- Single biggest reason it does not slap yet:
-- Timing notes only if they affect feel:
-- Broken-surface checks only if they found a blocker:
-- Fresh play material used for the judgment:
-```
-
-Hard rule: if `Would I play another 30 seconds?`, `What the game does back`,
-`What changed that matters`, or `Better next attempt` is empty, do not call it
-`SLAPS`.
-
-### Pass 3 - Judge The First Act
+### Pass 5 - Judge The First Act
 
 Run these quick checks:
 
@@ -226,13 +258,13 @@ For strategy-heavy games, the first commitment can be a discrete option. For
 auto-resolving games, the meaningful choice must happen before automation, and
 automation must visibly prove the commitment.
 
-### Pass 4 - Classify Failure And Repair Order
+### Pass 6 - Classify Failure And Repair Order
 
 Use the first failing label:
 
 | Failure | Symptom | Repair first |
 |---|---|---|
-| No TTFMC | More than 5s before a meaningful act, or no act exists. | Move the first choice/interaction into the first screen. |
+| Slow or absent agency | More than 5s before a meaningful act, or no act exists. | Move the first choice/interaction into the first screen. |
 | Passive start | Player mostly waits, watches, reads, or taps through. | Replace passive opener with a playable commitment. |
 | Fake choice | Button/gesture exists but alternatives do not matter. | Add divergent consequence or execution skill. |
 | Hidden affordance | Valid action is not invited. | Strengthen signifier, target, gesture affordance, and hit area. |
@@ -244,7 +276,7 @@ Use the first failing label:
 
 Repair order is strict: first meaningful act -> immediate feedback -> integrated consequence -> learned pattern -> result/restart -> juice/polish. Do not polish a passive start.
 
-### Pass 5 - Verdict
+### Pass 7 - Verdict
 
 Return exactly one verdict:
 
@@ -265,6 +297,7 @@ These are the only things that matter:
 - the game answers the act;
 - the act changes something visible and integrated;
 - the player can infer a better next attempt;
+- the verdict names the concrete play moment;
 - the material comes from real play, not loading, menu, autoplay, or results.
 
 ## Contrastive Examples
@@ -308,6 +341,7 @@ Use this section in the handoff:
 ```text
 First Fun Judgment:
 - Verdict: SLAPS | DOES NOT SLAP | BLOCKED
+- Play moment: I <acted>; the game <answered>; <state changed>; next I wanted <...>.
 - Would I play another 30 seconds?: <yes/no/blocked + why>
 - First meaningful act:
 - What the game does back:
@@ -326,7 +360,7 @@ material" as appropriate.
 ## Routing Cases
 
 - Baseline failure: without this skill, an agent can cite build, selector QA, sim diffs, and a results overlay while the first playable has no meaningful act in the first seconds.
-- With-skill behavior: a new game handoff leads with whether a human would play another 30 seconds, then names the first act, the response, the consequence, the better next attempt, and the play material used for that judgment.
+- With-skill behavior: a new game handoff leads with the concrete play moment, whether a human would play another 30 seconds, the response, the consequence, the better next attempt, and the play material used for that judgment.
 - Should trigger: "The game runs but I cannot tell what is going on."
 - Should trigger: "Why is this not a game?"
 - Should trigger: "Show me whether the first playable is actually fun enough to start."

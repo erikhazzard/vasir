@@ -558,7 +558,12 @@
   </constraint>
 
   <constraint>
-      Build vFinal, not V1. A committed implementation may be incomplete, but it must be the version we extend, not a version we replace. Milestone rungs can omit capability; they cannot fake the core model. Before coding, choose the real authority, storage shape, state transitions, external contract, failure behavior, telemetry, and proof path for the slice being built. If making the feature production-correct later requires throwing this work away, the slice is invalid.
+      No Stopgaps / Build vFinal, not V1:
+      Build the smallest correct version of the real system, not a temporary substitute for it. A committed implementation may be incomplete, but it must be the version we extend, not a version we replace. Milestone rungs can omit capability; they cannot fake the core model.
+
+      A stopgap is any change that makes the immediate test/request pass while choosing the wrong authority, data model, state transition, integration boundary, lifecycle, failure behavior, telemetry, or proof path. Stopgaps are forbidden even when they are faster.
+
+      If the full feature is too large, reduce capability, not correctness. Use the real authority/model/path and fail closed for unsupported capability. Temporary compatibility paths are allowed only for migration, rollback, protocol, persistence, or client-version safety, and must name the removal condition in the Work Spec. If making the feature production-correct later requires throwing this work away, the slice is invalid.
   </constraint>
 
   <constraint>

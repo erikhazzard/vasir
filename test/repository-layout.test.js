@@ -111,6 +111,61 @@ test("built-in eval suites live with their owning skills and include guidelines"
   }
 });
 
+test("work spec skill includes a golden milestone-rung example", () => {
+  const workSpecSkillPath = path.join(SKILLS_ROOT, "plan__maintain-work-spec", "SKILL.md");
+  const workSpecExamplePath = path.join(
+    SKILLS_ROOT,
+    "plan__maintain-work-spec",
+    "references",
+    "s-tier-work-spec-example.md"
+  );
+
+  const workSpecSkillText = fs.readFileSync(workSpecSkillPath, "utf8");
+  const workSpecExampleText = fs.readFileSync(workSpecExamplePath, "utf8");
+
+  assert.match(workSpecSkillText, /Work Spec = Product Requirement Doc \+ Engineering Specification \+ Design Document \+ UX Document/);
+  assert.match(workSpecSkillText, /Spend the Work Spec detail budget on milestone rungs/);
+  assert.match(workSpecSkillText, /The header names the active rung; it does not duplicate the rung/);
+  assert.match(workSpecSkillText, /references\/s-tier-work-spec-example\.md/);
+  assert.match(workSpecSkillText, /Random Context/);
+  assert.match(workSpecSkillText, /Completed rungs record the short commit hash plus commit subject/);
+  assert.match(workSpecSkillText, /Rung commit/);
+  assert.match(workSpecSkillText, /Evidence artifacts/);
+  assert.match(workSpecSkillText, /`tmp\/\.\.\.` paths are allowed and may expire/);
+  assert.match(workSpecSkillText, /Every rung records Complexity, Risk, Perf Impact, and Cost Impact/);
+  assert.match(workSpecSkillText, /N\/A - <reason>/);
+  assert.match(workSpecSkillText, /No stopgaps: build the smallest correct version of the real system/);
+  assert.match(workSpecSkillText, /Do not add a repeated no-stopgap field to each rung/);
+  assert.match(workSpecSkillText, /No-stopgap contract is satisfied or contradiction is called out/);
+
+  assert.match(workSpecExampleText, /# S-Tier Work Spec Example/);
+  assert.match(workSpecExampleText, /Core User Journey Unlock/);
+  assert.match(workSpecExampleText, /Core Developer Journey Unlock/);
+  assert.match(workSpecExampleText, /Core Engineering Unlock/);
+  assert.match(workSpecExampleText, /Rung Sizing Model/);
+  assert.match(workSpecExampleText, /Complexity/);
+  assert.match(workSpecExampleText, /Risk/);
+  assert.match(workSpecExampleText, /Perf Impact/);
+  assert.match(workSpecExampleText, /Cost Impact/);
+  assert.match(workSpecExampleText, /Milestone rungs should be rich enough to execute/);
+  assert.match(workSpecExampleText, /No stopgaps/);
+  assert.match(workSpecExampleText, /not a temporary substitute/);
+  assert.match(workSpecExampleText, /No-stopgap belongs in Section 4 as one global contract/);
+  assert.match(workSpecExampleText, /Rung commit/);
+  assert.match(workSpecExampleText, /Evidence artifacts/);
+  assert.match(workSpecExampleText, /\| Rung \| State \| Size \| User \/ Dev \/ Engineering unlock \| Proof summary \| Evidence artifact \| Rung commit \| Notes \|/);
+  assert.match(workSpecExampleText, /hit-marker-before-after\.png/);
+  assert.match(workSpecExampleText, /frame-budget-before-after\.md/);
+  assert.match(workSpecExampleText, /Before \/ after benchmark table/);
+  assert.match(workSpecExampleText, /Cost Impact N\/A - local client\/runtime only/);
+  assert.match(workSpecExampleText, /Perf Impact M: touches frame-loop feedback and camera impulses/);
+  assert.match(workSpecExampleText, /`a1b2c3d` - add rifle fire and damage loop/);
+  assert.match(workSpecExampleText, /Pending - commit after M3 proof \+ spec\/eval sync/);
+  assert.match(workSpecExampleText, /Done when:/);
+  assert.match(workSpecExampleText, /Random Context \/ Scratchpad/);
+  assert.doesNotMatch(workSpecExampleText, /Objectively Green/);
+});
+
 test("agent template snippets own profile-specific insertion blocks", () => {
   assert.ok(!fs.existsSync(path.join(REPO_ROOT, "templates", "agents", "profiles")), "profiles/ must not return; profile selection composes from snippets/");
 
@@ -221,6 +276,10 @@ test("root AGENTS ties commits to objectively green Work Spec rungs", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
 
   assert.match(agentsTemplateText, /Active lane = current user instruction \+ active Work Spec milestone\/rung \+ proof gate \+ owning subsystem/);
+  assert.match(agentsTemplateText, /No Stopgaps \/ Build vFinal, not V1/);
+  assert.match(agentsTemplateText, /Build the smallest correct version of the real system, not a temporary substitute for it/);
+  assert.match(agentsTemplateText, /reduce capability, not correctness/);
+  assert.match(agentsTemplateText, /Temporary compatibility paths are allowed only for migration, rollback, protocol, persistence, or client-version safety/);
   assert.match(agentsTemplateText, /When a Work Spec milestone rung is Objectively Green, update Work Spec\/eval status, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message/);
   assert.match(agentsTemplateText, /A rung with a subjective gate is not commit-ready until the human accepts the artifact/);
   assert.doesNotMatch(agentsTemplateText, /`git add -A` and `git commit` are allowed when committing current workspace progress/);

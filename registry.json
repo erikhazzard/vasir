@@ -609,7 +609,7 @@
     },
     {
       "name": "game__orchestrating-playable-build",
-      "description": "Orchestrates broad game build, finish, polish, release-ready, and first-playable implementation work by routing our game design, genre, art, UI, juice, performance, and runtime checks around a human play verdict. Use when the user wants a playable game or major game upgrade delivered end to end; do not use for pure pre-code design, a narrow bug fix, or isolated art/UI advice.",
+      "description": "Drives broad game build, finish, polish, release-ready, and first-playable implementation work toward one playable slice that earns a human play verdict. Use when the user wants a playable game or major game upgrade delivered end to end; do not use for pure pre-code design, a narrow bug fix, or isolated art/UI advice.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -705,7 +705,7 @@
     },
     {
       "name": "game-proof__auditing-first-playable-comprehension",
-      "description": "Judges whether a Studio or Idavoll first playable works and feels good in the opening seconds. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.",
+      "description": "Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment: input, response, consequence, and desire to continue. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -774,13 +774,14 @@
     },
     {
       "name": "plan__maintain-work-spec",
-      "description": "Creates or updates the durable Work Spec for Broad Feature Work and Planning-Only Work. The Work Spec is the canonical product + UX + engineering + scope + milestone + decision-state artifact for a unit of work. It captures the user/system unlock, current truth, constraints, milestone ladder, approved file/eval envelope, open blockers, and next action. It works in tandem with an eval-plan.md, and the proof-gate design is owned by eval__design-proof-gates. Triggers anytime we are spec'ing out new work, defining milestones, or updating work context files.",
+      "description": "Creates or updates the durable Work Spec for Broad Feature Work and Planning-Only Work. The Work Spec is equal parts Product Requirement Doc, Engineering Specification, Design Document, UX Document, milestone ladder, and current decision-state artifact; use it when defining work, updating milestone rungs, or preserving active feature context without turning the spec into an audit log.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "references/s-tier-work-spec-example.md"
       ],
       "path": ".agents/skills/plan__maintain-work-spec",
       "entry": "SKILL.md"
