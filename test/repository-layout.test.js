@@ -143,6 +143,9 @@ test("work spec skill includes a golden milestone-rung example", () => {
   assert.match(workSpecSkillText, /Every user-provided item is mapped in the Input Coverage Ledger/);
   assert.match(workSpecSkillText, /Taste-Critical Work/);
   assert.match(workSpecSkillText, /name the reference bar, the `must feel` \/ `must not feel` delta/);
+  assert.match(workSpecSkillText, /Section 1\.B sets the feature-wide taste bar; it does not satisfy a taste-critical rung by itself/);
+  assert.match(workSpecSkillText, /each taste-critical rung needs its own rung-specific taste delta and rejection criteria/);
+  assert.match(workSpecSkillText, /Do not rely only on Section 1\.B/);
   assert.match(workSpecSkillText, /Human-review rejection criteria/);
   assert.match(workSpecSkillText, /Taste-critical rungs elevate taste/);
   assert.match(workSpecSkillText, /Browser-Rendered Proof/);
@@ -173,6 +176,8 @@ test("work spec skill includes a golden milestone-rung example", () => {
   assert.match(workSpecExampleText, /Reference bar: M2 before\/after hit-readability artifact/);
   assert.match(workSpecExampleText, /Must-feel delta/);
   assert.match(workSpecExampleText, /Rejection criteria: reject the clip/);
+  assert.match(workSpecExampleText, /global Design \/ UX Bar is not enough by itself/);
+  assert.match(workSpecExampleText, /not a substitute for per-rung taste deltas/);
   assert.match(workSpecExampleText, /Browser-rendered proof/);
   assert.match(workSpecExampleText, /\/arena-fps\?scenario=rifle-feel-m3/);
   assert.match(workSpecExampleText, /playwright-desktop-before-after\.png/);

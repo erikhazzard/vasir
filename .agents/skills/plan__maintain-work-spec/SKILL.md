@@ -88,6 +88,7 @@ Never renumber existing IDs:
 
 ### Taste-Critical Work
 - If a rung changes feel, UX, visuals, copy, game design, interaction, or developer ergonomics, the rung must name the reference bar, the `must feel` / `must not feel` delta, the artifact that proves the result, and the human-review rejection criteria.
+- Section 1.B sets the feature-wide taste bar; it does not satisfy a taste-critical rung by itself. Each taste-critical implementation/proof rung must include rung-specific `Reference bar:`, `Must-feel delta:`, `Must-not-feel delta:`, and `Rejection criteria:` lines in the rung detail.
 - Taste is not treated as purely objective, but it must be inspectable. Use screenshots, clips, interactive captures, before/after tables, or review notes so a human can accept or reject the result against the stated bar.
 
 ### Browser-Rendered Proof
@@ -150,7 +151,7 @@ Rules:
 - **Contracts live in Section 4 only.** Elsewhere, reference `C-###` rather than restating rules.
 - **No stopgaps:** The no-stopgap rule lives as a Section 4 contract. Do not add a repeated no-stopgap field to each rung.
 - **Input coverage:** For specs created from multi-item user input, preserve a compact Input Coverage Ledger until the user accepts the spec. The ledger maps user asks to rungs/contracts/open questions/non-goals without converting asks into `[FACT]` boilerplate.
-- **Taste-critical work:** Rungs that change feel, UX, visuals, copy, game design, interaction, or developer ergonomics must name the reference bar, `must feel` / `must not feel` delta, proof artifact, and human-review rejection criteria.
+- **Taste-critical work:** Rungs that change feel, UX, visuals, copy, game design, interaction, or developer ergonomics must name the reference bar, `must feel` / `must not feel` delta, proof artifact, and human-review rejection criteria. Section 1.B is not enough; each taste-critical rung needs its own rung-specific taste delta and rejection criteria.
 - **Browser-rendered proof:** Browser-rendered user-facing rungs must record a Playwright/browser artifact from the actual route or playable scenario, plus viewport(s) and console/network error status. Unit tests and DOM assertions do not count as visual proof by themselves.
 - **Detail budget:** Milestone rungs carry the rich product/UX/design/engineering/proof context. Header/current truth/open questions/source refs stay active and compact.
 - **Active rung:** The header names the active rung; do not duplicate its content in a separate active-rung section.
@@ -382,7 +383,7 @@ For a milestone and the subwork within a milestone to be done, the **value path*
 - **Goal:** <capability unlocked>
 - **User / dev / engineering journey:** Actor + entry + 3–5 steps + success (observable)
 - **Rung size:** S/M/L/XL - summary judgment. Include Complexity, Risk, Perf Impact, and Cost Impact; use `N/A - <reason>` where an axis truly does not apply.
-- **Rung design brief:** product intent, reference bar, must-feel / must-not-feel deltas, taste constraints, rejection criteria, engineering shape, or implementation philosophy needed to execute well
+- **Rung design brief:** product intent, engineering shape, or implementation philosophy needed to execute well. For every taste-critical rung, use explicit rung-specific lines: `Reference bar:`, `Must-feel delta:`, `Must-not-feel delta:`, and `Rejection criteria:`. Do not rely only on Section 1.B for these.
 - **Mandates / best practices:** the rung-specific musts, must-nots, and taste constraints that a senior engineer should preserve
 - **Implementation lane:** owned systems/surfaces; evidence, not an allowlist
 - **Experience invariants:** reference the relevant `C-###` (do not restate)
@@ -442,7 +443,7 @@ Assume 100m users, with 10mm DAUs. Scale all numbers around these assumptions.
 - Active references concise (target ≤ 15 bullets): ✅/❌
 - Recent Change Log ≤ 3 active entries: ✅/❌
 - Milestone rungs are the richest section: ✅/❌
-- Taste-critical rungs name reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria: ✅/❌/N/A
+- Each taste-critical rung, not just Section 1.B, names rung-specific reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria: ✅/❌/N/A
 - Browser-rendered user-facing rungs have real route/scenario artifact, viewport(s), console/network status, and canvas/game nonblank/interacting proof when applicable: ✅/❌/N/A
 - Rung evidence artifacts are recorded or explicitly pending: ✅/❌
 - No-stopgap contract is satisfied or contradiction is called out: ✅/❌
@@ -525,7 +526,7 @@ This appendix can hold a full build spec when needed. It should expand on *mecha
 - Multi-item user intake has an Input Coverage Ledger until spec acceptance; no user item disappears into generic boilerplate.
 - Every milestone rung is a self-contained build packet, not a one-line task.
 - Every milestone rung names the user, developer, or engineering journey it unlocks.
-- Taste-critical rungs elevate taste by naming the reference bar, taste delta, proof artifact, and rejection criteria; they do not hide subjective judgment behind vague "polish" language.
+- Taste-critical rungs elevate taste by naming rung-specific reference bar, taste delta, proof artifact, and rejection criteria; they do not hide subjective judgment behind vague "polish" language or rely only on the global Design / UX Bar.
 - Browser-rendered user-facing rungs are not accepted on unit tests, DOM assertions, snapshots, or static markup alone; they record real app browser artifacts plus console/network status.
 - Every implementation-ready milestone references eval-plan proof, artifact-backed human review, missing-harness work, or the exact blocker.
 - The Work Spec has one no-stopgap contract in Section 4; rungs do not repeat a no-stopgap field.

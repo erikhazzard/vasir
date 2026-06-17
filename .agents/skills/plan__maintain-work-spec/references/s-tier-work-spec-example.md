@@ -48,7 +48,7 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 - **Contracts live in Section 4 only.** Milestones reference `C-###`.
 - **No stopgaps:** The no-stopgap rule lives in Section 4. Do not repeat it as a field in every rung.
 - **Input coverage:** Because this example started from a multi-item ask, the Input Coverage Ledger stays visible until the spec is accepted.
-- **Taste-critical work:** Feel-changing rungs name the reference bar, must-feel/must-not-feel delta, proof artifact, and human-review rejection criteria.
+- **Taste-critical work:** Feel-changing rungs name rung-specific reference bar, must-feel/must-not-feel delta, proof artifact, and human-review rejection criteria. The global Design / UX Bar is not enough by itself.
 - **Browser-rendered proof:** Browser/game rungs record Playwright/browser artifacts from the actual playable scenario, including viewport(s), console/network status, and nonblank/interacting canvas proof.
 - **History:** Move superseded decisions, old source refs, resolved questions, and completed proof narration to Appendix.
 - **Random context:** Use Appendix A5 for quarantined notes that may matter later but do not belong in active sections.
@@ -414,7 +414,7 @@ The appendix is real. It holds history and random context so the active sections
 - Work Specs are not shorter by being less rigorous.
 - Multi-item user asks need an Input Coverage Ledger until spec acceptance, so concrete asks do not disappear into generic sections.
 - Milestone rungs should be rich enough to execute.
-- Taste-critical rungs elevate taste by naming the reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria.
+- Taste-critical rungs elevate taste by naming rung-specific reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria; the global Design / UX Bar is not a substitute for per-rung taste deltas.
 - Browser-rendered user-facing rungs need real route/playable-scenario artifacts; unit tests and DOM assertions are not visual proof by themselves.
 - User journey, developer journey, and engineering unlock language beats mechanical "objective green" phrasing.
 - No-stopgap belongs in Section 4 as one global contract, not as repeated rung boilerplate.
