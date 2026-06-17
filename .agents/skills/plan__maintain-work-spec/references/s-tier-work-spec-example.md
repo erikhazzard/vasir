@@ -24,6 +24,7 @@ This is a calibration example for `$plan__maintain-work-spec`. It is not a domai
 **Stakeholders:** Players, game designers, gameplay engineers, QA
 
 **Purpose:** Make the starter rifle feel immediate, powerful, readable, and controllable without turning the game into a tactical sim. This pass defines the product feel target, engineering lane, and proof needed for a shippable first weapon-feel slice.
+**Core Product Outcome Unlock:** The first combat loop earns enough trust and satisfaction that players want another fight instead of blaming the controls or missing the hit feedback.
 **Core User Journey Unlock:** A player fires the starter rifle at a moving enemy and immediately understands shot timing, recoil, hit confirmation, enemy reaction, and when they can correct aim.
 **Core Developer Journey Unlock:** A future gameplay engineer can tune rifle feel through named constants and focused tests without reverse-engineering animation timing, camera response, and hit feedback coupling.
 **Core Engineering Unlock:** Weapon feedback becomes a deterministic, testable loop with separated fire timing, hit events, camera impulse, enemy reaction, and feedback rendering boundaries.

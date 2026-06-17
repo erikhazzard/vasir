@@ -123,7 +123,8 @@ Rules:
 **Stakeholders:** <optional>  
 
 **Purpose:** <1–2 sentences. What is being built and why.>
-**Core User Journey Unlock:** What product experience this feature unlocks.
+**Core Product Outcome Unlock:** The one-level-higher product/business outcome the user journey creates.
+**Core User Journey Unlock:** The concrete product experience this feature unlocks for the actor.
 **Core Developer Journey Unlock:** What the next engineer/agent can now do more safely or quickly.
 **Core Engineering Unlock:** What system capability, contract, reliability property, or operational truth this unlocks.
 
