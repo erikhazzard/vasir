@@ -69,7 +69,7 @@ When someone picks you, you get a notification. Tapping it opens a card showing:
 - Your three named, visible, not-picked peers
 - The app URL watermark: `tbh/gasapp.co`
 - Snap and Instagram buttons right on the card: "Reply on..."
-- A locked upsell: "See who sent it" 
+- A locked upsell: "See who sent it"
 
 This card is the viral unit. Every element is load-bearing.
 

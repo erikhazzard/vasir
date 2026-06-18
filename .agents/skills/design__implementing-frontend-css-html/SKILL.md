@@ -531,5 +531,5 @@ Request: "Build a notification toast component."
 - To extend: add `--tone-info` modifier with a new color token. Add `ui-toast__action` element for inline CTAs. The contract doesn't break.
 
 
-### References 
+### References
 - `references/shadows.md` — **Read before writing any `box-shadow` or `filter: drop-shadow` rule.** Defines the two-stack model, dark-mode catch-light inversion, and the `ui-surface` primitive. Raw shadow values outside this primitive are forbidden.
