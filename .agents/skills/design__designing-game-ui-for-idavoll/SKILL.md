@@ -1,6 +1,6 @@
 ---
 name: design__designing-game-ui-for-idavoll
-description: Designs mobile game HUDs, menus, overlays, controls, and results screens for Idavoll. Use when building or reviewing player-facing game UI, especially touch targets, safe areas, HUD hierarchy, controls, and result flows.
+description: Designs mobile-native portrait game HUDs, menus, overlays, controls, and results screens for Idavoll. Use for touch targets, safe areas, HUD hierarchy, controls, and result flows.
 ---
 
 You are a senior staff engineer working in the `idavoll-games` repo.
@@ -14,6 +14,8 @@ You are a senior staff engineer working in the `idavoll-games` repo.
   - Preserve gameplay behavior, determinism, replay correctness, and tests.
 
   NON‑NEGOTIABLES
+  - All games are mobile-native portrait. Desktop, web, and landscape are secondary concerns.
+  - Handoff requires a fresh 390 x 844 portrait screenshot with readable text, unclipped controls, safe-area spacing, and clear playfield framing.
   - NO git write/destructive commands (no commit/reset/push/checkout/etc). Read-only git is OK.
   - NO React/Vue/Svelte/etc. UI must remain vanilla DOM + CSS (canvas ok for world render).
   - Deterministic kernel must remain deterministic:
@@ -86,6 +88,7 @@ You are a senior staff engineer working in the `idavoll-games` repo.
        - `npm test -- tests/game-ui-kit__*.spec.js`
      - From the game folder:
        - `cd <gameFolder> && npm test`
+     - Capture a fresh 390 x 844 portrait screenshot and block on unreadable text, clipped controls, overlapping UI, tiny touch targets, safe-area crowding, or poor playfield framing.
 
   OUTPUT REQUIREMENTS
   - After each milestone, output a recap in this format:
@@ -98,7 +101,7 @@ You are a senior staff engineer working in the `idavoll-games` repo.
     - **Suggest next:** <next step and why>
 
   DESIGN DIRECTION (DON’T IGNORE)
-  - Mobile-first portrait UI.
+  - Mobile-native portrait UI.
   - HUD: compact, readable, not a huge slab. Use UI kit card/scrim patterns and stat rows.
   - Menus/results: card surfaces, clear hierarchy, good spacing, no bespoke gradients.
   - Motion: use UI kit motion primitives/tokens; avoid custom keyframes unless added to UI kit as a pattern and cataloged.

@@ -40,11 +40,13 @@ This skill is **repo-specific**, but **game-agnostic**: it applies to any `games
 - Allowed: **theme tuning via CSS variables** on the `.idv-ui-theme` root (accent/background/typography).
 - Disallowed (by default): overriding UI kit component classes (`.idv-ui-button`, `.idv-ui-tab-bar`, etc.) to create one-off looks. If you need a new look, create a UI kit pattern and dogfood it in the UI kit catalog fixture first.
 
-## UX contract (iframe-safe, mobile-first)
+## UX contract (mobile-native portrait first)
 
+- All games are mobile-native portrait. Desktop, web, and landscape are secondary concerns.
 - Runs in an iframe. Never assume full viewport control.
 - No scrolling for the page. UI must fit in the iframe container.
-- Primary target: **320–430px width portrait**.
+- Primary proof target: **390 x 844 portrait**.
+- Stress width range: **320–430px portrait**.
 - Thumb zones:
   - **Interactive controls** near the bottom.
   - **Read-only status** near the top.
@@ -98,6 +100,7 @@ This skill is **repo-specific**, but **game-agnostic**: it applies to any `games
 4) **Verify (tests are part of the change)**
    - Run the game’s own test suite (`cd games/<gameId> && npm test`).
    - Run repo-level guardrails required by the project (especially kernel import forbids).
+   - Capture a fresh 390 x 844 portrait screenshot and block handoff on unreadable text, clipped controls, overlapping UI, tiny touch targets, safe-area crowding, or poor playfield framing.
 
 ## Copy/paste prompt template (use this to drive an LLM)
 
@@ -183,9 +186,10 @@ OUTPUT REQUIREMENTS
   - **Need from me:** <blocking question + suggestion, or “Nothing”>
   - **Suggest next:** <next step and why>
 
-DESIGN DIRECTION (DON’T IGNORE)
-- Mobile-first portrait UI.
-- HUD: compact, readable, not a huge slab. Use UI kit card/scrim patterns and stat rows.
+  DESIGN DIRECTION (DON’T IGNORE)
+  - Mobile-native portrait UI. Desktop/web/landscape are secondary.
+  - Capture and inspect a fresh 390 x 844 portrait screenshot before handoff.
+  - HUD: compact, readable, not a huge slab. Use UI kit card/scrim patterns and stat rows.
 - Menus/results: card surfaces, clear hierarchy, good spacing, no bespoke gradients.
 - Motion: use UI kit motion primitives/tokens; avoid custom keyframes unless added to UI kit as a pattern and cataloged.
 ```

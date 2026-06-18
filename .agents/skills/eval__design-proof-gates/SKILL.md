@@ -85,6 +85,8 @@ If any element is missing, the gate is incomplete.
 
 The gate should be as close as possible to the final value extraction path. Prefer one strong value-path integration/browser/simulation/contract/sandbox/replay/benchmark gate over many implementation-trivia unit gates.
 
+For game work, the final value path is mobile-native portrait. Every game eval plan must include a fresh **390 x 844** portrait screenshot gate. Non-game eval plans mark mobile portrait proof as not applicable. Desktop, web, or landscape artifacts may supplement but cannot replace the mobile portrait gate.
+
 ---
 
 ## 3. Non-Negotiable Rules

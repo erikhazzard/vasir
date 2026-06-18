@@ -29,7 +29,8 @@ When the creator says "make", "build", "create", or otherwise asks for a game, s
 5. If the creator explicitly asks for spec-only, review-before-build, or approval-first work, create or revise only `README__game-spec.md` and stop for approval.
 6. If the creator asked to make, build, create, implement, initialize, or finish the game, continue after writing the spec by invoking `game-creation__selecting-initial-template` in the same session.
 7. Avoid copyrighted game names, characters, assets, UI, story, and exact mechanic bundles. Capture inspiration as broad design intent.
-8. Make the first playable concrete: one primary action, one success loop, one failure pressure, one feedback language, and one proof command/check.
+8. Every game spec defaults to **mobile-native portrait**. Desktop, web, and landscape may appear only as additional surfaces; they are secondary concerns.
+9. Make the first playable concrete: one primary action, one success loop, one failure pressure, one feedback language, and one proof command/check.
 
 ## Spec Hazard Audit
 
@@ -50,6 +51,7 @@ If any red flag appears, the spec must encode the proof obligations inside the e
 - `Core Loop`: define `player action -> game response -> state consequence -> renewed intent`; for auto-resolving games, name the prior decision that changes the outcome and how the player reads why.
 - `Feedback + Juice Spec`: state how the player learns phase transitions, enemy threat, damage, death, score, win/loss, and next action without relying on prose.
 - `Acceptance Criteria`: require a proof packet that shows first frame, player action, immediate feedback, consequence, later outcome, and result. Results-only proof is invalid.
+- `Technical Envelope` / platform sections: state mobile-native portrait as the primary runtime and require a fresh 390 x 844 portrait screenshot for first-playable approval.
 - `Visual Contract` / art sections: require runtime asset identity and layering rules when sprites/cards/units carry gameplay meaning.
 
 Do not treat "no instruction text" as a quality bar by itself. It is only acceptable when composition, affordance, animation, feedback, and failure pricing teach the first action and consequence.
@@ -71,6 +73,7 @@ Do not use the older short format with sections like `## One-Sentence Pitch`, `#
 - The title and pitch should be original even when the creator gives a reference game.
 - Each system bullet must expose the player decision, state change, and feedback; a noun list is not enough.
 - Acceptance criteria must be observable in the first playable, not aspirational future features.
+- Acceptance criteria must require a 390 x 844 portrait screenshot that proves the first playable reads at mobile-native size.
 - The technical envelope should guide `game-creation__selecting-initial-template` without choosing a template because of theme words alone.
 - If the spec needs metadata later, leave enough visual/theme detail for `node .studio-ai-runtime/tools/studio/ensure-game-metadata.js --json` to produce ontology and marketing assets.
 - If the spec uses automation, timers, or indirect strategy decisions, it must make the player's readable decision and readable consequence stronger than the automation.

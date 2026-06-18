@@ -30,9 +30,10 @@ A passing handoff means the next excellent engineer or agent can inspect the app
 5. **Fresh means current code.** Stale screenshots, old traces, cached benchmark output, and pre-change logs do not prove completion.
 6. **Binding blockers stay blocking.** A `NO-SHIP`, P0, failed gate, missing subjective acceptance, or unaccepted delta blocks PASS unless concrete evidence disproves it or the human explicitly accepts the risk.
 7. **Subjective quality is human-owned.** Feel, fun, visual taste, animation quality, and readability require artifact-backed human acceptance.
-8. **No destructive operations.** Do not suggest or run destructive git commands, data deletion, credential guessing, or destructive cleanup.
-9. **Unknown after read-only discovery means BLOCKED.** Do not invent touchpoints, eval tools, audit results, or approvals.
-10. **Blunt, compact, actionable.** Prefer a precise NO-SHIP over a fragile PASS.
+8. **Games are mobile-native portrait.** For game work, PASS requires a fresh current-code 390 x 844 portrait screenshot. Web, desktop, and landscape proof can supplement it, not replace it.
+9. **No destructive operations.** Do not suggest or run destructive git commands, data deletion, credential guessing, or destructive cleanup.
+10. **Unknown after read-only discovery means BLOCKED.** Do not invent touchpoints, eval tools, audit results, or approvals.
+11. **Blunt, compact, actionable.** Prefer a precise NO-SHIP over a fragile PASS.
 
 ---
 
@@ -96,6 +97,7 @@ Before verdict, establish this bundle through read-only discovery. If a field ca
   <Eval_Tool>[exact command, harness, browser check, simulation, benchmark, trace, or artifact capture]</Eval_Tool>
   <Target_Env>[real target or closest local environment exercising the value path]</Target_Env>
   <Fresh_Artifacts>[current-code artifact paths]</Fresh_Artifacts>
+  <Mobile_Portrait_Proof>[390 x 844 screenshot path + pass/blocker, or "Not game work"]</Mobile_Portrait_Proof>
   <Changed_Files>[exact changed source/test/docs/context files]</Changed_Files>
   <Scoped_AGENTS_Read>[paths or "Root only"]</Scoped_AGENTS_Read>
   <Artifact_Ledger>[new durable files classified, temporary proof under tmp/**, or "No new files"]</Artifact_Ledger>
@@ -127,9 +129,9 @@ Fail or block on: skipped scoped `AGENTS.md`, changes outside the approved envel
 
 ### 2. Proof-of-Value
 
-PASS only if the declared Proof-of-Value State has a direct, falsifiable gate and a fresh current-code artifact proving it in the target environment.
+PASS only if the declared Proof-of-Value State has a direct, falsifiable gate and a fresh current-code artifact proving it in the target environment. For game work, the target environment includes mobile-native portrait proof via a 390 x 844 screenshot.
 
-Fail or block on: stale artifacts, proof that does not exercise the value path, no raw output, no gate comparison, unaccepted remaining delta, or subjective quality without human acceptance.
+Fail or block on: stale artifacts, proof that does not exercise the value path, no raw output, no gate comparison, missing 390 x 844 game screenshot, unaccepted remaining delta, or subjective quality without human acceptance.
 
 ### 3. Eval Trace & Raw Artifact Trail
 

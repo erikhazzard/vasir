@@ -8,10 +8,10 @@ Do not copy placeholder examples into committed eval plans. Replace every placeh
 
 # EVAL-PLAN — <FEATURE_NAME>
 
-**Last updated:** YYYY-MM-DD  
-**Status:** Draft | Approved | In Progress | Blocked | Complete  
-**Feature slug:** `<FEATURE-SLUG>`  
-**WIP:** `<path/to/WIP.md>`  
+**Last updated:** YYYY-MM-DD
+**Status:** Draft | Approved | In Progress | Blocked | Complete
+**Feature slug:** `<FEATURE-SLUG>`
+**WIP:** `<path/to/WIP.md>`
 **Root approval state:** Needs human approval | Approved milestone | Planning only | Blocked | Unknown
 
 ---
@@ -23,7 +23,7 @@ Do not copy placeholder examples into committed eval plans. Replace every placeh
 - **Unlock type:** User Journey Unlock | Engineering System Unlock
 - **Unlock:** <observable user/system outcome>
 - **Proof-of-Value State:** <terminal state that proves value exists>
-- **Target environment:** <runtime/environment where value matters>
+- **Target environment:** <runtime/environment where value matters; for game work include mobile-native portrait at 390 x 844>
 
 ### 1.2 Scope
 
@@ -61,6 +61,7 @@ Gate class catalog:
 - Orchestrated compound
 - Scale/performance
 - Browser/render
+- Mobile portrait render
 - Network/packet
 - Failure/hostile
 - Security/privacy/auth
@@ -102,7 +103,7 @@ pass_fail: "<exact verdict condition>"
 eval_tool: "<existing command | missing harness: name | manual review | blocked: reason>"
 target_env: "<runtime/environment where value matters>"
 data_payload: "<fixture/seed/request/replay/world state/account state/schema payload>"
-fresh_artifact: "<path pattern or artifact type>"
+fresh_artifact: "<path pattern or artifact type; for game work include 390 x 844 portrait screenshot>"
 harness_status: "existing | missing | deferred | manual | blocked"
 ci_policy: "Default CI now | Non-default local eval | Milestone-gated future CI | Manual human review | Blocked until harness exists | Blocked until environment/credential exists"
 stop_condition: "<allowed stop condition>"
@@ -134,7 +135,7 @@ pass_fail: "<exact verdict condition>"
 eval_tool: "<existing command | missing harness: name | blocked: reason>"
 target_env: "<target environment>"
 data_payload: "<payload>"
-fresh_artifact: "<path pattern or artifact type>"
+fresh_artifact: "<path pattern or artifact type; for game work include 390 x 844 portrait screenshot>"
 harness_status: "existing | missing | deferred | manual | blocked"
 ci_policy: "Default CI now | Non-default local eval | Milestone-gated future CI | Manual human review | Blocked until harness exists | Blocked until environment/credential exists"
 stop_condition: "<allowed stop condition>"
@@ -184,9 +185,9 @@ action: "<action>"
 observation: "<observable proof>"
 pass_fail: "<exact verdict>"
 eval_tool: "<existing command | missing harness: name | blocked: reason>"
-target_env: "<target env>"
+target_env: "<target env; for game work include mobile-native portrait at 390 x 844>"
 data_payload: "<payload>"
-fresh_artifact: "<artifact>"
+fresh_artifact: "<artifact; for game work include 390 x 844 portrait screenshot>"
 harness_status: "existing | missing | deferred | manual | blocked"
 ci_policy: "Default CI now | Non-default local eval | Blocked until harness exists | Blocked until environment/credential exists"
 stop_condition: "<allowed stop condition>"

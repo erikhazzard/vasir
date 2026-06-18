@@ -1,6 +1,6 @@
 ---
 name: game-proof__auditing-first-playable-comprehension
-description: Audits whether a zero-context player can act, see feedback, understand consequence, and want another try in a first playable. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff.
+description: Audits first-playable comprehension and mobile-native portrait quality. Use after a runnable game exists and before initialization, vertical-slice, publish-readiness, or final handoff claims.
 ---
 
 # First Fun Judgment
@@ -30,6 +30,12 @@ next I wanted to <try this>.
 
 If that sentence cannot be written from actual play material, the first
 playable does not slap yet or the review is blocked.
+
+## Mobile-Native Portrait Mandate
+
+All games are mobile-native portrait products. Web, desktop, and landscape are secondary concerns.
+
+Before any `SLAPS`, publish-readiness, vertical-slice, final handoff, or first-playable completion claim, capture and inspect a fresh current-code screenshot at **390 x 844** portrait. The verdict is `BLOCKED` if the artifact is missing. The verdict is `DOES NOT SLAP` if that screenshot shows unreadable text, clipped controls, overlapping UI, hidden state, unsafe-area crowding, tiny touch targets, poor playfield framing, or a layout that only looks acceptable at desktop size.
 
 ## Human QA Slap Test
 
@@ -69,7 +75,7 @@ Use this skill when:
 - a Studio or Idavoll first playable has been implemented or materially changed;
 - initialization, first playable, vertical slice, publish readiness, or final handoff is about to be claimed;
 - the game might be passive, confusing, self-playing, over-automated, tutorial-dependent, results-only, or unclear in the first seconds;
-- fresh play material exists or can be captured: screenshots, clip, input trace, deterministic sim output, replay, or browser QA.
+- fresh play material exists or can be captured: the required 390 x 844 portrait screenshot, clip, input trace, deterministic sim output, replay, or browser QA.
 
 Do not use this skill for:
 
@@ -158,6 +164,8 @@ real player-facing time, not only internal sim output. A still screenshot can
 show a blocker, but it cannot earn `SLAPS` for a game where input response,
 motion, collision, camera, or feedback matters.
 
+The proof packet must include the fresh **390 x 844** portrait screenshot path and the mobile-readability verdict. If the available command cannot capture that viewport, report `BLOCKED - missing 390 x 844 mobile portrait proof` instead of substituting desktop proof.
+
 Record the play moment before writing any verdict:
 
 ```text
@@ -195,6 +203,7 @@ First Fun Judgment:
 - Single biggest reason it does not slap yet:
 - Timing notes only if they affected feel:
 - Broken-surface checks only if they found a blocker:
+- Mobile portrait screenshot (390 x 844): <path> - pass/blocker
 - Fresh play material used for the judgment:
 ```
 

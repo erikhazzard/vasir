@@ -1,6 +1,6 @@
 ---
 name: game__orchestrating-playable-build
-description: Drives broad game build, finish, polish, release-ready, and first-playable implementation work toward one playable slice that earns a human play verdict. Use when the user wants a playable game or major game upgrade delivered end to end; do not use for pure pre-code design, a narrow bug fix, or isolated art/UI advice.
+description: Drives mobile-native portrait game build, finish, polish, release-ready, and first-playable work toward one playable slice that earns a human play verdict.
 model: opus
 tools:
   - Read
@@ -32,6 +32,8 @@ Every broad build must preserve this concrete play sentence:
 I <did this input/choice>; the game <answered this way>; <this state changed>;
 next I wanted to <try this>.
 ```
+
+All games are mobile-native portrait by default. Desktop, web, and landscape are secondary proof surfaces; they cannot substitute for mobile portrait proof.
 
 ## Human QA Slap Test
 
@@ -109,7 +111,7 @@ Build lane:
 - First meaningful act:
 - Play moment to create or improve: I <acted>; the game <answered>; <state changed>; next I wanted <...>.
 - Human QA bet: why should this slap in the first 15 seconds?
-- Target platform/orientation:
+- Target platform/orientation: mobile-native portrait; secondary surfaces only if explicitly relevant
 - Current game state: none / runnable / broken / playable candidate
 - Highest-risk gap:
 - Specialist skills to load:
@@ -191,7 +193,7 @@ broken surface the human pass might miss.
 | Build/browser smoke | Catch blank canvas, startup crash, console/page errors, or missing assets. |
 | First-fun judgment | Force the play moment: input -> response -> consequence -> one-more-try. |
 | Active-play visual slap review | Judge whether the active play sequence reads and feels authored. |
-| Mobile viewport check | Catch text/control overlap, wrong framing, bad touch path, or unreadable scale. |
+| 390 x 844 portrait screenshot | Required for every game handoff; catches text/control overlap, wrong framing, bad touch path, safe-area crowding, or unreadable scale. |
 | Performance check | Use only when jank, density, physics, particles, or 3D cost can hurt feel. |
 
 Never present a supporting check as the reason the game slaps. At most, say it

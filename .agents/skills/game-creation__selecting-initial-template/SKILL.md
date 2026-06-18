@@ -11,6 +11,8 @@ Choose the smallest Idavoll starter template that makes the first playable easie
 
 The template is a substrate, not a product decision: pick the least powerful template that can honestly support the spec, copy/adapt it only when the workspace needs a scaffold, then immediately build the actual game.
 
+All games are mobile-native portrait products. Desktop, web, and landscape are secondary concerns and must not become the proof target for first-playable readiness.
+
 This skill is also the create-game initialization root. Studio and local Codex must use the same skill stack; Studio may prepare the workspace, but it must not secretly route prompts, choose templates, or inject hidden design rules that local Codex cannot run.
 
 When this skill is invoked by a creator request to make, build, create, initialize, or finish a game, it has full approval to drive the workspace to a proven first playable. Do not stop between template selection, implementation, proof, audit, and repair unless the creator explicitly asked for approval-first work or a real blocker prevents progress.
@@ -38,11 +40,11 @@ Run this algorithm until the workspace reaches exactly one terminal state: `Read
 2. **Template pass**: inspect local template inventory, choose the smallest viable substrate, and emit `Selected template: <template path> - <reason>.`
 3. **Skill-stack pass**: load the Required Initialization Skill Stack and start the Skill Evidence Ledger before product-code edits.
 4. **Build pass**: adapt or create the game loop, controls, feedback, UI, assets, tests, simulations, and metadata hooks needed by the spec. Build the actual game, not a copied scaffold.
-5. **Proof pass**: run the smallest real command set that proves the current risk surface: tests, build, simulations, browser QA, screenshot/video/timeline capture, metadata ensure, and any game-specific proof named by the spec.
+5. **Proof pass**: run the smallest real command set that proves the current risk surface: tests, build, simulations, browser QA, mandatory 390 x 844 portrait screenshot, video/timeline capture, metadata ensure, and any game-specific proof named by the spec.
 6. **Audit pass**: inspect the proof packet against player agency, first-screen quality, UI comprehension, art/asset integrity, and technical correctness. Use subagents when available.
 7. **Repair pass**: fix the single highest-severity blocker found by proof/audit, then return to step 5. Do not drift into unrelated polish while a proof blocker remains.
 8. **Terminal-state pass**:
-   - `Ready`: player action, immediate feedback, state consequence, later outcome, result/restart, required visual assets, tests/build/browser proof, and skill ledger all pass.
+   - `Ready`: player action, immediate feedback, state consequence, later outcome, result/restart, required visual assets, 390 x 844 portrait screenshot proof, tests/build/browser proof, and skill ledger all pass.
    - `Candidate`: the game runs and has a plausible loop, but subjective feel, art/readability, metadata, or proof depth still needs human review or another pass.
    - `Blocked`: a missing tool, API key, package, auth state, unsafe/copyright ambiguity, or impossible proof dependency prevents the required loop.
 
@@ -72,11 +74,12 @@ The ledger is not ceremonial. If a required skill does not change a design decis
 
 Before calling initialization done, capture or run the narrowest available preview/QA proof and inspect the first playable screen. Fail the pass and revise if any of these are true:
 
+- No fresh current-code **390 x 844** portrait screenshot exists for the first playable surface.
 - The screen reads as instrumentation, debug HUD, or generic neon prototype instead of the game promised by the spec.
 - The first viewport has no strong subject-matter signal: no readable enemy, board, avatar, place, object, card art language, or game-specific interaction focus.
 - The stage is mostly empty while UI chrome carries the experience.
 - Live HUD/status appears as detached pill/card/dashboard clutter instead of stage-first overlay posture.
-- Touch targets, labels, or card text are too small to read at 320-430px portrait width.
+- Touch targets, labels, or card text are too small at 390 x 844 portrait; 320-430px width variants are secondary stress checks, not replacements.
 - The palette is a one-note dark blue/purple/neon or beige/brown theme without a deliberate art-direction reason.
 - A player-facing control, result, draft, or upgrade surface bypasses the Idavoll UI-kit posture expected by `design__designing-game-ui-for-idavoll`.
 
@@ -99,6 +102,7 @@ Invalid proof:
 - proof that relies on forced fast-results mode;
 - a deterministic sim diff with no player-readable browser artifact;
 - screenshots that already show missing art, opaque sprite boxes, mismatched identity, distortion, unreadable UI, or hidden causality.
+- desktop-only or landscape-only screenshots used as a substitute for 390 x 844 portrait proof.
 
 ## Expertise Payload
 
