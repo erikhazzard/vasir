@@ -1,6 +1,6 @@
 ---
 name: explaining__creating-interactive-articles
-description: Create S-tier fully offline, D3-first interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations; starts new requests with a targeted five-question alignment grill
+description: Creates offline D3-first interactive explanations of technical concepts. Use when building explorable articles, visual tutorials, concept demos, or alignment-question flows before authoring an interactive explanation.
 user_invocable: true
 ---
 # Interactive Technical Explanations

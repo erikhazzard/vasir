@@ -1,6 +1,6 @@
 ---
 name: game__adding-juice
-description: Adds game feel and game juice to JavaScript-built 2D games (Canvas, WebGL, Phaser, custom engines). Focuses on responsiveness, clarity, and virtual sensation, then layers high-ROI polish — camera work, hit feedback, animation timing, particles, UI motion, and readable spectacle. Prioritizes maximum perceptual payoff for minimum complexity and performance cost. Use when polishing game interactions, adding screen shake or hit-stop, implementing particle effects, tuning animation timing, or making any game action feel more satisfying.
+description: Adds responsive game feel and high-payoff polish to JavaScript 2D games. Use to add more "juice", eg when tuning hits, screen shake, hit-stop, particles, camera motion, animation timing, UI motion, or interaction satisfaction.
 tools:
   - Read
   - Grep

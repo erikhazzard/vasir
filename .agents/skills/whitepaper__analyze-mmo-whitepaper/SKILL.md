@@ -1,6 +1,6 @@
 ---
 name: whitepaper__analyze-mmo-whitepaper
-description: This analyzes an MMO whitepaper and produces insights. Only called manually. 
+description: Analyzes MMO whitepapers for design, systems, economy, world, and retention insights. Use only when manually reviewing an MMO whitepaper or extracting product/design implications from one.
 ---
 
 # S-tier MMO Design Insight Prompt

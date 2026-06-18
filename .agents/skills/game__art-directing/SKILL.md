@@ -1,6 +1,6 @@
 ---
 name: game__art-directing
-description: Art directs games from concept through implementation-ready specs. Covers the full visual stack — color systems, shape language, animation grammar, juice budgets, spatial pacing, UI hierarchy, procedural art systems, and mobile rendering constraints. Prioritizes gameplay readability first, emotional resonance second, aesthetic beauty third. Designs visual systems that produce O(n²) distinctiveness from O(n) authored assets. Use when establishing a game's visual identity, defining color palettes, specifying animation grammars, or creating implementation-ready art specs.
+description: Art-directs games into implementation-ready visual systems for gameplay readability and identity. Use when defining visual identity, palettes, shape language, animation grammar, spatial pacing, UI hierarchy, or art specs.
 tools:
   - Read
   - Grep

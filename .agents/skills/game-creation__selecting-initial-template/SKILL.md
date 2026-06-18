@@ -165,14 +165,10 @@ Use the Autonomous First-Playable Algorithm above as the controlling loop. These
 
 Name the selected template and reason before implementation begins, then repeat it in the final response alongside the Skill Evidence Ledger, game changes, preview/QA proof packet, and proof commands. If you ran metadata ensure, report `ready`, `queued`, or the blocking status plainly.
 
-## Skill Eval Cases
+## Routing Boundaries
 
-- Should trigger: "Initialize this Studio game from `README__game-spec.md`."
-- Should trigger: "Pick the best starter template and make the first playable."
-- Should trigger autonomous loop: "Make me a mobile game about schoolyard monsters" after `game-creation__writing-game-spec` creates a concrete spec.
-- Should trigger: "The spec is a pinball-like 2D physics toy with bumpers and impulse chains."
-- Should not trigger: "Add juice to an already built game without changing its substrate."
-- Borderline: "Make a 2D platformer with collision and knockback" should default to `game-template`, not Rapier, unless rigid-body simulation is central.
-- Collision boundary: if a genre skill also triggers, use this skill only for the initial substrate/template decision, then use the genre skill for game-specific implementation judgment.
-- Attention-drift case: if tests, build, `npm run qa`, and a results timeline pass but the proof packet lacks player action and consequence, the skill must force a candidate/blocked handoff instead of complete.
-- Subagent case: for a broad first playable, the root agent should use subagents when available for gameplay, UI, art/assets, and QA/proof lanes, while keeping all edits in the same game workspace.
+- Use this skill for create-game initialization, starter-template selection, and autonomous first-playable creation from a concrete `README__game-spec.md`.
+- Do not use this skill for narrow polish or juice work after the substrate is already correct; use the focused gameplay, UI, art, or proof skill instead.
+- If a genre/system skill also applies, this skill owns only the substrate decision and first-playable orchestration; the genre/system skill owns domain mechanics.
+- Template selection must follow mechanics, not theme language: collisions do not imply Rapier, and fantasy depth does not imply 3D.
+- Proof exhaustion still wins over optimism: if the browser proof lacks player action and consequence, return `Candidate` or repair instead of claiming `Ready`.

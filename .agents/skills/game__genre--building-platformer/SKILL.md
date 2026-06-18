@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-platformer
-description: Implements production-quality 2D side-scroller movement in JavaScript. Covers the complete movement vocabulary — variable jump, wall jump, wall slide, dash, double jump, ladders, moving platforms, one-way platforms, conveyor belts, spring pads, hazard zones, and checkpoints. Builds on a correct physics foundation (fixed timestep, semi-implicit Euler, AABB collision) and state machine architecture. Every mechanic ships with tunable parameters, interaction rules, edge-case handling, mobile touch considerations, and juice integration hooks. Targets mobile-native iOS via JS. Use when building platformer movement, tuning jump feel, adding wall mechanics, implementing collision systems, or wiring mobile touch controls for side-scrollers.
+description: Builds production 2D platformer movement, collision, and feel systems in JavaScript. Use when implementing or tuning jumps, wall moves, dashes, hazards, checkpoints, side-scroller collisions, or mobile platformer controls.
 tools:
   - Read
   - Grep

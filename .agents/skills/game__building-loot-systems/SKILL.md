@@ -1,6 +1,6 @@
 ---
 name: game__building-loot-systems
-description: Designs and implements complete loot and reward systems for JavaScript 2D games (Canvas, WebGL, Phaser, custom engines). Covers the full pipeline from kill-to-dopamine — weighted drop tables, rarity tiers, pity/mercy mechanics, procedural item generation, stat rolling, chest/crate breakables, pickup physics (bounce, magnet, float), and reward fanfare choreography. Handles the math, the feel, and the economy. Use when creating drop tables, implementing rarity systems, adding pickup physics, designing pity mechanics, or choreographing reward fanfare sequences.
+description: Designs and implements loot, drops, rarity, pickup, and reward-fanfare systems for JavaScript games. Use when creating drop tables, rarity tiers, item rolls, pity mechanics, pickups, chests, or reward presentation.
 tools:
   - Read
   - Grep

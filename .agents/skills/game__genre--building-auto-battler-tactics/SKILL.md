@@ -231,14 +231,15 @@ Good: `Loss - your Ranger was targeted first; enemy Caster dealt 62 damage; Guar
 
 Why: the good summary preserves responsibility and renewed intent without needing a lecture.
 
-## Skill Eval Cases
+## Routing Boundaries
 
-- Baseline failure: without this skill, a generated auto-battler can pass build/QA with auto-start combat, white sprite boxes, and an unexplained score.
-- With-skill behavior: "Build an auto chess tactics game" defines commitment contract, phase machine, deterministic combat ledger, asset gates, and action-consequence proof before claiming complete.
-- Should trigger: "Make a TFT-like mobile game."
-- Should trigger: "Why did my auto-battler characters just die?"
-- Should trigger: "The draft phase starts battle randomly."
-- Should trigger: "Make a squad tactics game where units fight automatically after placement."
-- Should not trigger: "Make enemy sprites for a platformer" unless those sprites are for a draft/placement/auto-combat game.
-- Collision boundary: pure tower defense uses `game__genre--building-tower-defense`; if the game has both tower placement and squad auto-combat rounds, use both and let this skill own the auto-combat commitment/result loop.
-- Attention-drift case: if tests and sim diffs pass but the player cannot tell what locked, what combat tested, or why the result happened, the skill forces a blocked/candidate handoff.
+- Use this skill for auto-battlers, auto chess, squad tactics, draft/bench/board games, party synergies, or any game where combat resolves automatically after a player setup decision.
+- Do not use this skill for ordinary platformer, shooter, action, or tower-defense enemies unless the player makes a pre-combat commitment and then watches an automated resolution.
+- Pure tower defense should use `game__genre--building-tower-defense`; mixed tower placement plus squad auto-combat should use both skills, with this skill owning commitment, combat resolution, and result legibility.
+
+## Completion Boundaries
+
+- An auto-battler is not complete because combat runs. It must show what the player committed, what the combat tested, why the result happened, and what the player should try next.
+- The battle phase cannot auto-start before the player has made a readable commitment unless the spec explicitly designs that as a recovery/default path.
+- Build, QA, or sim diffs are insufficient if the player cannot read locked choices, combat causes, unit roles, target selection, damage, loss reasons, or renewed intent.
+- Runtime unit art must carry identity cleanly; white sprite boxes and placeholder silhouettes are blockers when units carry gameplay meaning.

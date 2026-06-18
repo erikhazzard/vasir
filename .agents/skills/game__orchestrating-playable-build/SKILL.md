@@ -220,18 +220,15 @@ Use `SLAPS` only when the requested claim is satisfied and the first active
 slice works in the hand. Use `CLOSE` when the game runs and has a real toy, but
 one blocker still keeps it from earning another try.
 
-## Routing Cases
+## Routing Boundaries
 
-- Baseline failure: without this skill, an agent builds a visually busy scene,
-  reports `npm run build`, and skips the first-act play judgment.
-- With-skill behavior: the agent defines the player promise, loads the relevant
-  specialist skills needed for the repair, implements the loop, plays or watches
-  the first active slice, and leads with the concrete play moment plus whether it
-  actually slaps.
-- Should trigger: "Build me a playable tower defense game from scratch."
-- Should trigger: "Finish this prototype and make it feel like a real game."
-- Should trigger: "Get this to a release-ready first playable."
-- Should not trigger: "Give me three game concepts" because that is pre-code direction.
-- Should not trigger: "The jump feels bad" unless the user asks for broad build orchestration.
-- Collision case: when a game exists and the user asks "is this actually playable?", route directly to first-fun judgment unless fixes are requested.
-- Attention-drift case: late in a long build, remember this: if a human QA pass would not want another 30 seconds, no phase checkbox matters.
+- Use this skill for broad playable-build work: new playable slices, prototype rescue, release-ready first playables, or multi-skill game repair where the loop, visuals, proof, and handoff all need coordination.
+- Do not use this skill for concept-only ideation, spec-only planning, or narrow mechanic tuning unless the creator explicitly asks for broad playable-build orchestration.
+- If the game already exists and the creator only asks whether it is actually playable, route to first-fun judgment unless fixes are requested.
+- When a narrower genre, movement, combat, UI, art, juice, or proof skill applies, this skill coordinates the lane; the specialist skill owns its domain judgment.
+
+## Completion Boundaries
+
+- A visually busy scene plus `npm run build` is not a playable build.
+- The agent must define the player promise, load the relevant specialist skills, implement or repair the loop, play or watch the first active slice, and lead the handoff with the concrete play moment.
+- Late in a long build, if a human QA pass would not want another 30 seconds, no phase checkbox matters.

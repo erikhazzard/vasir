@@ -1,6 +1,6 @@
 ---
 name: security__auditing-code
-description: Static attacker-grade audit for backend code, schema, policies, and adjacent config that mutate privileged or economic state. Maps workflows, invariants, authorization graphs, and async mutation pipelines; finds real exploit chains; produces evidence-based release blockers and a prioritized remediation plan without rewriting code.
+description: Audits backend code, schemas, policies, and config for exploit chains around privileged or economic state. Use when reviewing authz, trust boundaries, async mutations, policy enforcement, state-changing APIs, or release-blocking security risk.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

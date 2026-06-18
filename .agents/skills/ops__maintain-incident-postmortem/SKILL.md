@@ -1,6 +1,6 @@
 ---
 name: ops__maintain-incident-postmortem
-description: Creates or updates durable incident postmortems under docs/incidents/<semantic-domain>/<YYYY-MM-DD>__<incident-slug>/postmortem.md. Turns incident notes, logs, PRs, timelines, fixes, and follow-up evidence into a source-backed causal record optimized for future responders and LLM re-ingestion. Captures user impact, proof of cause, ruled-out hypotheses, fast path next time, recurrence pattern, corrective actions, and verification state.
+description: Creates or updates durable incident postmortems with source-backed timelines, causes, ruled-out hypotheses, fixes, and recurrence prevention. Use after incidents, outages, regressions, or production failures when notes, logs, PRs, and evidence need a responder-ready record.
 tools:
   - Read
   - Grep

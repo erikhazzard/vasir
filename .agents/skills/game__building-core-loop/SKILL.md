@@ -1,6 +1,6 @@
 ---
 name: game__building-core-loop
-description: Designs, implements, diagnoses, and tunes the core game loop of mobile games in JavaScript. Covers loop architecture — state machines, input systems, feedback timing, session design, tension curves, difficulty pacing, and interruption recovery. Focuses on the fractal structure of play from micro-loop through session arc, mobile-native input design, and production-ready JS with feel parameters. Complements game__tuning-economy-progression — this skill builds the heartbeat, that skill builds the circulatory system. Use when architecting a new game loop, diagnosing pacing issues, tuning session flow, or wiring input-to-feedback timing.
+description: Designs, implements, diagnoses, and tunes the moment-to-moment and session loop for JavaScript mobile games. Use when starting a new game loop, diagnosing pacing, wiring input-to-feedback timing, or tuning session flow.
 tools:
   - Read
   - Grep

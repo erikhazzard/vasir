@@ -1,6 +1,6 @@
 ---
 name: game-proof__auditing-first-playable-comprehension
-description: Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment
+description: Audits whether a zero-context player can act, see feedback, understand consequence, and want another try in a first playable. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff.
 ---
 
 # First Fun Judgment
@@ -357,16 +357,16 @@ If the verdict is `DOES NOT SLAP` or `BLOCKED`, do not claim complete. Use
 "candidate first playable", "does not slap yet", or "blocked on fresh first-fun
 material" as appropriate.
 
-## Routing Cases
+## Routing Boundaries
 
-- Baseline failure: without this skill, an agent can cite build, selector QA, sim diffs, and a results overlay while the first playable has no meaningful act in the first seconds.
-- With-skill behavior: a new game handoff leads with the concrete play moment, whether a human would play another 30 seconds, the response, the consequence, the better next attempt, and the play material used for that judgment.
-- Should trigger: "The game runs but I cannot tell what is going on."
-- Should trigger: "Why is this not a game?"
-- Should trigger: "Show me whether the first playable is actually fun enough to start."
-- Should trigger: "It starts randomly and my characters just die."
-- Should trigger: "Where is the first meaningful choice?"
-- Should not trigger: "Design the whole game direction before implementation" because `game__directing` and `game__building-core-loop` come first.
-- Should not trigger: "Make the HUD prettier" unless first-fun judgment or comprehension is the requested outcome.
-- Collision boundary: for auto-battlers, use `game__genre--building-auto-battler-tactics` for the system; use this skill to judge whether the first commitment reaches the player quickly and reads in play material.
-- Attention-drift case: if the agent is late in a long turn and only remembers one rule, it must remember this: `Would I play another 30 seconds?` must be yes, backed by action -> feedback -> consequence -> better next attempt.
+- Use this skill when judging whether a runnable game is actually understandable, playable, or worth another 30 seconds.
+- Use it before claiming a first playable, vertical slice, publish-readiness, or final handoff complete.
+- Do not use it as the initial design skill; `game__directing` and `game__building-core-loop` come first when the core game direction is still missing.
+- Do not use it for narrow HUD beautification unless the requested outcome is first-play comprehension, first-fun judgment, or player-readable causality.
+- For auto-battlers, use `game__genre--building-auto-battler-tactics` for the system design, then use this skill to judge whether the first commitment reaches the player quickly and reads in play material.
+
+## Completion Boundaries
+
+- Build, selector QA, sim diffs, and a results overlay do not prove first playable quality unless the first seconds show a meaningful act.
+- The handoff must lead with the concrete play moment, whether a human would play another 30 seconds, the response, the consequence, the better next attempt, and the play material used for that judgment.
+- If only one rule survives a long turn, keep this one: `Would I play another 30 seconds?` must be yes, backed by action -> feedback -> consequence -> better next attempt.

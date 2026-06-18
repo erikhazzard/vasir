@@ -1,6 +1,6 @@
 ---
 name: design__designing-typography
-description: Designs and implements UI typography for web interfaces and mobile game UI — hierarchy, type scales, spacing/letterspacing rules, numerals, font selection, localization resilience, web font loading/performance, and typography system architecture. Produces exact values + copy‑paste code, opinionated defaults, audits/reviews, and debugging protocols. Use when choosing fonts, building a typography system, tuning readability/scanability, reviewing existing type specs, fixing “something feels off,” or shipping web fonts without layout shift.
+description: Designs and implements typography systems for web interfaces and mobile game UI. Use when choosing fonts, type scales, hierarchy, readability, numerals, localization behavior, web-font loading, or layout-shift-safe text.
 ---
 
 # UI Typography Design

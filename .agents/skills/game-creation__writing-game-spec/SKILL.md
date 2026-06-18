@@ -91,12 +91,9 @@ After creating or revising `README__game-spec.md`, stop only when the creator ex
 
 In the visible response, state the assumptions briefly and summarize the first playable in one sentence. Do not present assumptions as a blocker unless they are genuinely unsafe, copyrighted, impossible, or proof-changing.
 
-## Skill Eval Cases
+## Mode Boundaries
 
-- Should trigger assumption-first autonomous creation: "Make me a mobile fantasy battler" in a Studio workspace with no `README__game-spec.md`; expected behavior is write the spec and continue to `game-creation__selecting-initial-template`.
-- Should trigger ask-first: "Ask me whatever you need before creating the game doc."
-- Should trigger spec creation: the creator answers a prior plain-text Studio question batch in a workspace with no `README__game-spec.md`.
-- Should trigger: "The spec is too vague, rewrite it before building."
-- Should stop after spec: "Draft the spec first, do not build yet."
-- Should not trigger: "Implement the approved spec" when `README__game-spec.md` is already concrete and approved.
-- Borderline: If the creator asks for both a new game and immediate implementation, write the spec first, then continue automatically unless the prompt explicitly requests approval-first handling.
+- **Autonomous creation**: missing or vague spec plus a make/build/create request means write the spec from assumptions, then continue into first-playable creation.
+- **Ask-first**: ask questions only when the creator explicitly asks to be questioned first, or when no safe assumption exists for a proof-changing decision.
+- **Spec-only**: stop after `README__game-spec.md` only when the creator explicitly asks for spec-only, review-before-build, or approval-first work.
+- **Approved-spec implementation**: when a concrete spec already exists and the creator asks to implement it, skip this skill and use `game-creation__selecting-initial-template`.

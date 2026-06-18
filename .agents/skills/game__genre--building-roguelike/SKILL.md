@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-roguelike
-description: Designs and builds roguelike and roguelite games in JavaScript. Covers the full design stack — procedural generation philosophy, entity architecture, item synergy design, meta-progression, run pacing, economy, difficulty curves, and touch-native UI. Focuses on emergent gameplay, meaningful decisions, and the "one more run" compulsion loop. Prioritizes systems that produce O(n²) player experiences from O(n) authored content. Use when creating roguelikes from scratch, designing item synergy systems, implementing meta-progression, tuning run pacing, or building procedural content pipelines.
+description: Designs and builds JavaScript roguelike and roguelite games. Use when creating runs, procedural levels, entity systems, item synergies, meta-progression, economy, difficulty, touch UI, or one-more-run pacing.
 tools:
   - Read
   - Grep

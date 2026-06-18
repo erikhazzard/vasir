@@ -1,6 +1,6 @@
 ---
 name: plan__prepare-summary
-description: Used to summarize a workspec plan before executing
+description: Summarizes an approved Work Spec into execution-ready context. Use immediately before implementation when a plan needs a compact handoff, scope recap, or milestone focus.
 tools: Read, Grep, Glob, Edit, Write
 model: opus
 ---

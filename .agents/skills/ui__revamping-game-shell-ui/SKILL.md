@@ -1,6 +1,6 @@
 ---
 name: ui__revamping-game-shell-ui
-description: Revamps any Idavoll game’s shell UI (HUD/menus/results/overlays) using vanilla DOM + @idavoll/game-ui-kit while preserving deterministic kernel + replay boundaries. Use when the user asks to redesign UI, change HUD/menu/results layout, migrate to the UI kit, restyle a game UI to match the design system, or fix UI breakage without touching gameplay determinism. Enforces “kernel vs shell” boundaries, stable UI kit entrypoints only, iframe-safe mobile-first layout, safe-area/thumb-zone rules, input safety (real interactive elements), semantic intents drained on simulation ticks, and required verification commands.
+description: Revamps Idavoll game HUDs, menus, overlays, and results screens while preserving deterministic kernel and replay boundaries. Use when redesigning shell UI, migrating to @idavoll/game-ui-kit, fixing UI breakage, or changing HUD/menu/results layout without altering gameplay simulation.
 tools:
   - Read
   - Grep
@@ -200,4 +200,3 @@ When in doubt, require (at minimum):
   - `npm test`
 
 If kernel is touched (avoid it), also run the game’s determinism/replay suites as defined by that game’s `AGENTS.md`.
-

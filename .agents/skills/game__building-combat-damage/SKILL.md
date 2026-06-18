@@ -1,6 +1,6 @@
 ---
 name: game__building-combat-damage
-description: Architects and implements combat and damage systems for JavaScript 2D games (Canvas, WebGL, Phaser, custom engines). Covers hitboxes/hurtboxes, attack lifecycles with frame data, combo/chain/cancel systems, input buffering, cooldowns, invincibility frames, damage formulas, damage types and resistances, health/shield/armor pipelines, projectile systems, AOE, DoT, and crit/proc rolls. Prioritizes correct timing, clean architecture, tunable math, and game-feel integration. Use when adding melee or ranged combat, designing damage pipelines, tuning hit feedback, or implementing health and defense systems.
+description: Architects and implements JavaScript 2D combat, damage, hitbox, and health systems. Use when adding melee, ranged, projectiles, attack timing, combos, cooldowns, damage formulas, defenses, or hit feedback.
 tools:
   - Read
   - Grep

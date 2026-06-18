@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-tower-defense
-description: Designs and builds tower defense games in JavaScript. Focuses on systems design, balance, player decision-making, and information clarity. Covers path systems, grid placement, targeting, projectiles, upgrade trees, wave pacing, economy, and fast-forward/pause. References Bloons TD and Kingdom Rush. Prioritizes meaningful player decisions over feature count, balance over content volume, and information clarity over visual spectacle. Use when creating tower defense games, implementing placement grids, designing wave systems, tuning tower upgrades, or balancing economy and targeting.
+description: Designs and builds JavaScript tower-defense games with readable placement, waves, targeting, upgrades, and economy. Use when creating tower-defense games, placement grids, pathing, projectile systems, wave pacing, tower upgrades, or balance passes.
 tools:
   - Read
   - Grep

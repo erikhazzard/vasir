@@ -1,6 +1,6 @@
 ---
 name: game-assets__generating-images
-description: Generates, persists, and wires bitmap game assets for Idavoll and Studio games including backgrounds, sprites, icons, portraits, item art, card art, UI textures, transparent cutouts, and reference images. Use when a creator asks for raster game art or when implementation needs new bitmap assets, prefer Codex-native image generation when available, use the Studio source image command only as a thin fallback, and avoid backend prompt routing or metadata image flows.
+description: Generates, saves, and wires bitmap assets for Idavoll and Studio games. Use when a creator or implementation needs raster backgrounds, sprites, icons, portraits, items, cards, UI textures, cutouts, or reference art.
 ---
 
 # Game Image Asset Generation
@@ -206,18 +206,17 @@ Why: Provider truth matters for debugging quality differences between local Code
 | Silent provider downgrade | Hides why Studio output differs from local Codex. | Report actual provider/model when visible. |
 | Bitmap for simple code-native UI | Creates blurry, inflexible UI assets. | Use CSS/SVG/canvas for health bars, frames, simple vector masks, debug overlays, and abstract primitives unless raster art is the point. |
 
-## Skill Eval Cases
+## Routing Boundaries
 
-- Baseline failure: without this skill, the agent waits for backend image routing or leaves generated art outside the workspace.
-- With-skill behavior: "Generate a battle background and use it in the game" produces a workspace image, promotes it to semantic `src/assets/...`, wires it into code, and runs an asset-resolution proof.
-- With-skill behavior: "Make me a fantasy battler" does not rely on inline SVG/card/vector placeholder art for the main scene, characters, title art, items, or background; if visual assets are needed, it generates bitmap assets and persists them under `src/assets`.
-- Should trigger: "Make a transparent sprite for the boss."
-- Should trigger with transparency by default: "Generate enemy sprites and character art for the battle."
-- Should trigger with transparency by default: "Create item icons for these loot drops."
-- Regression case: "Generate enemy sprites" must not wire a white-background sprite sheet directly into runtime; it must either generate transparency or produce a transparent cutout before claiming completion.
-- Should trigger: "Use the attached sketch as reference art for a card portrait."
-- Should not trigger: "Draw a health bar with CSS."
-- Should not trigger: "Generate marketing images for publish metadata" when the request is specifically about catalog/marketing metadata rather than workspace game assets.
-- Borderline: "Make the game look more polished" should use art/UI/juice skills first; invoke this skill only when new bitmap files need to exist.
-- Collision boundary: when `game__art-directing` also triggers, use art direction to define visual language, then use this skill for the raster asset pipeline.
-- Attention-drift case: after implementing gameplay for several turns, if adding an image late, still persist/promote under `src/assets` and report actual provider/model instead of leaving tool output in place.
+- Use this skill when game runtime visuals need real raster assets: characters, enemies, items, cards, icons, portraits, sprite sheets, backgrounds, textures, title art, or reference-image-based game art.
+- Do not use this skill for simple code-native UI primitives such as health bars, frames, masks, debug overlays, or abstract CSS/canvas decoration.
+- Do not use this skill for catalog/publish marketing metadata unless the creator specifically asks to create game-source art assets for the workspace.
+- When `game__art-directing` also applies, use art direction to define the visual language first, then use this skill for the raster asset pipeline.
+- Vague polish requests should go through art direction, UI, or juice first; invoke this skill only when new bitmap files must exist.
+
+## Completion Boundaries
+
+- A runtime asset is not complete until final image bytes live under a semantic workspace path such as `src/assets/...`, code imports or references that path, and a proof shows the asset resolves.
+- Layerable runtime subjects default to transparent PNG. Do not wire white-background sprites directly into gameplay.
+- Do not satisfy game-defining art with inline SVG, CSS gradients, script-drawn fake PNGs, or generated files left outside the workspace.
+- Report the actual provider/model when visible, especially after fallback paths or provider changes.

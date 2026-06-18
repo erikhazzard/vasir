@@ -1,6 +1,6 @@
 ---
 name: handoff__final-quality-gate
-description: Final SHIP / NO-SHIP / BLOCKED gate for approved feature work and material code changes. Invokes code__auditing and testing__auditing, verifies Proof-of-Value, artifacts, scope, docs/context, subjective acceptance, and remaining delta before any agent may claim final completion.
+description: Runs the final ship/no-ship gate by verifying scope, proof artifacts, tests, docs, acceptance, and remaining risk. Use before claiming feature completion, milestone closure, release readiness, or final handoff.
 model: opus
 tools:
   - Read

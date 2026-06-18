@@ -215,7 +215,7 @@
     },
     {
       "name": "design__designing-game-ui-for-idavoll",
-      "description": "Design high-quality mobile UI for our game",
+      "description": "Designs mobile game HUDs, menus, overlays, controls, and results screens for Idavoll. Use when building or reviewing player-facing game UI, especially touch targets, safe areas, HUD hierarchy, controls, and result flows.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -393,7 +393,7 @@
     },
     {
       "name": "game__building-core-loop",
-      "description": "Designs, implements, diagnoses, and tunes the core game loop of mobile games in JavaScript. Covers loop architecture — state machines, input systems, feedback timing, session design, tension curves, difficulty pacing, and interruption recovery. Focuses on the fractal structure of play from micro-loop through session arc, mobile-native input design, and production-ready JS with feel parameters. Complements game__tuning-economy-progression — this skill builds the heartbeat, that skill builds the circulatory system. Use when architecting a new game loop, diagnosing pacing issues, tuning session flow, or wiring input-to-feedback timing.",
+      "description": "Designs, implements, diagnoses, and tunes the moment-to-moment and session loop for JavaScript mobile games. Use when starting a new game loop, diagnosing pacing, wiring input-to-feedback timing, or tuning session flow.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -510,7 +510,7 @@
     },
     {
       "name": "game__genre--building-platformer",
-      "description": "Implements production-quality 2D side-scroller movement in JavaScript. Covers the complete movement vocabulary — variable jump, wall jump, wall slide, dash, double jump, ladders, moving platforms, one-way platforms, conveyor belts, spring pads, hazard zones, and checkpoints. Builds on a correct physics foundation (fixed timestep, semi-implicit Euler, AABB collision) and state machine architecture. Every mechanic ships with tunable parameters, interaction rules, edge-case handling, mobile touch considerations, and juice integration hooks. Targets mobile-native iOS via JS. Use when building platformer movement, tuning jump feel, adding wall mechanics, implementing collision systems, or wiring mobile touch controls for side-scrollers.",
+      "description": "Builds production 2D platformer movement, collision, and feel systems in JavaScript. Use when implementing or tuning jumps, wall moves, dashes, hazards, checkpoints, side-scroller collisions, or mobile platformer controls.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -744,7 +744,7 @@
     },
     {
       "name": "game-proof__auditing-first-playable-comprehension",
-      "description": "Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment",
+      "description": "Audits whether a zero-context player can act, see feedback, understand consequence, and want another try in a first playable. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -758,7 +758,7 @@
     },
     {
       "name": "handoff__final-quality-gate",
-      "description": "Final SHIP / NO-SHIP / BLOCKED gate for approved feature work and material code changes. Invokes code__auditing and testing__auditing, verifies Proof-of-Value, artifacts, scope, docs/context, subjective acceptance, and remaining delta before any agent may claim final completion.",
+      "description": "Runs the final ship/no-ship gate by verifying scope, proof artifacts, tests, docs, acceptance, and remaining risk. Use before claiming feature completion, milestone closure, release readiness, or final handoff.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -771,7 +771,7 @@
     },
     {
       "name": "ops__maintain-incident-postmortem",
-      "description": "Creates or updates durable incident postmortems under docs/incidents/<semantic-domain>/<YYYY-MM-DD>__<incident-slug>/postmortem.md. Turns incident notes, logs, PRs, timelines, fixes, and follow-up evidence into a source-backed causal record optimized for future responders and LLM re-ingestion. Captures user impact, proof of cause, ruled-out hypotheses, fast path next time, recurrence pattern, corrective actions, and verification state.",
+      "description": "Creates or updates durable incident postmortems with source-backed timelines, causes, ruled-out hypotheses, fixes, and recurrence prevention. Use after incidents, outages, regressions, or production failures when notes, logs, PRs, and evidence need a responder-ready record.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -827,7 +827,7 @@
     },
     {
       "name": "plan__prepare-goal",
-      "description": "N/A, ONLY CALLED MANUALLY",
+      "description": "Prepares goal context before extended autonomous work. Use only when manually starting or resuming a named goal that needs planning context, budget framing, or handoff setup.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -950,7 +950,7 @@
     },
     {
       "name": "security__auditing-code",
-      "description": "Static attacker-grade audit for backend code, schema, policies, and adjacent config that mutate privileged or economic state. Maps workflows, invariants, authorization graphs, and async mutation pipelines; finds real exploit chains; produces evidence-based release blockers and a prioritized remediation plan without rewriting code.",
+      "description": "Audits backend code, schemas, policies, and config for exploit chains around privileged or economic state. Use when reviewing authz, trust boundaries, async mutations, policy enforcement, state-changing APIs, or release-blocking security risk.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1020,7 +1020,7 @@
     },
     {
       "name": "threejs__improve-performance",
-      "description": "Diagnose, profile, and maximize runtime performance in Three.js + Rapier. Find the real bottleneck, fix it in priority order, and preserve determinism, correctness, and gameplay semantics unless the user explicitly allows a trade. Covers low FPS, frame pacing and stutter, GPU bottlenecks, draw-call pressure, shader compile hitches, texture bandwidth and VRAM pressure, shadows and post-processing cost, JS/GC churn, worker handoff overhead, Rapier broadphase/narrowphase/solver cost, collider authoring, event/query overhead, resource disposal leaks, load/decode/parse stalls, and regression-proof perf budgets.",
+      "description": "Profiles and improves Three.js + Rapier runtime performance while preserving determinism and gameplay semantics. Use for low FPS, stutter, load-time, GPU, CPU, GC, scene graph, shader, asset, physics, collider, or memory issues in Three.js/Rapier apps.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1037,7 +1037,7 @@
     },
     {
       "name": "ui__revamping-game-shell-ui",
-      "description": "Revamps any Idavoll game’s shell UI (HUD/menus/results/overlays) using vanilla DOM + @idavoll/game-ui-kit while preserving deterministic kernel + replay boundaries. Use when the user asks to redesign UI, change HUD/menu/results layout, migrate to the UI kit, restyle a game UI to match the design system, or fix UI breakage without touching gameplay determinism. Enforces “kernel vs shell” boundaries, stable UI kit entrypoints only, iframe-safe mobile-first layout, safe-area/thumb-zone rules, input safety (real interactive elements), semantic intents drained on simulation ticks, and required verification commands.",
+      "description": "Revamps Idavoll game HUDs, menus, overlays, and results screens while preserving deterministic kernel and replay boundaries. Use when redesigning shell UI, migrating to @idavoll/game-ui-kit, fixing UI breakage, or changing HUD/menu/results layout without altering gameplay simulation.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

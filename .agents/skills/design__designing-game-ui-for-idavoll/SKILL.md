@@ -1,6 +1,6 @@
 ---
 name: design__designing-game-ui-for-idavoll
-description: Design high-quality mobile UI for our game
+description: Designs mobile game HUDs, menus, overlays, controls, and results screens for Idavoll. Use when building or reviewing player-facing game UI, especially touch targets, safe areas, HUD hierarchy, controls, and result flows.
 ---
 
 You are a senior staff engineer working in the `idavoll-games` repo.

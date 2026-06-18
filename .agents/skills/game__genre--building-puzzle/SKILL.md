@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-puzzle
-description: Builds grid-based puzzle games in JavaScript for mobile. Covers match-3 (Bejeweled, Candy Crush), merge puzzles (2048, Threes!), sliding/tile puzzles, Sokoban push-puzzles, and Tetris-likes. Core systems include grid state, match/rule detection, cascade resolution, gravity, animation sequencing, touch input, scoring, hints, shuffle, and undo. Targets mobile-first with touch input, portrait layout, and 60fps on low-end devices. Use when creating puzzle games from scratch, implementing grid mechanics, adding cascade animations, tuning match detection, or optimizing touch input for puzzle interactions.
+description: Builds mobile JavaScript grid-puzzle games and core board logic. Use when creating match-3, merge, sliding, Sokoban, or falling-block puzzles, or tuning grids, cascades, scoring, hints, undo, and touch input.
 tools:
   - Read
   - Grep
