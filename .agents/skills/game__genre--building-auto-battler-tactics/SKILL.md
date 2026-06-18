@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-auto-battler-tactics
-description: Designs autobattlers; use for autochess / autobattler games.
+description: Designs/builds autobattler and squad-tactics systems. Use for shops, benches, boards, formations, synergies, items, draft/economy phases, automated combat, combat causality, or TFT-like games.
 ---
 
 # Auto-Battler / Tactics Game Builder

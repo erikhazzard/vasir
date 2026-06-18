@@ -1,6 +1,6 @@
 ---
 name: code__fixing-bugs
-description: Investigates and fixes bugs, defects, and "this isn't working" reports using a strict workflow — defines the broken user-journey contract, reproduces with a minimal integration test using real dependencies, applies the smallest safe fix, and locks the fix with deterministic CI-ready guardrails. Use when diagnosing failures, hunting regressions, triaging defect reports, or applying targeted fixes that need reproduction tests.
+description: Investigates and fixes bugs by reproducing the broken user-journey contract and locking the fix with deterministic proof. Use when diagnosing failures, regressions, defect reports, or targeted fixes that need reproduction tests.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

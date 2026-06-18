@@ -1,6 +1,6 @@
 ---
 name: doc__guard-drift
-description: Detects and prevents documentation drift by treating docs as testable claims and verifying them against primary source artifacts in the current repository. Compares docs to implementation, schemas, types, tests, configs, build/deploy files, and recent changes; then reports mismatches, missing coverage, and exact doc fixes. Use before releases, after refactors, during PR review, or whenever README/API docs/runbooks may have drifted from reality.
+description: Audits docs as testable claims against current repo source, schemas, tests, configs, and build artifacts. Use before releases, after refactors, during PR review, or when README/API docs/runbooks may be stale.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

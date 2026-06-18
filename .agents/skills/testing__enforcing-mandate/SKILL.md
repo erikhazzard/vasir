@@ -1,6 +1,6 @@
 ---
 name: testing__enforcing-mandate
-description: Outcome-driven testing doctrine for production-safe shipping. Prioritizes public interfaces, real user journeys, Playwright/browser evals when appropriate, integration/value-path proofs, deterministic suites, repo-truth validation, and zero tolerance for unguarded critical paths. Triggers anytime we write code, anytime we we write tests, planning changes, or shipping code safely.
+description: Outcome-driven testing doctrine for safe shipping. Use when writing code/tests, planning test strategy, proving user journeys, adding Playwright/browser evals, or guarding critical paths.
 tools:
   - Read
   - Grep

@@ -1,6 +1,6 @@
 ---
 name: game-ai__architecting-ai
-description: Production game-AI design skill for creating S-tier agent, bot, NPC, director, and autoplay/testing AI specs. Triggers when working on game AI Bot related AI behavior and ai / bot NPCs.
+description: Game-AI architecture for agents, bots, NPCs, directors, companions, enemy behavior, autoplay, and testing AI. Use for deterministic behavior design, fairness, tactics, perception, tuning, or debug specs.
 ---
 
 # Game AI Architect Skill

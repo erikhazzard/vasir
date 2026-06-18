@@ -1,6 +1,6 @@
 ---
 name: game__adding-juice
-description: Adds responsive game feel and high-payoff polish to JavaScript 2D games. Use to add more "juice", eg when tuning hits, screen shake, hit-stop, particles, camera motion, animation timing, UI motion, or interaction satisfaction.
+description: Adds responsive game feel and high-payoff polish to JavaScript 2D games. Use when tuning hits, screen shake, hit-stop, particles, camera motion, animation timing, UI motion, or interaction satisfaction.
 tools:
   - Read
   - Grep

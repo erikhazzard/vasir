@@ -1,6 +1,6 @@
 ---
 name: design__kicking-off
-description: Generates canonical production-grade frontend UI from scratch — pure BEM naming, strict class budgets, token-based styles, and intentional, distinctive aesthetics. Tailwind and utility-soup strictly forbidden. Establishes the initial design system foundation for a new project or component library. Use when starting a new frontend project, bootstrapping a component library, or establishing the visual identity and CSS architecture for a fresh codebase.
+description: Creates opinionated BEM frontend foundations from scratch. Use when starting a frontend project, component library, visual identity, or CSS architecture.
 tools:
   - Read
   - Grep
@@ -24,6 +24,8 @@ Generate frontend code that is:
 - **Designed on purpose**: strong aesthetic direction, not “default SaaS template #84.”
 
 This codebase optimizes for: **clarity, stability, and taste under pressure**.
+
+When work moves from initial CSS/visual foundation into component UX, accessibility, responsive states, or frontend polish, also use `design__building-frontend-interfaces`.
 
 ---
 

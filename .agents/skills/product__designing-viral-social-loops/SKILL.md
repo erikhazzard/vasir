@@ -1,6 +1,6 @@
 ---
 name: product__designing-viral-social-loops
-description: Designs and audits self-reinforcing social, creator-supply, and playable-social loops by tracing incentives, payloads, graph density, conversion surfaces, creator upside, and leakage. Triggers on designing or iterating on product or distributino loops,playable UGC or co-play loops, invite/share or challenge mechanics, social-proof loops, or diagnosing why a growth loop feels generic, cringe, loose, or non-defensible.
+description: Designs/audits self-reinforcing social, creator-supply, and playable loops. Use for invite/share/challenge/co-play/UGC/social-proof mechanics, graph density, creator upside, leakage, or non-defensible growth.
 ---
 
 # Design Viral Social Loops

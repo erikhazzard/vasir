@@ -1,6 +1,6 @@
 ---
 name: game-design__ensuring-design-coherence
-description: Extract and pressure-test a game's or feature's actual fantasy, core loop, and design pillars. Triggers on designing game loops, improving gameplay, and diagnosising why a game doesn't feel good.
+description: Pressure-tests a game's real fantasy, core loop, incentives, design pillars, and meaning bugs. Use when designing gameplay, improving feel, or diagnosing why a game feels incoherent.
 ---
 # Game Core Design Coherence
 

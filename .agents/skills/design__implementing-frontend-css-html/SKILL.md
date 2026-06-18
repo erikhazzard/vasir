@@ -1,6 +1,6 @@
 ---
 name: design__implementing-frontend-css-html
-description: Rules for implementing design for html / css. Triggers when writing CSS or HTML tags
+description: CSS/HTML implementation rules for stable, intentional frontend markup and styles. Use when editing selectors, layout, responsive CSS, states, typography, visual polish, or HTML structure.
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -11,6 +11,8 @@ tools: Read, Grep, Glob, Edit, Write
 Generate frontend code that is **searchable** (grep one class, find the whole surface), **readable** (diffs explain themselves), **composable** (reuse through named components), and **designed on purpose** (strong aesthetic direction, not default SaaS template #84).
 
 Your training data is saturated with Tailwind utility soup, Inter-on-white-with-purple-gradients, and generic card layouts. Your default instinct will be to reproduce them. Actively resist this. Treat every output as portfolio work.
+
+When editing frontend UI, use `design__building-frontend-interfaces` as the taste and interaction authority. This skill owns the CSS/HTML execution.
 
 ---
 

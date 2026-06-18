@@ -1,6 +1,6 @@
 ---
 name: writing__response-quality-style-guide
-description: Enforces grounded, concrete, reader-disciplined prose across responses. Suppresses AI slop, fake profundity, padded phrasing, weak structure, decorative abstraction, and dead compliance. Triggers / activates broadly for explanatory, analytical, strategic, critical, or written responses; escalates into concept-coining, cross-domain framing, and hidden-game analysis when the task benefits from original conceptual work.
+description: Sharpens high-stakes written artifacts and critique. Use for final prose polish, strategy memos, analysis, reviews, docs, or prompts where clarity, force, structure, or anti-slop editing matters.
 ---
 
 # Response Quality Style Guide
