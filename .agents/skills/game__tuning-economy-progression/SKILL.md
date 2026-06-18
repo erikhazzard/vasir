@@ -1,6 +1,6 @@
 ---
 name: game__tuning-economy-progression
-description: Designs, implements, tunes, and debugs game economy and progression systems in JavaScript. Covers difficulty curves, XP curves, unlock trees, currency systems, loot rarity tables, difficulty scaling, idle/clicker math, reward schedules, and prestige mechanics. Focuses on systems thinking, player psychology, and tuning guidance. Use when balancing game economies, designing progression systems, tuning difficulty curves, debugging reward schedules, or implementing currency and unlock systems.
+description: Designs, implements, tunes, and debugs JavaScript game economy and progression systems. Use when balancing difficulty, XP, unlock trees, currencies, loot rarity, reward schedules, prestige, or progression pacing.
 tools:
   - Read
   - Grep

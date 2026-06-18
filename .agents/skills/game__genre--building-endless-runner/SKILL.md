@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-endless-runner
-description: Builds and improves endless/auto-runner games in JavaScript for mobile (iOS). Covers scroll engines, speed ramping, lane switching, obstacle generation with solvability guarantees, ground/segment recycling, near-miss detection, magnet pickups, shield/revive systems, distance-as-score, and session psychology. Targets Temple Run, Subway Surfers, and Canabalt style games. Use when creating runners from scratch, fixing unfair obstacle spawning, adding pickups/power-ups, tuning difficulty curves, or making a runner feel polished and addictive.
+description: Builds mobile JavaScript endless and auto-runner games. Use when creating runners, lane or scroll systems, solvable obstacles, pickups, difficulty ramps, distance scoring, or runner polish.
 tools:
   - Read
   - Grep

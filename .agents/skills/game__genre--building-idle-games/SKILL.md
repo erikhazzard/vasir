@@ -1,6 +1,6 @@
 ---
 name: game__genre--building-idle-games
-description: Builds idle and incremental games in JavaScript for mobile. Covers big number math (beyond Number.MAX_SAFE_INTEGER), prestige layers, offline progress calculation, upgrade cost curves (exponential, polynomial), auto-clickers, milestone unlocks, notation formatting (1.5M, 2.3e15), tick-based simulation with background catch-up, save/load persistence, and mobile-specific optimization (touch, battery, Page Visibility). References Cookie Clicker, Adventure Capitalist, and Antimatter Dimensions. Use when building, debugging, or enhancing any idle or incremental game.
+description: Builds mobile JavaScript idle and incremental games. Use when implementing big-number economies, prestige, offline progress, upgrade curves, auto-clickers, save/load, notation, or background catch-up.
 tools:
   - Read
   - Grep

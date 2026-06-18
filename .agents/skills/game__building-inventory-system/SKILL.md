@@ -1,6 +1,6 @@
 ---
 name: game__building-inventory-system
-description: Designs and implements item and inventory systems for JavaScript games (Canvas, WebGL, Phaser, React, custom engines). Covers item data definitions, inventory grids, drag-and-drop, equipment slots, crafting recipes, stat modifiers/affixes, tooltip generation, stack/split, and serialization. Prioritizes data integrity, clean serialization, and edge-case correctness over clever abstractions. Use when creating inventory UIs, defining item schemas, implementing crafting systems, adding equipment slots, or building stack/split and drag-and-drop interactions.
+description: Designs and implements JavaScript item, inventory, equipment, crafting, and serialization systems. Use when building inventory UIs, item schemas, equipment slots, tooltips, stack/split behavior, or drag-and-drop.
 tools:
   - Read
   - Grep

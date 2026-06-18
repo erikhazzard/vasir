@@ -1,6 +1,6 @@
 ---
 name: game__designing-systems
-description: Designs, implements, tunes, and debugs game systems using formal, Machinations-style modeling + simulation + production-ready JavaScript. Handles economies, progression, crafting, combat loops, loot/RNG, difficulty scaling/DDA, unlock trees, AI behavior arbitration, systemic events, and meta loops. Produces a system spec, a model representation (resource-flow/FSM/probabilistic/utility), a deterministic sim + tests, JS implementation, instrumentation, tuning playbook, and exploit/degeneracy analysis. Use when you need director-level systems thinking that ships.
+description: Designs, models, simulates, and tunes production JavaScript game systems. Use for economies, progression, crafting, combat loops, loot/RNG, difficulty, unlock trees, AI arbitration, or systemic events.
 model: opus
 ---
 

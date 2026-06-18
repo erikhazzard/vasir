@@ -1,6 +1,6 @@
 ---
 name: game-onboarding__designing-game-onboarding
-description: Designs and audits S-tier platformer onboarding sequences by converting player learning into moment-by-moment playable situations, using Mega Man X's opening highway as the gold-star benchmark. Use when creating or critiquing first levels, first five/ten/fifteen minutes, tutorial-free onboarding, movement/combat introductions, boss-select setup, sequel onboarding, or player-learning beat maps for 2D or 3D platformers; not for general plot summaries, art direction, or unrelated level design.
+description: Designs and audits platformer onboarding by turning player learning into playable first-level situations. Use when creating or critiquing first levels, tutorial-free introductions, movement/combat teaching, boss-select setup, or player-learning beat maps.
 ---
 
 # S-Tier Platformer Onboarding
@@ -234,4 +234,3 @@ Before finalizing:
 - `references/eval-cases.md` — Read when testing this skill, designing skill evals, or checking routing boundaries.
 - `references/hades-first-death-loop-gold-star.md` — S-tier roguelite/action onboarding reference covering Hades' first escape attempt, first likely death, House of Hades return, and second-run setup.
 - `references/plants-vs-zombies-day-world-gold-star.md` — S-tier casual strategy / tower-defense onboarding reference covering Plants vs. Zombies' first Day world, from Level 1-1 through the Day finale and transition to Night.
-

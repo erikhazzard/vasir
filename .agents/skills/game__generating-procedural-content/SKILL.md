@@ -1,6 +1,6 @@
 ---
 name: game__generating-procedural-content
-description: Designs and implements procedural generation systems for JavaScript games — dungeons, terrain, caves, placement, loot, waves, names, and infinite worlds. Produces seed-deterministic, designer-tunable, playable content from algorithms matched to the game's needs. Prioritizes output quality (playable, diverse, readable) over algorithmic cleverness. Use when creating level generators, implementing terrain algorithms, building wave spawners, designing name generators, or adding seed-based deterministic content pipelines.
+description: Designs and implements seed-deterministic procedural content systems for JavaScript games. Use when creating level, terrain, dungeon, cave, placement, loot, wave, name, or infinite-world generators.
 tools:
   - Read
   - Grep

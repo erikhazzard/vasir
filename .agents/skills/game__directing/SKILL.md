@@ -1,6 +1,6 @@
 ---
 name: game__directing
-description: Directs LLM game generation by producing a compact, enforceable Design Brief and validation plan before any code gets written. Prevents incoherence where games run but feel random. Optimized for iOS touch-first games in portrait orientation, but adaptable to other targets. Use when starting a new game from scratch, establishing the creative vision, defining core mechanics upfront, or validating that generated code matches the intended design.
+description: Turns a new game idea into a compact design brief and validation plan before implementation. Use when starting a game, defining core mechanics, aligning creative direction, or checking generated code against intent.
 model: opus
 tools:
   - Read

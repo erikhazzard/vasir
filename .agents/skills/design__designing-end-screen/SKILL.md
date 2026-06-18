@@ -1,6 +1,6 @@
 ---
 name: design__designing-end-screen
-description: Design high-quality post-match and results screens for mobile games. Covers the universal 4-phase animated sequence (outcome burst, stat reveal, rewards cascade, social/next action), share artifact design (Wordle grid pattern, transport selection, spoiler safety), and return hooks. Triggers when designing the game over / victory / post match / results / score screen, share card, end-of-round summary, or any screen shown after a session ends.
+description: Designs post-match, victory, game-over, results, reward, and share screens for mobile games. Use when creating end-of-round summaries, score screens, share cards, restart flows, or any screen shown after a session ends.
 ---
 
 # Game Results Screen Design

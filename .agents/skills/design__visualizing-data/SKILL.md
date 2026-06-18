@@ -1,6 +1,6 @@
 ---
 name: design__visualizing-data
-description: Discovers, validates, and tells the strongest defensible story in data for the web. Combines Munzner-style task framing, Cleveland/McGill + Heer/Bostock perceptual accuracy, Tufte/Few/Cairo editorial clarity, Segel/Heer narrative modes, Hullman-style framing and uncertainty checks, FlowingData practical clarity tests, Du Bois’s moral force and graphic identity, and Minard’s multivariate hierarchy. Chooses among chart, table, text, or mixed artifact. Produces production-grade JS/React/D3/SVG implementations when appropriate.
+description: Designs, audits, and implements web data visualizations that tell defensible stories from validated data. Use when choosing charts, tables, narrative graphics, D3/SVG/React visuals, uncertainty framing, or visualization reviews.
 tools:
   - Read
   - Grep
