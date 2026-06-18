@@ -1,6 +1,6 @@
 ---
 name: design__building-frontend-interfaces
-description: Opionioated design engineeirng guidelines. Use when building or designing frontend UIs
+description: "Opinionated frontend interface engineering guidance. Must be used whenever agents edit, design, build, polish, or review frontend UI, including components, layouts, CSS/HTML, visual design, interaction states, accessibility, responsive behavior, and user-facing product surfaces."
 ---
 
 # Polished Interface Engineering
