@@ -1,6 +1,6 @@
 ---
 name: game-creation__selecting-initial-template
-description: Selects the initial Idavoll game creation template and orchestrates the first-playable skill stack for new games. Use during create-game initialization, first-playable scaffolding, or local starter-template selection; keeps template, genre, art/UI, juice, and proof judgment inside Codex skills rather than Studio backend/frontend routing.
+description: Selects the initial Idavoll game creation template and orchestrates the autonomous first-playable proof/repair loop for new games. Use during create-game initialization, first-playable scaffolding, local starter-template selection, or "make/build/create this game" requests after a spec exists.
 ---
 
 # Game Creation Initial Template Selector
@@ -12,6 +12,8 @@ Choose the smallest Idavoll starter template that makes the first playable easie
 The template is a substrate, not a product decision: pick the least powerful template that can honestly support the spec, copy/adapt it only when the workspace needs a scaffold, then immediately build the actual game.
 
 This skill is also the create-game initialization root. Studio and local Codex must use the same skill stack; Studio may prepare the workspace, but it must not secretly route prompts, choose templates, or inject hidden design rules that local Codex cannot run.
+
+When this skill is invoked by a creator request to make, build, create, initialize, or finish a game, it has full approval to drive the workspace to a proven first playable. Do not stop between template selection, implementation, proof, audit, and repair unless the creator explicitly asked for approval-first work or a real blocker prevents progress.
 
 ## Required Initialization Skill Stack
 
@@ -26,6 +28,34 @@ After reading the approved `README__game-spec.md`, explicitly load or invoke the
 7. **Juice/polish**: use `game__adding-juice` once the loop is readable, especially for taps, hits, kills, rewards, transitions, and failure.
 
 Do not paste these skill bodies into the prompt. Let Codex load the skills normally from `.codex/skills` or `.agents/skills`. If a required skill is missing, say which skill is missing, use the nearest available repo guidance, and treat that as a skill-sync bug to fix rather than a reason to invent backend prompt choreography.
+
+## Autonomous First-Playable Algorithm
+
+Run this algorithm until the workspace reaches exactly one terminal state: `Ready`, `Candidate`, or `Blocked`.
+
+0. **Authority pass**: confirm the creator requested make/build/create/initialize/finish or otherwise approved autonomous implementation. If the creator asked for spec-only or approval-first work, do not run this algorithm.
+1. **Spec pass**: read `README__game-spec.md`. If it is missing, placeholder, vague, or contradicted by the creator request, invoke `game-creation__writing-game-spec`; after the spec is written, continue unless that skill stopped for explicit approval-first handling.
+2. **Template pass**: inspect local template inventory, choose the smallest viable substrate, and emit `Selected template: <template path> - <reason>.`
+3. **Skill-stack pass**: load the Required Initialization Skill Stack and start the Skill Evidence Ledger before product-code edits.
+4. **Build pass**: adapt or create the game loop, controls, feedback, UI, assets, tests, simulations, and metadata hooks needed by the spec. Build the actual game, not a copied scaffold.
+5. **Proof pass**: run the smallest real command set that proves the current risk surface: tests, build, simulations, browser QA, screenshot/video/timeline capture, metadata ensure, and any game-specific proof named by the spec.
+6. **Audit pass**: inspect the proof packet against player agency, first-screen quality, UI comprehension, art/asset integrity, and technical correctness. Use subagents when available.
+7. **Repair pass**: fix the single highest-severity blocker found by proof/audit, then return to step 5. Do not drift into unrelated polish while a proof blocker remains.
+8. **Terminal-state pass**:
+   - `Ready`: player action, immediate feedback, state consequence, later outcome, result/restart, required visual assets, tests/build/browser proof, and skill ledger all pass.
+   - `Candidate`: the game runs and has a plausible loop, but subjective feel, art/readability, metadata, or proof depth still needs human review or another pass.
+   - `Blocked`: a missing tool, API key, package, auth state, unsafe/copyright ambiguity, or impossible proof dependency prevents the required loop.
+
+### Subagent Lanes
+
+Use subagents whenever the provider exposes them and the task is broad enough to benefit. The root agent remains responsible for integration, final files, and the terminal state.
+
+- **Gameplay/agency auditor**: checks core verb, meaningful choice, feedback, state consequence, and renewed intent.
+- **UI/comprehension auditor**: checks first frame, controls, HUD, overlays, results, labels, and mobile readability.
+- **Art/assets auditor**: checks game-specific visual identity, generated/promoted bitmap assets, sprite/background readability, and placeholder leakage.
+- **QA/proof auditor**: checks tests, build, browser artifacts, screenshots/video, metadata readiness, and missing proof.
+
+Subagents share the same workspace. Do not use worktrees, branches, private copies, per-agent source roots, or merge protocols. Subagents may read broadly; they may edit only when the root agent assigns a narrow file lane. If subagents are unavailable, run the same lanes sequentially as self-audits.
 
 ## Skill Evidence Ledger
 
@@ -100,6 +130,8 @@ Invalid proof:
 
 ## Workflow
 
+Use the Autonomous First-Playable Algorithm above as the controlling loop. These template mechanics are the substrate-selection subroutine inside that algorithm:
+
 1. Classify the gameplay substrate from the spec:
    - dimensionality: 2D, fake-depth 2D, or real 3D;
    - physics centrality: none/simple overlaps, authored collisions, or rigid-body simulation;
@@ -115,7 +147,7 @@ Invalid proof:
 7. Replace template placeholders such as `{{GAME_ID}}` and `{{TITLE}}` from the spec or existing workspace metadata.
 8. Immediately adapt the scaffold into the actual game loop, controls, feedback, and validation path.
 9. Run the Required Initialization Skill Stack above and maintain the Skill Evidence Ledger before declaring the first playable complete.
-10. Capture the First-Playable Proof Packet. If any required proof segment is missing, hand off as "candidate first playable" or "blocked proof", not complete.
+10. Capture the First-Playable Proof Packet and loop through Proof -> Audit -> Repair until `Ready`, `Candidate`, or `Blocked`.
 11. Once `README__game-spec.md` exists and the workspace is ready for publish/share metadata, run `node .studio-ai-runtime/tools/studio/ensure-game-metadata.js --json` from the Studio workspace when that tool is available. Treat queued marketing generation as an explicit handoff state, then rerun with `--require-ready` only when readiness must be proven before publish.
 
 ## Anti-Patterns
@@ -137,8 +169,10 @@ Name the selected template and reason before implementation begins, then repeat 
 
 - Should trigger: "Initialize this Studio game from `README__game-spec.md`."
 - Should trigger: "Pick the best starter template and make the first playable."
+- Should trigger autonomous loop: "Make me a mobile game about schoolyard monsters" after `game-creation__writing-game-spec` creates a concrete spec.
 - Should trigger: "The spec is a pinball-like 2D physics toy with bumpers and impulse chains."
 - Should not trigger: "Add juice to an already built game without changing its substrate."
 - Borderline: "Make a 2D platformer with collision and knockback" should default to `game-template`, not Rapier, unless rigid-body simulation is central.
 - Collision boundary: if a genre skill also triggers, use this skill only for the initial substrate/template decision, then use the genre skill for game-specific implementation judgment.
 - Attention-drift case: if tests, build, `npm run qa`, and a results timeline pass but the proof packet lacks player action and consequence, the skill must force a candidate/blocked handoff instead of complete.
+- Subagent case: for a broad first playable, the root agent should use subagents when available for gameplay, UI, art/assets, and QA/proof lanes, while keeping all edits in the same game workspace.

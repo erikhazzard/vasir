@@ -1,6 +1,6 @@
 ---
 name: game-proof__auditing-first-playable-comprehension
-description: "Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment: input, response, consequence, and desire to continue. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear."
+description: Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment
 ---
 
 # First Fun Judgment

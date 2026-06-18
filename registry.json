@@ -686,7 +686,7 @@
     },
     {
       "name": "game-creation__selecting-initial-template",
-      "description": "Selects the initial Idavoll game creation template and orchestrates the first-playable skill stack for new games. Use during create-game initialization, first-playable scaffolding, or local starter-template selection; keeps template, genre, art/UI, juice, and proof judgment inside Codex skills rather than Studio backend/frontend routing.",
+      "description": "Selects the initial Idavoll game creation template and orchestrates the autonomous first-playable proof/repair loop for new games. Use during create-game initialization, first-playable scaffolding, local starter-template selection, or \"make/build/create this game\" requests after a spec exists.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -744,7 +744,7 @@
     },
     {
       "name": "game-proof__auditing-first-playable-comprehension",
-      "description": "Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment: input, response, consequence, and desire to continue. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff, especially when the first seconds may be passive, confusing, auto-resolving, results-only, or unclear.",
+      "description": "Judges whether a Studio or Idavoll first playable works and feels good by inspecting the first real play moment",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

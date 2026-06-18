@@ -11,6 +11,8 @@ Create the smallest durable game brief that lets Codex build a coherent first pl
 
 `README__game-spec.md` is the creator-approved game contract, not a backend work plan. It should be readable by a human, useful to game-building skills, and specific enough for template selection, implementation, QA, metadata generation, and publish readiness.
 
+When the creator says "make", "build", "create", or otherwise asks for a game, spec writing is a launch ramp, not a stop sign: infer safe defaults, write the spec, and continue into first-playable creation unless the creator explicitly asked for spec-only or approval-first work.
+
 ## When To Use
 
 - A Studio game workspace has no `README__game-spec.md`.
@@ -20,12 +22,14 @@ Create the smallest durable game brief that lets Codex build a coherent first pl
 
 ## Non-Negotiables
 
-1. In a missing-spec Studio game creation turn with no prior Studio question answers, ask the creator one initial question batch before creating `README__game-spec.md`, even if the prompt seems specific enough.
-2. Do not create backend `docs/work/**`, eval plans, implementation plans, XML status blocks, or product-code scaffolds during the spec-only turn.
-3. The initial Studio question batch should contain 1-3 concise questions that most affect genre focus, input model, platform orientation, theme boundaries, implementation substrate, or first-playable proof. Include exactly one valid fenced JSON block with `"kind": "studio_questions"` matching the Studio question-card shape, then stop before editing files.
-4. After the creator answers the initial Studio question batch, create or revise only `README__game-spec.md` unless the creator explicitly asks for other files.
-5. Avoid copyrighted game names, characters, assets, UI, story, and exact mechanic bundles. Capture inspiration as broad design intent.
-6. Make the first playable concrete: one primary action, one success loop, one failure pressure, one feedback language, and one proof command/check.
+1. Default to assumption-first game creation. If the creator prompt describes a new game, infer reasonable defaults and create or revise `README__game-spec.md` without an initial question round.
+2. Ask questions only when an unanswered choice would materially change the game, implementation substrate, proof gate, asset direction, safety boundary, or copyrighted-reference boundary and there is no safe conservative default.
+3. Do not create backend `docs/work/**`, eval plans, XML status blocks, or platform planning artifacts from this skill. If the current turn is explicitly spec-only, do not create product-code scaffolds.
+4. If the creator explicitly asks to be questioned first, ask one concise plain-text batch with 1-3 questions. Use this shape: `1. Question: <...>. Recommendation: <recommended default>; Alternative: <credible alternative>.` Do not use JSON, XML, fenced code blocks, or machine-readable question cards for this batch. Then stop before editing files.
+5. If the creator explicitly asks for spec-only, review-before-build, or approval-first work, create or revise only `README__game-spec.md` and stop for approval.
+6. If the creator asked to make, build, create, implement, initialize, or finish the game, continue after writing the spec by invoking `game-creation__selecting-initial-template` in the same session.
+7. Avoid copyrighted game names, characters, assets, UI, story, and exact mechanic bundles. Capture inspiration as broad design intent.
+8. Make the first playable concrete: one primary action, one success loop, one failure pressure, one feedback language, and one proof command/check.
 
 ## Spec Hazard Audit
 
@@ -83,13 +87,16 @@ Do not use the older short format with sections like `## One-Sentence Pitch`, `#
 
 ## Handoff
 
-After creating or revising `README__game-spec.md`, stop for creator approval unless the creator explicitly approved autonomous implementation. In the visible response, name that the spec is ready and summarize the first playable in one sentence.
+After creating or revising `README__game-spec.md`, stop only when the creator explicitly asked for spec-only, approval-first, or ask-first work. Otherwise, treat "make/build/create a game" as approval to continue into `game-creation__selecting-initial-template` and the autonomous first-playable loop.
+
+In the visible response, state the assumptions briefly and summarize the first playable in one sentence. Do not present assumptions as a blocker unless they are genuinely unsafe, copyrighted, impossible, or proof-changing.
 
 ## Skill Eval Cases
 
-- Should trigger question-first: "Make me a mobile fantasy battler" in a Studio workspace with no `README__game-spec.md`.
-- Should trigger spec creation: the creator answers the initial Studio question batch in a workspace with no `README__game-spec.md`.
+- Should trigger assumption-first autonomous creation: "Make me a mobile fantasy battler" in a Studio workspace with no `README__game-spec.md`; expected behavior is write the spec and continue to `game-creation__selecting-initial-template`.
+- Should trigger ask-first: "Ask me whatever you need before creating the game doc."
+- Should trigger spec creation: the creator answers a prior plain-text Studio question batch in a workspace with no `README__game-spec.md`.
 - Should trigger: "The spec is too vague, rewrite it before building."
-- Should trigger: "Ask me whatever you need before creating the game doc."
+- Should stop after spec: "Draft the spec first, do not build yet."
 - Should not trigger: "Implement the approved spec" when `README__game-spec.md` is already concrete and approved.
-- Borderline: If the creator asks for both a new game and immediate implementation, write the spec first, then continue only if approval/autonomy is explicit.
+- Borderline: If the creator asks for both a new game and immediate implementation, write the spec first, then continue automatically unless the prompt explicitly requests approval-first handling.
