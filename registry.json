@@ -120,7 +120,7 @@
     },
     {
       "name": "code__fixing-bugs",
-      "description": "Investigates and fixes bugs, defects, and \"this isn't working\" reports using a strict workflow — defines the broken user-journey contract, reproduces with a minimal integration test using real dependencies, applies the smallest safe fix, and locks the fix with deterministic CI-ready guardrails. Use when diagnosing failures, hunting regressions, triaging defect reports, or applying targeted fixes that need reproduction tests.",
+      "description": "Investigates and fixes bugs by reproducing the broken user-journey contract and locking the fix with deterministic proof. Use when diagnosing failures, regressions, defect reports, or targeted fixes that need reproduction tests.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -145,19 +145,6 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "code__writing-code-frontend",
-      "description": "Mandates for frontend code - html, js, css. Triggers when writing frontend code",
-      "category": "uncategorized",
-      "tags": [],
-      "version": "0.1.0",
-      "recommends": [],
-      "files": [
-        "SKILL.md"
-      ],
-      "path": ".agents/skills/code__writing-code-frontend",
-      "entry": "SKILL.md"
-    },
-    {
       "name": "design__animating-interfaces",
       "description": "Designs and implements UI animations for web and product interfaces — transition timing, easing curves, micro-interactions, feedback animations, loading states, and motion system architecture. Provides exact values, opinionated best practices, and in-depth reviews. Use when adding motion to components, building animation systems, tuning transition feel, reviewing animation performance, or establishing motion design tokens.",
       "category": "uncategorized",
@@ -172,7 +159,7 @@
     },
     {
       "name": "design__building-frontend-interfaces",
-      "description": "Opionioated design engineeirng guidelines. Use when building or designing frontend UIs",
+      "description": "Opinionated frontend interface engineering guidance. Must be used whenever agents edit, design, build, polish, or review frontend UI, including components, layouts, CSS/HTML, visual design, interaction states, accessibility, responsive behavior, and user-facing product surfaces.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -202,7 +189,7 @@
     },
     {
       "name": "design__designing-end-screen",
-      "description": "Design high-quality post-match and results screens for mobile games. Covers the universal 4-phase animated sequence (outcome burst, stat reveal, rewards cascade, social/next action), share artifact design (Wordle grid pattern, transport selection, spoiler safety), and return hooks. Triggers when designing the game over / victory / post match / results / score screen, share card, end-of-round summary, or any screen shown after a session ends.",
+      "description": "Designs post-match, victory, game-over, results, reward, and share screens for mobile games. Use when creating end-of-round summaries, score screens, share cards, restart flows, or any screen shown after a session ends.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -215,7 +202,7 @@
     },
     {
       "name": "design__designing-game-ui-for-idavoll",
-      "description": "Designs mobile game HUDs, menus, overlays, controls, and results screens for Idavoll. Use when building or reviewing player-facing game UI, especially touch targets, safe areas, HUD hierarchy, controls, and result flows.",
+      "description": "Designs mobile-native portrait game HUDs, menus, overlays, controls, and results screens for Idavoll. Use for touch targets, safe areas, HUD hierarchy, controls, and result flows.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -228,7 +215,7 @@
     },
     {
       "name": "design__designing-typography",
-      "description": "Designs and implements UI typography for web interfaces and mobile game UI — hierarchy, type scales, spacing/letterspacing rules, numerals, font selection, localization resilience, web font loading/performance, and typography system architecture. Produces exact values + copy‑paste code, opinionated defaults, audits/reviews, and debugging protocols. Use when choosing fonts, building a typography system, tuning readability/scanability, reviewing existing type specs, fixing “something feels off,” or shipping web fonts without layout shift.",
+      "description": "Designs and implements typography systems for web interfaces and mobile game UI. Use when choosing fonts, type scales, hierarchy, readability, numerals, localization behavior, web-font loading, or layout-shift-safe text.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -241,7 +228,7 @@
     },
     {
       "name": "design__implementing-frontend-css-html",
-      "description": "Rules for implementing design for html / css. Triggers when writing CSS or HTML tags",
+      "description": "CSS/HTML implementation rules for stable, intentional frontend markup and styles. Use when editing selectors, layout, responsive CSS, states, typography, visual polish, or HTML structure.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -255,7 +242,7 @@
     },
     {
       "name": "design__kicking-off",
-      "description": "Generates canonical production-grade frontend UI from scratch — pure BEM naming, strict class budgets, token-based styles, and intentional, distinctive aesthetics. Tailwind and utility-soup strictly forbidden. Establishes the initial design system foundation for a new project or component library. Use when starting a new frontend project, bootstrapping a component library, or establishing the visual identity and CSS architecture for a fresh codebase.",
+      "description": "Creates opinionated BEM frontend foundations from scratch. Use when starting a frontend project, component library, visual identity, or CSS architecture.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -268,7 +255,7 @@
     },
     {
       "name": "design__visualizing-data",
-      "description": "Discovers, validates, and tells the strongest defensible story in data for the web. Combines Munzner-style task framing, Cleveland/McGill + Heer/Bostock perceptual accuracy, Tufte/Few/Cairo editorial clarity, Segel/Heer narrative modes, Hullman-style framing and uncertainty checks, FlowingData practical clarity tests, Du Bois’s moral force and graphic identity, and Minard’s multivariate hierarchy. Chooses among chart, table, text, or mixed artifact. Produces production-grade JS/React/D3/SVG implementations when appropriate.",
+      "description": "Designs, audits, and implements web data visualizations that tell defensible stories from validated data. Use when choosing charts, tables, narrative graphics, D3/SVG/React visuals, uncertainty framing, or visualization reviews.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -281,7 +268,7 @@
     },
     {
       "name": "doc__guard-drift",
-      "description": "Detects and prevents documentation drift by treating docs as testable claims and verifying them against primary source artifacts in the current repository. Compares docs to implementation, schemas, types, tests, configs, build/deploy files, and recent changes; then reports mismatches, missing coverage, and exact doc fixes. Use before releases, after refactors, during PR review, or whenever README/API docs/runbooks may have drifted from reality.",
+      "description": "Audits docs as testable claims against current repo source, schemas, tests, configs, and build artifacts. Use before releases, after refactors, during PR review, or when README/API docs/runbooks may be stale.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -335,7 +322,7 @@
     },
     {
       "name": "explaining__creating-interactive-articles",
-      "description": "Create S-tier fully offline, D3-first interactive explanations of technical concepts, inspired by Distill.pub and explorable explanations; starts new requests with a targeted five-question alignment grill",
+      "description": "Creates offline D3-first interactive explanations of technical concepts. Use when building explorable articles, visual tutorials, concept demos, or alignment-question flows before authoring an interactive explanation.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -352,7 +339,7 @@
     },
     {
       "name": "game__adding-juice",
-      "description": "Adds game feel and game juice to JavaScript-built 2D games (Canvas, WebGL, Phaser, custom engines). Focuses on responsiveness, clarity, and virtual sensation, then layers high-ROI polish — camera work, hit feedback, animation timing, particles, UI motion, and readable spectacle. Prioritizes maximum perceptual payoff for minimum complexity and performance cost. Use when polishing game interactions, adding screen shake or hit-stop, implementing particle effects, tuning animation timing, or making any game action feel more satisfying.",
+      "description": "Adds responsive game feel and high-payoff polish to JavaScript 2D games. Use when tuning hits, screen shake, hit-stop, particles, camera motion, animation timing, UI motion, or interaction satisfaction.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -366,7 +353,7 @@
     },
     {
       "name": "game__art-directing",
-      "description": "Art directs games from concept through implementation-ready specs. Covers the full visual stack — color systems, shape language, animation grammar, juice budgets, spatial pacing, UI hierarchy, procedural art systems, and mobile rendering constraints. Prioritizes gameplay readability first, emotional resonance second, aesthetic beauty third. Designs visual systems that produce O(n²) distinctiveness from O(n) authored assets. Use when establishing a game's visual identity, defining color palettes, specifying animation grammars, or creating implementation-ready art specs.",
+      "description": "Art-directs games into implementation-ready visual systems for gameplay readability and identity. Use when defining visual identity, palettes, shape language, animation grammar, spatial pacing, UI hierarchy, or art specs.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -380,7 +367,7 @@
     },
     {
       "name": "game__building-combat-damage",
-      "description": "Architects and implements combat and damage systems for JavaScript 2D games (Canvas, WebGL, Phaser, custom engines). Covers hitboxes/hurtboxes, attack lifecycles with frame data, combo/chain/cancel systems, input buffering, cooldowns, invincibility frames, damage formulas, damage types and resistances, health/shield/armor pipelines, projectile systems, AOE, DoT, and crit/proc rolls. Prioritizes correct timing, clean architecture, tunable math, and game-feel integration. Use when adding melee or ranged combat, designing damage pipelines, tuning hit feedback, or implementing health and defense systems.",
+      "description": "Architects and implements JavaScript 2D combat, damage, hitbox, and health systems. Use when adding melee, ranged, projectiles, attack timing, combos, cooldowns, damage formulas, defenses, or hit feedback.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -406,7 +393,7 @@
     },
     {
       "name": "game__building-inventory-system",
-      "description": "Designs and implements item and inventory systems for JavaScript games (Canvas, WebGL, Phaser, React, custom engines). Covers item data definitions, inventory grids, drag-and-drop, equipment slots, crafting recipes, stat modifiers/affixes, tooltip generation, stack/split, and serialization. Prioritizes data integrity, clean serialization, and edge-case correctness over clever abstractions. Use when creating inventory UIs, defining item schemas, implementing crafting systems, adding equipment slots, or building stack/split and drag-and-drop interactions.",
+      "description": "Designs and implements JavaScript item, inventory, equipment, crafting, and serialization systems. Use when building inventory UIs, item schemas, equipment slots, tooltips, stack/split behavior, or drag-and-drop.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -419,7 +406,7 @@
     },
     {
       "name": "game__building-loot-systems",
-      "description": "Designs and implements complete loot and reward systems for JavaScript 2D games (Canvas, WebGL, Phaser, custom engines). Covers the full pipeline from kill-to-dopamine — weighted drop tables, rarity tiers, pity/mercy mechanics, procedural item generation, stat rolling, chest/crate breakables, pickup physics (bounce, magnet, float), and reward fanfare choreography. Handles the math, the feel, and the economy. Use when creating drop tables, implementing rarity systems, adding pickup physics, designing pity mechanics, or choreographing reward fanfare sequences.",
+      "description": "Designs and implements loot, drops, rarity, pickup, and reward-fanfare systems for JavaScript games. Use when creating drop tables, rarity tiers, item rolls, pity mechanics, pickups, chests, or reward presentation.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -432,7 +419,7 @@
     },
     {
       "name": "game__designing-systems",
-      "description": "Designs, implements, tunes, and debugs game systems using formal, Machinations-style modeling + simulation + production-ready JavaScript. Handles economies, progression, crafting, combat loops, loot/RNG, difficulty scaling/DDA, unlock trees, AI behavior arbitration, systemic events, and meta loops. Produces a system spec, a model representation (resource-flow/FSM/probabilistic/utility), a deterministic sim + tests, JS implementation, instrumentation, tuning playbook, and exploit/degeneracy analysis. Use when you need director-level systems thinking that ships.",
+      "description": "Designs, models, simulates, and tunes production JavaScript game systems. Use for economies, progression, crafting, combat loops, loot/RNG, difficulty, unlock trees, AI arbitration, or systemic events.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -445,7 +432,7 @@
     },
     {
       "name": "game__directing",
-      "description": "Directs LLM game generation by producing a compact, enforceable Design Brief and validation plan before any code gets written. Prevents incoherence where games run but feel random. Optimized for iOS touch-first games in portrait orientation, but adaptable to other targets. Use when starting a new game from scratch, establishing the creative vision, defining core mechanics upfront, or validating that generated code matches the intended design.",
+      "description": "Turns a new game idea into a compact design brief and validation plan before implementation. Use when starting a game, defining core mechanics, aligning creative direction, or checking generated code against intent.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -458,7 +445,7 @@
     },
     {
       "name": "game__generating-procedural-content",
-      "description": "Designs and implements procedural generation systems for JavaScript games — dungeons, terrain, caves, placement, loot, waves, names, and infinite worlds. Produces seed-deterministic, designer-tunable, playable content from algorithms matched to the game's needs. Prioritizes output quality (playable, diverse, readable) over algorithmic cleverness. Use when creating level generators, implementing terrain algorithms, building wave spawners, designing name generators, or adding seed-based deterministic content pipelines.",
+      "description": "Designs and implements seed-deterministic procedural content systems for JavaScript games. Use when creating level, terrain, dungeon, cave, placement, loot, wave, name, or infinite-world generators.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -471,7 +458,7 @@
     },
     {
       "name": "game__genre--building-auto-battler-tactics",
-      "description": "Designs autobattlers; use for autochess / autobattler games.",
+      "description": "Designs/builds autobattler and squad-tactics systems. Use for shops, benches, boards, formations, synergies, items, draft/economy phases, automated combat, combat causality, or TFT-like games.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -484,7 +471,7 @@
     },
     {
       "name": "game__genre--building-endless-runner",
-      "description": "Builds and improves endless/auto-runner games in JavaScript for mobile (iOS). Covers scroll engines, speed ramping, lane switching, obstacle generation with solvability guarantees, ground/segment recycling, near-miss detection, magnet pickups, shield/revive systems, distance-as-score, and session psychology. Targets Temple Run, Subway Surfers, and Canabalt style games. Use when creating runners from scratch, fixing unfair obstacle spawning, adding pickups/power-ups, tuning difficulty curves, or making a runner feel polished and addictive.",
+      "description": "Builds mobile JavaScript endless and auto-runner games. Use when creating runners, lane or scroll systems, solvable obstacles, pickups, difficulty ramps, distance scoring, or runner polish.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -497,7 +484,7 @@
     },
     {
       "name": "game__genre--building-idle-games",
-      "description": "Builds idle and incremental games in JavaScript for mobile. Covers big number math (beyond Number.MAX_SAFE_INTEGER), prestige layers, offline progress calculation, upgrade cost curves (exponential, polynomial), auto-clickers, milestone unlocks, notation formatting (1.5M, 2.3e15), tick-based simulation with background catch-up, save/load persistence, and mobile-specific optimization (touch, battery, Page Visibility). References Cookie Clicker, Adventure Capitalist, and Antimatter Dimensions. Use when building, debugging, or enhancing any idle or incremental game.",
+      "description": "Builds mobile JavaScript idle and incremental games. Use when implementing big-number economies, prestige, offline progress, upgrade curves, auto-clickers, save/load, notation, or background catch-up.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -523,7 +510,7 @@
     },
     {
       "name": "game__genre--building-puzzle",
-      "description": "Builds grid-based puzzle games in JavaScript for mobile. Covers match-3 (Bejeweled, Candy Crush), merge puzzles (2048, Threes!), sliding/tile puzzles, Sokoban push-puzzles, and Tetris-likes. Core systems include grid state, match/rule detection, cascade resolution, gravity, animation sequencing, touch input, scoring, hints, shuffle, and undo. Targets mobile-first with touch input, portrait layout, and 60fps on low-end devices. Use when creating puzzle games from scratch, implementing grid mechanics, adding cascade animations, tuning match detection, or optimizing touch input for puzzle interactions.",
+      "description": "Builds mobile JavaScript grid-puzzle games and core board logic. Use when creating match-3, merge, sliding, Sokoban, or falling-block puzzles, or tuning grids, cascades, scoring, hints, undo, and touch input.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -536,7 +523,7 @@
     },
     {
       "name": "game__genre--building-roguelike",
-      "description": "Designs and builds roguelike and roguelite games in JavaScript. Covers the full design stack — procedural generation philosophy, entity architecture, item synergy design, meta-progression, run pacing, economy, difficulty curves, and touch-native UI. Focuses on emergent gameplay, meaningful decisions, and the \"one more run\" compulsion loop. Prioritizes systems that produce O(n²) player experiences from O(n) authored content. Use when creating roguelikes from scratch, designing item synergy systems, implementing meta-progression, tuning run pacing, or building procedural content pipelines.",
+      "description": "Designs and builds JavaScript roguelike and roguelite games. Use when creating runs, procedural levels, entity systems, item synergies, meta-progression, economy, difficulty, touch UI, or one-more-run pacing.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -549,7 +536,7 @@
     },
     {
       "name": "game__genre--building-tower-defense",
-      "description": "Designs and builds tower defense games in JavaScript. Focuses on systems design, balance, player decision-making, and information clarity. Covers path systems, grid placement, targeting, projectiles, upgrade trees, wave pacing, economy, and fast-forward/pause. References Bloons TD and Kingdom Rush. Prioritizes meaningful player decisions over feature count, balance over content volume, and information clarity over visual spectacle. Use when creating tower defense games, implementing placement grids, designing wave systems, tuning tower upgrades, or balancing economy and targeting.",
+      "description": "Designs and builds JavaScript tower-defense games with readable placement, waves, targeting, upgrades, and economy. Use when creating tower-defense games, placement grids, pathing, projectile systems, wave pacing, tower upgrades, or balance passes.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -562,7 +549,7 @@
     },
     {
       "name": "game__genre--designing-mmos",
-      "description": "Designs and reviews massive single-world MMO/MMORPG systems with no player-facing servers or realms by tracing how mechanics create locality, player dependency, institutions, logistics, sovereignty, persistent memory, authored history, and durable retention at scale. Use for world-fabric and feature reviews across public-solo and group play, guilds, squads, coalitions, economies, cities, skilling, progression, maps/intel, institution lifecycle, comparative MMO calibration, and AI-native MMO design where LLMs change questing, NPCs, simulation, personalization, and recommendations; not for generic single-player RPG design or realm topology planning.",
+      "description": "Designs and reviews single-world MMO/MMORPG systems around locality, player dependency, institutions, economies, persistence, and retention. Use for MMO world-fabric, guild, economy, progression, map, AI-native NPC, or feature-design reviews; not for generic single-player RPGs.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -609,7 +596,7 @@
     },
     {
       "name": "game__orchestrating-playable-build",
-      "description": "Drives broad game build, finish, polish, release-ready, and first-playable implementation work toward one playable slice that earns a human play verdict. Use when the user wants a playable game or major game upgrade delivered end to end; do not use for pure pre-code design, a narrow bug fix, or isolated art/UI advice.",
+      "description": "Drives mobile-native portrait game build, finish, polish, release-ready, and first-playable work toward one playable slice that earns a human play verdict.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -622,7 +609,7 @@
     },
     {
       "name": "game__tuning-economy-progression",
-      "description": "Designs, implements, tunes, and debugs game economy and progression systems in JavaScript. Covers difficulty curves, XP curves, unlock trees, currency systems, loot rarity tables, difficulty scaling, idle/clicker math, reward schedules, and prestige mechanics. Focuses on systems thinking, player psychology, and tuning guidance. Use when balancing game economies, designing progression systems, tuning difficulty curves, debugging reward schedules, or implementing currency and unlock systems.",
+      "description": "Designs, implements, tunes, and debugs JavaScript game economy and progression systems. Use when balancing difficulty, XP, unlock trees, currencies, loot rarity, reward schedules, prestige, or progression pacing.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -635,7 +622,7 @@
     },
     {
       "name": "game-ai__architecting-ai",
-      "description": "Production game-AI design skill for creating S-tier agent, bot, NPC, director, and autoplay/testing AI specs. Triggers when working on game AI Bot related AI behavior and ai / bot NPCs.",
+      "description": "Game-AI architecture for agents, bots, NPCs, directors, companions, enemy behavior, autoplay, and testing AI. Use for deterministic behavior design, fairness, tactics, perception, tuning, or debug specs.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -673,7 +660,7 @@
     },
     {
       "name": "game-assets__generating-images",
-      "description": "Generates, persists, and wires bitmap game assets for Idavoll and Studio games including backgrounds, sprites, icons, portraits, item art, card art, UI textures, transparent cutouts, and reference images. Use when a creator asks for raster game art or when implementation needs new bitmap assets, prefer Codex-native image generation when available, use the Studio source image command only as a thin fallback, and avoid backend prompt routing or metadata image flows.",
+      "description": "Generates, saves, and wires bitmap assets for Idavoll and Studio games. Use when a creator or implementation needs raster backgrounds, sprites, icons, portraits, items, cards, UI textures, cutouts, or reference art.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -712,7 +699,7 @@
     },
     {
       "name": "game-design__ensuring-design-coherence",
-      "description": "Extract and pressure-test a game's or feature's actual fantasy, core loop, and design pillars. Triggers on designing game loops, improving gameplay, and diagnosising why a game doesn't feel good.",
+      "description": "Pressure-tests a game's real fantasy, core loop, incentives, design pillars, and meaning bugs. Use when designing gameplay, improving feel, or diagnosing why a game feels incoherent.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -725,7 +712,7 @@
     },
     {
       "name": "game-onboarding__designing-game-onboarding",
-      "description": "Designs and audits S-tier platformer onboarding sequences by converting player learning into moment-by-moment playable situations, using Mega Man X's opening highway as the gold-star benchmark. Use when creating or critiquing first levels, first five/ten/fifteen minutes, tutorial-free onboarding, movement/combat introductions, boss-select setup, sequel onboarding, or player-learning beat maps for 2D or 3D platformers; not for general plot summaries, art direction, or unrelated level design.",
+      "description": "Designs and audits platformer onboarding by turning player learning into playable first-level situations. Use when creating or critiquing first levels, tutorial-free introductions, movement/combat teaching, boss-select setup, or player-learning beat maps.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -744,7 +731,7 @@
     },
     {
       "name": "game-proof__auditing-first-playable-comprehension",
-      "description": "Audits whether a zero-context player can act, see feedback, understand consequence, and want another try in a first playable. Use after a runnable game exists and before claiming initialization, vertical-slice, publish-readiness, or final handoff.",
+      "description": "Audits first-playable comprehension and mobile-native portrait quality. Use after a runnable game exists and before initialization, vertical-slice, publish-readiness, or final handoff claims.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -840,7 +827,7 @@
     },
     {
       "name": "plan__prepare-summary",
-      "description": "Used to summarize a workspec plan before executing",
+      "description": "Summarizes an approved Work Spec into execution-ready context. Use immediately before implementation when a plan needs a compact handoff, scope recap, or milestone focus.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -866,7 +853,7 @@
     },
     {
       "name": "product__designing-viral-social-loops",
-      "description": "Designs and audits self-reinforcing social, creator-supply, and playable-social loops by tracing incentives, payloads, graph density, conversion surfaces, creator upside, and leakage. Triggers on designing or iterating on product or distributino loops,playable UGC or co-play loops, invite/share or challenge mechanics, social-proof loops, or diagnosing why a growth loop feels generic, cringe, loose, or non-defensible.",
+      "description": "Designs/audits self-reinforcing social, creator-supply, and playable loops. Use for invite/share/challenge/co-play/UGC/social-proof mechanics, graph density, creator upside, leakage, or non-defensible growth.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -911,7 +898,7 @@
     },
     {
       "name": "prompt__perform-root-casuse-analysis",
-      "description": "Performs post-fix root cause analysis that traces a resolved bug to deeper mechanism, process, testing, or agent-policy failures and turns the incident into prevention layers. Triggers on RCA, postmortems, incident reviews, lessons learned, “why did this break,” or “how do we prevent this again” after a fix already exists, including requests for guardrails, test strategy, lint rules, or agent-policy updates.",
+      "description": "Performs post-fix root cause analysis and turns resolved failures into prevention layers. Use after a bug fix, incident, regression, postmortem, or \"why did this break\" request.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1005,7 +992,7 @@
     },
     {
       "name": "testing__enforcing-mandate",
-      "description": "Outcome-driven testing doctrine for production-safe shipping. Prioritizes public interfaces, real user journeys, Playwright/browser evals when appropriate, integration/value-path proofs, deterministic suites, repo-truth validation, and zero tolerance for unguarded critical paths. Triggers anytime we write code, anytime we we write tests, planning changes, or shipping code safely.",
+      "description": "Outcome-driven testing doctrine for safe shipping. Use when writing code/tests, planning test strategy, proving user journeys, adding Playwright/browser evals, or guarding critical paths.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1050,7 +1037,7 @@
     },
     {
       "name": "whitepaper__analyze-mmo-whitepaper",
-      "description": "This analyzes an MMO whitepaper and produces insights. Only called manually.",
+      "description": "Analyzes MMO whitepapers for design, systems, economy, world, and retention insights. Use only when manually reviewing an MMO whitepaper or extracting product/design implications from one.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1063,7 +1050,7 @@
     },
     {
       "name": "writing__response-quality-style-guide",
-      "description": "Enforces grounded, concrete, reader-disciplined prose across responses. Suppresses AI slop, fake profundity, padded phrasing, weak structure, decorative abstraction, and dead compliance. Triggers / activates broadly for explanatory, analytical, strategic, critical, or written responses; escalates into concept-coining, cross-domain framing, and hidden-game analysis when the task benefits from original conceptual work.",
+      "description": "Sharpens high-stakes written artifacts and critique. Use for final prose polish, strategy memos, analysis, reviews, docs, or prompts where clarity, force, structure, or anti-slop editing matters.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
