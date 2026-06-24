@@ -1,6 +1,6 @@
 ---
 name: plan__prepare-goal
-description: Prepares goal context before extended autonomous work. Use only when manually starting or resuming a named goal that needs planning context, budget framing, or handoff setup.
+description: Prepares to implement a work spec. Called manually.
 ---
 
 Implement all of <WORK SPEC FILE>
