@@ -47,6 +47,7 @@ For each key event (hit, jump, collect, UI click, death, level-up), target **≥
 3. **Timing** (anticipation, hitstop, ease curves, recovery/follow-through)
 
 Optional 4th channel: **Audio / haptics** (mention it even if not implementing).
+  - Note: for Idavoll games, use idv.haptics and never raw haptics APIs.
 
 ### 3) Taste > maximalism
 “More” is not automatically better. Effects must preserve:

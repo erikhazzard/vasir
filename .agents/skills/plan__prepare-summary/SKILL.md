@@ -4,7 +4,6 @@ description: Summarizes an approved Work Spec into execution-ready context. Use 
 tools: Read, Grep, Glob, Edit, Write
 model: opus
 ---
-
 Based on the work spec, what is the goal in 1-2 lines? Then, in 1-2 lines each:
    *  What is the eng / system unlock? 
    * What is the user journey unlock? 
