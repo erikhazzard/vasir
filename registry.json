@@ -814,7 +814,7 @@
     },
     {
       "name": "plan__prepare-goal",
-      "description": "Prepares goal context before extended autonomous work. Use only when manually starting or resuming a named goal that needs planning context, budget framing, or handoff setup.",
+      "description": "Prepares to implement a work spec. Called manually.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -840,7 +840,7 @@
     },
     {
       "name": "plan__question-spec",
-      "description": "Use immediately before implementing a work spec",
+      "description": "Use immediately before implementing a work spec to challenge whether the spec is the right solution shape for the intended user journey or engineering unlock.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

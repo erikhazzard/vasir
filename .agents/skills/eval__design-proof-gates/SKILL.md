@@ -85,6 +85,8 @@ If any element is missing, the gate is incomplete.
 
 The gate should be as close as possible to the final value extraction path. Prefer one strong value-path integration/browser/simulation/contract/sandbox/replay/benchmark gate over many implementation-trivia unit gates.
 
+A good gate is also a usable development feedback loop. It lets the executor rerun the real surface cheaply after each repair and see the changed behavior directly. If the only available proof is a proxy check, the gate must name the missing real loop as a missing harness.
+
 For game work, the final value path is mobile-native portrait. Every game eval plan must include a fresh **390 x 844** portrait screenshot gate. Non-game eval plans mark mobile portrait proof as not applicable. Desktop, web, or landscape artifacts may supplement but cannot replace the mobile portrait gate.
 
 ---
@@ -96,25 +98,26 @@ For game work, the final value path is mobile-native portrait. Every game eval p
 3. **No fake proof.** Never claim a gate passed unless an executor ran it against current code and captured a fresh artifact.
 4. **No fake commands.** Do not invent scripts, routes, fixtures, services, env vars, accounts, or artifact paths. Discover them read-only. If no runnable command exists, write `missing harness: <name>`.
 5. **Code inspection is not the primary gate.** Lint, typecheck, static review, broad manual QA, or “looks correct” cannot be the primary proof for a Material Code Change.
-6. **Use full milestone IDs.** Durable milestone gate IDs must include the full prefixed milestone ID from the Work Spec, such as `REPLAY-PROJECTION__M1__G1`. Never write naked `M1-G1`, `Phase 1`, or `Step 2`.
-7. **Broad features need global plus milestone gates.** Broad Feature Work requires one global final proof and at least one proof gate for every proposed or active milestone.
-8. **Material changes need a change gate.** Material Code Changes without milestone gates require at least `CHANGE-G1`.
-9. **Subjective quality requires human acceptance.** Gameplay feel, visual taste, animation readability, motion comfort, fun, trust, or perceived responsiveness require artifact-backed human review. Automation may support but cannot finalize acceptance.
-10. **Hostile paths are part of proof.** Non-trivial Material Code Changes require at least one hostile/negative gate unless the eval plan explicitly explains why it is not applicable.
-11. **Nearby behavior must be accounted for.** Non-trivial Material Code Changes must name one nearby behavior expected to remain unchanged, with status: `tested`, `inspected`, `inferred`, or `left unverified`.
-12. **Future gates must not poison default CI.** Future-state gates for later milestones may live as eval-plan contracts, non-default harnesses, skipped-with-explicit-reason tests, or milestone-gated CI checks until they are expected to pass.
-13. **Every gate needs CI policy.** Each gate must use exactly one CI policy from Section 10.
-14. **Every gate needs a stop condition.** Failure/blockage must route to repair once, missing-harness implementation, credential/environment request, human review, Plan Delta, or circuit breaker.
-15. **Discovery is read-only.** Do not mutate repo state except the `eval-plan.md` artifact explicitly in scope.
-16. **Small Change Fast Path stays small.** Do not create durable eval plans for typo, formatting, stale path, comment-only, or dead-import work unless the user explicitly asks for eval documentation.
-17. **Compound value must be proven as a compound gate.** If the value claim depends on several conditions being true at the same time, such as load plus realtime sync plus visual rendering, design one orchestrated gate that runs the workload and observers concurrently. Do not split it into disconnected checks that can pass independently while the user journey fails.
-18. **Derive gate classes from the claim.** Do not rely on canned domain examples. Decompose the actual unlock into required truths, generate the gate classes that could falsify each truth, then include only the smallest sufficient set.
-19. **Every included gate must kill a plausible lie.** For each gate, name what false confidence it prevents. If a gate cannot catch a plausible way the value could be broken, remove it.
-20. **Every excluded obvious gate needs a reason.** If a reasonable reviewer would expect security, persistence, performance, visual, network, replay, or failure proof, either include the gate or explicitly exclude it with the reason.
-21. **Measurable claims require measurement-first gates.** If the claim uses or implies speed, latency, responsiveness, smoothness, throughput, fanout, queueing, convergence, scale, capacity, or "works under N", design a programmatic measurement gate before subjective/manual acceptance. The gate must name the measured actor action, observer, time source or sequence/correlation identifier, sample window, budget or budget-assumption, workload dimensions, artifact, and failure threshold.
-22. **Separate product observers from diagnostic probes.** Browser/manual/human observation may prove product integration, render correctness, or subjective feel, but it is not enough to prove a backend/protocol/performance bottleneck when a lower-overhead probe can measure the same value path. If no direct probe is possible, the eval plan must say why and mark the proof lower confidence or blocked.
-23. **Counts are not capacity proof.** A scale gate that only proves N connections/items/actors reached a count is incomplete unless the claim is only "can open N". Capacity gates must also measure the value behavior under load, such as latency, update gaps, stale age, error rate, queue depth, resource use, or authoritative state correctness.
-24. **Load dimensions must be explicit.** For any scale/performance/realtime gate, separate connected-idle count, active/moving/work-producing count, operation/event cadence, payload size, locality/density, churn/fault model, ramp/steady-state duration, target environment, and machine/topology constraints when relevant. A single ambiguous "N users" number is not a falsifiable scale claim.
+6. **No proxy green.** A unit test, helper test, mocked component test, lint, build, or API-only check may be a supporting gate, but it is not the primary gate for user-visible or runtime-visible behavior. The primary gate must exercise the real loop or declare `missing harness`.
+7. **Use full milestone IDs.** Durable milestone gate IDs must include the full prefixed milestone ID from the Work Spec, such as `REPLAY-PROJECTION__M1__G1`. Never write naked `M1-G1`, `Phase 1`, or `Step 2`.
+8. **Broad features need global plus milestone gates.** Broad Feature Work requires one global final proof and at least one proof gate for every proposed or active milestone.
+9. **Material changes need a change gate.** Material Code Changes without milestone gates require at least `CHANGE-G1`.
+10. **Subjective quality requires human acceptance.** Gameplay feel, visual taste, animation readability, motion comfort, fun, trust, or perceived responsiveness require artifact-backed human review. Automation may support but cannot finalize acceptance.
+11. **Hostile paths are part of proof.** Non-trivial Material Code Changes require at least one hostile/negative gate unless the eval plan explicitly explains why it is not applicable.
+12. **Nearby behavior must be accounted for.** Non-trivial Material Code Changes must name one nearby behavior expected to remain unchanged, with status: `tested`, `inspected`, `inferred`, or `left unverified`.
+13. **Future gates must not poison default CI.** Future-state gates for later milestones may live as eval-plan contracts, non-default harnesses, skipped-with-explicit-reason tests, or milestone-gated CI checks until they are expected to pass.
+14. **Every gate needs CI policy.** Each gate must use exactly one CI policy from Section 10.
+15. **Every gate needs a stop condition.** Failure/blockage must route to repair once, missing-harness implementation, credential/environment request, human review, Plan Delta, or circuit breaker.
+16. **Discovery is read-only.** Do not mutate repo state except the `eval-plan.md` artifact explicitly in scope.
+17. **Small Change Fast Path stays small.** Do not create durable eval plans for typo, formatting, stale path, comment-only, or dead-import work unless the user explicitly asks for eval documentation.
+18. **Compound value must be proven as a compound gate.** If the value claim depends on several conditions being true at the same time, such as load plus realtime sync plus visual rendering, design one orchestrated gate that runs the workload and observers concurrently. Do not split it into disconnected checks that can pass independently while the user journey fails.
+19. **Derive gate classes from the claim.** Do not rely on canned domain examples. Decompose the actual unlock into required truths, generate the gate classes that could falsify each truth, then include only the smallest sufficient set.
+20. **Every included gate must kill a plausible lie.** For each gate, name what false confidence it prevents. If a gate cannot catch a plausible way the value could be broken, remove it.
+21. **Every excluded obvious gate needs a reason.** If a reasonable reviewer would expect security, persistence, performance, visual, network, replay, or failure proof, either include the gate or explicitly exclude it with the reason.
+22. **Measurable claims require measurement-first gates.** If the claim uses or implies speed, latency, responsiveness, smoothness, throughput, fanout, queueing, convergence, scale, capacity, or "works under N", design a programmatic measurement gate before subjective/manual acceptance. The gate must name the measured actor action, observer, time source or sequence/correlation identifier, sample window, budget or budget-assumption, workload dimensions, artifact, and failure threshold.
+23. **Separate product observers from diagnostic probes.** Browser/manual/human observation may prove product integration, render correctness, or subjective feel, but it is not enough to prove a backend/protocol/performance bottleneck when a lower-overhead probe can measure the same value path. If no direct probe is possible, the eval plan must say why and mark the proof lower confidence or blocked.
+24. **Counts are not capacity proof.** A scale gate that only proves N connections/items/actors reached a count is incomplete unless the claim is only "can open N". Capacity gates must also measure the value behavior under load, such as latency, update gaps, stale age, error rate, queue depth, resource use, or authoritative state correctness.
+25. **Load dimensions must be explicit.** For any scale/performance/realtime gate, separate connected-idle count, active/moving/work-producing count, operation/event cadence, payload size, locality/density, churn/fault model, ramp/steady-state duration, target environment, and machine/topology constraints when relevant. A single ambiguous "N users" number is not a falsifiable scale claim.
 
 ---
 
@@ -483,6 +486,7 @@ action: "<exact user/system/browser/worker/game/tool/network/operator action>"
 observation: "<terminal state, artifact, metric, persisted row, packet, screenshot, video, trace, log, or output>"
 pass_fail: "<exact verdict condition>"
 eval_tool: "<existing command | missing harness: name | manual review | blocked: reason>"
+real_feedback_loop: "<rerunnable command, URL + action, harness, replay, simulation, or missing harness that lets an executor observe the real consequence after each repair>"
 target_env: "<runtime/environment where value matters>"
 data_payload: "<fixture/seed/request/replay/world state/account state/schema payload>"
 fresh_artifact: "<path pattern or artifact type>"
@@ -828,6 +832,7 @@ Output this XML block exactly:
   <Proof_of_Value_State>[one sentence]</Proof_of_Value_State>
   <Domains>[backend-node | ui-playwright | games-realtime | agent-tool-workflows | persistence-networking | performance | mixed]</Domains>
   <Gate_Classes_Considered>[included and notable excluded classes]</Gate_Classes_Considered>
+  <Real_Feedback_Loop>[primary gate ID + existing loop or missing harness]</Real_Feedback_Loop>
   <Global_Final_Proof>[gate ID and one sentence, or "Not required — reason"]</Global_Final_Proof>
   <Gate_IDs>[comma-separated gate IDs]</Gate_IDs>
   <Subjective_Gates>[gate IDs and short summary, or None]</Subjective_Gates>

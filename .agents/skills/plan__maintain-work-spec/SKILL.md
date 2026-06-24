@@ -388,7 +388,7 @@ Milestones are grounded in what user, developer, or engineering journey they unl
 Every task must be framed as: "This unlocks [user journey]. Within that journey, this feature enables [specific step]. The next thing the user will obviously try is [next step]." If the next step doesn't exist, it's a gap.
 When describing completed work, describe what it unlocks, not what it implements. Not "implemented replay event decoder." Instead: "Unlocks: player watches their run back and sees exactly where they tapped."
 
-For a milestone and the subwork within a milestone to be done, the **value path** must be proven by at least one real user/developer/engineering journey proof. Prefer deterministic full value path integration tests; use artifact-backed human review for taste, feel, UX, visual quality, or other subjective product claims.
+For a milestone and the subwork within a milestone to be done, the **value path** must be proven by at least one real user/developer/engineering journey proof. The proof should use the shortest real feedback loop for that journey: seed/select the real state, drive the real action, observe the real consequence, inspect failure channels, and capture the artifact. Unit tests and static checks may support the rung, but they do not complete user-visible or runtime-visible work by themselves.
 
 ---
 
@@ -410,7 +410,8 @@ For a milestone and the subwork within a milestone to be done, the **value path*
 - **Risk & failure modes:** privacy / perf / data loss / hangs
 - **Performance budget:** reference `C-###`
 - **Context propagation checks:** reference `C-###`
-- **Proof plan:** eval-plan gate IDs or missing-harness notes, phrased as user/dev/engineering journey evidence
+- **Proof plan:** eval-plan gate IDs or missing-harness notes, phrased as user/dev/engineering journey evidence, and naming the shortest real feedback loop for this rung
+- **Feedback-loop guardrail:** The shortest real feedback loop must be selected from the user/dev/engineering journey. A loop that proves only a mechanism, helper, or implementation detail is proxy proof and cannot complete the rung.
 - **Done when:** exact observable rung completion condition, including evidence artifact pointer(s), spec/eval status sync, and recorded rung commit
 
 #### <FEATURE-SLUG>__Mn... — <title>

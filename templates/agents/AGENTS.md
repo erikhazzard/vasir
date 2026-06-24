@@ -30,7 +30,7 @@
     S-tier means:
     - The user journey or engineering unlock is preserved.
     - The Proof-of-Value State is verified in the real target environment.
-    - The value path is guarded by deterministic tests, benchmarks, browser checks, simulation harnesses, screenshots, video artifacts, or equivalent real evals.
+    - The value path is proven through the shortest real feedback loop that exercises the user/dev/engineering journey in the actual medium. Deterministic tests, benchmarks, browser checks, simulation harnesses, screenshots, video artifacts, lint, typecheck, mocked components, and helper checks are supporting sensors, not green by themselves.
     - Subjective product quality gates are surfaced to the human with concrete artifacts instead of being falsely “automated.”
     - The implementation minimizes reader state and avoids shallow abstraction.
     - Public surfaces are deep, coarse-grained, and fail-closed.
@@ -930,40 +930,41 @@
 
 ---
 
-# 9. Hard Acceptance Gates: Code → Eval Means Real Eval
+# 9. Hard Acceptance Gates: Code -> Real Loop -> Eval Means Real Eval
 
 <acceptance_gates>
   A Material Code Change means any change that is not eligible for Small Change Fast Path and adds or changes implementation logic, behavior-encoding tests, API contracts, persistence, auth, networking, concurrency, performance-sensitive paths, or player/user-visible UX.
 
   For every Material Code Change:
   - gate = exact user-requested bar, or the Proof-of-Value State declared in the approved plan.
-  - Code inspection, linting alone, typechecking alone, broad manual QA, or “looks correct” cannot be the primary eval for a Material Code Change.
+  - real_loop = the shortest command, route, harness, replay, browser journey, simulation, request path, or tool workflow that exercises the actual user/dev/engineering journey in the medium where the behavior matters.
   - eval_tool = the smallest real command, harness, benchmark, browser check, screenshot/video capture, simulation, trace, or test that proves/falsifies the gate.
   - target_env = the real runtime the user cares about; if no remote/runtime target is required, use the closest local repo environment that exercises the value path.
   - fresh_artifact = raw output, benchmark JSON, screenshot, video, trace, log excerpt, generated file, persisted record, or audit artifact captured from current code.
+  - Proxy checks may support the result, but they cannot make user-visible or runtime-visible work green unless the real_loop also ran.
 
   ## Required Algorithm:
-  1. Define gate, eval_tool, target_env, and fresh_artifact explicitly.
-  2. Establish the eval before implementation:
-     - If a direct eval exists, run it when needed to prove the current gap or capture the baseline.
-     - If no direct eval exists, invoke `$eval__design-proof-gates`.
+  1. Define gate, real_loop, eval_tool, target_env, and fresh_artifact explicitly.
+  2. Establish the real loop / eval before implementation:
+     - If a direct real loop exists, run it when needed to prove the current gap or capture the baseline.
+     - If no direct real loop exists, invoke `$eval__design-proof-gates`.
      - If an approved objective gate needs a runnable harness, invoke `$eval__implement-proof-gate`.
-     - If no real eval can measure the gate and one cannot be created inside the active lane, halt before implementation with `<S_Tier_Progress>` no higher than 2/10.
+     - If no real loop can measure the gate and one cannot be created inside the active lane, halt before implementation with `<S_Tier_Progress>` no higher than 2/10.
   3. Run or create the failing value-path eval first whenever behavior is changing.
   4. Edit the code.
-  5. Run eval_tool in target_env.
+  5. Rerun real_loop / eval_tool in target_env.
   6. Capture a fresh artifact from the current code.
   7. Compare the artifact to the gate.
   8. Write the remaining delta list in concrete terms.
-  9. If the delta list is non-empty, perform one repair loop and rerun the relevant eval.
+  9. If the delta list is non-empty, perform one repair loop and rerun the same real loop / eval_tool.
   10. If the same or similar failure repeats, trigger the circuit breaker.
   11. If the delta list is empty, proceed to close-out.
 
-  ### Eval Tool Mapping:
-  - Visual fidelity: Playwright, browser QA, screenshot capture, video capture, real-render tooling, or equivalent.
-  - Gameplay feel: browser playthrough, video artifact, input replay, simulation trace, plus human subjective verification.
+  ### Real Loop Mapping:
+  - Visual fidelity: real rendered route/screen, Playwright browser journey, screenshot/video/trace, or equivalent real-render tooling.
+  - Gameplay feel: playable scenario, browser playthrough, input replay, simulation trace, video artifact, plus human subjective verification.
   - FPS/latency/performance: benchmark, profiler, trace, frame metric, memory metric, or target-runtime measurement.
-  - Correctness/regression: exact failing test, repro path, simulation, contract test, replay, or harness.
+  - Correctness/regression: exact failing value-path repro, simulation, contract test, replay, or harness through the public/runtime entrypoint.
   - Agent/tool workflow: deterministic tool harness, schema validator, golden transcript replay, sandbox tool run, or machine-readable trace proving the agent selected the right action and respected backend/tool constraints.
   - Persistence/networking: real or sandboxed persistence/network path, contract test, replay, trace, or integration harness.
   - Security/auth: fail-closed boundary test, permission matrix, denial proof, audit log proof, or sandboxed integration check.
@@ -978,14 +979,15 @@
   Terminal shape:
 
   <Eval_Trace>
-  [PASS|FAIL|BLOCKED] — [One sentence naming the value path and result].
-  Key numbers: [2-5 load-bearing metrics/facts: actual vs budget, sample count, error count, artifact path, assertion result, screenshot/video path, persisted row count, response status, etc.].
-  Interpretation: [1 sentence explaining whether this is comfortably green, borderline, regressed, risky, production-safe, or waiting on subjective acceptance].
-  Audit: [number] eval command(s) ran; full raw output captured at `[path]`.
+  [PASS|FAIL|BLOCKED] — [One sentence naming the user/dev/engineering journey and result].
+  Real loop: [command/route/harness/replay used]; artifact: [fresh artifact path].
+  Key facts: [2-5 load-bearing metrics/facts: error count, screenshot/video path, persisted row count, response status, trace result, etc.].
+  Interpretation: [1 sentence explaining whether this is green, borderline, regressed, risky, or waiting on subjective acceptance].
+  Audit: [raw output / eval-trace artifact path].
   </Eval_Trace>
 
   Rules:
-  - Keep terminal `<Eval_Trace>` to 2-4 human-readable lines by default.
+  - Keep terminal `<Eval_Trace>` to 2-5 human-readable lines by default.
   - Include only load-bearing facts, not every passing test line.
   - The LLM must interpret the numbers for the human; do not merely restate that tests passed.
   - Do not produce one interpretation per command. Produce one interpretation per value gate.
@@ -1006,7 +1008,7 @@
     - remaining delta,
     - timestamp,
     - git identifier when available.
-  - The terminal `<Eval_Trace>` MUST name the audit artifact path.
+  - The terminal `<Eval_Trace>` MUST name both the real-loop value artifact and the audit artifact path.
   - The audit artifact satisfies the command-level raw-output requirement for successful, non-borderline evals.
 
   Expanded Eval Trace:
@@ -1046,7 +1048,7 @@
 
   - For successful, non-borderline evals:
     - terminal `<Eval_Trace>` MUST be compact and human-first,
-    - terminal `<Eval_Trace>` MUST name the audit artifact path,
+    - terminal `<Eval_Trace>` MUST name the real loop, fresh value artifact, and audit artifact,
     - terminal response MUST NOT dump full raw command output by default.
 
   - For failed, blocked, flaky, warning-producing, or borderline evals:
@@ -1100,7 +1102,7 @@
   - Proposed: described but not approved.
   - Approved: accepted by the human and allowed for implementation.
   - In Progress: implementation/eval loop underway.
-  - Objectively Green: automated gate passed with fresh artifact.
+  - Objectively Green: the real loop ran in the target environment, fresh artifacts were inspected, proxy checks did not contradict it, and the remaining delta list is empty.
   - Waiting Human: subjective gate requires human acceptance.
   - Blocked: named dependency prevents progress.
   - Complete: objective gates passed, subjective gates accepted if present, docs/eval status updated.

@@ -168,6 +168,7 @@ Before editing, produce this block internally or in the skill result:
   <Harness_Path>[exact path to create/edit, or approved narrow envelope]</Harness_Path>
   <Command>[literal command that will run this harness]</Command>
   <Target_Env>[runtime that matters]</Target_Env>
+  <Real_Feedback_Loop>[approved rerunnable loop this harness creates]</Real_Feedback_Loop>
   <Fresh_Artifact>[artifact path/type that will be created]</Fresh_Artifact>
   <Expected_First_Result>[READY_RED | READY_GREEN | UNKNOWN]</Expected_First_Result>
   <Approved_File_Envelope>[exact approved files/envelopes]</Approved_File_Envelope>
@@ -243,6 +244,8 @@ Smallest means:
 Smallest does **not** mean shallow.
 
 A compound value claim must get a compound harness.
+
+The harness must be reusable as the implementation feedback loop after product repairs. A one-off check that cannot be rerun to observe the real consequence is not sufficient unless the approved gate explicitly says the proof is one-time only.
 
 ---
 
@@ -572,6 +575,7 @@ Return this block:
   <Harness_Path>...</Harness_Path>
   <Command>...</Command>
   <Target_Env>...</Target_Env>
+  <Real_Feedback_Loop>...</Real_Feedback_Loop>
   <Fresh_Artifact>...</Fresh_Artifact>
   <Expected_First_Result>...</Expected_First_Result>
 </Proof_Gate_Target>
