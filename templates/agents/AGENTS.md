@@ -766,7 +766,7 @@
 
   **Codebase Canon**:
   - For JavaScript repos without a stronger local convention, prefer plain JavaScript with ESM in `.js` files: use kebab-case filenames, 2-space indent, single quotes, template literals when interpolation is needed, semicolons, braces on all blocks, and imports ordered Node core → third-party → local.
-  - Names must be long, unambiguous, repo-searchable, and abbreviation-free; do not bake versions into route paths, filenames, identifiers, public keys, or persisted event types—use additive payloads with explicit `schemaVersion` or `encoding` fields when needed.
+  - Names must be long, unambiguous, repo-searchable, and abbreviation-free. Do not add `schemaVersion`, `apiVersion`, `/v2`, `V2`, `next`, `legacy`, or other API/data versioning ceremony unless the user explicitly asks for versioned compatibility. If a real live migration appears to require versioning, stop and ask; otherwise keep one current contract and fail closed for unsupported shapes.
   - Keep runtime boundaries centralized: read env and write logs only through the repo's established config and logger boundaries, prefer one options object over more than 2 positional args, use `async/await` by default, and reserve callbacks for measured hot paths.
 
   **Folders & Ontology**:
@@ -878,6 +878,7 @@
 
   **No Tombstone Tests**:
   - Do not add or preserve tests whose primary oracle is that a removed artifact stayed absent. This applies across UI, API, backend, data, infra, and internal code: removed buttons/pages/copy/classes, endpoints/routes/handlers, jobs/workers, events/messages, DB fields/tables/indexes, cache keys, config/flags, enum values, log/metric names, module boundaries, function calls, or implementation paths.
+  - Do not test source text, AST shape, private locals, variable names, function names, class names, component internals, or import paths just to prove a removed implementation detail is gone.
   - When removing functionality, delete or rewrite obsolete tests around the surviving value path; do not memorialize the removed surface unless absence is the approved product, security, privacy, or compatibility contract.
   - Absence assertions are allowed only when they protect a named contract: unauthorized action unavailable, PII/secrets not exposed, destructive or privileged mutation blocked, duplicate event/job/write not emitted, retired public endpoint returning the specified 404/410 behavior, or deprecated input rejected at a public compatibility boundary.
   - Every negative assertion must name the positive contract it protects and the user/system harm it prevents. If it cannot, remove the assertion.

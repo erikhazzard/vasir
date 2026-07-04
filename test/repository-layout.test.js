@@ -368,7 +368,9 @@ test("testing doctrine forbids tombstone absence tests", () => {
   assert.match(agentsTemplateText, /No Tombstone Tests/);
   assert.match(agentsTemplateText, /Every negative assertion must name the positive contract it protects/);
   assert.match(agentsTemplateText, /endpoints\/routes\/handlers, jobs\/workers, events\/messages, DB fields\/tables\/indexes/);
+  assert.match(agentsTemplateText, /private locals, variable names, function names/);
   assert.match(testingSkillText, /No tombstone tests/);
+  assert.match(testingSkillText, /private locals, variable names, function names/);
   assert.match(testingSkillText, /Writing tombstone tests that only prove removed UI\/API\/backend\/data\/implementation artifacts stayed absent/);
 });
 

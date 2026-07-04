@@ -190,6 +190,8 @@ Otherwise prefer observable outputs and public reads.
 
 Do not add or preserve tests whose primary oracle is that a removed artifact stayed absent. This applies across UI, API, backend, data, infra, and internal code: removed buttons/pages/copy/classes, endpoints/routes/handlers, jobs/workers, events/messages, DB fields/tables/indexes, cache keys, config/flags, enum values, log/metric names, module boundaries, function calls, or implementation paths.
 
+Do not test source text, AST shape, private locals, variable names, function names, class names, component internals, or import paths just to prove a removed implementation detail is gone.
+
 When removing functionality, delete obsolete tests or rewrite them around the surviving/replacement value path. Do not memorialize the removed surface unless absence is itself the approved product, security, privacy, or compatibility contract.
 
 Allowed absence assertions must protect a named positive contract:
