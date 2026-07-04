@@ -1,5 +1,5 @@
 ---
-name: prompt__perform-root-casuse-analysis
+name: prompt__perform-root-cause-analysis
 description: Performs post-fix root cause analysis and turns resolved failures into prevention layers. Use after a bug fix, incident, regression, postmortem, or "why did this break" request.
 ---
 
