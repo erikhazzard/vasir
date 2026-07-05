@@ -125,7 +125,7 @@ test("work spec skill owns the current schema and projection rules", () => {
 
   assert.match(workSpecSkillText, /Work Spec = Product Requirement Doc \+ Engineering Specification \+ Design Document \+ UX Document/);
   assert.match(workSpecSkillText, /serialization format for judgment state/);
-  assert.match(workSpecSkillText, /This file is the only schema truth/);
+  assert.match(workSpecSkillText, /Schema truth:\*\* the `plan__maintain-work-spec` skill/);
   assert.match(workSpecSkillText, /Stale specs are synced, not versioned/);
   assert.match(workSpecSkillText, /Spec authorship is judgment work/);
   assert.match(workSpecSkillText, /Milestone rungs are self-contained build packets/);
