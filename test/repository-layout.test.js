@@ -244,23 +244,26 @@ test("agent template snippets own profile-specific insertion blocks", () => {
   }
 });
 
-test("root AGENTS template treats touchpoints as lane evidence, not approval boundaries", () => {
+test("root AGENTS template uses the operating contract shape and required renderer seams", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
   const exampleAgentsText = fs.readFileSync(path.join(REPO_ROOT, "docs", "example-agents.md"), "utf8");
 
   assert.doesNotMatch(agentsTemplateText, /vasir:profile/);
   assert.doesNotMatch(agentsTemplateText, /Last Updated/);
   assert.doesNotMatch(agentsTemplateText, /update alongside major architectural PRs/);
-  assert.match(agentsTemplateText, /<Lane_Contract>/);
-  assert.match(agentsTemplateText, /Work source of truth:/);
-  assert.match(agentsTemplateText, /Repo evidence read:/);
-  assert.match(agentsTemplateText, /Likely starting points:/);
-  assert.match(agentsTemplateText, /Active lane:/);
-  assert.match(agentsTemplateText, /Neighboring lanes to avoid:/);
-  assert.match(agentsTemplateText, /Senior-engineer latitude:/);
-  assert.match(agentsTemplateText, /Boundary report triggers:/);
-  assert.match(agentsTemplateText, /Treat discovered paths as orientation evidence, not edit permission\./);
-  assert.match(agentsTemplateText, /File lists are orientation evidence, not permission\./);
+  assert.match(agentsTemplateText, /# AGENTS\.md — \[Project Name\] Root Operating Contract/);
+  assert.match(agentsTemplateText, /<!-- vasir:purpose:start -->/);
+  assert.match(agentsTemplateText, /<!-- vasir:routing:start -->/);
+  assert.match(agentsTemplateText, /<!-- vasir:nonobvious:start -->/);
+  assert.match(agentsTemplateText, /<!-- vasir:engineering-doctrine-inserts:start -->/);
+  assert.match(agentsTemplateText, /# 0\. The Unlock Mandate/);
+  assert.match(agentsTemplateText, /# 1\. Constraint Precedence/);
+  assert.match(agentsTemplateText, /# 3\. The Working Relationship/);
+  assert.match(agentsTemplateText, /# 5\. Proof Doctrine/);
+  assert.match(agentsTemplateText, /# 8\. Custody/);
+  assert.match(agentsTemplateText, /Senior-engineer latitude/);
+  assert.match(agentsTemplateText, /The lane is a journey boundary, not a file list/);
+  assert.match(agentsTemplateText, /Boundary discipline — attribute, don't fix/);
   assert.doesNotMatch(agentsTemplateText, /Existing files allowed to edit:/);
   assert.doesNotMatch(agentsTemplateText, /Plan Amendment Protocol/);
   assert.doesNotMatch(agentsTemplateText, /Escalation triggers:/);
@@ -283,11 +286,11 @@ test("AGENTS taxonomy separates generated roots from folder steering maps", () =
   );
 
   for (const documentText of [agentsTemplateText, templateReadmeText, rootReadmeText, cliReferenceText]) {
-    assert.match(documentText, /Nested root `AGENTS\.md`|nested root `AGENTS\.md`|Nested root AGENTS|nested root AGENTS/);
+    assert.match(documentText, /Nested root \/ folder `AGENTS\.md`|Nested root `AGENTS\.md`|nested root `AGENTS\.md`|Nested root AGENTS|nested root AGENTS/);
     assert.match(documentText, /Folder `AGENTS\.md`|Folder AGENTS|folder AGENTS/);
   }
 
-  assert.match(agentsTemplateText, /Folder AGENTS must steer work/);
+  assert.match(agentsTemplateText, /Folder `AGENTS\.md` files are hand-authored steering maps/);
   assert.match(rootReadmeText, /Do not use `vasir agents sync --scope` for ordinary folder steering maps/);
   assert.match(cliReferenceText, /Folder `AGENTS\.md` files are different/);
   assert.match(folderAgentsSkillText, /Folder AGENTS are local steering maps/);
@@ -304,12 +307,10 @@ test("root AGENTS and handoff gate block proof exhaust and script bloat", () => 
     "utf8"
   );
 
-  assert.match(agentsTemplateText, /Durable Artifact Admission:/);
-  assert.match(agentsTemplateText, /Every new durable file must graduate into production code, canonical test\/eval, reusable tool, folder steering map, or active work doc/);
-  assert.match(agentsTemplateText, /Anything else is temporary proof and must stay in `tmp\/\*\*` or be deleted before completion/);
-  assert.match(agentsTemplateText, /Package Script Admission:/);
-  assert.match(agentsTemplateText, /`package\.json` scripts are a stable developer and CI interface, not a proof log/);
-  assert.match(agentsTemplateText, /task, bug, milestone, date, or proof-specific checks/);
+  assert.match(agentsTemplateText, /Raw proof: `tmp\/<datetime>__<semantic-description>\/` — current-run evidence only/);
+  assert.match(agentsTemplateText, /Durable logic, reusable harnesses, and canonical docs never live in `tmp\/`/);
+  assert.match(agentsTemplateText, /the spec keeps the numbers/);
+  assert.match(agentsTemplateText, /`package\.json` scripts are a six-month developer interface, not a proof log/);
 
   assert.match(handoffSkillText, /Repo Shape & Command Surface/);
   assert.match(handoffSkillText, /<Artifact_Ledger>/);
@@ -321,13 +322,14 @@ test("root AGENTS and handoff gate block proof exhaust and script bloat", () => 
 test("root AGENTS ties commits to objectively green Work Spec rungs", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
 
-  assert.match(agentsTemplateText, /Active lane = current user instruction \+ active Work Spec milestone\/rung \+ proof gate \+ owning subsystem/);
-  assert.match(agentsTemplateText, /No Stopgaps \/ Build vFinal, not V1/);
-  assert.match(agentsTemplateText, /Build the smallest correct version of the real system, not a temporary substitute for it/);
+  assert.match(agentsTemplateText, /Objectively Green/);
+  assert.match(agentsTemplateText, /`Complete` — objective gates green, subjective gates accepted, docs synced, audit run/);
+  assert.match(agentsTemplateText, /Git — commit forward, commit often/);
+  assert.match(agentsTemplateText, /The orchestrator commits: at every Objectively Green rung, at lane close, and at coherent stopping points/);
+  assert.match(agentsTemplateText, /No stopgaps — build vFinal/);
   assert.match(agentsTemplateText, /reduce capability, not correctness/);
-  assert.match(agentsTemplateText, /Temporary compatibility paths are allowed only for migration, rollback, protocol, persistence, or client-version safety/);
-  assert.match(agentsTemplateText, /When a Work Spec milestone rung is Objectively Green, update Work Spec\/eval status, run `git status --short`, `git add -A`, inspect the staged diff summary, then `git commit` with a truthful 1-2 line message/);
-  assert.match(agentsTemplateText, /A rung with a subjective gate is not commit-ready until the human accepts the artifact/);
+  assert.match(agentsTemplateText, /compatibility shims only for migration\/rollback\/protocol\/persistence\/client-version safety/);
+  assert.match(agentsTemplateText, /A failure state is the user having to run `git commit` himself/);
   assert.doesNotMatch(agentsTemplateText, /`git add -A` and `git commit` are allowed when committing current workspace progress/);
   assert.doesNotMatch(agentsTemplateText, /Commit messages should be generated 1-2 line summaries/);
   assert.doesNotMatch(agentsTemplateText, /When a verified Work Spec milestone is complete/);
@@ -343,10 +345,9 @@ test("root AGENTS keeps generic JS and game test doctrine profile-aware", () => 
     "utf8"
   );
 
-  assert.match(agentsTemplateText, /For JavaScript repos without a stronger local convention, prefer plain JavaScript with ESM in `\.js` files/);
-  assert.match(agentsTemplateText, /read env and write logs only through the repo's established config and logger boundaries/);
-  assert.match(agentsTemplateText, /use the nearest game folder `AGENTS\.md` or established repo convention for test placement/);
-  assert.match(agentsTemplateText, /absent a local convention, prefer `games\/<gameId>\/tests\/`/);
+  assert.match(agentsTemplateText, /Plain ESM JavaScript in `\.js` files absent a stronger local convention/);
+  assert.match(agentsTemplateText, /Env reads and logging only through the repo's config\/logger boundaries/);
+  assert.match(agentsTemplateText, /games use `games\/<gameId>\/tests\/` absent a local convention/);
   assert.match(backendSnippetText, /Backend profile default: ESM in `\.js` files\. Follow stronger repo-local module or file-extension conventions when present/);
   assert.match(backendSnippetText, /Backend profile default: Mocha for backend tests\. Follow stronger repo-local test-runner conventions when present/);
   assert.match(backendSnippetText, /Do not read `process\.env` outside the repo-owned config boundary; backend profile default is `src\/env\.js`/);
@@ -365,10 +366,8 @@ test("testing doctrine forbids tombstone absence tests", () => {
     "utf8"
   );
 
-  assert.match(agentsTemplateText, /No Tombstone Tests/);
-  assert.match(agentsTemplateText, /Every negative assertion must name the positive contract it protects/);
-  assert.match(agentsTemplateText, /endpoints\/routes\/handlers, jobs\/workers, events\/messages, DB fields\/tables\/indexes/);
-  assert.match(agentsTemplateText, /private locals, variable names, function names/);
+  assert.match(agentsTemplateText, /No tombstone tests:/);
+  assert.match(agentsTemplateText, /Absence assertions only guard a named contract/);
   assert.match(testingSkillText, /No tombstone tests/);
   assert.match(testingSkillText, /private locals, variable names, function names/);
   assert.match(testingSkillText, /Writing tombstone tests that only prove removed UI\/API\/backend\/data\/implementation artifacts stayed absent/);

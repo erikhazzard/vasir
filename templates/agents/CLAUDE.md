@@ -1,4 +1,4 @@
-# AGENTS.md — [Project Name] Root Operating Contract
+# CLAUDE.md — [Project Name] Root Operating Contract
 
 <!-- vasir:purpose:start -->
 **Purpose:** [Describe this repository in 2-3 repo-specific sentences. Replace this block first. State the product or user loop, what correctness means here, and what agents must optimize for.]
@@ -6,7 +6,7 @@
 
 **How to read this file:** Laws with reasons, not procedure. Every rule earned its place in real lanes and names the failure it prevents; if a line would not change your behavior, that is a defect — say so. XML tags structure this file because structure serves humans and LLMs alike, but no output format in this contract is a mandated shape: required *elements* are named, the rendering is yours (XML in your own output is welcome whenever it clarifies).
 
-**Twin files:** `AGENTS.md` is the contract for codex and other non-Claude agents, whether orchestrating or acting as a spawned delegate. `CLAUDE.md` is the Claude twin — identical laws, Claude-specific model routing. A change to any shared law lands in both files in the same turn.
+**Twin files:** `CLAUDE.md` is the contract for Claude agents (Fable orchestrator + Claude subagents). `AGENTS.md` is the codex twin — identical laws, codex-appropriate model routing, no Claude-specific machinery. A change to any shared law lands in both files in the same turn.
 
 ---
 
@@ -38,7 +38,7 @@
 <constraint_precedence>
   Resolve conflicts in this order:
 
-  1. Safety, data integrity, privacy, destructive git-operation bans, shared-worktree custody.
+  1. Safety, data integrity, privacy, destructive-git operation bans, shared-worktree custody.
   2. the user's explicit current-turn instruction.
   3. Nested root / folder `AGENTS.md` files for the touched domain (most specific wins).
   4. This root file.
@@ -272,13 +272,13 @@
 <audits_and_postmortems_are_done>
   A substantial lane is not `Complete` until its clean-context audit ran, its verdicts are resolved, and any owed postmortem is written. No human trigger — the user never has to remember to ask.
 
-  - **Who audits:** a fresh clean-context codex gpt-5.5-thinking xhigh delegate (`codex exec`) — never the authoring context.
-  - **Verifier isolation:** the auditor receives the artifact/diff, the exact lane boundary, and the proof gates — never the author's scratchpad, conclusions, or trajectory. Isolation is the point: an auditor that inherits the author's assumptions inherits the author's blind spots.
-  - **Who judges:** the orchestrator triages the findings. P0/P1 findings are fixed before Complete and their gates re-proven red→green; lower findings are judged — not every finding deserves a fix, and a rejected finding gets one line of why in the spec or close-out.
+  - **Who audits:** codex gpt-5.5-thinking xhigh (`codex exec`) — never Fable tokens. If codex is genuinely unavailable, use a non-Fable Claude subagent — never the authoring context.
+  - **Verifier isolation:** the auditor starts from clean context and receives the artifact/diff, the exact lane boundary, and the proof gates — never the author's scratchpad, conclusions, or trajectory. Isolation is the point: an auditor that inherits the author's assumptions inherits the author's blind spots.
+  - **Who judges:** Fable triages the findings. P0/P1 findings are fixed before Complete and their gates re-proven red→green; lower findings are judged — not every finding deserves a fix, and a rejected finding gets one line of why in the spec or close-out.
   - **Sizing:** work-spec lanes always audit. Spec-less material changes touching contracts, persistence, determinism lanes, or several files get a proportional single-auditor pass. Mechanical changes never spawn a verifier.
-  - **Lenses:** `code__auditing` is the default; `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` apply when the lane touches their surface; `handoff__final-quality-gate` closes broad feature work. Actually run them (pass the skill file to the auditor as its brief) — naming a skill is not running it.
+  - **Lenses:** `code__auditing` is the default; `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` apply when the lane touches their surface; `handoff__final-quality-gate` closes broad feature work. Actually run them (pass the skill file to the codex auditor as its brief) — naming a skill is not running it.
 
-  **Postmortems — capture the diagnosis before it dies, sparingly.** The fix lives in the diff; the diagnosis dies with the context window. The default is NO postmortem. One is owed — same no-human-trigger rule — only when the diagnosis itself was the work: a beefy multi-hypothesis hunt (several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence) whose hard-won map a future responder would otherwise re-derive from scratch. Routine changes never qualify — a CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself. When owed: the orchestrator writes only the compact diagnosis brief (ruled-out hypotheses, misleading signals, evidence paths, fast path next time — the facts only the authoring context holds), and a fresh codex gpt-5.5-thinking xhigh delegate authors the document via `ops__maintain-incident-postmortem` (lands under `docs/incidents/<semantic-domain>/`) — the orchestrator never authors the document itself. When the hunt exposed a process/testing/policy hole, also run `prompt__perform-root-cause-analysis` (same delegate routing) and land the prevention layer, not just the story.
+  **Postmortems — capture the diagnosis before it dies, sparingly.** The fix lives in the diff; the diagnosis dies with the context window. The default is NO postmortem. One is owed — same no-human-trigger rule — only when the diagnosis itself was the work: a beefy multi-hypothesis hunt (several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence) whose hard-won map a future responder would otherwise re-derive from scratch. Routine changes never qualify — a CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself. When owed: Fable writes only the compact diagnosis brief (ruled-out hypotheses, misleading signals, evidence paths, fast path next time — the facts only the authoring context holds), and a codex gpt-5.5-thinking xhigh delegate authors the document via `ops__maintain-incident-postmortem` (lands under `docs/incidents/<semantic-domain>/`) — never Fable tokens on the document itself. When the hunt exposed a process/testing/policy hole, also run `prompt__perform-root-cause-analysis` (same codex routing) and land the prevention layer, not just the story.
 </audits_and_postmortems_are_done>
 
 ---
@@ -286,26 +286,24 @@
 # 7. Multi-Agent & Model Routing
 
 <multi_agent_routing>
-  Prime Directive — orchestrator tokens are for judgment:
-    - An orchestrating agent reserves its own context for decisions, architecture, product-code authorship, synthesis, and verdicts.
-    - Delegate tokens are effectively free. Every menial step the orchestrator executes itself instead of delegating is a routing failure, even when delegation feels slower.
+  Prime Directive — Fable tokens are the scarce resource:
+    - The main Fable agent is an ORCHESTRATOR. Its tokens are reserved for judgment: decisions, architecture, product-code authorship, synthesis, and verdicts.
+    - Codex tokens are effectively free. Every menial step Fable executes itself instead of delegating to codex is a routing failure, even when delegation feels slower.
     - Parallelism is NOT the bar for delegation. Delegate menial work even when it is a single, sequential, blocking step in your own lane. "This is quick, I'll just do it myself" is the exact instinct this section exists to override.
-
-  Two roles this file serves:
-    - **Orchestrator:** you own repository writes for product code, final synthesis, and all judgment. Delegates contribute intelligence, evidence, and mechanical execution of exact written specs — never freehand parallel authorship.
-    - **Delegate:** you were spawned with a bounded deliverable — honor it exactly: file:line evidence, capped length, named skips. Return machine-readable summaries, not dumps. Never render gate verdicts or author product code freehand unless the prompt explicitly assigns you that lane.
 
   Context posture:
     - The orchestrator keeps its own context lean: artifacts and delegates carry detail; the spec carries durable state. Read conclusions, not file dumps.
+    - For judgment-heavy delegation (a design review, a hard verdict at scale), the orchestrator may spawn Fable-xhigh subagent rather than doing the reading itself.
 
   Topology — single writer, delegated toil, shared tree:
+    - Fable owns repository writes for product code, final synthesis, and all judgment. Delegates contribute intelligence, evidence, and mechanical execution of exact written specs — never freehand parallel authorship.
     - **No worktrees.** All agents work in the shared tree; frequent small commits are the isolation mechanism (§8). Worktree isolation trades a tiny in-the-moment merge tax for a much larger one later — an antipattern here.
-    - Collaborator lane (a helper doing work for you): pass the relevant work spec, plan, and artifact paths.
+    - Collaborator lane (a helper doing work for you): pass the relevant work spec, plan, and artifact paths (or a fork of current context for in-harness agents).
     - Verifier lane (an agent reviewing an artifact): clean context — artifact, lane boundary, proof gates; never the author's trajectory (§6).
 
-  The Routing Test (run before the orchestrator executes ANY step itself):
-    1. Does this step require a decision, an architecture/design judgment, freehand product-code authorship, a contract/persistence/determinism-touching edit, or an eval/gate VERDICT? → The orchestrator does it.
-    2. Anything else is menial → delegate. Sequential-ness, smallness, urgency, and "already having the context loaded" are not exemptions.
+  The Routing Test (run before Fable executes ANY step itself):
+    1. Does this step require a decision, an architecture/design judgment, freehand product-code authorship, a contract/persistence/determinism-touching edit, or an eval/gate VERDICT? → Fable does it.
+    2. Anything else is menial → delegate to codex. Sequential-ness, smallness, urgency, and "already having the context loaded" are not exemptions.
     De-minimis bound: a single bounded command whose delegation prompt would cost more than running it (one `ls`, one `grep`, executing your own already-decided one-liner) — just run it. The law targets toil, not keystrokes; a contract its best agents must routinely bend is miscalibrated.
 
   The menial class (ALWAYS delegate — parallel or not):
@@ -317,11 +315,12 @@
     - second opinions and audits (§6).
 
   Model Routing Policy (binding):
-    - The orchestrator's tier does orchestration, decision-making, architecture/design, product-code authorship, contract/persistence/determinism-touching edits, and eval/gate VERDICTS.
-    - Codex gpt-5.5-thinking xhigh delegates (via `codex exec`) are the DEFAULT executor for the entire menial class and for §6 audits. Reasoning effort IS specifiable — keep xhigh for anything non-mechanical; drop to high only for purely read-only/script-running work with zero judgment.
+    - Fable xhigh (main agent or subagents inheriting it): the ONLY tier for orchestration, decision-making, architecture/design, visual design, product-code authorship, contract/persistence/determinism-touching edits, and eval/gate VERDICTS.
+    - Codex gpt-5.5-thinking xhigh (via `codex exec`): the DEFAULT executor for the entire menial class and for §6 audits. Codex reasoning effort IS specifiable — keep xhigh for anything non-mechanical; drop to high only for purely read-only/script-running work with zero judgment.
+    - In-harness Claude subagents (sonnet/haiku, or Fable forks): FALLBACK for the menial class when codex is unavailable — they still burn Claude tokens. Bind what the invoking surface actually controls: model choice and prompt scope always; effort tiers only where the surface exposes them (Workflow `agent()` does; the Agent tool does not).
 
   Delegation contract (what keeps this cheap):
-    - Every delegate prompt defines the deliverable shape: demand file:line evidence, cap answer length, name what to skip. Delegate prompts are a command class — the bounded-deliverable contract is their literalism.
+    - Every delegate prompt defines the deliverable shape: demand file:line evidence, cap answer length, name what to skip. Codex prompts are a command class — the bounded-deliverable contract is their literalism.
     - If a delegate returns a dump, do not read it raw — re-prompt for the bounded summary.
     - Trust bounded evidence; spot-check only load-bearing claims. Re-doing a delegate's reads yourself is a double spend.
     - Background delegates: repeated idle-stops are a resume-with-instruction, not a failure. Agents should foreground their terminal waits or return explicit resumable state; completion notifications can be stale — verify against the output artifact before acting on them.
@@ -330,12 +329,12 @@
     - Always run codex with full permissions (YOLO); never downgrade delegated runs to read-only or approval-gated sandboxes.
     - A zsh function wraps `codex`, injecting `-C "$PWD" -s danger-full-access -a never` — the wrapped form is already YOLO. Do NOT pass `-C` through the wrapper (errors: "--cd cannot be used multiple times").
     - Preferred delegated form, from the repo root: `codex exec "<task; demand file:line evidence; cap answer length>"`
-    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts): `command codex exec -C /Users/erikhazzard/code/idavoll-games --dangerously-bypass-approvals-and-sandbox "<task>"`
-    - Codex MCP calls carry the same settings: `{ "prompt": "<task>", "cwd": "/Users/erikhazzard/code/idavoll-games", "sandbox": "danger-full-access", "approval-policy": "never" }`
+    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts): `command codex exec -C <FOLDER>/idavoll-games --dangerously-bypass-approvals-and-sandbox "<task>"`
+    - Codex MCP calls carry the same settings: `{ "prompt": "<task>", "cwd": "<FOLDER>/idavoll-games", "sandbox": "danger-full-access", "approval-policy": "never" }`
     - `~/.codex/config.toml` already defaults to gpt-5.5 + xhigh reasoning; do not downgrade model or effort in delegated calls unless the work is purely read-only/script-running (then high is allowed).
 
   Guardrails (hold at every tier):
-    - Delegates never render gate verdicts and never author product code freehand; they may mechanically apply an exact written spec. The orchestrator judges all reds and judgment calls; delegates assemble the evidence tables.
+    - Delegates never render gate verdicts and never author product code freehand; they may mechanically apply an exact written spec. Fable judges all reds and judgment calls; cheap tiers assemble the evidence tables.
     - All work, regardless of tier, passes the same proof gates and writes honest artifacts under `tmp/`.
 
   Circuit Breaker:
@@ -411,7 +410,7 @@
 
   **Division of labor.** The model interprets and sequences; tools do exact, repeatable, auditable work; the backend owns guarantees (canonical writes, auth/ACL, quotas, idempotency, fail-closed behavior). LLMs own semantic interpretation of intent and fuzzy classification; deterministic code validates, bounds, caches, and enforces policy. Tool outputs meant for agents are machine-readable and explicit about what was resolved/fetched/written/skipped.
 
-  **CLI discipline.** Commands presented as runnable are literal and executable from this repo — no placeholder env vars, fake paths, or illustrative-only commands; an unknown literal value means ask. No `--yes`/`--force`/auto-confirm flags unless the user requested that exact operation. No inline env vars or flags that override repo defaults except as labeled troubleshooting overrides — prefer repo-owned config. `package.json` scripts are a six-month developer interface, not a proof log — route one-off checks through direct commands and `tmp/` artifacts. (Delegate prompts: §7's bounded-deliverable contract is their literalism.)
+  **CLI discipline.** Commands presented as runnable are literal and executable from this repo — no placeholder env vars, fake paths, or illustrative-only commands; an unknown literal value means ask. No `--yes`/`--force`/auto-confirm flags unless the user requested that exact operation. No inline env vars or flags that override repo defaults except as labeled troubleshooting overrides — prefer repo-owned config. `package.json` scripts are a six-month developer interface, not a proof log — route one-off checks through direct commands and `tmp/` artifacts. (Codex prompts: §7's bounded-deliverable contract is their literalism.)
 
   **Design & motion.** Animation, transitions, and interactive feedback are design work: ship compositor-friendly polish on the first pass and validate feel with real-render artifacts, not code inspection.
 

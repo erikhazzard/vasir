@@ -330,8 +330,8 @@ vasir agents sync --scope services/api --profile backend
 - Result:
   - `AGENTS.md` exists in the resolved repo root.
   - The file has the guessed project name filled in.
-  - The file has a loud `EDIT THESE FIRST` block at the top.
-  - The `Purpose` block and Section 1 routing block are still safe placeholders until you replace them manually or via `draft-purpose --write` and `draft-routing --write`.
+  - The file uses the current root operating-contract template.
+  - The `Purpose` block and routing block are still safe placeholders until you replace them manually or via `draft-purpose --write` and `draft-routing --write`.
 - Notes:
   - Supported profiles are `backend`, `frontend`, `ios`, and `generic`.
   - The repo root is the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
@@ -393,7 +393,7 @@ vasir agents draft-routing --write
   - `agents sync` runs this check automatically.
   - Use `--scope <path>` to validate a generated nested root AGENTS file such as `frontend/AGENTS.md`.
   - This is still useful after manual edits or lower-level `agents init`, `agents draft-purpose --write`, and `agents draft-routing --write` flows.
-  - Common failures include the `EDIT THESE FIRST` block, `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a required local `AGENTS.md`.
+  - Common failures include `[Project Name]`, `[Example]`, untouched purpose/routing markers, missing routed directories, and routed lanes that do not yet own a required local `AGENTS.md`.
 
 Examples:
 

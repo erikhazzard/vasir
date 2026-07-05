@@ -110,15 +110,16 @@ export function installSkillsIntoProject({
   });
   const projectInstallState = readProjectInstallState({ projectPaths });
   const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
+  const projectClaudeFilePath = path.join(projectPaths.projectRootDirectory, "CLAUDE.md");
 
   if (agentsProfileName !== null) {
     assertSupportedAgentsProfile(agentsProfileName);
-    if (fs.existsSync(projectAgentsFilePath) && !replaceExistingSkills) {
+    if ((fs.existsSync(projectAgentsFilePath) || fs.existsSync(projectClaudeFilePath)) && !replaceExistingSkills) {
       throw new VasirCliError({
         code: "AGENTS_FILE_EXISTS",
-        message: `AGENTS.md already exists at ${projectAgentsFilePath}`,
+        message: `AGENTS.md or CLAUDE.md already exists in ${projectPaths.projectRootDirectory}`,
         suggestion:
-          "Review the existing file, or rerun `vasir add <skill> --agents-profile <profile> --replace` if you explicitly want to overwrite it as part of add.",
+          "Review the existing files, or rerun `vasir add <skill> --agents-profile <profile> --replace` if you explicitly want to overwrite them as part of add.",
         docsRef: REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF
       });
     }
@@ -239,8 +240,10 @@ export function installSkillsIntoProject({
       })
     : {
         agentsFilePath: path.join(projectPaths.projectRootDirectory, "AGENTS.md"),
+        claudeFilePath: path.join(projectPaths.projectRootDirectory, "CLAUDE.md"),
         profile: null,
-        wroteAgentsFile: false
+        wroteAgentsFile: false,
+        wroteClaudeFile: false
       };
 
   writeProjectInstallState({
@@ -259,8 +262,10 @@ export function installSkillsIntoProject({
     installedSkillNames,
     replacedSkillNames,
     agentsFilePath: agentsInitialization.agentsFilePath,
+    claudeFilePath: agentsInitialization.claudeFilePath,
     agentsProfile: agentsInitialization.profile,
-    wroteAgentsFile: agentsInitialization.wroteAgentsFile
+    wroteAgentsFile: agentsInitialization.wroteAgentsFile,
+    wroteClaudeFile: agentsInitialization.wroteClaudeFile
   };
 }
 

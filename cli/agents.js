@@ -32,6 +32,7 @@ const PURPOSE_PLACEHOLDER_FRAGMENT = "Replace this block first.";
 const NONOBVIOUS_PLACEHOLDER_FRAGMENT = "[Add repo-specific landmines here.]";
 const EMPTY_NONOBVIOUS_TEXT = "None recorded yet.";
 const DEFAULT_AGENTS_TEMPLATE = path.join("templates", "agents", "AGENTS.md");
+const DEFAULT_CLAUDE_TEMPLATE = path.join("templates", "agents", "CLAUDE.md");
 
 const AGENTS_PROFILE_SNIPPETS = Object.freeze({
   backend: path.join("templates", "agents", "snippets", "backend-inserts.md"),
@@ -569,6 +570,7 @@ function resolveAgentsTemplate(profileName) {
     return {
       profile: "generic",
       templateRelativePath: DEFAULT_AGENTS_TEMPLATE,
+      claudeTemplateRelativePath: DEFAULT_CLAUDE_TEMPLATE,
       snippetRelativePath: null
     };
   }
@@ -578,6 +580,7 @@ function resolveAgentsTemplate(profileName) {
     return {
       profile: "generic",
       templateRelativePath: DEFAULT_AGENTS_TEMPLATE,
+      claudeTemplateRelativePath: DEFAULT_CLAUDE_TEMPLATE,
       snippetRelativePath: null
     };
   }
@@ -595,6 +598,7 @@ function resolveAgentsTemplate(profileName) {
   return {
     profile: normalizedProfileName,
     templateRelativePath: DEFAULT_AGENTS_TEMPLATE,
+    claudeTemplateRelativePath: DEFAULT_CLAUDE_TEMPLATE,
     snippetRelativePath
   };
 }
@@ -909,6 +913,47 @@ function renderAgentsTemplate({
     startMarker: ENGINEERING_DOCTRINE_INSERTS_START_MARKER,
     endMarker: ENGINEERING_DOCTRINE_INSERTS_END_MARKER,
     replacementText: doctrineReplacement,
+    templateFilePath
+  });
+}
+
+function renderSynchronizedRootContractText({
+  templateText,
+  profileSnippetText,
+  projectName,
+  profile,
+  templateFilePath,
+  snippetFilePath,
+  purposeText,
+  routingLines,
+  nonobviousText
+}) {
+  let synchronizedText = removeScaffoldEditBlock(renderAgentsTemplate({
+    templateText,
+    profileSnippetText,
+    projectName,
+    profile,
+    templateFilePath,
+    snippetFilePath
+  }));
+
+  synchronizedText = finalizeMarkedBlock({
+    agentsText: synchronizedText,
+    startMarker: PURPOSE_START_MARKER,
+    endMarker: PURPOSE_END_MARKER,
+    replacementText: `**Purpose:** ${purposeText}`
+  });
+  synchronizedText = finalizeMarkedBlock({
+    agentsText: synchronizedText,
+    startMarker: ROUTING_START_MARKER,
+    endMarker: ROUTING_END_MARKER,
+    replacementText: routingLines.join("\n")
+  });
+  return replaceTemplateBlock({
+    templateText: synchronizedText,
+    startMarker: NONOBVIOUS_START_MARKER,
+    endMarker: NONOBVIOUS_END_MARKER,
+    replacementText: nonobviousText,
     templateFilePath
   });
 }
@@ -1394,22 +1439,26 @@ export function initializeProjectAgentsFile({
 }) {
   const resolvedTemplate = resolveAgentsTemplate(profileName);
   const agentsFilePath = path.join(projectRootDirectory, "AGENTS.md");
+  const claudeFilePath = path.join(projectRootDirectory, "CLAUDE.md");
   const agentsFileExists = fs.existsSync(agentsFilePath);
+  const claudeFileExists = fs.existsSync(claudeFilePath);
 
-  if (agentsFileExists && ifExists === "skip") {
+  if ((agentsFileExists || claudeFileExists) && ifExists === "skip") {
     return {
       agentsFilePath,
+      claudeFilePath,
       profile: resolvedTemplate.profile,
-      wroteAgentsFile: false
+      wroteAgentsFile: false,
+      wroteClaudeFile: false
     };
   }
 
-  if (agentsFileExists && ifExists !== "replace") {
+  if ((agentsFileExists || claudeFileExists) && ifExists !== "replace") {
     throw new VasirCliError({
       code: "AGENTS_FILE_EXISTS",
-      message: `AGENTS.md already exists at ${agentsFilePath}`,
+      message: `AGENTS.md or CLAUDE.md already exists in ${projectRootDirectory}`,
       suggestion:
-        "Review the existing file, or rerun `vasir agents init <profile> --replace` if you explicitly want to overwrite it.",
+        "Review the existing files, or rerun `vasir agents init <profile> --replace` if you explicitly want to overwrite them.",
       docsRef: AGENTS_REFERENCE_DOCS_REF
     });
   }
@@ -1420,9 +1469,13 @@ export function initializeProjectAgentsFile({
   }
   const snippetFilePath = resolvedTemplate.snippetRelativePath
     ? path.join(globalCatalogDirectory, resolvedTemplate.snippetRelativePath)
-    : null;
+      : null;
   if (snippetFilePath && !fs.existsSync(snippetFilePath)) {
     throw createAgentsTemplateMissingError(snippetFilePath);
+  }
+  const claudeTemplateFilePath = path.join(globalCatalogDirectory, resolvedTemplate.claudeTemplateRelativePath);
+  if (!fs.existsSync(claudeTemplateFilePath)) {
+    throw createAgentsTemplateMissingError(claudeTemplateFilePath);
   }
 
   const renderedTemplate = renderAgentsTemplate({
@@ -1433,7 +1486,16 @@ export function initializeProjectAgentsFile({
     templateFilePath,
     snippetFilePath
   });
+  const renderedClaudeTemplate = renderAgentsTemplate({
+    templateText: fs.readFileSync(claudeTemplateFilePath, "utf8"),
+    profileSnippetText: snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null,
+    projectName: guessProjectName(projectRootDirectory),
+    profile: resolvedTemplate.profile,
+    templateFilePath: claudeTemplateFilePath,
+    snippetFilePath
+  });
   fs.writeFileSync(agentsFilePath, renderedTemplate);
+  fs.writeFileSync(claudeFilePath, renderedClaudeTemplate);
   writeConfiguredAgentsProfileName({
     projectRootDirectory,
     profileName: resolvedTemplate.profile
@@ -1441,8 +1503,10 @@ export function initializeProjectAgentsFile({
 
   return {
     agentsFilePath,
+    claudeFilePath,
     profile: resolvedTemplate.profile,
-    wroteAgentsFile: true
+    wroteAgentsFile: true,
+    wroteClaudeFile: true
   };
 }
 
@@ -1483,14 +1547,16 @@ function renderSynchronizedAgentsText({
   globalCatalogDirectory,
   projectRootDirectory,
   existingAgentsText,
+  existingClaudeText = null,
   profileName = null,
   configuredProfileName = null,
   nonobviousText = EMPTY_NONOBVIOUS_TEXT
 }) {
-  const existingProfileName = existingAgentsText ? readAgentsProfileHint(existingAgentsText) : null;
+  const existingRootContractText = existingAgentsText ?? existingClaudeText;
+  const existingProfileName = existingRootContractText ? readAgentsProfileHint(existingRootContractText) : null;
   const inspectedProfileRecommendation = inspectRecommendedAgentsProfile({
     projectRootDirectory,
-    agentsText: existingAgentsText ?? ""
+    agentsText: existingRootContractText ?? ""
   });
   const requestedProfileName =
     profileName ??
@@ -1503,6 +1569,10 @@ function renderSynchronizedAgentsText({
   if (!fs.existsSync(templateFilePath)) {
     throw createAgentsTemplateMissingError(templateFilePath);
   }
+  const claudeTemplateFilePath = path.join(globalCatalogDirectory, resolvedTemplate.claudeTemplateRelativePath);
+  if (!fs.existsSync(claudeTemplateFilePath)) {
+    throw createAgentsTemplateMissingError(claudeTemplateFilePath);
+  }
 
   const snippetFilePath = resolvedTemplate.snippetRelativePath
     ? path.join(globalCatalogDirectory, resolvedTemplate.snippetRelativePath)
@@ -1513,17 +1583,19 @@ function renderSynchronizedAgentsText({
 
   const repositoryContext = inspectRepositoryContext({
     projectRootDirectory,
-    agentsText: existingAgentsText ?? ""
+    agentsText: existingRootContractText ?? ""
   });
-  const purposeText = extractExistingPurposeText(existingAgentsText) ?? createLocalPurposeDraft({
+  const existingPurposeText = extractExistingPurposeText(existingRootContractText);
+  const purposeText = existingPurposeText ?? createLocalPurposeDraft({
     repositoryContext,
     profileName: resolvedTemplate.profile
   });
-  const purposeSource = extractExistingPurposeText(existingAgentsText) ? "preserved" : "generated";
+  const purposeSource = existingPurposeText ? "preserved" : "generated";
 
+  const profileSnippetText = snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null;
   const renderedTemplate = renderAgentsTemplate({
     templateText: fs.readFileSync(templateFilePath, "utf8"),
-    profileSnippetText: snippetFilePath ? fs.readFileSync(snippetFilePath, "utf8") : null,
+    profileSnippetText,
     projectName: repositoryContext.projectName,
     profile: resolvedTemplate.profile,
     templateFilePath,
@@ -1531,33 +1603,36 @@ function renderSynchronizedAgentsText({
   });
   const synchronizedRouting = formatSynchronizedRoutingLines({
     projectRootDirectory,
-    agentsText: existingAgentsText ?? renderedTemplate,
+    agentsText: existingRootContractText ?? renderedTemplate,
     profileName: resolvedTemplate.profile
   });
 
-  let synchronizedAgentsText = removeScaffoldEditBlock(renderedTemplate);
-  synchronizedAgentsText = finalizeMarkedBlock({
-    agentsText: synchronizedAgentsText,
-    startMarker: PURPOSE_START_MARKER,
-    endMarker: PURPOSE_END_MARKER,
-    replacementText: `**Purpose:** ${purposeText}`
+  const synchronizedAgentsText = renderSynchronizedRootContractText({
+    templateText: fs.readFileSync(templateFilePath, "utf8"),
+    profileSnippetText,
+    projectName: repositoryContext.projectName,
+    profile: resolvedTemplate.profile,
+    templateFilePath,
+    snippetFilePath,
+    purposeText,
+    routingLines: synchronizedRouting.routingLines,
+    nonobviousText
   });
-  synchronizedAgentsText = finalizeMarkedBlock({
-    agentsText: synchronizedAgentsText,
-    startMarker: ROUTING_START_MARKER,
-    endMarker: ROUTING_END_MARKER,
-    replacementText: synchronizedRouting.routingLines.join("\n")
-  });
-  synchronizedAgentsText = replaceTemplateBlock({
-    templateText: synchronizedAgentsText,
-    startMarker: NONOBVIOUS_START_MARKER,
-    endMarker: NONOBVIOUS_END_MARKER,
-    replacementText: nonobviousText,
-    templateFilePath
+  const synchronizedClaudeText = renderSynchronizedRootContractText({
+    templateText: fs.readFileSync(claudeTemplateFilePath, "utf8"),
+    profileSnippetText,
+    projectName: repositoryContext.projectName,
+    profile: resolvedTemplate.profile,
+    templateFilePath: claudeTemplateFilePath,
+    snippetFilePath,
+    purposeText,
+    routingLines: synchronizedRouting.routingLines,
+    nonobviousText
   });
 
   return {
     synchronizedAgentsText,
+    synchronizedClaudeText,
     profile: resolvedTemplate.profile,
     profileSource: profileName
       ? "argument"
@@ -1582,21 +1657,26 @@ export function synchronizeProjectAgentsFile({
   persistProfileConfig = false
 }) {
   const agentsFilePath = path.join(projectRootDirectory, "AGENTS.md");
+  const claudeFilePath = path.join(projectRootDirectory, "CLAUDE.md");
   const agentsFileExists = fs.existsSync(agentsFilePath);
+  const claudeFileExists = fs.existsSync(claudeFilePath);
   const existingAgentsText = agentsFileExists ? fs.readFileSync(agentsFilePath, "utf8") : null;
-  const existingProfileName = existingAgentsText ? readAgentsProfileHint(existingAgentsText) : null;
+  const existingClaudeText = claudeFileExists ? fs.readFileSync(claudeFilePath, "utf8") : null;
+  const existingRootContractText = existingAgentsText ?? existingClaudeText;
+  const existingProfileName = existingRootContractText ? readAgentsProfileHint(existingRootContractText) : null;
   const configuredProfileName = persistProfileConfig
     ? readConfiguredAgentsProfileName({ projectRootDirectory })
     : null;
   const nonobviousContext = resolveNonobviousContext({
     projectRootDirectory,
-    existingAgentsText,
+    existingAgentsText: existingRootContractText,
     dryRun
   });
   const synchronizedAgents = renderSynchronizedAgentsText({
     globalCatalogDirectory,
     projectRootDirectory,
     existingAgentsText,
+    existingClaudeText,
     profileName,
     configuredProfileName,
     nonobviousText: nonobviousContext.nonobviousText
@@ -1614,6 +1694,7 @@ export function synchronizeProjectAgentsFile({
   }
 
   const agentsFileChanged = existingAgentsText !== synchronizedAgents.synchronizedAgentsText;
+  const claudeFileChanged = existingClaudeText !== synchronizedAgents.synchronizedClaudeText;
   const shouldPersistProfileConfig =
     persistProfileConfig &&
     (profileName !== null || configuredProfileName !== null || existingProfileName !== null);
@@ -1622,6 +1703,7 @@ export function synchronizeProjectAgentsFile({
     configuredProfileName !== synchronizedAgents.profile;
   const changed =
     agentsFileChanged ||
+    claudeFileChanged ||
     Boolean(nonobviousContext.pendingNonobviousFileText) ||
     profileConfigChanged;
   if (nonobviousContext.pendingNonobviousFileText && !dryRun) {
@@ -1639,6 +1721,9 @@ export function synchronizeProjectAgentsFile({
   if (agentsFileChanged && !dryRun) {
     fs.writeFileSync(agentsFilePath, synchronizedAgents.synchronizedAgentsText);
   }
+  if (claudeFileChanged && !dryRun) {
+    fs.writeFileSync(claudeFilePath, synchronizedAgents.synchronizedClaudeText);
+  }
   if (profileConfigChanged && !dryRun) {
     writeConfiguredAgentsProfileName({
       projectRootDirectory,
@@ -1648,9 +1733,11 @@ export function synchronizeProjectAgentsFile({
 
   return {
     agentsFilePath,
-    mode: !agentsFileExists ? "created" : agentsFileChanged ? "refreshed" : changed ? "refreshed" : "unchanged",
+    claudeFilePath,
+    mode: !agentsFileExists ? "created" : agentsFileChanged || claudeFileChanged ? "refreshed" : changed ? "refreshed" : "unchanged",
     changed,
     wroteAgentsFile: agentsFileChanged && !dryRun,
+    wroteClaudeFile: claudeFileChanged && !dryRun,
     wroteProjectConfigProfile: profileConfigChanged && !dryRun,
     dryRun,
     profile: synchronizedAgents.profile,
@@ -1939,10 +2026,11 @@ export async function runAgents({
             ui.formatStatusLine({
               kind: agentsSync.changed ? dryRunRequested ? "info" : "ok" : "info",
               text: agentsSync.changed
-                ? dryRunRequested ? "Would sync AGENTS.md" : "Synced AGENTS.md"
-                : "AGENTS.md already current"
+                ? dryRunRequested ? "Would sync AGENTS.md + CLAUDE.md" : "Synced AGENTS.md + CLAUDE.md"
+                : "AGENTS.md + CLAUDE.md already current"
             }),
-            ui.formatField("path", ui.formatPath(agentsSync.agentsFilePath)),
+            ui.formatField("agents", ui.formatPath(agentsSync.agentsFilePath)),
+            ui.formatField("claude", ui.formatPath(agentsSync.claudeFilePath)),
             ...scopeLine,
             ui.formatField("profile", `${agentsSync.profile} (${agentsSync.profileSource})`),
             ui.formatField("purpose", agentsSync.purposeSource),
@@ -2019,9 +2107,10 @@ export async function runAgents({
           lines: [
             ui.formatStatusLine({
               kind: "ok",
-              text: `Wrote ${agentsInitialization.profile} AGENTS starter`
+              text: `Wrote ${agentsInitialization.profile} AGENTS + CLAUDE starters`
             }),
-            ui.formatField("path", ui.formatPath(agentsInitialization.agentsFilePath)),
+            ui.formatField("agents", ui.formatPath(agentsInitialization.agentsFilePath)),
+            ui.formatField("claude", ui.formatPath(agentsInitialization.claudeFilePath)),
             ui.formatField("edit first", "Purpose block, Section 1 routing, and any placeholder lines"),
             ui.formatField(
               "next",
@@ -2036,7 +2125,8 @@ export async function runAgents({
       subcommand: "init",
       profile: agentsInitialization.profile,
       projectRootDirectory: projectPaths.projectRootDirectory,
-      agentsFilePath: agentsInitialization.agentsFilePath
+      agentsFilePath: agentsInitialization.agentsFilePath,
+      claudeFilePath: agentsInitialization.claudeFilePath
     };
   }
 

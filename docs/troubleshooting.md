@@ -203,7 +203,7 @@ Recommended path:
 Verification:
 
 - `AGENTS.md` exists at the repo root.
-- The file no longer contains scaffold text like `EDIT THESE FIRST`, `[Project Name]`, or `[Example]`.
+- The file no longer contains scaffold text like `[Project Name]`, `[Example]`, or untouched purpose/routing markers.
 - Any routed directory in Section 1 exists and owns the required local `AGENTS.md`, or that route has been removed.
 
 ## Eval Errors

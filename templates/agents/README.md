@@ -2,8 +2,8 @@
 
 Start here.
 
-This folder is the canonical source for AGENTS starter content. The shared
-root manifest structure lives in [AGENTS.md](./AGENTS.md); stack-specific
+This folder is the canonical source for AGENTS operating-contract starter content. The shared
+root operating-contract structure lives in [AGENTS.md](./AGENTS.md); stack-specific
 profile content lives in [snippets/](./snippets/) and is inserted into the
 canonical structure.
 
@@ -50,7 +50,7 @@ If you want to edit the source templates directly, use the table below and stop 
 | Change frontend profile content | [snippets/frontend-inserts.md](./snippets/frontend-inserts.md) |
 | Change iOS profile content | [snippets/ios-inserts.md](./snippets/ios-inserts.md) |
 | Change the shared AGENTS section structure | [AGENTS.md](./AGENTS.md) |
-| See a filled example instead of a blank starter | [../../docs/example-agents.md](../../docs/example-agents.md) |
+| See a filled example instead of the source template | [../../docs/example-agents.md](../../docs/example-agents.md) |
 
 ## Recommended Workflow
 

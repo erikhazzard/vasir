@@ -1754,7 +1754,9 @@ async function runInit({
   let unchangedSkills = [];
   let effectiveTrackingMode = syncPlan.trackingMode;
   let agentsFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "AGENTS.md");
+  let claudeFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "CLAUDE.md");
   let wroteAgentsFile = false;
+  let wroteClaudeFile = false;
 
   if (syncPlan.trackingMode === null) {
     const projectAgentsFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "AGENTS.md");
@@ -1787,7 +1789,9 @@ async function runInit({
     unchangedSkills = [];
     effectiveTrackingMode = "all";
     agentsFilePath = initResult.agentsFilePath;
+    claudeFilePath = initResult.claudeFilePath;
     wroteAgentsFile = initResult.wroteAgentsFile;
+    wroteClaudeFile = initResult.wroteClaudeFile;
   } else {
     if (syncPlan.blockedSkillPlans.length > 0) {
       throw syncPlan.blockedSkillPlans[0].error;
@@ -1896,6 +1900,13 @@ async function runInit({
           detail: agentsFilePath
         })
       );
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "CLAUDE starter ready at",
+          detail: claudeFilePath
+        })
+      );
     }
 
     renderedLines.push(
@@ -1928,7 +1939,9 @@ async function runInit({
     updatedSkills,
     unchangedSkills,
     agentsFilePath,
-    wroteAgentsFile
+    claudeFilePath,
+    wroteAgentsFile,
+    wroteClaudeFile
   };
 }
 
@@ -3634,6 +3647,13 @@ async function runAdd({
           detail: installResult.agentsFilePath
         })
       );
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: `CLAUDE starter ready at (${profileLabel}, ${sourceLabel})`,
+          detail: installResult.claudeFilePath
+        })
+      );
       if (agentsSelection.reason) {
         renderedLines.push(
           ui.formatStatusLine({
@@ -3649,6 +3669,13 @@ async function runAdd({
           kind: "info",
           text: "AGENTS left unchanged at",
           detail: installResult.agentsFilePath
+        })
+      );
+      renderedLines.push(
+        ui.formatStatusLine({
+          kind: "info",
+          text: "CLAUDE left unchanged at",
+          detail: installResult.claudeFilePath
         })
       );
     }
@@ -3676,9 +3703,11 @@ async function runAdd({
     installedSkills: installResult.installedSkillNames,
     replacedSkills: installResult.replacedSkillNames,
     agentsFilePath: installResult.agentsFilePath,
+    claudeFilePath: installResult.claudeFilePath,
     agentsProfile: effectiveAgentsProfile,
     agentsProfileSource: agentsSelection.source,
-    wroteAgentsFile: installResult.wroteAgentsFile
+    wroteAgentsFile: installResult.wroteAgentsFile,
+    wroteClaudeFile: installResult.wroteClaudeFile
   };
 }
 
