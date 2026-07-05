@@ -81,7 +81,7 @@
     },
     {
       "name": "code__auditing",
-      "description": "Audits code for testability, correctness, efficiency, and production readiness against \"God-Tier\" standards. Identifies boundary issues, traces state ownership, flags inefficiencies, and recommends minimal high-leverage improvements. Produces actionable, evidence-based audit findings — never rewrites code. Use when reviewing modules for production readiness, investigating performance concerns, validating architecture boundaries, or assessing test coverage gaps.",
+      "description": "Static audit lens grading code against production standards — testability, correctness, performance, hardening — with evidence, cost-both-ways ledgers, and a prioritized plan; never rewrites code.  Triggers on reviewing modules for production readiness, performance concerns, architecture boundaries, or test-coverage gaps; AGENTS §6's default audit lens on any lane touching source.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -94,7 +94,7 @@
     },
     {
       "name": "code__crafting-dev-ux",
-      "description": "Design every internal API, module, function, config surface, error type, event/message shape, and CLI so it’s trivially easy to use correctly and hard to use incorrectly — for both human developers and LLMs. Dev UX includes interface shape *and* the surrounding system, findability, first-success, workflow/debuggability, migration UX, governance/enforcement, and DX feedback loops.",
+      "description": "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as AGENTS §6's AUDIT lens when a lane shipped or changed dev-facing surfaces.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -107,7 +107,7 @@
     },
     {
       "name": "code__enforcing-principles",
-      "description": "Mandatory pre-code protocol for concrete repo changes. Forces repo-grounded current-state mapping, user-journey framing, explicit system contracts, deterministic integration tests, failure/observability/performance proofs, safe rollouts, and disciplined migrations across backend, iOS, and infra surfaces. Use for any concrete code change or code-quality review tied to a real repo diff. Do not use for abstract philosophy with no proposed repo change.",
+      "description": "The change protocol for concrete repo edits — risk classification (C-tags) that generates proof obligations, risk-boundary naming, contract-ownership vocabulary, failure pre-mortems, and migration/observability discipline; feeds the work spec and eval plan rather than replacing them. Triggers on any concrete code change, before design or implementation; sizing a diff's proof obligations; retries, schema/contract changes, migrations, rollouts. Not for abstract discussion with no proposed repo edit.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -120,7 +120,7 @@
     },
     {
       "name": "code__fixing-bugs",
-      "description": "Investigates and fixes bugs by reproducing the broken user-journey contract and locking the fix with deterministic proof. Use when diagnosing failures, regressions, defect reports, or targeted fixes that need reproduction tests.",
+      "description": "Bug-fixing protocol — turns a defect into an executable journey contract: failing reproduction at the real port (watched-red), evidence-led fault localization, minimal fix, durable guardrails. Triggers on any defect, regression, or failure report; flaky/heisenbug hunts; replay or kernel divergence; before patching production code for a bug.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -294,7 +294,7 @@
     },
     {
       "name": "eval__design-proof-gates",
-      "description": "Designs falsifiable proof gates and eval-plan.md artifacts that decompose an unlock into the truths it must prove. Triggers on validating a value path, planning measurement-first probes for perf/realtime/scale claims, or any \"how do we know this works\" moment before implementation.",
+      "description": "Designs falsifiable proof gates and the durable eval-plan.md — decomposes an unlock into required truths and the gates that could prove each one false. Triggers on before implementation on any substantial lane; \"how do we know this works\" / \"what should we test\"; any perf, realtime, or scale claim; speccing missing harnesses.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -309,7 +309,7 @@
     },
     {
       "name": "eval__implement-proof-gate",
-      "description": "Builds the missing runnable eval harness for an already-approved objective proof gate. Use after Work Spec / eval planning when a milestone has a concrete objective gate but no command, test, browser check, simulation, benchmark, replay, packet capture, or artifact-producing harness yet. This skill implements proof only; it must not implement product behavior or weaken the approved gate.",
+      "description": "Builds the missing runnable harness for an approved gate card, runs it, and writes the state transition (Red captured / Objectively Green / Blocked) — proof only, never product behavior. Triggers on a gate's loop says \"missing harness\"; a gate needs a literal runnable command before product code proceeds; an existing harness is marked defective.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -745,7 +745,7 @@
     },
     {
       "name": "handoff__final-quality-gate",
-      "description": "Runs the final ship/no-ship gate by verifying scope, proof artifacts, tests, docs, acceptance, and remaining risk. Use before claiming feature completion, milestone closure, release readiness, or final handoff.",
+      "description": "Clean-context ship/no-ship audit before a lane claims Complete — verifies the proof system: gates terminal, artifacts fresh, terminal value shown, lenses clean, docs synced, deltas accepted. Triggers on before claiming feature completion, lane or milestone closure, release readiness, or final handoff.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -758,7 +758,7 @@
     },
     {
       "name": "ops__maintain-incident-postmortem",
-      "description": "Creates or updates durable incident postmortems with source-backed timelines, causes, ruled-out hypotheses, fixes, and recurrence prevention. Use after incidents, outages, regressions, or production failures when notes, logs, PRs, and evidence need a responder-ready record.",
+      "description": "Authors or updates the durable incident postmortem — preserves a hard diagnosis: ruled-out hypotheses, misleading signals, proven mechanism, fast-path discriminator. Triggers only when the diagnosis itself was the work (multi-hypothesis hunt, misleading symptoms, cross-lane evidence); routine bugs return not-owed. Also triggers on signficant corrective-action updates and closure.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -800,14 +800,13 @@
     },
     {
       "name": "plan__maintain-work-spec",
-      "description": "Creates or updates the durable Work Spec for Broad Feature Work and Planning-Only Work. The Work Spec is equal parts Product Requirement Doc, Engineering Specification, Design Document, UX Document, milestone ladder, and current decision-state artifact; use it when defining work, updating milestone rungs, or preserving active feature context without turning the spec into an audit log.",
+      "description": "Creates or updates the durable Work Spec — a lane's judgment state: unlock, contracts, milestone rungs, decisions, and proven-vs-claimed status. Triggers on defining, approving, or resuming substantial work; any rung or status change; any decision, invariant, or eval result that must outlive the session; also triggers for substantial work that does not yet have a  work spec.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md",
-        "references/s-tier-work-spec-example.md"
+        "SKILL.md"
       ],
       "path": ".agents/skills/plan__maintain-work-spec",
       "entry": "SKILL.md"
@@ -840,7 +839,7 @@
     },
     {
       "name": "plan__question-spec",
-      "description": "Use immediately before implementing a work spec to challenge whether the spec is the right solution shape for the intended user journey or engineering unlock.",
+      "description": "Adversarial pre-implementation review of a drafted work spec — challenges whether it is the correct, simplest, highest-value shape for the intended user journey or engineering unlock, benchmarked against the best domain references. Triggers after the work spec and eval plan are drafted, before the first rung executes; after any material spec restructuring; when a lane feels mis-shaped mid-flight.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -872,7 +871,7 @@
     },
     {
       "name": "prompt__create-analysis",
-      "description": "Analyzes an existing prompt to find the highest-leverage gaps, missing domain assumptions, and priority fixes instead of giving generic rewrite advice. Triggers on specific requests to improve a prompt or prompt chain",
+      "description": "Analyzes an existing prompt by mapping its domain's expert knowledge first — mental models, heuristics, failure modes — then tracing every gap and fix to specific findings; analysis only, the rewrite happens separately. Triggers on any request to improve, review, or diagnose a prompt, skill, or prompt chain before rewriting it.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

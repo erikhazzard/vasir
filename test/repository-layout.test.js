@@ -118,105 +118,57 @@ test("built-in eval suites live with their owning skills and include guidelines"
   }
 });
 
-test("work spec skill includes a golden milestone-rung example", () => {
+test("work spec skill owns the current schema and projection rules", () => {
   const workSpecSkillPath = path.join(SKILLS_ROOT, "plan__maintain-work-spec", "SKILL.md");
-  const workSpecExamplePath = path.join(
-    SKILLS_ROOT,
-    "plan__maintain-work-spec",
-    "references",
-    "s-tier-work-spec-example.md"
-  );
 
   const workSpecSkillText = fs.readFileSync(workSpecSkillPath, "utf8");
-  const workSpecExampleText = fs.readFileSync(workSpecExamplePath, "utf8");
 
   assert.match(workSpecSkillText, /Work Spec = Product Requirement Doc \+ Engineering Specification \+ Design Document \+ UX Document/);
-  assert.match(workSpecSkillText, /Spend the Work Spec detail budget on milestone rungs/);
-  assert.match(workSpecSkillText, /The header names the active rung; it does not duplicate the rung/);
-  assert.match(workSpecSkillText, /references\/s-tier-work-spec-example\.md/);
-  assert.match(workSpecSkillText, /Random Context/);
-  assert.match(workSpecSkillText, /Completed rungs record the short commit hash plus commit subject/);
-  assert.match(workSpecSkillText, /Rung commit/);
-  assert.match(workSpecSkillText, /Evidence artifacts/);
-  assert.match(workSpecSkillText, /`tmp\/\.\.\.` paths are allowed and may expire/);
-  assert.match(workSpecSkillText, /Every rung records Complexity, Risk, Perf Impact, and Cost Impact/);
-  assert.match(workSpecSkillText, /N\/A - <reason>/);
-  assert.match(workSpecSkillText, /No stopgaps: build the smallest correct version of the real system/);
-  assert.match(workSpecSkillText, /Do not add a repeated no-stopgap field to each rung/);
-  assert.match(workSpecSkillText, /No-stopgap contract is satisfied or contradiction is called out/);
-  assert.match(workSpecSkillText, /Input Coverage Ledger/);
-  assert.match(workSpecSkillText, /Every user-provided item must map to exactly one disposition/);
-  assert.match(workSpecSkillText, /Do not turn user asks into `\[FACT\]` entries/);
-  assert.match(workSpecSkillText, /Every user-provided item is mapped in the Input Coverage Ledger/);
-  assert.match(workSpecSkillText, /Taste-Critical Work/);
-  assert.match(workSpecSkillText, /name the reference bar, the `must feel` \/ `must not feel` delta/);
-  assert.match(workSpecSkillText, /Section 1\.B sets the feature-wide taste bar; it does not satisfy a taste-critical rung by itself/);
-  assert.match(workSpecSkillText, /each taste-critical rung needs its own rung-specific taste delta and rejection criteria/);
-  assert.match(workSpecSkillText, /Do not rely only on Section 1\.B/);
-  assert.match(workSpecSkillText, /Human-review rejection criteria/);
-  assert.match(workSpecSkillText, /Taste-critical rungs elevate taste/);
-  assert.match(workSpecSkillText, /Browser-Rendered Proof/);
-  assert.match(workSpecSkillText, /actual browser artifact from the running app route or playable scenario/);
-  assert.match(workSpecSkillText, /Unit tests, DOM assertions, component snapshots, and static markup are not enough/);
-  assert.match(workSpecSkillText, /viewport\(s\), and console\/network error status/);
-  assert.match(workSpecSkillText, /Canvas\/game rungs also need a nonblank, correctly framed, interacting\/moving check/);
-
-  assert.match(workSpecExampleText, /# S-Tier Work Spec Example/);
+  assert.match(workSpecSkillText, /serialization format for judgment state/);
+  assert.match(workSpecSkillText, /This file is the only schema truth/);
+  assert.match(workSpecSkillText, /Stale specs are synced, not versioned/);
+  assert.match(workSpecSkillText, /Spec authorship is judgment work/);
+  assert.match(workSpecSkillText, /Milestone rungs are self-contained build packets/);
+  assert.match(workSpecSkillText, /A spec whose header is richer than its active rung is upside down/);
+  assert.match(workSpecSkillText, /Multi-item user asks get an Input Coverage Ledger before synthesis/);
+  assert.match(workSpecSkillText, /`tmp\/` artifacts expire; every recorded artifact keeps a surviving summary/);
+  assert.match(workSpecSkillText, /Parked/);
+  assert.match(workSpecSkillText, /Projection resync/);
+  assert.match(workSpecSkillText, /rung bodies \(§5\.2\) are truth/);
+  assert.match(workSpecSkillText, /header fields, Human Read, §5\.1 index row, and §6 gate table are projections/);
+  assert.match(workSpecSkillText, /gate state resolves toward the eval plan/);
   assert.match(workSpecSkillText, /# WORK SPEC — <FEATURE_NAME>\n\*\*Human Read:\*\*/);
-  assert.match(workSpecSkillText, /The first field under the Work Spec title is `\*\*Human Read:\*\*`/);
-  assert.match(workSpecSkillText, /downstream product, customer, business, safety, trust, revenue, retention, or operational outcome/);
-  assert.match(workSpecSkillText, /Do not merely restate the workflow in nicer words/);
+  assert.match(workSpecSkillText, /The first field under the title, always/);
+  assert.match(workSpecSkillText, /so that <one-level-higher outcome>/);
   assert.match(workSpecSkillText, /Weak: `We are trying to make incidents easier to scan so that operators can triage incidents confidently\.`/);
   assert.match(workSpecSkillText, /Strong: `We are trying to make incidents easier to scan so that Harbor Pulse reduces time-to-mitigation and customer-impact uncertainty during live incidents\.`/);
-  assert.match(workSpecSkillText, /so that <downstream product\/customer\/business\/safety\/trust\/revenue\/retention\/operational outcome>/);
-  assert.match(workSpecSkillText, /names the active rung, next proof, main risk, and decision needed/);
-  assert.match(workSpecExampleText, /# WORK SPEC - Arena FPS Weapon Feel Pass\n\n\*\*Human Read:\*\*/);
-  assert.match(workSpecExampleText, /so that first-session combat earns enough trust and appetite for mastery/);
-  assert.match(workSpecSkillText, /Core Product Outcome Unlock/);
-  assert.match(workSpecSkillText, /one-level-higher product\/business outcome/);
-  assert.match(workSpecExampleText, /Core Product Outcome Unlock/);
-  assert.match(workSpecExampleText, /First-session combat earns enough trust and appetite for mastery/);
-  assert.match(workSpecExampleText, /Core User Journey Unlock/);
-  assert.match(workSpecExampleText, /Core Developer Journey Unlock/);
-  assert.match(workSpecExampleText, /Core Engineering Unlock/);
-  assert.match(workSpecExampleText, /Rung Sizing Model/);
-  assert.match(workSpecExampleText, /Complexity/);
-  assert.match(workSpecExampleText, /Risk/);
-  assert.match(workSpecExampleText, /Perf Impact/);
-  assert.match(workSpecExampleText, /Cost Impact/);
-  assert.match(workSpecExampleText, /Milestone rungs should be rich enough to execute/);
-  assert.match(workSpecExampleText, /No stopgaps/);
-  assert.match(workSpecExampleText, /not a temporary substitute/);
-  assert.match(workSpecExampleText, /No-stopgap belongs in Section 4 as one global contract/);
-  assert.match(workSpecExampleText, /Input Coverage Ledger/);
-  assert.match(workSpecExampleText, /\| # \| User item \| Disposition \| Where it lives \| Notes \|/);
-  assert.match(workSpecExampleText, /Click response should feel immediate/);
-  assert.match(workSpecExampleText, /Designer tuning UI/);
-  assert.match(workSpecExampleText, /Do not convert these user asks into `\[FACT\]` entries/);
-  assert.match(workSpecExampleText, /Taste-critical work/);
-  assert.match(workSpecExampleText, /Reference bar: M2 before\/after hit-readability artifact/);
-  assert.match(workSpecExampleText, /Must-feel delta/);
-  assert.match(workSpecExampleText, /Rejection criteria: reject the clip/);
-  assert.match(workSpecExampleText, /global Design \/ UX Bar is not enough by itself/);
-  assert.match(workSpecExampleText, /not a substitute for per-rung taste deltas/);
-  assert.match(workSpecExampleText, /Browser-rendered proof/);
-  assert.match(workSpecExampleText, /\/arena-fps\?scenario=rifle-feel-m3/);
-  assert.match(workSpecExampleText, /playwright-desktop-before-after\.png/);
-  assert.match(workSpecExampleText, /browser-console-network\.md/);
-  assert.match(workSpecExampleText, /nonblank\/framed\/interacting canvas checks/);
-  assert.match(workSpecExampleText, /Rung commit/);
-  assert.match(workSpecExampleText, /Evidence artifacts/);
-  assert.match(workSpecExampleText, /\| Rung \| State \| Size \| User \/ Dev \/ Engineering unlock \| Proof summary \| Evidence artifact \| Rung commit \| Notes \|/);
-  assert.match(workSpecExampleText, /hit-marker-before-after\.png/);
-  assert.match(workSpecExampleText, /frame-budget-before-after\.md/);
-  assert.match(workSpecExampleText, /Before \/ after benchmark table/);
-  assert.match(workSpecExampleText, /Cost Impact N\/A - local client\/runtime only/);
-  assert.match(workSpecExampleText, /Perf Impact M: touches frame-loop feedback and camera impulses/);
-  assert.match(workSpecExampleText, /`a1b2c3d` - add rifle fire and damage loop/);
-  assert.match(workSpecExampleText, /Pending - commit after M3 proof \+ spec\/eval sync/);
-  assert.match(workSpecExampleText, /Done when:/);
-  assert.match(workSpecExampleText, /Random Context \/ Scratchpad/);
-  assert.doesNotMatch(workSpecExampleText, /Objectively Green/);
+  assert.match(workSpecSkillText, /User Journey Unlock/);
+  assert.match(workSpecSkillText, /Engineering System Unlock/);
+  assert.match(workSpecSkillText, /\| # \| User item \| Disposition \| Where it lives \| Notes \|/);
+  assert.match(workSpecSkillText, /Do not reorder or rename top-level sections 1–7 or A1–A5/);
+  assert.match(workSpecSkillText, /no naked `M1`\/`Phase 2` anywhere/);
+  assert.match(workSpecSkillText, /Contracts live in §4 only/);
+  assert.match(workSpecSkillText, /Status vocabulary is root §4's/);
+  assert.match(workSpecSkillText, /Objectively Green/);
+  assert.match(workSpecSkillText, /Waiting Human/);
+  assert.match(workSpecSkillText, /Evidence:/);
+  assert.match(workSpecSkillText, /browser-rendered rungs record real route\/scenario captures/);
+  assert.match(workSpecSkillText, /Taste-critical rungs/);
+  assert.match(workSpecSkillText, /Reference bar:/);
+  assert.match(workSpecSkillText, /Must-feel delta:/);
+  assert.match(workSpecSkillText, /Must-not-feel delta:/);
+  assert.match(workSpecSkillText, /Rejection criteria:/);
+  assert.match(workSpecSkillText, /Rung sizing/);
+  assert.match(workSpecSkillText, /\| Complexity \|/);
+  assert.match(workSpecSkillText, /\| Risk \|/);
+  assert.match(workSpecSkillText, /\| Perf impact \|/);
+  assert.match(workSpecSkillText, /\| Cost impact \|/);
+  assert.match(workSpecSkillText, /\| Rung \| State \| Size \| Unlock \| Proof summary \| Evidence \| Commit \| Notes \|/);
+  assert.match(workSpecSkillText, /\*\*Proof plan:\*\* eval-plan gate IDs plus the shortest real journey loop/);
+  assert.match(workSpecSkillText, /Rung commit:/);
+  assert.match(workSpecSkillText, /Pending — commit after proof, spec sync, and eval sync/);
+  assert.match(workSpecSkillText, /Conformance Check \(run before writing — never stored in the doc\)/);
+  assert.doesNotMatch(workSpecSkillText, /# S-Tier Work Spec Example/);
 });
 
 test("agent template snippets own profile-specific insertion blocks", () => {
@@ -343,11 +295,11 @@ test("root AGENTS and handoff gate block proof exhaust and script bloat", () => 
     assert.match(templateText, /`package\.json` scripts are a six-month developer interface, not a proof log/);
   }
 
-  assert.match(handoffSkillText, /Repo Shape & Command Surface/);
-  assert.match(handoffSkillText, /<Artifact_Ledger>/);
-  assert.match(handoffSkillText, /<Package_Script_Changes>/);
-  assert.match(handoffSkillText, /temporary proof outside `tmp\/\*\*`/);
-  assert.match(handoffSkillText, /package scripts named for a bug, task, milestone, date, incident, proof rung, or temporary scenario/);
+  assert.match(handoffSkillText, /Repo shape & command surface/);
+  assert.match(handoffSkillText, /Temporary proof lives under `tmp\/\*\*` only/);
+  assert.match(handoffSkillText, /Added or changed package scripts name a six-month developer or CI command/);
+  assert.match(handoffSkillText, /never a bug, task, date, or proof rung/);
+  assert.match(handoffSkillText, /This table \*is\* the audit/);
 });
 
 test("root AGENTS ties commits to objectively green Work Spec rungs", () => {

@@ -16,9 +16,8 @@ Work Spec = Product Requirement Doc + Engineering Specification + Design Documen
 
 ## Schema Authority
 
-- **This file is the only schema truth.** `references/s-tier-work-spec-example.md` calibrates prose quality and rung richness — never structure. If the example diverges structurally from this file, the example is the bug; do not copy its shape.
 - **Stale specs are synced, not versioned.** A spec that predates the current template is handled like any lagging doc (root §1): status-only edits conform locally; the first lane that materially touches it restructures it to the current template — mapping old sections in, archiving displaced content with pointers, noting the restructure in the change log. Never renumber existing IDs.
-- When creating a spec, materially restructuring one, or rewriting a milestone ladder, load the reference example first. For status syncs and small fixes it is optional.
+- When creating a spec, materially restructuring one, or rewriting a milestone ladder, use this file's template and conformance check as the source of truth. For status syncs and small fixes, preserve the existing structure unless the touched section is already stale.
 
 ---
 
