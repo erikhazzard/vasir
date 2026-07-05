@@ -282,6 +282,7 @@ test("init inside a repo installs and tracks the full catalog", async () => {
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
   const projectConfig = JSON.parse(
     fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8")
   );
@@ -291,6 +292,8 @@ test("init inside a repo installs and tracks the full catalog", async () => {
   );
   assert.equal(installState.catalog.trackingMode, "all");
   assert.match(capturedOutput.readStdout(), /Tracking Full catalog/);
+  assert.match(capturedOutput.readStdout(), /AGENTS starter ready at/);
+  assert.match(capturedOutput.readStdout(), /CLAUDE starter ready at/);
 });
 
 test("update bootstraps the canonical global catalog when it is missing", async () => {
@@ -1024,6 +1027,7 @@ test("add installs skills into repo-local .agents and repairs compatibility alia
   assert.equal(statusCode, 0);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
   assert.equal(
     fs.realpathSync(path.join(projectDirectory, ".claude", "skills")),
     fs.realpathSync(path.join(projectDirectory, ".agents", "skills"))
@@ -1057,8 +1061,10 @@ test("add installs into the repository root when invoked from a nested subdirect
   assert.equal(statusCode, 0);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
   assert.ok(!fs.existsSync(path.join(projectNestedDirectory, ".agents")));
   assert.ok(!fs.existsSync(path.join(projectNestedDirectory, "AGENTS.md")));
+  assert.ok(!fs.existsSync(path.join(projectNestedDirectory, "CLAUDE.md")));
 });
 
 test("add all installs every catalog skill into the repository root", async () => {
@@ -1077,6 +1083,8 @@ test("add all installs every catalog skill into the repository root", async () =
   assert.equal(statusCode, 0);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "roguelike", "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
   assert.match(capturedOutput.readStdout(), /Installed react/);
   assert.match(capturedOutput.readStdout(), /Installed roguelike/);
 });

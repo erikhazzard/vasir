@@ -97,7 +97,7 @@ Recommended path:
 1. Prefer `vasir remove <skill>` over manual deletion when you want to remove a project-local skill.
 2. If you already deleted `.agents/skills/<skill>` manually, rerun `vasir remove <skill>` once to let Vasir report it as already absent and keep the local snapshot clean.
 3. Inspect `.agents/skills/` as the canonical directory. Do not delete from `.claude/skills` or `.codex/skills`; those are aliases.
-4. Update `AGENTS.md` yourself if it still routes to a removed skill.
+4. Update generated root contracts yourself if they still route to a removed skill.
 
 Verification:
 
@@ -197,13 +197,13 @@ Recommended path:
 1. Preview with `vasir agents sync --dry-run`.
 2. Run `vasir agents sync`.
 3. If Vasir inferred the wrong profile, rerun with `vasir agents sync --profile backend`, `vasir agents sync --profile frontend`, `vasir agents sync --profile ios`, or `vasir agents sync --profile generic`.
-4. Keep repo-specific landmines in `AGENTS__non-obvious.md`; `AGENTS.md` is regenerated from it.
+4. Keep repo-specific landmines in `AGENTS__non-obvious.md`; `AGENTS.md` and `CLAUDE.md` are regenerated from it.
 5. Use `vasir agents init`, `draft-purpose`, `draft-routing`, and `validate` only when you intentionally need the lower-level primitives.
 
 Verification:
 
-- `AGENTS.md` exists at the repo root.
-- The file no longer contains scaffold text like `[Project Name]`, `[Example]`, or untouched purpose/routing markers.
+- `AGENTS.md` and `CLAUDE.md` exist at the repo root.
+- The generated `AGENTS.md` file no longer contains scaffold text like `[Project Name]`, `[Example]`, or untouched purpose/routing markers.
 - Any routed directory in Section 1 exists and owns the required local `AGENTS.md`, or that route has been removed.
 
 ## Eval Errors

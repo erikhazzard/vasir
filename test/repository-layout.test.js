@@ -16,6 +16,13 @@ const AGENTS_SNIPPET_MARKER_PAIRS = Object.freeze([
   ["<!-- vasir:engineering-doctrine-inserts:start -->", "<!-- vasir:engineering-doctrine-inserts:end -->"]
 ]);
 
+const ROOT_CONTRACT_MARKER_PAIRS = Object.freeze([
+  ["<!-- vasir:purpose:start -->", "<!-- vasir:purpose:end -->"],
+  ["<!-- vasir:routing:start -->", "<!-- vasir:routing:end -->"],
+  ["<!-- vasir:nonobvious:start -->", "<!-- vasir:nonobvious:end -->"],
+  ["<!-- vasir:engineering-doctrine-inserts:start -->", "<!-- vasir:engineering-doctrine-inserts:end -->"]
+]);
+
 function walkFiles(directoryPath) {
   const discoveredFiles = [];
   for (const directoryEntry of fs.readdirSync(directoryPath, { withFileTypes: true })) {
@@ -244,32 +251,51 @@ test("agent template snippets own profile-specific insertion blocks", () => {
   }
 });
 
-test("root AGENTS template uses the operating contract shape and required renderer seams", () => {
+test("root contract templates use the operating contract shape and required renderer seams", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
   const exampleAgentsText = fs.readFileSync(path.join(REPO_ROOT, "docs", "example-agents.md"), "utf8");
 
-  assert.doesNotMatch(agentsTemplateText, /vasir:profile/);
-  assert.doesNotMatch(agentsTemplateText, /Last Updated/);
-  assert.doesNotMatch(agentsTemplateText, /update alongside major architectural PRs/);
   assert.match(agentsTemplateText, /# AGENTS\.md — \[Project Name\] Root Operating Contract/);
-  assert.match(agentsTemplateText, /<!-- vasir:purpose:start -->/);
-  assert.match(agentsTemplateText, /<!-- vasir:routing:start -->/);
-  assert.match(agentsTemplateText, /<!-- vasir:nonobvious:start -->/);
-  assert.match(agentsTemplateText, /<!-- vasir:engineering-doctrine-inserts:start -->/);
-  assert.match(agentsTemplateText, /# 0\. The Unlock Mandate/);
-  assert.match(agentsTemplateText, /# 1\. Constraint Precedence/);
-  assert.match(agentsTemplateText, /# 3\. The Working Relationship/);
-  assert.match(agentsTemplateText, /# 5\. Proof Doctrine/);
-  assert.match(agentsTemplateText, /# 8\. Custody/);
-  assert.match(agentsTemplateText, /Senior-engineer latitude/);
-  assert.match(agentsTemplateText, /The lane is a journey boundary, not a file list/);
-  assert.match(agentsTemplateText, /Boundary discipline — attribute, don't fix/);
-  assert.doesNotMatch(agentsTemplateText, /Existing files allowed to edit:/);
-  assert.doesNotMatch(agentsTemplateText, /Plan Amendment Protocol/);
-  assert.doesNotMatch(agentsTemplateText, /Escalation triggers:/);
-  assert.doesNotMatch(agentsTemplateText, /ESCALATION_REQUEST/);
-  assert.doesNotMatch(agentsTemplateText, /Approved change envelope:/);
-  assert.doesNotMatch(agentsTemplateText, /file targets exceed the approved envelope/);
+  assert.match(claudeTemplateText, /# CLAUDE\.md — \[Project Name\] Root Operating Contract/);
+  assert.match(agentsTemplateText, /contract for codex and other non-Claude agents/);
+  assert.match(claudeTemplateText, /contract for Claude agents \(Fable orchestrator \+ Claude subagents\)/);
+  assert.match(agentsTemplateText, /The orchestrator's tier does orchestration/);
+  assert.match(agentsTemplateText, /Codex gpt-5\.5-thinking xhigh delegates/);
+  assert.match(claudeTemplateText, /Prime Directive — Fable tokens are the scarce resource/);
+  assert.match(claudeTemplateText, /Fable xhigh \(main agent or subagents inheriting it\)/);
+  assert.match(claudeTemplateText, /In-harness Claude subagents/);
+
+  for (const [templateName, templateText] of [
+    ["AGENTS", agentsTemplateText],
+    ["CLAUDE", claudeTemplateText]
+  ]) {
+    assert.doesNotMatch(templateText, /vasir:profile/, `${templateName} template should not persist profile markers`);
+    assert.doesNotMatch(templateText, /Last Updated/, `${templateName} template should not carry stale timestamp fields`);
+    assert.doesNotMatch(templateText, /update alongside major architectural PRs/, `${templateName} template should not carry legacy boilerplate`);
+    for (const [startMarker, endMarker] of ROOT_CONTRACT_MARKER_PAIRS) {
+      assert.match(templateText, new RegExp(startMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${templateName} template missing ${startMarker}`);
+      assert.match(templateText, new RegExp(endMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${templateName} template missing ${endMarker}`);
+      assert.ok(
+        templateText.indexOf(startMarker) < templateText.indexOf(endMarker),
+        `${templateName} template must place ${startMarker} before ${endMarker}`
+      );
+    }
+    assert.match(templateText, /# 0\. The Unlock Mandate/);
+    assert.match(templateText, /# 1\. Constraint Precedence/);
+    assert.match(templateText, /# 3\. The Working Relationship/);
+    assert.match(templateText, /# 5\. Proof Doctrine/);
+    assert.match(templateText, /# 8\. Custody/);
+    assert.match(templateText, /Senior-engineer latitude/);
+    assert.match(templateText, /The lane is a journey boundary, not a file list/);
+    assert.match(templateText, /Boundary discipline — attribute, don't fix/);
+    assert.doesNotMatch(templateText, /Existing files allowed to edit:/);
+    assert.doesNotMatch(templateText, /Plan Amendment Protocol/);
+    assert.doesNotMatch(templateText, /Escalation triggers:/);
+    assert.doesNotMatch(templateText, /ESCALATION_REQUEST/);
+    assert.doesNotMatch(templateText, /Approved change envelope:/);
+    assert.doesNotMatch(templateText, /file targets exceed the approved envelope/);
+  }
   assert.doesNotMatch(exampleAgentsText, /Which exact files and systems will be touched/);
   assert.doesNotMatch(exampleAgentsText, /Do not edit outside the declared lane/);
   assert.doesNotMatch(exampleAgentsText, /approved change boundary/);
@@ -277,6 +303,7 @@ test("root AGENTS template uses the operating contract shape and required render
 
 test("AGENTS taxonomy separates generated roots from folder steering maps", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
   const templateReadmeText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "README.md"), "utf8");
   const rootReadmeText = fs.readFileSync(path.join(REPO_ROOT, "README.md"), "utf8");
   const cliReferenceText = fs.readFileSync(path.join(REPO_ROOT, "docs", "cli-reference.md"), "utf8");
@@ -285,12 +312,13 @@ test("AGENTS taxonomy separates generated roots from folder steering maps", () =
     "utf8"
   );
 
-  for (const documentText of [agentsTemplateText, templateReadmeText, rootReadmeText, cliReferenceText]) {
+  for (const documentText of [agentsTemplateText, claudeTemplateText, templateReadmeText, rootReadmeText, cliReferenceText]) {
     assert.match(documentText, /Nested root \/ folder `AGENTS\.md`|Nested root `AGENTS\.md`|nested root `AGENTS\.md`|Nested root AGENTS|nested root AGENTS/);
     assert.match(documentText, /Folder `AGENTS\.md`|Folder AGENTS|folder AGENTS/);
   }
 
   assert.match(agentsTemplateText, /Folder `AGENTS\.md` files are hand-authored steering maps/);
+  assert.match(claudeTemplateText, /Folder `AGENTS\.md` files are hand-authored steering maps/);
   assert.match(rootReadmeText, /Do not use `vasir agents sync --scope` for ordinary folder steering maps/);
   assert.match(cliReferenceText, /Folder `AGENTS\.md` files are different/);
   assert.match(folderAgentsSkillText, /Folder AGENTS are local steering maps/);
@@ -302,15 +330,18 @@ test("AGENTS taxonomy separates generated roots from folder steering maps", () =
 
 test("root AGENTS and handoff gate block proof exhaust and script bloat", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
   const handoffSkillText = fs.readFileSync(
     path.join(REPO_ROOT, ".agents", "skills", "handoff__final-quality-gate", "SKILL.md"),
     "utf8"
   );
 
-  assert.match(agentsTemplateText, /Raw proof: `tmp\/<datetime>__<semantic-description>\/` — current-run evidence only/);
-  assert.match(agentsTemplateText, /Durable logic, reusable harnesses, and canonical docs never live in `tmp\/`/);
-  assert.match(agentsTemplateText, /the spec keeps the numbers/);
-  assert.match(agentsTemplateText, /`package\.json` scripts are a six-month developer interface, not a proof log/);
+  for (const templateText of [agentsTemplateText, claudeTemplateText]) {
+    assert.match(templateText, /Raw proof: `tmp\/<datetime>__<semantic-description>\/` — current-run evidence only/);
+    assert.match(templateText, /Durable logic, reusable harnesses, and canonical docs never live in `tmp\/`/);
+    assert.match(templateText, /the spec keeps the numbers/);
+    assert.match(templateText, /`package\.json` scripts are a six-month developer interface, not a proof log/);
+  }
 
   assert.match(handoffSkillText, /Repo Shape & Command Surface/);
   assert.match(handoffSkillText, /<Artifact_Ledger>/);
@@ -321,39 +352,45 @@ test("root AGENTS and handoff gate block proof exhaust and script bloat", () => 
 
 test("root AGENTS ties commits to objectively green Work Spec rungs", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
 
-  assert.match(agentsTemplateText, /Objectively Green/);
-  assert.match(agentsTemplateText, /`Complete` — objective gates green, subjective gates accepted, docs synced, audit run/);
-  assert.match(agentsTemplateText, /Git — commit forward, commit often/);
-  assert.match(agentsTemplateText, /The orchestrator commits: at every Objectively Green rung, at lane close, and at coherent stopping points/);
-  assert.match(agentsTemplateText, /No stopgaps — build vFinal/);
-  assert.match(agentsTemplateText, /reduce capability, not correctness/);
-  assert.match(agentsTemplateText, /compatibility shims only for migration\/rollback\/protocol\/persistence\/client-version safety/);
-  assert.match(agentsTemplateText, /A failure state is the user having to run `git commit` himself/);
-  assert.doesNotMatch(agentsTemplateText, /`git add -A` and `git commit` are allowed when committing current workspace progress/);
-  assert.doesNotMatch(agentsTemplateText, /Commit messages should be generated 1-2 line summaries/);
-  assert.doesNotMatch(agentsTemplateText, /When a verified Work Spec milestone is complete/);
-  assert.doesNotMatch(agentsTemplateText, /declared scope/);
-  assert.doesNotMatch(agentsTemplateText, /approved scope/);
-  assert.doesNotMatch(agentsTemplateText, /active scope/);
+  for (const templateText of [agentsTemplateText, claudeTemplateText]) {
+    assert.match(templateText, /Objectively Green/);
+    assert.match(templateText, /`Complete` — objective gates green, subjective gates accepted, docs synced, audit run/);
+    assert.match(templateText, /Git — commit forward, commit often/);
+    assert.match(templateText, /The orchestrator commits: at every Objectively Green rung, at lane close, and at coherent stopping points/);
+    assert.match(templateText, /No stopgaps — build vFinal/);
+    assert.match(templateText, /reduce capability, not correctness/);
+    assert.match(templateText, /compatibility shims only for migration\/rollback\/protocol\/persistence\/client-version safety/);
+    assert.match(templateText, /A failure state is the user having to run `git commit` himself/);
+    assert.doesNotMatch(templateText, /`git add -A` and `git commit` are allowed when committing current workspace progress/);
+    assert.doesNotMatch(templateText, /Commit messages should be generated 1-2 line summaries/);
+    assert.doesNotMatch(templateText, /When a verified Work Spec milestone is complete/);
+    assert.doesNotMatch(templateText, /declared scope/);
+    assert.doesNotMatch(templateText, /approved scope/);
+    assert.doesNotMatch(templateText, /active scope/);
+  }
 });
 
 test("root AGENTS keeps generic JS and game test doctrine profile-aware", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
   const backendSnippetText = fs.readFileSync(
     path.join(REPO_ROOT, "templates", "agents", "snippets", "backend-inserts.md"),
     "utf8"
   );
 
-  assert.match(agentsTemplateText, /Plain ESM JavaScript in `\.js` files absent a stronger local convention/);
-  assert.match(agentsTemplateText, /Env reads and logging only through the repo's config\/logger boundaries/);
-  assert.match(agentsTemplateText, /games use `games\/<gameId>\/tests\/` absent a local convention/);
+  for (const templateText of [agentsTemplateText, claudeTemplateText]) {
+    assert.match(templateText, /Plain ESM JavaScript in `\.js` files absent a stronger local convention/);
+    assert.match(templateText, /Env reads and logging only through the repo's config\/logger boundaries/);
+    assert.match(templateText, /games use `games\/<gameId>\/tests\/` absent a local convention/);
+    assert.doesNotMatch(templateText, /For Javascript, write plain JavaScript with ESM in `\.js` files only: No `\.mjs`/);
+    assert.doesNotMatch(templateText, /For individual games, tests MUST live under `games\/<gameId>\/tests\/`/);
+    assert.doesNotMatch(templateText, /Game-Specific:\n  - Individual game tests live under `games\/<gameId>\/tests\/`/);
+  }
   assert.match(backendSnippetText, /Backend profile default: ESM in `\.js` files\. Follow stronger repo-local module or file-extension conventions when present/);
   assert.match(backendSnippetText, /Backend profile default: Mocha for backend tests\. Follow stronger repo-local test-runner conventions when present/);
   assert.match(backendSnippetText, /Do not read `process\.env` outside the repo-owned config boundary; backend profile default is `src\/env\.js`/);
-  assert.doesNotMatch(agentsTemplateText, /For Javascript, write plain JavaScript with ESM in `\.js` files only: No `\.mjs`/);
-  assert.doesNotMatch(agentsTemplateText, /For individual games, tests MUST live under `games\/<gameId>\/tests\/`/);
-  assert.doesNotMatch(agentsTemplateText, /Game-Specific:\n  - Individual game tests live under `games\/<gameId>\/tests\/`/);
   assert.doesNotMatch(backendSnippetText, /Modules: ESM with `\.js` files only\. Do not create `\.mjs`/);
   assert.doesNotMatch(backendSnippetText, /Use Mocha for backend tests/);
   assert.doesNotMatch(backendSnippetText, /approved scope/);
@@ -361,13 +398,16 @@ test("root AGENTS keeps generic JS and game test doctrine profile-aware", () => 
 
 test("testing doctrine forbids tombstone absence tests", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
   const testingSkillText = fs.readFileSync(
     path.join(REPO_ROOT, ".agents", "skills", "testing__enforcing-mandate", "SKILL.md"),
     "utf8"
   );
 
-  assert.match(agentsTemplateText, /No tombstone tests:/);
-  assert.match(agentsTemplateText, /Absence assertions only guard a named contract/);
+  for (const templateText of [agentsTemplateText, claudeTemplateText]) {
+    assert.match(templateText, /No tombstone tests:/);
+    assert.match(templateText, /Absence assertions only guard a named contract/);
+  }
   assert.match(testingSkillText, /No tombstone tests/);
   assert.match(testingSkillText, /private locals, variable names, function names/);
   assert.match(testingSkillText, /Writing tombstone tests that only prove removed UI\/API\/backend\/data\/implementation artifacts stayed absent/);
@@ -386,6 +426,7 @@ test("local markdown links resolve", () => {
     "docs/writing-skills.md",
     "templates/agents/README.md",
     "templates/agents/AGENTS.md",
+    "templates/agents/CLAUDE.md",
     "templates/SKILL.md"
   ];
 

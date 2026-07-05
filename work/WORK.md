@@ -65,6 +65,7 @@ The CLI installs selected skills into the current repo:
 ```text
 my-project/
   AGENTS.md
+  CLAUDE.md
   .agents/
     skills/
       design__building-frontend/
@@ -84,7 +85,7 @@ Rules:
 - `.claude/skills` and `.codex/skills` must be links to `.agents/skills`, never copies.
 - `add` never overwrites an existing project skill directory.
 - `update` never mutates project-local skills.
-- The template `AGENTS.md` should reference `.agents/skills/<skill>/SKILL.md` as the canonical route.
+- The generated root contracts should reference `.agents/skills/<skill>/SKILL.md` as the canonical route.
 
 ## 5. Cross-Platform Link Contract
 
@@ -159,8 +160,8 @@ Behavior:
 - Create or repair project-local `.agents/skills`, `.claude/skills`, and `.codex/skills`.
 - Copy the full checked-in skill directory contents.
 - Refuse to overwrite an existing `<repo>/.agents/skills/<skill>` directory unless `--replace` is explicitly provided.
-- If root `AGENTS.md` is missing, copy the template into place.
-- Support `--json` with the installed skill names, replaced skill names, the resolved project root path, and the project skills path.
+- If root contracts are missing, copy `AGENTS.md` and `CLAUDE.md` templates into place.
+- Support `--json` with the installed skill names, replaced skill names, the resolved project root path, the project skills path, and generated root contract paths.
 - `--replace` refreshes an existing project-local skill copy from the global catalog only when the local directory still matches the last Vasir-managed snapshot.
 - If the project-local skill has local edits, unexpected files, or missing tracked state, `--replace` must fail closed and instruct the user to back up/delete manually.
 
@@ -198,7 +199,10 @@ vasir/
       meta.json?            # optional compatibility metadata only
       references/...
   templates/
-    AGENTS.md
+    agents/
+      AGENTS.md
+      CLAUDE.md
+      snippets/
     SKILL.md
   docs/
     cli-reference.md
@@ -276,7 +280,7 @@ Required test surfaces:
    - `update` bootstraps the global clone when it is missing.
    - `update` rejects a dirty global clone.
    - `list` reads the catalog from the canonical global clone.
-   - `add` copies the requested skill into `.agents/skills` and repairs `.claude/skills` and `.codex/skills`.
+   - `add` copies the requested skill into `.agents/skills`, repairs `.claude/skills` and `.codex/skills`, and seeds `AGENTS.md` + `CLAUDE.md` when no root contract already exists.
    - `add --replace` refreshes an existing project-local skill from the global catalog.
    - `add --replace` fails closed when the project-local skill has local divergence from the last Vasir-managed snapshot.
    - `--json` success and error envelopes stay stable.
@@ -309,10 +313,10 @@ The repo docs must tell one coherent story:
 - `docs/create-your-first-skill.md` is the end-to-end tutorial for a first contribution.
 - `docs/writing-skills.md` is the authoring how-to.
 - `docs/skill-reference.md` owns file layout, metadata, and versioning facts.
-- `templates/agents/README.md` is the single "start here" page for AGENTS templates and profile selection.
-- `docs/example-agents.md` provides a filled `AGENTS.md` example alongside the blank template.
+- `templates/agents/README.md` is the single "start here" page for AGENTS/CLAUDE templates and profile selection.
+- `docs/example-agents.md` provides a filled generated root-contract example alongside the blank templates.
 - `README.md` routes readers to the companion pages for repo-root resolution, CLI details, and troubleshooting.
-- `templates/agents/AGENTS.md` is the canonical root operating-contract template.
+- `templates/agents/AGENTS.md` and `templates/agents/CLAUDE.md` are canonical twin root operating-contract templates.
 - `docs/writing-skills.md` keeps the flat `.agents/skills/<name>` authoring contract.
 
 ## 12. Implementation Sequence

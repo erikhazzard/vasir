@@ -254,9 +254,9 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /refreshes the skills tracked by the current repo/i);
   assert.match(capturedOutput.readStdout(), /adopt never copies or overwrites skill files/i);
   assert.match(capturedOutput.readStdout(), /mutates only the current repo/i);
-  assert.match(capturedOutput.readStdout(), /agents sync is the one-command generated AGENTS path/i);
+  assert.match(capturedOutput.readStdout(), /agents sync is the one-command generated AGENTS\/CLAUDE path/i);
   assert.match(capturedOutput.readStdout(), /Folder AGENTS files are hand-authored steering maps/i);
-  assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root/i);
+  assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root and writes AGENTS\.md \+ CLAUDE\.md/i);
   assert.match(capturedOutput.readStdout(), /agents validate fails closed/i);
   assert.match(capturedOutput.readStdout(), /auto-initializes the global catalog if needed/i);
   assert.match(capturedOutput.readStdout(), /remove mutates only the current repo root/i);
@@ -337,6 +337,7 @@ test("unknown agents profiles fail before add mutates project skills or AGENTS",
   assert.equal(parsedError.code, "AGENTS_PROFILE_UNKNOWN");
   assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents")));
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
 });
 
 test("replace is rejected outside the add command", async () => {
@@ -783,20 +784,30 @@ test("agents init writes a stack-specific starter with the project name and purp
   assert.equal(parsedOutput.subcommand, "init");
   assert.equal(parsedOutput.profile, "frontend");
   assert.equal(parsedOutput.projectRootDirectory, projectDirectory);
+  assert.equal(parsedOutput.agentsFilePath, path.join(projectDirectory, "AGENTS.md"));
+  assert.equal(parsedOutput.claudeFilePath, path.join(projectDirectory, "CLAUDE.md"));
 
   const agentsFilePath = path.join(projectDirectory, "AGENTS.md");
+  const claudeFilePath = path.join(projectDirectory, "CLAUDE.md");
   const agentsText = fs.readFileSync(agentsFilePath, "utf8");
+  const claudeText = fs.readFileSync(claudeFilePath, "utf8");
   assert.match(agentsText, /# AGENTS\.md: space-admin-console Root Manifest/);
+  assert.match(claudeText, /# CLAUDE\.md: space-admin-console Root Manifest/);
   assert.doesNotMatch(agentsText, /vasir:profile/);
+  assert.doesNotMatch(claudeText, /vasir:profile/);
   assert.doesNotMatch(agentsText, /Last Updated/);
+  assert.doesNotMatch(claudeText, /Last Updated/);
   assert.match(agentsText, /Replace this block first\./);
+  assert.match(claudeText, /Replace this block first\./);
   assert.match(agentsText, /This line must survive stack-profile composition\./);
+  assert.match(claudeText, /This line must survive stack-profile composition\./);
   assert.match(agentsText, /Use local UI state first\./);
+  assert.match(claudeText, /Use local UI state first\./);
   const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
   assert.equal(projectConfig.agents.profile, "frontend");
 });
 
-test("add can install skills and seed a stack-specific AGENTS starter in one command", async () => {
+test("add can install skills and seed stack-specific AGENTS and CLAUDE starters in one command", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -823,12 +834,46 @@ test("add can install skills and seed a stack-specific AGENTS starter in one com
   assert.equal(parsedOutput.status, "success");
   assert.equal(parsedOutput.agentsProfile, "frontend");
   assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
+  assert.equal(parsedOutput.agentsFilePath, path.join(projectDirectory, "AGENTS.md"));
+  assert.equal(parsedOutput.claudeFilePath, path.join(projectDirectory, "CLAUDE.md"));
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  const claudeText = fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8");
   assert.doesNotMatch(agentsText, /vasir:profile/);
+  assert.doesNotMatch(claudeText, /vasir:profile/);
+  assert.match(claudeText, /# CLAUDE\.md: space-admin-console Root Manifest/);
   const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
   assert.equal(projectConfig.agents.profile, "frontend");
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+});
+
+test("add leaves root contracts unchanged when only CLAUDE already exists", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const capturedOutput = captureCommandWriters();
+
+  writeFile(path.join(projectDirectory, "CLAUDE.md"), "# Existing Claude Contract\n");
+
+  const statusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 0);
+  const parsedOutput = JSON.parse(capturedOutput.readStdout());
+  assert.equal(parsedOutput.command, "add");
+  assert.equal(parsedOutput.status, "success");
+  assert.equal(parsedOutput.wroteAgentsFile, false);
+  assert.equal(parsedOutput.wroteClaudeFile, false);
+  assert.equal(parsedOutput.agentsFilePath, path.join(projectDirectory, "AGENTS.md"));
+  assert.equal(parsedOutput.claudeFilePath, path.join(projectDirectory, "CLAUDE.md"));
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.equal(fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8"), "# Existing Claude Contract\n");
 });
 
 test("add all installs the full catalog into the current repo", async () => {
@@ -855,6 +900,10 @@ test("add all installs the full catalog into the current repo", async () => {
   assert.equal(parsedOutput.status, "success");
   assert.deepEqual(parsedOutput.installedSkills, ["react"]);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "react", "SKILL.md")));
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
+  assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
 });
 
 test("add rejects mixing all with specific skill names", async () => {
@@ -903,7 +952,9 @@ test("add infers a stronger AGENTS profile when the repo shape is obvious", asyn
   assert.equal(parsedOutput.agentsProfile, "frontend");
   assert.equal(parsedOutput.agentsProfileSource, "inferred");
   assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
   assert.doesNotMatch(fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"), /vasir:profile/);
+  assert.doesNotMatch(fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8"), /vasir:profile/);
   const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
   assert.equal(projectConfig.agents.profile, "frontend");
 });
@@ -1041,21 +1092,33 @@ Existing files allowed to edit:
   assert.equal(parsedOutput.profileSource, "inferred");
   assert.equal(parsedOutput.mode, "refreshed");
   assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
+  assert.equal(parsedOutput.claudeFilePath, path.join(projectDirectory, "CLAUDE.md"));
   assert.equal(parsedOutput.nonobviousSource, "migrated-from-agents");
   assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "AGENTS__non-obvious.md"));
   assert.equal(parsedOutput.wroteNonobviousFile, true);
   assert.equal(parsedOutput.wouldWriteNonobviousFile, false);
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  const claudeText = fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8");
   assert.match(agentsText, /# AGENTS\.md: space-admin-console Root Manifest/);
+  assert.match(claudeText, /# CLAUDE\.md: space-admin-console Root Manifest/);
   assert.doesNotMatch(agentsText, /vasir:profile/);
+  assert.doesNotMatch(claudeText, /vasir:profile/);
   assert.match(agentsText, /Launcher default-game policy lives in Promotions, not Games\./);
+  assert.match(claudeText, /Launcher default-game policy lives in Promotions, not Games\./);
   assert.match(agentsText, /If touching `\/src\/components\/`, use this root `AGENTS\.md`/);
+  assert.match(claudeText, /If touching `\/src\/components\/`, use this root `AGENTS\.md`/);
   assert.doesNotMatch(agentsText, /Existing files allowed to edit/);
+  assert.doesNotMatch(claudeText, /Existing files allowed to edit/);
   assert.doesNotMatch(agentsText, /EDIT THESE FIRST/);
+  assert.doesNotMatch(claudeText, /EDIT THESE FIRST/);
   assert.doesNotMatch(agentsText, /vasir:purpose:start/);
+  assert.doesNotMatch(claudeText, /vasir:purpose:start/);
   assert.doesNotMatch(agentsText, /vasir:routing:start/);
+  assert.doesNotMatch(claudeText, /vasir:routing:start/);
   assert.doesNotMatch(agentsText, /\[Example\]/);
+  assert.doesNotMatch(claudeText, /\[Example\]/);
   assert.equal(
     fs.readFileSync(path.join(projectDirectory, "AGENTS__non-obvious.md"), "utf8"),
     "Launcher default-game policy lives in Promotions, not Games.\n"
@@ -1114,6 +1177,8 @@ Games cannot call platform APIs directly.
   assert.equal(parsedOutput.profile, "generic");
   assert.equal(parsedOutput.profileSource, "default-generic");
   assert.equal(parsedOutput.routingProfile, "generic");
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
   assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/games/`")));
   assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/tools/`")));
   assert.ok(parsedOutput.routingLines.some((line) => line.includes("`/packages/`")));
@@ -1121,15 +1186,25 @@ Games cannot call platform APIs directly.
   assert.ok(!parsedOutput.routingLines.some((line) => line.includes("`/src/ui/`")));
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  const claudeText = fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8");
   assert.doesNotMatch(agentsText, /vasir:profile/);
+  assert.doesNotMatch(claudeText, /vasir:profile/);
   assert.match(agentsText, /idavoll-games owns deterministic browser games/);
+  assert.match(claudeText, /idavoll-games owns deterministic browser games/);
   assert.match(agentsText, /Games cannot call platform APIs directly\./);
+  assert.match(claudeText, /Games cannot call platform APIs directly\./);
   assert.match(agentsText, /Game Source/);
+  assert.match(claudeText, /Game Source/);
   assert.match(agentsText, /Local Tooling/);
+  assert.match(claudeText, /Local Tooling/);
   assert.match(agentsText, /Shared Packages/);
+  assert.match(claudeText, /Shared Packages/);
   assert.match(agentsText, /Public Docs/);
+  assert.match(claudeText, /Public Docs/);
   assert.doesNotMatch(agentsText, /Use local UI state first\./);
+  assert.doesNotMatch(claudeText, /Use local UI state first\./);
   assert.doesNotMatch(agentsText, /React \*\*19\.2\*\*/);
+  assert.doesNotMatch(claudeText, /React \*\*19\.2\*\*/);
 });
 
 test("agents sync creates an empty non-obvious source file from generated placeholder text", async () => {
@@ -1165,13 +1240,16 @@ test("agents sync creates an empty non-obvious source file from generated placeh
   const parsedOutput = JSON.parse(capturedOutput.readStdout());
   assert.equal(parsedOutput.nonobviousSource, "created-empty-file");
   assert.equal(parsedOutput.wroteNonobviousFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
   assert.equal(
     fs.readFileSync(path.join(projectDirectory, "AGENTS__non-obvious.md"), "utf8"),
     "None recorded yet.\n"
   );
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  const claudeText = fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8");
   assert.doesNotMatch(agentsText, /Do not attempt to "fix,[\s\S]*Do not attempt to "fix,/);
+  assert.doesNotMatch(claudeText, /Do not attempt to "fix,[\s\S]*Do not attempt to "fix,/);
 });
 
 test("agents sync migrates the old .agents/non-obvious.md source file to the root sidecar", async () => {
@@ -1198,6 +1276,7 @@ test("agents sync migrates the old .agents/non-obvious.md source file to the roo
   assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "AGENTS__non-obvious.md"));
   assert.equal(parsedOutput.legacyNonobviousFilePath, path.join(projectDirectory, ".agents", "non-obvious.md"));
   assert.equal(parsedOutput.wroteNonobviousFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
   assert.equal(parsedOutput.removedLegacyNonobviousFile, true);
   assert.equal(
     fs.readFileSync(path.join(projectDirectory, "AGENTS__non-obvious.md"), "utf8"),
@@ -1206,10 +1285,12 @@ test("agents sync migrates the old .agents/non-obvious.md source file to the roo
   assert.ok(!fs.existsSync(path.join(projectDirectory, ".agents", "non-obvious.md")));
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  const claudeText = fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8");
   assert.match(agentsText, /Legacy source must move out of the installed skill directory\./);
+  assert.match(claudeText, /Legacy source must move out of the installed skill directory\./);
 });
 
-test("agents sync uses AGENTS__non-obvious.md as the source over generated AGENTS text", async () => {
+test("agents sync uses AGENTS__non-obvious.md as the source over generated root contract text", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();
@@ -1253,10 +1334,14 @@ Old generated block that should be replaced.
   assert.equal(parsedOutput.nonobviousSource, "file");
   assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "AGENTS__non-obvious.md"));
   assert.equal(parsedOutput.wroteNonobviousFile, false);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
 
   const agentsText = fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8");
+  const claudeText = fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8");
   assert.match(agentsText, /Production auth state is owned by AppShell/);
+  assert.match(claudeText, /Production auth state is owned by AppShell/);
   assert.doesNotMatch(agentsText, /Old generated block that should be replaced/);
+  assert.doesNotMatch(claudeText, /Old generated block that should be replaced/);
 });
 
 test("agents sync writes a nested root AGENTS file with inferred profile and local non-obvious source", async () => {
@@ -1293,12 +1378,21 @@ test("agents sync writes a nested root AGENTS file with inferred profile and loc
   assert.equal(parsedOutput.profile, "frontend");
   assert.equal(parsedOutput.profileSource, "inferred");
   assert.equal(parsedOutput.nonobviousFilePath, path.join(projectDirectory, "frontend", "AGENTS__non-obvious.md"));
+  assert.equal(parsedOutput.agentsFilePath, path.join(projectDirectory, "frontend", "AGENTS.md"));
+  assert.equal(parsedOutput.claudeFilePath, path.join(projectDirectory, "frontend", "CLAUDE.md"));
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
 
   const nestedRootAgentsText = fs.readFileSync(path.join(projectDirectory, "frontend", "AGENTS.md"), "utf8");
+  const nestedRootClaudeText = fs.readFileSync(path.join(projectDirectory, "frontend", "CLAUDE.md"), "utf8");
   assert.doesNotMatch(nestedRootAgentsText, /vasir:profile/);
+  assert.doesNotMatch(nestedRootClaudeText, /vasir:profile/);
   assert.match(nestedRootAgentsText, /Frontend auth state is hydrated before routes render\./);
+  assert.match(nestedRootClaudeText, /Frontend auth state is hydrated before routes render\./);
   assert.match(nestedRootAgentsText, /Use local UI state first\./);
+  assert.match(nestedRootClaudeText, /Use local UI state first\./);
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
 
   const capturedValidateOutput = captureCommandWriters();
   const validateStatusCode = await runCommandLine(["node", "vasir", "agents", "validate", "--scope", "frontend", "--json"], {
@@ -1337,10 +1431,15 @@ test("agents sync --profile forces the nested root AGENTS profile", async () => 
   assert.equal(parsedOutput.profile, "backend");
   assert.equal(parsedOutput.profileSource, "argument");
   assert.equal(parsedOutput.agentsScope, "services/api");
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
 
   const nestedRootAgentsText = fs.readFileSync(path.join(projectDirectory, "services", "api", "AGENTS.md"), "utf8");
+  const nestedRootClaudeText = fs.readFileSync(path.join(projectDirectory, "services", "api", "CLAUDE.md"), "utf8");
   assert.doesNotMatch(nestedRootAgentsText, /vasir:profile/);
+  assert.doesNotMatch(nestedRootClaudeText, /vasir:profile/);
   assert.match(nestedRootAgentsText, /Keep retry paths idempotent\./);
+  assert.match(nestedRootClaudeText, /Keep retry paths idempotent\./);
 });
 
 test("agents sync dry-run previews AGENTS reconciliation without writing", async () => {
@@ -1370,11 +1469,13 @@ test("agents sync dry-run previews AGENTS reconciliation without writing", async
   assert.equal(parsedOutput.dryRun, true);
   assert.equal(parsedOutput.changed, true);
   assert.equal(parsedOutput.wroteAgentsFile, false);
+  assert.equal(parsedOutput.wroteClaudeFile, false);
   assert.equal(parsedOutput.nonobviousSource, "would-create-empty-file");
   assert.equal(parsedOutput.wroteNonobviousFile, false);
   assert.equal(parsedOutput.wouldWriteNonobviousFile, true);
   assert.equal(parsedOutput.mode, "created");
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(!fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS__non-obvious.md")));
 });
 
@@ -1488,6 +1589,10 @@ test("add success supports json output for automation consumers", async () => {
   assert.equal(parsedOutput.projectConfigFilePath, path.join(projectDirectory, ".agents", "vasir.json"));
   assert.deepEqual(parsedOutput.installedSkills, ["react"]);
   assert.deepEqual(parsedOutput.replacedSkills, []);
+  assert.equal(parsedOutput.agentsFilePath, path.join(projectDirectory, "AGENTS.md"));
+  assert.equal(parsedOutput.claudeFilePath, path.join(projectDirectory, "CLAUDE.md"));
+  assert.equal(parsedOutput.wroteAgentsFile, true);
+  assert.equal(parsedOutput.wroteClaudeFile, true);
 });
 
 test("replace on an untracked manual skill returns a structured json error with docs guidance", async () => {

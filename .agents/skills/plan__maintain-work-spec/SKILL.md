@@ -1,581 +1,252 @@
 ---
 name: plan__maintain-work-spec
-description: Creates or updates the durable Work Spec for Broad Feature Work and Planning-Only Work. The Work Spec is equal parts Product Requirement Doc, Engineering Specification, Design Document, UX Document, milestone ladder, and current decision-state artifact; use it when defining work, updating milestone rungs, or preserving active feature context without turning the spec into an audit log.
+description: Creates or updates the durable Work Spec — a lane's judgment state: unlock, contracts, milestone rungs, decisions, and proven-vs-claimed status. Triggers on defining, approving, or resuming substantial work; any rung or status change; any decision, invariant, or eval result that must outlive the session; also triggers for substantial work that does not yet have a  work spec.
 tools: Read, Grep, Glob, Edit, Write
-model: opus
 ---
 
 # Work Spec
-Work Spec = Product Requirement Doc + Engineering Specification + Design Document + UX Document + milestone ladder + current decision state.
-This is not a brainstorm, not a scratchpad, not a PRD-only doc, not a status update, and not an audit log. It is the canonical spec for a unit of work.
 
-- This skill file owns and maintains `docs/work/<semantic-folders>/<feature-slug>/work-spec.md` as the durable source of truth.
-This skill file may reference the eval plan, summarize its current gate status, and list the eval-plan path.
+Work Spec = Product Requirement Doc + Engineering Specification + Design Document + UX Document + milestone ladder + current decision state — one file. It is the serialization format for judgment state: context windows die, `tmp/` gets swept, and parallel sessions cannot see each other's reasoning, so everything expensive to re-derive (the unlock, contracts, measured baselines, decision history, proven-vs-claimed) must survive here. It is not a brainstorm, scratchpad, status feed, or audit log.
 
-- The $eval__design-proof-gates skill owns and maintains the corresponding `docs/work/<semantic-folder>/<feature-slug>/eval-plan.md` 
-Keep `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md` linked and status-synchronized when it exists. Proof-gate design is authoritative only after `$eval__design-proof-gates` has run, or after an existing eval plan is cited as already covering the exact lane.
+**Ownership boundary.** This skill owns `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`. `$eval__design-proof-gates` owns the sibling `eval-plan.md`. The boundary: the **eval plan owns proof mechanics** — gate design, harnesses, thresholds, adequacy of proof. The **work spec owns lane truth** — scope, contracts, rung state, and the surviving result summaries after proof runs. The spec cites gate IDs and mirrors their state in §6; on divergence, the eval plan wins for gate state and mechanics, the spec wins for lane scope. Proof-gate design is authoritative only after `$eval__design-proof-gates` has run or an existing eval plan is cited as covering the exact lane.
 
+**Routing.** Spec authorship is judgment work — orchestrator tier per root §7. Delegates may mechanically apply an exact written outline; contracts, rungs, and decisions are never delegated freehand. No model pin here: the caller's routing law decides.
 
-work-spec.md = what we are building, why, lane, constraints, milestone rung state
-eval-plan.md = how we prove it is real
+---
 
-## Core Principle
+## Schema Authority
 
-Spend the Work Spec detail budget on milestone rungs. Each rung is a self-contained build packet with enough product intent, UX/design taste, engineering boundary, contracts, and proof context for a senior engineer or agent to execute well.
+- **This file is the only schema truth.** `references/s-tier-work-spec-example.md` calibrates prose quality and rung richness — never structure. If the example diverges structurally from this file, the example is the bug; do not copy its shape.
+- **Stale specs are synced, not versioned.** A spec that predates the current template is handled like any lagging doc (root §1): status-only edits conform locally; the first lane that materially touches it restructures it to the current template — mapping old sections in, archiving displaced content with pointers, noting the restructure in the change log. Never renumber existing IDs.
+- When creating a spec, materially restructuring one, or rewriting a milestone ladder, load the reference example first. For status syncs and small fixes it is optional.
 
-Every Work Spec starts with a `Human Read`: one plain-language scan line that says the direct outcome, the one-level-higher "so that" outcome, active rung, next proof, main risk, and decision needed. It is an index into the spec, not a second source of truth.
+---
 
-The header names the active rung; it does not duplicate the rung. Cut bloat from stale changelogs, stale facts, resolved questions, old source refs, and completed proof narration, not from the rungs.
+## Core Principle — Spend the Budget on Rungs
 
-When creating a Work Spec, materially restructuring one, or rewriting a milestone ladder, load `references/s-tier-work-spec-example.md` before editing. For status-only updates, small typo fixes, or one-line source/status sync, this reference is optional.
+Milestone rungs are self-contained build packets: enough product intent, taste, engineering boundary, contracts, and proof context that a senior engineer or agent with zero authoring context can execute well. Everything outside the rungs is a compact index into them. Cut bloat from stale changelogs, resolved questions, dead source refs, and completed proof narration — never from the active rung. A spec whose header is richer than its active rung is upside down.
 
-## Goal
+---
 
-Turn messy, multi-window feature context into a **single, high-signal** Work Spec file that is:
-- **Human-friendly:** Quick to scan, stable structure
-- **LLM-friendly:** Explicit contracts, low ambiguity
-- **Reality-anchored:** Separates facts from assumptions
+## Authoring Laws
 
-## When to Use
+Rules any reader or editor of the artifact must preserve live **once**, in the spec's own Doc Conventions block (inside the template below) — the spec must defend itself even when this skill is not loaded. This section carries only what cannot live in the document:
 
-- Create a new `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`
-- Update existing Work Spec
-- Consolidate milestones, constraints, contracts
-- Establish feature "source of truth" across sessions
+1. **Rigidity is claimed, not accidental.** The root contract says required elements, free rendering. A multi-writer durable artifact earns more: stable top-level addresses and append-only IDs are what make concurrent merge-additive editing and cross-file references possible — that is the exemption, and it is scoped. **Rigid:** the section skeleton, the ID grammar, contracts-in-§4-only, milestone namespacing, the projection-sync rule. **Free:** prose shape inside rungs, which contract clusters exist, field rendering, and all counts — targets, not mandates — except the ≤5 next-actions and ≤3 active-changelog caps, which are load-bearing anti-bloat.
+2. **Doc health is audited, not self-graded.** Run the conformance check at the end of this file before writing; store no scorecard. A stored ✅ grid graded by the context that wrote the doc is fake proof; the §6 audit lens owns doc-health verdicts.
+3. **Intake is sacred.** Multi-item user asks get an Input Coverage Ledger before synthesis; no item disappears into generic prose. User asks are intake, never `[FACT]`.
+4. **The spec outlives its evidence.** `tmp/` artifacts expire; every recorded artifact keeps a surviving summary — the load-bearing figures and how to regenerate them — in the rung itself.
 
-## Workflow 
+---
 
-1. **Ingest inputs:** Current Work Spec + new material (PRs, tests, logs, decisions).
-2. **Preserve multi-item intake:** If the user provides a list of asks, create or update the Input Coverage Ledger before synthesis. Do not let user items disappear into generic Work Spec prose.
-3. **Find the active rung:** Identify the current milestone rung, latest completed rung commit, next user/developer journey proof, evidence artifacts, blockers, and next commit point.
-4. **Apply epistemic discipline:** Source active claims or label `[UNVERIFIED]`.
-5. **Centralize contracts:** Authority, ordering, privacy, safety, performance, data-shape, and failure rules live in Section 4.
-6. **Spend tokens on rungs:** Keep header/current-truth/open-question sections compact; make each milestone rung long enough to execute with product, UX, design, engineering, and proof context.
-7. **Archive history:** Move superseded decisions, old source refs, completed proof narration, and resolved questions to Appendix instead of leaving them in active sections.
-8. **Output:** Write or modify the Work Spec artifact, update linked eval-plan status if applicable, and return the Skill Result fields. Do not emit the root `<Recap>`; the calling agent owns the final human-facing response.
+## Lifecycle
 
-## Non-Negotiable Rules
+- **Create** when a substantial lane is proposed or approved (root §4). The unlock, acceptance gate, lane boundary, and biggest risk exist in the spec before implementation starts.
+- **Maintain** after approval, after every rung state change, and whenever a discovered invariant, decision, or eval failure reveals repo truth. For ongoing work, load the active spec before broad repo reads.
+- **Park** when a lane is deliberately paused: status `Parked`, with the reason and the resume condition named. `In Progress` with no active rung and no `Blocked`/`Parked` marker is a defect — fix the state, don't leave zombies.
+- **Close** when the lane hits root §6's Complete checklist: final change-log entry records the closing commit, status flips to `Complete`, and the feature folder gains the `DONE__` prefix (repo convention, cf. `docs/features/DONE__*`) so closed lanes are visible from the tree without opening a file.
 
-### Human Read
-- The first field under the Work Spec title is `**Human Read:**`.
-- Use this shape: `We are trying to <direct product outcome> so that <one-level-higher product/business/user outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.`
-- The `so that` clause must climb one level above the immediate workflow. It should name the downstream product, customer, business, safety, trust, revenue, retention, or operational outcome created by the direct outcome. Do not merely restate the workflow in nicer words.
+---
+
+## Workflow
+
+1. **Re-read, then ingest.** Re-read the current spec immediately before editing (parallel sessions edit it too), then ingest the new material: diffs, decisions, proof output, user asks.
+2. **Coverage before synthesis.** Multi-item intake → create or update the Input Coverage Ledger first (Law 3).
+3. **Find the active rung:** state, latest rung commit, next journey proof, blockers, next commit point.
+4. **Epistemic pass:** source or label every active claim per the truth-labeling convention; contradictions land in §7, never smoothed over.
+5. **Write rung packets rich; keep everything else index-thin.**
+6. **Archive sweep:** resolved questions leave §7; old changelog → A1; superseded IDs → A4 with replacement pointers; completed-rung narration collapses to unlock + proof summary + surviving figures.
+7. **Projection resync:** header, Human Read, §5.1 index row, §6 gate table — all in this same edit (see conventions).
+8. **Emit the Skill Result** fields to the caller. The caller owns the human-facing close-out (root §5); do not render one here.
+
+---
+
+## The Human Read
+
+The first field under the title, always. Shape: `We are trying to <direct product outcome> so that <one-level-higher outcome>. The active rung is <FEATURE-SLUG>__M# because <why it is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.`
+
+The `so that` clause must climb one level above the workflow — name the downstream product, player, business, trust, retention, or operational outcome, not the workflow restated in nicer words.
+
 - Weak: `We are trying to make incidents easier to scan so that operators can triage incidents confidently.`
 - Strong: `We are trying to make incidents easier to scan so that Harbor Pulse reduces time-to-mitigation and customer-impact uncertainty during live incidents.`
-- Keep it to one tight paragraph. It summarizes the current read for humans; it does not replace the milestone ladder, contracts, or proof details.
 
-### Stable Structure
-Do not reorder sections.
+One tight paragraph. It is an index into the spec, never a second source of truth.
 
-### Stable IDs
-Never renumber existing IDs:
-- Facts: `F-###`
-- Unverified: `U-###`
-- Inferences: `I-###`
-- Plans: `P-###`
-- Sources: `SRC-###`
-- Actions: `A1`…`A5`
-- Contracts/Invariants: `C-###`
-- Milestones: `<FEATURE-SLUG>__M1`, `<FEATURE-SLUG>__M2`, `<FEATURE-SLUG>__M3.1`
+---
 
-### Truth Labeling
-- `[FACT]` — sourced
-- `[INFERENCE]` — references fact IDs
-- `[PLAN]` — future intent
-- `[UNVERIFIED]` — no source (even if "obvious")
-
-### Input Coverage
-- When creating or materially restructuring a Work Spec from multi-item user input, preserve an Input Coverage Ledger until the user accepts the spec.
-- Every user-provided item must map to exactly one disposition: `Included`, `Merged`, `Deferred`, `Blocked`, `Open question`, or `Non-goal`.
-- The ledger points each item to the rung, contract, open question, non-goal, or appendix context where it lives. Nothing may disappear by being summarized.
-- Do not turn user asks into `[FACT]` entries. User asks are intake, not repo truth.
-
-### Detail Budget
-- Milestone rungs are allowed to be juicy. They may contain design briefs, UX mandates, engineering boundaries, dev journey notes, implementation lane guidance, "not in this rung" lists, and "done when" language.
-- Header, Current State, Open Questions, Source References, and Change Log must stay compact and active. If a detail does not affect the active rung, next rung, blocker, or durable contract, move it to Appendix.
-- Stable IDs do not mean active-section immortality. Never renumber IDs, but superseded IDs may move to Appendix with a replacement pointer.
-- Resolved open questions leave Section 7. Old changelog entries leave the header. Completed milestone proof narration collapses to the rung's `Proof` and `Done` fields.
-
-### Taste-Critical Work
-- If a rung changes feel, UX, visuals, copy, game design, interaction, or developer ergonomics, the rung must name the reference bar, the `must feel` / `must not feel` delta, the artifact that proves the result, and the human-review rejection criteria.
-- Section 1.B sets the feature-wide taste bar; it does not satisfy a taste-critical rung by itself. Each taste-critical implementation/proof rung must include rung-specific `Reference bar:`, `Must-feel delta:`, `Must-not-feel delta:`, and `Rejection criteria:` lines in the rung detail.
-- Taste is not treated as purely objective, but it must be inspectable. Use screenshots, clips, interactive captures, before/after tables, or review notes so a human can accept or reject the result against the stated bar.
-
-### Browser-Rendered Proof
-- If a rung changes browser-rendered user-facing behavior, the rung must include an actual browser artifact from the running app route or playable scenario: Playwright/browser screenshot, video, trace, or before/after capture.
-- Browser-rendered user-facing behavior includes visible UI, layout, copy-in-context, animation, interaction, canvas/game feel, responsive state, and browser-facing error state.
-- Unit tests, DOM assertions, component snapshots, and static markup are not enough by themselves. Record the artifact path, route/scenario, viewport(s), and console/network error status.
-- Prefer Playwright when available. If the repo uses another browser harness, use that, but the artifact must come from the real app surface, not isolated fake markup when the route/scenario exists.
-- Canvas/game rungs also need a nonblank, correctly framed, interacting/moving check; "page loaded" is not proof.
-
-## Milestone Namespace Rule
-
-Milestones must be globally unambiguous across durable Work Spec / eval artifacts.
-
-Rules:
-- Do not use naked `M1`, `M2`, `Phase 1`, or `Step 2` across files.
-- Prefix milestone IDs with the semantic feature/work slug. 
-  - Example: `REPLAY-PROJECTION__M1`,  `FRIEND-LIST-PRESENCE__M1`, `SPRITE-KIT-CATALOG__M2`, `REPLAY-PROJECTION__M3`.
-- Cross-file references must use the full prefixed ID.
-- If an agent encounters an ambiguous naked milestone reference, it must halt and ask for clarification or emit a Plan Delta naming the ambiguity.
-
-## Template Structure
+## Template
 
 ```markdown
 # WORK SPEC — <FEATURE_NAME>
-**Human Read:** We are trying to <direct product outcome> so that <downstream product/customer/business/safety/trust/revenue/retention/operational outcome>. The active rung is <FEATURE-SLUG>__M# because <why this is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.
+**Human Read:** We are trying to <direct product outcome> so that <one-level-higher outcome>. The active rung is <FEATURE-SLUG>__M# because <why it is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.
 
-**Last updated:** YYYY-MM-DD  
-**Status:** Draft | In Progress | Blocked | Done
-**Active rung:** <FEATURE-SLUG>__M# - <name> - <state or "None yet">
-**Next commit point:** <when the active rung proves its user/developer/engineering journey and spec/eval status is synced, or "Not yet defined">
-**Blocked by:** <none | exact blocker>
-**Eval plan:** `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md` or `Not created yet`
-**Owners:** <humans/teams>  
-**Stakeholders:** <optional>  
+**Last updated:** YYYY-MM-DD
+**Status:** Draft | Approved | In Progress | Blocked | Waiting Human | Parked | Complete
+**Active rung:** <FEATURE-SLUG>__M# — <name> — <root §4 state> | None
+**Next commit point:** <observable condition> | Not yet defined
+**Blocked by:** none | <exact blocker or waiting-human gate>
+**Eval plan:** `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md` | Not created yet
+**Owners:** <humans/teams>
 
-**Purpose:** <1–2 sentences. What is being built and why.>
-**Core Product Outcome Unlock:** The one-level-higher product/business outcome the user journey creates.
-**Core User Journey Unlock:** The concrete product experience this feature unlocks for the actor.
-**Core Developer Journey Unlock:** What the next engineer/agent can now do more safely or quickly.
-**Core Engineering Unlock:** What system capability, contract, reliability property, or operational truth this unlocks.
+**Purpose:** <1–2 sentences: what is being built and why.>
+**User Journey Unlock:** <the concrete experience this unlocks for the player/user — for SDK/tooling lanes, the "user" is the consuming developer>
+**Engineering System Unlock:** <the capability, contract, reliability property, or operational truth this unlocks — omit only if genuinely none, and say so in Purpose>
+**Primary entry point(s):** <exact API/event/command/route>
+**Related docs:** <links / SRC refs>
 
-**Primary entry point(s):** <exact API/event/command>  
-**Related docs:** <links or SRC refs, if relevant>
-
-**Recent Change Log:** (max 3 active entries; move older history to Appendix A1)
-- YYYY-MM-DD - <what changed in this update and which rung/contract/proof it affected>
+**Recent Change Log:** (≤3 active; older → A1)
+- YYYY-MM-DD — <what changed; which rung/contract/proof it affected>
 
 ---
 
 ## Doc Conventions (Do Not Delete)
 
-- **Stable structure:** Do not reorder or rename top-level sections `1..8` or Appendix sections `A1..A5`.
-- **Stable IDs:** Never renumber existing IDs. Append new IDs only.
-  - Facts: `F-###`
-  - Unverified: `U-###`
-  - Inferences: `I-###`
-  - Plans: `P-###`
-  - Contracts/Invariants: `C-###`
-  - Sources: `SRC-###`
-  - Actions: `A1`…`A5`
-  - Milestones: `<FEATURE-SLUG>__M1`, `<FEATURE-SLUG>__M2`, `<FEATURE-SLUG>__M3.1` (no duplicates)
-- **Truth labeling:** If it’s not sourced, it must be `[UNVERIFIED]` even if it seems obvious.
-- **Contracts live in Section 4 only.** Elsewhere, reference `C-###` rather than restating rules.
-- **Human Read first:** The first field under the title is `Human Read`. It uses the `so that` ladder and names the active rung, next proof, main risk, and decision needed.
-- **No stopgaps:** The no-stopgap rule lives as a Section 4 contract. Do not add a repeated no-stopgap field to each rung.
-- **Input coverage:** For specs created from multi-item user input, preserve a compact Input Coverage Ledger until the user accepts the spec. The ledger maps user asks to rungs/contracts/open questions/non-goals without converting asks into `[FACT]` boilerplate.
-- **Taste-critical work:** Rungs that change feel, UX, visuals, copy, game design, interaction, or developer ergonomics must name the reference bar, `must feel` / `must not feel` delta, proof artifact, and human-review rejection criteria. Section 1.B is not enough; each taste-critical rung needs its own rung-specific taste delta and rejection criteria.
-- **Browser-rendered proof:** Browser-rendered user-facing rungs must record a Playwright/browser artifact from the actual route or playable scenario, plus viewport(s) and console/network error status. Unit tests and DOM assertions do not count as visual proof by themselves.
-- **Detail budget:** Milestone rungs carry the rich product/UX/design/engineering/proof context. Header/current truth/open questions/source refs stay active and compact.
-- **Active rung:** The header names the active rung; do not duplicate its content in a separate active-rung section.
-- **Rung commits:** Completed rungs record the short commit hash plus commit subject. Active/proposed rungs say `Pending` until proof, Work Spec sync, eval status sync, and commit are done.
-- **Evidence artifacts:** Each rung records the proof artifact path(s): screenshots, clips, logs, benchmark tables, trace captures, or `Pending`. `tmp/...` paths are allowed and may expire; keep a compact evidence summary so the Work Spec remains useful after temporary files disappear.
-- **History:** Superseded decisions, old source refs, resolved questions, and completed proof narration move to Appendix.
-- **Random context:** Use Appendix A5 for quarantined notes that may matter later but do not belong in the active lane.
-- **Keep it compact outside rungs:** Next actions <= 5. Active facts target <= 12 bullets. Active references target <= 15.
+- **Schema truth:** the `plan__maintain-work-spec` skill. Do not reorder or rename top-level sections 1–7 or A1–A5. A section with nothing active holds one honest line — never empty scaffolding, never `N/A` filler.
+- **Stable IDs, append-only; never renumber:** Facts `F-###` · Unverified `U-###` · Inferences `I-###` · Plans `P-###` · Contracts `C-###` · Sources `SRC-###` · Next actions `N-1…N-5` · Milestones `<FEATURE-SLUG>__M#` (no naked `M1`/`Phase 2` anywhere, including cross-file references; an ambiguous naked reference is a halt-and-clarify, not a guess). Superseded IDs move to A4 with a replacement pointer.
+- **Truth labels:** `[FACT]` requires `(SRC-###)`, file:line where possible. Unsourced claims are `[UNVERIFIED]` even when obvious. Major `[INFERENCE]` entries carry `Disprove if:`. `[PLAN]` marks intent. User asks live in the ledger, never as `[FACT]`.
+- **Contracts live in §4 only;** elsewhere cite `C-###`. Root laws bind by reference (`root §9 — no stopgaps`), never cloned as local contracts: every `C-###` is lane-specific and testable — write only contracts you could watch fail.
+- **Projection sync:** rung bodies (§5.2) are truth. The header fields, Human Read, §5.1 index row, and §6 gate table are projections — resync all of them in the same edit as any rung-state change. Conflicts resolve toward the rung body; gate state resolves toward the eval plan.
+- **Status vocabulary is root §4's,** verbatim, for rungs: Proposed / Approved / In Progress / Blocked / Objectively Green / Waiting Human / Complete. `Waiting Human` is never auto-claimed and never bundled into completion. The word "Done" is not a state.
+- **Evidence:** every rung records artifact path(s) or `Pending — <what will be captured>`. `tmp/` paths may expire: each recorded artifact keeps a one-to-three-line surviving summary (load-bearing figures + regeneration command). Artifact medium matches the gate (root §5): browser-rendered rungs record real route/scenario captures with viewport(s) and console/network status; canvas/game rungs additionally prove nonblank, correctly framed, interacting — "page loaded" is not proof.
+- **Taste-critical rungs** (feel, UX, visuals, copy, game design, interaction, dev ergonomics) carry rung-specific `Reference bar:` / `Must-feel delta:` / `Must-not-feel delta:` / `Rejection criteria:` lines. §1.D sets the feature-wide bar and never satisfies a rung by itself. Acceptance is a Waiting Human gate.
+- **Concurrency custody (root §8):** re-read before editing; merge additively; never clobber another session's recorded decisions.
+- **History moves, never vanishes:** resolved questions leave §7; old changelog → A1; superseded content → A4 with pointers; quarantined maybe-useful notes → A5.
 
 ---
 
-## Input Coverage Ledger (Required For Multi-Item Intake Until Accepted)
-
-Use this section when creating or materially restructuring a Work Spec from a user's list of asks. Remove or archive it after the user accepts the spec and the items are safely represented in rungs/contracts/open questions/non-goals.
+## Input Coverage Ledger (multi-item intake; lives here until the user accepts the spec, then → A4)
 
 | # | User item | Disposition | Where it lives | Notes |
 | --- | --- | --- | --- | --- |
-| 1 | <plain-language item from user> | Included / Merged / Deferred / Blocked / Open question / Non-goal | <rung / C-### / UQ-### / Section 2 / A5> | <why> |
-| 2 | <plain-language item from user> | ... | ... | ... |
+| 1 | <user's wording, audit-preservable> | Included / Merged / Deferred / Blocked / Open question / Non-goal | <rung / C-### / §7 / §2 / A5> | <why> |
 
-Rules:
-- Preserve the user's wording enough that coverage can be audited.
-- If several asks merge into one rung, keep separate ledger rows and point them to the same rung.
-- If an item is not being built, say whether it is deferred, blocked, open, or a non-goal.
-- Do not reclassify user asks as `[FACT]`; source-backed repo truth still belongs in Section 3.
+Several asks merging into one rung keep separate rows pointing at the same rung. An item not being built says which of Deferred / Blocked / Open question / Non-goal it is.
 
 ---
 
 ## 1) North Star (Product, UX, Design)
 
-### 1.A North Star user journey - Product Grounding & Experience
-*Before we define the code, we must define the reality we are building.*
-For the whole feature:
+### 1.A Journey
+- **Actor:** <user / service / operator>
+- **Entry point:** <the exact API/event/command they hit first>
+- **Steps:** <3–5 max>
+- **Success:** <what "worked" means, observably>
+- **Next thing they'll try:** <the action that must be obvious after success>
 
-##### 1.A.i For the North Star vision: 
-* **Actor:** Who is doing this (user/service/operator)?
-* **Entry Point:** The exact API/event/command they hit first.
-* **Steps:** Minimal sequence of interactions (3-5 steps max).
-* **Success:** What "worked" means in observable behavior (e.g., "User sees the replay load within 2 seconds").
-* **Next thing the user will try:** The next action that should be obvious after success.
-* **Non-Goals:** Explicitly what is out of scope.
+### 1.B Experience invariants — "it's not real unless…"
+Author these directly as `C-###` entries in §4; list only the IDs here with a one-line gloss each. (Single-homed: the contract text lives in §4.)
 
-#### 1.A.ii **Experience Invariants** (The "It's Not Real Unless..." List)
-List 3-7 non-negotiable properties that define the feature's existence.
-* *Format:* "If [condition], then [result] must happen, otherwise the feature is broken."
-* *Example:* "If a user disconnects mid-match, the replay must still be available up to the disconnect timestamp."
+### 1.C Obviousness audit
+Top ~5 things a reasonable user assumes true that engineers might forget to build: **Assumption** → **Technical implication** (the requirement or integration proof it maps to).
 
-#### 1.A.iii ***The "Obviousness Audit"**
-List the top 5 things a reasonable user would assume are true, but which engineers might forget to build.
-* **The Assumption:** (e.g., "I assume I can pause the replay.")
-* **The Technical Implication:** Map this to a specific requirement or integration test (e.g., "Must persist state every tick, not just at end-of-match").
-
-### 1.B Design / UX Bar
-
+### 1.D Design / UX bar (feature-wide)
 - **Experience target:** <what this should feel like or enable>
-- **Reference bar:** <specific product, local artifact, clip, screenshot, design system, prior implementation, or "None yet - must be established in rung X">
-- **Must feel:** <3-5 taste/UX/design qualities>
-- **Must not feel:** <3-5 failure qualities>
-- **Human-review rejection criteria:** <what would make a reviewer reject the feel/UX/visual/copy/dev-ergonomics result>
-- **Reference points:** <optional inspiration or prior art; label as reference targets, not copied implementation>
+- **Reference bar:** <specific product, local artifact, clip, prior implementation, or "None yet — established in rung X">
+- **Must feel:** <3–5> · **Must not feel:** <3–5>
+- **Human-review rejection criteria:** <what makes a reviewer reject the result>
 
----
+## 2) Non-Goals
 
-## 2) Non-Goals (Scope Guardrails)
-
-- <explicitly out of scope>
-- <“we are not building X”>
-
----
+- <explicitly out of scope — "we are not building X">
 
 ## 3) Current State
 
-### 3.1 What is true today for active/next rungs (FACTS / UNVERIFIED / INFERENCE / PLAN)
-
-Use stable IDs:
-
+### 3.1 Truth for active/next rungs
 - [FACT F-001 | Confidence: High/Med/Low] <claim> — (SRC-001)
 - [UNVERIFIED U-001] <claim> — <what source is missing>
-- [INFERENCE I-001] <claim> — supported by F-___, F-___ — Disprove if: <one-liner>
-- [PLAN P-001] <planned change> — <why> — (links: M__ / C__)
+- [INFERENCE I-001] <claim> — supported by F-___ — Disprove if: <one-liner>
+- [PLAN P-001] <planned change> — <why> — (links: M__ / C-___)
+Facts not affecting the active rung, next rung, a blocker, or a durable contract move to A3.
 
-If a fact does not affect the active rung, next rung, blocker, or durable contract, move it to Appendix A3.
+### 3.2 Gaps vs North Star
+- <gap / risk / unknown>
 
-### 3.2 What’s broken / missing (gaps vs North Star)
-
-- <gap>
-- <risk>
-- <unknown>
-
-### 3.3 Next actions (max 5, concrete)
-
-Format:
-
-- (A1) <imperative action> — done when <measurable condition> — (owner optional) — (test/SRC if relevant)
-- (A2) …
-- (A3) …
-- (A4) …
-- (A5) …
-
----
+### 3.3 Next actions (≤5)
+- (N-1) <imperative action> — done when <measurable condition>
 
 ## 4) Contracts & Invariants (SOURCE OF TRUTH)
 
-This section is authoritative. Any hard constraint, invariant, cap, ordering rule, privacy redline, or “empty vs missing vs error” semantic must live here as a `C-###`.
+Optional definitions first. Then lane-specific `C-###` entries, clustered by concern **as needed — omit empty clusters entirely:** experience/product · safety/privacy · performance & hot path (budgets; include a cost-guardrail contract only when the lane changes production resource usage — infra, external services, model/tool calls, storage, hot paths — with the full Fermi worksheet in A5; otherwise cost analysis does not appear at all) · data bounding (hard caps, ordering, pagination, truncation, idempotency, empty-vs-missing-vs-error semantics) · surface schemas (name, inputs, outputs, limits, error semantics, observability — compact JSON examples where helpful) · failure & degradation (retries, dead letters, circuit breaking, rollback).
 
-### 4.1 Definitions (recommended)
+- [C-001 | Must] If <condition>, then <result>, otherwise the feature is broken. — (SRC-___ if verified)
+- [C-002 | Must Not] <…>
 
-- <term> — <definition>
-- <term> — <definition>
+## 5) Milestones (production-shippable ladder)
 
-**Rung Sizing** (used in Milestone Index, Section 5.1):
-In an LLM-assisted codebase, time is not the bottleneck — judgment surface area and blast radius are. Every rung records Complexity, Risk, Perf Impact, and Cost Impact. Use `N/A - <reason>` only when an axis truly does not apply.
+**Rung sizing** — judgment surface and blast radius, not calendar. Every rung records all four axes; `N/A` only with a reason.
 
-**Complexity**: how many systems/surfaces touched, how many judgment calls required
-S = single service, well-patterned, LLM can mostly solo
-M = 2–3 services, some ambiguous contracts, needs human review passes
-L = cross-cutting, new patterns, multiple integration surfaces
-XL = architectural change, new primitives, high coordination across teams
-N/A = not applicable because no implementation work happens in this rung
+| Axis | S | M | L | XL |
+| --- | --- | --- | --- | --- |
+| Complexity | one surface, well-patterned | 2–3 surfaces, some ambiguity | cross-cutting, new patterns | architectural, new primitives |
+| Risk | revertible, 1-feature blast radius | shared infra, needs rollback plan | data model / user-facing degradation | irreversible migration, security, or money |
+| Perf impact | no hot-path change | measurable, within budget | needs load test | architectural risk |
+| Cost impact | <$100/mo | $100–1k/mo | $1k–10k/mo | >$10k/mo |
 
-**Risk**: what breaks if we get it wrong
-S = revertible, no data migration, blast radius = 1 feature
-M = touches shared infra, needs rollback plan
-L = data model changes, potential corruption, user-facing degradation
-XL = irreversible migration, security surface, or money on the line
-N/A = not applicable because the rung is documentation/status-only
+### 5.1 Rung index (projection of 5.2)
 
-**Perf Impact** (hot path load delta)
-S = no hot-path change
-M = measurable, within budget
-L = needs load test
-XL = architectural risk
-N/A = not applicable because no runtime path changes
+| Rung | State | Size | Unlock | Proof summary | Evidence | Commit | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 
-**Cost Impact**: (infra $ delta, when applicable)
-S = <$100/mo
-M = $100–1k/mo
-L = $1k–10k/mo
-XL = >$10k/mo
-N/A = not applicable because no infra, external-service, model/tool-call, storage, or runtime cost changes
+### 5.2 Rung packets (truth)
 
-### 4.2 Experience invariants (“It’s not real unless…”)
+Frame every rung one level above the implementation: "This unlocks [journey]. Within it, this rung enables [specific step]. The next thing the user will obviously try is [next step]" — if that next step doesn't exist, that is a named gap. Completed work is described by what it unlocked, not what it implemented.
 
-- [C-001 | Must] If <condition>, then <result> must happen, otherwise the feature is broken. — (SRC-___ if verified)
-- [C-002 | Must] …
-- [C-003 | Must Not] …
-- [C-004 | Must] No stopgaps: build the smallest correct version of the real system, not a temporary substitute. If the full feature is too large, reduce capability, not correctness. The active rung must use the real authority/model/path and fail closed for unsupported capability.
-- [C-005 | Must] Temporary compatibility paths are allowed only for migration, rollback, protocol, persistence, or client-version safety, and must name the removal condition.
+Required elements per rung — rendering is free, elements are not:
 
-### 4.3 Safety / Privacy (Must / Must Not)
+- **State** (root §4 vocabulary) and **Size** (four axes).
+- **Unlock:** the user/developer/engineering journey — actor, entry, 3–5 steps, observable success.
+- **Design brief:** the product intent, engineering shape, or implementation philosophy needed to execute well; taste-critical rungs include their four taste lines here (see conventions).
+- **Implementation lane:** owned systems/surfaces — evidence, not an allowlist.
+- **Not in this rung:** what it intentionally does not do.
+- **Contracts:** `C-###` refs and root-law refs; never restated.
+- **Obviousness checks:** top assumptions → integration proof or time-bounded defer.
+- **Risk & failure modes:** when material (privacy / perf / data loss / hangs).
+- **Proof plan:** eval-plan gate IDs plus the shortest real journey loop that proves the value path (root §5 — mechanism-only or proxy proof cannot complete a rung; the eval plan owns harness mechanics and thresholds).
+- **Evidence artifacts:** paths or `Pending — <what>`, with surviving summaries; medium per conventions.
+- **Rung commit:** `<short-sha> — <subject>` | `Pending — commit after proof, spec sync, and eval sync`.
+- **Done when:** the exact observable completion condition, including evidence recorded, projections synced, and commit recorded.
 
-- [C-010 | Must] …
-- [C-011 | Must Not] …
-- [C-012 | Must] Data retention / deletion rules: …
-- [C-013 | Must] Access controls / authN+authZ expectations: …
+Completed rungs collapse to: unlock + proof summary + surviving figures + evidence pointer + commit. Narration → A4.
 
-### 4.4 Performance / Hot Path (Must / Must Not)
+## 6) Proof & Eval Summary (projection of the eval plan)
 
-- [C-020 | Must] p95 latency budget: <number> for <endpoint/path> under <assumptions>. — (SRC-___ if measured)
-- [C-021 | Must] Throughput / QPS expectations and backpressure behavior: …
-- [C-022 | Must Not] No unbounded fan-out, no N+1 calls in hot path, etc.
-- [C-023 | Must] Cost guardrail / budget signal: <High/Med/Low or $/month> — (SRC-___ if measured)
+| Gate | Rung | State | Artifact |
+| --- | --- | --- | --- |
 
-### 4.5 Data access & bounding rules (determinism)
+Mirrors eval-plan gate state; divergence resolves toward the eval plan. A gate without a runnable harness is marked `needs $eval__implement-proof-gate`, never quietly skipped.
 
-- [C-030 | Must] Hard caps: <e.g., max items, max bytes, max time window>
-- [C-031 | Must] Ordering: <stable ordering rule>
-- [C-032 | Must] Pagination: <cursor/offset> + `hasMore` semantics
-- [C-033 | Must] Truncation semantics: <what is dropped first, how it is signaled>
-- [C-034 | Must] Idempotency + dedupe semantics: <keys, windows>
-- [C-035 | Must] Empty vs Missing vs Error semantics are explicit for every surface:
-  - Empty: …
-  - Missing: …
-  - Error: …
+## 7) Open Questions / Blockers
 
-### 4.6 Tool / API contracts (canonical schemas)
-
-For each surface (endpoint, event, tool, job, prompt contract), define:
-
-- **Name:** <stable name>
-- **Inputs:** <types + required/optional>
-- **Outputs:** <JSON shape, types>
-- **Ordering & limits:** <explicit>
-- **Empty result semantics:** <explicit>
-- **Missing data semantics:** <explicit>
-- **Error semantics:** <explicit error codes>
-- **Observability:** <metrics/log fields + timings phases>
-
-Include compact JSON examples where helpful.
-
-### 4.7 Observability & context propagation
-
-- [C-040 | Must] Context IDs that propagate across every hop: <TraceID, SpanID, UserID, FeatureEntityID…>
-- [C-041 | Must] Logging requirements (every log line includes …)
-- [C-042 | Must] Metrics guardrails (SLIs/SLOs) and alarms: …
-
-### 4.8 Failure handling & degradation policy
-
-- [C-050 | Must] Retry policy: <what retries, how many, jitter, when to stop>
-- [C-051 | Must] Dead letter handling: <where bad inputs go, how they’re inspected>
-- [C-052 | Must] Circuit breaker / shed load behavior: <thresholds and degraded mode>
-- [C-053 | Must] Data corruption / rollback expectations: …
-
----
-
-## 5) Milestones (Production-shippable ladder)
-
-### 5.1 Milestone rung index
-
-| Rung | State | Size | User / Dev / Engineering unlock | Proof summary | Evidence artifact | Rung commit | Notes |
-|---|---|---|---|---|---|---|---|
-| <FEATURE-SLUG>__M1 |  |  |   |   |   |   |   |
-| <FEATURE-SLUG>__M2 |  |  |   |   |   |   |   |
-...
-| <FEATURE-SLUG>__Mn |  |  |   |   |   |   |   |
-
-
-### 5.2 Milestone details (user journey first)
-Milestones are grounded in what user, developer, or engineering journey they unlock one level above the implementation. Not "what does this feature do" but "what can the user or engineer now accomplish that they couldn't before?" A replay system doesn't unlock a replay system. It unlocks "player just had an insane moment and wants to show their friend." From that framing, shareable links and tap overlays are obvious. From "build replay playback infrastructure," they're not.
-Every task must be framed as: "This unlocks [user journey]. Within that journey, this feature enables [specific step]. The next thing the user will obviously try is [next step]." If the next step doesn't exist, it's a gap.
-When describing completed work, describe what it unlocks, not what it implements. Not "implemented replay event decoder." Instead: "Unlocks: player watches their run back and sees exactly where they tapped."
-
-For a milestone and the subwork within a milestone to be done, the **value path** must be proven by at least one real user/developer/engineering journey proof. The proof should use the shortest real feedback loop for that journey: seed/select the real state, drive the real action, observe the real consequence, inspect failure channels, and capture the artifact. Unit tests and static checks may support the rung, but they do not complete user-visible or runtime-visible work by themselves.
-
----
-
-#### <FEATURE-SLUG>__M1 — <title>
-
-- **Goal:** <capability unlocked>
-- **User / dev / engineering journey:** Actor + entry + 3–5 steps + success (observable)
-- **Rung size:** S/M/L/XL - summary judgment. Include Complexity, Risk, Perf Impact, and Cost Impact; use `N/A - <reason>` where an axis truly does not apply.
-- **Rung design brief:** product intent, engineering shape, or implementation philosophy needed to execute well. For every taste-critical rung, use explicit rung-specific lines: `Reference bar:`, `Must-feel delta:`, `Must-not-feel delta:`, and `Rejection criteria:`. Do not rely only on Section 1.B for these.
-- **Mandates / best practices:** the rung-specific musts, must-nots, and taste constraints that a senior engineer should preserve
-- **Implementation lane:** owned systems/surfaces; evidence, not an allowlist
-- **Experience invariants:** reference the relevant `C-###` (do not restate)
-- **Evidence artifacts:** screenshot/clip/log/benchmark/table paths for this rung, or `Pending - <what will be captured>`. For browser-rendered user-facing changes, include Playwright/browser screenshot, video, trace, or before/after capture from the actual route/playable scenario, viewport(s), and console/network error status. For canvas/game changes, include a nonblank/framed/interacting check. Use Markdown links when the artifact is durable in-repo; use backticked paths for short-lived `tmp/...` artifacts. If a `tmp/...` artifact may expire, include a one-sentence evidence summary that survives the file.
-- **Rung commit:** `<short-sha>` - <commit subject> for completed rungs; `Pending - commit after proof, Work Spec sync, and eval status sync` for active/proposed rungs
-- **Not in this rung:** what this rung intentionally does NOT do
-- **Obviousness checks (top assumptions -> proof or defer):**
-  1. <assumption> → <integration test or time-bounded defer>
-  2. …
-- **Risk & failure modes:** privacy / perf / data loss / hangs
-- **Performance budget:** reference `C-###`
-- **Context propagation checks:** reference `C-###`
-- **Proof plan:** eval-plan gate IDs or missing-harness notes, phrased as user/dev/engineering journey evidence, and naming the shortest real feedback loop for this rung
-- **Feedback-loop guardrail:** The shortest real feedback loop must be selected from the user/dev/engineering journey. A loop that proves only a mechanism, helper, or implementation detail is proxy proof and cannot complete the rung.
-- **Done when:** exact observable rung completion condition, including evidence artifact pointer(s), spec/eval status sync, and recorded rung commit
-
-#### <FEATURE-SLUG>__Mn... — <title>
-Each additional milestone must follow format of <FEATURE-SLUG>__M1
-
-<same fields as <FEATURE-SLUG>__M1>
-
----
-
-## 6. Capacity & Cost (Napkin Math)
-For features that do not affect persistence, infra cost, external services, hot paths, storage, model/tool calls, or production load, write:
-- [FACT F-___] Capacity/cost impact is not applicable because <reason>. — (SRC-___)
-
-Do not perform the 100m-user Feynman estimate unless the feature changes production resource usage or an operator cost surface.
-
-### 6.1. Infra Math
-* **Assumptions:** State the numbers (e.g., 10k CCU, 50 events/sec/user).
-* **Throughput:** Calculate required Read/Write OPS.
-* **Storage Projection:** Data volume per day/month.
-* **The Cost Reality:** Rough estimation of infrastructure costs (High/Medium/Low) and where the money goes.
-
-### 6.2. Feynman Cost Estimate
-Conduct a Feynman Cost Estimate for the total production load cost by deconstructing the feature(s) into their fundamental cost drivers, use Fermi estimation to confidently approximate any missing values with stated assumptions, and calculate the final Total Net $/Month Increase.
-Assume 100m users, with 10mm DAUs. Scale all numbers around these assumptions.
-* **Total Additional Net $ per month**: You must provide this number.
-
-
---- 
-
-## 7. Open Questions / Needs Verification
-
-(NOTE: WIth each open question, you MUST provide YOUR opinionated suggestion)
-
-- <blocking unknown>
-- <contradiction between sources> — evidence needed: <what would resolve it>
-- <assumption we might be wrong about> — disprove by: <test/log/measurement>
-
----
-
-## 8. Doc Health (Lint)
-
-- Next actions ≤ 5: ✅/❌
-- Active facts concise (target ≤ 12 bullets): ✅/❌
-- Active references concise (target ≤ 15 bullets): ✅/❌
-- Recent Change Log ≤ 3 active entries: ✅/❌
-- Milestone rungs are the richest section: ✅/❌
-- Each taste-critical rung, not just Section 1.B, names rung-specific reference bar, must-feel/must-not-feel delta, proof artifact, and rejection criteria: ✅/❌/N/A
-- Browser-rendered user-facing rungs have real route/scenario artifact, viewport(s), console/network status, and canvas/game nonblank/interacting proof when applicable: ✅/❌/N/A
-- Rung evidence artifacts are recorded or explicitly pending: ✅/❌
-- No-stopgap contract is satisfied or contradiction is called out: ✅/❌
-- Every user-provided item is mapped in the Input Coverage Ledger: ✅/❌/N/A
-- All [FACT] have (SRC-###): ✅/❌
-- No duplicate milestone IDs: ✅/❌
-- Contracts centralized (no scattered caps/contracts elsewhere): ✅/❌
-- Major [INFERENCE] entries include “Disprove if”: ✅/❌
-- Contradictions captured in Open Questions (not smoothed over): ✅/❌
+Each entry: why it matters, what would resolve it, and YOUR opinionated recommendation. Resolved questions move out (A4) in the same edit that resolves them.
 
 ---
 
 # Appendix
 
-## A1) Recent / Historical Change Log
-
-- YYYY-MM-DD - <older changelog entry moved out of header> - <replacement pointer if any>
-
----
-
-## A2) Decision Log (ADRs-lite)
-
-Each entry:
-
-- **Date:** YYYY-MM-DD
-- **Decision:** <what we decided>
-- **Rationale:** <why>
-- **Alternatives considered:** <bullets>
-- **Consequences / tradeoffs:** <bullets>
-- **Disprove if:** <one-liner>
-
-## A3) References (Primary Sources) (Optional)
-
-List the sources used by `[FACT]` entries above:
-
-- SRC-001: <file path / PR/commit / command / test output> — <what it proves> — (captured YYYY-MM-DD)
-- SRC-002: …
-- SRC-003: …
-
----
-
-## A4) Archive (Obsoleted or superseded) (Optional)
-
-- YYYY-MM-DD — <what moved> — <why obsolete> — <replacement pointer>
-
----
-
-## A5) Full Freeform Implementation Spec / Random Context (Optional, quarantined)
-
-This appendix can hold a full build spec when needed. It should expand on *mechanics and design*, but it must **not redefine contracts**—reference Section 4 `C-###`.
-
-### A5.1 Visual dynamics
-- `mermaid` sequence diagram (happy path):
-- `mermaid` state diagram (if lifecycle-managed):
-
-### A5.2 Context Propagation Audit
-- Trace context required:
-- Origin & destination:
-- Verification (tests/logs):
-
-### A5.3 Data Internals (Schemas & Payloads)
-- Primary store schema:
-- Hot store key patterns + TTL:
-- Event payloads / API responses (JSON schemas):
-
-### A5.4 Defense Against Failure
-
-- Failure modes table (risk → mitigation → test):
-- Retries & DLQ:
-- Circuit breakers / degraded mode:
-
-### A5.5 Random Context / Scratchpad
-- Raw notes, pasted Slack/chat/context, weird edge cases, maybe-important reminders, or "random ass context" may live here.
-- This section is quarantined. Promote a note into active sections only when it affects the active rung, next rung, blocker, or durable contract.
-
+## A1) Change-log history — entries rotated out of the header.
+## A2) Decision log (ADR-lite) — Date / Decision / Rationale / Alternatives / Consequences / Disprove if. Recorded decisions bind later sessions (root §3).
+## A3) Sources — `SRC-###: <file:line / commit / command / test output> — <what it proves> — (captured YYYY-MM-DD)`; plus inactive facts.
+## A4) Archive — superseded content with replacement pointers; accepted coverage ledgers; completed-rung narration; resolved questions.
+## A5) Quarantined scratch — raw notes, pasted context, maybe-important edge cases; optional deep implementation spec (sequence/state diagrams, store schemas, payload examples, cost worksheet). Must not redefine §4 contracts. Promote a note only when it affects a rung, blocker, or contract.
 ```
 
-## Quality Bar
-- Milestones use full prefixed IDs, not naked `M1` / `M2`.
-- Multi-item user intake has an Input Coverage Ledger until spec acceptance; no user item disappears into generic boilerplate.
-- Every milestone rung is a self-contained build packet, not a one-line task.
-- The first field under the Work Spec title is `Human Read`, and it uses the `so that` ladder to connect direct outcome to the one-level-higher outcome.
-- Every milestone rung names the user, developer, or engineering journey it unlocks.
-- Taste-critical rungs elevate taste by naming rung-specific reference bar, taste delta, proof artifact, and rejection criteria; they do not hide subjective judgment behind vague "polish" language or rely only on the global Design / UX Bar.
-- Browser-rendered user-facing rungs are not accepted on unit tests, DOM assertions, snapshots, or static markup alone; they record real app browser artifacts plus console/network status.
-- Every implementation-ready milestone references eval-plan proof, artifact-backed human review, missing-harness work, or the exact blocker.
-- The Work Spec has one no-stopgap contract in Section 4; rungs do not repeat a no-stopgap field.
-- Every rung records evidence artifact pointer(s) or `Pending`; short-lived `tmp/...` artifacts are acceptable only with a compact evidence summary that survives expiry.
-- Every completed milestone rung records its short commit hash and commit subject; unfinished rungs are explicitly `Pending`.
-- Header names the active rung; Section 5 owns the rung detail.
-- Appendix exists for archive and random context without polluting active sections.
+---
 
-Before output:
-- Contracts appear ONLY in section 4
-- Every `[FACT]` has `SRC-###`
-- Every major `[INFERENCE]` says "Disprove if: …"
-- Next actions ≤ 5
-- Contradictions in Open Questions, not smoothed over
-- Resolved questions, old source refs, and old changelog entries are moved out of active sections
+## Conformance Check (run before writing — never stored in the doc)
 
-## Skill Result
-After writing or updating the Work Spec, report these fields to the calling agent:
+- Human Read is the first field; its `so that` climbs a level; it names active rung, next proof, main risk, decision needed.
+- Every `[FACT]` has a `SRC`; major inferences have `Disprove if`; contradictions sit in §7, not smoothed over.
+- Contracts appear only in §4; zero root-law clones; every `C-###` is testable.
+- Rungs are the richest section; taste-critical rungs carry their own taste block; every rung has evidence recorded or `Pending` with a surviving-summary plan.
+- Projections match rung bodies (header, Human Read, §5.1, §6) after this edit.
+- ≤5 next actions; ≤3 active changelog entries; archives carry pointers; no empty scaffolding sections.
+- No naked or duplicate milestone IDs; statuses use root vocabulary; ledger covers every user item on multi-item intake.
 
-- Work Spec path:
-- Eval plan path:
-- Eval plan coverage: [Missing | Existing covers exact lane | Needs `$eval__design-proof-gates` | Updated from eval skill result]
-- Feature slug:
-- Approval state:
-- Active rung:
-- Input coverage state:
-- Rung commit state:
-- Evidence artifacts:
-- Proposed milestone IDs:
-- Proof-of-Value State:
-- Lane contract:
-- Open blockers:
-- Next proof / commit point:
-- Recommended next action:
+## Skill Result (return to caller)
 
-The root AGENTS.md owns the final human-facing recap format.
+- Work spec path · Eval plan path
+- Eval-plan coverage: Missing | Covers exact lane | Needs `$eval__design-proof-gates` | Synced this edit
+- Feature slug
+- Lane status + approval state · Active rung · Lane boundary (one line)
+- Input coverage state · Open blockers
+- Next proof / commit point · Recommended next action

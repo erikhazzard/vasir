@@ -1,9 +1,9 @@
 # Vasir
 
-Vasir gives each repo a generated agent manual, a small source file for local constraints, and a managed skill tree.
+Vasir gives each repo generated root agent manuals, a small source file for local constraints, and a managed skill tree.
 
 - `AGENTS__non-obvious.md` is authored. Put repo constraints, hazards, and local rules here.
-- `AGENTS.md` is generated. Commit it, but regenerate it from Vasir.
+- `AGENTS.md` and `CLAUDE.md` are generated twin root contracts. Commit them, but regenerate them from Vasir.
 - `.agents/skills/` holds copied skills. `.codex/skills` and `.claude/skills` point at the same tree.
 
 Source rule: edit `AGENTS__non-obvious.md`, then run `vasir agents sync`.
@@ -32,15 +32,15 @@ vasir agents sync
 - copies skills into `.agents/skills/`
 - creates `.agents/vasir.json` and `.agents/vasir-install-state.json`
 - creates `.codex/skills` and `.claude/skills` links
-- seeds root `AGENTS.md` when missing
+- seeds root `AGENTS.md` and `CLAUDE.md` when missing
 
-`vasir agents sync` renders the agent manual:
+`vasir agents sync` renders the root manuals:
 
 - infers or applies a `frontend`, `backend`, `ios`, or `generic` profile
 - creates `AGENTS__non-obvious.md` when missing
-- injects the sidecar into Section 4 of `AGENTS.md`
+- injects the sidecar into Section 2 of both generated root contracts
 - fills purpose and routing from local repo context
-- validates the generated result before writing
+- validates the generated `AGENTS.md` result before writing the pair
 
 After that, edit the sidecar and regenerate.
 
@@ -49,7 +49,7 @@ $EDITOR AGENTS__non-obvious.md
 vasir agents sync
 ```
 
-## Root, Nested Root, And Folder AGENTS
+## Root, Nested Root, And Folder AGENTS/CLAUDE
 
 Use the repo root for repo-wide rules.
 
@@ -59,7 +59,7 @@ vasir agents sync --profile frontend
 vasir agents sync --profile generic
 ```
 
-Nested root AGENTS are generated root contracts for app/package folders. Use `--scope` only when a subfolder is a nested app/package root, such as `frontend/`, `backend/`, `apps/web/`, `packages/web/`, or `services/api/`.
+Nested root AGENTS/CLAUDE pairs are generated root contracts for app/package folders. Use `--scope` only when a subfolder is a nested app/package root, such as `frontend/`, `backend/`, `apps/web/`, `packages/web/`, or `services/api/`.
 
 ```bash
 vasir agents sync --scope frontend --profile frontend
@@ -69,15 +69,17 @@ vasir agents sync --scope packages/web --profile frontend
 vasir agents sync --scope services/api --profile backend
 ```
 
-Nested root sync writes the sidecar and generated AGENTS file inside that folder.
+Nested root sync writes the sidecar and generated twin files inside that folder.
 
 ```text
 frontend/
   AGENTS.md
+  CLAUDE.md
   AGENTS__non-obvious.md
 
 backend/
   AGENTS.md
+  CLAUDE.md
   AGENTS__non-obvious.md
 ```
 
@@ -124,7 +126,7 @@ vasir update --dry-run
 vasir update
 ```
 
-Preview or apply AGENTS template changes.
+Preview or apply root contract template changes.
 
 ```bash
 vasir agents sync --dry-run
@@ -192,15 +194,16 @@ Vasir owns these files.
 
 ```text
 AGENTS.md
+CLAUDE.md
 .agents/vasir-install-state.json
 ```
 
-`AGENTS.md` is safe to commit. Put durable repo constraints in `AGENTS__non-obvious.md` and rerun `vasir agents sync`.
+`AGENTS.md` and `CLAUDE.md` are safe to commit. Put durable repo constraints in `AGENTS__non-obvious.md` and rerun `vasir agents sync`.
 
 Vasir also carries old layouts forward:
 
 - old `.agents/non-obvious.md` sidecars move to `AGENTS__non-obvious.md`
-- old manual `AGENTS.md` non-obvious blocks can seed `AGENTS__non-obvious.md`
+- old manual `AGENTS.md` or `CLAUDE.md` non-obvious blocks can seed `AGENTS__non-obvious.md`
 - dirty global caches move to `~/.agents/vasir.dirty-backup.<timestamp>` during `init` or `update`, then Vasir rebuilds a clean cache from the installed bundle
 
 In the Vasir repo itself, these generated files also change when templates, skills, or package metadata change.
@@ -239,8 +242,8 @@ npm test
 
 - CLI details: [docs/cli-reference.md](./docs/cli-reference.md)
 - Troubleshooting: [docs/troubleshooting.md](./docs/troubleshooting.md)
-- AGENTS template notes: [templates/agents/README.md](./templates/agents/README.md)
-- Example generated AGENTS file: [docs/example-agents.md](./docs/example-agents.md)
+- AGENTS/CLAUDE template notes: [templates/agents/README.md](./templates/agents/README.md)
+- Example generated root contract: [docs/example-agents.md](./docs/example-agents.md)
 - Create a skill: [docs/create-your-first-skill.md](./docs/create-your-first-skill.md)
 - Skill authoring reference: [docs/writing-skills.md](./docs/writing-skills.md)
 - Skill metadata/layout reference: [docs/skill-reference.md](./docs/skill-reference.md)

@@ -28,11 +28,11 @@ vasir --version
 | `init` | `vasir init [--json] [--repo-root <path>]` | Sync the installed bundled catalog into `~/.agents/vasir`; inside a repo, also install and track the full catalog there |
 | `update` | `vasir update [--json] [--dry-run] [--repo-root <path>]` | Sync `~/.agents/vasir`; then refresh whatever that repo is tracking: the full catalog or a selected installed subset |
 | `list` | `vasir list [--json]` | Read the global catalog and list available skills |
-| `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS scaffolding; use `vasir add all` for the full catalog |
+| `add` | `vasir add <skill> [skill...] [--json] [--replace] [--agents-profile <name>] [--repo-root <path>]` | Copy skills into the current repo root at `.agents/skills`, with optional one-command AGENTS/CLAUDE scaffolding; use `vasir add all` for the full catalog |
 | `adopt` | `vasir adopt [--json] [--repo-root <path>]` | Snapshot an existing `.agents/skills` tree into Vasir-managed state without copying or overwriting files |
 | `remove` | `vasir remove <skill> [skill...] [--json] [--repo-root <path>]` | Remove project-local skills from the current repo root |
-| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios\|generic>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile a root or nested root `AGENTS.md` from the canonical template, local context, and `AGENTS__non-obvious.md` |
-| `agents init` | `vasir agents init <backend\|frontend\|ios\|generic> [--json] [--replace] [--repo-root <path>]` | Write the canonical `AGENTS.md` starter in the current repo root |
+| `agents sync` | `vasir agents sync [--scope <path>] [--profile <backend\|frontend\|ios\|generic>] [--json] [--dry-run] [--repo-root <path>]` | Reconcile root or nested root `AGENTS.md` and `CLAUDE.md` from the canonical templates, local context, and `AGENTS__non-obvious.md` |
+| `agents init` | `vasir agents init <backend\|frontend\|ios\|generic> [--json] [--replace] [--repo-root <path>]` | Write canonical `AGENTS.md` and `CLAUDE.md` starters in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
 | `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Fail closed when a root or nested root `AGENTS.md` still contains scaffold placeholders or broken repo routes |
@@ -218,7 +218,7 @@ vasir list
 - Result:
   - `.agents/skills/<name>/...` is created in the resolved repo root.
   - `.claude/skills` and `.codex/skills` are repaired as aliases to `.agents/skills`.
-  - `AGENTS.md` is copied into the repo root if it does not already exist, using the canonical template plus an inferred stack snippet when the repo shape is obvious, or the canonical template alone when it is not.
+  - `AGENTS.md` and `CLAUDE.md` are copied into the repo root when no root contract already exists, using the canonical templates plus an inferred stack snippet when the repo shape is obvious, or the canonical templates alone when it is not.
 - Notes:
   - The repo root is the nearest parent containing `.git`.
   - If no `.git` ancestor exists, the current working directory is used.
@@ -227,8 +227,8 @@ vasir list
   - `vasir add all` marks the repo to keep tracking the full catalog on later `vasir update` runs.
   - `vasir add <specific skills>` marks the repo to keep tracking only those installed skills on later `vasir update` runs.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
-  - Pass `--agents-profile backend`, `--agents-profile frontend`, `--agents-profile ios`, or `--agents-profile generic` when you want to override inference and force a specific AGENTS profile.
-  - If you pass `--agents-profile` and `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
+  - Pass `--agents-profile backend`, `--agents-profile frontend`, `--agents-profile ios`, or `--agents-profile generic` when you want to override inference and force a specific root-contract profile.
+  - If you pass `--agents-profile` and `AGENTS.md` or `CLAUDE.md` already exists, the command fails closed unless `--replace` is explicitly provided.
   - `all` cannot be combined with specific skill names in the same command.
 
 Examples:
@@ -277,7 +277,7 @@ vasir adopt --repo-root packages/web
   - If you omit skill names in an interactive terminal, Vasir opens a multi-select prompt over the installed project-local skills.
   - Removing a missing skill is a clean no-op and is reported back in the command result.
   - Removing a skill from a repo that was tracking the full catalog switches that repo back to selected-subset tracking so later `vasir update` runs do not reinstall the removed skill.
-  - `AGENTS.md` is not edited automatically; remove or update any routing to the deleted skill yourself.
+  - Generated root contracts are not edited automatically; remove or update any routing to the deleted skill yourself.
 
 Examples:
 
@@ -289,27 +289,27 @@ vasir remove
 
 ## Agents
 
-`vasir agents` exists for one generated path: make root and nested root `AGENTS.md` files obvious to create, refresh, and validate.
+`vasir agents` exists for one generated path: make root and nested root `AGENTS.md` + `CLAUDE.md` pairs obvious to create, refresh, and keep aligned.
 
 Folder `AGENTS.md` files are different. They are hand-authored steering maps for ordinary subtrees. Do not generate them with `vasir agents sync --scope`; use the installed `agents__creating-folder-agents` skill or edit the folder file directly.
 
 ### `agents sync`
 
-- Purpose: the one-command generated AGENTS path for normal repos and nested app/package roots.
+- Purpose: the one-command generated AGENTS/CLAUDE path for normal repos and nested app/package roots.
 - Result:
-  - renders `AGENTS.md` from the current canonical template and the inferred or explicit profile
-  - stores explicit root profile intent in `.agents/vasir.json`, not in generated `AGENTS.md`
+  - renders `AGENTS.md` and `CLAUDE.md` from the current canonical templates and the inferred or explicit profile
+  - stores explicit root profile intent in `.agents/vasir.json`, not in generated root contract files
   - fills the purpose paragraph from deterministic local repo context without a model call
   - generates Section 1 routing from existing repo directories
   - injects repo-owned non-obvious constraints from `AGENTS__non-obvious.md`
-  - validates the generated result before writing it
+  - validates the generated `AGENTS.md` result before writing the pair
 - Notes:
   - By default, sync targets the resolved repo root.
-  - Use `--scope <path>` when a folder is a nested app/package root, such as `frontend/AGENTS.md` or `apps/web/AGENTS.md`.
+  - Use `--scope <path>` when a folder is a nested app/package root, such as `frontend/AGENTS.md` + `frontend/CLAUDE.md` or `apps/web/AGENTS.md` + `apps/web/CLAUDE.md`.
   - Use `--profile frontend`, `--profile backend`, `--profile ios`, or `--profile generic` when inference is wrong or when the scope is mixed.
   - Use `vasir agents sync --dry-run` to preview without writing.
   - The legacy positional profile form, such as `vasir agents sync frontend`, still works, but new scripts should use `--profile`.
-  - If `AGENTS__non-obvious.md` is missing, sync creates it. Existing `.agents/non-obvious.md` sidecars are moved to the root file, and legacy manual `AGENTS.md` files are migrated by seeding the root file from the old non-obvious block.
+  - If `AGENTS__non-obvious.md` is missing, sync creates it. Existing `.agents/non-obvious.md` sidecars are moved to the root file, and legacy manual `AGENTS.md` or `CLAUDE.md` files can seed the root file from the old non-obvious block.
   - Skill catalog updates remain separate: use `vasir update` for tracked `.agents/skills/**` content.
 
 Examples:
@@ -326,16 +326,16 @@ vasir agents sync --scope services/api --profile backend
 
 ### `agents init`
 
-- Purpose: write the canonical `AGENTS.md` starter into the resolved repo root with selected profile content composed in.
+- Purpose: write canonical `AGENTS.md` and `CLAUDE.md` starters into the resolved repo root with selected profile content composed in.
 - Result:
-  - `AGENTS.md` exists in the resolved repo root.
-  - The file has the guessed project name filled in.
-  - The file uses the current root operating-contract template.
+  - `AGENTS.md` and `CLAUDE.md` exist in the resolved repo root.
+  - Both files have the guessed project name filled in.
+  - Both files use the current root operating-contract templates.
   - The `Purpose` block and routing block are still safe placeholders until you replace them manually or via `draft-purpose --write` and `draft-routing --write`.
 - Notes:
   - Supported profiles are `backend`, `frontend`, `ios`, and `generic`.
   - The repo root is the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
-  - If `AGENTS.md` already exists, the command fails closed unless `--replace` is explicitly provided.
+  - If `AGENTS.md` or `CLAUDE.md` already exists, the command fails closed unless `--replace` is explicitly provided.
 
 Examples:
 
@@ -541,7 +541,7 @@ Facts:
 
 ## JSON Output
 
-`--json` is supported by `status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `list`, `add`, `adopt`, `remove`, and `eval run`.
+`--json` is supported by `status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `list`, `add`, `adopt`, `remove`, `agents sync`, `agents init`, `agents draft-purpose`, `agents draft-routing`, `agents validate`, and `eval run`.
 
 Success envelope:
 
@@ -555,9 +555,11 @@ Success envelope:
 - `checks[]` and `issues[]` for `doctor`
 - `catalogSourceDirectory`, `trackingMode`, `trackingSource`, `rebuiltProjectConfig`, `rebuiltInstallState`, and `restoredSkills[]` for `repair`
 - `catalogSourceDirectory`, `trackingMode`, `requestedSkills`, `hasDiff`, `hasBlockedSkills`, and `skills[]` for `diff`
-- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, and `updatedSkills` for `update`
+- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `updatedSkills`, `agentsFilePath`, `claudeFilePath`, `wroteAgentsFile`, and `wroteClaudeFile` for repo-local `init` and `update`
 - `skills` for `list`
-- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `installedSkills`, and `replacedSkills` for `add`
+- `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `installedSkills`, `replacedSkills`, `agentsFilePath`, `claudeFilePath`, `wroteAgentsFile`, and `wroteClaudeFile` for `add`
+- `subcommand`, `agentsFilePath`, `claudeFilePath`, `profile`, `wroteAgentsFile`, and `wroteClaudeFile` for `agents init`
+- `subcommand`, `agentsFilePath`, `claudeFilePath`, `profile`, `profileSource`, `purposeSource`, `nonobviousFilePath`, `wroteAgentsFile`, `wroteClaudeFile`, `wroteNonobviousFile`, `routingLines[]`, and `issues[]` for `agents sync`
 - `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `adoptedSkills`, and `skippedSkills` for `adopt`
 - `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `removedSkills`, and `missingSkills` for `remove`
 
@@ -595,7 +597,11 @@ Example success envelope:
   "projectRootDirectory": "/repo",
   "projectSkillsDirectory": "/repo/.agents/skills",
   "installedSkills": ["design__building-frontend"],
-  "replacedSkills": []
+  "replacedSkills": [],
+  "agentsFilePath": "/repo/AGENTS.md",
+  "claudeFilePath": "/repo/CLAUDE.md",
+  "wroteAgentsFile": true,
+  "wroteClaudeFile": true
 }
 ```
 

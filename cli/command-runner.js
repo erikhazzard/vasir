@@ -1396,14 +1396,14 @@ Notes:
   Pass --repo-root <path> to target an explicit repo root, including monorepo subprojects.
   Use "vasir add all" to install every catalog skill into the current repo.
   add auto-initializes the global catalog if needed.
-  add also seeds AGENTS.md when it is missing; --agents-profile backend|frontend|ios|generic overrides profile inference.
-  agents sync is the one-command generated AGENTS path: it infers or accepts a profile, can target a nested app/package root with --scope, fills purpose/routing locally, injects AGENTS__non-obvious.md, and validates the result.
+  add also seeds AGENTS.md + CLAUDE.md when no root contract already exists; --agents-profile backend|frontend|ios|generic overrides profile inference.
+  agents sync is the one-command generated AGENTS/CLAUDE path: it infers or accepts a profile, can target a nested app/package root with --scope, fills purpose/routing locally, injects AGENTS__non-obvious.md into both root contracts, and validates the generated AGENTS result.
   Folder AGENTS files are hand-authored steering maps for ordinary subtrees; do not generate them with agents sync --scope.
-  agents init mutates only the current repo root and writes AGENTS.md from the selected profile.
+  agents init mutates only the current repo root and writes AGENTS.md + CLAUDE.md from the selected profile.
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
   agents validate fails closed when AGENTS.md still contains known scaffold placeholders or broken repo routes.
-  Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md during vasir agents init.
+  Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md + CLAUDE.md during vasir agents init.
   remove mutates only the current repo root and also updates .agents/vasir.json and .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
   eval defaults to openai:gpt-5.4 and anthropic:claude-opus-4-6.
@@ -1760,7 +1760,8 @@ async function runInit({
 
   if (syncPlan.trackingMode === null) {
     const projectAgentsFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "AGENTS.md");
-    const agentsSelection = fs.existsSync(projectAgentsFilePath)
+    const projectClaudeFilePath = path.join(managedProjectSkills.projectPaths.projectRootDirectory, "CLAUDE.md");
+    const agentsSelection = fs.existsSync(projectAgentsFilePath) || fs.existsSync(projectClaudeFilePath)
       ? {
           profileName: null
         }
@@ -3563,17 +3564,18 @@ async function runAdd({
     projectRootDirectory
   });
   const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
+  const projectClaudeFilePath = path.join(projectPaths.projectRootDirectory, "CLAUDE.md");
   const agentsSelection = agentsProfileName !== null
     ? {
         profileName: agentsProfileName,
         source: "flag",
         reason: "Explicitly requested via --agents-profile."
       }
-    : fs.existsSync(projectAgentsFilePath)
+    : fs.existsSync(projectAgentsFilePath) || fs.existsSync(projectClaudeFilePath)
       ? {
           profileName: null,
           source: "existing",
-          reason: "AGENTS.md already exists, so Vasir left it unchanged."
+          reason: "AGENTS.md or CLAUDE.md already exists, so Vasir left root contracts unchanged."
         }
       : await resolveRecommendedAgentsProfile({
           projectRootDirectory: projectPaths.projectRootDirectory,

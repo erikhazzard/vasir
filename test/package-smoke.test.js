@@ -118,10 +118,13 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.match(addResult.stdout, /Project skills ready at/);
   assert.match(addResult.stdout, /Repo config ready at/);
   assert.match(addResult.stdout, /AGENTS starter ready at \(frontend, inferred\)/);
+  assert.match(addResult.stdout, /CLAUDE starter ready at \(frontend, inferred\)/);
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "design__building-frontend-interfaces", "SKILL.md")));
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "vasir.json")));
   assert.ok(fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+  assert.ok(fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
   assert.doesNotMatch(fs.readFileSync(path.join(projectDirectory, "AGENTS.md"), "utf8"), /vasir:profile/);
+  assert.doesNotMatch(fs.readFileSync(path.join(projectDirectory, "CLAUDE.md"), "utf8"), /vasir:profile/);
   const projectConfig = JSON.parse(fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8"));
   assert.equal(projectConfig.agents.profile, "frontend");
 
