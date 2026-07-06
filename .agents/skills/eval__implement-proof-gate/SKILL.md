@@ -1,6 +1,6 @@
 ---
 name: eval__implement-proof-gate
-description:Builds the missing runnable harness for an approved gate card, runs it, and writes the state transition (Red captured / Objectively Green / Blocked) — proof only, never product behavior. Triggers on a gate's loop says "missing harness"; a gate needs a literal runnable command before product code proceeds; an existing harness is marked defective.
+description: Builds the missing runnable harness for an approved gate card, runs it, and writes the state transition (Red captured / Objectively Green / Blocked) — proof only, never product behavior. Triggers on a gate's loop says "missing harness"; a gate needs a literal runnable command before product code proceeds; an existing harness is marked defective.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
