@@ -53,99 +53,15 @@
 
 ---
 
-# 2. The Idavoll Laws (Platform Physics)
+# 2. Project-Specific Non-Obvious Constraints
 
-<non-obvious_architectural_considerations>
-  Do not attempt to “fix,” optimize, flatten, migrate, or replace these patterns unless you have verified why they exist and the approved plan names the change.
+<project_specific_non_obvious_constraints>
+  This generated root is intentionally project-agnostic. Product, company, repo-family, and domain-specific context belongs in `AGENTS__non-obvious.md` or the nearest scoped `AGENTS.md`, then syncs into the marker block below.
 
   <!-- vasir:nonobvious:start -->
   None recorded yet.
   <!-- vasir:nonobvious:end -->
-
-  # Idavoll Context
-
-  **Idavoll** is a deterministic, mobile + desktop social gaming platform. Players discover, play, and compete through the Idavoll launcher app.
-
-  There are four repos:
-
-  - **idavoll-games**: A subset of games in our catalogue (useful for building sdk / backend functionality, eg. multiplayer); tooling (`tools/idv/*`); the game-side SDK (`packages/game-sdk/*`) that exposes platform / game engine functionality and bridges games ↔ host. Our games are **deterministic** and break the classic tradeoff where more abstraction means less creative freedom — by abstracting only the decisions that are never creative (platform plumbing, determinism, viewport math, input pipelines, game feel, testing) and leaving the AI with the narrowest possible surface that's still genre-flexible: entities, rules, rendering, and juice.
-  - **idavoll-frontend** — The web + mobile launcher app: game browsing, game loading (manifest → bundle → iframe), debug tooling, and all player-facing UX
-  - **idavoll-game-platform-backend**: Contains platform infrastructure and Kernel APIs: Terraform, DynamoDB, S3, CloudFront, IAM, and the catalog/launch resolution endpoints that tell the launcher what version of a game to load. It also contains the Admin Frontend and the backend for the game creation Studio.
-  - **idavoll-studio-frontend** - The frontend repo for the client side implementation of the game creation Studio.
-
-  There is also a native app which is a thin shell with a webview that loads the launcher (frontend repo), which loads each game into an iframe — so the runtime stack is native app → iframe → idavoll-frontend → iframe → game.
-
-  # AWS Usage
-
-  You may use `aws cli` to inspect our aws stack as needed.
-
-  # Idavoll Games Context
-  ## The Game Execution Laws (Non-Negotiable)
-
-  * **No Platform Networking:** Games cannot initiate platform networking. No `fetch('/api/*')`. Use `idv.*` only.
-  * **`Math.random()` Is Banned — Everywhere:** There is never a reason to call `Math.random()` in game code — not in gameplay, score, presentation, VFX, or games that are not fully deterministic. Seeded RNG is the repo-wide posture: kernel lanes use the keyed RNG facade below; everything else uses `idv.random` / `createSeededRandom(...)` (`packages/game-sdk/src/domains/random.js`) with the seed chosen once per attempt and recorded. You must not hand-roll RNG for outcome-affecting logic; the runtime owns it.
-  * **The RNG Facade:** For deterministic games, use this exact syntax inside `stepKernel(...)`:
-  ```js
-  keyedKernelRng.getStream({ streamName }).createTickEntityScopedRngFacade({ tickIndexUnsigned32, entityIdUnsigned32 }).float01('purposeLabel', drawIndexUnsigned32=0)
-  ```
-  *(Note: `drawIndexUnsigned32` is an explicit “which draw?” selector for consumption-order independence).*
-
-  * **Deterministic Math:** Inside kernel lanes, you MUST use `idv.Math.*` (portable across iOS WebKit + Chromium).
-  * *Error Recovery:* If you see `[idv deterministic math] Redirected Math.<fn>...`, you illegally used global `Math`. Fix the callsite. If you see `[idv deterministic guardrail] DET_NONDETERMINISM_FORBIDDEN_API`, you triggered a true non-determinism source and the SDK fail-closed.
-  * **Deterministic Harnesses Count:** Any test, simulation, replay tool, or headless runner that executes kernel-affecting code is part of the deterministic lane. It MUST follow the same nondeterminism and math rules as live gameplay code. Kernel-adjacent harnesses must not default to native `Math.*`; require an explicit deterministic math adapter or fail fast.
-  * **Replay / Snapshot Proof Depth:** If a deterministic test or simulation exercises replay, snapshot, or restore, it MUST verify at least one checkpoint at the restore boundary and at least one later checkpoint or final hash. Final-state-only equality is insufficient because a broken restore can reconverge later and hide drift.
-  * **Canonical Truth Source for Backend Selection:** Canonical games/examples and their game-local tests/simulations must resolve backend/package selection through one bootstrap or adapter seam. Do not duplicate backend truth across runtime code, tests, and simulations. If no stable seam exists yet, document the missing seam explicitly instead of normalizing multiple truth sources.
-
-  * **Semantic Intents over Raw DOM:** Record *intent* events, not raw DOM. Apply inputs/events purely on simulation ticks to remain replay-friendly.
-  * **Replayable Menus:** If the player expects to see a menu (equipment, upgrades, pause) in a replay, it MUST live inside the match boundary (`runtime.start()`) and encode actions as semantic intents (no pointermove/DOM capture).
-  * **Analog Axes:** Match recording for joysticks/aim axes is default "off". If required, record *only* simulation-tick-consumed axes (never raw pointermove) and bound the payloads.
-  * **Twin-Stick Aim Default:** If the game spec or named genre implies a twin-stick shooter, free aim, or an "aim vector," default right-stick aiming to bounded analog deterministic intents. Do not quantize aim to 4/8-way unless the spec explicitly calls for snapped aiming.
-
-  ## Game Developer Repo Map (Where to look)
-
-  If you are working on a game, you must consult these canonical sources:
-
-  1. **Game Location:** All game-specific files (tests, docs) live strictly in `games/<game-id>`.
-  2. **The Playbook:** Read `docs/sdk/game-template-architecture.md` and `tools/idv/data/game-template/AGENTS.md` for the step-by-step implementation guide.
-  3. **Genre Specs:** Read the Universal Template in `docs/specs/deterministic-game-kernel-reference-by-genre.md` first, then find the specific game archetype blueprint.
-  4. **Determinism & Authority:** Read `docs/architecture/determinism-and-authority.md` before changing deterministic kernels, replay, shared-world networking, WebXR pose handling, or authority boundaries.
-  5. **SDK & Match Envelopes:** Refer to `packages/game-sdk/README.md` for SDK usage and `docs/features/DONE__match-events-type-data-envelope.md` for exact match event shapes and invariants.
-  6. **3D Player + Environment Scale:** Use `docs/specs/3d-player-environment-scale-standards.md` for humanoid height, camera, jump, run/sprint, stairs, mantle/cover, doors, walls, ceilings, roofs, and placement baselines.
-
-  # Idavoll Game Platform Physics (The Idavoll Laws)
-
-  * **Determinism Is The Contract:** In deterministic lanes, outcomes derive only from tick semantics + recorded intents + `keyedKernelRng`. Never use wall-clock time, `Math.random()`, or other nondeterminism for outcome logic.
-  * **The Truth Lane Owns Outcomes:** Never let presentation drive outcomes. The kernel — or the owning authority lane — decides; the shell renders. Replay-relevant feedback/VFX must be driven by simulation-tick events and simulation time.
-  * **Replay Is A First-Class Output:** Never hand-roll recording/replay plumbing. Never put secrets/PII in match/replay data. If the player expects to see it in replay, encode it as semantic intents inside the match boundary.
-  * **Idv Is The Bridge:** Never call Idavoll `/api/*`, never touch `window.parent`, and never handle platform auth tokens/headers. Use injected `globalThis.idv` only for host features.
-  * **Hot Path Discipline:** Never churn DOM or allocate unboundedly in render/tick hot paths; treat mobile perf cliffs as correctness bugs.
-  * **Presentation Followers Are Parented, Never Copied:** Presentation that follows a per-frame-moving object (camera-attached viewmodels, held equipment, billboards on the local avatar) must be scene-graph parented to the object it follows, or updated in the same frame phase that poses that object. Never copy world transforms from a post-render sync callback — the copy renders exactly one frame stale, which reads as weapon/prop jitter during movement while fps stays perfect. Keep the Character3D camera in the scene graph (`scene.add(camera)`): three.js silently skips rendering children of a parentless camera, and that silent failure is what pushes authors toward the copy workaround. Motion-tracking proof: `npm run qa:viewmodel-motion` in the Character3D template QA game.
-
-  # Authority Models & Determinism
-  - Every game declares its authority model in its spec — a product fork the user owns:
-    - **Deterministic kernel** (SC2-class): a replayable kernel owns outcomes; replay = re-simulation from tick-indexed intents. The strictest rules bind (keyed RNG facade, `idv.Math.*`, deterministic harnesses).
-    - **Server/host authority** (CS2-class): an authority lane owns accepted state; clients predict and reconcile; replay = the recorded accepted-state/event stream (demo model), not re-simulation.
-    - Hybrids are normal (e.g. deterministic kernel + authority transport for shared worlds).
-  - **Determinism-first posture:** bounded determinism is the default bar, not a universal mandate. Prefer the deterministic kernel wherever the genre allows — it buys the cheapest replay, testing, and proof machinery — but do not force lockstep onto genres that need authority-lane netcode. `docs/architecture/determinism-and-authority.md` is the canonical taxonomy; read it before changing kernels, replay, netcode, or authority boundaries.
-  - Invariants that hold in EVERY model:
-    - Truth has exactly one owner — a deterministic kernel or an authority lane. Presentation and raw sensors never own outcomes; client data is evidence, not truth.
-    - `Math.random()` stays banned (see Game Execution Laws): non-kernel randomness draws from seeded `idv.random` streams so any behavior can be reproduced from its recorded seed.
-    - Do not record raw reality: browser events, device motion, wall-clock time, frame dt, pointer paths, and sensor noise become bounded, validated, ordered payloads before touching truth — semantic intents for kernels; quantized envelopes with ordering metadata for authority lanes.
-    - Replay is first-class in both models; the mechanism follows the model. Deterministic replay proof asserts at the restore boundary AND a later checkpoint (final-state equality hides drift). Authority-lane replay proof shows the recorded stream reconstructs the match.
-    - Presentation may be nondeterministic only when it cannot feed back: smoothing, interpolation, particles, camera easing, hover effects, and UI animation stay local-only if they cannot affect gameplay, replay, scoring, or physics truth.
-    - Any camera/look/aim delta that affects gameplay or replay enters the truth lane as tick-indexed intent (kernel) or a bounded envelope (authority); presentation may only smooth or preview motion the truth lane will actually consume.
-  - Inside a deterministic lane, determinism is absolute — no halfway kernels: if a value can change gameplay state, score, targeting, replay, save state, or authoritative physics in a kernel game, it must be deterministic.
-  - Scope honesty: the SDK's authority lane today is presence/build-state reconciliation. CS2-class support (server-authoritative hit registration, demo-stream recording/playback) is legal under this law but is future lane work — do not claim it exists.
-
-  Do not force determinism (tick-indexed reproducibility) for:
-    - render interpolation
-    - camera smoothing
-    - cosmetic VFX
-    - local prediction visuals
-    - observer smoothing
-    - tiny mouse deltas before they become a gameplay intent
-    (random draws inside these still use seeded streams — what is relaxed is reproducibility of the whole path, never RNG hygiene)
-</non-obvious_architectural_considerations>
+</project_specific_non_obvious_constraints>
 
 ---
 
@@ -330,8 +246,8 @@
     - Always run codex with full permissions (YOLO); never downgrade delegated runs to read-only or approval-gated sandboxes.
     - A zsh function wraps `codex`, injecting `-C "$PWD" -s danger-full-access -a never` — the wrapped form is already YOLO. Do NOT pass `-C` through the wrapper (errors: "--cd cannot be used multiple times").
     - Preferred delegated form, from the repo root: `codex exec "<task; demand file:line evidence; cap answer length>"`
-    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts): `command codex exec -C /Users/erikhazzard/code/idavoll-games --dangerously-bypass-approvals-and-sandbox "<task>"`
-    - Codex MCP calls carry the same settings: `{ "prompt": "<task>", "cwd": "/Users/erikhazzard/code/idavoll-games", "sandbox": "danger-full-access", "approval-policy": "never" }`
+    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts), run from the repo root: `command codex exec -C "$PWD" --dangerously-bypass-approvals-and-sandbox "<task>"`
+    - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, and `cwd` set to the current repo root.
     - `~/.codex/config.toml` already defaults to gpt-5.5 + xhigh reasoning; do not downgrade model or effort in delegated calls unless the work is purely read-only/script-running (then high is allowed).
 
   Guardrails (hold at every tier):
@@ -441,7 +357,7 @@
 
   **Where to start:**
   <!-- vasir:routing:start -->
-  - `/games/` → this file + the Game Developer Repo Map in §2; `/tools/` and `/packages/` → this file + the package/tool READMEs; `/docs/` → read `docs/AGENTS.md` first.
+  - Source roots -> this file + the nearest scoped `AGENTS.md` and local README; tests/evals -> nearest test/eval guidance; docs -> `docs/AGENTS.md` when present.
   <!-- vasir:routing:end -->
 
   **Feel-gate delivery.** Subjective gates get a published before/after artifact page — capture pairs, judge-cards, honest known-limits — then the user's explicit accept/reject with named deltas.

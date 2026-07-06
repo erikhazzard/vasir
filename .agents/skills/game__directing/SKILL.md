@@ -515,12 +515,13 @@ Downstream skills (consult as needed during implementation):
 - **game__adding-juice**: Implements the Feedback Contract from the Design Brief. Consult for detailed particle systems, screenshake tuning, hitstop values, animation curves.
 - **game__art-directing**: Art direction from concept through implementation — color systems, shape language, animation grammar, juice budgets, UI hierarchy, procedural art; gameplay readability first.
 - **game__building-core-loop**: Core loop design — state machines, input systems, feedback timing, session design, tension curves, difficulty pacing.
-- **game__combat-damage**: Combat & damage systems — hitboxes, frame data, combos, cooldowns, damage formulas, projectiles, AOE, DoT.
-- **game__economy-progression**: Economy & progression — XP curves, unlock trees, currency, loot tables, difficulty scaling, reward schedules, prestige.
-- **game__proc-gen**: Procedural generation — dungeons, terrain, placement, loot, waves; seed-deterministic, designer-tunable.
-- **game__inventory-system**: Item & inventory — item data, grids, drag-and-drop, equipment slots, crafting, stat modifiers.
-- **game__loot**: Loot & reward pipeline — drop tables, rarity, pity/mercy, procedural items, pickup physics, reward choreography.
-- **Genre skill**: game__genre-routing for endless runner, idle/incremental, platformer, puzzle, roguelike, tower-defense, autobattler/tactics, and MMO routes.
+- **game__designing-systems**: Formal system modeling — stocks/flows, FSMs, RNG policy, arbitration, invariants, simulation harnesses, and tuning knobs.
+- **game__building-combat-damage**: Combat and damage systems — hitboxes, frame data, combos, cooldowns, damage formulas, projectiles, AOE, DoT.
+- **game__tuning-economy-progression**: Economy and progression — XP curves, unlock trees, currency, loot tables, difficulty scaling, reward schedules, prestige.
+- **game__generating-procedural-content**: Procedural generation — dungeons, terrain, placement, loot, waves; seed-deterministic, designer-tunable.
+- **game__building-inventory-system**: Item and inventory — item data, grids, drag-and-drop, equipment slots, crafting, stat modifiers.
+- **game__building-loot-systems**: Loot and reward pipeline — drop tables, rarity, pity/mercy, procedural items, pickup physics, reward choreography.
+- **game__genre-routing**: Genre router for endless runner, idle/incremental, platformer, puzzle, roguelike, tower-defense, autobattler/tactics, and MMO routes.
 
 All downstream skills must respect: the token inventory (7A–7F), the three-system constraint, the emotional target, and the cut list. Any conflict is resolved in favor of the Design Brief.
 

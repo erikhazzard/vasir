@@ -92,7 +92,7 @@ A performance budget is required for material backend changes. It must state:
 ### 3.1 Infra Design
 - Projection judgment: Do not reject Valkey because it is “not truth”; make it truth-backed with state/sourceVersion/dirty/unavailable semantics. The mistake is using DynamoDB as the default read path when a repairable Valkey projection is the cheaper/faster product path.
 - Hot social reads: If a pair-page/social-graph fragment can be served by a bounded Valkey key/ZSET/HASH, default to Valkey as the hot serving path; DDB is durable truth, idempotency, audit, and rebuild source.
-  - When using DDB, keep as minimal canonical truth, not a second serving model. Keep Valkey as the only healthy hot serving model. This gives durability without paying double. 
+  - When using DDB, keep as minimal canonical truth, not a second serving model. Keep Valkey as the only healthy hot serving model. This gives durability without paying double.
 
 ---
 
@@ -340,7 +340,7 @@ mocha <filepath> --exit
 ---
 
 ## 13. Autonomus / Persistence
-You may run long running scripts / evals / etc. However, you may not leave a process running unbounded sitting silently for hours when you expect the result should return quickly. 
+You may run long running scripts / evals / etc. However, you may not leave a process running unbounded sitting silently for hours when you expect the result should return quickly.
 
 When running any long service / test flow:
 * Start processes with a tracked PID/session
