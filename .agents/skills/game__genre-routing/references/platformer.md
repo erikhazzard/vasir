@@ -1,14 +1,3 @@
----
-name: game__genre--building-platformer
-description: Builds production 2D platformer movement, collision, and feel systems in JavaScript. Use when implementing or tuning jumps, wall moves, dashes, hazards, checkpoints, side-scroller collisions, or mobile platformer controls.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
----
 
 # Platformer Movement Vocabulary Skill (JavaScript — Mobile iOS)
 

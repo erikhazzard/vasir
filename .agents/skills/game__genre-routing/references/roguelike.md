@@ -1,14 +1,3 @@
----
-name: game__genre--building-roguelike
-description: Designs and builds JavaScript roguelike and roguelite games. Use when creating runs, procedural levels, entity systems, item synergies, meta-progression, economy, difficulty, touch UI, or one-more-run pacing.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
----
 
 # Roguelike Design & Development Skill (JavaScript / Mobile)
 

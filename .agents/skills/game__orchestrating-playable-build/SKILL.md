@@ -88,7 +88,7 @@ For broad playable builds, the usual tool map is:
 |---|---|---|
 | Vision/coherence | `game__directing` | One-sentence vision, pillars, token lock, scope cuts. |
 | Core loop | `game__building-core-loop` | Verb, objective, pressure, reward, fail/retry, session shape. |
-| Genre implementation | Relevant `game__genre--*` skill | Mechanics, constraints, solvability, genre-specific edge cases. |
+| Genre implementation | `game__genre-routing` | Mechanics, constraints, solvability, genre-specific edge cases. |
 | Systems | `game__designing-systems`, combat/inventory/loot/procgen/economy skills as needed | Shared state, progression, rewards, authored content loops. |
 | Feel | `game__adding-juice` | Input response, feedback channels, camera, hitstop, particles, comfort. |
 | Art direction | `game__art-directing` | Visual language, readability, active-play slap review. |

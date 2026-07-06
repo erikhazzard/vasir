@@ -372,7 +372,7 @@ material" as appropriate.
 - Use it before claiming a first playable, vertical slice, publish-readiness, or final handoff complete.
 - Do not use it as the initial design skill; `game__directing` and `game__building-core-loop` come first when the core game direction is still missing.
 - Do not use it for narrow HUD beautification unless the requested outcome is first-play comprehension, first-fun judgment, or player-readable causality.
-- For auto-battlers, use `game__genre--building-auto-battler-tactics` for the system design, then use this skill to judge whether the first commitment reaches the player quickly and reads in play material.
+- For auto-battlers, use `game__genre-routing` with the auto-battler route for the system design, then use this skill to judge whether the first commitment reaches the player quickly and reads in play material.
 
 ## Completion Boundaries
 

@@ -515,7 +515,7 @@ Downstream skills (consult as needed during implementation):
 - **game__proc-gen**: Procedural generation — dungeons, terrain, placement, loot, waves; seed-deterministic, designer-tunable.
 - **game__inventory-system**: Item & inventory — item data, grids, drag-and-drop, equipment slots, crafting, stat modifiers.
 - **game__loot**: Loot & reward pipeline — drop tables, rarity, pity/mercy, procedural items, pickup physics, reward choreography.
-- **Genre skills**: game__genre--endless-runner, game__genre--idle-games, game__genre--platformer, game__genre--puzzle, game__genre--rogue-like, game__genre--tower-defense.
+- **Genre skill**: game__genre-routing for endless runner, idle/incremental, platformer, puzzle, roguelike, tower-defense, autobattler/tactics, and MMO routes.
 
 All downstream skills must respect: the token inventory (7A–7F), the three-system constraint, the emotional target, and the cut list. Any conflict is resolved in favor of the Design Brief.
 

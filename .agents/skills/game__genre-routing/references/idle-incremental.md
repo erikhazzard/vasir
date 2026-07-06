@@ -1,14 +1,3 @@
----
-name: game__genre--building-idle-games
-description: Builds mobile JavaScript idle and incremental games. Use when implementing big-number economies, prestige, offline progress, upgrade curves, auto-clickers, save/load, notation, or background catch-up.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
----
 
 # Idle / Incremental Game Skill (JavaScript · Mobile)
 

@@ -1,7 +1,3 @@
----
-name: game__genre--building-auto-battler-tactics
-description: Designs/builds autobattler and squad-tactics systems. Use for shops, benches, boards, formations, synergies, items, draft/economy phases, automated combat, combat causality, or TFT-like games.
----
 
 # Auto-Battler / Tactics Game Builder
 
@@ -235,7 +231,7 @@ Why: the good summary preserves responsibility and renewed intent without needin
 
 - Use this skill for auto-battlers, auto chess, squad tactics, draft/bench/board games, party synergies, or any game where combat resolves automatically after a player setup decision.
 - Do not use this skill for ordinary platformer, shooter, action, or tower-defense enemies unless the player makes a pre-combat commitment and then watches an automated resolution.
-- Pure tower defense should use `game__genre--building-tower-defense`; mixed tower placement plus squad auto-combat should use both skills, with this skill owning commitment, combat resolution, and result legibility.
+- Pure tower defense should use `game__genre-routing` with the tower-defense route; mixed tower placement plus squad auto-combat should read both tower-defense and auto-battler references, with this reference owning commitment, combat resolution, and result legibility.
 
 ## Completion Boundaries
 

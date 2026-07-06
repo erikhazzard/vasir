@@ -1,6 +1,6 @@
 ---
 name: code__fixing-bugs
-description: Bug-fixing protocol — turns a defect into an executable journey contract: failing reproduction at the real port (watched-red), evidence-led fault localization, minimal fix, durable guardrails. Triggers on any defect, regression, or failure report; flaky/heisenbug hunts; replay or kernel divergence; before patching production code for a bug.
+description: "Bug-fixing protocol — turns a defect into an executable journey contract: failing reproduction at the real port (watched-red), evidence-led fault localization, minimal fix, durable guardrails. Triggers on any defect, regression, or failure report; flaky/heisenbug hunts; replay or kernel divergence; before patching production code for a bug."
 ---
 
 # Fixing Bugs — The Journey Contract

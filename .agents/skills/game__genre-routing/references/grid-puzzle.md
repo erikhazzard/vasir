@@ -1,14 +1,3 @@
----
-name: game__genre--building-puzzle
-description: Builds mobile JavaScript grid-puzzle games and core board logic. Use when creating match-3, merge, sliding, Sokoban, or falling-block puzzles, or tuning grids, cascades, scoring, hints, undo, and touch input.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
----
 
 # Grid-Based Puzzle Game Skill (JavaScript / Mobile)
 

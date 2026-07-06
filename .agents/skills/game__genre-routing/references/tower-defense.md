@@ -1,14 +1,3 @@
----
-name: game__genre--building-tower-defense
-description: Designs and builds JavaScript tower-defense games with readable placement, waves, targeting, upgrades, and economy. Use when creating tower-defense games, placement grids, pathing, projectile systems, wave pacing, tower upgrades, or balance passes.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
----
 
 # Tower Defense Game Design Skill 
 

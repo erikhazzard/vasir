@@ -1,14 +1,3 @@
----
-name: game__genre--building-endless-runner
-description: Builds mobile JavaScript endless and auto-runner games. Use when creating runners, lane or scroll systems, solvable obstacles, pickups, difficulty ramps, distance scoring, or runner polish.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
----
 
 # Endless Runner Skill (JavaScript · Mobile-Native iOS)
 

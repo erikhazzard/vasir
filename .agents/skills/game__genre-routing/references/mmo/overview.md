@@ -1,7 +1,3 @@
----
-name: game__genre--designing-mmos
-description: Designs and reviews single-world MMO/MMORPG systems around locality, player dependency, institutions, economies, persistence, and retention. Use for MMO world-fabric, guild, economy, progression, map, AI-native NPC, or feature-design reviews; not for generic single-player RPGs.
----
 
 # Massive Single-World MMO Social Systems Design
 

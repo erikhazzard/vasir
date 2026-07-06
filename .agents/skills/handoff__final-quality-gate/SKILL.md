@@ -1,6 +1,6 @@
 ---
 name: handoff__final-quality-gate
-description: Clean-context ship/no-ship audit before a lane claims Complete — verifies the proof system: gates terminal, artifacts fresh, terminal value shown, lenses clean, docs synced, deltas accepted. Triggers on before claiming feature completion, lane or milestone closure, release readiness, or final handoff.
+description: "Clean-context ship/no-ship audit before a lane claims Complete — verifies the proof system: gates terminal, artifacts fresh, terminal value shown, lenses clean, docs synced, deltas accepted. Triggers on before claiming feature completion, lane or milestone closure, release readiness, or final handoff."
 tools: Read, Grep, Glob, Bash, Write
 ---
 

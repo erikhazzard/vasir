@@ -1,6 +1,6 @@
 ---
 name: plan__maintain-work-spec
-description: Creates or updates the durable Work Spec — a lane's judgment state: unlock, contracts, milestone rungs, decisions, and proven-vs-claimed status. Triggers on defining, approving, or resuming substantial work; any rung or status change; any decision, invariant, or eval result that must outlive the session; also triggers for substantial work that does not yet have a  work spec.
+description: "Creates or updates the durable Work Spec — a lane's judgment state: unlock, contracts, milestone rungs, decisions, and proven-vs-claimed status. Triggers on defining, approving, or resuming substantial work; any rung or status change; any decision, invariant, or eval result that must outlive the session; also triggers for substantial work that does not yet have a  work spec."
 tools: Read, Grep, Glob, Edit, Write
 ---
 

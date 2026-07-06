@@ -1,6 +1,6 @@
 ---
 name: code__crafting-dev-ux
-description: Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as AGENTS §6's AUDIT lens when a lane shipped or changed dev-facing surfaces.
+description: "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as AGENTS §6's AUDIT lens when a lane shipped or changed dev-facing surfaces."
 tools: Read, Grep, Glob, Write
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ops__maintain-incident-postmortem
-description: Authors or updates the durable incident postmortem — preserves a hard diagnosis: ruled-out hypotheses, misleading signals, proven mechanism, fast-path discriminator. Triggers only when the diagnosis itself was the work (multi-hypothesis hunt, misleading symptoms, cross-lane evidence); routine bugs return not-owed. Also triggers on signficant corrective-action updates and closure.
+description: "Authors or updates the durable incident postmortem — preserves a hard diagnosis: ruled-out hypotheses, misleading signals, proven mechanism, fast-path discriminator. Triggers only when the diagnosis itself was the work (multi-hypothesis hunt, misleading symptoms, cross-lane evidence); routine bugs return not-owed. Also triggers on signficant corrective-action updates and closure."
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

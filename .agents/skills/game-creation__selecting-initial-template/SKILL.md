@@ -23,7 +23,7 @@ After reading the approved `README__game-spec.md`, explicitly load or invoke the
 
 1. **Template substrate**: this skill chooses the starter template and states `Selected template: <template path> - <reason>.`
 2. **Game direction**: use `game__directing` for coherence unless a narrower genre skill is clearly the stronger fit.
-3. **Genre/system skill**: use the closest `game__genre--building-*`, combat, loot, inventory, economy, or procedural skill when the spec meaningfully depends on that domain. Use `game__genre--building-auto-battler-tactics` for auto-battlers, tactics drafts, shop/bench/board games, party synergies, or automated combat after player setup.
+3. **Genre/system skill**: use `game__genre-routing`, combat, loot, inventory, economy, or procedural skills when the spec meaningfully depends on that domain. Route auto-battlers, tactics drafts, shop/bench/board games, party synergies, or automated combat after player setup through `game__genre-routing`.
 4. **Art direction**: use `game__art-directing` before implementing the first screen if the game has any visual world, characters, enemies, cards, pieces, board, arena, or branded object language.
 5. **Player-facing shell UI**: use `design__designing-game-ui-for-idavoll` for any HUD, card row, upgrade/draft surface, controls, pause, results, or runtime overlay. A first playable is not complete if the first screen is generic debug chrome.
 6. **First-playable comprehension proof**: use `game-proof__auditing-first-playable-comprehension` to inspect whether a zero-context player can understand goal, action, consequence, score, phase, and win/loss before claiming initialization done.
