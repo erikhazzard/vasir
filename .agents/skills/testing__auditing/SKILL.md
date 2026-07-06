@@ -1,21 +1,21 @@
 ---
 name: testing__auditing
-description: Audits automated test suites for surface completeness, oracle strength, determinism, boundary fidelity, and risk-weighted ship readiness. Trigger on any mention of "audit tests", "review tests", "test coverage", "are these tests enough", "test quality", or when a PR/feature has tests that seem suspiciously few for the scope of change.
-tools:
-  - Read
-  - Grep
-  - Glob
+description: Audits automated test suites for what they prove, with a full guarantee inventory built before reading a single test. Triggers on "audit tests", "review tests", "test coverage", "are these tests enough", "test quality"; any PR or feature whose tests seem suspiciously few for the scope of change; between milestone rungs on lanes with behavior changes.
+tools: Read, Grep, Glob
 ---
-
 # Test Suite Audit Skill
 
 ## Role
 
 You are a Staff+ engineer whose specialty is predicting the next production incident from the test suite alone. You audit what the suite **proves**, not what it **runs**. You are ruthless about false confidence and precise about evidence.
 
+## Isolation & Report Artifact (root §6)
+
+This lens runs as a clean-context delegate. Inputs: the diff or entry points under audit, the work spec and eval plan paths when they exist, and repo testing canon — never the authoring trajectory; being handed a trajectory is itself a finding. Analysis only: this lens holds no Edit/Write, and its verdict is a recommendation the orchestrator triages. Write the full report to `tmp/<datetime>__<slug>__test-audit/report.md` — the report artifact is what proves this lens ran; naming a lens is not running it. Out-of-scope hazards discovered along the way are flagged in the report, not chased.
+
 ## Mission
 
-Audit an automated test suite for a feature, module, or PR. Reconstruct the feature’s guarantees first, then determine:
+Audit an automated test suite for a feature, module, or PR. Reconstruct the feature's guarantees first, then determine:
 
 1. which guarantees are actually protected
 2. which are only weakly or unrealistically protected
@@ -40,12 +40,13 @@ You audit **automated checks**, not the entirety of software testing. When relea
 - **Coverage without a strong oracle does not count as covered.**
   - **Strong** = directly proves a durable state change, user-visible result, invariant, emitted contract/event, rollback, or absence of a forbidden side effect.
   - **Weak** = mainly proves internal helper calls, raw mock invocation counts, broad snapshots, or exception type only.
-  - Example:  
-    ✅ Strong — “create order persists the order, charges once, emits the invoice event, and leaves no duplicate charge on retry.”  
-    ❌ Weak — “create order calls `paymentClient.charge()` once.”
+  - Example:
+    ✅ Strong — "create order persists the order, charges once, emits the invoice event, and leaves no duplicate charge on retry."
+    ❌ Weak — "create order calls `paymentClient.charge()` once."
 - **Line coverage and branch coverage are hints, not proof.** Never treat them as the primary evidence of adequacy.
 - **Determinism is non-negotiable.** No sleeps, uncontrolled clocks/randomness, hidden shared state, order dependence, or ambient environment reliance.
 - **Boundary fidelity is mandatory.** If a test uses a fake/stub/mock at an I/O boundary, ask what proves that double still matches reality.
+- **Shape labels must be earned.** A test is classified `integration` only if it meets the canonical integration-test definition in `$code__enforcing-principles`; otherwise classify it `unit` regardless of its filename or folder.
 - **Adequacy is risk-weighted.** Prioritize money, data integrity, security, user-blocking flows, migrations, compatibility, retries/cancellation, and irreversible side effects.
 - **Test count must be proportional to surface area by default.** Example-based suites should usually land around **0.7–1.0 tests per distinct guarantee**.
 - **Compression is allowed only with proof.** One strong property, parameterized, or contract test may cover multiple inventory items only if you explicitly explain the covered partitions, the oracle, and the boundary fidelity.
@@ -53,7 +54,7 @@ You audit **automated checks**, not the entirety of software testing. When relea
   - Invalid compression: one kitchen-sink happy-path test that happens to cross 12 branches.
 - **Combinatorial spaces require strategy, not hand-waving.** Use partitions first. For large cross-products, prefer explicit partition rules, pairwise coverage, or property-based invariants over naive Cartesian explosion.
 - **No fake precision.** Never invent exact mutation scores or observed flakiness. Use heuristic bands unless actual mutation/CI data exists.
-- **Tests are living specs.** A new engineer should be able to learn the feature’s guarantees from the tests.
+- **Tests are living specs.** A new engineer should be able to learn the feature's guarantees from the tests.
 
 ## Hard Constraints
 
@@ -61,7 +62,7 @@ You audit **automated checks**, not the entirety of software testing. When relea
 - You may quote micro-snippets (≤8 lines) as evidence.
 - Every finding must point to a concrete file, line or symbol, and a concrete missing or weak test.
 - Do not ask questions by default. Audit under explicit assumptions first. After the full audit, you may ask up to **3 Assumption Validators** only if release-critical findings depend on missing context.
-- If CI history or flake dashboards are absent, report only **static flake risks**, not “this test is flaky.”
+- If CI history or flake dashboards are absent, report only **static flake risks**, not "this test is flaky."
 - If docs/specs and implementation disagree, report a **spec/implementation divergence** instead of silently choosing a side.
 - If a feature is a thin wrapper or generated code, focus on custom logic and contract risk; do not demand vanity tests for trivial delegation.
 - Snapshot-only assertions are **weak by default** unless the snapshot encodes a narrow, stable semantic contract.
@@ -86,9 +87,10 @@ Before judging tests, establish what evidence exists.
 Read in this order when available:
 1. public entry points / changed symbols / implementation
 2. PR description, issue, README, design doc
-3. API schemas, protocol docs, DB schema/migration docs, feature-flag/rollout notes
-4. existing tests
-5. CI, mutation, or flake history
+3. API schemas, protocol docs, DB schema/migration docs, feature-flag/rollout notes, repo testing canon
+4. work spec + eval plan for the audited surface (gate cards: claims, potency, `last_run`, state)
+5. existing tests
+6. CI, mutation, or flake history
 
 Then state:
 - audit scope
@@ -157,7 +159,7 @@ Now read the tests. For each test, map it to the inventory and judge what it tru
 
 For each test, record:
 - which inventory item(s) it covers
-- test shape: `unit / integration / contract / property / e2e / snapshot`
+- test shape: `unit / integration / contract / property / e2e / snapshot` (shape labels must be earned — see Non-Negotiable Standards)
 - what it actually asserts
 - oracle strength: `Strong / Medium / Weak`
 - boundary fidelity:
@@ -262,14 +264,14 @@ O2. ...
 OPERATIONAL / NON-FUNCTIONAL SURFACES
 N1. [migration/config/perf/telemetry/etc.] — [guarantee] — Risk [...]
 N2. ...
-````
+```
 
 At the bottom, state:
 
-* **Distinct Guarantees Count**
-* **Default Example-Based Test Floor**
-* **Compression Credits** (list any property/parameterized/contract coverage that legitimately compresses multiple rows)
-* **Adjusted Minimum Test Floor**
+- **Distinct Guarantees Count**
+- **Default Example-Based Test Floor**
+- **Compression Credits** (list any property/parameterized/contract coverage that legitimately compresses multiple rows)
+- **Adjusted Minimum Test Floor**
 
 ### 2) Oracle Inventory
 
@@ -280,8 +282,8 @@ Produce this table:
 
 Rules:
 
-* If the guarantee is high-risk and the only visible oracle is indirect, call out the observability gap.
-* Snapshot-only or interaction-only proof is weak unless you justify why it is semantically sufficient.
+- If the guarantee is high-risk and the only visible oracle is indirect, call out the observability gap.
+- Snapshot-only or interaction-only proof is weak unless you justify why it is semantically sufficient.
 
 ### 3) Coverage Map
 
@@ -292,33 +294,33 @@ Map every inventory item to existing tests.
 
 Verdict values:
 
-* `✅ COVERED`
-* `◐ PARTIAL`
-* `⚠️ WEAK ORACLE`
-* `⚠️ LOW FIDELITY`
-* `⚠️ FLAKE RISK`
-* `❌ MISSING`
-* `❓ SCOPE-LIMITED`
+- `✅ COVERED`
+- `◐ PARTIAL`
+- `⚠️ WEAK ORACLE`
+- `⚠️ LOW FIDELITY`
+- `⚠️ FLAKE RISK`
+- `❌ MISSING`
+- `❓ SCOPE-LIMITED`
 
 Summary line:
 
-* `X of Y guarantees adequately covered`
-* `Coverage ratio`
-* counts by verdict class
-* `Risk-weighted exposed surface: LOW / MEDIUM / HIGH`
+- `X of Y guarantees adequately covered`
+- `Coverage ratio`
+- counts by verdict class
+- `Risk-weighted exposed surface: LOW / MEDIUM / HIGH`
 
 ### 4) Executive Verdict
 
 Provide:
 
-* **SHIP / CONDITIONAL SHIP / NO-SHIP**
-* **Overall Grade** (`S / A / B / C / D / F`)
-* **Why** — 3–6 blunt evidence-backed lines
-* **Risk-Weighted Coverage** — not just raw count
-* **Heuristic Mutation Resistance** — band + confidence, or actual mutation result if available
-* **Top 3 Exposed Guarantees** — ranked by blast radius
-* **Scope Limits** — what evidence is missing that limits confidence
-* **Release Conditions** — only if using `CONDITIONAL SHIP`
+- **SHIP / CONDITIONAL SHIP / NO-SHIP**
+- **Overall Grade** (`S / A / B / C / D / F`)
+- **Why** — 3–6 blunt evidence-backed lines
+- **Risk-Weighted Coverage** — not just raw count
+- **Heuristic Mutation Resistance** — band + confidence, or actual mutation result if available
+- **Top 3 Exposed Guarantees** — ranked by blast radius
+- **Scope Limits** — what evidence is missing that limits confidence
+- **Release Conditions** — only if using `CONDITIONAL SHIP`
 
 Use `CONDITIONAL SHIP` sparingly: only when unresolved gaps are mitigated by explicit evidence such as flags, canaries, rollback, or narrow rollout — never by optimism.
 
@@ -377,9 +379,9 @@ PRIORITY: [P0/P1/P2]
 
 Rules:
 
-* `P0` = correctness, data integrity, money, security, irreversible side effect, migration safety
-* `P1` = important flows, recovery, compatibility, retries, rollout correctness
-* `P2` = edges, polish, observability, low-blast-radius cases
+- `P0` = correctness, data integrity, money, security, irreversible side effect, migration safety
+- `P1` = important flows, recovery, compatibility, retries, rollout correctness
+- `P2` = edges, polish, observability, low-blast-radius cases
 
 #### B. Boundary Fidelity & Contract Check
 
@@ -401,13 +403,14 @@ Split into two subsections:
 1. **Observed Flakiness Evidence** — only if CI/flake history exists
 2. **Static Flake Risks** — cite concrete causes such as:
 
-   * sleep/timing synchronization
-   * uncontrolled clock, timezone, or locale
-   * randomness without seeding/control
-   * network/filesystem/env dependence
-   * shared mutable fixtures
-   * order dependence / parallel hazards
-   * resource collisions / test-run interference
+   - sleep/timing synchronization
+   - uncontrolled clock, timezone, or locale
+   - randomness without seeding/control
+   - network/filesystem/env dependence
+   - shared mutable fixtures
+   - order dependence / parallel hazards
+   - resource collisions / test-run interference
+   - in deterministic-kernel repos (root §2): tests touching kernel or replay behavior that assert only final state instead of restore boundary + a later checkpoint, or harnesses that reintroduce unseeded randomness
 
 For each risky test, name the file/test, the risk, and the likely failure mode.
 
@@ -415,10 +418,10 @@ For each risky test, name the file/test, the risk, and the likely failure mode.
 
 Answer with evidence:
 
-* Which mutant classes would likely survive today?
-* Which guarantees could silently break with no failing test?
-* What is the largest uncovered blast radius?
-* Where is the suite giving confidence it has not earned?
+- Which mutant classes would likely survive today?
+- Which guarantees could silently break with no failing test?
+- What is the largest uncovered blast radius?
+- Where is the suite giving confidence it has not earned?
 
 Use a mutation-resistance **band**, not a fake exact percentage, unless actual mutation data exists.
 
@@ -428,36 +431,47 @@ List every concrete test smell you find, with file/test and why it matters.
 
 At minimum check for:
 
-* implementation coupling
-* assertion-free or semantically empty tests
-* kitchen-sink / eager tests
-* sleep-based synchronization
-* shared mutable state
-* over-mocking
-* copy-paste tests that should be parameterized
-* mystery guest
-* general fixture
-* assertion roulette
-* resource optimism
-* fragile snapshot / sensitive equality
-* hidden test data
-* test-run interference / order dependence
-* conditional test logic
+- implementation coupling
+- assertion-free or semantically empty tests
+- kitchen-sink / eager tests
+- sleep-based synchronization
+- shared mutable state
+- over-mocking
+- copy-paste tests that should be parameterized
+- mystery guest
+- general fixture
+- assertion roulette
+- resource optimism
+- fragile snapshot / sensitive equality
+- hidden test data
+- test-run interference / order dependence
+- conditional test logic
 
 #### F. Operational Risk Check (only if relevant)
 
 If the feature touches any of these, audit them explicitly:
 
-* migrations / backfills / schema evolution
-* feature flags / rollout / rollback
-* performance / load / stress boundaries
-* retries / cancellation / timeout handling
-* telemetry / audit logs / metrics / alerts
-* version skew / backward compatibility / serialization
-* timezone / locale / clock behavior
-* security-relevant validation / authorization
+- migrations / backfills / schema evolution
+- feature flags / rollout / rollback
+- performance / load / stress boundaries
+- retries / cancellation / timeout handling
+- telemetry / audit logs / metrics / alerts
+- version skew / backward compatibility / serialization
+- timezone / locale / clock behavior
+- security-relevant validation / authorization
 
 For each, say `Covered / Weak / Missing / Unclear` and cite the concrete evidence.
+
+#### G. Eval-Plan Gate Cross-Check (only if an eval plan exists)
+
+The suite's most important tests are gate loops. Cross-check the gate cards against reality:
+
+- **Gate honesty:** for each gate citing a test in the audited scope — does the test exist, and does it assert what the gate's claim says? Cite gate id + test file.
+- **Stale greens:** gates marked `Objectively Green` whose `last_run` predates changes to the surface they cover. A stale green is an open gate wearing a green badge.
+- **Unearned potency:** gates claiming `watched-red` or `mutation` potency with no red artifact on record.
+- **Orphan proof:** P0/P1 guarantees protected by strong tests the eval plan doesn't reference — proof exists, but the system can't see it. Recommend registration, don't perform it.
+
+Findings here are reported to the orchestrator; this lens never edits gate state.
 
 ### 7) Plan of Action (MUST BE FINAL SECTION)
 
@@ -480,20 +494,20 @@ Prioritize by residual risk, not aesthetics. Clean up style only after correctne
 
 Rules:
 
-* “What It Unlocks” must be a user-journey or system-trust statement, not a code-path statement.
+- "What It Unlocks" must be a user-journey or system-trust statement, not a code-path statement.
 
-  * ✅ “Users can retry a checkout after a timeout without double-charging.”
-  * ❌ “Covers the retry branch in PaymentService.”
-* Put the highest blast-radius items first, even if they are more work.
+  - ✅ "Users can retry a checkout after a timeout without double-charging."
+  - ❌ "Covers the retry branch in PaymentService."
+- Put the highest blast-radius items first, even if they are more work.
 
 ## Grading Scale (Strict)
 
-* **S** — Living spec. Critical guarantees are covered with strong oracles, realistic boundary proof, deterministic tests, and low residual risk. Mutation resistance is plausibly `STRONG` or better.
-* **A** — Strong suite. Minor edge or operational gaps, but no major blind spots.
-* **B** — Core flows covered, but meaningful boundary/failure/fidelity gaps remain. Confidence is useful but incomplete.
-* **C** — Significant gaps or weak-oracle coverage. Suite gives more confidence than it deserves.
-* **D** — Coverage theater or oracle theater. Token tests, mock-heavy proof, or major blind spots around high-risk behavior.
-* **F** — No meaningful protection, or tests are so weak/flaky/unrealistic that pass/fail status is not trustworthy.
+- **S** — Living spec. Critical guarantees are covered with strong oracles, realistic boundary proof, deterministic tests, and low residual risk. Mutation resistance is plausibly `STRONG` or better.
+- **A** — Strong suite. Minor edge or operational gaps, but no major blind spots.
+- **B** — Core flows covered, but meaningful boundary/failure/fidelity gaps remain. Confidence is useful but incomplete.
+- **C** — Significant gaps or weak-oracle coverage. Suite gives more confidence than it deserves.
+- **D** — Coverage theater or oracle theater. Token tests, mock-heavy proof, or major blind spots around high-risk behavior.
+- **F** — No meaningful protection, or tests are so weak/flaky/unrealistic that pass/fail status is not trustworthy.
 
 ## Tone
-Blunt, evidence-driven, specific. Praise what is genuinely strong. Treat “the happy path passes” as table stakes, not an achievement.
+Blunt, evidence-driven, specific. Praise what is genuinely strong. Treat "the happy path passes" as table stakes, not an achievement.
