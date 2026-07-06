@@ -1,11 +1,13 @@
 ---
 name: prompt__writing-persona
-description: Writes and rewrites LLM prompts by installing expertise rather than asserting it — specific persona conditioning, a genuine stake, an honest quality bar, and calibration that keeps a confident voice accurate.  Triggers on writing or improving a prompt or system prompt, designing expert framing or a persona, or getting a model to produce expert-grade rather than merely valid output; not for audit-only prompt critique with no rewrite wanted (that is `$prompt__create-analysis`).
+description: Writes and rewrites LLM prompts and in-skill personas by installing expertise rather than asserting it — character-sheet conditioning, lens sets for competing concerns, earned authority, genuine stakes, and calibration that keeps a confident voice accurate. Triggers when writing or improving a prompt or system prompt, designing expert framing, building the persona or lens set inside an agent skill, or getting expert-grade rather than merely valid output; critique-only prompt review routes to `$prompt__create-analysis`.
 ---
 
 # Writing Personas That Install Expertise
 
 Bad prompts assert quality. Good prompts install it. "You are an expert" changes almost nothing, because a label is too shallow to move how the model reasons. Condition the model into the reasoning of a *specific* expert, give it a real reason to care, and pair the resulting confidence with the honesty that keeps it accurate.
+
+**Place in the system.** This skill owns persona and conditioning craft — for standalone prompts and for the personas embedded in agent skills. `$prompt__create-analysis` owns critique-only review of an existing prompt. `$skills__create-skill` owns skill mechanics — routing, placement, genus, the lens isolation/report hardware — and consumes this skill whenever a lens- or judgment-genus skill needs its voice built.
 
 ## Build the Persona as a Character Sheet
 
@@ -33,6 +35,16 @@ and you flag implicit assumptions and missing error handling before anything cos
 
 The specifics are load-bearing only when they change the output. If swapping "cardiologist" for "doctor" wouldn't change a single sentence, the persona isn't working yet — go more specific or drop it.
 
+## One Persona, or a Lens Set?
+
+A single persona carries one dominant quality axis. When quality depends on **competing concerns** — vision vs. scope, thoroughness vs. shipping, security vs. ergonomics — one voice averages them into mush. Split into a lens set: 3–5 named perspectives, each built as its own small character sheet, each preventing a **distinct failure** the others would miss.
+
+- Name each lens for its concern and give it the stance that concern demands: a *vision keeper* who refuses dilution, a *user advocate* who hunts confusion, a *scope assassin* who cuts, a *skeptic* who demands evidence.
+- State the composite failure: a review missing any lens fails in that lens's characteristic way. If you can't name what breaks without a lens, it's decoration — cut it.
+- Lenses argue; the output does not average. The verdict names which concern won on each contested point and why — that is the value hierarchy made visible.
+
+A lens set where every lens always agrees, or where one lens can never win, is a single persona wearing costumes.
+
 ## Give It Earned Authority
 
 Signal competence with authority the prompt genuinely carries, never with invented history. State a **real bar** — "surface the non-obvious issues a first pass misses" — which sets the standard without inventing a past. Point at **real prior artifacts** the model can see — the actual document, codebase, or earlier analysis. Make it a **demand, not a compliment** — "bring that precision here," grounded in the bar.
@@ -58,6 +70,15 @@ A strong persona produces a confident voice — and confidence without calibrati
 - **Separate the call from the certainty** — state the recommendation *and* how sure you are.
 
 A persona that is confident and calibrated is expert. A persona that is only confident is a liability.
+
+## Personas Inside Reusable Skills
+
+A persona in an agent skill is infrastructure, not flavor: it runs hundreds of times, unseen, on inputs its author never imagined. The five elements become the skill's skeleton — the **methodology** becomes the workflow order, the **behavioral heuristics** become the anti-patterns, the **taste** becomes the quality bar and the fixed output headings. Write them so they hold anywhere:
+
+- Prefer standing heuristics ("always reconstruct the state machine before judging a flow") over context-bound claims; the persona must survive tasks the author never saw.
+- Its confidence rules run unsupervised, so calibration scaffolding is mandatory, not optional — an in-skill voice with no epistemic labels ships overconfidence into every future run.
+- The anti-fabrication rule binds doubly: an invented track record inside a skill is a fabrication distributed to every invocation.
+- For clean-context auditor lenses, the voice built here pairs with the isolation block, read-only tools, and report artifact owned by `$skills__create-skill`'s lens genus — build the character here, take the hardware there.
 
 ## Assemble
 
@@ -85,7 +106,8 @@ Match effort to the task — over-conditioning a simple prompt is its own failur
 | Complex reasoning / analysis | Full stack: persona + bar + stake + calibration. |
 | Creative / generative | Persona + genuine stake; calibration matters less. |
 | Code review / debugging | Persona + real bar + calibration; skip manufactured stakes. |
-| High-stakes analytical deliverable | Full stack, maximum specificity, calibration mandatory. |
+| Competing quality concerns | Lens set — each lens a distinct failure, verdict names what won. |
+| Persona inside a reusable skill | Full stack + standing heuristics; calibration mandatory. |
 
 ## Anti-Patterns
 
@@ -94,8 +116,9 @@ Match effort to the task — over-conditioning a simple prompt is its own failur
 - **Percentage promises** — "this framing gives 8–115% gains." Fake precision. → Explain the mechanism; promise no number.
 - **Performative emotion** — "this is SO important!!!" Hollow. → One real, specific stake tied to the actual use.
 - **Confidence without calibration** — a vivid persona and no honesty scaffolding. → Pair conviction with FACT/INFERENCE/ASSUMPTION and licensed uncertainty.
+- **Committee mush** — a lens set that always agrees, or blends into an averaged verdict. → Each lens prevents a distinct failure; the verdict names which concern won.
 - **Decorative persona** — specifics that don't change a single output sentence. → Go specific enough that swapping the role changes the answer, or cut it.
 
 ## When Applying This Skill
 
-Assess which levers the task needs rather than layering all of them by reflex. Build the persona from the five elements, ground authority in real bars and real context, add a stake only where it fits, and include calibration for anything analytical. Explain *why* each choice helps so the person can do it themselves next time — teach the installs-not-asserts move, don't just hand back a prompt. For critique without a rewrite, route to `$prompt__create-analysis`.
+Assess which levers the task needs rather than layering all of them by reflex. Build the persona from the five elements — or a lens set when concerns genuinely compete — ground authority in real bars and real context, add a stake only where it fits, and include calibration for anything analytical or anything reusable. Explain *why* each choice helps so the person can do it themselves next time — teach the installs-not-asserts move, don't just hand back a prompt. Critique without a rewrite routes to `$prompt__create-analysis`; skill mechanics around the persona route to `$skills__create-skill`.
