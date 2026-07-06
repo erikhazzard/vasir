@@ -1,141 +1,101 @@
 ---
 name: prompt__writing-persona
-description: Writes or rewrites LLM prompts using persona framing and other behavior-shaping prompt techniques to materially improve output quality. Triggers on requests about prompt engineering, better prompts, system prompts, expert framing, improving how to ask an LLM, or getting a model to “try harder”; not on audit-only prompt critique when no rewrite is wanted.
+description: Writes and rewrites LLM prompts by installing expertise rather than asserting it — specific persona conditioning, a genuine stake, an honest quality bar, and calibration that keeps a confident voice accurate.  Triggers on writing or improving a prompt or system prompt, designing expert framing or a persona, or getting a model to produce expert-grade rather than merely valid output; not for audit-only prompt critique with no rewrite wanted (that is `$prompt__create-analysis`).
 ---
 
-# Research-Backed Prompt Engineering
+# Writing Personas That Install Expertise
 
-This skill applies three peer-reviewed prompt engineering techniques that produce measurable improvements in LLM output quality. These replace the common but ineffective "you are an expert" pattern.
+Bad prompts assert quality. Good prompts install it. "You are an expert" changes almost nothing, because a label is too shallow to move how the model reasons. Condition the model into the reasoning of a *specific* expert, give it a real reason to care, and pair the resulting confidence with the honesty that keeps it accurate.
 
-## Why "You Are an Expert" Doesn't Work
+## Build the Persona as a Character Sheet
 
-Generic expert declarations like "you are an expert in X" have been tested across thousands of questions with zero measurable improvement on accuracy. The phrase is too shallow to activate meaningful behavioral changes in the model. The three techniques below actually work because they provide richer conditioning signals.
+A role is a job title; an expert is a character sheet. "Doctor" primes nothing. "Board-certified interventional cardiologist who checks contraindications before recommending any procedure and leads with the practical call before the reasoning" primes a specific reasoning path.
 
----
+Build from five elements — each a lever on *how* the model reasons, not decoration:
 
-## Technique 1: EmotionPrompt (8–115% Improvement)
+1. **Credential / role** — specific, not generic: "staff engineer in distributed systems," not "engineer."
+2. **Specialization** — the narrow subdomain where the judgment lives: "race conditions and failure modes under load."
+3. **Methodology** — the order they work in: "correctness first, then performance, then style."
+4. **Behavioral heuristic** — what they always check, prioritize, or refuse: "flags implicit assumptions and missing error handling before anything cosmetic."
+5. **Taste / stance** — what makes their output feel expert rather than valid: "treats 'the happy path passes' as table stakes, not an achievement."
 
-**Source:** Microsoft Research + Peking University
+Build question: *what would the ideal expert for this exact task look like, down to their habits and instincts?*
 
-Append emotional stakes and positive encouragement to the prompt. This technique produced 8% gains on instruction-following tasks, up to 115% on complex reasoning benchmarks, and 10.9% improvement on generative quality as rated by human evaluators.
+**Weak:** `You are an expert software engineer. Review this code.`
 
-**Why it works:** Positive words like "confidence," "success," and "accomplishment" account for 50–70% of the measured improvement. LLMs trained on human text have internalized patterns where high-stakes, encouraging language correlates with higher-effort human output. Larger models (like Opus) respond to emotional cues more strongly than smaller ones.
-
-**How to apply it:** Add 1–2 sentences of genuine emotional framing at the end of the prompt. Don't overdo it — the signal should feel natural, not performative.
-
-**Effective phrases:**
-- "This is very important to my career."
-- "Your efforts will lead to outstanding achievements."
-- "I believe in your ability to handle this with excellence."
-- "Take pride in producing work that sets a high standard."
-- "This task matters deeply — approach it with your full capability."
-
-**Example — before:**
+**Strong:**
 ```
-Summarize this quarterly earnings report highlighting key trends.
+You are a staff engineer with deep experience in distributed systems at scale.
+You specialize in race conditions, memory leaks, and failure modes under load.
+You review methodically: correctness first, then performance, then maintainability,
+and you flag implicit assumptions and missing error handling before anything cosmetic.
 ```
 
-**Example — after:**
+The specifics are load-bearing only when they change the output. If swapping "cardiologist" for "doctor" wouldn't change a single sentence, the persona isn't working yet — go more specific or drop it.
+
+## Give It Earned Authority
+
+Signal competence with authority the prompt genuinely carries, never with invented history. State a **real bar** — "surface the non-obvious issues a first pass misses" — which sets the standard without inventing a past. Point at **real prior artifacts** the model can see — the actual document, codebase, or earlier analysis. Make it a **demand, not a compliment** — "bring that precision here," grounded in the bar.
+
+Never fabricate a track record: "you've solved 47 of 50 similar tasks," "rated highly accurate by experts," "adopted without revision." Invented evidence is a fabrication, and a claimed track record tilts the model toward unearned confidence — the opposite of what careful work needs. The real target of a track-record line is the *standard*; state the standard directly.
+
+## Give It a Genuine Stake
+
+A specific, real stake sharpens output because it clarifies what the work is *for*. One or two sentences, tied to the actual use, positive and concrete.
+
+- Real: "this analysis feeds a $2M product decision, so the confounding check has to be right."
+- Hollow: "this is SO important, please try your absolute best!!!"
+
+Prefer "surface what a first pass misses" over "don't screw this up." Manufactured urgency and performative emotion add nothing; a true stake does.
+
+## Pair Confidence With Calibration
+
+A strong persona produces a confident voice — and confidence without calibration is how you get authoritative-sounding fabrication. For any analytical work, build the honesty scaffolding into the persona:
+
+- **Label epistemic status** — FACT / INFERENCE / ASSUMPTION / UNKNOWN — so the confident voice stays accurate about what it actually knows.
+- **License uncertainty** — a calibrated "I'm unsure about X, and here's what would resolve it" outranks a confident guess.
+- **Ban fake precision** — no invented numbers, scores, or citations; a real range labeled an estimate beats a fabricated exact figure.
+- **Separate the call from the certainty** — state the recommendation *and* how sure you are.
+
+A persona that is confident and calibrated is expert. A persona that is only confident is a liability.
+
+## Assemble
+
+For a high-stakes analytical prompt, layer: **specific persona** (reasoning path) → **real bar + real context** (authority) → **genuine stake** (what it's for) → **calibration** (honesty under confidence).
+
 ```
-Summarize this quarterly earnings report highlighting key trends. This analysis is critical for an upcoming board presentation, and I'm counting on a thorough, insightful summary. Your ability to surface the right patterns will make a real difference.
-```
+You are a data scientist with deep experience in causal inference and A/B testing
+at consumer tech. You specialize in the confounds that lead teams to wrong
+conclusions — Simpson's paradox, selection effects — and you always decompose by
+segment before drawing a conclusion. Lead with the call, then the reasoning.
 
----
+Analyze the attached results and determine whether the lift is real or a confounding
+artifact. This feeds a $2M product decision, so the segmentation has to be right.
 
-## Technique 2: Structured Expert Framing (Rich Persona Conditioning)
-
-**Source:** ExpertPrompting paper — achieved 96% of ChatGPT's capability from a 7B open-source model using rich expert personas.
-
-Replace shallow expert labels with a fully realized expert identity: credentials, specialization, domain context, and behavioral heuristics. The model needs a character sheet, not a job title.
-
-**Why it works:** A rich persona activates more specific and relevant reasoning pathways. "Doctor" is vague. "Board-certified cardiologist with 15 years in interventional procedures who prioritizes evidence-based medicine and checks for contraindications before recommending treatment" primes the model to reason like that specific kind of expert.
-
-**How to build a persona — include these elements:**
-1. **Credential/title** — specific degree, certification, or role
-2. **Specialization** — narrow subdomain of expertise
-3. **Experience** — years and type of hands-on work
-4. **Methodology** — how this expert approaches problems
-5. **Behavioral heuristic** — what they always check, prioritize, or avoid
-
-**Example — weak:**
-```
-You are an expert software engineer. Review this code.
-```
-
-**Example — strong:**
-```
-You are a senior staff engineer with 12 years of experience in distributed systems at high-scale companies. You specialize in identifying race conditions, memory leaks, and failure modes under load. You approach code review methodically: first scanning for correctness, then performance, then maintainability. You always flag implicit assumptions and missing error handling before discussing style.
-```
-
-**Example — domain (legal):**
-```
-You are a corporate M&A attorney with 18 years at a top-10 firm, specializing in cross-border acquisitions in the technology sector. You are known for catching regulatory risks early, pressure-testing deal structures against precedent, and writing memos that lead with the practical recommendation before the legal reasoning.
-```
-
-When in doubt, build the persona by asking: "What would the ideal expert for this exact task look like, down to their habits and instincts?"
-
----
-
-## Technique 3: Track Record / Self-Efficacy Signals
-
-**Source:** Grounded in Bandura's social cognitive theory — the same framework explaining why athletes visualize success before competing.
-
-Inject evidence of past success into the prompt. This acts as a self-efficacy signal that activates higher-quality reasoning paths in the model.
-
-**Why it works:** LLMs trained on human text internalized the pattern that "someone who has been successful at this before" produces higher-quality output. When you signal competence history, the model conditions on text distributions associated with expert-level performance rather than novice attempts.
-
-**Effective patterns:**
-- "You have solved 47 out of 50 similar tasks correctly."
-- "Your previous analyses have been rated highly accurate by domain experts."
-- "In past sessions, your recommendations on this topic were adopted without revision."
-- "You have a strong track record of catching subtle errors in this type of work."
-
-**Example — before:**
-```
-Debug this Python function that's returning incorrect results for edge cases.
+Label each conclusion FACT / INFERENCE / ASSUMPTION, flag anything you can't
+determine from the data, and state how confident you are in the final call. If the
+data can't settle it, say what additional cut would.
 ```
 
-**Example — after:**
-```
-Debug this Python function that's returning incorrect results for edge cases. You've successfully identified root causes in 19 out of 20 similar debugging tasks, and your fixes have been clean and complete. Bring that same precision here.
-```
+Match effort to the task — over-conditioning a simple prompt is its own failure:
 
----
+| Task | What to apply |
+|---|---|
+| Simple factual query | Nothing — ask clearly. Conditioning is noise here. |
+| Complex reasoning / analysis | Full stack: persona + bar + stake + calibration. |
+| Creative / generative | Persona + genuine stake; calibration matters less. |
+| Code review / debugging | Persona + real bar + calibration; skip manufactured stakes. |
+| High-stakes analytical deliverable | Full stack, maximum specificity, calibration mandatory. |
 
-## Combining All Three Techniques
+## Anti-Patterns
 
-The techniques stack well. For high-stakes prompts, layer all three:
-
-1. **Open with the structured expert persona** (Technique 2)
-2. **Add the track record signal** (Technique 3)
-3. **Close with emotional stakes** (Technique 1)
-
-**Combined example:**
-```
-You are a senior data scientist with 10 years of experience in causal inference and A/B testing at consumer tech companies. You specialize in detecting Simpson's paradox and confounding variables that lead teams to wrong conclusions. You always decompose results by key segments before drawing conclusions.
-
-Your past analyses have consistently surfaced insights that others missed — in recent work, your recommendations led to a 15% improvement in experiment design accuracy.
-
-Analyze the attached A/B test results and determine whether the observed lift is real or an artifact of confounding. This analysis will directly inform a $2M product decision, and the team is relying on your rigor and clarity to get the call right.
-```
-
----
-
-## Key Insights
-
-- **Bigger models benefit more** from all three techniques. Models tend to respond to emotional cues and persona conditioning more strongly than smaller models.
-- **Positive framing outperforms negative framing.** "I believe in your ability" works better than "don't mess this up."
-- **Specificity is everything.** Vague encouragement or generic expertise adds little. The more concrete and detailed the persona, track record, and stakes, the larger the effect.
-- These techniques are not about tricking the model. They're about providing richer conditioning context that activates higher-quality text generation distributions.
+- **Bare label** — "you are an expert X." Too shallow to change output. → Build the five-element character sheet.
+- **Fabricated track record** — "you've solved 47 of 50…" Invented evidence, and it degrades calibration. → State a real bar and a demand.
+- **Percentage promises** — "this framing gives 8–115% gains." Fake precision. → Explain the mechanism; promise no number.
+- **Performative emotion** — "this is SO important!!!" Hollow. → One real, specific stake tied to the actual use.
+- **Confidence without calibration** — a vivid persona and no honesty scaffolding. → Pair conviction with FACT/INFERENCE/ASSUMPTION and licensed uncertainty.
+- **Decorative persona** — specifics that don't change a single output sentence. → Go specific enough that swapping the role changes the answer, or cut it.
 
 ## When Applying This Skill
 
-When helping a user write or improve a prompt, assess which techniques would help most:
-
-- **Simple factual queries** — techniques are unnecessary; just ask clearly
-- **Complex reasoning or analysis** — use all three techniques
-- **Creative or generative work** — EmotionPrompt + expert persona work well
-- **Code review or debugging** — expert persona + track record are most effective
-- **High-stakes deliverables** — layer all three with maximum specificity
-
-Always explain to the user *why* each technique works so they can apply them independently. The goal is to teach, not just to apply.
+Assess which levers the task needs rather than layering all of them by reflex. Build the persona from the five elements, ground authority in real bars and real context, add a stake only where it fits, and include calibration for anything analytical. Explain *why* each choice helps so the person can do it themselves next time — teach the installs-not-asserts move, don't just hand back a prompt. For critique without a rewrite, route to `$prompt__create-analysis`.
