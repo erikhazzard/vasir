@@ -1,6 +1,6 @@
 ---
 name: game__genre-routing
-description: Routes genre-specific game design / game development / building / tweaking work to the right genre playbook. Use when desisgning, creating, tuning platformers, runners, puzzles, roguelikes, idle/incremental games, tower defense, autobattler/tactics, or MMO systems.
+description: Routes genre-specific game design / game development / building / tweaking work to the right genre playbook. Use when designing, creating, tuning platformers, runners, puzzles, roguelikes, idle/incremental games, tower defense, autobattler/tactics, or MMO systems.
 tools:
   - Read
   - Grep

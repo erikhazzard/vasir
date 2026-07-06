@@ -15,7 +15,7 @@
 
 ## 1. Backend Runtime Canon
 
-- Runtime: Node 22 LTS.
+- Runtime: use the repo-pinned Node baseline from README/package engines/.nvmrc/etc.; if none exists, confirm before changing runtime-sensitive code.
 - Language: plain JavaScript. No TypeScript.
 - Backend profile default: ESM in `.js` files. Follow stronger repo-local module or file-extension conventions when present.
 - Local dev: no Docker unless a local infra rule explicitly says otherwise.
