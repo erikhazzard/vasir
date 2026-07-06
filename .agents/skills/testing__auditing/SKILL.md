@@ -1,7 +1,7 @@
 ---
 name: testing__auditing
 description: Audits automated test suites for what they prove, with a full guarantee inventory built before reading a single test. Triggers on "audit tests", "review tests", "test coverage", "are these tests enough", "test quality"; any PR or feature whose tests seem suspiciously few for the scope of change; between milestone rungs on lanes with behavior changes.
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, Edit, Write
 ---
 # Test Suite Audit Skill
 

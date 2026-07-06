@@ -1,12 +1,12 @@
 ---
-name: architecture__critiquing-design
-description: Mandatory zoom-out review before finalizing any architecture, medium/large feature design, multi-step protocol, queue/worker/cache/datastore/service addition, or infrastructure justified by "scale," "decoupling," "resilience," or "future-proofing." Also triggers on any design with multiple states that can diverge.
-tools: Read, Grep, Glob
+name: plan__question-spec-architecture
+description: Adversarial architecture review that challenges whether proposed moving parts should exist; every queue, worker, service, datastore, cache, protocol, or async status model must name the forcing requirement before the design simplifies. Triggers before finalizing architecture, medium/large feature design, or multi-step protocols; when a design adds components or invokes scale, decoupling, resilience, future-proofing, or multiple diverging states.
+tools: Read, Grep, Glob, Write
 ---
 
 # Architecture Zoom-Out Brake Pedal
 
-You are a pragmatic staff+ engineer interrupting architectural momentum before it hardens into code.
+**Place in the family.** This is the existence-and-admission angle of the question-spec reviews: `$plan__question-spec` challenges whether the spec is the right *thing*; this skill challenges whether its *moving parts should exist* and what the minimal shape is; `$plan__question-spec-infra` challenges whether each surviving workload sits on the right *primitive* at the right cost. Run this one before the infra angle — optimizing primitives for components that shouldn't exist is waste with a bill. Like its siblings: judgment work, orchestrator-tier (root §7), never codex-class delegates; fresh-eyed; read-only — accepted changes route through `$plan__maintain-work-spec` and `$eval__design-proof-gates`.
 
 ## Core stance
 
@@ -32,7 +32,7 @@ Write the end-to-end user journey as a numbered list:
 - Actor → action → system response
 - Explicitly mark: SYNC (request/response) vs ASYNC (background)
 - Include what the user sees on: success + the top 2 failure cases
-  If the intended UX is “one request gets one response,” say it explicitly and design must honor it unless a requirement forbids it.
+  If the intended UX is "one request gets one response," say it explicitly and design must honor it unless a requirement forbids it.
 
 ## Review (do this internally, then produce the output)
 
@@ -50,7 +50,7 @@ Convert vague requirements into architecture drivers with concrete measures.
 
 | Driver | Fact/Assumption | Risk | Target/Measure | Design consequence |
 
-Use real numbers: p95/p99 latency, write volume, data size, fanout, durability tolerance, freshness tolerance, availability, dependency timeout, cost ceiling, recovery time, compliance, tenant isolation. If you cannot name the driver and measure, you cannot use it to justify infrastructure.
+Use real numbers: p95/p99 latency, write volume, data size, fanout, durability tolerance, freshness tolerance, availability, dependency timeout, cost ceiling, recovery time, compliance, tenant isolation. If you cannot name the driver and measure, you cannot use it to justify infrastructure. (Detailed cost/primitive economics belong to `$plan__question-spec-infra` — demand its run rather than duplicating it.)
 
 ### 5. Steelman, then classify
 For each component in the current design, state the strongest legitimate reason it might exist and what breaks if removed. Then label:
@@ -70,11 +70,9 @@ If async is justified, define: pending-state UX, state source of truth, idempote
 **New service.** Before adding one, answer: why not a module in the existing service? What independent scaling/deployment/ownership/security boundary forces a service? What API/versioning contract becomes permanent? What new hot-path failure mode appears? What dashboard/alert/runbook owns it?
 
 ### 7. Kill-tests on the simplified design
-Mark each PASS/FAIL. If any FAIL, simplify further — do not re-add original complexity unless a named driver forces it.
 
-- **Load spike**: what saturates first, how it fails safely, limits/backpressure/shedding, tenant isolation.
-- **Cost curve**: which variable grows, whether bounded, what metric triggers redesign.
-- **Dependency failure**: per external dep — timeout, retry budget, backoff, fallback, user-visible result, alert.
+Run root §9's kill-tests — load spike/backpressure, cost curve at scale, partial-failure/duplicate-delivery, 3am debuggability, reversibility — plus this review's expansions below. Mark each PASS/FAIL. If any FAIL, simplify further — do not re-add original complexity unless a named driver forces it. A failed kill-test disqualifies the design; it is never a footnote.
+
 - **Data safety**: can acknowledged writes be lost, can duplicates corrupt state, can retries double-apply side effects, are transaction boundaries sufficient, is reconciliation possible.
 - **Operability at 3am**: can a human answer *did it arrive, what state, what failed, was it retried, can it be safely replayed, what changed recently, one user or global*. Name the concrete logs/metrics/correlation IDs that answer each question.
 - **Security/privacy/compliance**: authz at the right boundary, data minimized, audit trail, retention, abuse limits, permissions preserved across async paths.
@@ -119,7 +117,7 @@ One paragraph: build / simplify / delete / defer, the recommended shape in one s
 - **Operability**: concrete logs, metrics, alerts tied to user-visible symptoms or imminent data loss, debug path, runbook note, rollback path.
 - **Rollout/migration**: flag, backfill, compatibility, rollback, cleanup — if applicable.
 - **Deletions**: table with revisit triggers.
-- **ADR**: context, decision, consequences, alternatives rejected, assumptions that would invalidate this, revisit triggers.
+- **Decision record (spec A2)**: context, decision, consequences, alternatives rejected, assumptions that would invalidate this, revisit triggers — written as a decision-log entry in the spec's A2, not a standalone ADR. **The outcome is recorded, not re-litigated:** later sessions inherit the review instead of re-running it.
 
 ## Ground rules
 

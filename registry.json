@@ -17,19 +17,6 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "architecture__critiquing-design",
-      "description": "Mandatory zoom-out review before finalizing any architecture, medium/large feature design, multi-step protocol, queue/worker/cache/datastore/service addition, or infrastructure justified by \"scale,\" \"decoupling,\" \"resilience,\" or \"future-proofing.\" Also triggers on any design with multiple states that can diverge.",
-      "category": "uncategorized",
-      "tags": [],
-      "version": "0.1.0",
-      "recommends": [],
-      "files": [
-        "SKILL.md"
-      ],
-      "path": ".agents/skills/architecture__critiquing-design",
-      "entry": "SKILL.md"
-    },
-    {
       "name": "art-direction__defining-game-art",
       "description": "Routes and directs game-art work across reusable art-direction references, especially premium 2D RPG pixel art and stylized 3D hero-action art. Use when creating, critiquing, or specifying game characters, environments, weapons, VFX, animation, maps, asset pipelines, or art quality bars; load the matching subfolder reference for Sea-of-Stars-adjacent 2D pixel RPG work or Overwatch-adjacent 3D hero-action work.",
       "category": "uncategorized",
@@ -743,7 +730,7 @@
     },
     {
       "name": "plan__prepare-summary",
-      "description": "Summarizes an approved Work Spec into execution-ready context. Use immediately before implementation when a plan needs a compact handoff, scope recap, or milestone focus.",
+      "description": "Lane pre-flight — re-derive the spec's goal, unlocks, and concrete Done before touching code; catches wrong-thing builds and projection drift.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -765,6 +752,32 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/plan__question-spec",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "plan__question-spec-architecture",
+      "description": "Adversarial architecture review that challenges whether proposed moving parts should exist; every queue, worker, service, datastore, cache, protocol, or async status model must name the forcing requirement before the design simplifies. Triggers before finalizing architecture, medium/large feature design, or multi-step protocols; when a design adds components or invokes scale, decoupling, resilience, future-proofing, or multiple diverging states.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__question-spec-architecture",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "plan__question-spec-infra",
+      "description": "Adversarial infra review of a drafted work spec — challenges whether the design is simultaneously performant, scalable, and cheap by checking workload decomposition and primitive fit; refuses the pick-two triangle unless the tradeoff is physics. Triggers after the spec and eval plan are drafted, for any lane with meaningful infra surface; before admitting any new cache, queue, table, index, or service; when a running lane's infra smells slow or expensive.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__question-spec-infra",
       "entry": "SKILL.md"
     },
     {
@@ -853,7 +866,7 @@
     },
     {
       "name": "security__auditing-code",
-      "description": "Audits backend code, schemas, policies, and config for exploit chains around privileged or economic state. Use when reviewing authz, trust boundaries, async mutations, policy enforcement, state-changing APIs, or release-blocking security risk.",
+      "description": "Attacker-grade static security audit of backend code, schemas, policies, and config — hunts exploit chains around privileged and economic state via trust-boundary, state-machine, authorization-graph, and idempotency analysis, with control provenance tracked per finding. Triggers on reviewing authz, trust boundaries, async mutations, policy enforcement, economic/reward flows, or state-changing APIs; any release-blocking security risk; between milestone rungs on lanes touching privileged or economic state.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -895,7 +908,7 @@
     },
     {
       "name": "testing__auditing",
-      "description": "Audits automated test suites for surface completeness, oracle strength, determinism, boundary fidelity, and risk-weighted ship readiness. Trigger on any mention of \"audit tests\", \"review tests\", \"test coverage\", \"are these tests enough\", \"test quality\", or when a PR/feature has tests that seem suspiciously few for the scope of change.",
+      "description": "Audits automated test suites for what they prove, with a full guarantee inventory built before reading a single test. Triggers on \"audit tests\", \"review tests\", \"test coverage\", \"are these tests enough\", \"test quality\"; any PR or feature whose tests seem suspiciously few for the scope of change; between milestone rungs on lanes with behavior changes.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -908,15 +921,13 @@
     },
     {
       "name": "testing__enforcing-mandate",
-      "description": "Outcome-driven testing doctrine for safe shipping. Use when writing code/tests, planning test strategy, proving user journeys, adding Playwright/browser evals, or guarding critical paths.",
+      "description": "Outcome-driven test strategy — given a change, decides what proof at what seam at what size protects the user or system value path, at the cheapest credible cost; the strategy front-end the triad's gates and bug-repros execute against.  Triggers when writing code or tests, planning test strategy, proving a user journey, choosing a test seam or size, adding browser/journey evals, or guarding a critical path.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md",
-        "evals/README.md",
-        "evals/suite.json"
+        "SKILL.md"
       ],
       "path": ".agents/skills/testing__enforcing-mandate",
       "entry": "SKILL.md"
