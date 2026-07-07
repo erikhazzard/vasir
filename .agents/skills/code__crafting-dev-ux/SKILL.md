@@ -1,7 +1,7 @@
 ---
 name: code__crafting-dev-ux
-description: "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as AGENTS §6's AUDIT lens when a lane shipped or changed dev-facing surfaces."
-tools: Read, Grep, Glob, Write
+description: Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort.  Triggers on designing or modifying any public surface (before coding); as root §6's AUDIT lens when a lane shipped or changed dev-facing surfaces.
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 # Dev UX Skill
@@ -17,7 +17,7 @@ Create a **Pit of Success**: correct usage is the default path; misuse requires 
 3. **First success:** a new consumer can achieve a working “hello world” in <5 minutes with copy/paste runnable example.
 4. **Debug story:** when it fails in prod, you can go from symptom → identifier → logs/traces → root cause without tribal knowledge.
 
-**Pit scale:** 🟢 obvious+safe · 🟡 usable but sharp edges · 🔴 confusing · ⛔ the easy path is wrong.  
+**Pit scale:** 🟢 obvious+safe · 🟡 usable but sharp edges · 🔴 confusing · ⛔ the easy path is wrong.
 If any test < 🟢, redesign before shipping.
 
 ---
@@ -41,13 +41,14 @@ Classify the change, then choose output mode:
 State both at the top of your response.
 
 ## 0.5) Audit Mode (root §6 lens)
-When running as an audit lens, this file is a clean-context delegate's brief:
+When running as an audit lens, this file is a clean-context delegate's brief. Stance: you are the consumer who has never seen this code and has no one to ask.
 
-- **Isolation:** you receive the diff/scope under audit and the exact lane boundary — never the author's trajectory or conclusions. Re-derive from the code; discovery is read-only.
+- **Isolation:** inputs are the diff/scope under audit and the exact lane boundary — never the author's trajectory or conclusions; being handed a trajectory is itself a finding. Re-derive from the code.
+- **Custody:** writes are scoped to this lens's own report directory — never the surfaces under audit.
 - **Rubric:** grade each touched public surface against the four green tests, the Non‑Negotiables (§2), and its Minimum DX Stack row (§3). Pit-scale every surface (🟢🟡🔴⛔) with evidence — symbols, file:line, micro-snippets ≤10 lines.
 - **Findings:** any ⛔ is a release blocker; 🔴 on a public surface is P0/P1 by blast radius. Each finding names the green test or non-negotiable violated, the smallest fix, and proof of closure (the example, lint rule, or CI check that keeps it fixed).
-- **Output shape:** the same consumption surface as `code__auditing` — Executive Verdict (SHIP / NO-SHIP) + release blockers + P0/P1/P2 Plan of Action — so the closer and orchestrator triage identically. Do not produce the FULL design sections; audit grades what shipped.
-- **Report artifact:** write the complete report to `tmp/<datetime>__<slug>__dev-ux-audit/report.md` — the artifact is how the closing gate verifies this lens actually ran. Your verdict is a recommendation the orchestrator triages.
+- **Output shape:** the same consumption surface as `$code__auditing` — Executive Verdict (SHIP / NO-SHIP) + release blockers + P0/P1/P2 Plan of Action — so the closer and orchestrator triage identically. Do not produce the FULL design sections; audit grades what shipped.
+- **Report artifact:** write the complete report to `tmp/<datetime>__<slug>__dev-ux-audit/report.md` — the report artifact is what proves this lens ran; a named lens is not a run lens. The verdict is a recommendation the orchestrator triages; release-ready claims close through `$handoff__final-quality-gate`, which consumes this report by name.
 
 ---
 
@@ -62,7 +63,7 @@ Write tight bullets. No hidden constraints.
 6. **Workflow graph:** common next step after success + common follow-up operation + cleanup/shutdown step (if any)
 7. **Use cases:** 80% common + 15% advanced + 5% expert escape hatch
 8. **Misuse top 3:** what callers will do wrong first (and why)
-9. **Semantics that must be explicit (if relevant):** side effects, ordering, durability, idempotency, retries, timeouts, cancellation, lifecycle/ownership, backpressure/limits, partial failure
+9. **Semantics that must be explicit (if relevant):** side effects, ordering, durability, idempotency, retries, timeouts, cancellation, lifecycle/ownership, backpressure/limits, partial failure, determinism obligations
 10. **Performance posture:** hot vs cold; alloc/log limits if hot
 11. **Security posture:** authn/authz assumptions, PII/redaction, secret sourcing, least-privilege defaults, dangerous ops ceremony
 12. **Compatibility posture:** new vs existing surface; breaking-change budget; versioning/deprecation expectations; rollout constraints
@@ -79,15 +80,16 @@ Write tight bullets. No hidden constraints.
 2. **Constrain misuse structurally:** types/enums/schemas > prose; make invalid states hard to express.
 3. **Defaults are policy:** safe + boring by default; perf/risk is explicit opt-in.
 4. **Errors are recovery protocols:** stable code + what/why/how + structured context + redaction-safe.
-5. **Validation at boundaries:** fail early with actionable errors; internals assume validated inputs (esp. hot paths).
+5. **Validation at boundaries:** fail early with actionable errors; internals assume validated inputs (mechanics for hot paths: §9).
 6. **No deep imports for public use:** public surfaces have **stable entrypoints**; internal paths are intentionally inconvenient.
 7. **Findability is part of the interface:** predictable names, canonical entrypoints, and a capability index entry for non-trivial domains.
-8. **First success is mandatory:** include a runnable “hello world” example that matches reality.
+8. **First success is mandatory:** a runnable “hello world” example that matches reality.
 9. **Debug story is mandatory:** every failure yields an identifier that links to logs/traces; diagnostic modes exist where relevant.
-10. **Evolution is UX:** additive-by-default; breaking changes require a migration kit (shim + guidance + timeline, codemod when feasible).
+10. **Evolution is UX:** additive-by-default; breaking changes require a migration kit (contents: §12).
 11. **Consistency across ecosystem:** naming, options shapes, return envelopes, error codes, lifecycle patterns — learn once, predict everywhere.
-12. **Truth maintenance:** examples/schemas are machine-checked against reality (compile/run/validate) or you’re shipping future lies.
+12. **Truth maintenance:** examples/schemas are machine-checked against reality (mechanics: §15) or you’re shipping future lies.
 13. **Governance beats heroics:** standards must be enforceable (lint/templates/checks), not “remembered.”
+14. **An LLM is a first-class consumer:** every public surface must be correctly usable from types + one example alone, with zero tribal knowledge (mechanics: §11). In this repo the primary consumer of most surfaces is a coding agent — this law outranks convenience.
 
 ---
 
@@ -98,6 +100,7 @@ Each surface must satisfy **Surface + Findability + First success + Debug + Evol
 |---|---|
 | Public function/method | Level 1/2/3 + precise types + boundary validation + structured errors + explicit semantics + ≥1 runnable common-case example + misuse→error example |
 | Module export / SDK | **Single canonical entrypoint** + no deep imports + top-of-file quickstart + consistent return envelopes + “public vs internal” markers + capability index entry + related/anti-goals |
+| Game-facing SDK / kernel surface | deterministic by construction — time/random injected via seeded sources, never ambient (root §2) + replay-safe semantics stated + misuse fails loudly with a guardrail error, not silent drift + runnable example in the mobile-portrait harness (390×844) |
 | Config/options | defaults + precedence rules + schema validation w/ fix suggestions + units in names + secrets guidance + unknown-field policy + example config + migration notes |
 | Error model | standard shape (code/message/context/suggestion/retryable/cause) + redaction rules + mapping (HTTP/CLI) + stable taxonomy + diagnostics identifiers |
 | Event/message | standard envelope incl. version + schema (JSON Schema/AsyncAPI/proto) + example payload + evolution rules + consumer guidance + tooling hooks for validation |
@@ -135,16 +138,15 @@ Rules:
 
 ## 5) Discoverability & Navigation (Make the right thing easy to find)
 
-### Rules
+Mechanics for NN #6 and #7:
 
 * **Canonical entrypoint:** one obvious import path / module entry / CLI command per capability.
-* **No deep imports** for public usage:
+* Deep-import contrast:
 
   * ✅ `import { sendMessage } from "messaging"`
   * ❌ `import { sendMessage } from "messaging/internal/send"`
 * **Search-friendly naming:** avoid generic verbs (`process`, `handle`, `doThing`); include domain nouns in symbols and filenames.
 * **Public surface declaration:** mark public exports explicitly (e.g., index.ts + @public JSDoc tag...)
-* **Capability index:** for any non-trivial subsystem, maintain a small index mapping “what I want to do” → entrypoint.
 
 Example capability index (keep tiny; optimize for grep + LLM retrieval):
 
@@ -172,9 +174,9 @@ Diagnostics: every call emits requestId/traceId; see errors.docsRef
 
 ## 6) First Success & Workflow Ergonomics (Optimize the daily loop)
 
-### Rules
+Mechanics for NN #8:
 
-* Provide a **copy/paste runnable** common-case example with expected output/shape.
+* The runnable common-case example carries its **expected output/shape**.
 * Provide the **“next obvious step”** after success (workflow graph), not just a single call.
 * Provide **inspection affordances**:
 
@@ -207,7 +209,7 @@ tool doctor
 
 ## 7) Contracts & Semantics (Make the invisible visible)
 
-When relevant to the boundary, make explicit:
+The contract vocabulary — retry owner, timeout/deadline owner, delivery semantics, idempotency key and dedupe scope — is defined once in `$code__enforcing-principles`; this section's job is making the chosen answers **visible at the surface**. When relevant to the boundary, make explicit:
 
 * **Side effects:** what changes, where, and when it’s durable
 * **Success semantics:** under retries/partial failure
@@ -217,6 +219,7 @@ When relevant to the boundary, make explicit:
 * **Retries:** safe? who retries? backoff responsibility?
 * **Lifecycle/ownership:** init/shutdown/dispose; resource ownership
 * **Backpressure/limits:** queue limits, drop policy, slow-consumer behavior
+* **Determinism (kernel-adjacent surfaces, root §2):** does this run inside the deterministic kernel? Time and randomness arrive via injected seeded sources — the signature must make ambient `Date.now()`/`Math.random()` impossible or loudly illegal, and replay implications are stated.
   If you can’t state semantics cleanly, the interface isn’t done.
 
 ---
@@ -268,6 +271,8 @@ Example:
 }
 ```
 
+The repo's determinism guardrails are the house exemplar of this law: `DET_NONDETERMINISM_FORBIDDEN_API` and `[idv deterministic math] Redirected` are stable codes that name the violated law and point at the fix — an error that teaches. New error taxonomies should meet that bar.
+
 Rules:
 
 * No generic errors. If you know what happened, say it.
@@ -309,7 +314,7 @@ getMessages(...) -> { messages: Message[] }
 
 ---
 
-## 11) LLM Consumers (Assume zero tribal knowledge)
+## 11) LLM Consumers (mechanics for NN #14 — assume zero tribal knowledge)
 
 Rules:
 
@@ -334,7 +339,7 @@ Rules:
 * Prefer additive changes over breaking renames.
 * Never silently change semantics under the same name.
 * Events/config must carry a `version` and clear evolution rules.
-* Breaking changes require a **migration kit**:
+* Breaking changes require a **migration kit** — the one full definition:
 
   * deprecated wrapper/shim (with timeline)
   * migration doc snippet
@@ -383,11 +388,8 @@ Minimum governance for public surfaces:
 
 ---
 
-## 15) Documentation Truth Maintenance (Prevent rot)
+## 15) Documentation Truth Maintenance (mechanics for NN #12)
 
-Rules:
-
-* Examples must match real return shapes and real errors.
 * Prefer executable snippets:
 
   * compile checks for TS/Go
@@ -430,7 +432,7 @@ Before coding, simulate the consumer experience:
 
 ### FULL (use for `NEW_*`, `MODIFY_PUBLIC_SURFACE`, semantic/compat changes)
 
-For a substantial lane, the FULL output's durable parts land in the work spec — the interface design as the rung design brief, semantics and the error taxonomy as `C-###` contracts, deep mechanics in A5. Chat output is not durable memory.
+For a substantial lane, the FULL output's durable parts land in the work spec via `$plan__maintain-work-spec` — the interface design as the rung design brief, semantics and the error taxonomy as `C-###` contracts, deep mechanics in A5. Chat output is not durable memory.
 
 Use these headings exactly:
 
@@ -445,7 +447,7 @@ Use these headings exactly:
 9. **Machine-Readable Artifact** (OpenAPI/JSON Schema/proto if boundary warrants; otherwise precise types)
 10. **Compatibility, Migration Kit, and Timeline** (shim/warnings/codemod; breakage budget)
 11. **Governance & Enforcement Hooks** (owner, stability, review gate, lint/CI/doc-check plan)
-12. **Verification Plan** (tests described as user journeys; include “examples stay true” check; hot-path perf guard if applicable)
+12. **Verification Plan** (tests described as user journeys — these become eval-plan gates via `$eval__design-proof-gates`; include “examples stay true” check; hot-path perf guard if applicable)
 13. **DX Signals** (what you’ll measure to detect confusion + migration progress)
 
 ### LIGHT (mechanical-only changes)
@@ -460,7 +462,7 @@ Use these headings exactly:
 
 ### AUDIT (root §6 lens)
 
-Use `code__auditing`'s consumption shape, written to the report artifact (§0.5):
+Use `$code__auditing`'s consumption shape, written to the report artifact (§0.5):
 
 1. **Audit Context** (surfaces in scope; assumptions)
 2. **Executive Verdict** (SHIP / NO-SHIP + release blockers)
@@ -475,14 +477,13 @@ Use `code__auditing`'s consumption shape, written to the report artifact (§0.5)
 * If the request is ambiguous: state assumptions explicitly, choose safe defaults, and design so later tightening is additive.
 * If constraints conflict (perf vs safety vs compatibility): present the tradeoff, choose the safest default, and provide an explicit escape hatch.
 * If existing ecosystem patterns conflict: prefer consistency with the dominant pattern; if you must diverge, document why and provide a wrapper/migration path.
-* For hot paths: minimize allocations/log formatting; validate once at ingress; keep rich diagnostics at the boundary.
 * Never introduce “magic” requirements (global state, import order, hidden env vars) without making them explicit and discoverable.
 
 ---
 
 ## Guardrails
 
-* Don’t break callers without a migration kit (shim + timeline; codemod when feasible).
+* Don’t break callers without a migration kit (§12).
 * Don’t add abstraction layers unless they reduce concept count at call sites.
 * Don’t ship un-enforceable standards; prefer lint/templates/CI checks.
 * If external references aren’t provided, don’t cite them — treat this document and the repo’s conventions as source-of-truth.
@@ -503,7 +504,7 @@ Describe where valid values come from when possible
 
 
 ### Pattern: `@example` for Every Public Function
-This is the single highest-impact thing you can do for people / LLMs reading code. 
+This is the single highest-impact thing you can do for people / LLMs reading code.
 
 ```javascript
 /**
@@ -593,9 +594,9 @@ export { ChannelNotFoundError, MessageTooLargeError } from './errors.js';
  */
 ```
 
-### AGENTS.md at Folder Root
+### Folder-Root Orientation Doc
 
-A single document that orients both humans and LLMs to the codebase:
+A single first-screen document that orients both humans and LLMs to a subsystem (in this repo, keep it distinct from the operating-contract `AGENTS.md` — orientation, not law):
 
 ```markdown
 # Architecture
@@ -609,7 +610,7 @@ A single document that orients both humans and LLMs to the codebase:
 - All modules use progressive disclosure (see dev-ux skill)
 - All async functions return `{ data }` shape, never raw values
 - All errors extend AppError with code + context + suggestion
-- Config loaded via `src/env.js` only (code__principles §3.2)
+- Config loaded via `src/env.js` only (see `$code__enforcing-principles`)
 
 ## Data Flow
 1. Client → API Gateway → Message Router → Channel Pipeline → Storage
