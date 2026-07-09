@@ -188,13 +188,13 @@
 <audits_and_postmortems_are_done>
   A substantial lane is not `Complete` until its clean-context audit ran, its verdicts are resolved, and any owed postmortem is written. No human trigger — the user never has to remember to ask.
 
-  - **Who audits:** codex gpt-5.5-thinking xhigh (`codex exec`) — never Fable tokens. If codex is genuinely unavailable, use a non-Fable Claude subagent — never the authoring context.
+  - **Who audits:** `codex exec` running model `gpt-5.5` with `model_reasoning_effort = "xhigh"` — never Fable tokens. If codex is genuinely unavailable, use a non-Fable Claude subagent — never the authoring context.
   - **Verifier isolation:** the auditor starts from clean context and receives the artifact/diff, the exact lane boundary, and the proof gates — never the author's scratchpad, conclusions, or trajectory. Isolation is the point: an auditor that inherits the author's assumptions inherits the author's blind spots.
   - **Who judges:** Fable triages the findings. P0/P1 findings are fixed before Complete and their gates re-proven red→green; lower findings are judged — not every finding deserves a fix, and a rejected finding gets one line of why in the spec or close-out.
   - **Sizing:** work-spec lanes always audit. Spec-less material changes touching contracts, persistence, determinism lanes, or several files get a proportional single-auditor pass. Mechanical changes never spawn a verifier.
   - **Lenses:** `code__auditing` is the default; `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` apply when the lane touches their surface; `handoff__final-quality-gate` closes broad feature work. Actually run them (pass the skill file to the codex auditor as its brief) — naming a skill is not running it.
 
-  **Postmortems — capture the diagnosis before it dies, sparingly.** The fix lives in the diff; the diagnosis dies with the context window. The default is NO postmortem. One is owed — same no-human-trigger rule — only when the diagnosis itself was the work: a beefy multi-hypothesis hunt (several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence) whose hard-won map a future responder would otherwise re-derive from scratch. Routine changes never qualify — a CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself. When owed: Fable writes only the compact diagnosis brief (ruled-out hypotheses, misleading signals, evidence paths, fast path next time — the facts only the authoring context holds), and a codex gpt-5.5-thinking xhigh delegate authors the document via `ops__maintain-incident-postmortem` (lands under `docs/incidents/<semantic-domain>/`) — never Fable tokens on the document itself. When the hunt exposed a process/testing/policy hole, also run `prompt__perform-root-cause-analysis` (same codex routing) and land the prevention layer, not just the story.
+  **Postmortems — capture the diagnosis before it dies, sparingly.** The fix lives in the diff; the diagnosis dies with the context window. The default is NO postmortem. One is owed — same no-human-trigger rule — only when the diagnosis itself was the work: a beefy multi-hypothesis hunt (several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence) whose hard-won map a future responder would otherwise re-derive from scratch. Routine changes never qualify — a CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself. When owed: Fable writes only the compact diagnosis brief (ruled-out hypotheses, misleading signals, evidence paths, fast path next time — the facts only the authoring context holds), and a `codex exec` delegate running model `gpt-5.5` with `model_reasoning_effort = "xhigh"` authors the document via `ops__maintain-incident-postmortem` (lands under `docs/incidents/<semantic-domain>/`) — never Fable tokens on the document itself. When the hunt exposed a process/testing/policy hole, also run `prompt__perform-root-cause-analysis` (same codex routing) and land the prevention layer, not just the story.
 </audits_and_postmortems_are_done>
 
 ---
@@ -232,7 +232,7 @@
 
   Model Routing Policy (binding):
     - Fable xhigh (main agent or subagents inheriting it): the ONLY tier for orchestration, decision-making, architecture/design, visual design, product-code authorship, contract/persistence/determinism-touching edits, and eval/gate VERDICTS.
-    - Codex gpt-5.5-thinking xhigh (via `codex exec`): the DEFAULT executor for the entire menial class and for §6 audits. Codex reasoning effort IS specifiable — keep xhigh for anything non-mechanical; drop to high only for purely read-only/script-running work with zero judgment.
+    - Codex delegates running model `gpt-5.5` with reasoning effort `xhigh` (via `codex exec`): the DEFAULT executor for the entire menial class and for §6 audits. Codex reasoning effort IS specifiable; always set or preserve `model_reasoning_effort = "xhigh"` for delegated Codex calls.
     - In-harness Claude subagents (sonnet/haiku, or Fable forks): FALLBACK for the menial class when codex is unavailable — they still burn Claude tokens. Bind what the invoking surface actually controls: model choice and prompt scope always; effort tiers only where the surface exposes them (Workflow `agent()` does; the Agent tool does not).
 
   Delegation contract (what keeps this cheap):
@@ -244,10 +244,10 @@
   Codex invocation mechanics (this machine):
     - Always run codex with full permissions (YOLO); never downgrade delegated runs to read-only or approval-gated sandboxes.
     - A zsh function wraps `codex`, injecting `-C "$PWD" -s danger-full-access -a never` — the wrapped form is already YOLO. Do NOT pass `-C` through the wrapper (errors: "--cd cannot be used multiple times").
-    - Preferred delegated form, from the repo root: `codex exec "<task; demand file:line evidence; cap answer length>"`
-    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts), run from the repo root: `command codex exec -C "$PWD" --dangerously-bypass-approvals-and-sandbox "<task>"`
-    - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, and `cwd` set to the current repo root.
-    - `~/.codex/config.toml` already defaults to gpt-5.5 + xhigh reasoning; do not downgrade model or effort in delegated calls unless the work is purely read-only/script-running (then high is allowed).
+    - Preferred delegated form, from the repo root: `codex exec -m gpt-5.5 -c 'model_reasoning_effort="xhigh"' "<task; demand file:line evidence; cap answer length>"`
+    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts), run from the repo root: `command codex exec -C "$PWD" --dangerously-bypass-approvals-and-sandbox -m gpt-5.5 -c 'model_reasoning_effort="xhigh"' "<task>"`
+    - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, `cwd` set to the current repo root, `model=gpt-5.5`, and `model_reasoning_effort=xhigh`.
+    - `~/.codex/config.toml` already defaults to `model = "gpt-5.5"` and `model_reasoning_effort = "xhigh"`; delegated calls must preserve those values, and explicit invocations should pass them as shown above.
 
   Guardrails (hold at every tier):
     - Delegates never render gate verdicts and never author product code freehand; they may mechanically apply an exact written spec. Fable judges all reds and judgment calls; cheap tiers assemble the evidence tables.
