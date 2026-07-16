@@ -248,9 +248,8 @@ mocha <filepath> --exit
 
 ## 12. Backend Data and Migration Discipline
 
-- Prefer one runtime path. Do not add long-lived dual-write or dual-read paths unless the approved Work Spec explicitly requires migration/rollback compatibility.
-- Soft ban on `schemaVersion` and versioning — stale shapes are migrated, not versioned.
-- Do not bake versions into route paths, filenames, Redis keys, S3 prefixes, or durable identifiers unless the approved Work Spec requires an explicit coexistence/migration window — and then the versioned artifact carries its removal condition in the same spec (Expand → Migrate → Contract; no permanent second way).
+- **Hard ban on versioned or parallel shapes.** Never introduce `v2`, `schemaVersion`, versioned keys/routes/files, or parallel data shapes. Maintain one canonical shape: change it directly and update all consumers in the same lane.
+- Halt only when old and new shapes must coexist in production. That requires explicit migration approval and a removal condition; temporary compatibility is allowed only for that approved migration or rollback and never becomes the canonical writer contract.
 
 ---
 

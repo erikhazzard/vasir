@@ -4,6 +4,26 @@
   "raw_base": "https://raw.githubusercontent.com/erikhazzard/vasir/main",
   "skills": [
     {
+      "name": "game__adding-replays",
+      "description": "Adds game-owned Best, Latest, and History replay UI through idv.replays, including launcher PiP/fullscreen and safe typed replay input for presentation-only ghosts. Use when implementing replay buttons, recent replay lists, replay overlays, ghosts, trails, or comparisons in a game; exclude platform capture/storage/playback-engine and public sharing work.",
+      "category": "games",
+      "tags": [
+        "game",
+        "replay",
+        "sdk",
+        "results-screen"
+      ],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
+      ],
+      "path": ".agents/skills/game__adding-replays",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "agents__creating-folder-agents",
       "description": "Creates, rewrites, audits, or declines folder AGENTS.md files as local steering maps for one subtree. Use when a folder needs durable agent orientation, local instructions, and folder-specific non-obvious constraints; not for repo-root AGENTS, nested app/package root generation, generic coding standards, ordinary API reference, or one-off task plans.",
       "category": "uncategorized",
@@ -68,7 +88,7 @@
     },
     {
       "name": "code__auditing",
-      "description": "Static audit lens grading code against production standards — testability, correctness, performance, hardening — with evidence, cost-both-ways ledgers, and a prioritized plan; never rewrites code.  Triggers on reviewing modules for production readiness, performance concerns, architecture boundaries, or test-coverage gaps; AGENTS §6's default audit lens on any lane touching source.",
+      "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Triggers on code review, merge safety, production readiness, correctness, performance, or hardening requests; exhaustive hypothetical hardening is opt-in only.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -81,7 +101,7 @@
     },
     {
       "name": "code__crafting-dev-ux",
-      "description": "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as AGENTS §6's AUDIT lens when a lane shipped or changed dev-facing surfaces.",
+      "description": "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as root §6's AUDIT lens when a lane shipped or changed dev-facing surfaces.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -493,7 +513,8 @@
         "references/mmo/world-of-warcraft-lessons.md",
         "references/platformer.md",
         "references/roguelike.md",
-        "references/tower-defense.md"
+        "references/tower-defense.md",
+        "references/whitepaper__analyze-mmo-whitepaper/SKILL.md"
       ],
       "path": ".agents/skills/game__genre-routing",
       "entry": "SKILL.md"
@@ -509,6 +530,26 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/game__orchestrating-playable-build",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "game__qa",
+      "description": "Runs browser-game feature QA end to end — owner brief, test-plan enumeration and sign-off, orchestrated parallel execution, evidence and playtest review, one verdict — via role contracts in references/; also bootstraps a project's qa rig once. Triggers on \"request QA\", \"verify X\", \"QA this\", \"make sure it works\" on game feature work. Not for tooling, build scripts, infra, or non-game code.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/bootstrap.md",
+        "references/role-engineer.md",
+        "references/role-enumerator.md",
+        "references/role-lead.md",
+        "references/role-owner.md",
+        "references/role-playtest.md",
+        "references/role-reviewer.md"
+      ],
+      "path": ".agents/skills/game__qa",
       "entry": "SKILL.md"
     },
     {
@@ -717,7 +758,7 @@
     },
     {
       "name": "plan__prepare-goal",
-      "description": "Prepares to implement a work spec. Called manually.",
+      "description": "Lane launch — turns a grounded work spec into rung-by-rung implementation with full motion approval, gate-first proof, between-rung audit lenses, and a hard stop at the first human boundary. Triggers: invoked to launch or resume implementation of a work spec, after `$plan__prepare-summary`",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -730,7 +771,7 @@
     },
     {
       "name": "plan__prepare-summary",
-      "description": "Lane pre-flight — re-derive the spec's goal, unlocks, and concrete Done before touching code; catches wrong-thing builds and projection drift.",
+      "description": "Lane pre-flight — re-derives the spec's goal, unlocks, and concrete Done from rung bodies before any code, catching wrong-thing builds and projection drift; ends in a Grounded/Spec-gap launch verdict.  Triggers when opening or resuming any lane, before the first rung executes; as the required goal block for `$plan__implement-work-spec`; after compaction or handoff when a lane needs re-grounding.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -743,7 +784,7 @@
     },
     {
       "name": "plan__question-spec",
-      "description": "Adversarial pre-implementation review of a drafted work spec — challenges whether it is the correct, simplest, highest-value shape for the intended user journey or engineering unlock, benchmarked against the best domain references. Triggers after the work spec and eval plan are drafted, before the first rung executes; after any material spec restructuring; when a lane feels mis-shaped mid-flight.",
+      "description": "Adversarial pre-implementation review of a drafted work spec — challenges whether it is the correct, simplest, highest-value shape for the intended user journey or engineering unlock, benchmarked against the best domain references.  Triggers after the work spec and eval plan are drafted, before the first rung executes; after any material spec restructuring; when a lane feels mis-shaped mid-flight.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -853,7 +894,7 @@
     },
     {
       "name": "prompt__writing-persona",
-      "description": "Writes or rewrites LLM prompts using persona framing and other behavior-shaping prompt techniques to materially improve output quality. Triggers on requests about prompt engineering, better prompts, system prompts, expert framing, improving how to ask an LLM, or getting a model to “try harder”; not on audit-only prompt critique when no rewrite is wanted.",
+      "description": "Writes and rewrites LLM prompts and in-skill personas by installing expertise rather than asserting it — character-sheet conditioning, lens sets for competing concerns, earned authority, genuine stakes, and calibration that keeps a confident voice accurate. Triggers when writing or improving a prompt or system prompt, designing expert framing, building the persona or lens set inside an agent skill, or getting expert-grade rather than merely valid output; critique-only prompt review routes to `$prompt__create-analysis`.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -892,7 +933,7 @@
     },
     {
       "name": "skills__create-skill",
-      "description": "Designs, rewrites, audits, and debugs reusable AI-agent skills and SKILL.md manifests by compressing expert judgment into routed behavior changes. Use when creating skills, fixing trigger descriptions, choosing skill names, pruning bloated manifests, extracting reusable behavior from AGENTS.md-style context, encoding hard-won insights, values, tradeoffs, taste, or non-obvious constraints, deciding skill granularity, or designing skill eval cases.",
+      "description": "Designs, rewrites, audits, and debugs reusable AI-agent skills by compressing expert judgment into routed prior-rewrites placed at the cheapest effective layer of the system they live in.  Triggers on creating skills, fixing trigger descriptions, naming skills, pruning bloated manifests, extracting skills from repo doctrine, deciding granularity, or designing skill evals.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -908,7 +949,7 @@
     },
     {
       "name": "testing__auditing",
-      "description": "Audits automated test suites for what they prove, with a full guarantee inventory built before reading a single test. Triggers on \"audit tests\", \"review tests\", \"test coverage\", \"are these tests enough\", \"test quality\"; any PR or feature whose tests seem suspiciously few for the scope of change; between milestone rungs on lanes with behavior changes.",
+      "description": "Audits automated test suites for what they prove, not what they run — a full guarantee inventory and oracle inventory are built before reading a single test, then every guarantee is mapped to evidence, risk-weighted, and graded. Triggers on \"audit tests\", \"review tests\", \"test coverage\", \"are these tests enough\", \"test quality\"; any PR or feature whose tests seem suspiciously few for the scope of change; between milestone rungs on lanes with behavior changes.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -960,19 +1001,6 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/ui__revamping-game-shell-ui",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "whitepaper__analyze-mmo-whitepaper",
-      "description": "Analyzes MMO whitepapers for design, systems, economy, world, and retention insights. Use only when manually reviewing an MMO whitepaper or extracting product/design implications from one.",
-      "category": "uncategorized",
-      "tags": [],
-      "version": "0.1.0",
-      "recommends": [],
-      "files": [
-        "SKILL.md"
-      ],
-      "path": ".agents/skills/whitepaper__analyze-mmo-whitepaper",
       "entry": "SKILL.md"
     },
     {

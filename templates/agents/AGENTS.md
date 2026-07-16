@@ -188,13 +188,13 @@
 <audits_and_postmortems_are_done>
   A substantial lane is not `Complete` until its clean-context audit ran, its verdicts are resolved, and any owed postmortem is written. No human trigger — the user never has to remember to ask.
 
-  - **Who audits:** a fresh clean-context `codex exec` delegate running model `gpt-5.5` with `model_reasoning_effort = "xhigh"` — never the authoring context.
+  - **Who audits:** a fresh clean-context `codex exec` delegate running model `gpt-5.6-sol` with `model_reasoning_effort = "xhigh"` — never the authoring context. Auditing requires judgment, so Luna and Sol high are insufficient.
   - **Verifier isolation:** the auditor receives the artifact/diff, the exact lane boundary, and the proof gates — never the author's scratchpad, conclusions, or trajectory. Isolation is the point: an auditor that inherits the author's assumptions inherits the author's blind spots.
   - **Who judges:** the orchestrator triages the findings. P0/P1 findings are fixed before Complete and their gates re-proven red→green; lower findings are judged — not every finding deserves a fix, and a rejected finding gets one line of why in the spec or close-out.
   - **Sizing:** work-spec lanes always audit. Spec-less material changes touching contracts, persistence, determinism lanes, or several files get a proportional single-auditor pass. Mechanical changes never spawn a verifier.
   - **Lenses:** `code__auditing` is the default; `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` apply when the lane touches their surface; `handoff__final-quality-gate` closes broad feature work. Actually run them (pass the skill file to the auditor as its brief) — naming a skill is not running it.
 
-  **Postmortems — capture the diagnosis before it dies, sparingly.** The fix lives in the diff; the diagnosis dies with the context window. The default is NO postmortem. One is owed — same no-human-trigger rule — only when the diagnosis itself was the work: a beefy multi-hypothesis hunt (several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence) whose hard-won map a future responder would otherwise re-derive from scratch. Routine changes never qualify — a CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself. When owed: the orchestrator writes only the compact diagnosis brief (ruled-out hypotheses, misleading signals, evidence paths, fast path next time — the facts only the authoring context holds), and a fresh `codex exec` delegate running model `gpt-5.5` with `model_reasoning_effort = "xhigh"` authors the document via `ops__maintain-incident-postmortem` (lands under `docs/incidents/<semantic-domain>/`) — the orchestrator never authors the document itself. When the hunt exposed a process/testing/policy hole, also run `prompt__perform-root-cause-analysis` (same delegate routing) and land the prevention layer, not just the story.
+  **Postmortems — capture the diagnosis before it dies, sparingly.** The fix lives in the diff; the diagnosis dies with the context window. The default is NO postmortem. One is owed — same no-human-trigger rule — only when the diagnosis itself was the work: a beefy multi-hypothesis hunt (several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence) whose hard-won map a future responder would otherwise re-derive from scratch. Routine changes never qualify — a CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself. When owed: the orchestrator writes only the compact diagnosis brief (ruled-out hypotheses, misleading signals, evidence paths, fast path next time — the facts only the authoring context holds), and a fresh `codex exec` delegate running model `gpt-5.6-sol` with `model_reasoning_effort = "xhigh"` authors the document via `ops__maintain-incident-postmortem` (lands under `docs/incidents/<semantic-domain>/`) — the orchestrator never authors the document itself. When the hunt exposed a process/testing/policy hole, also run `prompt__perform-root-cause-analysis` (same delegate routing) and land the prevention layer, not just the story.
 </audits_and_postmortems_are_done>
 
 ---
@@ -202,39 +202,32 @@
 # 7. Multi-Agent & Model Routing
 
 <multi_agent_routing>
-  Prime Directive — orchestrator tokens are for judgment:
-    - An orchestrating agent reserves its own context for decisions, architecture, product-code authorship, synthesis, and verdicts.
-    - Delegate tokens are effectively free. Every menial step the orchestrator executes itself instead of delegating is a routing failure, even when delegation feels slower.
-    - Parallelism is NOT the bar for delegation. Delegate menial work even when it is a single, sequential, blocking step in your own lane. "This is quick, I'll just do it myself" is the exact instinct this section exists to override.
+  Prime Directive — use the cheapest tier that is actually correct:
+    - **gpt-5.6-luna medium:** exact command execution — tests, builds, benchmarks, and other explicitly named safe commands — with raw or capped output returned unchanged.
+    - **gpt-5.6-luna xhigh:** reading and reconnaissance — file discovery, repo mapping, searches, failure investigation, log/diff interpretation, and evidence extraction.
+    - **gpt-5.6-sol high:** routine orchestration and straightforward work that needs neither repository investigation nor deep judgment.
+    - **gpt-5.6-sol xhigh:** coding, architecture, judgment, synthesis, reviews, gate verdicts, and final decisions.
+    - Precedence is explicit: code or consequential judgment routes to Sol xhigh; read/recon and interpretation route to Luna xhigh; exact command running routes to Luna medium; only the remainder routes to Sol high.
+    - Never use Sol xhigh merely to read files, search the repo, run commands, or summarize output.
 
   Two roles this file serves:
     - **Orchestrator:** you own repository writes for product code, final synthesis, and all judgment. Delegates contribute intelligence, evidence, and mechanical execution of exact written specs — never freehand parallel authorship.
     - **Delegate:** you were spawned with a bounded deliverable — honor it exactly: file:line evidence, capped length, named skips. Return machine-readable summaries, not dumps. Never render gate verdicts or author product code freehand unless the prompt explicitly assigns you that lane.
 
-  Context posture:
-    - The orchestrator keeps its own context lean: artifacts and delegates carry detail; the spec carries durable state. Read conclusions, not file dumps.
+  Delegation threshold:
+    - Delegation is optional, not a ritual. Do not spawn a subagent for one file read, one search, or one bounded command when doing it directly costs less than prompting and consuming another context.
+    - Delegate only a concrete bounded task with enough work to repay the spawn overhead, or when clean-context isolation is required by §6.
+    - Batch related read/recon work into one Luna xhigh task and related commands into one Luna medium task. Do not create chains of tiny reader or command-runner agents.
 
   Topology — single writer, delegated toil, shared tree:
     - **No worktrees.** All agents work in the shared tree; frequent small commits are the isolation mechanism (§8). Worktree isolation trades a tiny in-the-moment merge tax for a much larger one later — an antipattern here.
     - Collaborator lane (a helper doing work for you): pass the relevant work spec, plan, and artifact paths.
     - Verifier lane (an agent reviewing an artifact): clean context — artifact, lane boundary, proof gates; never the author's trajectory (§6).
 
-  The Routing Test (run before the orchestrator executes ANY step itself):
-    1. Does this step require a decision, an architecture/design judgment, freehand product-code authorship, a contract/persistence/determinism-touching edit, or an eval/gate VERDICT? → The orchestrator does it.
-    2. Anything else is menial → delegate. Sequential-ness, smallness, urgency, and "already having the context loaded" are not exemptions.
-    De-minimis bound: a single bounded command whose delegation prompt would cost more than running it (one `ls`, one `grep`, executing your own already-decided one-liner) — just run it. The law targets toil, not keystrokes; a contract its best agents must routinely bend is miscalibrated.
-
-  The menial class (ALWAYS delegate — parallel or not):
-    - read-only scouting/reconnaissance/detective work: "where is X defined/used/configured," repo-structure mapping, convention discovery;
-    - reading long files, logs, diffs, or test output and returning a bounded summary with file:line evidence;
-    - running command batteries, test suites, benchmarks, harnesses, builds; collecting artifacts under `tmp/`;
-    - mechanical multi-file sweeps applying an exact written spec (renames, path updates, boilerplate propagation);
-    - log/output triage, failure clustering, evidence tables for reds;
-    - second opinions and audits (§6).
-
   Model Routing Policy (binding):
-    - The orchestrator's tier does orchestration, decision-making, architecture/design, product-code authorship, contract/persistence/determinism-touching edits, and eval/gate VERDICTS.
-    - Codex delegates running model `gpt-5.5` with reasoning effort `xhigh` (via `codex exec`) are the DEFAULT executor for the entire menial class and for §6 audits. Reasoning effort IS specifiable; always set or preserve `model_reasoning_effort = "xhigh"` for delegated Codex calls.
+    - Classify every delegate before launch and set both the model and reasoning effort explicitly; never rely on defaults.
+    - Luna medium executes and reports; it does not diagnose failures or decide whether a gate passed. Luna xhigh may investigate and interpret evidence, but returns consequential decisions to Sol xhigh.
+    - Sol high does not decide architecture, review findings, gate status, or final outcomes. Escalate those decisions to Sol xhigh.
 
   Delegation contract (what keeps this cheap):
     - Every delegate prompt defines the deliverable shape: demand file:line evidence, cap answer length, name what to skip. Delegate prompts are a command class — the bounded-deliverable contract is their literalism.
@@ -245,13 +238,17 @@
   Codex invocation mechanics (this machine):
     - Always run codex with full permissions (YOLO); never downgrade delegated runs to read-only or approval-gated sandboxes.
     - A zsh function wraps `codex`, injecting `-C "$PWD" -s danger-full-access -a never` — the wrapped form is already YOLO. Do NOT pass `-C` through the wrapper (errors: "--cd cannot be used multiple times").
-    - Preferred delegated form, from the repo root: `codex exec -m gpt-5.5 -c 'model_reasoning_effort="xhigh"' "<task; demand file:line evidence; cap answer length>"`
-    - When bypassing the wrapper (`command codex`, scripts, non-zsh contexts), run from the repo root: `command codex exec -C "$PWD" --dangerously-bypass-approvals-and-sandbox -m gpt-5.5 -c 'model_reasoning_effort="xhigh"' "<task>"`
-    - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, `cwd` set to the current repo root, `model=gpt-5.5`, and `model_reasoning_effort=xhigh`.
-    - `~/.codex/config.toml` already defaults to `model = "gpt-5.5"` and `model_reasoning_effort = "xhigh"`; delegated calls must preserve those values, and explicit invocations should pass them as shown above.
+    - Command runner: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="medium"' "<exact safe commands; return raw or capped output; make no verdict>"`
+    - Read/recon: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="xhigh"' "<bounded evidence task; demand file:line evidence; cap answer length>"`
+    - Routine work: `codex exec -m gpt-5.6-sol -c 'model_reasoning_effort="high"' "<bounded task; cap answer length>"`
+    - Coding/judgment: `codex exec -m gpt-5.6-sol -c 'model_reasoning_effort="xhigh"' "<coding or judgment task; define authority and deliverable>"`
+    - Bypass form (`command codex`, scripts, non-zsh contexts): add `-C "$PWD" --dangerously-bypass-approvals-and-sandbox` to the corresponding invocation.
+    - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, and `cwd` set to the current repo root.
+    - Every delegated invocation explicitly selects its model and `model_reasoning_effort`; local defaults do not determine routing.
 
   Guardrails (hold at every tier):
-    - Delegates never render gate verdicts and never author product code freehand; they may mechanically apply an exact written spec. The orchestrator judges all reds and judgment calls; delegates assemble the evidence tables.
+    - Luna medium, Luna xhigh, and Sol high delegates never render gate verdicts or author product code. A Sol xhigh delegate may author code or perform a judgment-heavy review only when its prompt explicitly assigns that lane; the orchestrator retains final acceptance and synthesis.
+    - Model routing never grants mutation authority. Destructive, deploy, infrastructure, and production-data commands still require the approval defined elsewhere in this contract.
     - All work, regardless of tier, passes the same proof gates and writes honest artifacts under `tmp/`.
 
   Circuit Breaker:

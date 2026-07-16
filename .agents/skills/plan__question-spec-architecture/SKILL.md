@@ -1,88 +1,129 @@
 ---
-name: plan__question-spec-infra
-description: Adversarial infra review of a drafted work spec — challenges whether the design is simultaneously performant, scalable, and cheap via workload decomposition and primitive fit; refuses the pick-two triangle unless the tradeoff is physics, and prices every claim with sourced napkin math. Triggers after the spec and eval plan are drafted, on any lane with meaningful infra surface; before admitting a new cache, queue, table, index, or service; when a running lane's infra smells slow or expensive.
-tools: Read, Grep, Glob
+name: plan__question-spec-architecture
+description: Adversarial architecture review that challenges whether proposed moving parts should exist; every queue, worker, service, datastore, cache, protocol, or async status model must name the forcing requirement before the design simplifies. Triggers before finalizing architecture, medium/large feature design, or multi-step protocols; when a design adds components or invokes scale, decoupling, resilience, future-proofing, or multiple diverging states.
+tools: Read, Grep, Glob, Write
 ---
 
-# Question the Spec — Infra Angle
+# Architecture Zoom-Out Brake Pedal
 
-**Place in the family.** This is the primitive-selection angle of the question-spec reviews: `$plan__question-spec` challenges whether the spec is the right *thing*; `$plan__question-spec-architecture` challenges whether its *moving parts should exist* and what the minimal shape is; this skill challenges whether each surviving workload sits on the right *primitive* at the right cost. Run it after the architecture angle — it chooses primitives for the moving parts that survived the existence review. Like its siblings: judgment work, orchestrator-tier (root §7), never codex-class delegates; fresh-eyed; read-only — accepted changes route through `$plan__maintain-work-spec` and `$eval__design-proof-gates`.
+**Place in the family.** This is the existence-and-admission angle of the question-spec reviews: `$plan__question-spec` challenges whether the spec is the right *thing*; this skill challenges whether its *moving parts should exist* and what the minimal shape is; `$plan__question-spec-infra` challenges whether each surviving workload sits on the right *primitive* at the right cost. Run this one before the infra angle — optimizing primitives for components that shouldn't exist is waste with a bill. Like its siblings: judgment work, orchestrator-tier (root §7), never codex-class delegates; fresh-eyed; read-only — accepted changes route through `$plan__maintain-work-spec` and `$eval__design-proof-gates`.
 
-## The Creed
+## Core stance
 
-**We can have all three — performant, scalable, and cheap. It is definitely possible, and it is usually possible by putting the right primitives in the right places.** The pick-two triangle is almost always a symptom of primitive mismatch, not a law of nature. When performance, scale, and cost fight each other, the usual cause is a workload served by the wrong primitive, at the wrong layer, with the wrong access pattern — and the fix is structural (move the workload), not parametric (buy bigger, cache harder).
+- Do not defend the existing design. Steelman it once, then delete anything not forced by a named requirement.
+- Every retained component pays rent. Every new datastore, queue, worker, cache, service, or protocol must name the exact requirement that forces it and what breaks without it.
+- Default to 1–3 components. Default to one durable source of truth. Default to synchronous when the UX expects a response.
+- Production-grade ≠ speculative final form. Scale claims need concrete drivers, current evidence, or an explicit revisit trigger.
+- Security, privacy, authz, audit, compliance, durability, idempotency, and operability are not accidental complexity. They may be simplified; they may not be deleted.
+- If the happy-path sequence and its top failure paths cannot be explained in under 15 lines each, simplify until they can.
 
-Real tradeoffs live at the physics layer: consistency vs latency across distance, durability vs write latency, retention length vs access speed. If a claimed tradeoff is not one of those, suspect the primitive. **A tradeoff you can name a primitive-swap out of is not a tradeoff.**
+Be skeptical, not nihilistic. A skill that mechanically deletes 40% of every design will eventually delete the audit log.
 
-## Ground first
+## Precondition: ground yourself in the real stack
 
-Receive fresh-eyed: the work spec, the eval plan, the repo's backend/infra canon, and any real load, latency, or cost data available. Napkin math is mandatory; fake precision is banned. Every load or cost figure is sourced (canon budget, SLO, metrics, pricing page) or labeled an assumption with a falsifier. An order-of-magnitude napkin (±3x, labeled) beats no napkin; an invented exact number is worse than either.
+Before proposing anything, inspect the codebase with `Read`, `Grep`, `Glob` when available. Identify existing primitives for: storage, cache, queue/worker, auth, logging/metrics/tracing, retry/idempotency, feature flags, deployment, and domain ownership. Prefer existing primitives unless a named constraint proves they are insufficient. Do not modify files during the review.
 
-## The Review
+If context is genuinely missing, proceed under explicit assumptions marked `LOW`/`MED`/`HIGH` risk. Ask at most 3 questions, and only ones that would change the architecture.
 
-The review is the report: each dimension emits its section directly — **verdict** (Pass / Needs Work / Blocker) · **the strongest concern** · **the smallest concrete fix** — citing diseases by name where found. Depth scales with the infra surface.
+## Step 0 — Walk the user journey (contract first)
 
-### The Named Diseases — hunt vocabulary
+Write the end-to-end user journey as a numbered list:
 
-- **Truth-as-serving-path** — durable truth store used as the default hot read path when a repairable projection is the cheaper, faster product path (backend canon §6's Valkey judgment, cited not restated).
-- **Pick-two surrender** — the spec accepts a perf/scale/cost tradeoff without a decomposition attempt; the triangle asserted, not earned.
-- **Unbounded-by-default** — keys, scans, fanout, queue depth, or payloads with no stated bound; bounds are design-time-cheap and retrofit-expensive.
-- **Cache-as-apology** — a cache layered on top of a wrong primitive instead of moving the workload; now you pay for both, plus invalidation.
-- **Premature distribution** — a queue + workers + cache for a workload one process handles; scalable ≠ distributed, and this shape fails all three axes at once.
-- **Retrofit bounds** — "we'll add limits/pagination/TTL later"; later is a migration, now is a parameter.
-- **Per-request pricing on the hot path** — per-op billed primitives (per-invoke compute, per-request KV) sitting on ≥1M-class message paths.
+- Actor → action → system response
+- Explicitly mark: SYNC (request/response) vs ASYNC (background)
+- Include what the user sees on: success + the top 2 failure cases
+  If the intended UX is "one request gets one response," say it explicitly and design must honor it unless a requirement forbids it.
 
-### 1. Workload Decomposition
+## Review (do this internally, then produce the output)
 
-Per user journey the spec serves, split the traffic into access classes: reads vs writes vs scans vs fanout vs streams; hot vs warm vs cold; public/shared vs private/per-user; bounded vs unbounded. (Same decomposition vocabulary as the eval plan's load-shape analysis.) Emit the class table. A spec that serves every class through one primitive is paying the worst primitive's price for all of them — decomposition is where "all three" comes from.
+### 1. So what?
+Name the specific user loop, metric, risk, or compliance/platform requirement this unlocks. No "better UX" or "more scalable." If nothing concrete, the recommended architecture may be *delete the ticket*.
 
-### 2. Primitive Fit
+### 2. Restate the problem with no solution words
+3–5 sentences. No queues, workers, DBs, caches, services, protocols.
 
-The physics card:
+### 3. User contract
+Numbered journey, each step tagged `SYNC` or `ASYNC`. Include success UX and the top 2 failure UX cases. State whether the product contract is "one request, one response" or tolerates pending/deferred results. Note whether duplicates, refreshes, retries, and disconnects are possible.
 
-| Primitive | Reach for it when | It punishes you when |
-| --- | --- | --- |
-| Valkey/Redis | hot bounded serving — keys, ZSET/HASH fragments, counters; μs latency, RAM-priced | keys/values unbounded, per-user cardinality explodes, or it's treated as unrepairable truth (make it truth-backed instead — backend canon §6) |
-| DynamoDB / durable KV | canonical truth, idempotency records, audit, rebuild source; key-shaped access | used as the default hot read path; scans; per-request pricing on per-message paths |
-| S3 / object storage | large blobs, immutable artifacts, cheap at rest | hot small reads; `LIST` used as a query; per-request cost on hot paths |
-| SQS / streams | decoupling, spike absorption, fanout with at-least-once semantics | placed inside a synchronous journey (adds latency and cost to the critical path); unbounded depth without backpressure |
-| CDN / shared cache | public, browse-heavy, identical-for-everyone responses — the cheapest read is the one you never serve | private or per-user payloads; data whose correctness requires immediate write visibility |
-| Long-lived compute | sustained hot paths — per-message cost amortizes toward zero | idle fleets carrying rare, spiky work |
-| Per-invoke compute | rare, spiky, embarrassingly parallel jobs | per-message hot paths — per-request pricing times a million messages is the whole budget |
-| In-process memory | the forgotten primitive: single-writer state, tiny hot lookups, per-tick working sets | anything needing durability, cross-instance coherence, or unbounded growth |
+### 4. Driver table
+Convert vague requirements into architecture drivers with concrete measures.
 
-Per workload class, emit: the primitive the spec chose · the access pattern · the dominant cost driver · the swap that would beat it, or state that none does. Catches **Truth-as-serving-path**, **Cache-as-apology**, **Premature distribution**.
+| Driver | Fact/Assumption | Risk | Target/Measure | Design consequence |
 
-### 3. The Triangle Check
+Use real numbers: p95/p99 latency, write volume, data size, fanout, durability tolerance, freshness tolerance, availability, dependency timeout, cost ceiling, recovery time, compliance, tenant isolation. If you cannot name the driver and measure, you cannot use it to justify infrastructure. (Detailed cost/primitive economics belong to `$plan__question-spec-infra` — demand its run rather than duplicating it.)
 
-For every perf/scale/cost tradeoff the spec accepts: is it physics (consistency, durability, distance, retention) or a primitive mismatch wearing a tradeoff costume? Catches **Pick-two surrender**.
+### 5. Steelman, then classify
+For each component in the current design, state the strongest legitimate reason it might exist and what breaks if removed. Then label:
+- `REQUIRED` — forced by a driver or constraint
+- `OPTIONAL` — speculative or premature
+- `PATCH` — exists to fix problems created by other complexity
+- `UNKNOWN` — cannot justify with available context
 
-### 4. Bounds & Budgets
+### 6. Apply the forcing-function tests
 
-Every key space, scan, fanout, queue, and payload carries a stated bound. Napkin math at target scale AND at 10x; budgets cite the repo canon or are labeled assumptions with falsifiers. Root §9's kill-tests bind — load spike/backpressure and cost curve at scale; a failed kill-test disqualifies the design, it is never a footnote. Catches **Unbounded-by-default**, **Retrofit bounds**.
+**Async forcing function.** No queue/worker/scheduler/stream/webhook/async status model unless at least one holds: work exceeds request latency budget; depends on slow/unreliable/rate-limited external service; requires fanout that makes the request path fragile; must survive user disconnect; requires human approval or scheduled execution; product contract supports pending; spike-smoothing needed and stale results acceptable; isolation from downstream outage required and pending state acceptable.
 
-### 5. Hot-Path Economics
+If async is justified, define: pending-state UX, state source of truth, idempotency key, retry limit and backoff, max queue age, poison/DLQ handling, backpressure, reconciliation path, operator debug path.
 
-On ≥1M-class paths, name the per-message cost drivers: RTTs, command cardinality, parse/stringify, allocations, per-op billing. Every one is a multiplier, and at scale the multiplier is the whole budget. Catches **Per-request pricing on the hot path**.
+**New datastore.** Before adding one, answer: why not a table/hash/zset/blob/index in the existing stack? Authoritative or derived? Consistency required? Backup, migration, rebuild, operator? Behavior when down? What query/load shape proves the existing store insufficient?
 
-### 6. Failure & Degradation Economics
+**New service.** Before adding one, answer: why not a module in the existing service? What independent scaling/deployment/ownership/security boundary forces a service? What API/versioning contract becomes permanent? What new hot-path failure mode appears? What dashboard/alert/runbook owns it?
 
-What does this design cost during partial failure and spikes? Retry storms multiply spend exactly when the system is weakest — backpressure and shed paths named. Presence-shaped surfaces degrade fidelity before existence (backend canon §5). 3am debuggability has a cost line too (root §9).
+### 7. Kill-tests on the simplified design
 
-### 7. Simplicity Dividend
+Run root §9's kill-tests — load spike/backpressure, cost curve at scale, partial-failure/duplicate-delivery, 3am debuggability, reversibility — plus this review's expansions below. Mark each PASS/FAIL. If any FAIL, simplify further — do not re-add original complexity unless a named driver forces it. A failed kill-test disqualifies the design; it is never a footnote.
 
-Is the fast-cheap-scalable shape also the simplest one? It usually is — fewer moving parts. If the proposal adds infrastructure, what does it delete? One clear path (root §9); a second serving model is a split brain with a monthly bill.
+- **Data safety**: can acknowledged writes be lost, can duplicates corrupt state, can retries double-apply side effects, are transaction boundaries sufficient, is reconciliation possible.
+- **Operability at 3am**: can a human answer *did it arrive, what state, what failed, was it retried, can it be safely replayed, what changed recently, one user or global*. Name the concrete logs/metrics/correlation IDs that answer each question.
+- **Security/privacy/compliance**: authz at the right boundary, data minimized, audit trail, retention, abuse limits, permissions preserved across async paths.
+- **Rollout/rollback/migration**: backward compatible, feature-flagged, backfill path, rollback without corruption, cleanup.
 
-## Calibration Example — the move this review exists to find
+### 8. State and invariants (if durable state, async, retries, or derived data exist)
 
-A pair-page social fragment read on every visit. Served from the durable KV: slower (network + storage latency), more expensive (per-request pricing × hot traffic), and scan-prone as it grows — losing on all three axes. Served from a bounded Valkey projection — truth-backed with `state/sourceVersion/dirty/unavailable` semantics (backend canon §6), durable KV kept as minimal canonical truth and rebuild source: μs reads, RAM-pennies, cluster-slotted. Faster AND cheaper AND scales. All three, by moving the workload — not by buying anything.
+| State | Source of truth | Derived | Invariant | Txn boundary | Idempotency/retry | Reconciliation |
 
-## Verdict
+Every mutating endpoint has an idempotency story. Every derived state has a stale tolerance and rebuild path. Every status enum has legal transitions and terminal states. Every partial-write has a recovery path. Every cache has invalidation/TTL/rebuild. Every lock has timeout behavior.
 
-- **Infra recommendation:** Implement as written / Implement with changes / Fix spec first
-- **Top 3 required changes before implementation** — each with its napkin number
-- **Biggest remaining risk if we proceed** — with its cost or latency figure where estimable
+### 9. Deletions with revisit triggers
 
-## Record (spec A2)
+| Removed | Why safe now | Replacement | Add-later cost | Revisit trigger |
 
-**The outcome is recorded, not re-litigated:** accepted changes land through `$plan__maintain-work-spec`; measurement demands route to `$eval__design-proof-gates` as measurement-first gates (sourced budgets, probes, workload ladder), never measured ad hoc here; the recommendation, plus each rejected concern with a one-line why, gets a decision-log entry in the spec's A2 — so later sessions inherit the challenge instead of re-running it.
+Each deletion must name a concrete condition (metric, volume, latency, cost threshold) that would justify adding it back. Deletion without a revisit trigger is a bet, not a decision.
+
+## Output
+
+Be decisive. Recommend one design. Let sections scale with problem size — a CRUD feature does not need the same depth as a payments flow.
+
+### 1. Recommendation
+One paragraph: build / simplify / delete / defer, the recommended shape in one sentence, why it is the right production-grade design.
+
+### 2. Review summary
+- **Real problem** (3–5 sentences, no solution words)
+- **User contract** (numbered, sync/async tagged, success + top 2 failures)
+- **Drivers** (table)
+- **Constraints** (architecture-changing only, facts vs assumptions)
+- **Steelman** (best case for existing complexity, and whether it survives)
+- **Deleted** (brief list)
+- **Open questions** (≤3, architecture-changing only; still proceed under assumptions)
+
+### 3. Recommended design
+- **Boundary**: actors, this system's responsibility, external deps, non-goals.
+- **Components**: 1–3 by default. Each: responsibility, why it exists, owner/on-call, failure behavior. Justify every additional component with a named driver.
+- **Data model**: only necessary fields. Mark source-of-truth vs derived. Include idempotency keys, critical indexes/constraints, retention/audit fields if required.
+- **API surface**: usually 1–3 endpoints. Per endpoint: method, request, response, sync/async, idempotency, main errors.
+- **Critical path**: happy path in ≤15 numbered lines. If it exceeds, simplify before answering.
+- **Failure paths**: top cases — what fails, user-visible result, data-safety guarantee, retry/recovery, operator signal.
+- **State and invariants**: table, when applicable.
+- **Operability**: concrete logs, metrics, alerts tied to user-visible symptoms or imminent data loss, debug path, runbook note, rollback path.
+- **Rollout/migration**: flag, backfill, compatibility, rollback, cleanup — if applicable.
+- **Deletions**: table with revisit triggers.
+- **Decision record (spec A2)**: context, decision, consequences, alternatives rejected, assumptions that would invalidate this, revisit triggers — written as a decision-log entry in the spec's A2, not a standalone ADR. **The outcome is recorded, not re-litigated:** later sessions inherit the review instead of re-running it.
+
+## Ground rules
+
+- Do not present a menu unless asked. Recommend one design.
+- Do not claim "scalable," "robust," "resilient," or "production-ready" without naming the mechanism and the measure.
+- Do not propose queues, workers, caches, services, pub/sub, event sourcing, CQRS, distributed locks, orchestration, or multi-region without a forcing function.
+- Do not strip essential complexity (security, privacy, compliance, audit, durability, idempotency, rollback, operability) in the name of simplification.
+- When a tradeoff remains unresolved, name it and choose the safer default under stated assumptions.
+- End with the recommended design, not with caveats.

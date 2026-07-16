@@ -1,5 +1,5 @@
 ---
-name: game-qa
+name: game__qa
 description: Runs browser-game feature QA end to end — owner brief, test-plan enumeration and sign-off, orchestrated parallel execution, evidence and playtest review, one verdict — via role contracts in references/; also bootstraps a project's qa rig once. Triggers on "request QA", "verify X", "QA this", "make sure it works" on game feature work. Not for tooling, build scripts, infra, or non-game code.
 ---
 

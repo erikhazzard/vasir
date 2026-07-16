@@ -184,7 +184,7 @@ vasir init --repo-root packages/web
   - Fails closed if the existing global cache is dirty.
   - Uses the current repo root as the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
   - `vasir init` marks a repo as full-catalog tracking.
-  - `vasir add <skill>` marks a repo as selected-subset tracking.
+  - `vasir add <skill>` preserves an existing explicit `tracking.mode: all`; otherwise it creates or extends selected-subset tracking, so a new or unmanaged repo becomes `selected`.
   - `vasir add all` also marks a repo as full-catalog tracking.
   - `vasir remove <skill>` from a full-catalog repo switches that repo back to selected-subset tracking so the removed skill does not come back unexpectedly.
   - Local edits to a managed skill still fail closed, the same way `vasir add <skill> --replace` does.
@@ -225,7 +225,7 @@ vasir list
   - `--repo-root <path>` overrides that detection and treats the provided directory as the repo root.
   - Use `vasir add all` when you want every catalog skill copied into the current repo.
   - `vasir add all` marks the repo to keep tracking the full catalog on later `vasir update` runs.
-  - `vasir add <specific skills>` marks the repo to keep tracking only those installed skills on later `vasir update` runs.
+  - `vasir add <specific skills>` preserves an existing explicit `tracking.mode: all`; otherwise it creates or extends selected-subset tracking for later `vasir update` runs, so a new or unmanaged repo becomes `selected`.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
   - Pass `--agents-profile backend`, `--agents-profile frontend`, `--agents-profile ios`, or `--agents-profile generic` when you want to override inference and force a specific root-contract profile.
   - If you pass `--agents-profile` and `AGENTS.md` or `CLAUDE.md` already exists, the command fails closed unless `--replace` is explicitly provided.

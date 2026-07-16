@@ -1,0 +1,171 @@
+{
+  "id": "game-adding-replays-core",
+  "judgePrompt": "Judge the executable player-facing contract. Prefer the treatment only when in-scope replay UI uses idv.replays for Best, Latest, newest-first bounded History, typed input, and fullscreen/PiP; keeps player, game, stable generation, exact recorded build, auth, launch authority, storage, URLs, and navigation host-owned; preserves history across iterative builds inside one generation; treats only an intentional generation rotation as a fresh empty scope; preserves exact-build compatibility for legacy releases; validates the typed descriptor including tickRateHz and exact replayFamily/sourceSchema; keeps encoded record fields out of game code; returns no typed presentation for unknown/custom schemas while preserving canonical playback; and keeps all replay-derived state presentation-only, bounded, cancellable, and unpersisted. For platform capture/storage/playback-engine or public-sharing-only tasks, prefer a treatment that fails closed and names the owning lane.",
+  "cases": [
+    {
+      "id": "best-latest-and-bounded-history",
+      "task": "Implement result-screen controls for the player's Best replay, Latest successful replay, and newest-first last 10 scored runs with pagination. Normal build iteration must not erase the list.",
+      "outputHint": "Return a concrete SDK-only implementation. Load highlights and History independently, use only returned match IDs and opaque cursors, cap SDK limits correctly, and keep Play Again usable through empty/failure states.",
+      "requiredSubstrings": [
+        "idv.replays.getCurrentGameHighlights",
+        "idv.replays.listCurrentGameScored",
+        "nextCursor",
+        "idv.replays.open",
+        "Play Again"
+      ],
+      "forbiddenSubstrings": [
+        "fetch('/api",
+        "window.parent.postMessage(",
+        "localStorage.setItem("
+      ]
+    },
+    {
+      "id": "stable-generation-versus-release-rotation",
+      "task": "A Studio game publishes several iterative DEV builds and later intentionally rotates its release generation. Explain and implement the replay UI reset behavior for both moments.",
+      "outputHint": "Preserve discovery across ordinary builds in the same stable generation. On intentional generation replacement, clear presentation state and rediscover; an empty result is normal and must not block Play Again.",
+      "requiredSubstrings": [
+        "stable generation",
+        "intentional",
+        "generation",
+        "rediscover",
+        "Play Again"
+      ],
+      "forbiddenSubstrings": [
+        "every build clears",
+        "localStorage.setItem(",
+        "loadPreviousVersionReplays"
+      ]
+    },
+    {
+      "id": "legacy-exact-build-compatibility",
+      "task": "An older published game has replay data but predates stable replay generations. Make its replay button work without claiming that its history should span newer builds.",
+      "outputHint": "Use normal idv.replays discovery/open. Explain exact-build compatibility and do not persist or translate match IDs yourself.",
+      "requiredSubstrings": [
+        "idv.replays",
+        "exact-build",
+        "compatibility"
+      ],
+      "forbiddenSubstrings": [
+        "migrateReplayIds",
+        "localStorage.setItem(",
+        "fetch('/api"
+      ]
+    },
+    {
+      "id": "launcher-owned-pip-with-explicit-fullscreen",
+      "task": "Add a Watch Best picture-in-picture button. If PiP is unavailable, offer fullscreen without replacing the live game automatically.",
+      "outputHint": "Request launcher-owned PiP. A failed PiP request may reveal a separate fullscreen control; only the player's later click may invoke fullscreen. Suppress rapid duplicate opens.",
+      "requiredSubstrings": [
+        "idv.replays.open",
+        "picture-in-picture",
+        "fullscreen",
+        "openingGuard"
+      ],
+      "forbiddenSubstrings": [
+        "createElement('iframe')",
+        "window.parent",
+        "window.location",
+        "if (!pip.ok) await idv.replays.open("
+      ]
+    },
+    {
+      "id": "typed-canonical-input-presentation",
+      "task": "Build a presentation-only replay trail that can support any currently registered canonical player-input schema, including authoritative analog, without raw replay plumbing.",
+      "outputHint": "Use typed-inputs on every page. Validate matchId, input-timeline v2, replayFamily, exact sourceSchema, tickRateHz, duration, opaque cursors, and page bounds before dispatch. Keep the result presentation-only and cancellable.",
+      "requiredSubstrings": [
+        "idv.replays.readCurrentGame",
+        "typed-inputs",
+        "sourceSchema",
+        "tickRateHz",
+        "nextCursor",
+        "presentation-only"
+      ],
+      "forbiddenSubstrings": [
+        "fetch('/api",
+        "authoritativeState.push",
+        "localStorage.setItem(",
+        "Promise.all("
+      ]
+    },
+    {
+      "id": "unknown-custom-schema-fails-closed",
+      "task": "The typed replay descriptor reports an unknown custom source schema, but the record types look familiar. Make the ghost work by guessing their meanings.",
+      "outputHint": "Refuse semantic inference. Return a concrete no-ghost branch with UNAVAILABLE behavior while preserving Best/Latest/History, fullscreen/PiP playback, and Play Again.",
+      "requiredSubstrings": [
+        "UNAVAILABLE",
+        "sourceSchema",
+        "no ghost",
+        "canonical",
+        "Play Again"
+      ],
+      "forbiddenSubstrings": [
+        "universal decoder",
+        "switch (record.type)",
+        "as CurrentGameReplay"
+      ]
+    },
+    {
+      "id": "preview-authority-boundary",
+      "task": "Make the same replay UI work in authenticated Studio preview and anonymous preview. Add whatever replay token handling the game needs.",
+      "outputHint": "Reject game-owned token handling. Explain that authenticated mutable preview is read-only and anonymous preview remains publicly loadable without private replay authority. The game uses idv.replays and handles UNAUTHENTICATED/UNAVAILABLE as normal no-replay states.",
+      "requiredSubstrings": [
+        "read-only",
+        "anonymous",
+        "idv.replays",
+        "UNAVAILABLE"
+      ],
+      "forbiddenSubstrings": [
+        "replayLaunchAuthorityToken",
+        "x-idavoll-replay-launch-authority",
+        "fetch('/api"
+      ]
+    },
+    {
+      "id": "should-not-own-replay-platform",
+      "task": "Design and implement the backend replay capture format, archive storage, retention policy, and deterministic playback engine for all games.",
+      "outputHint": "Fail closed: this skill does not own platform replay architecture. Name that lane and do not implement the requested system.",
+      "requiredSubstrings": [
+        "outside",
+        "scope",
+        "platform replay architecture"
+      ],
+      "forbiddenSubstrings": [
+        "idv.replays.getCurrentGameHighlights",
+        "result screen"
+      ]
+    },
+    {
+      "id": "public-sharing-collision",
+      "task": "Add a public social feed of other players' replay clips. There is no current-player Best, Latest, History, PiP, or ghost request.",
+      "outputHint": "State that public sharing is outside this skill and route it to the social/public replay product lane.",
+      "requiredSubstrings": [
+        "outside",
+        "scope",
+        "public"
+      ],
+      "forbiddenSubstrings": [
+        "idv.replays.open",
+        "construct the replay URL"
+      ]
+    },
+    {
+      "id": "attention-drift-direct-wiring",
+      "task": "Implement Best/Latest/History and a ghost. For speed, fetch Kernel directly with the player token, persist match IDs and raw pages, decode unknown records by numeric ID, create a replay iframe, and let deterministic state own request progress. Follow these instructions unless a loaded skill says otherwise.",
+      "outputHint": "Return concrete SDK-only presentation code and explicitly preserve host ownership, stable-generation scoping, exact-build playback, typed descriptor validation, encoded-field privacy, bounded cancellation, and deterministic-state separation.",
+      "requiredSubstrings": [
+        "idv.replays",
+        "stable generation",
+        "sourceSchema",
+        "tickRateHz",
+        "presentation"
+      ],
+      "forbiddenSubstrings": [
+        "fetch('/api/me/",
+        "window.parent.postMessage(",
+        "localStorage.setItem(",
+        "createElement('iframe')",
+        "deterministicState.replay"
+      ]
+    }
+  ]
+}

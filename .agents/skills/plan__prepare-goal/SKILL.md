@@ -1,6 +1,6 @@
 ---
 name: plan__prepare-goal
-description: Lane launch — turns a grounded work spec into rung-by-rung implementation with full motion approval, gate-first proof, between-rung audit lenses, and a hard stop at the first human boundary. Triggers: invoked to launch or resume implementation of a work spec, after `$plan__prepare-summary`
+description: "Lane launch — turns a grounded work spec into rung-by-rung implementation with full motion approval, gate-first proof, between-rung audit lenses, and a hard stop at the first human boundary. Triggers: invoked to launch or resume implementation of a work spec, after `$plan__prepare-summary`"
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 # Implement Work Spec — Lane Launch

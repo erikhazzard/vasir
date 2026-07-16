@@ -254,7 +254,10 @@ export function installSkillsIntoProject({
     projectPaths,
     trackingMode,
     trackedSkillNames: Object.keys(projectInstallState.skills),
-    agentsProfileName: agentsInitialization.profile ?? undefined
+    agentsProfileName:
+      agentsProfileName === null
+        ? undefined
+        : agentsInitialization.profile ?? undefined
   });
 
   return {

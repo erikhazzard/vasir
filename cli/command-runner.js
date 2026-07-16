@@ -3552,7 +3552,7 @@ async function runAdd({
     platform,
     spawnSyncImplementation
   });
-  const tracksFullCatalog = skillNames.some(
+  const requestsFullCatalog = skillNames.some(
     (requestedSkillName) => requestedSkillName.toLowerCase() === ADD_ALL_SKILLS_KEYWORD
   );
   const resolvedSkillNames = resolveRequestedAddSkillNames({
@@ -3563,6 +3563,8 @@ async function runAdd({
     currentWorkingDirectory,
     projectRootDirectory
   });
+  const existingProjectConfig = readProjectConfig({ projectPaths });
+  const tracksFullCatalog = requestsFullCatalog || existingProjectConfig?.tracking?.mode === "all";
   const projectAgentsFilePath = path.join(projectPaths.projectRootDirectory, "AGENTS.md");
   const projectClaudeFilePath = path.join(projectPaths.projectRootDirectory, "CLAUDE.md");
   const agentsSelection = agentsProfileName !== null

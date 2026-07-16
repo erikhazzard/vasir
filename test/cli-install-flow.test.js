@@ -605,6 +605,79 @@ Tune jump arcs before adding content.`
   assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "platformer", "SKILL.md")));
 });
 
+test("targeted add preserves an existing full-catalog tracking policy", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+
+  runGitCommand(projectDirectory, ["init"]);
+  runGitCommand(projectDirectory, ["config", "user.email", "test@example.com"]);
+  runGitCommand(projectDirectory, ["config", "user.name", "Test Runner"]);
+
+  const initStatusCode = await runCommandLine(["node", "vasir", "init"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...captureCommandWriters()
+  });
+  assert.equal(initStatusCode, 0);
+  const initializedProjectConfigPath = path.join(projectDirectory, ".agents", "vasir.json");
+  const initializedProjectConfig = JSON.parse(fs.readFileSync(initializedProjectConfigPath, "utf8"));
+  initializedProjectConfig.agents = { profile: "backend" };
+  writeFile(initializedProjectConfigPath, `${JSON.stringify(initializedProjectConfig, null, 2)}\n`);
+
+  const nextRegistry = JSON.parse(fs.readFileSync(path.join(repositoryDirectory, "registry.json"), "utf8"));
+  nextRegistry.skills.push({
+    name: "platformer",
+    path: ".agents/skills/platformer",
+    entry: "SKILL.md",
+    description: "Tight jump arcs and collision feel",
+    category: "games",
+    tags: ["games"],
+    version: "1.0.0",
+    recommends: [],
+    files: ["SKILL.md"]
+  });
+  writeFile(path.join(repositoryDirectory, "registry.json"), `${JSON.stringify(nextRegistry, null, 2)}\n`);
+  writeFile(
+    path.join(repositoryDirectory, ".agents", "skills", "platformer", "SKILL.md"),
+    `---
+name: platformer
+description: Tight jump arcs and collision feel.
+category: games
+tags: [games]
+recommends: []
+version: 1.0.0
+---
+
+# Platformer
+
+Tune jump arcs before adding content.`
+  );
+  runGitCommand(repositoryDirectory, ["add", "."]);
+  runGitCommand(repositoryDirectory, ["commit", "-m", "add platformer skill for targeted install"]);
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "platformer", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...captureCommandWriters()
+  });
+
+  assert.equal(addStatusCode, 0);
+  assert.ok(fs.existsSync(path.join(projectDirectory, ".agents", "skills", "platformer", "SKILL.md")));
+  const projectConfig = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir.json"), "utf8")
+  );
+  assert.equal(projectConfig.tracking.mode, "all");
+  assert.deepEqual(projectConfig.tracking.skillNames, []);
+  assert.equal(projectConfig.agents.profile, "backend");
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.equal(installState.catalog.trackingMode, "all");
+});
+
 test("update follows explicit repo config when a selected tracked skill directory is missing", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
