@@ -64,9 +64,9 @@ Legacy releases without an explicit stable generation use an exact-build compati
 
 Never persist match IDs, cursors, pages, or typed records in saves, `localStorage`, deterministic state, or a game-owned backend.
 
-## Launch and preview authority
+## Launch and preview scope
 
-Games never manage replay auth. A normal authenticated Play launch receives host-private authority for current-generation reads and replay-recordable match creation. An authenticated mutable DevHub/Studio preview may receive read-only preview authority; it cannot record canonical replays. Anonymous preview loading remains public, but private replay calls are unavailable. The host re-resolves the server-held launch authority on every history/action-data continuation and revalidates the sealed manifest on every action-data page; cursor encryption prefers the per-launch secret, permits only bounded configured replay-secret rotation fallback, and never derives key authority from a session ID. Never ask the game to pass a token, generation, version, build, player, or session.
+Games never manage replay auth. Authenticated Play records and reads the launcher-pinned stable generation; an authenticated DevHub/Studio preview records and reads only its isolated preview generation. A launch token or configured replay secret is never required, and pagination survives a session refresh. Anonymous preview loading remains public. The host still revalidates the sealed player/game/generation/match scope on every action-data page. Never ask the game to pass a token, generation, version, build, player, or session.
 
 ## PiP is launcher-owned
 

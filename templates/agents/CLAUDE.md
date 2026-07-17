@@ -123,7 +123,7 @@
   - `Objectively Green` — the real loop ran in the target environment, fresh artifacts were inspected, and the remaining delta list is empty.
   - `Waiting Human` — a subjective gate awaits the user. Never auto-claimed, never bundled into "done."
   - `Complete` — objective gates green, subjective gates accepted, docs synced, audit run, any owed postmortem written (§6).
-  Milestones are stepping stones through the final journey, not versions: design vFinal, prove it one rung at a time. Scope control lives in non-goals and gates, not in shipping a lesser "v1."
+  Milestones are stepping stones through the final journey, not versions: design the canonical final shape, then prove it one rung at a time. Scope control lives in non-goals and gates, not in shipping a lesser "v1."
 
   Milestone autonomy: proceed through objective gates without pausing; pause at subjective gates and boundaries (§3). If an eval fails twice for the same or similar reason, circuit-break (§7).
 </lanes_and_artifacts>
@@ -202,36 +202,28 @@
 # 7. Multi-Agent & Model Routing
 
 <multi_agent_routing>
-  Prime Directive — use the cheapest tier that is actually correct:
-    - **gpt-5.6-luna medium:** exact command execution — tests, builds, benchmarks, and other explicitly named safe commands — with raw or capped output returned unchanged.
-    - **gpt-5.6-luna xhigh:** reading and reconnaissance — file discovery, repo mapping, searches, failure investigation, log/diff interpretation, and evidence extraction.
-    - **gpt-5.6-sol high:** routine orchestration and straightforward delegated work that needs neither repository investigation nor deep judgment.
-    - **gpt-5.6-sol xhigh:** delegated coding, architecture, judgment, synthesis, reviews, gate verdicts, and final decisions. Fable xhigh remains the Claude-context equivalent for work the main agent owns directly.
-    - Precedence is explicit: code or consequential judgment routes to an xhigh judgment tier; read/recon and interpretation route to Luna xhigh; exact command running routes to Luna medium; only the remainder routes to Sol high.
-    - Never use Sol xhigh or a Fable xhigh subagent merely to read files, search the repo, run commands, or summarize output.
+  Default: Fable does the work in the current context. Delegate only when a bounded task is large enough to repay spawn overhead or §6 requires clean-context isolation. Never spawn a helper for one file read, one search, one command, or context the current coding/judgment agent needs to own its lane.
 
-  Context posture:
-    - Delegation is optional, not a ritual. Do not spawn a subagent for one file read, one search, or one bounded command when doing it directly costs less than prompting and consuming another context.
-    - Delegate only a concrete bounded task with enough work to repay the spawn overhead, or when clean-context isolation is required by §6.
-    - Batch related read/recon work into one Luna xhigh task and related commands into one Luna medium task. Do not create chains of tiny reader or command-runner agents.
+  Routing order (first match wins):
+    1. **Fable xhigh or gpt-5.6-sol xhigh:** product code, architecture, consequential judgment, synthesis, reviews, gate verdicts, and final decisions. Fable owns direct Claude-context work; use Sol only for an explicitly delegated lane.
+    2. **gpt-5.6-luna xhigh:** bounded file/repo reading, reconnaissance, failure investigation, log/diff interpretation, and evidence extraction.
+    3. **gpt-5.6-luna medium:** exact safe command batteries such as tests, builds, and benchmarks; return raw or capped output and make no diagnosis or verdict.
+    4. **gpt-5.6-sol high:** the routine delegated remainder that needs neither repository investigation, product-code authorship, nor consequential judgment.
+    A coding or judgment agent may read files and run commands needed for its own lane. The routing table governs delegation; it does not require fragmenting one coherent task across agents.
 
-  Topology — single writer, delegated toil, shared tree:
-    - Fable owns final synthesis, final acceptance, and the lane's judgment. Product-code authorship stays single-writer and may be assigned to Fable xhigh or a Sol xhigh delegate — never to parallel freehand authors.
-    - **No worktrees.** All agents work in the shared tree; frequent small commits are the isolation mechanism (§8). Worktree isolation trades a tiny in-the-moment merge tax for a much larger one later — an antipattern here.
-    - Collaborator lane (a helper doing work for you): pass the relevant work spec, plan, and artifact paths (or a fork of current context for in-harness agents).
-    - Verifier lane (an agent reviewing an artifact): clean context — artifact, lane boundary, proof gates; never the author's trajectory (§6).
+  Bindability gate:
+    - Never delegate through a surface that cannot explicitly bind the required model and reasoning effort. In-harness Claude/Codex subagent surfaces without those controls are forbidden for routed work.
+    - Use `codex exec` for model-routed delegation. If explicit routing is unavailable, work locally; if §6 requires an isolated verifier, report the missing verifier surface as a blocker.
 
-  Model Routing Policy (binding):
-    - Classify every delegate before launch and set both the model and reasoning effort explicitly; never rely on defaults.
-    - Luna medium executes and reports; it does not diagnose failures or decide whether a gate passed. Luna xhigh may investigate and interpret evidence, but returns consequential decisions to Fable xhigh or Sol xhigh.
-    - Sol high does not decide architecture, review findings, gate status, or final outcomes. Escalate those decisions to Fable xhigh or Sol xhigh.
-    - In-harness Claude subagents are fallback only when the matching Codex tier is unavailable; bind model choice and prompt scope explicitly.
+  Authority and topology:
+    - Fable owns final acceptance, synthesis, and every gate verdict. Product-code authorship stays single-writer and may be assigned only to Fable xhigh or an explicitly scoped Sol xhigh lane.
+    - Luna medium, Luna xhigh, and Sol high delegates never author product code or render gate verdicts. Luna xhigh returns evidence for consequential decisions to Fable xhigh or Sol xhigh.
+    - Model routing never grants mutation authority. Destructive, deploy, infrastructure, and production-data commands still require the approval defined elsewhere in this contract.
+    - **No worktrees.** All agents work in the shared tree; §8 governs custody.
 
-  Delegation contract (what keeps this cheap):
-    - Every delegate prompt defines the deliverable shape: demand file:line evidence, cap answer length, name what to skip. Codex prompts are a command class — the bounded-deliverable contract is their literalism.
-    - If a delegate returns a dump, do not read it raw — re-prompt for the bounded summary.
-    - Trust bounded evidence; spot-check only load-bearing claims. Re-doing a delegate's reads yourself is a double spend.
-    - Background delegates: repeated idle-stops are a resume-with-instruction, not a failure. Agents should foreground their terminal waits or return explicit resumable state; completion notifications can be stale — verify against the output artifact before acting on them.
+  Delegate prompt contract:
+    - Name the bounded deliverable, relevant spec/artifact paths, required file:line evidence, answer-length cap, and explicit skips. Reject dumps; request the bounded result instead.
+    - Verifiers receive only the artifact/diff, lane boundary, and proof gates, never the author's trajectory (§6).
 
   Codex invocation mechanics (this machine):
     - Always run codex with full permissions (YOLO); never downgrade delegated runs to read-only or approval-gated sandboxes.
@@ -244,9 +236,7 @@
     - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, and `cwd` set to the current repo root.
     - Every delegated invocation explicitly selects its model and `model_reasoning_effort`; local defaults do not determine routing.
 
-  Guardrails (hold at every tier):
-    - Luna medium, Luna xhigh, and Sol high delegates never render gate verdicts or author product code. A Sol xhigh delegate may author code or perform a judgment-heavy review only when its prompt explicitly assigns that lane; Fable retains final acceptance and synthesis.
-    - Model routing never grants mutation authority. Destructive, deploy, infrastructure, and production-data commands still require the approval defined elsewhere in this contract.
+  Proof:
     - All work, regardless of tier, passes the same proof gates and writes honest artifacts under `tmp/`.
 
   Circuit Breaker:
@@ -286,15 +276,22 @@
 
   **Deep and boring.** Ousterhout-deep modules: simple public surface, substantial internals. Complexity flows downward into well-contained internals, not outward into every caller. No shallow pass-throughs, unnecessary adapters, or architecture that exists to look clean. Redis is the bar — simple interfaces, deep internals, low surprise — and the goal is to beat it.
 
-  **One clear path.** Decide. One solution per approved unlock: no feature flags, alternate modes, deprecated fallbacks, or side-by-side implementations unless the plan names them as product requirements. When replacing an implementation, delete the old path in the same change; compatibility shims only for migration/rollback/protocol/persistence/client-version safety, with the removal condition named in the spec.
+  **One clear path.** Decide. One solution per approved unlock: no feature flags, alternate modes, deprecated fallbacks, or side-by-side implementations unless the plan names them as product requirements.
 
-  **No stopgaps — build vFinal.** A committed slice may be incomplete, but it must be the version we extend, not replace. A stopgap is any change that passes the immediate test while choosing the wrong authority, data model, lifecycle, failure behavior, or proof path — forbidden even when faster. If the full feature is too large, reduce capability, not correctness: real authority/model/path, fail closed on unsupported capability. If making it production-correct later means throwing this away, the slice is invalid.
+  **No internal versioning — decision order (binding).** Apply these branches in order:
+  1. **Existing production or external contract? Preserve it exactly.** Never bump, rename, fork, or remove an existing production route, field, key, event type, object path, codec, table, persisted identifier, or externally imposed protocol token as drive-by cleanup. Existing versioned names are frozen compatibility names. Keep external versioned paths and fields inside their owning adapter; translate them before they enter a repo-owned contract. Tests and fixtures may reproduce these exact names or prove rejection, but may not establish a new production contract.
+  2. **New repo-owned surface? Versioning is forbidden.** Never introduce `schemaVersion`, a repo-owned `version` field that selects behavior, `v2`/`V2`, a versioned route, or a parallel versioned shape. The token does not matter: `format`, `kind`, `generation`, `legacy`, `next`, or `new` is equally forbidden when its purpose is choosing between repo-owned payload schemas or implementations. This applies to APIs, payloads, files, folders, functions, classes, exports, identifiers, event types, commands, environment variables, queues, streams, topics, tables, indexes, object paths, Redis keys, cache namespaces, metrics, fixtures, and tests.
+  3. **Legitimate identity data? Keep it data-only.** Package semver, game/source/build identifiers, immutable artifact identifiers, external protocol values, and concurrency revisions may identify state or select an immutable deployed artifact. They may never select between repo-owned API, persistence, payload, or implementation shapes. Name repo-owned concurrency controls `revision`, `generation`, or `etag`, never `schemaVersion`.
+  4. **Compatible contract change? Ship it in place.** Maintain one canonical contract and one canonical write authority per owned entity or partition. Add optional fields, provide safe defaults, tolerate unknown fields, and use consumer-first rollout ordering when needed. Update every producer, consumer, policy, fixture, and proof in the same lane. Temporary tolerant reading during a rolling deployment is not a second contract and requires no special approval.
+  5. **Genuine dual-contract migration? Halt.** Halt only when production correctness requires simultaneously active canonical write contracts, selectable schemas or behaviors, version-distinguished routes/keys/tables, or an irreversible data migration. That is a product/operations fork requiring explicit human approval and a bounded removal plan.
+
+  **No stopgaps — build the lasting shape.** A committed slice may be incomplete, but it must be the implementation we extend, not replace. A stopgap is any change that passes the immediate test while choosing the wrong authority, data model, lifecycle, failure behavior, or proof path — forbidden even when faster. If the full feature is too large, reduce capability, not correctness: real authority/model/path, fail closed on unsupported capability. If making it production-correct later means throwing this away, the slice is invalid.
 
   **Design gate for non-trivial architecture.** Separate facts / assumptions / ideas (facts from repo truth or primary source; assumptions name their risk). Start with the simplest viable shape; add a moving part only when a simpler option fails a stated constraint. Kill-test the preferred option before committing: load spike and backpressure, cost curve at scale, partial-failure/duplicate-delivery behavior, 3am debuggability, reversibility. A failed kill-test disqualifies the design — it is not a footnote.
 
   **Cognitive load.** Design for a reviewer with zero working memory: one user journey readable across ≤2 files; explicit dataflow over hidden or mutated state; inline logic used fewer than 3 times unless extraction protects an invariant or isolates a boundary; functions declare required context as inputs and return transformed data.
 
-  **Codebase canon.** Plain ESM JavaScript in `.js` files absent a stronger local convention: kebab-case filenames, 2-space indent, single quotes, semicolons, braces on all blocks, imports ordered Node core → third-party → local. Long, unambiguous, repo-searchable, abbreviation-free names. No versions baked into routes, filenames, identifiers, or persisted event types — additive payloads with explicit `schemaVersion`/`encoding` fields. Env reads and logging only through the repo's config/logger boundaries; one options object over more than 2 positional args; `async/await` by default. Files stay under ~1k LOC — split by domain before they bloat.
+  **Codebase canon.** Plain ESM JavaScript in `.js` files absent a stronger local convention: kebab-case filenames, 2-space indent, single quotes, semicolons, braces on all blocks, imports ordered Node core → third-party → local. Long, unambiguous, repo-searchable, abbreviation-free names. Env reads and logging only through the repo's config/logger boundaries; one options object over more than 2 positional args; `async/await` by default. Files stay under ~1k LOC — split by domain before they bloat.
 
   **Errors & observability.** Operability is part of the feature: every non-trivial change defines how we know it is healthy and how we know it is broken. No exception-based flow control; no swallowed errors; a user-facing toast is not observability. Every `catch` that re-wraps or generalizes logs the original with full diagnostics first.
 

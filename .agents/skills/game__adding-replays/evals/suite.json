@@ -1,6 +1,6 @@
 {
   "id": "game-adding-replays-core",
-  "judgePrompt": "Judge the executable player-facing contract. Prefer the treatment only when in-scope replay UI uses idv.replays for Best, Latest, newest-first bounded History, typed input, and fullscreen/PiP; keeps player, game, stable generation, exact recorded build, auth, launch authority, storage, URLs, and navigation host-owned; preserves history across iterative builds inside one generation; treats only an intentional generation rotation as a fresh empty scope; preserves exact-build compatibility for legacy releases; validates the typed descriptor including tickRateHz and exact replayFamily/sourceSchema; keeps encoded record fields out of game code; returns no typed presentation for unknown/custom schemas while preserving canonical playback; and keeps all replay-derived state presentation-only, bounded, cancellable, and unpersisted. For platform capture/storage/playback-engine or public-sharing-only tasks, prefer a treatment that fails closed and names the owning lane.",
+  "judgePrompt": "Judge the executable player-facing contract. Prefer the treatment only when in-scope replay UI uses idv.replays for Best, Latest, newest-first bounded History, typed input, and fullscreen/PiP; keeps player, game, stable generation, exact recorded build, auth, optional launch compatibility metadata, storage, URLs, and navigation host-owned; preserves history across iterative builds inside one generation; treats only an intentional generation rotation as a fresh empty scope; preserves exact-build compatibility for legacy releases; validates the typed descriptor including tickRateHz and exact replayFamily/sourceSchema; keeps encoded record fields out of game code; returns no typed presentation for unknown/custom schemas while preserving canonical playback; and keeps all replay-derived state presentation-only, bounded, cancellable, and unpersisted. For platform capture/storage/playback-engine or public-sharing-only tasks, prefer a treatment that fails closed and names the owning lane.",
   "cases": [
     {
       "id": "best-latest-and-bounded-history",
@@ -107,12 +107,12 @@
     {
       "id": "preview-authority-boundary",
       "task": "Make the same replay UI work in authenticated Studio preview and anonymous preview. Add whatever replay token handling the game needs.",
-      "outputHint": "Reject game-owned token handling. Explain that authenticated mutable preview is read-only and anonymous preview remains publicly loadable without private replay authority. The game uses idv.replays and handles UNAUTHENTICATED/UNAVAILABLE as normal no-replay states.",
+      "outputHint": "Reject game-owned token handling. Explain that authenticated preview records and reads only its isolated preview generation without a launch token, while anonymous preview remains publicly loadable and may have no authenticated replay calls. The game uses idv.replays and handles UNAUTHENTICATED/UNAVAILABLE as normal no-replay states.",
       "requiredSubstrings": [
-        "read-only",
+        "isolated",
         "anonymous",
         "idv.replays",
-        "UNAVAILABLE"
+        "launch token"
       ],
       "forbiddenSubstrings": [
         "replayLaunchAuthorityToken",
