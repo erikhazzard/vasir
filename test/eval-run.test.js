@@ -149,6 +149,39 @@ test("eval run scores baseline vs treatment with --model mock and stores history
   assert.equal(secondRun.previousComparison.previousRunId, firstRun.runId);
 });
 
+test("mock eval remains zero-cost when the suite defines live fixed judges", async () => {
+  const repositoryDirectory = createEvalFixtureRepository();
+  const suitePath = path.join(repositoryDirectory, ".agents", "skills", "react", "evals", "suite.json");
+  const suite = JSON.parse(fs.readFileSync(suitePath, "utf8"));
+  suite.judgePrompt = "Prefer the response that follows the declared React contracts.";
+  writeFile(suitePath, `${JSON.stringify(suite, null, 2)}\n`);
+  writeFile(
+    path.join(repositoryDirectory, "keys.json"),
+    `${JSON.stringify({ OPENAI_API_KEY: "must-not-be-used", ANTHROPIC_API_KEY: "must-not-be-used" })}\n`
+  );
+  const capturedOutput = captureCommandWriters();
+  let networkCalls = 0;
+
+  const statusCode = await runCommandLine(
+    ["node", "vasir", "eval", "run", "react", "--json", "--model", "mock", "--trials", "1"],
+    {
+      currentWorkingDirectory: repositoryDirectory,
+      environmentVariables: {},
+      fetchImplementation: async () => {
+        networkCalls += 1;
+        throw new Error("mock eval attempted a live request");
+      },
+      ...capturedOutput
+    }
+  );
+
+  assert.equal(statusCode, 0, capturedOutput.readStderr());
+  const result = JSON.parse(capturedOutput.readStdout());
+  assert.equal(result.judgeStatus, "disabled");
+  assert.deepEqual(result.judgeModels, []);
+  assert.equal(networkCalls, 0);
+});
+
 test("eval run aggregates provider token usage into the saved summary", async () => {
   const repositoryDirectory = createEvalFixtureRepository();
   const capturedOutput = captureCommandWriters();

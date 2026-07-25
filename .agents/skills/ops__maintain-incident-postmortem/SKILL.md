@@ -1,6 +1,6 @@
 ---
 name: ops__maintain-incident-postmortem
-description: "Authors or updates the durable incident postmortem — preserves a hard diagnosis: ruled-out hypotheses, misleading signals, proven mechanism, fast-path discriminator. Triggers only when the diagnosis itself was the work (multi-hypothesis hunt, misleading symptoms, cross-lane evidence); routine bugs return not-owed. Also triggers on signficant corrective-action updates and closure."
+description: "Authors or updates a durable incident postmortem preserving ruled-out hypotheses, misleading signals, proven mechanism, and the fast-path discriminator. Triggers when the user explicitly requests one or the diagnosis would be materially expensive or dangerous to re-derive; routine bugs return not warranted."
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
@@ -8,11 +8,11 @@ tools: Read, Grep, Glob, Bash, Edit, Write
 
 The fix lives in the diff; the diagnosis dies with the context window (root §6). A postmortem is the durable causal record of an operational failure — not a changelog, blame document, debugging diary, or patch summary. Its reusable payload is the map of the search space: what broke in the journey, what evidence proved the mechanism, which hypotheses died and what killed them, what misled the hunt, and the discriminator a future responder should run first. It must let that responder answer: *Have we seen this pattern before? What proved the cause last time? What discriminator do I run first? What guardrail was missing? What action prevents, detects, or mitigates recurrence?*
 
-**Owed or not (root §6 — sparingly, no human trigger).** The default is NO postmortem. One is owed only when the diagnosis itself was the work: several ruled-out causes, misleading symptoms, cross-lane or networking/persistence/infra evidence — a map a future responder would otherwise re-derive from scratch. A CSS tweak, a plain bug with an obvious repro, anything whose diff explains itself: never. If invoked below the bar, return `not owed` with one line — an unearned postmortem dilutes the incident library. The handoff gate enforces owed-and-written at lane close; no human has to remember to ask.
+**When it earns a file (root §6).** The default is no postmortem. Create one only when the user explicitly requests it or the multi-hypothesis diagnosis would be materially expensive or dangerous to re-derive and the work spec/diff cannot preserve the useful search map. CSS tweaks, obvious bugs, and changes whose diff explains the cause do not qualify. If neither condition holds, return `not warranted` with one line and create nothing.
 
-**Routing & inputs (root §6).** The orchestrator writes the compact **diagnosis brief** — ruled-out hypotheses, misleading signals, evidence paths, the fast path next time, mechanism + confidence, and the fix pointer: the facts only the authoring context holds. A codex delegate authors this document; never orchestrator tokens on the document itself — this file is the delegate's brief, so no model pin. The diagnosis brief is the primary input; evidence discovery corroborates it, it does not replace it. Brief missing or thin → author only what the evidence supports, label the gaps `[UNKNOWN]`, and return the missing brief as the open blocker. If the hunt exposed a process, testing, or policy hole, flag `$prompt__perform-root-cause-analysis` as owed (same codex routing) — land the prevention layer, not just the story.
+**Routing & inputs (root §6).** The orchestrator writes the compact **diagnosis brief** — ruled-out hypotheses, misleading signals, evidence paths, fast path next time, mechanism/confidence, and fix pointer. A clean-context delegate may author the warranted document. Evidence corroborates the brief; it does not replace it. Missing facts stay `[UNKNOWN]`. If a material process/testing/policy hole remains, recommend `$prompt__perform-root-cause-analysis`; it runs only when explicitly requested or its specific prevention value is clear.
 
-**Ownership.** This skill owns `postmortem.md`, sanitized evidence excerpts created for it, and the document's status, confidence, pattern, and corrective-action state. It does not own product fixes, harnesses, system docs, or feature planning: substantial corrective work → a Work Spec; testable prevention → an eval gate or spec contract (Law 5); process holes → the RCA sibling. Never let the postmortem become a design doc.
+**Ownership.** This skill owns the warranted `postmortem.md`, sanitized evidence excerpts, and its causal/status truth. It does not own product fixes, harnesses, system docs, or feature planning: substantial corrective work → a Work Spec; a proof artifact exists only when a specific prevention risk warrants it; process holes → separately warranted RCA. Never let the postmortem become a design doc.
 
 **Storage.** `docs/incidents/<semantic-domain>/<YYYY-MM-DD>__<incident-slug>/postmortem.md` — domain is the product/system area (`payments`, `realtime-netcode`, `agent-tools`, `infra`, `auth`); date is the incident start in the canonical timezone when known; slug is a kebab-case symptom or mechanism. No severity or status in the path — they change. Sanitized excerpts live in `evidence/` beside it. Secrets, tokens, private user data, and unredacted production records are never copied into the repo — link or describe the source.
 
@@ -24,7 +24,7 @@ The fix lives in the diff; the diagnosis dies with the context window (root §6)
 2. **Journey-first, compact.** Lead with what failed for the user or operator, never with which file changed. One to two pages unless raw evidence genuinely needs the appendix. Never a file-by-file changelog — implementation detail appears only where it explains mechanism, resolution, rollback, or prevention.
 3. **Confusion is signal.** Capture why responders chased wrong ideas, what they believed at key moments, what collapsed the search space, and which logs, metrics, or dashboards misled. The missing discriminator, named explicitly, is the most valuable line in the document.
 4. **Commands are evidence only if they ran.** Captured or source-summarized output qualifies; anything else is a *proposed* discriminator in Fast Path, labeled as such. Discovery is read-only — nothing mutating, credentialed, or production-affecting.
-5. **Corrective actions land somewhere real.** Every CA carries: type (`Prevent | Detect | Mitigate`) · priority · **enforcement owner** — in a post-LLM shop the owner is the artifact that holds the line (an eval gate, a `C-###` contract, an alert, an AGENTS line, a header, a runbook), not a person's name · exact verification as a testable sentence ("alert fires when reconnect replay lag exceeds 2s for 3 consecutive minutes," never "monitor it") · a **lands-as** pointer. Substantial testable Prevent/Detect actions route to `$eval__design-proof-gates` (gate) or the work spec (`C-###`); the postmortem keeps the pointer, never the harness.
+5. **Corrective actions land somewhere real.** Every CA carries type, priority, enforcement owner, exact observable verification, and a lands-as pointer. Substantial Prevent/Detect actions route to the owning work spec; proof routes to `$eval__design-proof-gates` or a durable test only when a specific material risk warrants it. The postmortem keeps the pointer, never the harness.
 6. **Severity humility.** `Sev-N (proposed)` unless the team declared it. No invented severities, windows, or timestamps — `TBD` and `[UNKNOWN]` over fabrication.
 
 ## Status
@@ -33,12 +33,12 @@ The fix lives in the diff; the diagnosis dies with the context window (root §6)
 
 ## Workflow
 
-1. **Check the owed bar** — below it, return `not owed` and stop.
+1. **Check warrant** — absent an explicit user request or a materially expensive/dangerous-to-rederive diagnosis, return `not warranted` and stop.
 2. **Resolve identity:** domain, start date, slug, path, incident class, higher-order pattern, why-it-recurs, severity (proposed if undeclared).
 3. **Ingest:** the diagnosis brief first; then the smallest corroborating set — incident notes, the introducing/mitigating diff or PR, logs/traces/dashboard snapshots, repro tests, prior related incidents.
 4. **Build the causal frame before narrative:** symptom → affected journey → trigger → mechanism → missing defense → resolution → recurrence guardrail. Name at least one plausible wrong hypothesis and what ruled it out where evidence exists.
 5. **Write or update** per the template; run the conformance check (never stored).
-6. **Route:** CAs to their landing artifacts; flag the RCA sibling if a process hole surfaced.
+6. **Route:** substantial CAs to the owning work spec; recommend, but do not auto-create, proof or RCA artifacts.
 7. **Return the Skill Result.** The caller owns the human-facing close-out (root §5).
 
 ---
@@ -115,20 +115,20 @@ Similar incidents · shared failure pattern · why prior guardrails didn't preve
 
 ## Conformance Check (run before writing — never stored)
 
-- Owed bar met, or `not owed` returned; diagnosis brief ingested, or its absence flagged as the open blocker with gaps marked `[UNKNOWN]`.
+- The postmortem is explicitly requested or its durable diagnosis value is clear, otherwise `not warranted` was returned; diagnosis brief ingested, or gaps marked `[UNKNOWN]`.
 - Path, title, and Incident ID agree; Human Read carries symptom, mechanism, resolution, confidence, and the first discriminator.
 - Journey stated before mechanism; facts sourced; inferences disprovable; at least one ruled-out hypothesis where evidence exists; confidence stated and earned.
 - Fast Path names a real discriminator or labels proposed ones honestly.
-- Every CA has an enforcement owner, a lands-as pointer, and a testable verification; substantial Prevent/Detect actions routed to gates/contracts.
+- Every CA has an enforcement owner, lands-as pointer, and observable verification; substantial actions route to the owning work spec before any proof artifact.
 - No secrets or unredacted records; status honors closure criteria; severity humility held.
-- RCA sibling flagged if the hunt exposed a process/testing/policy hole.
+- RCA sibling recommended only when a material process/testing/policy hole remains and its prevention value is specific.
 
 ## Skill Result (return to caller — required elements, any shape)
 
-- Owed verdict: authored | updated | not owed — <one line>
+- Result: authored | updated | not warranted — <one line>
 - Postmortem path · Incident ID · Status · Severity
 - Incident class · Higher-order pattern · Root-cause confidence
 - Evidence state: sufficient | partial — <gaps> | blocked — missing diagnosis brief
 - Corrective actions: IDs + lands-as routing state | none owed
-- RCA owed: yes — <the hole> | no
+- RCA recommended: yes — <the hole and material impact> | no
 - Open blockers · Recommended next action (one)

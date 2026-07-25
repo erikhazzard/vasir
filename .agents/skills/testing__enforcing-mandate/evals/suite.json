@@ -1,0 +1,92 @@
+{
+  "id": "testing-enforcing-mandate-proportional-proof",
+  "judgePrompt": "Judge the testing decision, not the amount of testing prose. Prefer the treatment only when it decides whether a durable test is warranted before proposing one; permits zero new tests for static, mechanical, redundant, or low-harm changes; selects the cheapest seam that preserves the actual risk; uses watched-red when feasible for defects, characterization for unknown refactor behavior, and natural implementation order for new behavior; reserves mutation or adversarial potency for consequential invariants; chooses browser automation only for browser-specific failure modes; and chooses integration/contract proof only when real boundary semantics are at risk. Expected files are forecasts, not scope authority. Do not reward an answer that repeats these phrases while still prescribing ritual proof.",
+  "cases": [
+    {
+      "id": "static-ui-wrapper-no-durable-test",
+      "task": "Add one semantic wrapper div and change two lines of helper copy. There is no new interaction, routing, responsive behavior, state, API call, or accessibility semantic. Decide the verification strategy.",
+      "outputHint": "Give the smallest justified proof decision. Do not invent a browser-specific risk.",
+      "requiredSubstrings": [
+        "no new test",
+        "diff inspection"
+      ]
+    },
+    {
+      "id": "production-retry-bug-watched-red",
+      "task": "A normal worker retry can charge the same payment twice because the idempotency guard is bypassed. Plan the regression proof and fix ordering.",
+      "outputHint": "Treat this as an escaped production defect at a consequential boundary.",
+      "requiredSubstrings": [
+        "watched-red",
+        "idempotency",
+        "real boundary"
+      ]
+    },
+    {
+      "id": "new-public-behavior-no-absence-red",
+      "task": "Add a new deterministic public SDK filter that returns games matching an exact tag. No prior filter API exists. Choose implementation and proof ordering.",
+      "outputHint": "A focused public-surface test may be warranted, but a missing-API failure is not behavior potency.",
+      "requiredSubstrings": [
+        "natural order",
+        "public",
+        "credible oracle"
+      ]
+    },
+    {
+      "id": "legacy-refactor-characterization",
+      "task": "Refactor a legacy score-normalization module without changing emitted scores. Current behavior is poorly documented and only reachable through its public calculateScore entrypoint.",
+      "outputHint": "Protect unknown existing behavior without demanding a browser or unrelated journey.",
+      "requiredSubstrings": [
+        "characterization",
+        "calculateScore"
+      ]
+    },
+    {
+      "id": "keyboard-focus-browser-risk",
+      "task": "Fix a modal whose focus trap fails after Shift+Tab and whose Escape handler sometimes leaves the backdrop active. Choose the cheapest credible proof seam.",
+      "outputHint": "This failure is owned by real browser focus and keyboard behavior.",
+      "requiredSubstrings": [
+        "browser",
+        "focus",
+        "keyboard"
+      ]
+    },
+    {
+      "id": "backend-queue-boundary-integration",
+      "task": "Change the event written by an API handler and consumed by a queue worker. The risk is serialized payload compatibility, retry delivery, and one durable write. Choose the proof shape.",
+      "outputHint": "Preserve the real serialization and async state transition without requiring a live production service.",
+      "requiredSubstrings": [
+        "integration",
+        "serialization",
+        "retry"
+      ]
+    },
+    {
+      "id": "docs-only-should-not-create-proof-work",
+      "task": "Correct a spelling error in a Markdown explanation. There is no generated output and no executable snippet. State what testing work is warranted.",
+      "outputHint": "Keep a truly mechanical change mechanical.",
+      "requiredSubstrings": [
+        "no new test"
+      ]
+    },
+    {
+      "id": "attention-drift-late-static-edit",
+      "task": "Implement a twelve-step account recovery change. Steps 1-8 alter token validation, persistence, expiry, and retry behavior and need strong boundary proof. Step 9 only adds a static explanatory span beside an existing heading with no interaction or layout consequence. Steps 10-12 update docs and rollout notes. Decide proof per step, including step 9.",
+      "outputHint": "Strong proof for consequential recovery boundaries must not turn the unrelated static span into a browser-test obligation.",
+      "requiredSubstrings": [
+        "step 9",
+        "no new test",
+        "token"
+      ]
+    },
+    {
+      "id": "touchpoint-expansion-is-not-scope-expansion",
+      "task": "A planned API fix listed handler.js and handler.test.js. Investigation shows the same approved response contract is actually serialized in response-adapter.js, which must also change. No authority, product behavior, rollback shape, or public contract scope changes. Should work stop?",
+      "outputHint": "This is the collision boundary with the root scope law and code__enforcing-principles. Route ownership correctly and distinguish a newly discovered file from a real lane-boundary change.",
+      "requiredSubstrings": [
+        "code__enforcing-principles",
+        "continue",
+        "response-adapter.js"
+      ]
+    }
+  ]
+}

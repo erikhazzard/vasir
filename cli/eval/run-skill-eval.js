@@ -548,11 +548,12 @@ export async function runSkillEval({
   const judgePromptText = typeof suiteSource.suiteDefinition.judgePrompt === "string"
     ? suiteSource.suiteDefinition.judgePrompt
     : null;
+  const mockOnlyRun = modelResolution.modelDescriptors.every((descriptor) => descriptor.provider === "mock");
   let judgeModels = [];
-  let judgeStatus = judgePromptText ? "skipped" : "not_configured";
+  let judgeStatus = judgePromptText ? (mockOnlyRun ? "disabled" : "skipped") : "not_configured";
   const comparablePairsBeforeJudging = createComparableRowPairs(rows);
 
-  if (judgePromptText && comparablePairsBeforeJudging.length > 0) {
+  if (judgePromptText && !mockOnlyRun && comparablePairsBeforeJudging.length > 0) {
     const judgeResolution = await resolveEvalModels({
       requestedModelArguments: [...FIXED_JUDGES],
       environmentVariables: modelResolution.environmentVariables,

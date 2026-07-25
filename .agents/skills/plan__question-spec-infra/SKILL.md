@@ -1,6 +1,6 @@
 ---
 name: plan__question-spec-infra
-description: Adversarial infra review of a drafted work spec — challenges whether the design is simultaneously performant, scalable, and cheap by checking workload decomposition and primitive fit; refuses the pick-two triangle unless the tradeoff is physics. Triggers after the spec and eval plan are drafted, for any lane with meaningful infra surface; before admitting any new cache, queue, table, index, or service; when a running lane's infra smells slow or expensive.
+description: Adversarial infra review of a drafted work spec, run only when explicitly requested or when a specific material performance/scale/cost blind spot warrants clean-context judgment; challenges workload decomposition and primitive fit without becoming an automatic spec-stage audit.
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -10,9 +10,9 @@ The creed: **we can have all three — performant, scalable, and cheap. It is de
 
 Real tradeoffs live at the physics layer: consistency vs latency across distance, durability vs write latency, retention length vs access speed. If a claimed tradeoff is not one of those, suspect the primitive. **A tradeoff you can name a primitive-swap out of is not a tradeoff.**
 
-**Routing & inputs.** An infra challenge is a design verdict — judgment work, orchestrator-tier (root §7); never routed to codex-class delegates. Run it fresh-eyed: receive the work spec, the eval plan, the repo's backend/infra canon, and any real load, latency, or cost data available. This review is read-only — accepted changes route through `$plan__maintain-work-spec` and `$eval__design-proof-gates`; findings that need measurement become measurement-first gate demands, designed by the eval skill (sourced budgets, probes, workload ladder), not measured ad hoc here.
+**Routing & inputs.** Run fresh-eyed and read-only with the work spec, any current eval plan, repo backend/infra canon, and real decision-relevant load/latency/cost evidence. Accepted semantic changes route through `$plan__maintain-work-spec`. A measurement finding becomes an eval gate only when durable proof coordination is warranted.
 
-**Number honesty.** Napkin math is mandatory; fake precision is banned. Every load or cost figure is sourced (canon budget, SLO, metrics, pricing page) or labeled an assumption with a falsifier. An order-of-magnitude napkin (±3x, labeled) beats no napkin; an invented exact number is worse than either.
+**Number honesty.** Use napkin math when a number can change the design or verdict; fake precision and decorative estimates are banned. Every figure is sourced or labeled an assumption with a falsifier. A labeled order-of-magnitude estimate beats an invented exact number.
 
 ---
 
@@ -54,7 +54,7 @@ Review across these, using the sibling format — for each: **verdict** (Pass / 
 - **Workload Decomposition:** Are access classes separated and independently served, or monolith-served through one primitive?
 - **Primitive Fit:** Per class — right primitive, right layer, right access pattern? Name the swap that beats the current choice, or state none does.
 - **The Triangle Check:** For every perf/scale/cost tradeoff the spec accepts — is it physics (consistency, durability, distance, retention) or a primitive mismatch wearing a tradeoff costume?
-- **Bounds & Budgets:** Every key space, scan, fanout, queue, and payload carries a stated bound; napkin math at target scale AND at 10x. Root §9's kill-tests bind — load spike/backpressure and cost curve at scale; a failed kill-test disqualifies the design, it is never a footnote. Budgets cite the repo canon or are labeled assumptions.
+- **Bounds & Budgets:** Every material key space, scan, fanout, queue, and payload carries a stated bound; compute target scale and a justified stress factor only where it changes primitive fit. Root §9 kill-tests bind; budgets cite repo truth or are labeled assumptions.
 - **Hot-Path Economics:** On ≥1M-class paths, name the per-message cost drivers (RTTs, command cardinality, parse/stringify, allocations, per-op billing) — every one is a multiplier, and at scale the multiplier is the whole budget.
 - **Failure & Degradation Economics:** What does this design cost during partial failure and spikes? Retry storms multiply spend exactly when the system is weakest; backpressure and shed paths named; presence-shaped surfaces degrade fidelity before existence (canon doctrine); 3am debuggability has a cost line too (root §9).
 - **Simplicity Dividend:** Is the fast-cheap-scalable shape also the simplest one? It usually is — fewer moving parts. If the proposal adds infrastructure, what does it delete? One clear path (root §9); a second serving model is a split brain with a monthly bill.
@@ -73,4 +73,4 @@ A pair-page social fragment read on every visit. Served from the durable KV: slo
 - **Top 3 required changes before implementation** — each with its napkin number
 - **Biggest remaining risk if we proceed** — with its cost or latency figure where estimable
 
-**The outcome is recorded, not re-litigated:** accepted changes land through the owning skills; measurement demands route to `$eval__design-proof-gates` as measurement-first gates; the recommendation, plus each rejected concern with one line of why, gets a decision-log entry in the spec's A2 — so later sessions inherit the challenge instead of re-running it.
+**The outcome is recorded, not re-litigated:** accepted binding decisions land through the owning work-spec skill. Measurement needs route to `$eval__design-proof-gates` only when durable proof coordination is warranted. Record rejected concerns only when their rationale prevents likely rework; do not preserve the full review.

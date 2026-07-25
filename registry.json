@@ -101,7 +101,7 @@
     },
     {
       "name": "code__crafting-dev-ux",
-      "description": "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as root §6's AUDIT lens when a lane shipped or changed dev-facing surfaces.",
+      "description": "Designs developer-facing APIs, SDKs, config, errors, events, and CLIs for the pit of success. Runs as a terminal audit overlay only when the user requests it or a specific material consuming-developer blind spot warrants it; otherwise design depth scales with the public-contract change.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -114,7 +114,7 @@
     },
     {
       "name": "code__enforcing-principles",
-      "description": "The change protocol for concrete repo edits — risk classification (C-tags) that generates proof obligations, risk-boundary naming, contract-ownership vocabulary, failure pre-mortems, and migration/observability discipline; feeds the work spec and eval plan rather than replacing them. Triggers on any concrete code change, before design or implementation; sizing a diff's proof obligations; retries, schema/contract changes, migrations, rollouts. Not for abstract discussion with no proposed repo edit.",
+      "description": "Frames material contract, state, security, hot-path, migration, dependency, and operational risk for concrete repo changes. Trigger: use when one of those non-local risks is present or uncertain; skip routine local edits, obvious quick fixes, and abstract discussion.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -127,7 +127,7 @@
     },
     {
       "name": "code__fixing-bugs",
-      "description": "Bug-fixing protocol — turns a defect into an executable journey contract: failing reproduction at the real port (watched-red), evidence-led fault localization, minimal fix, durable guardrails. Triggers on any defect, regression, or failure report; flaky/heisenbug hunts; replay or kernel divergence; before patching production code for a bug.",
+      "description": "Fixes defects through the escaped user or system boundary, using the cheapest faithful reproduction that is feasible and a focused post-fix check. Trigger: confirmed defects, regressions, flaky/heisenbug hunts, or replay/kernel divergence; not speculative hardening or new behavior.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -301,14 +301,13 @@
     },
     {
       "name": "eval__design-proof-gates",
-      "description": "Designs falsifiable proof gates and the durable eval-plan.md — decomposes an unlock into required truths and the gates that could prove each one false. Triggers on before implementation on any substantial lane; \"how do we know this works\" / \"what should we test\"; any perf, realtime, or scale claim; speccing missing harnesses.",
+      "description": "Designs the smallest sufficient set of falsifiable proof gates and owns a warranted eval-plan.md. Trigger: multiple gates, actors, environments, sessions, or a missing harness require durable coordination; decline when one inline check is enough.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
-        "references/eval-plan-template.md",
         "references/gold-standard-proof-gate-examples.md"
       ],
       "path": ".agents/skills/eval__design-proof-gates",
@@ -316,7 +315,7 @@
     },
     {
       "name": "eval__implement-proof-gate",
-      "description": "Builds the missing runnable harness for an approved gate card, runs it, and writes the state transition (Red captured / Objectively Green / Blocked) — proof only, never product behavior. Triggers on a gate's loop says \"missing harness\"; a gate needs a literal runnable command before product code proceeds; an existing harness is marked defective.",
+      "description": "Builds and runs a missing proof harness explicitly warranted by a current eval card, then records the honest gate result without changing product behavior. Trigger: a current eval plan names a concrete missing harness need and envelope, or an existing required instrument is Defective.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -690,7 +689,7 @@
     },
     {
       "name": "handoff__final-quality-gate",
-      "description": "Clean-context ship/no-ship audit before a lane claims Complete — verifies the proof system: gates terminal, artifacts fresh, terminal value shown, lenses clean, docs synced, deltas accepted. Triggers on before claiming feature completion, lane or milestone closure, release readiness, or final handoff.",
+      "description": "Optional clean-context ship/no-ship judgment for a high-regret lane — verifies the current product boundary, terminal user value, warranted evidence, and human acceptance without becoming part of every lane.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -703,7 +702,7 @@
     },
     {
       "name": "ops__maintain-incident-postmortem",
-      "description": "Authors or updates the durable incident postmortem — preserves a hard diagnosis: ruled-out hypotheses, misleading signals, proven mechanism, fast-path discriminator. Triggers only when the diagnosis itself was the work (multi-hypothesis hunt, misleading symptoms, cross-lane evidence); routine bugs return not-owed. Also triggers on signficant corrective-action updates and closure.",
+      "description": "Authors or updates a durable incident postmortem preserving ruled-out hypotheses, misleading signals, proven mechanism, and the fast-path discriminator. Triggers when the user explicitly requests one or the diagnosis would be materially expensive or dangerous to re-derive; routine bugs return not warranted.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -745,7 +744,7 @@
     },
     {
       "name": "plan__maintain-work-spec",
-      "description": "Creates or updates the durable Work Spec — a lane's judgment state: unlock, contracts, milestone rungs, decisions, and proven-vs-claimed status. Triggers on defining, approving, or resuming substantial work; any rung or status change; any decision, invariant, or eval result that must outlive the session; also triggers for substantial work that does not yet have a  work spec.",
+      "description": "Creates and updates the durable product map for a substantial lane: the request, vFinal North Star, observable contracts, vertical-slice ladder, active rung, and current motion. Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or human decision.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -758,7 +757,7 @@
     },
     {
       "name": "plan__prepare-goal",
-      "description": "Lane launch — turns a grounded work spec into rung-by-rung implementation with full motion approval, gate-first proof, between-rung audit lenses, and a hard stop at the first human boundary. Triggers: invoked to launch or resume implementation of a work spec, after `$plan__prepare-summary`",
+      "description": "Builds an approved work spec's active vertical slice and continues toward vFinal while adapting implementation details to repo/runtime truth. Trigger: the user asks to begin, continue, resume, or finish a substantial lane whose product spine and active rung are clear.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -771,7 +770,7 @@
     },
     {
       "name": "plan__prepare-summary",
-      "description": "Lane pre-flight — re-derives the spec's goal, unlocks, and concrete Done from rung bodies before any code, catching wrong-thing builds and projection drift; ends in a Grounded/Spec-gap launch verdict.  Triggers when opening or resuming any lane, before the first rung executes; as the required goal block for `$plan__implement-work-spec`; after compaction or handoff when a lane needs re-grounding.",
+      "description": "Reconstructs a substantial lane's vFinal journey, required intake, active vertical slice, and next action from its canonical work spec. Trigger: explicit status/summary requests, cold handoffs after context loss, or genuine uncertainty about what to build next; not a mandatory launch step.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -784,7 +783,7 @@
     },
     {
       "name": "plan__question-spec",
-      "description": "Adversarial pre-implementation review of a drafted work spec — challenges whether it is the correct, simplest, highest-value shape for the intended user journey or engineering unlock, benchmarked against the best domain references.  Triggers after the work spec and eval plan are drafted, before the first rung executes; after any material spec restructuring; when a lane feels mis-shaped mid-flight.",
+      "description": "Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices. Trigger: explicit request for adversarial review, or a concrete product mismatch, proxy substitution, or high-regret ambiguity found during cold-context recovery; never an automatic pre-implementation audit.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -797,7 +796,7 @@
     },
     {
       "name": "plan__question-spec-architecture",
-      "description": "Adversarial architecture review that challenges whether proposed moving parts should exist; every queue, worker, service, datastore, cache, protocol, or async status model must name the forcing requirement before the design simplifies. Triggers before finalizing architecture, medium/large feature design, or multi-step protocols; when a design adds components or invokes scale, decoupling, resilience, future-proofing, or multiple diverging states.",
+      "description": "Adversarial architecture review run when explicitly requested or when a specific high-regret moving-parts blind spot warrants clean-context judgment; challenges whether queues, workers, services, datastores, caches, protocols, or async state are forced without becoming automatic spec ceremony.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -810,7 +809,7 @@
     },
     {
       "name": "plan__question-spec-infra",
-      "description": "Adversarial infra review of a drafted work spec — challenges whether the design is simultaneously performant, scalable, and cheap by checking workload decomposition and primitive fit; refuses the pick-two triangle unless the tradeoff is physics. Triggers after the spec and eval plan are drafted, for any lane with meaningful infra surface; before admitting any new cache, queue, table, index, or service; when a running lane's infra smells slow or expensive.",
+      "description": "Adversarial infra review of a drafted work spec, run only when explicitly requested or when a specific material performance/scale/cost blind spot warrants clean-context judgment; challenges workload decomposition and primitive fit without becoming an automatic spec-stage audit.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -949,7 +948,7 @@
     },
     {
       "name": "testing__auditing",
-      "description": "Audits automated test suites for what they prove, not what they run — a full guarantee inventory and oracle inventory are built before reading a single test, then every guarantee is mapped to evidence, risk-weighted, and graded. Triggers on \"audit tests\", \"review tests\", \"test coverage\", \"are these tests enough\", \"test quality\"; any PR or feature whose tests seem suspiciously few for the scope of change; between milestone rungs on lanes with behavior changes.",
+      "description": "Audits automated suites for risk-weighted confidence, weak oracles, fidelity gaps, and redundant test debt. Runs as a narrow overlay only for a named material blind spot, or as a full standalone suite audit only when explicitly requested; read-only, not test authoring.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -962,13 +961,15 @@
     },
     {
       "name": "testing__enforcing-mandate",
-      "description": "Outcome-driven test strategy — given a change, decides what proof at what seam at what size protects the user or system value path, at the cheapest credible cost; the strategy front-end the triad's gates and bug-repros execute against.  Triggers when writing code or tests, planning test strategy, proving a user journey, choosing a test seam or size, adding browser/journey evals, or guarding a critical path.",
+      "description": "Chooses whether proof is needed, then the cheapest credible seam and size that protects the user or system value path without redundant test debt. Triggers when writing or changing tests, planning proof, choosing browser/integration/unit seams, reproducing a defect, or guarding a critical path.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
       ],
       "path": ".agents/skills/testing__enforcing-mandate",
       "entry": "SKILL.md"

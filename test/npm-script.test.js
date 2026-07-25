@@ -37,8 +37,8 @@ test("npm run eval accepts a positional skill name without requiring --", () => 
   assert.equal(commandResult.status, 0, commandResult.stderr);
   assert.match(commandResult.stdout, /Starting Eval testing__enforcing-mandate/i);
   assert.match(commandResult.stdout, /Preparing Eval testing__enforcing-mandate/i);
-  assert.match(commandResult.stdout, /0\/6/i);
-  assert.match(commandResult.stdout, /6\/6 mock:skill-aware .*trial-3 .*treatment/i);
+  assert.match(commandResult.stdout, /0\/\d+ queued/i);
+  assert.match(commandResult.stdout, /\d+\/\d+ mock:skill-aware .*trial-3 .*treatment/i);
   assert.match(commandResult.stdout, /Summary/i);
   assert.match(commandResult.stdout, /summary via:\s+mock:skill-aware/i);
   assert.match(commandResult.stdout, /Inspect/i);

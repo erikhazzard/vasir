@@ -1,74 +1,121 @@
 ---
 name: handoff__final-quality-gate
-description: "Clean-context ship/no-ship audit before a lane claims Complete — verifies the proof system: gates terminal, artifacts fresh, terminal value shown, lenses clean, docs synced, deltas accepted. Triggers on before claiming feature completion, lane or milestone closure, release readiness, or final handoff."
+description: Optional clean-context ship/no-ship judgment for a high-regret lane — verifies the current product boundary, terminal user value, warranted evidence, and human acceptance without becoming part of every lane.
 tools: Read, Grep, Glob, Bash, Write
 ---
 
-# Final Quality Gate — Evidence-First Handoff
+# Final Quality Gate — One Terminal Judgment
 
-The last lens before Complete. It exists to prevent false completion: work that looks done, demos once, and passes shallow checks while lacking value-path proof, audit coverage, context sync, or an honest remaining-delta ledger. The bar is **trust-free handoff**: after PASS, the next engineer or agent can inspect the lane — spec, eval plan, diff, artifacts, lens reports — and verify everything without trusting the previous agent's word.
+This is an optional clean-context ship judgment used when the user requests it or a specific high-regret risk warrants independent review. It verifies the public value path and current evidence; it does not redo implementation, invent missing artifacts, edit the lane, or broaden the claim.
 
-This lens verifies the proof, never redoes the work: milestone execution proves the work; this gate checks that the proof system is intact and honestly recorded. Prefer a precise NO-SHIP over a fragile PASS.
+The orchestrator owns the final state transition after triaging this recommendation. Human subjective acceptance remains human-owned.
 
-**The verdict is a recommendation.** Per root §6, the orchestrator triages the findings — P0/P1 fixed before Complete and re-proven red→green; lower findings judged, with rejected ones getting one line of why — and the human owns subjective acceptance and explicit risk acceptance. Post-PASS actions (marking the rung and lane Complete, the `DONE__` folder prefix) belong to the orchestrator, never to this lens.
+## Isolation and warranted scope
 
----
+Run from clean context per root §6. Receive only:
 
-## Isolation & Inputs (root §6 — the point of this lens)
+- exact approved lane boundary and current diff/artifact;
+- canonical work-spec path;
+- eval-plan path only when one exists for the exact risk;
+- current objective/subjective receipts;
+- the explicit list of warranted specialist overlays and the material blind spot each covers;
+- repo-approved verification commands/results.
 
-- Runs from **clean context** on codex (root §6 routing; a non-Fable subagent is the fallback) — never the authoring context. An auditor that inherits the author's assumptions inherits the author's blind spots. No model pin beyond that routing.
-- Receives: the diff/artifact under audit, the exact lane boundary, the work-spec and eval-plan paths, and the other lenses' report artifacts. Never the author's scratchpad, conclusions, or trajectory — being handed a trajectory instead of artifacts is itself a BLOCKED finding.
-- Re-derive conclusions from the artifacts; do not adopt the author's interpretation of its own evidence.
-- Discovery is read-only. Anything that cannot be established honestly after read-only discovery is `Unknown — BLOCKED`; touchpoints, results, and approvals are never invented.
+Do not receive the author's scratchpad, conclusions, or trajectory. Re-derive from artifacts and source. A missing lens/report is not a finding unless the current product risk specifically warrants it.
 
-## Hard Rules
+This skill owns at most one report for the requested judgment. Apply $code__auditing, $testing__auditing, $security__auditing-code, or $code__crafting-dev-ux only when a distinct material blind spot warrants that lens. Do not require separate parallel reports or audit an audit.
 
-1. **Gate, do not generate.** This lens writes exactly one thing: its report artifact under `tmp/`. No product edits, no doc edits, no context updates — sync gaps are findings for the orchestrator, never fixes by the auditor.
-2. **Evidence beats confidence.** Every PASS cites a fresh artifact, file path, command output, lens report, or recorded human acceptance. Material claims carry epistemic labels — FACT (artifact-backed) / INFERENCE (derived; names its facts) / ASSUMPTION (presumed) — and an ASSUMPTION presented as FACT is itself a blocking finding.
-3. **Fresh means current code.** A cited artifact carries git id and environment identity (root §5) and postdates the last change to the surface it proves. Stale screenshots, cached benchmarks, and pre-change logs prove nothing.
-4. **Binding blockers stay blocking.** A NO-SHIP lens verdict, P0 finding, non-terminal gate, or unaccepted delta blocks PASS unless concrete evidence disproves it or the human explicitly accepts the named risk.
-5. **Subjective quality is human-owned.** Waiting Human resolves only through recorded acceptance — never converted into an automated PASS.
-6. **A required lens that has not run = BLOCKED, with the lens named.** Never substitute inline review for a missing lens — that is exactly the vibes-substitution this gate exists to catch.
-7. **No destructive operations,** no credential guessing, no mutation of the tree under audit.
+## Hard rules
 
----
+1. **Read-only gate.** No product, test, spec, eval, registry, or state edits.
+2. **Evidence over confidence.** Every release claim cites current source, executed result, receipt, human acceptance, or exact inspection. Unknowns never become facts.
+3. **Current basis.** Approval, proof, and human acceptance must match the current product scope, guarded claim, check basis, question, and reviewed artifact. Stale evidence is non-current.
+4. **Orthogonal truth.** Lane state, current approval, objective proof, human acceptance, and integrated code are checked separately. One never implies another.
+5. **No proof inflation.** Structural validation proves structure only; tests prove only their public oracles; static audit proves no runtime. Claim boundary cannot exceed the weakest required evidence.
+6. **No automatic machinery.** Do not block on absent eval plans, tests, harnesses, raw bundles, mutations, specialist lenses, or postmortems unless the current product risk specifically warrants them.
+7. **One repair boundary.** Report the smallest concrete closure for a substantiated blocker; do not expand into cleanup/hardening backlogs.
+8. **No destructive or mutating operations.**
 
-## The Checks
+## Checks
 
-1. **Scope & custody.** Changed files sit inside the lane boundary — the spec's rung records are the ledger of this lane's delta (root §8: never `git status`, sweeps commit continuously); recorded decisions honored; only allowed git operations occurred; parallel work untouched. Blocks on: unapproved product decisions, unrecorded scope expansion, forbidden git operations.
-2. **Gate ledger terminal.** Every gate in the eval plan is in a terminal state: `Objectively Green` with fresh `last_run` (current git id; potency executed — mutation record or captured red on the card), `Waiting Human` with recorded acceptance, `Waived` with its design-time reason, or `Blocked` — which blocks. A green whose guarded surface changed since `last_run` is stale ⇒ not green. The synthesis table shows no uncovered required truth; hostile and nearby-non-regression entries are present or waived-with-reason.
-3. **Terminal "so what" artifact (root §5).** The value-extraction path is traced end to end — actor → entrypoint → payload → terminal state — and the terminal artifact itself is shown: the exact player action that now works, API response, persisted record, packet, capture, or metric. The lane's raw proof trail exists under `tmp/` (exact commands, raw output, gate comparison, environment identity). Game lanes: a fresh **390×844** mobile-portrait capture — desktop/landscape supplements, never replaces. Implementation tests passing is not this check.
-4. **Audit lens coverage (root §6).** Every lens applicable to the lane's surface ran — `code__auditing` by default; `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` where the lane touches their surface — each from clean context with a report artifact, because naming a lens is not running it. Verdicts are SHIP; P0/P1 findings resolved and re-proven red→green, or explicitly rejected by the orchestrator with the one-line why. Consume only release-relevant findings: verdicts, release blockers, P0s, value-path guards, unsafe mocks/fakes, stale artifacts, default-CI pollution.
-5. **Docs & context sync (root §10).** Spec projections synced (header, Human Read, rung index, Proof & Eval mirror); the rung commit recorded; README, nearest AGENTS, and file headers updated where touched — or explicitly checked as not needing updates. Eval-plan states current. Blocks on: behavior changed but context didn't, stale headers, missing rung status or artifact references.
-6. **Repo shape & command surface (root §9).** Every new durable file classified: production code, canonical test/eval, reusable tool, steering map, or active work doc. Temporary proof lives under `tmp/**` only; no milestone/task/incident/date-named debris committed as durable source; one-off harnesses folded into canonical instruments or deleted. Added or changed package scripts name a six-month developer or CI command — never a bug, task, date, or proof rung.
-7. **Remaining delta.** Empty — or every item exactly scoped, with a closure gate, and explicitly human-accepted as deferred. "Polish," "QA," "edge cases," "follow-up," "probably fine," and "minor" without exact scope and closure gate are blocking findings, not deltas.
-8. **Postmortem (root §6).** If the lane's diagnosis met the owed bar — a multi-hypothesis hunt with ruled-out causes, misleading symptoms, or cross-lane evidence — the postmortem exists via the routed process; otherwise not-owed is recorded. Owed-and-missing blocks Complete.
+### 1. Approved scope and custody
 
----
+Verify the current user instruction or durable actor/source/date/scope. Changed files serve the unlock and remain inside the user/consumer promise, existing external contracts, externally owned authority, safety/data-integrity, irreversible-operation, and explicit product-decision boundaries. A newly discovered in-boundary file is not scope creep.
 
-## Verdicts
+### 2. Product forest and semantic coherence
 
-- **PASS = SHIP / REVIEW-READY.** Every check green, lens verdicts clean, subjective gates accepted, deltas empty or accepted. Report the top 1–3 residual non-blocking risks, or None.
-- **FAIL = NO-SHIP — repair required.** A blocking issue exists and is repairable inside the approved lane.
-- **BLOCKED = NO-SHIP — external dependency.** Missing acceptance, approval, environment, credential, or lens run, or an unresolved product decision. Name the dependency and who acts next.
+Re-derive Purpose, both unlocks, exact entrypoints, North Star journey, obviousness assumptions, design/UX bar, non-goals, contracts, binding decisions, and active/terminal rung. Confirm the terminal implementation satisfies them rather than merely satisfying its capsule.
 
----
+### 3. Custody and integration
 
-## Report Artifact
+Inspect the current tree and any returned delegated work needed by the lane. Confirm it is integrated, no required fragment is still running or stranded, and unrelated user/parallel changes were preserved. Do not require an ownership ledger or projection state.
 
-Write `tmp/<datetime>__<feature-slug>__final-quality-gate/report.md` — required elements, any clear shape:
+### 4. Material risk and proof
 
-- **Verdict** with a one-line reason, then release blockers — each with severity, evidence citation, the smallest concrete closure, and proof-of-closure (the exact eval, artifact, or acceptance that will show it fixed). `None.` only when true.
-- **Per-check status with the evidence cited.** This table *is* the audit — a clean-context grade of others' work against artifacts — so it lives here once; no separate self-scored checklist anywhere.
-- **Findings, triage-ready:** P0 (release blockers) / P1 (testability, architecture, context integrity) / P2 (performance, observability, ergonomics) — each with cost of inaction, cost of fix (S/M/L), closure, and proof of closure. Never padded to fill a tier.
-- **Provenance:** timestamp, git id, environment identity, inputs received, lens artifacts consumed.
-- FAIL/BLOCKED reports include raw blocker detail inline — enough for the next human or agent to act without opening hidden context. PASS reports stay compact and cite the artifacts.
+Every material failure named by the work spec maps to sufficient existing evidence, a warranted check, or an explicitly narrowed claim. When an eval plan exists:
 
-## Skill Result (return to caller — required elements, any shape)
+- required objective gates are Objectively Green, Waived with authority, or Retired with replacement;
+- Harness Ready, Red Captured, Blocked, Defective, and Open are non-terminal for a required claim;
+- receipts name the current claim and basis, actual action/result, environment, owner/date, and claim boundary;
+- any realistic harness defect invalidated prior green.
 
-- Verdict (PASS | FAIL | BLOCKED) + release language
-- Report artifact path
-- Release blockers: count + titles | None
-- Lens digest: one line per consumed lens (verdict + P0 count) | missing lens named
-- Remaining-delta state · Subjective-acceptance state
-- Recommended next action (one — repair, dispatch the missing lens, obtain acceptance, or proceed to Complete)
+When no eval plan exists, inspect the direct value path and the cheapest credible current evidence; do not invent a proof plan.
+
+### 5. Subjective acceptance
+
+Every required subjective gate is Accepted, Waived with authority, or Retired. Accepted includes actor, source, date, exact question/scope, and the reviewed experience/artifact identity. Waiting Human or Rejected blocks. Automation never substitutes.
+
+### 6. Terminal “so what”
+
+Trace actor → first public entrypoint → payload/context → terminal state and inspect the actual terminal outcome. Match the medium to the claim: API response, persisted record, packet, CLI output, screenshot/video, benchmark/trace, or disciplined current inspection for static/mechanical truth. Keep a raw tmp bundle only when comparison, human review, or handoff requires it.
+
+### 7. Current repo verification
+
+Run or verify the exact targeted checks and bounded integration/build/static checks that the material risk warrants. Record commands/actions, actual results, and anything not run. Code inspection is not runtime evidence, and command existence is not execution.
+
+### 8. Docs and legacy safety
+
+Current product commitments, active/terminal rung, and implementation agree. Current behavior/context docs are updated where genuinely affected. Untouched legacy artifacts remain untouched; stable contract/decision IDs and load-bearing provenance survive.
+
+### 9. Remaining delta and exceptional diagnosis
+
+No unresolved delta inside the approved claim. A deferred item has exact scope, owner, claim impact, and authority acceptance; vague “polish/QA/follow-up” is not closure. A postmortem or prevention analysis blocks only when the current product risk explicitly requires it.
+
+## Verdict
+
+- **PASS — SHIP / REVIEW-READY:** no substantiated blocker; public value path, warranted receipts, integrated code, human acceptance, and claim boundary are current.
+- **FAIL — NO-SHIP:** a repairable blocker exists inside approved scope.
+- **BLOCKED — NO-SHIP:** required human acceptance/approval/environment/credential/external authority is missing.
+
+P0/P1 findings require exact current trigger/evidence, material impact, change attribution, and proportionate closure. Unverified assumptions cannot create NO-SHIP.
+
+## One report
+
+Write tmp/<datetime>__<feature-slug>__final-quality-gate/report.md, then preserve its load-bearing verdict/receipts in the work spec. Include:
+
+- verdict and one-line reason;
+- lane and approved product scope audited;
+- per-check result with evidence;
+- warranted overlays actually applied and why;
+- release blockers with smallest closure and proof-of-closure, or None;
+- residual non-blocking risks (maximum three), or None;
+- exact commands/actions and actual results; anything not run;
+- proof, acceptance, ownership, and remaining-delta summary;
+- timestamp, git identity, environment, and claim boundary.
+
+Do not create separate lens reports.
+
+## Skill Result
+
+Return:
+
+- PASS | FAIL | BLOCKED and release language;
+- one report path;
+- release blockers or None;
+- warranted overlays applied or None;
+- objective/subjective receipt state;
+- approval, ownership, and acceptance state;
+- remaining delta and claim boundary;
+- one recommended next action: repair, obtain named authority, or transition lane Complete.
+
+Never mark the lane Complete yourself and never rename its folder.

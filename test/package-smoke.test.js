@@ -88,7 +88,6 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.match(helpResult.stdout, /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(helpResult.stdout, /vasir eval rescore <skill> \[run-id\] \[--json\]/);
   assert.match(helpResult.stdout, /vasir add all/i);
-
   const versionResult = runCommand(binaryPath, ["--version"], packDirectory);
   assert.equal(versionResult.status, 0, versionResult.stderr);
   assert.equal(versionResult.stdout.trim(), "vasir 0.1.0");

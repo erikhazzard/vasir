@@ -4096,12 +4096,12 @@ async function runSelectedCommand({
 
   if (
     projectRootArgument !== null &&
-    !["status", "context", "doctor", "repair", "diff", "init", "update", "add", "adopt", "remove", "agents", "eval"].includes(commandName)
+    !["status", "context", "doctor", "repair", "diff", "init", "update", "add", "adopt", "remove", "agents", "work", "eval"].includes(commandName)
   ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
       message: "--repo-root is only supported by repo-bound commands.",
-      suggestion: "Use `--repo-root <path>` with `vasir status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `add`, `adopt`, `remove`, `agents`, or `eval`.",
+      suggestion: "Use `--repo-root <path>` with `vasir status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `add`, `adopt`, `remove`, `agents`, `work`, or `eval`.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }

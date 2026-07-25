@@ -1,248 +1,262 @@
 ---
 name: eval__design-proof-gates
-description: Designs falsifiable proof gates and the durable eval-plan.md — decomposes an unlock into required truths and the gates that could prove each one false. Triggers on before implementation on any substantial lane; "how do we know this works" / "what should we test"; any perf, realtime, or scale claim; speccing missing harnesses.
+description: >-
+  Designs the smallest sufficient set of falsifiable proof gates and owns a warranted eval-plan.md.
+  Trigger: multiple gates, actors, environments, sessions, or a missing harness require durable coordination; decline when one inline check is enough.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
 # Eval Plan — Proof-Gate Design
 
-One question, answered before implementation proceeds:
+This skill answers one question:
 
-> What would make us honestly admit that the declared unlock does — or does not — work in the environment that matters?
+> What is the smallest credible evidence that can falsify the declared unlock in the environment that matters?
 
-This skill designs falsifiable proof contracts, not comforting test strategies. **Prime rule:** a gate that cannot falsify the value claim in the environment that matters is not a proof gate — move it closer to the value path, spec the missing harness, require an artifact-backed human gate, or mark it blocked. Design only: this skill never executes proof, never claims a pass, never pretends a harness exists, and never converts subjective product judgment into fake automation.
+It designs proof contracts. It never executes proof, claims green, invents a harness, accepts subjective quality, grants approval, or creates an eval plan merely because a lane is Substantial.
 
-**Ownership boundary.** This skill creates or updates exactly one artifact: `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md`. The **eval plan owns proof mechanics** — gate design, harnesses, thresholds, adequacy, gate state. The **work spec owns lane truth** — scope, contracts, rung state, surviving result summaries. The spec mirrors gate state in its Proof & Eval Summary; divergence resolves toward the eval plan for gate state and mechanics, toward the spec for scope. This skill never edits the work spec — sync needs return in the Skill Result. Routing to siblings: missing runnable harness → `$eval__implement-proof-gate`; final feature handoff → `$handoff__final-quality-gate`; post-code implementation audit → `$code__auditing`.
+## Ownership and warrant
 
-**Routing.** Gate design is judgment work — orchestrator tier per root §7; gate *verdicts* after runs are too. No model pin: the caller's routing law decides. Executors who later run gates update state and last-run identity in the plan under its own conventions block.
+Root §5 owns proportional proof. This skill decides whether proof coordination genuinely needs a durable eval plan. An eval plan is warranted when one or more of these are materially true:
 
----
+- several gates must remain coherent across rungs;
+- multiple actors, environments, or same-run observers must be coordinated;
+- gate state/receipts must survive several sessions;
+- objective and subjective receipts must remain coordinated across sessions;
+- a missing harness needs a durable implementation contract;
+- a critical proof basis can go stale independently of work state.
 
-## Schema Authority
+If existing evidence or one inline check is sufficient, return No eval plan warranted and create nothing.
 
-- **This file is the only schema truth** for `eval-plan.md`. `references/gold-standard-proof-gate-examples.md` calibrates *specificity* — the concreteness bar for setup, action, verdict, artifact, and same-run correlation — never structure, IDs, thresholds, commands, paths, or domain nouns. Structural divergence means the reference is the bug; do not copy its shape.
-- Load the reference before designing or materially updating gates; skip it for mechanical or status-only edits.
-- Stale plans are synced, not versioned (root §1): the first lane that materially touches one conforms it to the current template. Gate IDs are never renumbered.
+When warranted, this skill alone owns docs/work/<semantic-folders>/<feature-slug>/eval-plan.md: gate synthesis, mechanics, current proof basis, receipts, objective/subjective gate state, and harness inventory. The work spec owns lane scope and keeps only the surviving claim boundary and conclusion; it does not mirror gate state.
 
----
+Creating a gate does not automatically justify a new harness, durable test, raw bundle, critical falsifier, audit overlay, or product instrumentation. Each exists only when the card's specific material risk cannot be handled more simply. `$eval__implement-proof-gate` owns a warranted missing harness; `$testing__enforcing-mandate` owns durable-test judgment.
 
-## Design Laws
+## Sole schema authority
 
-Root §5 binds in full — fresh artifacts, real loop over proxies, hostile-path bias, nearby non-regression, watched-red potency, blind spots, check-existing-instruments — and is never restated as local rules. Each law below is the *design-time mechanism* this skill adds on top:
+This file is the only eval-plan schema truth. Shipped references may calibrate specificity only when explicitly labeled non-authoritative; they may not say “use this template” or define another state/ID/section model.
 
-1. **Falsifiable anatomy.** A gate is valid only if it binds all of: **Claim / Setup / Action / Observation / Verdict / Authority** (the target environment where value actually matters) **/ Artifact / Stop condition**. Any missing element = incomplete gate. Prefer one strong value-path gate over many implementation-trivia units. The gate doubles as the development feedback loop — rerunnable cheaply against the real surface after each repair; if the only available proof is a proxy, name the missing real loop as a missing harness.
-2. **Derive, don't pattern-match.** Decompose the unlock into required truths (workflow step 3); generate candidate classes from the menu; select the smallest sufficient set. Every included gate names the **plausible lie** it kills — if it cannot catch a plausible way the value breaks, cut it. Every excluded *obvious* class (security, persistence, perf, visual, network, replay, failure) records its exclusion reason. The synthesis table is **durable** — it lives in the plan, not in chat, because it is the record of why these gates and not others.
-3. **Potency is designed in.** Every objective gate names how it will be shown to fail *for the right reason*: `watched-red` when changing existing behavior (capture the red against unfixed code — that red exists only before the fix lands); `mutation: <what to hand-break>` for new behavior (the break must turn exactly this gate red). A red that only proves API absence proves nothing about behavior.
-4. **Name the blind spot.** Every gate records what its instrument cannot see; the proof stack names the axes no gate in the plan moves. A probe that never moves an axis will "prove" designs that fail on that axis.
-5. **Compound value = same-run proof.** When the claim needs several truths concurrently (load + realtime sync + rendered experience), design one orchestrated gate: one coordinator, every actor and observer correlated under one run ID, pass only if all required observers pass in the same steady-state window. Disconnected checks that pass independently while the journey fails are the classic lie.
-6. **Subjective quality gets human acceptance.** Feel, taste, fun, trust, readability, motion comfort: artifact-backed, one specific acceptance question, an explicit acceptance boundary. Automation supplies evidence and proves the artifact is technically healthy; it never accepts. The gate sits Waiting Human — never auto-claimed, never bundled into completion (root §4).
-7. **Hostile + nearby, operationalized.** Non-trivial behavior change: at least one hostile gate or a recorded waiver-with-reason in the plan; one nearby behavior named with status `tested | inspected | inferred | left unverified` plus the risk when unverified.
-8. **IDs are namespaced, append-only.** `<FEATURE-SLUG>__GLOBAL-G1`, `<FEATURE-SLUG>__M2__G1`, `<FEATURE-SLUG>__M1__S1`, `<SLUG>__CHANGE-G1` — spec-less quick changes mint a semantic slug. Never a naked `M1-G1`, `CHANGE-G1`, or `Phase 2`, in any file. Retire with a pointer; never renumber.
-9. **Stop conditions are exact.** Allowed: repair once from the trace, then circuit-break on repeated similar failure (root §7) · invoke `$eval__implement-proof-gate` before product code · halt for missing credential/environment · halt for Waiting Human acceptance · halt and report the boundary when scope or targets changed, or when the value path cannot be proven deterministically inside the lane (root §3, §5 — record the exception in the plan, never absorb it silently). Forbidden: "Investigate", "Fix tests", "Manual QA", "Check that it works", or any next action without a who/what.
-10. **Design ≠ execution.** Discovery is read-only: inspect scripts, task runners, tests, harnesses, docs; no installs, no services, no snapshot updates, no proof runs. Confirming a command *exists* never claims it proves current behavior. No invented scripts, routes, fixtures, env vars, or paths — undiscovered means `missing harness: <name>`. Thresholds carry a source (spec `C-###`, repo config, benchmark history, user instruction) or an explicit assumption/blocker label — never an unsourced number as fact.
-11. **Repo physics** (applies where the lane touches the surface; silence elsewhere — no N/A marking).
-    - **Browser gates name their instrument.** "Browser proof" is never abstract: the `loop` names the concrete driver and invocation — a Playwright project, a headless-Chromium script, an existing capture harness — whatever discovery actually finds (Law 10). When speccing a *missing* browser harness, default to Playwright unless an existing instrument already covers the surface — the `extends` field decides. Whichever driver: waits bind to user-visible state or exact network/frame events — an arbitrary sleep is a designed-in flake; console/page errors are zero unless the card explicitly waives them; when transport matters, assert method/path or websocket frame type plus the critical payload fields; canvas/game surfaces additionally prove nonblank, correctly framed, and interacting — "page loaded" is not proof. The `loop` may be the fast simulation harness while `authority` stays the browser: iterate cheap, prove final in the authority env (root §5).
-    - **Game lanes:** the final value path is mobile-native portrait — include a fresh **390×844** portrait gate (a viewport config on the lane's browser instrument, not a separate one); desktop/landscape artifacts may supplement, never replace.
-    - **Deterministic lanes:** replay/snapshot/restore gates assert at the restore boundary **and** a later checkpoint or final hash (root §2 — final-state-only equality hides reconverged drift).
+Legacy adoption follows root §4:
 
----
+- reading writes nothing;
+- state-only touch repairs only the affected gate and receipt;
+- material proof redesign adopts current cards for touched gates;
+- full restructure needs an unsafe active section or an approved docs lane;
+- gate IDs never renumber;
+- no schema-version marker.
 
-## Measurement-First Probes
+## Design laws
 
-Trigger vocabulary: smooth, live, fast, responsive, low latency, no jank, keeps up, converges, supports N, handles concurrency, scales, bounded fanout, queue drains, join is fast — any claim of speed, latency, smoothness, throughput, capacity, or convergence.
+1. **Material risk before gates.** For every plausible material failure, choose sufficient existing evidence, a warranted proof obligation, or an authorized narrowed claim. No material failure means no gate ceremony.
+2. **Falsifiable anatomy.** An objective gate binds Claim, plausible Lie, Setup, Action, Observation, Verdict, Authority, current Basis, Blind spot, Evidence receipt, Potency, and Stop condition. A field that does not affect the claim is omitted rather than filled ceremonially.
+3. **Smallest coherent stack.** Prefer one terminal value-path gate over several mechanism checks. A gate earns existence only if it kills a plausible lie that existing evidence cannot.
+4. **Potency follows consequence.** Defect: faithful watched-red. Refactor: existing guard or characterization where behavior is unknown. Critical invariant: realistic mutation, adversarial/property proof, or equivalent falsifier unless equivalent protection already exists. Routine behavior: a credible terminal oracle may be enough. Never manufacture an absence-red.
+5. **Same-run compound proof.** When the value requires truths concurrently, use one coordinator/run ID and pass only if every required observer passes in the same window. Disconnected greens cannot prove a compound journey.
+6. **Subjective truth stays human.** Feel, taste, trust, readability, motion, fun, and dev ergonomics use a Subjective gate only when an eval plan already needs to coordinate that decision. Acceptance records actor, source, date, exact question/scope, and reviewed artifact identity. A lone feel decision can remain directly in the work spec. Automation may prove artifact health; it never accepts.
+7. **State is basis-bound.** A green receipt names the guarded claim/contracts, exact current basis, action/command, environment, result, owner, date, and claim boundary. If the claim or basis changes materially, state returns Open. A realistic harness defect moves it to Defective and invalidates prior green until repair/rerun.
+8. **Waivers are authority acts.** Waived records authority, source, date, reason, exact scope/claim, residual risk, and expiry/revisit condition. It does not make behavior green.
+9. **IDs are namespaced and append-only.** Use <SLUG>__GLOBAL-G1, <SLUG>__M2__G1, and <SLUG>__M2__S1. Retire with replacement pointer.
+10. **No invented machinery.** Discovery is read-only. Commands, routes, fixtures, thresholds, paths, and environments come from repo truth or are labeled missing/assumed. A missing harness is a boundary, not an invitation to improvise.
+11. **Proof medium follows the failure.** Browser, packet, persistence, benchmark, replay, or human media exists only when the material failure requires that fidelity. User visibility alone selects none.
+12. **No automatic hostile or nearby gate.** Move a hostile/adjacent axis only when a plausible material failure warrants it.
+13. **Stop precisely.** Allowed stops: missing approval/environment/credential; Waiting Human; repeated similar harness defect; changed unlock/contract/authority/rollback/product boundary; or a material claim that cannot be credibly observed. New files inside an approved boundary are not stops.
 
-For these claims, design — or explicitly reject, with reason and lowered confidence — a direct programmatic probe **before** any subjective, browser, or manual acceptance:
+## Gate states and transitions
 
-- **Probe actors:** the minimal pair expressing the value path — writer/reader, sender/receiver, producer/consumer, player A/player B.
-- **Correlation:** sequence/operation/run/trace IDs, logical ticks, or timestamp discipline that matches cause to effect — never visual inference.
-- **Budget:** sourced threshold or labeled assumption/blocker (Law 10).
-- **Workload ladder:** a baseline rung plus the target-load rung minimum; intermediate rungs when the knee of the curve matters.
-- **Load shape, decomposed:** connected-idle vs. active work-producing counts, operation cadence, payload size, locality/density, churn/fault model, ramp + steady-state duration, machine/topology. A bare "N users" is not a falsifiable scale claim.
-- **Counts are not capacity.** Reaching N proves only "can open N"; capacity gates also measure behavior under load — latency, update gaps, stale age, error rate, queue depth, resource ceilings, authoritative-state correctness.
-- **Diagnostic attribution:** stage timings, queue depth, event-loop delay, resource signals — whenever the likely next action depends on knowing where time is spent.
-- **Artifact:** raw samples plus summary — never only a screenshot or prose note.
-- **Observer overhead:** if the observer materially changes the measurement, find the lower-overhead protocol/API/synthetic probe or record why none exists.
+Objective gate:
 
-Browser or manual observation of a measurable claim is classified as exactly one of: **integration observer** (proves the product path still works; the probe owns the SLO) · **subjective observer** (proves human feel; requires acceptance) · **primary measurement** (allowed only when the UI/browser is itself the boundary under test — justify why no lower-overhead probe proves the value).
+Open → Harness Ready or Red Captured → Objectively Green
 
----
+Any live objective state may become Blocked, Defective, Waived, or Retired with the required authority/evidence. Blocked returns to the prior safe state only when the named condition is evidenced. Objectively Green returns to Open when a guard/proof basis changes and to Defective when the instrument cannot distinguish the claim. Terminal Waived/Retired never silently reopen.
 
-## Gate Classes (synthesis menu, not canned tests)
+Subjective gate:
 
-| Class | Falsifies claims about | Canonical evidence |
-| --- | --- | --- |
-| Terminal value-path | the actual journey completes | final UI/API/persisted state |
-| Contract/API | request/response/event/schema semantics | status, payload, error body |
-| Persistence | survives reload, restart, retry, later query | read-after-write artifact |
-| Realtime/convergence | actors observe consistent state over time | correlated snapshots + divergence budget |
-| Orchestrated compound | several truths in the same live run | multi-observer bundle, one run ID |
-| Scale/performance | value holds under N, rate, size, duration | benchmark + error budget + resources |
-| Browser/render | user-visible state and interaction | Playwright/Chromium trace, video, screenshot, console/network |
-| Network/packet | transport, ordering, payload, timing | frame/packet capture |
-| Failure/hostile | safe behavior under bad input or failure | rejection/degrade/no-side-effect proof |
-| Security/privacy/auth | access, identity, permissions | allow/deny matrix, audit log |
-| Idempotency/retry | duplicates, replay, timeout, partial success | stable final state after repeats |
-| Migration/compatibility | old, new, mixed, malformed data coexist | fixture matrix + rollback proof |
-| Observability/operator | humans can detect healthy vs. broken | metric/log/alert evidence |
-| Subjective human | feel, taste, trust, readability | artifact + recorded acceptance |
-| Nearby non-regression | adjacent behavior unchanged | targeted proof or recorded status |
+Waiting Human → Accepted or Rejected; a named authority may Waive or Retire it with a receipt. If the question, scope, or reviewed artifact changes materially, prior Accepted is no longer current and a new Waiting Human receipt is required.
 
----
+Harness Ready means a new/intentionally changed value is absent and the instrument correctly detects that absence; it is not product potency. Red Captured is only a faithful escaped-defect reproduction. Objectively Green requires current authority-environment evidence and the declared potency. Defective is a first-class non-green state.
 
-## Gate States
+## Measurement and compound probes
 
-`Open` (designed; no fresh artifact) → `Red captured` (watched-red exists, pre-fix) → `Objectively Green` (ran in the authority environment against current code; fresh artifact + git id recorded; remaining-delta list empty — root §4) · `Waiting Human` (subjective acceptance pending) · `Blocked — harness | environment | credential` · `Waived — <reason>` · `Retired — superseded by <ID>`.
+Only when a material claim includes latency, throughput, smoothness, scale, capacity, convergence, or cost, design or explicitly decline a direct probe with:
 
-Green is a claim about a recorded run: artifact path + git id + date in `last_run`. No artifact, no green. A gate whose guarded surface has changed since `last_run` is stale — back to `Open`, not Green.
+- minimal actor pair and correlation ID;
+- sourced budget or explicit assumption;
+- baseline and target workload when a curve matters;
+- decomposed load shape (connected/active, cadence, payload, locality, churn, duration, topology);
+- value behavior under load, not connection count alone;
+- observer overhead and stage attribution when it changes the decision;
+- raw samples plus a surviving summary when later inspection or comparison requires retention.
 
----
+Browser/manual observation is primary measurement only when the UI/browser is the measured boundary; otherwise it is an integration or subjective observer.
+
+## Gate class menu
+
+Use only applicable classes: terminal value path; contract/API; persistence/restore; realtime/convergence; same-run compound; scale/performance/cost; browser/render; network/packet; failure/hostile; security/privacy/auth; idempotency/retry; migration/compatibility; observability/operator; subjective human; nearby non-regression.
+
+The menu is not a checklist.
 
 ## Workflow
 
-1. **Stabilize the claim:** work size (substantial lane vs. quick change — root §4), the unlock, the terminal proof-of-value state, work-spec path and rung IDs, target environment, whether subjective quality is part of the value. Multiple plausible unlocks that would materially change proof design = product fork: ask the one blocking question or emit a blocked design (root §3).
-2. **Discover read-only:** existing eval plan, work-spec contracts, scoped AGENTS, package/task-runner scripts, tests/evals/harnesses near the domain — including the owning QA game's instruments. Extending a shared instrument beats building bespoke (root §5); every missing-harness spec says what it extends or why nothing can.
-3. **Decompose the unlock into required truths.** Per truth: actor · boundary (where it can break: UI, client, network, server, storage, worker, tool, cache, auth, scheduler, operator) · state required · time (instant / eventual / steady-state / after restart / after reconnect / across versions) · scale · measurement (quantity, budget, window) · observer overhead · failure modes (invalid, missing, duplicate, out-of-order, delayed, partial, unavailable, malicious) · perception (must a human see/feel/trust it?) · authority (canonical evidence source) · plausible lie.
-4. **Synthesize and select** the smallest sufficient set (Law 2). Compound claims get the orchestrated gate first; supporting gates only where they isolate a high-risk dependency or make failures diagnosable.
-5. **Write gate cards** — states, loops, run policy, stop conditions, potency, blind spots.
-6. **Inventory harnesses honestly;** spec the missing ones.
-7. **Write or update `eval-plan.md`** (template below). Substantial lanes always get the durable plan. Inline-only design is allowed for a quick change with no active spec and no durable reuse expected — say why. Never create durable eval plans for truly mechanical edits.
-8. **Return the Skill Result.** The caller owns the human-facing close-out (root §5); no other response ceremony is mandated.
+1. Load root law, work spec, scoped repo law, and only the current proof artifacts that can change the decision.
+2. Re-derive the unlock, terminal truth, claim boundary, target authority environment, and plausible material failures.
+3. Decide **Plan warranted** or **No eval plan warranted**. If the latter, state the sufficient existing/inline evidence and stop without writing.
+4. Discover existing checks/harnesses read-only. Prefer reuse; record blind spots and actual fidelity.
+5. Decompose only material claims into required truths and plausible lies.
+6. Select the smallest coherent stack. Design same-run proof first for compound claims.
+7. Write objective and subjective cards, guards, potency, evidence receipt shape, state, and stop conditions.
+8. Record any missing harness with its specific reason, envelope, and owner. Product instrumentation routes to an approved product rung; never hide it inside harness work.
+9. Re-read before writing; write the eval plan; return the short surviving conclusion the work spec should retain.
+10. Run the structural validator when available. It cannot judge proof potency or product meaning.
 
----
+## Canonical template
 
-## Template
-
-````markdown
+~~~~markdown
 # EVAL PLAN — <FEATURE_NAME>
-**Human Read:** This plan can falsify <unlock> in <target environment>. The primary value-path gate is <ID>. Current state: <n green / n open / n blocked / n waiting human>. Biggest unproven risk: <risk>. Next gate to run: <ID> via <loop>.
+
+**Human Read:** This plan can falsify <claim> in <authority environment>. Primary gate: <ID>. Current proof boundary: <what is and is not supported>. Next gate action: <one action or blocker>.
+
+## Proof Capsule
 
 **Last updated:** YYYY-MM-DD
-**Work spec:** <path> | None — <why>
-**Feature slug:** <slug>
-**Target environment(s):** <runtime(s) where value matters>
+**Work spec:** <path>
+**Why this plan exists:** <why durable coordination/state is warranted instead of one inline check>
+**Current proof owner:** <owner> | None — terminal
+**First legal gate action:** <one action> | None — terminal
+**Claim boundary:** <supported and unsupported claims>
 
----
+## Doc Conventions
 
-## Doc Conventions (Do Not Delete)
-- **Schema truth:** the `eval__design-proof-gates` skill. Gate IDs are append-only, never renumbered; retired gates keep their card in the Appendix with a pointer to the superseding ID.
-- **IDs are fully namespaced** (`<SLUG>__M#__G#`, `<SLUG>__GLOBAL-G1`, `<SLUG>__CHANGE-G#`, `<SLUG>__M#__S#`); a naked ID anywhere is a halt-and-clarify, never a guess.
-- **States:** Open | Red captured | Objectively Green | Waiting Human | Blocked — <what> | Waived — <reason> | Retired — <pointer>. Objectively Green requires a fresh artifact from current code in the named authority environment, recorded in `last_run` (artifact path + git id + date). No artifact, no green — this document records proof, it never manufactures it. Guarded surface changed since `last_run` ⇒ state returns to Open.
-- **Waiting Human is never auto-claimed** or bundled into completion (root §4).
-- **Spec mirror:** the work spec's Proof & Eval Summary mirrors gate states — resync it in the same edit as any state change here. Divergence: this plan wins gate state and mechanics; the spec wins lane scope.
-- **The synthesis table (§2) is durable:** update it whenever gates are added, waived, or retired — it is the record of why these gates and not others.
-- **Future-state gates stay out of default CI** (run policy: Milestone-gated) until their milestone; a known-red never poisons the default loop (root §5).
-- **Thresholds carry a source** (`C-###`, `SRC-###`, benchmark history, user instruction) or an explicit assumption/blocker label.
-- **Deterministic-proof exceptions** (root §5: a value path that cannot be proven deterministically) are recorded in §6 with the architectural reason — never silently absorbed.
+- Schema truth: $eval__design-proof-gates only.
+- Objective and subjective state are separate.
+- Gate IDs never renumber; retired cards keep replacement pointers.
+- Green and Accepted bind exact claims, bases, and reviewed artifacts; material basis changes invalidate the current receipt.
+- A gate does not automatically require a test, harness, raw bundle, falsifier, audit, or product instrumentation.
 
-## 1) Unlock & Proof-of-Value State
-- **Unlock:** <user journey / engineering system unlock — root §0>
-- **Terminal truth:** <the exact terminal state ending the value path — what a reviewer inspects to falsify the claim>
-- **Subjective component:** <what only a human can accept> | None
+## 1) Unlock & Terminal Truth
 
-## 2) Gate Synthesis (durable)
-| Required truth | Plausible lie prevented | Class | Gate | Reason |
+- **Unlock:** <user journey or engineering system unlock>
+- **Terminal truth:** <publicly observable end state>
+- **Authority environment:** <where the claim matters>
+- **Subjective component:** <human-only truth> | None
+- **Claim boundary:** <what this plan can and cannot prove>
+
+## 2) Material Risk & Synthesis
+
+| Failure ID | Plausible material failure | Disposition | Gate / evidence / waiver | Why sufficient |
 | --- | --- | --- | --- | --- |
-| <truth> | <weak proof that could falsely pass> | <class> | <ID> / Excluded | <why included, or why excluded> |
 
-Obvious classes a reviewer would expect (security, persistence, perf, visual, network, replay, failure) appear here even when excluded.
+| Required truth | Plausible lie | Class | Gate | Inclusion/exclusion reason |
+| --- | --- | --- | --- | --- |
 
 ## 3) Proof Stack
-3–7 lines: which gates, and why each proves value rather than mechanism; the orchestrated gate first when the claim is compound. **Stack blind spot:** the axes no gate in this plan moves.
 
-## 4) Gates
-### 4.1 Index (projection of the cards)
-| Gate | Kind | Class | State | Loop | Last run |
+<3–7 lines: the smallest coherent stack and same-run relationship.>
+**Stack blind spot:** <axes no gate moves>.
+
+## 4) Objective Gates
+
+### 4.1 Index
+
+| Gate | Class | State | Current basis | Receipt |
+| --- | --- | --- | --- | --- |
+
+### 4.2 Cards
+
+~~~yaml
+id: <SLUG>__M1__G1
+class: <applicable class>
+claim: <value claim this can falsify>
+lie: <weak proof that could falsely pass>
+setup: <minimal concrete state>
+action: <exact public/system action>
+observation: <terminal outcome inspected>
+verdict: <exact pass/fail>
+authority: <environment/source of truth>
+basis: [<paths/contracts/rung anchors/harness/config/data/thresholds>]
+blind_spot: <what the instrument cannot see>
+potency: watched-red | characterization | mutation | adversarial/property | credible-oracle — <exact basis>
+loop: <literal command/action> | missing harness: <name> | blocked: <reason>
+run_policy: Default CI | Local eval | Milestone-gated | One-time | Human-assisted
+stop: <exact stop condition>
+state: Open | Harness Ready | Red Captured | Objectively Green | Blocked | Defective | Waived | Retired
+receipt:
+  last_run: none | <date/time>
+  action: none | <exact command/human action>
+  result: none | <actual result>
+  evidence: none | <inline surviving summary or necessary artifact path>
+  environment: none | <identity>
+  owner: none | <actor>
+  claim_boundary: none | <supported boundary>
+waiver: none | <authority/source/date/reason/scope/residual risk/expiry>
+refs: [<C-###>, <rung IDs>]
+~~~
+
+For a compound gate add coordinator, run_id, actors, scale/load shape, duration, churn/fault model, same-run observers, and aggregate verdict.
+
+## 5) Subjective Gates
+
+~~~yaml
+id: <SLUG>__M1__S1
+question: <one exact human acceptance question>
+scope: <what acceptance covers>
+artifact: <reviewed media path or live experience identity>
+support: <technical-health evidence>
+state: Waiting Human | Accepted | Rejected | Waived | Retired
+receipt:
+  actor: none | <human>
+  source: none | <durable source>
+  date: none | <date>
+  reviewed_artifact: <path/build/run identity>
+  response: none | <accepted/rejected wording>
+waiver: none | <authority/source/date/reason/scope/residual risk/expiry>
+refs: [<C-###>, <rung IDs>]
+~~~
+
+## 6) Harness Inventory & Missing Needs
+
+**Existing:** <command/path/authority/fidelity/blind spot>
+
+| Harness need | Enables | Why existing proof is insufficient | Envelope | Owner | Retirement |
 | --- | --- | --- | --- | --- | --- |
 
-### 4.2 Gate cards
-```yaml
-id: <SLUG>__M1__G1
-kind: global | milestone | change | hostile | non-regression
-class: <from the synthesis menu>
-claim: <value claim this gate can falsify>
-lie: <the weak proof that could pass while the value is broken>
-blind_spot: <what this instrument cannot see>
-setup: <fixture / seed / account / world / request / replay / service state>
-action: <exact user / system / browser / worker / tool / network / operator action>
-observation: <terminal state / persisted row / packet / metric / trace / log / output inspected>
-verdict: <exact pass/fail condition>
-authority: <target environment where the value matters>
-artifact: <fresh artifact type + path pattern, tmp/<datetime>__<semantic>/>
-potency: watched-red — <the red to capture before the fix> | mutation — <what to hand-break; must turn exactly this gate red> | n/a — <reason>
-loop: <rerunnable command | route + action | missing harness: <name> | blocked: <reason>>
-run_policy: Default CI | Local eval | Milestone-gated CI | Human review | Blocked
-stop: <one allowed stop condition — Design Law 9>
-state: Open | Red captured | Objectively Green | Waiting Human | Blocked — <what> | Waived — <reason> | Retired — <pointer>
-last_run: none | <artifact path> @ <git id>, YYYY-MM-DD
-refs: [<C-###>, <SRC-###>, <rung IDs>]
-orchestration:            # compound gates only
-  coordinator: <command | missing harness: <name>>
-  run_id: <correlation scheme tying every observation to one run>
-  actors: [<name — count — behavior>]
-  scale_target: <exact load + how it is measured>
-  duration: <ramp + steady-state>
-  churn_fault_model: <disconnect/reconnect/jitter/loss/late-join model | none — reason>
-  observers: [<server metrics>, <browser trace>, <frame capture>, <persistence query>]
-  aggregate_verdict: pass only if every required observer passes in the same run
-```
-```yaml
-id: <SLUG>__M1__S1
-kind: subjective
-artifact: <video / screenshot set / replay / before-after page>
-support: <automated evidence proving the artifact is complete and technically healthy>
-question: <the one specific acceptance question>
-boundary: <what explicit acceptance means; what a rejection must name>
-state: Waiting Human
-stop: Halt until acceptance or requested revision is recorded.
-refs: [<C-###>, <rung IDs>]
-```
+Warranted missing harnesses route to $eval__implement-proof-gate. A runtime hook, telemetry, product config, or contract change routes to an approved product rung.
 
-## 5) Harness Inventory
-**Existing:** <command — path — target env — artifact — limitations> (extend before building — root §5)
-**Missing:**
-```yaml
-harness: <stable repo-searchable name>
-proves: <gate IDs this harness enables>
-extends: <existing instrument extended> | nothing — <why no existing instrument can>
-envelope: <exact path or narrow creation envelope>
-payload: <fixture / seed / replay / world state required>
-verdict: <exact pass/fail the harness must decide>
-artifact: tmp/<datetime>__<semantic>/
-required_before_product_code: yes | no — <reason>
-route: $eval__implement-proof-gate
-```
+## 7) Run Policy & Exceptions
 
-## 6) Run Policy & Exceptions
-- Default CI now: <IDs> · Local eval: <IDs> · Milestone-gated: <IDs + milestone> · Human review: <IDs> · Blocked: <IDs + what unblocks each>
-- Artifact conventions: raw proof under `tmp/<datetime>__<semantic>/`; the work spec records surviving summaries after runs.
-- Deterministic-proof exceptions: none | <exception + architectural reason — root §5>
+- Default CI: <IDs> · Local: <IDs> · Milestone-gated: <IDs> · One-time: <IDs> · Human: <IDs> · Blocked: <IDs + condition>
+- Deterministic-proof exceptions: none | <narrowed claim and architectural reason>
+- Artifact retention: <only what later inspection/comparison needs; surviving summary and regeneration action>
 
 ## Appendix
-Retired gate cards (with superseding pointers) · superseded synthesis rows · run-history notes worth keeping.
-````
 
----
+Retired cards with replacement pointers; superseded synthesis rows; receipt history whose provenance is still load-bearing.
+~~~~
 
-## Conformance Check (run before writing — never stored; stored verdicts belong to the §6 audit lens)
+## Conformance check
 
-- Every gate binds the full anatomy (claim/setup/action/observation/verdict/authority/artifact/stop) and names its lie, blind spot, and potency.
-- Synthesis table covers every required truth; excluded obvious classes carry reasons; smallest sufficient set — no coverage theater, no mechanism-only gates.
-- Compound claims have one same-run orchestrated gate, not disconnected checks.
-- Measurable claims have a direct probe (or an explicit rejection) with sourced-or-labeled budgets and decomposed load shape; browser observers of measurable claims are classified.
-- Subjective quality has an artifact-backed human gate with one question and a boundary; nothing subjective is auto-accepted.
-- Hostile gate present or waived-with-reason; nearby behavior named with status.
-- All IDs namespaced; states from the machine; no green without artifact + git id; future gates out of default CI.
-- Harness inventory honest: existing instruments named with limitations; missing specs say what they extend; no invented commands, paths, or thresholds.
-- Browser gates name their concrete driver in the `loop`, wait on state/events (no sleeps), and carry the console/error policy; game lanes carry the 390×844 portrait gate; deterministic replay gates assert restore boundary + later checkpoint.
-- Work-spec sync need identified and returned in the Skill Result — never edited from here.
+- Durable coordination/state justifies the plan; otherwise no file was created.
+- Material-risk synthesis includes every plausible material failure without turning classes into a quota.
+- Every objective gate has falsifiable anatomy, current basis, potency, blind spot, and receipt shape.
+- Same-run compound claims are not laundered through disconnected checks.
+- Subjective truth uses a separate human receipt; no automation accepts it.
+- Waivers name authority, reason, scope, residual risk, and expiry.
+- Defective invalidates prior green.
+- Harnesses, tests, artifacts, falsifiers, and instrumentation exist only when their specific risk warrants them.
+- IDs and references resolve; the work spec retains only the current claim boundary and surviving conclusion.
+- No invented command, threshold, route, or environment.
+- Legacy untouched form was not rewritten.
 
-## Skill Result (return to caller — required elements, any shape)
+## Skill Result
 
-- Eval plan path | Inline only — <reason> | Blocked — <reason>
-- Work spec path + sync needed (yes — <what> | no)
-- Feature slug · Rungs covered (full IDs | not milestone-based)
-- Primary value-path gate + its loop (existing command | missing harness)
-- Gate IDs by kind · Subjective gates + their questions
-- Missing harnesses (names; which block product code)
-- Run-policy summary · Open blockers
-- Recommended next action (one)
+Return:
+
+- Plan warranted: yes/no and reason;
+- eval-plan path or None;
+- work-spec path and exact surviving conclusion to retain;
+- primary value-path gate/action;
+- objective gates by state;
+- subjective gates and current receipt state;
+- warranted harnesses/artifacts/falsifiers;
+- current claim boundary, blind spots, blockers;
+- recommended next action.
+
+Never render lane/rung completion or manufacture approval.

@@ -15,15 +15,15 @@ You think in two languages at once:
 
 If these diverge, the game breaks. Your job is to keep them aligned.
 
-**Place in the family & system.** This skill executes within the Design Brief (`$game__directing`): the vision, sacred three systems, cut list, and tokens bind this work, and a system that would be a 4th routes back to the brief's scope gate before any modeling. Durable outputs live in the repo, never only in chat: the model + params beside the system code (per repo canon, e.g. `games/<slug>/systems/<system>.model.json` + `.params.json`), the sim harness with the game's sims/tests. On a substantial lane: invariants and anti-goals become spec §4 contracts and eval-gate claims; the sim harness registers in the eval plan's harness inventory (`extends` an existing repo harness where one fits — check before writing a new runner, root §5); the risk table's detection metrics become observability contracts.
+**Place in the family & system.** This skill executes within the Design Brief. On a substantial lane, invariants/anti-goals become work-spec contracts and only material dynamics failures shape proof. Model/parameter files are durable only when the production system consumes them or future tuning genuinely needs them. Simulation may reuse an existing instrument, run one-time, or warrant a durable harness/test; it does not automatically create an eval plan.
 
 ---
 
 ## Non-Negotiables
 
 1. **Model before numbers.** If the structure is wrong, tuning is cosmetic.
-2. **Verification is a deliverable.** Every system you propose must include a deterministic sim harness + invariants/tests.
-3. **Design for debuggability.** Deterministic seeds, replay logs, instrumentation events, and minimal reproduction scenarios are required.
+2. **Verification is proportional.** Every system states falsifiable invariants and the cheapest credible observation. Add a deterministic sim/test harness only when material dynamics/RNG/state risk is not sufficiently guarded by existing evidence.
+3. **Design for debuggability.** State the seed/replay/instrumentation/minimal-reproduction seam actually needed by the material risk; do not create all of them as ritual.
 4. **No hallucinated constraints.** If context is missing, state assumptions explicitly and provide falsifiers (what data/playtests would prove you wrong).
 5. **Guard player trust.** RNG, difficulty adjustment, and hidden modifiers must be justified and tested for streaks/tail risk and perception.
 6. **One RNG stream.** Production systems draw randomness from the kernel's seeded RNG through the repo seam (root §2); sims use the same generator or the deterministic math adapter, so sim results transfer to the game. Never introduce a second RNG system into a game.
@@ -229,18 +229,9 @@ Output a compact risk table:
 
 * Risk | Trigger | Player symptom | Detection metric | Mitigation
 
-### Pass 6 — Verification (deterministic sim + invariants + sensitivity)
+### Pass 6 — Verification decision
 
-Deliver **JS code** that can be run as a standalone sim:
-
-* Deterministic PRNG (seeded)
-* Simulation runner (ticks/steps)
-* Metrics log
-* Assertions for invariants
-* Scenario tests (edge cases)
-* Sensitivity sweep for key parameters (even a small one)
-
-Before writing a new sim runner, check the repo's existing simulation harnesses (root §2/§5) and extend one where it fits; register the harness in the eval plan's inventory. A system sim that proves an invariant IS a fast-loop eval gate — wire it in, don't orphan it in the conversation.
+Map each plausible material system failure to existing evidence, a warranted one-time sim, a warranted durable harness/test, or an authorized narrowed claim. When simulation is the cheapest credible seam, specify only the needed deterministic seed, runner bounds, metrics/oracles, invariant assertions, scenarios, and sensitivity partition. Check existing instruments first. Register a harness in an eval plan only when durable coordination is warranted; otherwise keep one-time evidence inline or in a temporary receipt only when later inspection needs it.
 
 **Deterministic PRNG.** In a game repo, the sim draws from the kernel's seeded RNG or the deterministic math adapter (root §2) — the same stream production uses, so sim results transfer. Only for standalone explorations outside any game repo, fall back to a tiny local generator:
 
@@ -265,7 +256,7 @@ Deliver:
 * Shared parameter names with the model.
 * Clear separation: **spec/model → engine execution → sim → tuning → UI hooks**.
 * Instrumentation hooks (events emitted; counters recorded).
-* Serialization/versioning if state persists.
+* Serialization/compatibility and concurrency revision semantics if state persists; do not introduce repo-owned schema-version selectors.
 * Params in a data file committed beside the system; the model doc beside it. Chat is not durable memory.
 
 ### Pass 8 — Tuning Playbook (complaint → measure → knob)
@@ -322,11 +313,10 @@ Full arc for a new system: produce exactly these sections in order, each compact
 
 8. **Verification**
 
-   * Sim runner (extends existing harness where one fits)
-   * Invariant assertions
-   * Scenario tests
-   * Mini sensitivity sweep
-   * Output metrics to inspect
+   * Existing/one-time/durable seam and why it is warranted
+   * Applicable invariant oracle and bounded scenarios
+   * Sensitivity partition only where parameter uncertainty is material
+   * Actual or proposed output metrics, clearly distinguished
 
 9. **Tuning Playbook**
 
@@ -342,7 +332,7 @@ Full arc for a new system: produce exactly these sections in order, each compact
 
 * **No generic advice.** Every recommendation must tie to a mechanism, parameter, invariant, or metric.
 * **No silent assumptions.** If you assume, label it.
-* **No "just playtest it" cop-out.** You can recommend playtests, but must also provide a sim/metric plan.
+* **No "just playtest it" cop-out.** Pair material system claims with a falsifiable metric/invariant plan; do not manufacture a sim harness when another credible seam is sufficient.
 * **No drift.** Model params and JS params must match names and semantics.
 * **No hidden manipulation by default.** If shaping RNG/DDA, state the policy, test streaks, and address perception/trust.
 
@@ -387,7 +377,7 @@ You start with:
 * resource-flow model (inputs, outputs, sinks, rates, gates)
 * state machine for crafting lifecycle (start → in progress → complete → claim)
 * RNG policy if roll-based outcomes exist
-* sim harness to detect inflation, dead zones, and exploit loops
+* a bounded sim or other warranted invariant proof for material inflation/dead-zone/exploit risk
 * JS engine that implements the same parameters and emits telemetry
 
 That's the bar.

@@ -90,7 +90,7 @@ Do not use the older short format with sections like `## One-Sentence Pitch`, `#
 
 ## Handoff
 
-After creating or revising `README__game-spec.md`, stop only when the creator explicitly asked for spec-only, approval-first, or ask-first work. Otherwise, treat "make/build/create a game" as approval to continue into `game-creation__selecting-initial-template` and the autonomous first-playable loop.
+After creating or revising `README__game-spec.md`, stop only when the creator explicitly asked for spec-only, approval-first, or ask-first work. Otherwise, a direct “make/build/create this game” request is approval evidence for the exact game/first-playable scope at the current spec revision; preserve that actor/source/date/scope boundary when routing into `game-creation__selecting-initial-template`. It does not authorize publish/deploy, destructive, external-message, or unrelated product work.
 
 In the visible response, state the assumptions briefly and summarize the first playable in one sentence. Do not present assumptions as a blocker unless they are genuinely unsafe, copyrighted, impossible, or proof-changing.
 

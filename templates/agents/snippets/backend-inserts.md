@@ -4,10 +4,17 @@
 **Purpose:** [Describe this backend repository in 2-3 repo-specific sentences. Replace this block first. State the core API or system contract, what correctness means here, and what agents must optimize for.]
 <!-- vasir:purpose:end -->
 
+<!-- vasir:routing:start -->
+* **API Surface:** If touching `/src/api/` or `/app/api/`, read the API manifest before changing request or response behavior.
+* **Async Work:** If touching `/src/jobs/`, `/src/workers/`, or queue consumers, read the worker manifest before changing retry or delivery behavior.
+* **Data Layer:** If touching `/db/`, `/migrations/`, or raw SQL paths, read the data manifest before editing queries or schemas.
+* **Cold Storage:** Do not read `/docs/legacy/` unless explicitly instructed by the user.
+<!-- vasir:routing:end -->
+
 <!-- vasir:engineering-doctrine-inserts:start -->
 # Backend Development Canon
 
-Scope: all backend runtime code and its infrastructure in this repo. These mandates are hard-won and load-bearing; they bind by default. Precedence: a narrower `AGENTS.md` may tighten a rule or grant a named exception only where a rule says so; the approved Work Spec / eval plan may grant a per-lane exception only where a rule says so. Laws live here once — other sections and docs cite them, never restate them.
+Scope: all backend runtime code and its infrastructure in this repo. Root §1 precedence and ownership bind: this insert may name backend risks, authority environments, and credible fidelity seams; it may not automatically require tests, evals, harnesses, artifacts, audits, or postmortems. Narrower law refines only its owned surface. Laws live here once — other sections cite them.
 
 ---
 
@@ -34,19 +41,14 @@ Rules:
 - No ad-hoc clients. Redis/Valkey, DynamoDB, S3, SQS, external APIs, and cloud services are accessed through `src/adapters/*` or an existing repo-owned boundary.
 - Never bypass existing key builders, env modules, auth helpers, or persistence adapters. Redis keys come from `src/keys.js`, never hand-rolled; Redis clients come only from `src/db/redis-factory.js` or `src/db/redis-factory-shared.js`.
 - `process.env` is read only inside the repo-owned config boundary (backend default: `src/env.js`). An env constant used by more than one module is defined once there and imported.
-- If an adapter lacks a needed capability, extend the adapter minimally and prove it with integration tests.
-- Test-side parity for these boundaries is governed by §10: real local services; mocks/stubs on value paths only by documented Work Spec / eval-plan exception.
+- If an adapter lacks a needed capability, extend it minimally. Identify serialization/dependency semantics at risk; reuse sufficient evidence or add the cheapest fidelity-preserving contract/integration proof only when that material risk is otherwise unguarded.
+- Test-side fidelity for a warranted proof is governed by §10. The risky semantics decide whether a real local service, verified fake, contract-tested stub, or narrower seam is credible; a work spec records exceptions/claim boundaries without manufacturing a test.
 
 ---
 
 ## 3. Performance Doctrine — Quantified Hot-Path Budget
 
-Assume production-scale load unless an applicable `AGENTS.md` narrows it.
-
-Default planning lens:
-
-- Assume at least `1,000,000` sustained events/messages/requests per relevant hot-path class where applicable. Spikes may be materially higher.
-- p95 latency budgets come from repo specs, production SLOs, or an applicable `AGENTS.md`. If budget sources disagree, use the strictest target and name the discrepancy.
+Use observed production scale, a sourced product target, or a clearly labeled planning assumption only when scale can change the design. Do not invent a million-event workload or the strictest budget merely because code is backend. p95/throughput budgets come from the owning contract/SLO; disagreement is a decision boundary, not permission to silently choose.
 - A hot path is any per-frame, per-message, per-request, per-presence-update, per-stream-entry, per-worker-item, or high-fanout read/write path.
 
 Hot-path changes MUST NOT add, unless explicitly justified in the approved plan — every item below is a per-message multiplier, and at a million messages the multiplier is the whole budget:
@@ -60,7 +62,7 @@ Hot-path changes MUST NOT add, unless explicitly justified in the approved plan 
 - unbounded scans, maps, sets, arrays, queues, or stream reads;
 - per-message logging.
 
-A performance budget is required for material backend changes. It must state:
+When a change affects a sourced hot path or introduces a material resource/cost claim, record the decision-relevant budget. It states only applicable dimensions:
 
 - expected extra calls/RTTs;
 - allocation changes;
@@ -147,7 +149,7 @@ CDN/shared cache → bounded Valkey/read model → database fallback on bounded 
 
 ## 7. Redis / Valkey Cluster Safety
 
-Treat Valkey/Redis as cluster-sharded from day one. New caches/read models declare the §6 admission contract; this section is the wire-level mechanics.
+Treat Valkey/Redis as cluster-sharded from day one. New caches/read models declare the §6 serving-path contract; this section is the wire-level mechanics.
 
 - Never use `KEYS` — it scans the whole keyspace and blocks the shard.
 - No unbounded reads, anywhere, and especially not on hot paths: `XRANGE`/`XREVRANGE`/`SCAN`, list, set, sorted-set, queue, and stream reads all name an explicit bound — `COUNT`, limit, pagination, or TTL.
@@ -155,7 +157,7 @@ Treat Valkey/Redis as cluster-sharded from day one. New caches/read models decla
 - Lua scripts are allowed only when they collapse RTTs without changing semantics or hiding failure modes.
 - No cross-slot multi-key operations. Multi-key operations are allowed only when an applicable `AGENTS.md` explicitly allows the pattern and the keys are intentionally colocated.
 - Never pin a hot keyspace to one hash slot through constant `{tenant}` / `{scope}` tags — that is a self-inflicted hot shard. Use partition-first hash tags with a stable partition count derived from the entity key for scalable read models and leaderboards.
-- Every new hot read model ships a test or script proving distribution across slots/partitions; any change that depends on cluster-safe slotting or distribution adds an integration test.
+- Every new hot read model states its slot/partition distribution invariant. Reuse existing proof or add a deterministic script/test at the cheapest cluster-faithful seam only when skew could cause material harm and current evidence cannot catch it.
 
 ---
 
@@ -171,7 +173,7 @@ Treat Valkey/Redis as cluster-sharded from day one. New caches/read models decla
 
 ## 9. Infrastructure Parity — Ship the Wiring With the Feature
 
-A feature is incomplete if production wiring, local parity, and policy tests do not move with the code.
+A feature is incomplete if required production wiring and local/operator parity do not move with the code. Proof machinery remains conditional on specific material risk.
 
 When adding or changing: AWS/cloud SDK calls; secrets; env vars; queues/streams; object storage paths; database tables/indexes; worker entrypoints; container command paths; externally reachable endpoints; cloud dependencies —
 
@@ -180,7 +182,7 @@ the same active lane must include:
 - infrastructure declaration/update;
 - IAM/permission update where applicable;
 - local-dev bootstrap analog or documented local substitute;
-- CI/policy/integration test proving the wiring exists;
+- sufficient existing evidence, targeted inspection, or a warranted CI/policy/integration proof for the material wiring failure;
 - env module update and comments;
 - rollback/recovery note.
 
@@ -188,8 +190,8 @@ Examples:
 
 - New AWS SDK action → corresponding IAM policy update.
 - New secret/env var → `src/env.js`, local-dev equivalent, and infrastructure declaration.
-- New script referenced by ECS/Terraform task command → copied into the Docker image and covered by a policy/integration check.
-- New service dependency → local/sandbox parity path and CI/policy assertion when practical.
+- New script referenced by ECS/Terraform task command → copied into the image; use an existing policy check or add one only when inspection/build output cannot credibly catch omission.
+- New service dependency → local/sandbox parity path; add a CI/policy assertion only when a specific compatibility or safety risk warrants it.
 
 Rules:
 
@@ -202,7 +204,7 @@ Before editing infrastructure, read: `infra/README.md`, `infra/AGENTS.md`.
 
 ## 10. Backend Testing
 
-Backend behavior changes require value-path integration tests.
+Backend behavior changes require risk-preserving confidence, not integration tests by default. Boundary-crossing risks — serialization, permissions, persistence, queues/workers, async/error behavior, dependency semantics, delivery/order/idempotency, or producer/consumer compatibility — identify where a contract/integration proof may be credible; root §5's proportional-proof rule decides whether a new durable test is worth adding. Pure local behavior may use existing/focused proof; mechanical/static changes may need only inspection. Add nothing when existing evidence catches the meaningful failure.
 
 Rules:
 
@@ -214,10 +216,10 @@ mocha <filepath> --exit
 
 ### Data/service parity
 
-- Redis/Valkey tests must hit real local Redis.
-- DynamoDB behavior tests must use DynamoDB Local when applicable.
-- S3 behavior tests should use the repo-approved local/sandbox S3 equivalent when applicable.
-- Do not use in-memory mocks, pseudo-tables, or local fallback paths for production behavior tests unless the eval plan / Work Spec explicitly documents the exception. (This is the single home of the mock-exception rule; §2 defers here.)
+- A warranted Redis/Valkey proof hits real local Redis when Redis command/atomicity/cluster semantics are the risk.
+- A warranted DynamoDB proof uses DynamoDB Local when Dynamo behavior is the risk.
+- A warranted S3 proof uses the repo-approved local/sandbox equivalent when S3 behavior is the risk.
+- A verified fake, contract-tested stub, or smaller public seam is valid when dependency semantics are outside the claim; record fidelity and blind spot. Unverified mocks cannot prove a boundary they replace.
 
 ### Redis test isolation
 

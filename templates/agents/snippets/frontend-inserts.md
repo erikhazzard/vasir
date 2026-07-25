@@ -43,18 +43,18 @@ Hard requirements:
 
 ---
 
-# RENDERED USER JOURNEY PROOF MANDATE
-**Hard Requirement** For any Material Code Change that affects user-visible UI eg auth, onboarding, account management, payments, admin workflows, navigation, forms, modals, routing; or client/server interaction, static inspection, unit tests, lint, typecheck, and production build are not sufficient proof.
+# BROWSER PROOF ADMISSION
+User visibility alone never mandates browser automation. Require a real rendered-browser gate only when the plausible failure is browser-specific: interaction or event wiring; focus, keyboard, touch, or pointer behavior; routing/history; hydration; accessibility semantics; responsive layout; canvas/WebGL; browser-owned auth/session behavior; or client/server orchestration that a cheaper public boundary cannot preserve.
 
-You **must prove the core value path** in a **real rendered browser environment**.
+Static copy, markup, tokens, and isolated styling normally earn diff inspection and the cheapest relevant existing check. A rendered screenshot may be warranted when visual state itself is the claim; it does not automatically require Playwright, a journey harness, or a durable test. Apply root §5's proportional-proof rule before creating any browser instrument.
 
-Required behavior:
+When a browser gate is warranted:
 - Start the smallest real local app environment that exercises the value path.
 - Use Playwright or the repo’s existing browser automation harness when available.
-- If no browser harness exists, create or propose the smallest deterministic browser proof harness as part of the eval plan, unless the change is explicitly scoped as planning-only.
+- If no browser harness exists, create or propose one only when the browser-specific risk and expected reuse repay its maintenance cost; otherwise record the missing authority proof honestly.
 - Drive the journey through the public UI, not private components or mocked helper calls.
 - Assert the terminal user-visible state and the relevant server/client side effect.
-- Capture fresh artifacts: screenshot, trace, video, console/network log, or equivalent browser evidence.
+- Record fresh browser evidence at the cheapest credible medium. Retain a screenshot/trace/video/console-network bundle only when non-regenerable evidence, later handoff, or human acceptance requires it; otherwise keep the exact action/result inline.
 - Check at least the primary target viewport; for mobile-first surfaces, include the mobile viewport.
 - Treat console errors, failed network requests, blank renders, overlapping text, auth/session mismatch, and missing expected UI as failures.
 - Do not claim the UI works from code review, build success, or API tests alone.
@@ -66,12 +66,12 @@ For browser proof, the agent must name:
 - user actions performed;
 - network/API side effects expected;
 - terminal DOM/visual state;
-- artifact path;
+- evidence receipt, plus an artifact path only when retention is warranted;
 - pass/fail condition.
 
-If the app cannot be started, credentials are missing, or the browser journey cannot be exercised, the agent must report the blocker instead of downgrading to static proof.
+If a warranted browser gate cannot run because the app cannot start, credentials are missing, or the journey cannot be exercised, report that gate as blocked instead of laundering static checks into browser confidence. If no browser-specific gate was warranted, there is no browser blocker.
 
-**WHY**: A meaningful user-visible change is not proven until a browser has rendered and exercised the user journey that the change claims to fix.
+**WHY**: Browser evidence is valuable when the browser owns the failure mode. Using it as a tax on every visible edit slows delivery and creates low-value harness debt.
 
 ---
 
@@ -138,16 +138,14 @@ Avoid rerender storms by default.
 
 ---
 
-- **SECOND-ORDER REACTIVE TRACING**: Never write a useEffect or async state mutation without first explicitly documenting its failure path. You must logically prove that transitioning into an error state will not infinitely re-trigger the exact effect that initiated the call.
-
-- **TESTING ARCHITECTURE**: Never co-locate tests or use Jest/Cypress. All tests must be written in Vitest + MSW, placed strictly in the root /tests directory mirroring the src tree, and prioritize /journeys over component/unit tests. Use Vitest with happy-dom, @testing-library/react, and MSW for API mocking. More details for writing and working with tests are found in tests/AGENTS.md
+- **TESTING ARCHITECTURE**: When a durable frontend test is warranted, do not co-locate it or use Jest/Cypress. Use the repo's Vitest + MSW convention under root /tests mirroring src, preferring journey seams when they preserve the risk; a smaller public-surface check is valid when it does. Use happy-dom, @testing-library/react, and MSW only where the test needs them. See tests/AGENTS.md.
 
 - **Ontological Colocation**: Ban generic dumping grounds like scripts/ or utils/; every file must be strictly nested within the specific architectural domain or feature ontology it serves.
 
 ---
 
 # Rendered Proof
-Remember: A meaningful user-visible change is not proven until a browser has rendered and exercised the user journey that the change claims to fix.
+Rendered proof follows the proportional rule above. User visibility alone is never the trigger.
 
 ---
 

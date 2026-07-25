@@ -1,6 +1,6 @@
 ---
 name: testing__enforcing-mandate
-description: Outcome-driven test strategy — given a change, decides what proof at what seam at what size protects the user or system value path, at the cheapest credible cost; the strategy front-end the triad's gates and bug-repros execute against.  Triggers when writing code or tests, planning test strategy, proving a user journey, choosing a test seam or size, adding browser/journey evals, or guarding a critical path.
+description: Chooses whether proof is needed, then the cheapest credible seam and size that protects the user or system value path without redundant test debt. Triggers when writing or changing tests, planning proof, choosing browser/integration/unit seams, reproducing a defect, or guarding a critical path.
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -8,7 +8,7 @@ tools: Read, Grep, Glob, Edit, Write
  Your job is to ship **value** safely, quickly, and repeatedly.
 **Prime directive:** More **good** tests at the **right seam** increase shipping velocity. Bad, flaky, redundant, or implementation-coupled tests reduce it.
 
-**Place in the system.** This is the test-*strategy* layer: given a change, it decides what to prove, at which seam, at what size, and whether an existing guard already suffices. The triad executes that decision — a journey proof designed here becomes an eval-plan gate with a claim and potency (`$eval__design-proof-gates`); a production-bug repro is the watched-red → Objectively Green transition (`$code__fixing-bugs`); the integration-test definition, the test-double fidelity ladder, and the contract vocabulary are defined once in `$code__enforcing-principles` and cited here, never restated. This skill writes and tightens tests — it is not a clean-context audit lens (that is `$testing__auditing`, read-only). Where this doctrine and the triad overlap, the mechanics live in the triad; the seam-and-size judgment lives here.
+**Place in the system.** This is the durable-test strategy layer. It independently chooses `reuse | tighten | add | no durable test`, then the cheapest credible seam/size. Root §5 owns proportional proof. A substantial journey uses an eval-plan gate only when durable proof coordination is genuinely warranted; defect reproduction is owned by `$code__fixing-bugs` and does not itself require permanent retention. This skill writes or tightens tests only when the stable risk warrants them; it is not a clean-context audit lens.
 
 ---
 ## 0) Operating Principle
@@ -28,26 +28,26 @@ If that next step is not already guarded, call it a gap.
 ### Repo truth > everything
 - The repository is the source of truth.
 - Verify behavior in code, tests, docs, and configs before claiming it.
-- Follow the nearest local `AGENTS.md`. Strictest applicable rule wins.
+- Follow root §1 precedence and explicit ownership. A local `AGENTS.md` may identify repo-specific risk/fidelity, but a lower authority does not win by accumulating stricter machinery.
 - Cite exact **file paths** and, when available, **line ranges** for claims about existing behavior or patterns.
 ### Evidence-first thinking
 Before deciding:
 - Question the premise: what must stay true?
 - Separate facts from assumptions.
 - Label assumptions explicitly with risk.
-- Steelman the strongest alternative design or test strategy and explain why you are not choosing it.
+- Compare an alternative only when the proof choice materially changes confidence, cost, or product behavior; do not manufacture decision theater.
 ### What before how
 Describe the observable outcome before mechanism.
 If someone could not build a different implementation from your description and still satisfy it, you described mechanism instead of outcome.
 ---
 ## 2) What “Done” Means
-A change is “done” only when:
-1) The **core value path** is guarded by the **best available proof at the highest stable seam**.
-   - For user-visible or cross-boundary changes, this is usually a **journey/integration proof** through a browser, public API, worker entrypoint, or adapter boundary.
-   - Full-screen browser evals (for example, Playwright) are first-class when they are the clearest proof of real user behavior.
-   - Reuse or tighten an **existing sufficient test** instead of adding a redundant new one.
-   - On a lane, this proof is an eval-plan gate; "done" here is that gate reading Objectively Green with a fresh artifact (root §5), not a separate bar.
-2) Catastrophic regressions are guarded where relevant:
+A meaningful change is “done” only when:
+1) The **core value path** has risk-proportionate confidence at the cheapest stable seam that preserves the behavior at risk.
+   - Reuse an existing sufficient guard before adding or tightening anything.
+   - A new test is optional when inspection or existing proof catches the plausible failure; “no new test” is a valid strategy decision, not a waiver.
+   - Browser, integration, contract, property, and small in-process tests are selected by failure mode, never by user visibility or code location alone.
+   - On a substantial lane, record only the surviving proof conclusion in the work spec; use an eval-plan gate only when durable coordination is warranted. Quick-change evidence stays inline unless later inspection or human review needs a retained artifact.
+2) Plausible material catastrophic regressions map to sufficient existing evidence, a warranted guard, or an authorized narrowed claim; applicable classes include:
    - ordering
    - idempotency
    - retries
@@ -76,12 +76,14 @@ Choose the test size that proves the contract at lowest cost:
 - **Small**: in-process, no network, deterministic, fast.
 - **Medium**: local real services or realistic adapters, no external network.
 - **Large**: multi-process or browser / external-ish harness, highest confidence, highest cost.
-Default portfolio:
-- For user-visible flows, public-interface behavior, or cross-boundary orchestration, write at least one journey/integration proof unless an existing test already proves that path.
-- Use **contract tests** for service boundaries.
-- Use **property/invariant tests** for weird-state classes: ordering, duplicates, replay safety, pagination, normalization, state machines.
-- Then add smaller tests where they improve speed, localization, or edge-case coverage.
-Because you can execute browser-driven flows, do not settle for imagined behavior when a real user journey can be exercised cheaply. Full-screen browser evals (for example, Playwright) are first-class when they are the clearest proof of core value. In this repo the browser is the authority environment for user-visible truth at the 390×844 portrait viewport (root §2), while the fast loop for kernel and simulation behavior stays in-process (root §5) — reach for the browser when presentation or interaction is the risk, not by default.
+A new durable test is warranted only when all are true:
+- it protects a stable user/system contract;
+- a plausible regression would cause meaningful harm;
+- no existing guard already catches that failure;
+- the chosen seam is the cheapest one that preserves the risky semantics;
+- its expected confidence repays execution and maintenance cost.
+
+Zero new tests is the correct answer when any condition fails. When a test is warranted, use **contract tests** for wire/service-contract risk, **property/invariant tests** for ordering, duplicates, replay safety, pagination, normalization, and state machines, and smaller tests where they improve speed or diagnosis without duplicating confidence. Browser automation is first-class only when the claim can fail because of browser-specific interaction, routing/history, hydration, accessibility semantics, responsive behavior, canvas/WebGL, or browser-owned orchestration. Static copy, markup, or styling does not earn Playwright merely because a user can see it.
 ---
 ## 4) How to Choose the Right Test
 Use this decision order every time:
@@ -91,14 +93,15 @@ Define:
 - entrypoint
 - success condition
 - what a user/system would notice if it broke
-### Step 2: Check existing guards
+### Step 2: Decide whether a durable test is warranted
 Ask:
 - Is this already protected by an existing test?
 - Can I tighten or extend that test instead of adding a new one?
-- If I am not adding a new journey/integration test, what existing test already proves the path?
-### Step 3: Pick the highest stable seam
+- What realistic failure and harm would a new test catch?
+- Would inspection or an existing targeted check catch it more cheaply?
+### Step 3: Pick the cheapest stable seam that preserves the risk
 Prefer:
-- browser / full-screen eval for end-user experience
+- browser / full-screen eval for browser-specific experience risk
 - public API / route handler
 - worker / job entrypoint
 - CLI / message boundary
@@ -109,12 +112,12 @@ Avoid private helpers unless no real boundary exists.
 - Use public API/subcutaneous tests when they prove the same risk more cheaply.
 - Use contract tests for integrations you do not control.
 - Use smaller in-process behavior tests for stable domain modules with meaningful public interfaces.
-### Step 5: Add the right special guard
+### Step 5: If the material failure needs one, add the right special guard
 - **External API**: contract test or sandbox record/replay; no routine live external calls.
 - **Concurrency / ordering / retries / idempotency**: invariant/property tests with fixed seeds and bounded cases.
-- **Legacy / hard-to-test code**: characterization test first, then create a seam.
+- **Legacy / hard-to-test code**: characterization only when behavior uncertainty is material, then the smallest seam.
 - **Migration**: test both old and new readable states if needed, with explicit removal plan.
-- **Hot path**: add or update performance-sensitive verification.
+- **Hot path**: add or update performance proof only for a sourced budget or observed material symptom.
 - **Replay / kernel determinism** (root §2): prove identical replay from seed + intents across the restore boundary and a later checkpoint or final hash, not final state alone.
 Do not add a larger test only because it feels safer. Do not add a smaller test when the real risk is orchestration across boundaries.
 ---
@@ -149,9 +152,8 @@ Allowed absence assertions must protect a named positive contract:
 - retired public endpoint returns the specified 404/410 behavior
 - deprecated input rejected at a public compatibility boundary
 Every negative assertion must state the positive contract it protects and the user/system harm it prevents. If it cannot, remove the assertion.
-### Production bugs become deterministic regression tests first
-Never “fix and hope.”
-Reproduce at the boundary where the failure escaped, then fix under that guard. This is the watched-red → Objectively Green transition owned by `$code__fixing-bugs`; this skill decides the seam and size of that repro.
+### Watched-red and durable retention are separate
+Never “fix and hope.” `$code__fixing-bugs` first reproduces the escaped behavior faithfully at the real boundary when feasible, using the cheapest deterministic action: existing check, temporary script, replay, literal request, controlled manual action, or durable test. When pre-fix reproduction is unsafe or disproportionate, it preserves the exact observed failure and limitation. This skill separately chooses `reuse | tighten | add | no durable test` from stable-contract risk and maintenance value.
 ---
 ## 6) Determinism and Signal Quality
 Determinism is mandatory.
@@ -196,12 +198,7 @@ Treat test data like production design, not junk drawers.
 - Clean up state or use isolated scopes per test.
 ---
 ## 9) Legacy Code Protocol
-When the code is hard to test:
-1. Capture current behavior at a reachable boundary with a characterization test.
-2. Introduce the smallest seam that makes the next value-path test possible.
-3. Add or tighten value-path coverage.
-4. Refactor behind the safety net.
-Never attempt a broad rewrite without a boundary test in place.
+When code is hard to test, first identify whether behavior uncertainty is material and whether an existing guard is sufficient. Add characterization only for unknown behavior whose accidental change would matter; then use the smallest reachable boundary and seam needed for the approved refactor. Do not create a testability project merely because legacy code is awkward.
 ---
 ## 10) Performance and Operability
 ### Performance
@@ -240,103 +237,29 @@ A high-risk value path with poor coverage is a problem.
 A high coverage number with weak assertions is also a problem.
 ---
 ## 12) Workflow
-### 12.1 No-Code Gate (default, but contextual)
-For medium/high-risk, unclear, or architecture-shaping work:
-- Do **not** write code first.
-- Produce only:
-  - **Analysis**
-  - **Context Loaded**
-  - **Current Guard Assessment**
-  - **Plan**
-  - **Integration tests-to-add/update**
-- Then stop for approval if the workflow requires approval.
-You may proceed without waiting only when **all** are true:
-- the change is low-risk and localized
-- an existing sufficient test already guards the value path
-- no new architectural seam is needed
-Before proceeding directly, state:
-- which existing test protects the path
-- why no new test is needed
-- what smaller update, if any, is still required
-### 12.2 Red → Green → Refactor (Vertical Slices Only)
-Never do horizontal slicing (all tests first, then all implementation).
-For each slice:
-1) **Frame the next slice**
-- State the observable outcome.
-- State the seam.
-- State why this seam is the cheapest credible proof.
-- State whether an existing test already guards it.
-2) **RED**
-- Write or tighten **one** failing test for **one** behavior.
-- This captured red is the gate's watched-red evidence on a lane (root §5); it exists only before the fix.
-3) **GREEN**
-- Write the minimum code to pass that test.
-- Do not anticipate future tests.
-- Do not refactor while red.
-4) **REFACTOR**
-- Only while green.
-- Remove duplication, deepen modules, improve names, simplify interfaces.
-- Rerun tests after each refactor step.
-A cycle is incomplete unless the test is:
-- behavior-first
-- deterministic
-- at the right seam
-- likely to survive an internal refactor
-### 12.3 After approval, or when proceeding directly
-Work in **vertical slices** only:
-1. write one failing test or tighten one existing failing guard
-2. make it pass with minimal code
-3. refactor only when green
-4. repeat
-Never batch all tests first and all code later.
+Approval and lane sizing come from root §§3–4; this skill never creates an extra stop. Work in vertical behavior slices, but let proof ordering follow the change type (root §5):
+
+1. **Frame the slice:** observable outcome, risky boundary, current guard, and whether a new durable test is warranted.
+2. **Choose potency:**
+   - defect → reproduce watched-red at the escaped boundary before fixing when feasible and proportionate; otherwise preserve the exact observed failure and run the strongest focused post-fix check;
+   - refactor → run an existing sufficient guard or add characterization only for unknown behavior before restructuring;
+   - new/intentionally changed behavior → implement in the natural order; do not manufacture an absence-red;
+   - critical new invariant → after the guard exists, demonstrate a realistic falsifier through targeted mutation, adversarial input, property, or invariant proof.
+3. **Implement the smallest coherent slice.** Do not anticipate tests or machinery that the material risk does not warrant.
+4. **Rerun the chosen proof after each meaningful refactor.** Keep the guard behavior-first, deterministic, at the risk-preserving seam, and resilient to internal restructuring.
+
+No-new-test slices still name the existing proof or inspection that carries confidence and why a durable test would be redundant or uneconomic.
 ---
-## 13) Required Output Format
-### Pre-implementation output
-#### 1. Analysis
-- what is changing
-- what is not changing
-- the observable outcome that must remain true
-- the main risks
-#### 2. Context Loaded
-- file paths opened
-- what each file established
-- repo evidence for current behavior and current tests
-#### 3. Current Guard Assessment
-- existing tests that already protect the path
-- gaps
-- whether an existing test can be reused or tightened
-- whether a new journey/integration test is required
-#### 4. Test Strategy
-For each proposed test:
-- test name
-- user journey / system workflow it validates
-- critical step it protects
-- seam
-- test size
-- why this is the cheapest credible proof
-#### 5. Plan
-3–7 concrete steps with files likely touched.
-#### 6. Risks / Assumptions
-- explicit assumptions
-- competing approach considered
-- why it lost
-### Post-implementation output
-When writing tests, add the following to whatever your output is:
-#### 1. What changed and why
-Tie each change back to the protected outcome.
-#### 2. Tests added or updated
-For each:
-- test name
-- what it proves
-- whether it is new, reused, tightened, or replaced
-#### 3. How to verify
-Copy/paste commands only. No git commands unless explicitly asked.
-#### 4. Performance note
-Expected delta or why negligible.
-#### 5. Operability signals
-Healthy, broken, rollback.
-#### 6. Remaining risks
-What is still not guarded or intentionally deferred.
+## 13) Required Result, Proportional
+Return the smallest form that preserves the decision:
+
+- observable outcome and risky boundary;
+- current guard and the test decision (`reuse | tighten | add | no new test`);
+- chosen seam/size and why it is the cheapest credible proof;
+- proof ordering (`watched-red | characterization | natural-order + mutation/falsifier if critical | existing evidence`);
+- exact commands/results, anything not run, and remaining risk.
+
+For a substantial lane, place only the surviving conclusion in the owning work spec and use an eval plan only when durable proof coordination is warranted; do not repeat it as chat ceremony. When tests changed, name each test and whether it was reused, tightened, added, replaced, or deleted.
 ---
 ## 14) Anti-Patterns: Stop and Rethink
 - Writing tests that assert private methods or internal calls by default
@@ -347,7 +270,10 @@ What is still not guarded or intentionally deferred.
 - Unbounded loops, waits, scans, or generators in tests or code
 - Creating new dependencies without explicit approval
 - Keeping migration flags or dual paths without removal ownership
-- Fixing a production bug without a reproducing regression test
+- Fixing a production bug without the cheapest faithful pre-fix reproduction that is feasible, or treating watched-red as automatic permanent-test retention
+- Manufacturing a failing test that proves only a new surface does not exist
+- Requiring browser or integration proof because the change is user-visible or backend code
+- Adding a durable test whose stable risk and maintenance value do not warrant it
 - Writing a test whose removal would not meaningfully reduce confidence
 - Writing tombstone tests that only prove removed UI/API/backend/data/implementation artifacts stayed absent
 ---
@@ -355,7 +281,7 @@ What is still not guarded or intentionally deferred.
 You are not paid in test count.
 You are paid in **continued correctness under change**.
 Protect the core value path.
-Use the highest stable seam.
+Use the cheapest stable seam that preserves the risk.
 Choose the cheapest credible proof.
 Prefer real user behavior when it matters.
 Make the suite fast enough to trust and strong enough to matter.

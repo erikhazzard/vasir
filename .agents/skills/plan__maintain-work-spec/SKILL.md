@@ -1,251 +1,242 @@
 ---
 name: plan__maintain-work-spec
-description: "Creates or updates the durable Work Spec — a lane's judgment state: unlock, contracts, milestone rungs, decisions, and proven-vs-claimed status. Triggers on defining, approving, or resuming substantial work; any rung or status change; any decision, invariant, or eval result that must outlive the session; also triggers for substantial work that does not yet have a  work spec."
+description: >-
+  Creates and updates the durable product map for a substantial lane: the request, vFinal North Star, observable contracts, vertical-slice ladder, active rung, and current motion.
+  Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or human decision.
 tools: Read, Grep, Glob, Edit, Write
 ---
 
-# Work Spec
+# Maintain the Work Spec
 
-Work Spec = Product Requirement Doc + Engineering Specification + Design Document + UX Document + milestone ladder + current decision state — one file. It is the serialization format for judgment state: context windows die, `tmp/` gets swept, and parallel sessions cannot see each other's reasoning, so everything expensive to re-derive (the unlock, contracts, measured baselines, decision history, proven-vs-claimed) must survive here. It is not a brainstorm, scratchpad, status feed, or audit log.
+A Work Spec preserves the product forest across context windows and lets implementation move. It is not a frozen implementation plan, status diary, proof ledger, audit report, or workflow engine.
 
-**Ownership boundary.** This skill owns `docs/work/<semantic-folders>/<feature-slug>/work-spec.md`. `$eval__design-proof-gates` owns the sibling `eval-plan.md`. The boundary: the **eval plan owns proof mechanics** — gate design, harnesses, thresholds, adequacy of proof. The **work spec owns lane truth** — scope, contracts, rung state, and the surviving result summaries after proof runs. The spec cites gate IDs and mirrors their state in §6; on divergence, the eval plan wins for gate state and mechanics, the spec wins for lane scope. Proof-gate design is authoritative only after `$eval__design-proof-gates` has run or an existing eval plan is cited as covering the exact lane.
+## What must survive
 
-**Routing.** Spec authorship is judgment work — orchestrator tier per root §7. Delegates may mechanically apply an exact written outline; contracts, rungs, and decisions are never delegated freehand. No model pin here: the caller's routing law decides.
+Every substantial lane keeps these load-bearing:
 
----
+- **Purpose:** what is being built and why.
+- **User Journey Unlock:** the concrete experience made possible.
+- **Engineering System Unlock:** the capability or reliability truth made possible, when one genuinely exists.
+- **vFinal:** the complete intended journey, not a `v0`, `v1`, or MVP substitute.
+- **Primary entrypoints:** the exact API, route, event, command, or user action where the journey begins.
+- **North Star:** actor, steps, observable success, obvious next action, experience invariants, obviousness assumptions, and the design/UX bar.
+- **Non-goals:** explicit scope boundaries that do not weaken the required experience.
+- **Request anchor:** the user's required outcomes and prohibitions in near-verbatim language.
+- **Current truth:** only facts, unknowns, and decisions that can change the active or next slice.
+- **Observable contracts:** stable `C-###` statements that can visibly fail.
+- **Vertical-slice ladder:** meaningful working experiences leading to `vFinal`; the active rung is the richest build packet.
+- **Current motion:** active rung, next action or blocker, and the honest claim boundary.
+- **Acceptance:** the shortest direct value-path observation and any genuinely human feel decision.
 
-## Schema Authority
+If compaction makes the file smaller but loses one of these, the compaction failed.
 
-- **Stale specs are synced, not versioned.** A spec that predates the current template is handled like any lagging doc (root §1): status-only edits conform locally; the first lane that materially touches it restructures it to the current template — mapping old sections in, archiving displaced content with pointers, noting the restructure in the change log. Never renumber existing IDs.
-- When creating a spec, materially restructuring one, or rewriting a milestone ladder, use this file's template and conformance check as the source of truth. For status syncs and small fixes, preserve the existing structure unless the touched section is already stale.
+## Product hierarchy
 
----
+Read and author in this order:
 
-## Core Principle — Spend the Budget on Rungs
+1. `vFinal` and the North Star journey.
+2. Required user outcomes and non-goals.
+3. Vertical rungs through that same journey.
+4. Contracts and current engineering truth needed by the active rung.
+5. Current motion and proportionate proof.
 
-Milestone rungs are self-contained build packets: enough product intent, taste, engineering boundary, contracts, and proof context that a senior engineer or agent with zero authoring context can execute well. Everything outside the rungs is a compact index into them. Cut bloat from stale changelogs, resolved questions, dead source refs, and completed proof narration — never from the active rung. A spec whose header is richer than its active rung is upside down.
+Administrative neatness never outranks product meaning. A perfectly formatted spec that permits the wrong experience is not ready to build.
 
----
+## Request fidelity
 
-## Authoring Laws
+Capture every substantial request before synthesizing it away:
 
-Rules any reader or editor of the artifact must preserve live **once**, in the spec's own Doc Conventions block (inside the template below) — the spec must defend itself even when this skill is not loaded. This section carries only what cannot live in the document:
+- Use one near-verbatim bullet for a single critical request.
+- For multi-item intake, use one bullet per `Must`, `Must Not`, `Preference`, `Permission`, or `Question`.
+- `Must` and `Must Not` items must map to the North Star, a `C-###`, or a rung that observably delivers them.
+- A required item cannot be omitted, weakened, deferred, made a non-goal, or replaced by an easier non-equivalent proxy without an explicit human product decision naming that item.
+- Preferences, permissions, and questions guide implementation but do not freeze the product boundary unless the user promotes them to a requirement.
 
-1. **Rigidity is claimed, not accidental.** The root contract says required elements, free rendering. A multi-writer durable artifact earns more: stable top-level addresses and append-only IDs are what make concurrent merge-additive editing and cross-file references possible — that is the exemption, and it is scoped. **Rigid:** the section skeleton, the ID grammar, contracts-in-§4-only, milestone namespacing, the projection-sync rule. **Free:** prose shape inside rungs, which contract clusters exist, field rendering, and all counts — targets, not mandates — except the ≤5 next-actions and ≤3 active-changelog caps, which are load-bearing anti-bloat.
-2. **Doc health is audited, not self-graded.** Run the conformance check at the end of this file before writing; store no scorecard. A stored ✅ grid graded by the context that wrote the doc is fake proof; the §6 audit lens owns doc-health verdicts.
-3. **Intake is sacred.** Multi-item user asks get an Input Coverage Ledger before synthesis; no item disappears into generic prose. User asks are intake, never `[FACT]`.
-4. **The spec outlives its evidence.** `tmp/` artifacts expire; every recorded artifact keeps a surviving summary — the load-bearing figures and how to regenerate them — in the rung itself.
+Always ask: **Could an agent complete this spec while visibly failing what the user actually requested?** If yes, fix the product map before implementation. Similar colors, labels, mechanisms, or vibes are not equivalent delivery.
 
----
+## The map is not the territory
 
-## Lifecycle
+Approval protects product meaning, not guesses:
 
-- **Create** when a substantial lane is proposed or approved (root §4). The unlock, acceptance gate, lane boundary, and biggest risk exist in the spec before implementation starts.
-- **Maintain** after approval, after every rung state change, and whenever a discovered invariant, decision, or eval failure reveals repo truth. For ongoing work, load the active spec before broad repo reads.
-- **Park** when a lane is deliberately paused: status `Parked`, with the reason and the resume condition named. `In Progress` with no active rung and no `Blocked`/`Parked` marker is a defect — fix the state, don't leave zombies.
-- **Close** when the lane hits root §6's Complete checklist: final change-log entry records the closing commit, status flips to `Complete`, and the feature folder gains the `DONE__` prefix (repo convention, cf. `docs/features/DONE__*`) so closed lanes are visible from the tree without opening a file.
+- **Human decision required:** a materially different `vFinal`; a changed `Must` or `Must Not`; a non-goal reversal; a materially different user/consumer promise; violation of an existing external contract; a new externally owned authority or safety/data-integrity boundary; an irreversible operation; or reversal of an explicit product decision.
+- **Adaptive by default:** files, symbols, internal architecture, technical schema details that preserve the same external promise, sequencing, estimates, implementation notes, discovered touchpoints, proof mechanics, and splitting/merging/reordering equivalent rungs.
 
----
+Change adaptive details as implementation teaches you more. Update the spec immediately only when product meaning, a load-bearing contract, the observable rung boundary, a blocker, or a human decision changes. Otherwise batch useful implementation truth at a coherent checkpoint or rung close. Never stop delivery for wording polish or mechanical synchronization.
+
+## Rungs are working experiences
+
+Every rung:
+
+- begins at a real user, developer, operator, or system entrypoint;
+- crosses the real path needed for that slice;
+- ends in an observable outcome worth having;
+- uses the lasting shape we intend to extend;
+- leaves the repo coherent;
+- makes the next rung additive.
+
+A rung may defer capability. It may not fake the core experience, substitute a proxy, or create work expected to be replaced. Backend, schema, tests, polish, and bounded feasibility investigation are work inside a rung, not milestones by themselves.
+
+The active rung is rich enough to build. The next rung needs only enough detail to expose architecture-shaping constraints. Later rungs stay thin until they become active.
+
+## Proof serves implementation
+
+Start with direct inspection, current source, and existing checks. Add a durable test, eval plan, harness, artifact bundle, or independent audit only when a specific material risk cannot be credibly handled without it. The work spec records the surviving conclusion and honest claim boundary, not a second proof system.
+
+Subjective feel, taste, readability, motion, and fun remain human decisions. Record the exact question and response when they matter; do not invent automated acceptance.
+
+## One product file, optional supporting depth
+
+The work spec remains the only home for product commitments, contracts, active-rung judgment, current motion, and completion truth.
+
+If actual use shows that a large postmortem, code atlas, research corpus, payload collection, or media index obscures the product map, move that non-normative depth to a linked file in the same feature folder. Keep a short surviving conclusion and exact pointer in the work spec. Do not create default sidecars or move state into references.
 
 ## Workflow
 
-1. **Re-read, then ingest.** Re-read the current spec immediately before editing (parallel sessions edit it too), then ingest the new material: diffs, decisions, proof output, user asks.
-2. **Coverage before synthesis.** Multi-item intake → create or update the Input Coverage Ledger first (Law 3).
-3. **Find the active rung:** state, latest rung commit, next journey proof, blockers, next commit point.
-4. **Epistemic pass:** source or label every active claim per the truth-labeling convention; contradictions land in §7, never smoothed over.
-5. **Write rung packets rich; keep everything else index-thin.**
-6. **Archive sweep:** resolved questions leave §7; old changelog → A1; superseded IDs → A4 with replacement pointers; completed-rung narration collapses to unlock + proof summary + surviving figures.
-7. **Projection resync:** header, Human Read, §5.1 index row, §6 gate table — all in this same edit (see conventions).
-8. **Emit the Skill Result** fields to the caller. The caller owns the human-facing close-out (root §5); do not render one here.
+1. Read the current user request and existing work spec, then inspect the smallest repo/runtime path that can confirm or change the product map.
+2. Re-derive `vFinal`, the North Star, non-goals, required intake, the ladder, and the active slice.
+3. Repair any missing required outcome, proxy substitution, horizontal milestone, stale product assumption, or material contradiction.
+4. Keep only current truth that changes the active or next rung; route bulky non-normative depth only when the core file is genuinely impaired.
+5. If the product spine and active rung are coherent, implementation is the next action. Do not create another summary or planning artifact by default.
+6. Edit the spec only for durable judgment: changed product meaning, contract, rung boundary, blocker, human decision, or coherent rung-close evidence.
+7. Re-read immediately before writing and merge concurrent changes without losing either writer's load-bearing judgment.
+8. Return the compact result below. This skill maintains the map; `$plan__prepare-goal` builds from it.
 
----
+## Canonical template
 
-## The Human Read
-
-The first field under the title, always. Shape: `We are trying to <direct product outcome> so that <one-level-higher outcome>. The active rung is <FEATURE-SLUG>__M# because <why it is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.`
-
-The `so that` clause must climb one level above the workflow — name the downstream product, player, business, trust, retention, or operational outcome, not the workflow restated in nicer words.
-
-- Weak: `We are trying to make incidents easier to scan so that operators can triage incidents confidently.`
-- Strong: `We are trying to make incidents easier to scan so that Harbor Pulse reduces time-to-mitigation and customer-impact uncertainty during live incidents.`
-
-One tight paragraph. It is an index into the spec, never a second source of truth.
-
----
-
-## Template
-
-```markdown
+~~~markdown
 # WORK SPEC — <FEATURE_NAME>
-**Human Read:** We are trying to <direct product outcome> so that <one-level-higher outcome>. The active rung is <FEATURE-SLUG>__M# because <why it is the next constraint>. The next proof is <artifact/test/smoke>. Main risk: <risk>. Decision needed: <none / exact decision>.
 
-**Last updated:** YYYY-MM-DD
-**Status:** Draft | Approved | In Progress | Blocked | Waiting Human | Parked | Complete
-**Active rung:** <FEATURE-SLUG>__M# — <name> — <root §4 state> | None
-**Next commit point:** <observable condition> | Not yet defined
-**Blocked by:** none | <exact blocker or waiting-human gate>
-**Eval plan:** `docs/work/<semantic-folders>/<feature-slug>/eval-plan.md` | Not created yet
-**Owners:** <humans/teams>
+**Purpose:** <what is being built and why>
+**User Journey Unlock:** <the concrete player/user/developer experience this unlocks>
+**Engineering System Unlock:** <capability, contract, reliability, or operational truth; omit when genuinely none>
+**vFinal:** <the complete intended journey when this lane succeeds>
+**Primary entrypoint(s):** <exact API/event/command/route/user action>
+**Related context:** <only useful links or source pointers>
 
-**Purpose:** <1–2 sentences: what is being built and why.>
-**User Journey Unlock:** <the concrete experience this unlocks for the player/user — for SDK/tooling lanes, the "user" is the consuming developer>
-**Engineering System Unlock:** <the capability, contract, reliability property, or operational truth this unlocks — omit only if genuinely none, and say so in Purpose>
-**Primary entry point(s):** <exact API/event/command/route>
-**Related docs:** <links / SRC refs>
-
-**Recent Change Log:** (≤3 active; older → A1)
-- YYYY-MM-DD — <what changed; which rung/contract/proof it affected>
-
----
-
-## Doc Conventions (Do Not Delete)
-
-- **Schema truth:** the `plan__maintain-work-spec` skill. Do not reorder or rename top-level sections 1–7 or A1–A5. A section with nothing active holds one honest line — never empty scaffolding, never `N/A` filler.
-- **Stable IDs, append-only; never renumber:** Facts `F-###` · Unverified `U-###` · Inferences `I-###` · Plans `P-###` · Contracts `C-###` · Sources `SRC-###` · Next actions `N-1…N-5` · Milestones `<FEATURE-SLUG>__M#` (no naked `M1`/`Phase 2` anywhere, including cross-file references; an ambiguous naked reference is a halt-and-clarify, not a guess). Superseded IDs move to A4 with a replacement pointer.
-- **Truth labels:** `[FACT]` requires `(SRC-###)`, file:line where possible. Unsourced claims are `[UNVERIFIED]` even when obvious. Major `[INFERENCE]` entries carry `Disprove if:`. `[PLAN]` marks intent. User asks live in the ledger, never as `[FACT]`.
-- **Contracts live in §4 only;** elsewhere cite `C-###`. Root laws bind by reference (`root §9 — no stopgaps`), never cloned as local contracts: every `C-###` is lane-specific and testable — write only contracts you could watch fail.
-- **Projection sync:** rung bodies (§5.2) are truth. The header fields, Human Read, §5.1 index row, and §6 gate table are projections — resync all of them in the same edit as any rung-state change. Conflicts resolve toward the rung body; gate state resolves toward the eval plan.
-- **Status vocabulary is root §4's,** verbatim, for rungs: Proposed / Approved / In Progress / Blocked / Objectively Green / Waiting Human / Complete. `Waiting Human` is never auto-claimed and never bundled into completion. The word "Done" is not a state.
-- **Evidence:** every rung records artifact path(s) or `Pending — <what will be captured>`. `tmp/` paths may expire: each recorded artifact keeps a one-to-three-line surviving summary (load-bearing figures + regeneration command). Artifact medium matches the gate (root §5): browser-rendered rungs record real route/scenario captures with viewport(s) and console/network status; canvas/game rungs additionally prove nonblank, correctly framed, interacting — "page loaded" is not proof.
-- **Taste-critical rungs** (feel, UX, visuals, copy, game design, interaction, dev ergonomics) carry rung-specific `Reference bar:` / `Must-feel delta:` / `Must-not-feel delta:` / `Rejection criteria:` lines. §1.D sets the feature-wide bar and never satisfies a rung by itself. Acceptance is a Waiting Human gate.
-- **Concurrency custody (root §8):** re-read before editing; merge additively; never clobber another session's recorded decisions.
-- **History moves, never vanishes:** resolved questions leave §7; old changelog → A1; superseded content → A4 with pointers; quarantined maybe-useful notes → A5.
-
----
-
-## Input Coverage Ledger (multi-item intake; lives here until the user accepts the spec, then → A4)
-
-| # | User item | Disposition | Where it lives | Notes |
-| --- | --- | --- | --- | --- |
-| 1 | <user's wording, audit-preservable> | Included / Merged / Deferred / Blocked / Open question / Non-goal | <rung / C-### / §7 / §2 / A5> | <why> |
-
-Several asks merging into one rung keep separate rows pointing at the same rung. An item not being built says which of Deferred / Blocked / Open question / Non-goal it is.
-
----
-
-## 1) North Star (Product, UX, Design)
+## 1) North Star — vFinal
 
 ### 1.A Journey
-- **Actor:** <user / service / operator>
-- **Entry point:** <the exact API/event/command they hit first>
-- **Steps:** <3–5 max>
-- **Success:** <what "worked" means, observably>
-- **Next thing they'll try:** <the action that must be obvious after success>
+- **Actor:** <user / developer / service / operator>
+- **Entry point:** <what they hit first>
+- **Steps:** <3–5 maximum>
+- **Success:** <observable terminal result>
+- **Next thing they will try:** <the obvious next action>
 
-### 1.B Experience invariants — "it's not real unless…"
-Author these directly as `C-###` entries in §4; list only the IDs here with a one-line gloss each. (Single-homed: the contract text lives in §4.)
+### 1.B Experience invariants — “it is not real unless…”
+- `C-###` — <one-line gloss; contract text lives in §5>
 
 ### 1.C Obviousness audit
-Top ~5 things a reasonable user assumes true that engineers might forget to build: **Assumption** → **Technical implication** (the requirement or integration proof it maps to).
+- **Assumption:** <what a reasonable user assumes> → **Implication:** <what must therefore be built or proven>
 
-### 1.D Design / UX bar (feature-wide)
-- **Experience target:** <what this should feel like or enable>
-- **Reference bar:** <specific product, local artifact, clip, prior implementation, or "None yet — established in rung X">
-- **Must feel:** <3–5> · **Must not feel:** <3–5>
-- **Human-review rejection criteria:** <what makes a reviewer reject the result>
+### 1.D Design / UX bar
+- **Experience target:** <what it should feel like or enable>
+- **Reference bar:** <specific artifact/product/clip, or an explicit rung where it will be established>
+- **Must feel:** <3–5>
+- **Must not feel:** <3–5>
+- **Human rejection criteria:** <what makes the experience unacceptable>
 
 ## 2) Non-Goals
 
-- <explicitly out of scope — "we are not building X">
+- <explicitly out of scope without weakening the required journey>
 
-## 3) Current State
+## 3) Request Anchor
 
-### 3.1 Truth for active/next rungs
-- [FACT F-001 | Confidence: High/Med/Low] <claim> — (SRC-001)
-- [UNVERIFIED U-001] <claim> — <what source is missing>
-- [INFERENCE I-001] <claim> — supported by F-___ — Disprove if: <one-liner>
-- [PLAN P-001] <planned change> — <why> — (links: M__ / C-___)
-Facts not affecting the active rung, next rung, a blocker, or a durable contract move to A3.
+- **Must:** <near-verbatim required outcome>
+- **Must Not:** <near-verbatim prohibition>
+- **Preference:** <guidance, only when material>
+- **Permission:** <allowed option, not a requirement>
+- **Question:** <unresolved choice that could change the product>
 
-### 3.2 Gaps vs North Star
-- <gap / risk / unknown>
+Omit unused force types. A changed required item needs an explicit human product decision.
 
-### 3.3 Next actions (≤5)
-- (N-1) <imperative action> — done when <measurable condition>
+## 4) Current Truth
 
-## 4) Contracts & Invariants (SOURCE OF TRUTH)
+- **Fact:** <decision-relevant truth> — <source>
+- **Unknown:** <what is not yet known> — matters because <effect on active/next rung>
+- **Decision:** <binding choice and why> — <human or repo authority>
 
-Optional definitions first. Then lane-specific `C-###` entries, clustered by concern **as needed — omit empty clusters entirely:** experience/product · safety/privacy · performance & hot path (budgets; include a cost-guardrail contract only when the lane changes production resource usage — infra, external services, model/tool calls, storage, hot paths — with the full Fermi worksheet in A5; otherwise cost analysis does not appear at all) · data bounding (hard caps, ordering, pagination, truncation, idempotency, empty-vs-missing-vs-error semantics) · surface schemas (name, inputs, outputs, limits, error semantics, observability — compact JSON examples where helpful) · failure & degradation (retries, dead letters, circuit breaking, rollback).
+Keep this section scoped to the active and next rung.
 
-- [C-001 | Must] If <condition>, then <result>, otherwise the feature is broken. — (SRC-___ if verified)
-- [C-002 | Must Not] <…>
+## 5) Contracts & Invariants
 
-## 5) Milestones (production-shippable ladder)
+- `[C-001 | Must]` If <condition>, then <observable result>, otherwise the feature is broken.
+- `[C-002 | Must Not]` <forbidden observable outcome>.
 
-**Rung sizing** — judgment surface and blast radius, not calendar. Every rung records all four axes; `N/A` only with a reason.
+Contracts live here once. Elsewhere cite their IDs.
 
-| Axis | S | M | L | XL |
-| --- | --- | --- | --- | --- |
-| Complexity | one surface, well-patterned | 2–3 surfaces, some ambiguity | cross-cutting, new patterns | architectural, new primitives |
-| Risk | revertible, 1-feature blast radius | shared infra, needs rollback plan | data model / user-facing degradation | irreversible migration, security, or money |
-| Perf impact | no hot-path change | measurable, within budget | needs load test | architectural risk |
-| Cost impact | <$100/mo | $100–1k/mo | $1k–10k/mo | >$10k/mo |
+## 6) Vertical-Slice Ladder to vFinal
 
-### 5.1 Rung index (projection of 5.2)
+### <FEATURE-SLUG>__M1 — <valuable slice name> — Active
+- **Unlock:** <valuable part of vFinal now made real>
+- **Working slice:** <actor → real entrypoint → real path → observable success → obvious next action>
+- **vFinal advance:** <what becomes genuinely true and what remains>
+- **Experience bar:** <rung-specific quality/rejection criteria when needed>
+- **Lasting shape:** <why this is extended rather than replaced>
+- **Implementation map:** <current best design and likely surfaces; explicitly adaptive>
+- **Not in this rung:** <capability boundary>
+- **Contracts:** <C-###>
+- **Material risk:** <only a failure that could meaningfully break this slice>
+- **Direct proof:** <shortest credible observation of the promised outcome>
+- **Done when:** <the actor can complete and observe the slice>
 
-| Rung | State | Size | Unlock | Proof summary | Evidence | Commit | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+### <FEATURE-SLUG>__M2 — <next valuable slice>
+- **Unlock / vFinal advance:** <what it adds>
+- **Dependency or decision deadline:** <only what can shape the active rung>
+- **Not in this rung:** <boundary>
 
-### 5.2 Rung packets (truth)
+Future rungs may be one or two lines until they become active. Split, merge, reorder, or rewrite rungs when implementation truth changes while preserving the approved product boundary.
 
-Frame every rung one level above the implementation: "This unlocks [journey]. Within it, this rung enables [specific step]. The next thing the user will obviously try is [next step]" — if that next step doesn't exist, that is a named gap. Completed work is described by what it unlocked, not what it implemented.
+Collapse completed rungs so the active rung remains richest:
 
-Required elements per rung — rendering is free, elements are not:
+### <FEATURE-SLUG>__M0 — <completed slice> — Complete
+- **Unlock / surviving result:** <what now works, including any load-bearing figure>
+- **Regenerate / inspect:** <shortest command, action, or durable pointer when the evidence is ephemeral>
+- **Claim boundary:** <what this result does and does not establish>
 
-- **State** (root §4 vocabulary) and **Size** (four axes).
-- **Unlock:** the user/developer/engineering journey — actor, entry, 3–5 steps, observable success.
-- **Design brief:** the product intent, engineering shape, or implementation philosophy needed to execute well; taste-critical rungs include their four taste lines here (see conventions).
-- **Implementation lane:** owned systems/surfaces — evidence, not an allowlist.
-- **Not in this rung:** what it intentionally does not do.
-- **Contracts:** `C-###` refs and root-law refs; never restated.
-- **Obviousness checks:** top assumptions → integration proof or time-bounded defer.
-- **Risk & failure modes:** when material (privacy / perf / data loss / hangs).
-- **Proof plan:** eval-plan gate IDs plus the shortest real journey loop that proves the value path (root §5 — mechanism-only or proxy proof cannot complete a rung; the eval plan owns harness mechanics and thresholds).
-- **Evidence artifacts:** paths or `Pending — <what>`, with surviving summaries; medium per conventions.
-- **Rung commit:** `<short-sha> — <subject>` | `Pending — commit after proof, spec sync, and eval sync`.
-- **Done when:** the exact observable completion condition, including evidence recorded, projections synced, and commit recorded.
+## 7) Current Motion
 
-Completed rungs collapse to: unlock + proof summary + surviving figures + evidence pointer + commit. Narration → A4.
+- **Lane state:** Proposed | Active | Blocked | Parked | Complete | Superseded
+- **Approval:** <current-turn instruction or durable actor/source/date/scope when needed>
+- **Active rung:** <ID> | None
+- **Next action:** <one meaningful implementation action> | Blocked by <condition> | None
+- **Claim boundary:** <what current implementation/evidence supports and does not support>
 
-## 6) Proof & Eval Summary (projection of the eval plan)
+## 8) Proof & Human Acceptance
 
-| Gate | Rung | State | Artifact |
-| --- | --- | --- | --- |
+- **Terminal value-path observation:** <actor → entrypoint → terminal result, or pending>
+- **Material unproven risk:** <risk and cheapest credible next check> | None
+- **Human acceptance:** <exact question and response> | None required | Waiting
+- **Optional proof artifact:** <path and why it is necessary> | None
 
-Mirrors eval-plan gate state; divergence resolves toward the eval plan. A gate without a runnable harness is marked `needs $eval__implement-proof-gate`, never quietly skipped.
+## 9) Decisions & Supporting References
 
-## 7) Open Questions / Blockers
+- **Binding decision:** <date / decision / rationale / authority / what would reopen it>
+- **Supporting reference:** <path / surviving conclusion / when to read> | None
+~~~
 
-Each entry: why it matters, what would resolve it, and YOUR opinionated recommendation. Resolved questions move out (A4) in the same edit that resolves them.
+Delete empty optional lines and sections rather than filling them with `N/A`. Existing specs may keep stable IDs and a different rendering; do not rewrite them merely to resemble the template.
 
----
+## Final check
 
-# Appendix
+Before writing, confirm:
 
-## A1) Change-log history — entries rotated out of the header.
-## A2) Decision log (ADR-lite) — Date / Decision / Rationale / Alternatives / Consequences / Disprove if. Recorded decisions bind later sessions (root §3).
-## A3) Sources — `SRC-###: <file:line / commit / command / test output> — <what it proves> — (captured YYYY-MM-DD)`; plus inactive facts.
-## A4) Archive — superseded content with replacement pointers; accepted coverage ledgers; completed-rung narration; resolved questions.
-## A5) Quarantined scratch — raw notes, pasted context, maybe-important edge cases; optional deep implementation spec (sequence/state diagrams, store schemas, payload examples, cost worksheet). Must not redefine §4 contracts. Promote a note only when it affects a rung, blocker, or contract.
-```
+- the request anchor, `vFinal`, North Star, non-goals, contracts, and ladder describe the same product;
+- every required item maps to an observable contract or rung, with any changed/deferred treatment explicitly awaiting a human product decision;
+- every rung is a valuable vertical slice using the lasting shape;
+- the active rung is the richest section and is buildable now;
+- implementation details remain adaptive;
+- current motion names one next action or a real blocker;
+- proof is the cheapest credible direct observation, not a parallel product;
+- no digest, projection ledger, mandatory eval, or default audit was introduced.
 
----
+## Skill result
 
-## Conformance Check (run before writing — never stored in the doc)
+Return only:
 
-- Human Read is the first field; its `so that` climbs a level; it names active rung, next proof, main risk, decision needed.
-- Every `[FACT]` has a `SRC`; major inferences have `Disprove if`; contradictions sit in §7, not smoothed over.
-- Contracts appear only in §4; zero root-law clones; every `C-###` is testable.
-- Rungs are the richest section; taste-critical rungs carry their own taste block; every rung has evidence recorded or `Pending` with a surviving-summary plan.
-- Projections match rung bodies (header, Human Read, §5.1, §6) after this edit.
-- ≤5 next actions; ≤3 active changelog entries; archives carry pointers; no empty scaffolding sections.
-- No naked or duplicate milestone IDs; statuses use root vocabulary; ledger covers every user item on multi-item intake.
+- work-spec path;
+- `vFinal`;
+- active vertical-slice unlock;
+- next implementation action or exact blocker;
+- any changed product decision, contract, human acceptance, or honest claim boundary.
 
-## Skill Result (return to caller)
-
-- Work spec path · Eval plan path
-- Eval-plan coverage: Missing | Covers exact lane | Needs `$eval__design-proof-gates` | Synced this edit
-- Feature slug
-- Lane status + approval state · Active rung · Lane boundary (one line)
-- Input coverage state · Open blockers
-- Next proof / commit point · Recommended next action
+Do not grant approval or start implementation from this skill.

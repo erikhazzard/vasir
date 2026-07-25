@@ -110,6 +110,31 @@ Use local state first.`
   assert.deepEqual(listSkillPromptMarkdownFiles(skillDirectoryPath), ["SKILL.md", "references/patterns.md"]);
 });
 
+test("readSkillMetadata folds multiline frontmatter descriptions", () => {
+  const repositoryDirectory = createTemporaryDirectory();
+  const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "react");
+
+  writeFile(
+    path.join(skillDirectoryPath, "SKILL.md"),
+    `---
+name: react
+description: >-
+  Designs React component boundaries and effect discipline.
+  Trigger: component work where state ownership or external synchronization is unclear.
+---
+
+# React
+`
+  );
+
+  const skillMetadata = readSkillMetadata(skillDirectoryPath);
+
+  assert.equal(
+    skillMetadata.description,
+    "Designs React component boundaries and effect discipline. Trigger: component work where state ownership or external synchronization is unclear."
+  );
+});
+
 test("resolveSkillSource accepts repo skills that only define manifest metadata", () => {
   const repositoryDirectory = createTemporaryDirectory();
   const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "react");

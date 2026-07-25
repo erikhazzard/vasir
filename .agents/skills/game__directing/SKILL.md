@@ -18,7 +18,7 @@ Coherence is what happens when you actually know what you're making. The patholo
 Default domain context:
 * Platform: **mobile-native portrait browser** (Idavoll webview/PWA host), touch-first, 390 x 844 reference viewport (repo physics, root §2), 60fps+ target, short sessions (30s–10m), one-hand ergonomics (thumb near bottom), interruptions common (calls/notifications/tab-switch), haptics only where the host provides them
 
-**Place in the system.** The Design Brief is a durable artifact — it lives with the game (default `games/<slug>/design-brief.md`, or the repo's design-docs home per repo canon), never only in chat. On a substantial lane: the One-Sentence Vision and Emotion Map land in the work spec's North Star and taste bar (§1.A/1.B); the Validation Plan's acceptance criteria become eval-plan gates via `$eval__design-proof-gates`, with the Slap Test as the subjective gate — `$game__orchestrating-playable-build` renders the provisional verdict, the human closes it. The brief scales by depth, not by skipping sections: a tiny game gets short answers, not missing ones.
+**Place in the system.** The long-lived game Design Brief may remain a domain artifact, while each substantial lane single-homes its accepted vision/emotion/journey in the work spec. Validation criteria shape proof only when they represent plausible material failure; an eval gate exists only when durable coordination is warranted. If playability/feel is an approved subjective claim, a Slap Test question closes only on a human receipt. The brief scales by depth, not filler.
 
 ---
 
@@ -441,7 +441,7 @@ SECOND 3-10: What HAPPENS?
 If ANY of these answers are unclear or unsatisfying, redesign before coding. **Text-based tutorials are a design failure.** The game's visual and interactive design must be self-explanatory. If you need text to explain how to play, the design isn't communicating.
 
 
-You must output a minimal test plan with acceptance criteria:
+When zero-context first-playable comprehension is part of the requested claim, keep this compact human playcheck and its acceptance criteria inside the Design Brief. It does not automatically require an automated test, separate test-plan artifact, screenshot bundle, or fixed threshold; omit or adapt any item that does not protect the actual player journey:
 
 ### 13A) Micro-Playtest Script (5 minutes total)
 
@@ -461,13 +461,11 @@ Include targets like:
 * Failures feel attributable (player can say why they failed)
 * No single strategy dominates over 10 runs (qualitative + metric proxy)
 
-On a lane, these criteria become eval-plan gates; the micro-playtest script is the subjective gate's protocol.
+On a lane, these criteria become work-spec contracts only when they represent plausible material failure. Objective claims become eval-plan gates only when durable coordination is warranted; the micro-playtest becomes a subjective protocol only when playability/feel actually needs a human decision.
 
-### 13C) Instrumentation (lightweight)
+### 13C) Instrumentation decision
 
-List 5 metrics/events to log:
-
-* first input time, death cause, near-miss count, combo length, session duration, etc.
+Name only metrics/events needed to falsify a material design claim and not already observable. Product instrumentation is an approved product-rung change with its own contract; do not add five events by quota.
 
 ## 14) Implementation Guardrails (platform-aware, not engine-specific)
 
@@ -549,7 +547,7 @@ FEEDBACK:      [sandwich for verb + success + failure]        ☐ 3+ channels ea
 COMPOSITION:   [focal / state / ambient layers]               ☐ safe-area aware
 ONBOARDING:    [0-10s / 10-30s / 30-90s ladder]              ☐ no text tutorials
 STRATEGIES:    [≥ 2 viable, no dominant]                      ☐ both communicable
-VALIDATION:    [acceptance criteria + instrumentation]        ☐ measurable
+VALIDATION:    [acceptance criteria + warranted evidence]     ☐ falsifiable
 GUARDRAILS:    [dt-stable, determinism, states, save, perf, a11y] ☐ no conflicts
 
 TOKEN LOCK: After this point, no new colors, shapes, or

@@ -63,6 +63,28 @@ function parseInlineList(rawValue) {
     .filter(Boolean);
 }
 
+function parseBlockScalar(blockLines, style) {
+  const normalizedLines = blockLines.map((line) => line.trim());
+  if (style === "|") {
+    return normalizeScalarText(normalizedLines.join("\n")) ?? "";
+  }
+
+  let foldedValue = "";
+  for (const line of normalizedLines) {
+    if (!line) {
+      foldedValue = `${foldedValue.trimEnd()}\n`;
+      continue;
+    }
+
+    if (foldedValue && !foldedValue.endsWith("\n")) {
+      foldedValue += " ";
+    }
+    foldedValue += line;
+  }
+
+  return normalizeScalarText(foldedValue) ?? "";
+}
+
 function parseManifestFrontmatter(skillManifestContents) {
   const lines = skillManifestContents.split(/\r?\n/);
   if (lines[0]?.trim() !== "---") {
@@ -76,8 +98,10 @@ function parseManifestFrontmatter(skillManifestContents) {
 
   const frontmatter = {};
   let activeListKey = null;
+  const frontmatterLines = lines.slice(1, endMarkerIndex);
 
-  for (const rawLine of lines.slice(1, endMarkerIndex)) {
+  for (let lineIndex = 0; lineIndex < frontmatterLines.length; lineIndex += 1) {
+    const rawLine = frontmatterLines[lineIndex];
     const trimmedLine = rawLine.trim();
     if (!trimmedLine || trimmedLine.startsWith("#")) {
       continue;
@@ -99,6 +123,22 @@ function parseManifestFrontmatter(skillManifestContents) {
 
     const [, key, rawValue] = fieldMatch;
     const trimmedValue = rawValue.trim();
+    const blockScalarMatch = trimmedValue.match(/^([>|])[-+]?$/);
+    if (blockScalarMatch) {
+      const blockLines = [];
+      while (lineIndex + 1 < frontmatterLines.length) {
+        const nextLine = frontmatterLines[lineIndex + 1];
+        if (nextLine.trim() && !/^\s/.test(nextLine)) {
+          break;
+        }
+        lineIndex += 1;
+        blockLines.push(nextLine);
+      }
+      frontmatter[key] = parseBlockScalar(blockLines, blockScalarMatch[1]);
+      activeListKey = null;
+      continue;
+    }
+
     if (!trimmedValue) {
       frontmatter[key] = [];
       activeListKey = key;

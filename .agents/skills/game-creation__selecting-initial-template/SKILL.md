@@ -15,18 +15,18 @@ All games are mobile-native portrait products. Desktop, web, and landscape are s
 
 This skill is also the create-game initialization root. Studio and local Codex must use the same skill stack; Studio may prepare the workspace, but it must not secretly route prompts, choose templates, or inject hidden design rules that local Codex cannot run.
 
-When this skill is invoked by a creator request to make, build, create, initialize, or finish a game, it has full approval to drive the workspace to a proven first playable. Do not stop between template selection, implementation, proof, audit, and repair unless the creator explicitly asked for approval-first work or a real blocker prevents progress.
+When a creator explicitly asks to make, build, create, initialize, or finish a game, that request is durable approval evidence for the named first-playable scope — not “full approval.” Record the actor, source, date, exact scope, and current spec revision; exclude publish/deploy, destructive, external-message, and unrelated product decisions unless the request includes them. Within that current scope, proceed through implementation and proportional proof without repeatedly asking permission. If the creator requested spec-only or approval-first work, do not launch.
 
-## Required Initialization Skill Stack
+## Applicable Initialization Skill Routes
 
-After reading the approved `README__game-spec.md`, explicitly load or invoke the relevant local skills in this order:
+After reading the approved `README__game-spec.md`, load only the local skills whose judgment the game actually needs. This list is routing, not an artifact or skill-count quota:
 
 1. **Template substrate**: this skill chooses the starter template and states `Selected template: <template path> - <reason>.`
 2. **Game direction**: use `game__directing` for coherence unless a narrower genre skill is clearly the stronger fit.
 3. **Genre/system skill**: use `game__genre-routing`, combat, loot, inventory, economy, or procedural skills when the spec meaningfully depends on that domain. Route auto-battlers, tactics drafts, shop/bench/board games, party synergies, or automated combat after player setup through `game__genre-routing`.
 4. **Art direction**: use `game__art-directing` before implementing the first screen if the game has any visual world, characters, enemies, cards, pieces, board, arena, or branded object language.
 5. **Player-facing shell UI**: use `design__designing-game-ui-for-idavoll` for any HUD, card row, upgrade/draft surface, controls, pause, results, or runtime overlay. A first playable is not complete if the first screen is generic debug chrome.
-6. **First-playable comprehension proof**: use `game-proof__auditing-first-playable-comprehension` to inspect whether a zero-context player can understand goal, action, consequence, score, phase, and win/loss before claiming initialization done.
+6. **First-playable comprehension proof**: when the user requests an audit or a specific false-first-playable/mobile-comprehension risk warrants clean-context review, `game-proof__auditing-first-playable-comprehension` can own that focused review. Do not add another audit merely because the skill exists.
 7. **Juice/polish**: use `game__adding-juice` once the loop is readable, especially for taps, hits, kills, rewards, transitions, and failure.
 
 Do not paste these skill bodies into the prompt. Let Codex load the skills normally from `.codex/skills` or `.agents/skills`. If a required skill is missing, say which skill is missing, use the nearest available repo guidance, and treat that as a skill-sync bug to fix rather than a reason to invent backend prompt choreography.
@@ -38,43 +38,43 @@ Run this algorithm until the workspace reaches exactly one terminal state: `Read
 0. **Authority pass**: confirm the creator requested make/build/create/initialize/finish or otherwise approved autonomous implementation. If the creator asked for spec-only or approval-first work, do not run this algorithm.
 1. **Spec pass**: read `README__game-spec.md`. If it is missing, placeholder, vague, or contradicted by the creator request, invoke `game-creation__writing-game-spec`; after the spec is written, continue unless that skill stopped for explicit approval-first handling.
 2. **Template pass**: inspect local template inventory, choose the smallest viable substrate, and emit `Selected template: <template path> - <reason>.`
-3. **Skill-stack pass**: load the Required Initialization Skill Stack and start the Skill Evidence Ledger before product-code edits.
-4. **Build pass**: adapt or create the game loop, controls, feedback, UI, assets, tests, simulations, and metadata hooks needed by the spec. Build the actual game, not a copied scaffold.
-5. **Proof pass**: run the smallest real command set that proves the current risk surface: tests, build, simulations, browser QA, mandatory 390 x 844 portrait screenshot, video/timeline capture, metadata ensure, and any game-specific proof named by the spec.
-6. **Audit pass**: inspect the proof packet against player agency, first-screen quality, UI comprehension, art/asset integrity, and technical correctness. Use subagents when available.
-7. **Repair pass**: fix the single highest-severity blocker found by proof/audit, then return to step 5. Do not drift into unrelated polish while a proof blocker remains.
+3. **Skill-routing pass**: load the applicable routes above. Record only decisions a skill materially changes; no ledger entry exists just to prove a skill was mentioned.
+4. **Build pass**: adapt or create the actual game loop, controls, feedback, UI, and assets required by the approved spec. Add tests, simulations, metadata hooks, or new harness code only when a specific material failure cannot be guarded more simply.
+5. **Proof pass**: map plausible material failures to sufficient existing evidence, the cheapest warranted proof, or an authorized narrowed claim. Observe the real player loop at its public surface. A 390 x 844 portrait render is the mobile authority seam when visual/mobile truth is being proved; a stored screenshot, video, browser harness, simulation, or durable test is not automatic.
+6. **Optional audit pass**: run one focused clean-context review only when the user requests it or a named high-regret risk warrants independent judgment. Add gameplay/UI/art/QA lenses only for the specific blind spot; otherwise proceed without an audit.
+7. **Repair pass**: fix the highest-severity in-scope blocker, rerun only affected proof, and return the resolution to the terminal verdict. Do not drift into unrelated polish while a real blocker remains.
 8. **Terminal-state pass**:
-   - `Ready`: player action, immediate feedback, state consequence, later outcome, result/restart, required visual assets, 390 x 844 portrait screenshot proof, tests/build/browser proof, and skill ledger all pass.
+   - `Ready`: the public player loop shows action, immediate feedback, state consequence, later outcome, and result/restart; all warranted objective proof and required human acceptance are current; the claim is no broader than that evidence.
    - `Candidate`: the game runs and has a plausible loop, but subjective feel, art/readability, metadata, or proof depth still needs human review or another pass.
    - `Blocked`: a missing tool, API key, package, auth state, unsafe/copyright ambiguity, or impossible proof dependency prevents the required loop.
 
 ### Subagent Lanes
 
-Use subagents whenever the provider exposes them and the task is broad enough to benefit. The root agent remains responsible for integration, final files, and the terminal state.
+Delegate only when a bounded lane repays spawn overhead or a warranted audit requires clean-context isolation. The root agent remains responsible for integration, final files, and the terminal state. The lanes below are optional lenses, not a mandatory four-agent fan-out.
 
 - **Gameplay/agency auditor**: checks core verb, meaningful choice, feedback, state consequence, and renewed intent.
 - **UI/comprehension auditor**: checks first frame, controls, HUD, overlays, results, labels, and mobile readability.
 - **Art/assets auditor**: checks game-specific visual identity, generated/promoted bitmap assets, sprite/background readability, and placeholder leakage.
-- **QA/proof auditor**: checks tests, build, browser artifacts, screenshots/video, metadata readiness, and missing proof.
+- **QA/proof auditor**: checks warranted tests, builds, browser artifacts, screenshots/video, metadata readiness, and missing proof.
 
-Subagents share the same workspace. Do not use worktrees, branches, private copies, per-agent source roots, or merge protocols. Subagents may read broadly; they may edit only when the root agent assigns a narrow file lane. If subagents are unavailable, run the same lanes sequentially as self-audits.
+Subagents share the same workspace. Do not use worktrees, branches, private copies, per-agent source roots, or merge protocols. Subagents may read broadly; they may edit only when the root agent assigns a narrow file lane. If clean-context terminal verification is required but unavailable, report that exact blocker; do not manufacture several same-context “independent” audits.
 
 ## Skill Evidence Ledger
 
-Before implementation begins, keep a compact ledger of every required skill:
+When multiple skills materially influence the build, keep a compact ledger of the skills actually used:
 
 ```text
 Skill Evidence Ledger:
 - <skill-name>: <decision/result it changed> -> <artifact, code path, screenshot, sim, or proof it affected>
 ```
 
-The ledger is not ceremonial. If a required skill does not change a design decision, implementation decision, proof target, or handoff risk, it was not meaningfully used. Do not claim complete with a missing or empty ledger; report a blocked or candidate state instead.
+The ledger is not ceremonial. If a skill does not change a design decision, implementation decision, proof target, or handoff risk, omit it. A single-skill lane needs no empty ledger; completion depends on the player journey and warranted proof, not a skill count.
 
-## First-Screen Quality Gate
+## First-Screen Quality Check
 
-Before calling initialization done, capture or run the narrowest available preview/QA proof and inspect the first playable screen. Fail the pass and revise if any of these are true:
+Before calling initialization done, inspect the first playable screen through the narrowest faithful preview already available. Retain a durable visual artifact only when later human review, expensive/non-regenerable evidence, or handoff needs it. Reject the experience if any of these are true:
 
-- No fresh current-code **390 x 844** portrait screenshot exists for the first playable surface.
+- The inspected authority surface is not mobile portrait when the product claim is mobile portrait; 390 x 844 is the default reference size, not an automatic screenshot requirement.
 - The screen reads as instrumentation, debug HUD, or generic neon prototype instead of the game promised by the spec.
 - The first viewport has no strong subject-matter signal: no readable enemy, board, avatar, place, object, card art language, or game-specific interaction focus.
 - The stage is mostly empty while UI chrome carries the experience.
@@ -83,11 +83,11 @@ Before calling initialization done, capture or run the narrowest available previ
 - The palette is a one-note dark blue/purple/neon or beige/brown theme without a deliberate art-direction reason.
 - A player-facing control, result, draft, or upgrade surface bypasses the Idavoll UI-kit posture expected by `design__designing-game-ui-for-idavoll`.
 
-The pass is done only when mechanics, deterministic proof, and first-screen visual quality all pass together.
+The check is done only when the player loop and first-screen visual quality agree at the claimed authority surface. Deterministic proof is required only for a deterministic claim or risk.
 
-## First-Playable Proof Packet
+## First-Playable Value-Path Observation
 
-The proof packet must show a real player loop, not only a boot screen or result overlay:
+The terminal claim must observe a real player loop, not only a boot screen or result overlay. Keep a durable packet only when later inspection or human acceptance needs it:
 
 1. **First frame**: the player can identify what is interactive and what situation they are in.
 2. **Intentional player action**: a tap, drag, swipe, placement, choice, or movement that is not merely tap-to-continue.
@@ -100,9 +100,9 @@ Invalid proof:
 
 - a timeline whose frames are all results, loading, splash, or modal states;
 - proof that relies on forced fast-results mode;
-- a deterministic sim diff with no player-readable browser artifact;
+- a deterministic sim diff with no player-readable observation at the authority surface;
 - screenshots that already show missing art, opaque sprite boxes, mismatched identity, distortion, unreadable UI, or hidden causality.
-- desktop-only or landscape-only screenshots used as a substitute for 390 x 844 portrait proof.
+- desktop-only or landscape-only observation used as a substitute for a mobile-portrait claim.
 
 ## Expertise Payload
 
@@ -150,8 +150,8 @@ Use the Autonomous First-Playable Algorithm above as the controlling loop. These
    - never overwrite `marketing/icon.webp` or user-authored assets without a direct reason.
 7. Replace template placeholders such as `{{GAME_ID}}` and `{{TITLE}}` from the spec or existing workspace metadata.
 8. Immediately adapt the scaffold into the actual game loop, controls, feedback, and validation path.
-9. Run the Required Initialization Skill Stack above and maintain the Skill Evidence Ledger before declaring the first playable complete.
-10. Capture the First-Playable Proof Packet and loop through Proof -> Audit -> Repair until `Ready`, `Candidate`, or `Blocked`.
+9. Use the applicable skill routes above and record only material decisions before declaring the first playable complete.
+10. Observe the First-Playable value path, retain only necessary artifacts, and loop through affected Proof -> Repair until `Ready`, `Candidate`, or `Blocked`; run a terminal audit only when explicitly requested or warranted by a named high-regret risk.
 11. Once `README__game-spec.md` exists and the workspace is ready for publish/share metadata, run `node .studio-ai-runtime/tools/studio/ensure-game-metadata.js --json` from the Studio workspace when that tool is available. Treat queued marketing generation as an explicit handoff state, then rerun with `--require-ready` only when readiness must be proven before publish.
 
 ## Anti-Patterns
@@ -167,7 +167,7 @@ Use the Autonomous First-Playable Algorithm above as the controlling loop. These
 
 ## Handoff Note
 
-Name the selected template and reason before implementation begins, then repeat it in the final response alongside the Skill Evidence Ledger, game changes, preview/QA proof packet, and proof commands. If you ran metadata ensure, report `ready`, `queued`, or the blocking status plainly.
+Name the selected template and reason before implementation begins, then repeat it in the final response alongside material skill decisions, game changes, the observed player journey, retained artifacts, exact proof commands/actions, and anything not run. If you ran metadata ensure, report `ready`, `queued`, or the blocking status plainly.
 
 ## Routing Boundaries
 

@@ -35,7 +35,7 @@ Before calling a game playable, watch or play the first active 15 seconds and an
 
 If the answer to 5 is no, the build does not slap yet. Name the single biggest reason and repair that before polishing around it.
 
-**The verdict is evidence, not acceptance.** When the agent plays or watches, its SLAPS/CLOSE read is a recommendation backed by an active-play artifact — a clip, input replay, or live capture; a static screenshot cannot carry it. On a lane, the Slap Test IS the subjective gate's question: the verdict, play moment, biggest blocker, and artifact land on the gate card and the taste-critical rung, and the gate closes only on the human's recorded acceptance (root §4 — Waiting Human is never auto-claimed).
+**The verdict is evidence, not acceptance.** When the approved claim includes feel/playability, use active play and an exact human question; a static screenshot cannot carry that claim. The agent's SLAPS/CLOSE read is only a recommendation. Acceptance records the human, exact question/scope, source/date, and reviewed experience identity.
 
 ## Trigger Boundary
 
@@ -177,10 +177,10 @@ Run only the checks that help answer "does this work and feel good?" or catch a 
 | Build/browser smoke | Catch blank canvas, startup crash, console/page errors, or missing assets. |
 | First-fun judgment | Force the play moment: input -> response -> consequence -> one-more-try. |
 | Active-play visual slap review | Judge whether the active play sequence reads and feels authored. |
-| 390 x 844 portrait screenshot | Required for every game handoff; catches text/control overlap, wrong framing, bad touch path, safe-area crowding, or unreadable scale. |
+| 390 x 844 portrait check | Primary mobile authority when layout/touch/framing is in the claim; retain a screenshot only when visual proof or human acceptance needs it. |
 | Performance check | Use only when jank, density, physics, particles, or 3D cost can hurt feel. |
 
-On a lane, these checks are eval-plan gates — the 390 x 844 portrait gate already exists there as repo physics; record loops and artifacts on the gate cards rather than re-deriving checks in chat.
+On a substantial lane, map only plausible material failures to existing evidence, a warranted gate/artifact, or an authorized narrowed claim in the work spec. Use an eval-plan card only when durable proof coordination is warranted; mobile orientation identifies the authority environment, not an automatic screenshot/gate.
 
 Never present a supporting check as the reason the game slaps. At most, say it did not find a blocker.
 
@@ -209,5 +209,5 @@ Use `SLAPS` only when the requested claim is satisfied and the first active slic
 
 - A visually busy scene plus `npm run build` is not a playable build.
 - The agent must define the player promise, load the relevant specialist skills, implement or repair the loop, play or watch the first active slice, and lead the handoff with the concrete play moment.
-- Release-ready still closes through `$handoff__final-quality-gate`; the recorded human slap acceptance is what satisfies its subjective-gates check.
+- Release-ready closes through `$handoff__final-quality-gate` only when that optional review was requested or warranted; recorded human Slap acceptance closes an approved feel/playability question.
 - Late in a long build, if a human QA pass would not want another 30 seconds, no phase checkbox matters.

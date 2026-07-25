@@ -1,6 +1,6 @@
 ---
 name: code__crafting-dev-ux
-description: "Designs developer-facing surfaces — APIs, SDKs, config, errors, events, CLIs — for the pit of success: correct use is the default path for humans and LLMs; misuse takes deliberate effort. Triggers on designing or modifying any public surface (before coding); as root §6's AUDIT lens when a lane shipped or changed dev-facing surfaces."
+description: "Designs developer-facing APIs, SDKs, config, errors, events, and CLIs for the pit of success. Runs as a terminal audit overlay only when the user requests it or a specific material consuming-developer blind spot warrants it; otherwise design depth scales with the public-contract change."
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -35,20 +35,20 @@ Classify the change, then choose output mode:
 **Output mode:**
 - `FULL` for `NEW_*`, `MODIFY_PUBLIC_SURFACE`, or any semantic/compatibility change.
 - `LIGHT` for `MECHANICAL_CHANGE` only (still must cover semantics impact + compat check + example drift risk).
-- `AUDIT` when invoked as the root §6 lens on a lane that shipped or modified developer-facing surfaces — grade what exists; design nothing.
+- `AUDIT` only when the user requests it or the terminal handoff names a material consuming-developer blind spot — grade only that scope; design nothing.
 - If unsure: choose `FULL`.
 
 State both at the top of your response.
 
-## 0.5) Audit Mode (root §6 lens)
-When running as an audit lens, this file is a clean-context delegate's brief. Stance: you are the consumer who has never seen this code and has no one to ask.
+## 0.5) Audit Mode (root §6 optional overlay)
+When running inside terminal handoff, this file is a clean-context brief for the exact named blind spot. Stance: you are the consumer who has never seen this code and has no one to ask.
 
 - **Isolation:** inputs are the diff/scope under audit and the exact lane boundary — never the author's trajectory or conclusions; being handed a trajectory is itself a finding. Re-derive from the code.
 - **Custody:** writes are scoped to this lens's own report directory — never the surfaces under audit.
 - **Rubric:** grade each touched public surface against the four green tests, the Non‑Negotiables (§2), and its Minimum DX Stack row (§3). Pit-scale every surface (🟢🟡🔴⛔) with evidence — symbols, file:line, micro-snippets ≤10 lines.
 - **Findings:** any ⛔ is a release blocker; 🔴 on a public surface is P0/P1 by blast radius. Each finding names the green test or non-negotiable violated, the smallest fix, and proof of closure (the example, lint rule, or CI check that keeps it fixed).
 - **Output shape:** the same consumption surface as `$code__auditing` — Executive Verdict (SHIP / NO-SHIP) + release blockers + P0/P1/P2 Plan of Action — so the closer and orchestrator triage identically. Do not produce the FULL design sections; audit grades what shipped.
-- **Report artifact:** write the complete report to `tmp/<datetime>__<slug>__dev-ux-audit/report.md` — the report artifact is what proves this lens ran; a named lens is not a run lens. The verdict is a recommendation the orchestrator triages; release-ready claims close through `$handoff__final-quality-gate`, which consumes this report by name.
+- **Output:** return one bounded overlay section to `$handoff__final-quality-gate`; do not create a separate report or general P2 backlog. A standalone user-requested audit may write a report only when requested.
 
 ---
 
@@ -432,7 +432,7 @@ Before coding, simulate the consumer experience:
 
 ### FULL (use for `NEW_*`, `MODIFY_PUBLIC_SURFACE`, semantic/compat changes)
 
-For a substantial lane, the FULL output's durable parts land in the work spec via `$plan__maintain-work-spec` — the interface design as the rung design brief, semantics and the error taxonomy as `C-###` contracts, deep mechanics in A5. Chat output is not durable memory.
+For a substantial lane, the FULL output's durable parts land in the work spec via `$plan__maintain-work-spec` — the interface design in the active rung and semantics/error taxonomy as `C-###` contracts. Move deep non-normative mechanics to a linked supporting reference only when they genuinely obscure the product map. Chat output is not durable memory.
 
 Use these headings exactly:
 
@@ -447,7 +447,7 @@ Use these headings exactly:
 9. **Machine-Readable Artifact** (OpenAPI/JSON Schema/proto if boundary warrants; otherwise precise types)
 10. **Compatibility, Migration Kit, and Timeline** (shim/warnings/codemod; breakage budget)
 11. **Governance & Enforcement Hooks** (owner, stability, review gate, lint/CI/doc-check plan)
-12. **Verification Plan** (tests described as user journeys — these become eval-plan gates via `$eval__design-proof-gates`; include “examples stay true” check; hot-path perf guard if applicable)
+12. **Verification Decision** (map material consumer failures to existing evidence, a warranted test/eval gate, or authorized narrowed claim; examples/perf machinery are not automatic)
 13. **DX Signals** (what you’ll measure to detect confusion + migration progress)
 
 ### LIGHT (mechanical-only changes)
@@ -460,9 +460,9 @@ Use these headings exactly:
 4. **Example Drift Risk** (what examples/docs/tests must be updated/verified)
 5. **Verification Plan** (small, journey-framed)
 
-### AUDIT (root §6 lens)
+### AUDIT (user-requested or warranted terminal overlay)
 
-Use `$code__auditing`'s consumption shape, written to the report artifact (§0.5):
+For a standalone explicit audit, use `$code__auditing`'s consumption shape. For terminal overlay mode, return only the named surface verdict/evidence/smallest closure to the handoff report:
 
 1. **Audit Context** (surfaces in scope; assumptions)
 2. **Executive Verdict** (SHIP / NO-SHIP + release blockers)

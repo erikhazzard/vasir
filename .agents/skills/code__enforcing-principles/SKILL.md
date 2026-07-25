@@ -1,13 +1,15 @@
 ---
 name: code__enforcing-principles
-description: The change protocol for concrete repo edits — risk classification (C-tags) that generates proof obligations, risk-boundary naming, contract-ownership vocabulary, failure pre-mortems, and migration/observability discipline; feeds the work spec and eval plan rather than replacing them. Triggers on any concrete code change, before design or implementation; sizing a diff's proof obligations; retries, schema/contract changes, migrations, rollouts. Not for abstract discussion with no proposed repo edit.
+description: >-
+  Frames material contract, state, security, hot-path, migration, dependency, and operational risk for concrete repo changes.
+  Trigger: use when one of those non-local risks is present or uncertain; skip routine local edits, obvious quick fixes, and abstract discussion.
 ---
 
 # Production Code Change Protocol
 
-Treat every code change as a design, verification, and rollout decision. The job: the smallest safe diff that solves the evidenced problem, proves the risky boundary, preserves repo coherence, and makes the change easier to review than reading the diff cold.
+Use this protocol when a change has a material non-local risk boundary. The job is the smallest safe diff that solves the evidenced problem, protects that boundary, and preserves repo coherence.
 
-**Place in the system.** Root owns the laws (§5 proof doctrine, §8 custody, §9 engineering doctrine); the triad owns the artifacts. This protocol is the layer between: it classifies a change's risk, names the boundary where reality can break, and converts tags into proof obligations and contract entries. For a substantial lane, its outputs land in the artifacts — risk boundary and pre-mortem in the rung design brief, contract vocabulary as spec §4 `C-###`s, proof obligations as eval-plan gates. For a quick change (root §4), it is the inline discipline. It never spawns a rival design note: **the spec is the plan.**
+**Place in the system.** Root owns workflow, proof proportionality, lifecycle, and completion. This protocol owns material-risk classification, contract vocabulary, migration, and observability judgment. Tags identify risks; they never create a test, gate, harness, eval plan, artifact, audit, substantial lane, or extra stop. For a substantial lane, surviving risk/contract judgment lands in work-spec §4–§5; an eval plan is used only when durable proof coordination is genuinely warranted. It never spawns a rival plan.
 
 ---
 
@@ -21,10 +23,10 @@ Treat every code change as a design, verification, and rollout decision. The job
 
 ---
 
-## Scope Gate
+## Routing Gate
 
-1. **Concrete repo change?** If the ask is "thoughts," "strategy," or "is this right?" with no proposed edit — discuss only; do not cosplay a code task.
-2. **Meaningful?** Meaningful = can affect behavior, contracts, performance, observability, security/privacy, abuse resistance, rollout, data shape, persistence, failure handling, dependency graph, build/runtime config, generated code, or user/operator-visible output. If unsure, meaningful.
+1. **Material non-local risk?** Use this skill only for a contract, persisted/async state, security/privacy, hot path/capacity, migration/skew, dependency/build, or operational boundary whose failure could cause meaningful harm. If the change is a routine local edit or obvious quick fix, return to normal implementation without producing protocol output.
+2. **Concrete repo change?** If the ask is "thoughts," "strategy," or "is this right?" with no proposed edit, discuss only.
 3. **Name the risk boundary** — the exact place this change can break reality:
    - `Risk boundary: match-event ingest → queue enqueue; replayed requests can create duplicate jobs.`
    - `Risk boundary: old game bundles reading a launcher-manifest field they do not know.`
@@ -32,11 +34,13 @@ Treat every code change as a design, verification, and rollout decision. The job
    - `Risk boundary: backfill touching persisted player-save rows.`
    - `Risk boundary: none found; private rename with no emitted behavior change.`
 
+Expected files and symbols are reconnaissance, not the boundary. Expanding touchpoints is allowed when the same approved unlock, public contract, authority/data owner, rollback shape, and product behavior remain intact; record the discovery and continue. Stop only when one of those changes, not because the initial file forecast was incomplete. Never use touchpoint expansion for unrelated cleanup.
+
 ---
 
 ## Risk Classification
 
-**Change tags** (assign all that apply — tags determine proof obligations):
+**Change tags** (assign all that materially apply — tags identify risk classes, not automatic machinery):
 
 - `C0 Non-meaningful` — comments, formatting, mechanical rename/move; provably no runtime, emitted, build, test, or contract effect.
 - `C1 Local logic` — internal refactor; behavior unchanged; no external contract/state/security/hot-path/rollout effect.
@@ -52,21 +56,21 @@ Treat every code change as a design, verification, and rollout decision. The job
 
 ---
 
-## Tags → Obligations (the keystone)
+## Tags → Material-risk questions
 
-Each tag names the proof it owes (gate classes per `$eval__design-proof-gates`) and the contracts it must state (spec §4):
+Each tag names the claim/failure class that must be resolved and any contract that must be explicit. A row is satisfied by sufficient existing evidence, a warranted proof obligation, or an authorized narrowed claim; it does not demand an eval-plan gate:
 
-| Tag | Proof obligation (eval-plan gates) | Contract entries (spec `C-###`) |
+| Tag | Claim / plausible failure to resolve | Contract entries (spec `C-###`) |
 | --- | --- | --- |
-| C0 | prove no emitted change: compile/typecheck/existing checks | — |
-| C1 | focused journey test at the local boundary | — |
-| C2 | behavior gate at the user/operator-visible boundary | — |
-| C3 | contract gate on the serialized/wire/generated shape | schema + versioning + empty/missing/error semantics |
-| C4 | idempotency/retry + failure/hostile gates (replay, duplicates, ordering, partial failure, concurrency) | delivery semantics, ordering, idempotency, retry/timeout owners |
-| C5 | measurement-first probe with sourced budget + falsifier (probe anatomy: eval skill) | perf budget / hot-path contract |
-| C6 | security/privacy/auth gate, fail-closed denial proof | authz invariant, data class, redaction |
-| C7 | migration/compatibility gate: old, new, and coexistence | compatibility window, removal condition |
-| C8 | dependency/build verification: changelog + advisories read, lockfile diff explained, affected tests/build run, rollback named | — |
+| C0 | inspect the diff for no emitted change; run a targeted cheap check only when build/generated output could move | — |
+| C1 | reuse an existing focused guard; add characterization at the local public boundary only where behavior is otherwise unknown | — |
+| C2 | smallest credible behavior proof at the risky user/operator boundary; existing proof may suffice, and visibility alone does not imply browser/integration | — |
+| C3 | serialized/wire/generated shape drift that breaks a supported consumer | schema + compatibility + empty/missing/error semantics |
+| C4 | duplicate, replay, ordering, partial-failure, concurrency, or recovery invariant failure | delivery semantics, ordering, idempotency, retry/timeout owners |
+| C5 | sourced budget or observed hot-path/capacity regression under representative work | perf budget / hot-path contract |
+| C6 | unauthorized allow, privileged-data leak, or fail-open trust-boundary behavior | authz invariant, data class, redaction |
+| C7 | old/new/coexistence, resume, rollback, or irreversible migration failure | compatibility window, removal condition |
+| C8 | dependency/build/generated output changes unexpectedly or introduces a known applicable advisory; inspect only decision-relevant release notes/advisories | — |
 
 For deterministic-lane surfaces, root §2 binds on top of all of this (kernel RNG, `idv.Math`, harnesses count, replay depth).
 
@@ -74,8 +78,8 @@ For deterministic-lane surfaces, root §2 binds on top of all of this (kernel RN
 
 ## Work Sizing (root §4 vocabulary — no parallel lane system)
 
-- **Quick change:** C0, C1, or a narrow single-surface C2 with none of C3–C8/X and a known boundary → the inline note below. The quick lane avoids ceremony, never proof.
-- **Substantial lane:** any C3–C8, any X, or an unknown risk boundary → the spec and eval plan own the design; this protocol's outputs land in them.
+- **Quick change:** root §4's small, known, bounded change whose tag obligations can be satisfied inline. C0/C1 and narrow single-surface C2 changes are common examples; a narrow, reversible C3/C8 change can also remain quick when the contract/build risk is already guarded.
+- **Substantial lane:** root §4's milestone-, coordination-, new-instrument-, or durable-proof-shaped work. Unknown or cross-authority boundaries and most C4–C7 changes usually qualify; a tag or file count alone does not.
 - **Hotfix mode** (active or imminent production/user harm): state the signal proving harm; smallest reversible patch; no irreversible migrations; no unrelated redesign; verify the specific failure mode; name rollback, deferred proof, and the follow-up regression/design work explicitly.
 
 ---
@@ -88,7 +92,7 @@ Inspect the minimum relevant set: symbols/callers/generated sources · tests at 
 
 ---
 
-## Contract Vocabulary (state as spec §4 `C-###`s when touched)
+## Contract Vocabulary (state as spec §5 `C-###`s when touched)
 
 Authority / write owner · delivery semantics (`at-most-once | at-least-once | effectively-once`) · ordering (none / per-key / total, + key) · idempotency key + dedupe scope · **retry owner — one exclusive layer** · timeout/deadline owner · time authority (`serverTime | clientTime`) · replay behavior · read visibility/consistency · conflict resolution · schema/versioning · generated-code source of truth.
 
@@ -100,14 +104,14 @@ Authority / write owner · delivery semantics (`at-most-once | at-least-once | e
 
 ---
 
-## Failure Pre-Mortem (top 3, exact shape)
+## Failure Pre-Mortem (up to 3 material failures)
 
-`Outcome → Invariant → Guard → Deterministic test → Signal`
+`Outcome → Invariant → existing evidence or warranted guard → Signal`
 
 Catastrophic menu: data loss/corruption · unsafe duplicate effect · stale/conflicting state shown to users · authz bypass / privacy leak · abuse/replay/rate-limit bypass · unbounded memory/queue growth · backpressure collapse · event-loop stall / frame hitch · retry storm / fan-out amplification · rollout or version-skew break · tail-latency blowup · irreversible bad migration · generated-artifact drift.
 
 ```md
-- Unsafe duplicate match result → one accepted result per (matchId, playerId) → unique dedupe row → replay integration test → duplicate_reject_total.
+- Unsafe duplicate match result → one accepted result per (matchId, playerId) → unique dedupe row plus replay proof when no equivalent guard exists → duplicate_reject_total.
 ```
 
 ---
@@ -154,15 +158,13 @@ Catastrophic menu: data loss/corruption · unsafe duplicate effect · stale/conf
 
 **What "integration test" means here:** real production modules across the risk boundary — with real serialization, real async/error paths, real config shape, and real state transitions — running hermetically in CI. It does **not** need to hit production services; it does need to preserve the contract being tested. The four "reals" are named because they are exactly what fake integration tests silently swap out; hermeticity buys determinism, contract preservation buys truth, and dropping either produces a different artifact — a flaky e2e, or a unit test wearing integration clothes.
 
-Choose the highest-fidelity double that stays deterministic; the eval plan's gate cards record the choice: **real local dependency** (local DB, in-memory queue with production serialization) > **hermetic contract-preserving fake** (allowed when the risk is not inside the dependency) > **contract test** (required when the risk is wire shape, schema, generated code, or producer/consumer compatibility) > **mock** (only outside the risk boundary) > **snapshot** (only when the serialized output IS the contract) > **visual** (only when visual state IS the contract). A mocked-away risk boundary is fake proof: a replay bug needs the real unique constraint, not a mocked dedupe store; a schema change needs the serialized response, not the mapper's unit test.
+Choose the highest-fidelity double that stays deterministic; when an eval plan exists its gate card records the choice: **real local dependency** (local DB, in-memory queue with production serialization) > **hermetic contract-preserving fake** (allowed when the risk is not inside the dependency) > **contract test** (required when the risk is wire shape, schema, generated code, or producer/consumer compatibility) > **mock** (only outside the risk boundary) > **snapshot** (only when the serialized output IS the contract) > **visual** (only when visual state IS the contract). A mocked-away risk boundary is fake proof: a replay bug needs the real unique constraint, not a mocked dedupe store; a schema change needs the serialized response, not the mapper's unit test.
 
 ---
 
-## Quick-Change Note & Close-Out
+## Result When Invoked
 
-Quick changes carry an inline note — required elements, any shape: classification · risk boundary · problem check · smallest safe diff + out of scope · verification (exact tests/commands) · reviewer focus · unknowns/tentatives.
-
-Close-out is root §5's block; this protocol adds two required elements to it: **commands not run** (with why), and **reviewer focus** (the one place a reviewer or auditor should look hardest).
+Return only the material classification, exact risk boundary, affected contract or invariant, smallest safe response, warranted verification, and any real unknown or boundary. Add no fields for a routine edit that should not have invoked this skill.
 
 ---
 
@@ -180,7 +182,7 @@ I would not implement this as requested.
 
 ## Automation & Drift
 
-For every meaningful change, consider one automatable invariant: `Invariant → existing check → proposed automation (follow-up, not piggybacked)`. **Constitution Drift** reports stale, duplicated, conflicting, or repo-contradicted rules: ≤3 bullets, each with evidence; prefer deleting obsolete rules over accreting new ones; never fix drift beyond the scoped change; never turn subjective taste into fake automation. Durable decisions land in the spec's decision log (A2), not in standalone ADRs.
+When a stable material invariant cannot be protected cheaply enough by existing evidence, consider automation; do not create follow-up machinery just because a change is meaningful. **Constitution Drift** reports only stale, duplicated, conflicting, or repo-contradicted rules that affect the active lane: ≤3 bullets with evidence. Prefer deleting obsolete rules over accreting new ones; never fix drift beyond scope or automate subjective taste. Durable decisions land in work-spec §9.
 
 ---
 
