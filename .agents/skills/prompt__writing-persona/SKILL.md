@@ -1,6 +1,6 @@
 ---
 name: prompt__writing-persona
-description: Writes and rewrites LLM prompts and in-skill personas by installing expertise rather than asserting it — character-sheet conditioning, lens sets for competing concerns, earned authority, genuine stakes, and calibration that keeps a confident voice accurate. Triggers when writing or improving a prompt or system prompt, designing expert framing, building the persona or lens set inside an agent skill, or getting expert-grade rather than merely valid output; critique-only prompt review routes to `$prompt__create-analysis`.
+description: Writes and rewrites expert prompts and in-skill personas by encoding domain judgment, competing lenses, stakes, and calibrated authority. Use for system prompts, expert framing, or personas inside agent skills. Use prompt__create-analysis for critique without rewriting.
 ---
 
 # Writing Personas That Install Expertise

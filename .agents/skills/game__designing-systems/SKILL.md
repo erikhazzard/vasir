@@ -1,6 +1,6 @@
 ---
 name: game__designing-systems
-description: Systems design director — models game systems formally (stocks/flows, FSMs, RNG policy, arbitration), validates with deterministic simulation and invariants, then ships data-driven systems with matching parameter names and tuning knobs. Triggers on economies, progression, crafting, combat loops, loot/RNG, difficulty, unlock trees, AI arbitration, systemic events — designing, simulating, or tuning them.
+description: Models and tunes game systems with explicit state, resources, randomness, arbitration, invariants, deterministic simulation, and data-driven parameters. Use for economies, progression, crafting, combat loops, loot, difficulty, unlocks, AI arbitration, or systemic events.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

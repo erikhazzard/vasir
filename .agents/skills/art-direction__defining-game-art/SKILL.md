@@ -1,6 +1,6 @@
 ---
 name: art-direction__defining-game-art
-description: Routes and directs game-art work across reusable art-direction references, especially premium 2D RPG pixel art and stylized 3D hero-action art. Use when creating, critiquing, or specifying game characters, environments, weapons, VFX, animation, maps, asset pipelines, or art quality bars; load the matching subfolder reference for Sea-of-Stars-adjacent 2D pixel RPG work or Overwatch-adjacent 3D hero-action work.
+description: Routes game-art work to reusable art-direction references for premium 2D pixel RPGs and stylized 3D hero action. Use when creating, critiquing, or specifying characters, environments, weapons, VFX, animation, maps, asset pipelines, or art quality bars.
 ---
 
 # Game Art Direction Router
