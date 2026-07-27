@@ -750,7 +750,9 @@
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "templates/references/implementation-map.md",
+        "templates/references/provenance.md"
       ],
       "path": ".agents/skills/plan__maintain-work-spec",
       "entry": "SKILL.md"

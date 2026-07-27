@@ -84,18 +84,35 @@ Start with direct inspection, current source, and existing checks. Add a durable
 
 Subjective feel, taste, readability, motion, and fun remain human decisions. Record the exact question and response when they matter; do not invent automated acceptance.
 
-## One product file, optional supporting depth
+## One product file, progressively disclosed depth
 
 The work spec remains the only home for product commitments, contracts, active-rung judgment, current motion, and completion truth.
 
-If actual use shows that a large postmortem, code atlas, research corpus, payload collection, or media index obscures the product map, move that non-normative depth to a linked file in the same feature folder. Keep a short surviving conclusion and exact pointer in the work spec. Do not create default sidecars or move state into references.
+For every new substantial lane, create this small bundle from the skill templates:
+
+```text
+<feature>/
+  work-spec.md
+  references/
+    implementation-map.md
+    provenance.md
+```
+
+- `implementation-map.md` is warm, adaptive engineering depth: current source maps, flows, likely touchpoints, interface or payload examples, calculations, and sharp edges. Repository and runtime truth win when it drifts.
+- `provenance.md` is cold context worth recovering: material rationale, superseded approaches, useful completed-rung detail, and source lineage. It is not normal build context or a changelog; Git owns exhaustive history.
+
+The active rung keeps its compact implementation direction in the work spec and links the exact implementation-map headings needed to build it. Every link says when to read it. Product commitments, requirements, contracts, rung state, `Done when`, approvals, blockers, acceptance, and completion never move into references.
+
+A distinct postmortem, authored brief, research corpus, diagnosis, runbook, dataset card, human-review packet, or media index keeps an earned semantic filename. Do not create a generic research/context bucket or a reference index; the work spec is the router.
+
+On rung advance, refresh or prune the implementation map instead of accumulating a shadow plan. Preserve only historical context costly to rediscover in provenance. Existing lanes are not mass-migrated; split obvious non-normative depth on their next substantive touch.
 
 ## Workflow
 
 1. Read the current user request and existing work spec, then inspect the smallest repo/runtime path that can confirm or change the product map.
 2. Re-derive `vFinal`, the North Star, non-goals, required intake, the ladder, and the active slice.
 3. Repair any missing required outcome, proxy substitution, horizontal milestone, stale product assumption, or material contradiction.
-4. Keep only current truth that changes the active or next rung; route bulky non-normative depth only when the core file is genuinely impaired.
+4. Keep only current truth that changes the active or next rung. Put bulky current technical depth in `references/implementation-map.md`, cold retained context in `references/provenance.md`, and leave a short conclusion plus exact read-when link in the work spec.
 5. If the product spine and active rung are coherent, implementation is the next action. Do not create another summary or planning artifact by default.
 6. Edit the spec only for durable judgment: changed product meaning, contract, rung boundary, blocker, human decision, or coherent rung-close evidence.
 7. Re-read immediately before writing and merge concurrent changes without losing either writer's load-bearing judgment.
@@ -111,7 +128,10 @@ If actual use shows that a large postmortem, code atlas, research corpus, payloa
 **Engineering System Unlock:** <capability, contract, reliability, or operational truth; omit when genuinely none>
 **vFinal:** <the complete intended journey when this lane succeeds>
 **Primary entrypoint(s):** <exact API/event/command/route/user action>
-**Related context:** <only useful links or source pointers>
+**Reference routing:**
+- [Implementation map](references/implementation-map.md) — follow only the headings linked by the active rung before building.
+- [Provenance](references/provenance.md) — read only when prior rationale, retired paths, or source lineage matters.
+- <earned semantic reference and exactly when to read it>
 
 ## 1) North Star — vFinal
 
@@ -172,7 +192,7 @@ Contracts live here once. Elsewhere cite their IDs.
 - **vFinal advance:** <what becomes genuinely true and what remains>
 - **Experience bar:** <rung-specific quality/rejection criteria when needed>
 - **Lasting shape:** <why this is extended rather than replaced>
-- **Implementation map:** <current best design and likely surfaces; explicitly adaptive>
+- **Implementation map:** <compact current direction; link exact headings in `references/implementation-map.md` for deeper adaptive detail>
 - **Not in this rung:** <capability boundary>
 - **Contracts:** <C-###>
 - **Material risk:** <only a failure that could meaningfully break this slice>
@@ -225,6 +245,7 @@ Before writing, confirm:
 - every rung is a valuable vertical slice using the lasting shape;
 - the active rung is the richest section and is buildable now;
 - implementation details remain adaptive;
+- reference documents contain no product authority or current state, and every active link says when to read it;
 - current motion names one next action or a real blocker;
 - proof is the cheapest credible direct observation, not a parallel product;
 - no digest, projection ledger, mandatory eval, or default audit was introduced.

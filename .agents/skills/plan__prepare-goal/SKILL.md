@@ -12,6 +12,8 @@ The work spec is a map. This skill builds the product.
 
 Do not create a fresh summary, revision digest, projection sync, test plan, eval plan, or audit merely to begin. Use `$plan__prepare-summary` only when context is genuinely cold or the next product action is unclear.
 
+Before the first product write, follow the active rung's exact links into `references/implementation-map.md` and any semantic reference it names. Read only the linked depth. `references/provenance.md` is cold context: load it only when the current work genuinely turns on prior rationale, a retired path, or source lineage. References inform implementation but never override the work spec or current source/runtime truth.
+
 ## Start conditions
 
 Before the first product write, confirm:
@@ -38,7 +40,7 @@ If these are clear, build. Do not manufacture another gate.
 
 For each coherent chunk:
 
-1. Re-read the request anchor, `vFinal`, active slice, applicable contracts, and the smallest current source needed for the next change.
+1. Re-read the request anchor, `vFinal`, active slice, applicable contracts, its exact implementation-map links, and the smallest current source needed for the next change.
 2. Implement the natural in-boundary work required to make the promised outcome real.
 3. Inspect the direct value path and only the checks justified by the material risk.
 4. Let evidence change implementation details. If it exposes a product fork, stop; otherwise keep building.
