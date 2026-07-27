@@ -34,7 +34,7 @@ Return **Not ready to build** only when:
 
 - a required outcome is missing, weakened, contradicted by a non-goal, or represented by a non-equivalent proxy;
 - `vFinal` or the active slice is materially ambiguous;
-- a genuine product fork, existing external-contract violation, externally owned authority boundary, safety/data-integrity boundary, irreversible action, missing environment/credential, or shared-worktree collision blocks motion;
+- a genuine product fork, existing external-contract violation, externally owned authority boundary, safety/data-integrity boundary, irreversible action, missing environment/credential, or shared-folder custody collision blocks motion;
 - the next action would not advance the active vertical slice.
 
 Stale file guesses, symbols, sequencing, estimates, internal design, technical schema details that preserve the same external promise, or equivalent rung decomposition do not block implementation. Note the correction and keep moving.

@@ -64,7 +64,7 @@ Run this before extracting expertise — skipping it is how a locally-good skill
 - **Siblings:** find adjacent routing clusters; name what this skill owns vs. what each sibling owns; wire `$` cross-references both ways.
 - **Genus** — the kind of skill determines its shape:
   - **Artifact skill** — owns a durable document; needs a schema and an artifact home; rots via schema drift and law-cloning.
-  - **Lens / auditor** — persona and fixed output headings are load-bearing for clean-context delegates; needs an isolation block (inputs are the materials, never the authoring trajectory), a `tmp/<datetime>__<slug>__<name>/report.md` artifact proving it ran, read-only tools, and a verdict framed as a recommendation the orchestrator triages. The persona itself is built per `$prompt__writing-persona`.
+  - **Lens / auditor** — persona and fixed output headings are load-bearing for independent-review delegates using the same existing repo folder (root §7); needs a reviewer-input block (inputs are the materials, never the authoring trajectory), a `tmp/<datetime>__<slug>__<name>/report.md` artifact proving it ran, read-only tools, and a verdict framed as a recommendation the orchestrator triages. The persona itself is built per `$prompt__writing-persona`.
   - **Protocol / front-end** — orchestrator-context; owns a decision (what proof, what risk class, what seam) and feeds other skills' artifacts rather than producing a rival one.
   - **Domain orchestrator** — coordinates a specialist family; owns the family boundary; treats specialists as tools — loading a skill is not progress.
 - **Provenance:** foreign runtime, foreign infra, or rival-constitution vocabulary means the material was imported — keep the expertise, drop the scaffolding, cite local law.

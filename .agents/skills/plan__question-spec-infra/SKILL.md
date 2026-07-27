@@ -1,6 +1,6 @@
 ---
 name: plan__question-spec-infra
-description: Adversarial infra review of a drafted work spec, run only when explicitly requested or when a specific material performance/scale/cost blind spot warrants clean-context judgment; challenges workload decomposition and primitive fit without becoming an automatic spec-stage audit.
+description: Adversarial infra review of a drafted work spec, run only when explicitly requested or when a specific material performance/scale/cost blind spot warrants independent conversational judgment in the same repo folder; challenges workload decomposition and primitive fit without becoming an automatic spec-stage audit.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

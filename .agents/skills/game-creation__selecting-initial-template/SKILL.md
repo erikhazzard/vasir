@@ -26,7 +26,7 @@ After reading the approved `README__game-spec.md`, load only the local skills wh
 3. **Genre/system skill**: use `game__genre-routing`, combat, loot, inventory, economy, or procedural skills when the spec meaningfully depends on that domain. Route auto-battlers, tactics drafts, shop/bench/board games, party synergies, or automated combat after player setup through `game__genre-routing`.
 4. **Art direction**: use `game__art-directing` before implementing the first screen if the game has any visual world, characters, enemies, cards, pieces, board, arena, or branded object language.
 5. **Player-facing shell UI**: use `design__designing-game-ui-for-idavoll` for any HUD, card row, upgrade/draft surface, controls, pause, results, or runtime overlay. A first playable is not complete if the first screen is generic debug chrome.
-6. **First-playable comprehension proof**: when the user requests an audit or a specific false-first-playable/mobile-comprehension risk warrants clean-context review, `game-proof__auditing-first-playable-comprehension` can own that focused review. Do not add another audit merely because the skill exists.
+6. **First-playable comprehension proof**: when the user requests an audit or a specific false-first-playable/mobile-comprehension risk warrants independent review, `game-proof__auditing-first-playable-comprehension` can own that focused review. Do not add another audit merely because the skill exists.
 7. **Juice/polish**: use `game__adding-juice` once the loop is readable, especially for taps, hits, kills, rewards, transitions, and failure.
 
 Do not paste these skill bodies into the prompt. Let Codex load the skills normally from `.codex/skills` or `.agents/skills`. If a required skill is missing, say which skill is missing, use the nearest available repo guidance, and treat that as a skill-sync bug to fix rather than a reason to invent backend prompt choreography.
@@ -41,7 +41,7 @@ Run this algorithm until the workspace reaches exactly one terminal state: `Read
 3. **Skill-routing pass**: load the applicable routes above. Record only decisions a skill materially changes; no ledger entry exists just to prove a skill was mentioned.
 4. **Build pass**: adapt or create the actual game loop, controls, feedback, UI, and assets required by the approved spec. Add tests, simulations, metadata hooks, or new harness code only when a specific material failure cannot be guarded more simply.
 5. **Proof pass**: map plausible material failures to sufficient existing evidence, the cheapest warranted proof, or an authorized narrowed claim. Observe the real player loop at its public surface. A 390 x 844 portrait render is the mobile authority seam when visual/mobile truth is being proved; a stored screenshot, video, browser harness, simulation, or durable test is not automatic.
-6. **Optional audit pass**: run one focused clean-context review only when the user requests it or a named high-regret risk warrants independent judgment. Add gameplay/UI/art/QA lenses only for the specific blind spot; otherwise proceed without an audit.
+6. **Optional audit pass**: run one focused independent review only when the user requests it or a named high-regret risk warrants independent judgment. Add gameplay/UI/art/QA lenses only for the specific blind spot; otherwise proceed without an audit.
 7. **Repair pass**: fix the highest-severity in-scope blocker, rerun only affected proof, and return the resolution to the terminal verdict. Do not drift into unrelated polish while a real blocker remains.
 8. **Terminal-state pass**:
    - `Ready`: the public player loop shows action, immediate feedback, state consequence, later outcome, and result/restart; all warranted objective proof and required human acceptance are current; the claim is no broader than that evidence.
@@ -50,14 +50,14 @@ Run this algorithm until the workspace reaches exactly one terminal state: `Read
 
 ### Subagent Lanes
 
-Delegate only when a bounded lane repays spawn overhead or a warranted audit requires clean-context isolation. The root agent remains responsible for integration, final files, and the terminal state. The lanes below are optional lenses, not a mandatory four-agent fan-out.
+Delegate only when a bounded lane repays spawn overhead or a warranted audit requires independent conversational review. The root agent remains responsible for integration, final files, and the terminal state. The lanes below are optional lenses, not a mandatory four-agent fan-out.
 
 - **Gameplay/agency auditor**: checks core verb, meaningful choice, feedback, state consequence, and renewed intent.
 - **UI/comprehension auditor**: checks first frame, controls, HUD, overlays, results, labels, and mobile readability.
 - **Art/assets auditor**: checks game-specific visual identity, generated/promoted bitmap assets, sprite/background readability, and placeholder leakage.
 - **QA/proof auditor**: checks warranted tests, builds, browser artifacts, screenshots/video, metadata readiness, and missing proof.
 
-Subagents share the same workspace. Do not use worktrees, branches, private copies, per-agent source roots, or merge protocols. Subagents may read broadly; they may edit only when the root agent assigns a narrow file lane. If clean-context terminal verification is required but unavailable, report that exact blocker; do not manufacture several same-context “independent” audits.
+Use the existing repo folder throughout (root §7). Subagents may read broadly; they may edit only when the root agent assigns a narrow file lane. If an independent terminal reviewer is required but unavailable, report that exact blocker; do not manufacture several same-conversation “independent” audits.
 
 ## Skill Evidence Ledger
 

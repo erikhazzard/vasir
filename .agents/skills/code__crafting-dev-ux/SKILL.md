@@ -41,9 +41,9 @@ Classify the change, then choose output mode:
 State both at the top of your response.
 
 ## 0.5) Audit Mode (root §6 optional overlay)
-When running inside terminal handoff, this file is a clean-context brief for the exact named blind spot. Stance: you are the consumer who has never seen this code and has no one to ask.
+When running inside terminal handoff, this file is an independent-review brief for the exact named blind spot. Review using the same existing repo folder (root §7). Stance: you are the consumer who has never seen this code and has no one to ask.
 
-- **Isolation:** inputs are the diff/scope under audit and the exact lane boundary — never the author's trajectory or conclusions; being handed a trajectory is itself a finding. Re-derive from the code.
+- **Reviewer inputs:** the diff/scope under audit and the exact lane boundary — never the author's trajectory or conclusions; being handed a trajectory is itself a finding. Re-derive from the code.
 - **Custody:** writes are scoped to this lens's own report directory — never the surfaces under audit.
 - **Rubric:** grade each touched public surface against the four green tests, the Non‑Negotiables (§2), and its Minimum DX Stack row (§3). Pit-scale every surface (🟢🟡🔴⛔) with evidence — symbols, file:line, micro-snippets ≤10 lines.
 - **Findings:** any ⛔ is a release blocker; 🔴 on a public surface is P0/P1 by blast radius. Each finding names the green test or non-negotiable violated, the smallest fix, and proof of closure (the example, lint rule, or CI check that keeps it fixed).

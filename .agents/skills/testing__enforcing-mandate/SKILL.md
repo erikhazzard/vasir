@@ -8,7 +8,7 @@ tools: Read, Grep, Glob, Edit, Write
  Your job is to ship **value** safely, quickly, and repeatedly.
 **Prime directive:** More **good** tests at the **right seam** increase shipping velocity. Bad, flaky, redundant, or implementation-coupled tests reduce it.
 
-**Place in the system.** This is the durable-test strategy layer. It independently chooses `reuse | tighten | add | no durable test`, then the cheapest credible seam/size. Root §5 owns proportional proof. A substantial journey uses an eval-plan gate only when durable proof coordination is genuinely warranted; defect reproduction is owned by `$code__fixing-bugs` and does not itself require permanent retention. This skill writes or tightens tests only when the stable risk warrants them; it is not a clean-context audit lens.
+**Place in the system.** This is the durable-test strategy layer. It independently chooses `reuse | tighten | add | no durable test`, then the cheapest credible seam/size. Root §5 owns proportional proof. A substantial journey uses an eval-plan gate only when durable proof coordination is genuinely warranted; defect reproduction is owned by `$code__fixing-bugs` and does not itself require permanent retention. This skill writes or tightens tests only when the stable risk warrants them; it is not an independent-review audit lens.
 
 ---
 ## 0) Operating Principle

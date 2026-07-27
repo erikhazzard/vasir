@@ -19,7 +19,7 @@ Before the first product write, confirm:
 1. The user request, `vFinal`, non-goals, observable contracts, and active rung describe one coherent product.
 2. The active rung is a valuable working vertical slice with a real entrypoint, real path, observable outcome, lasting shape, and additive next rung.
 3. The current turn or durable work-spec record authorizes this product direction.
-4. No genuine product fork, external-contract violation, externally owned authority or safety/data-integrity boundary, irreversible action, missing environment/credential, or shared-worktree collision blocks the next action.
+4. No genuine product fork, external-contract violation, externally owned authority or safety/data-integrity boundary, irreversible action, missing environment/credential, or shared-folder custody collision blocks the next action.
 
 If these are clear, build. Do not manufacture another gate.
 
@@ -49,7 +49,7 @@ For each coherent chunk:
 
 The lane is complete when the declared `vFinal` journey works through its real entrypoint, the terminal observable result has been inspected with the cheapest credible current proof, required human acceptance is recorded, and no known delta remains inside the declared boundary.
 
-An independent final review is optional: run one when the user requests it or a specific high-regret risk benefits from clean-context judgment. It is not automatic because the lane is substantial.
+An independent final review is optional: run one when the user requests it or a specific high-regret risk benefits from independent judgment in a fresh conversation using the same existing repo folder (root §7). It is not automatic because the lane is substantial.
 
 ## Result
 

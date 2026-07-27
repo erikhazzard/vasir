@@ -1,6 +1,6 @@
 ---
 name: plan__question-spec-architecture
-description: Adversarial architecture review run when explicitly requested or when a specific high-regret moving-parts blind spot warrants clean-context judgment; challenges whether queues, workers, services, datastores, caches, protocols, or async state are forced without becoming automatic spec ceremony.
+description: Adversarial architecture review run when explicitly requested or when a specific high-regret moving-parts blind spot warrants independent conversational judgment in the same repo folder; challenges whether queues, workers, services, datastores, caches, protocols, or async state are forced without becoming automatic spec ceremony.
 tools: Read, Grep, Glob, Write
 ---
 

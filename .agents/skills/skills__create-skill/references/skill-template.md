@@ -136,8 +136,8 @@ Insert the block matching the skill's genus (root manifest, "Map the System").
 
 **Lens / auditor** — persona built per `$prompt__writing-persona` (character sheet or lens set, earned authority, calibration mandatory); after it, insert:
 ```markdown
-## Isolation & Report Artifact (root §6)
-This lens runs as a clean-context delegate. Inputs: [the materials under audit] — never the
+## Independent Review Inputs & Report Artifact (root §§6–7)
+This lens runs independently using the same existing repo folder. Inputs: [the materials under audit] — never the
 authoring trajectory; being handed a trajectory is itself a finding. Custody: writes are
 scoped to this lens's own report directory — never the code, tests, specs, or gate state
 under audit.

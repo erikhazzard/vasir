@@ -36,9 +36,9 @@ Explore low-probability combinations, future scale/topology, defense in depth, a
 
 State the selected mode in the report.
 
-## Isolation and scope
+## Independent review and scope
 
-- Run from clean context when used as a verifier. Re-derive conclusions from the candidate, lane boundary, and proof gates; do not inherit the author's conclusions.
+- Review independently using the same existing repo folder (root §7). Re-derive conclusions from the candidate, lane boundary, and proof gates; do not inherit the author's conclusions.
 - When invoked as a terminal handoff overlay, require the caller to name the exact material blind spot, audit only that slice, and return findings into the one `$handoff__final-quality-gate` report. Do not create a second report or expand into a general hardening audit.
 - A standalone user-requested code audit may use the full report shape below. Skill availability alone never warrants this lens.
 - Audit the provided scope. Briefly record adjacent hazards, but do not let unrelated pre-existing debt hijack the lane.

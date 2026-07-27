@@ -40,7 +40,7 @@
 <constraint_precedence>
   Resolve conflicts in this order:
 
-  1. Safety, data integrity, privacy, destructive-git operation bans, shared-worktree custody.
+  1. Safety, data integrity, privacy, destructive-git operation bans, shared-folder custody.
   2. the user's explicit current-turn instruction.
   3. Nested root / folder `AGENTS.md` files for the touched domain (most specific wins).
   4. This root file.
@@ -177,7 +177,7 @@
 # 6. Audits & Postmortems Are Exceptional
 
 <audits_and_postmortems_are_exceptional>
-  Independent review is useful when the user asks for it or a specific high-regret risk benefits from a fresh context. It is not automatically part of every substantial lane, rung transition, or definition of Done.
+  Independent review is useful when the user asks for it or a specific high-regret risk benefits from a fresh conversational context in the same existing repo folder (§7). It is not automatically part of every substantial lane, rung transition, or definition of Done.
 
   When an independent audit is warranted, run one focused read-only review against the exact product boundary and risky claim. The reviewer receives the artifact/diff and relevant evidence, not the author's conclusions. The orchestrator judges findings; the audit does not create automatic tests, reports, or follow-up lanes.
 
@@ -189,7 +189,7 @@
 # 7. Multi-Agent & Model Routing
 
 <multi_agent_routing>
-  Default: Fable does the work in the current context. Delegate only when a bounded task is large enough to repay spawn overhead or §6 requires clean-context isolation. Never spawn a helper for one file read, one search, one command, or context the current coding/judgment agent needs to own its lane.
+  Default: Fable does the work in the current context. Delegate only when a bounded task is large enough to repay spawn overhead or §6 requires independent conversational review. Never spawn a helper for one file read, one search, one command, or context the current coding/judgment agent needs to own its lane.
 
   Routing order (first match wins):
     1. **Fable xhigh or gpt-5.6-sol xhigh:** product code, architecture, consequential judgment, synthesis, reviews, gate verdicts, and final decisions. Fable owns direct Claude-context work; use Sol only for an explicitly delegated lane.
@@ -200,13 +200,13 @@
 
   Bindability gate:
     - Never delegate through a surface that cannot explicitly bind the required model and reasoning effort. In-harness Claude/Codex subagent surfaces without those controls are forbidden for routed work.
-    - Use `codex exec` for model-routed delegation. If explicit routing is unavailable, work locally; if §6 requires an isolated verifier, report the missing verifier surface as a blocker.
+    - Use `codex exec` for model-routed delegation. If explicit routing is unavailable, work locally; if §6 requires an independent reviewer, report the missing reviewer surface as a blocker.
 
   Authority and topology:
     - Fable owns final acceptance, synthesis, and every gate verdict. Product-code authorship stays single-writer and may be assigned only to Fable xhigh or an explicitly scoped Sol xhigh lane.
     - Luna medium, Luna xhigh, and Sol high delegates never author product code or render gate verdicts. Luna xhigh returns evidence for consequential decisions to Fable xhigh or Sol xhigh.
     - Model routing never grants mutation authority. Destructive, deploy, infrastructure, and production-data commands still require the approval defined elsewhere in this contract.
-    - **No worktrees.** All agents work in the shared tree; §8 governs custody.
+    - **Use the existing repo folder.** All agents work in that same folder. Stay in your assigned lane and preserve everyone else's changes. Never create another worktree, clone, copied repo, temporary checkout, or second dependency installation. A fresh or independent reviewer means a new conversation reading the same folder. If working there is unsafe because lanes conflict, stop and report the conflict. §8 governs custody.
 
   Delegate prompt contract:
     - Name the bounded deliverable, relevant spec/artifact paths, required file:line evidence, answer-length cap, and explicit skips. Reject dumps; request the bounded result instead.
@@ -235,7 +235,7 @@
 # 8. Custody
 
 <custody>
-  **Shared worktree.** This tree carries live work from the user and parallel agents. Treat unrecognized changes as protected. Inspect diffs before editing files that may hold parallel work; touch only the lines your lane requires; if your edit collides with an unowned change, halt and report (§3). Broad formatters, codemods, autofixes, and file rewrites are forbidden unless the plan names the exact files and expected rewrite. Never restore files to HEAD, discard hunks, or recreate files as a shortcut. Git drift is a lane sensor, not a narration trigger — mention unrelated dirty files only when they overlap your work or block proof.
+  **Shared repo folder.** This folder carries live work from the user and parallel agents. Treat unrecognized changes as protected. Inspect diffs before editing files that may hold parallel work; touch only the lines your lane requires; if your edit collides with an unowned change, halt and report (§3). Broad formatters, codemods, autofixes, and file rewrites are forbidden unless the plan names the exact files and expected rewrite. Never restore files to HEAD, discard hunks, or recreate files as a shortcut. Git drift is a lane sensor, not a narration trigger — mention unrelated dirty files only when they overlap your work or block proof.
 
   **Git — commit forward, commit often.**
   - The orchestrator commits after each completed working rung with current proof, at lane close, and at coherent stopping points. Trusted xhigh subagents may also commit their finished work. Prefer MORE commits over fewer — small commits are how an agent-heavy tree stays inspectable. A failure state is the user having to run `git commit` himself.

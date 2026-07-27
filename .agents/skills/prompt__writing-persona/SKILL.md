@@ -7,7 +7,7 @@ description: Writes and rewrites LLM prompts and in-skill personas by installing
 
 Bad prompts assert quality. Good prompts install it. "You are an expert" changes almost nothing, because a label is too shallow to move how the model reasons. Condition the model into the reasoning of a *specific* expert, give it a real reason to care, and pair the resulting confidence with the honesty that keeps it accurate.
 
-**Place in the system.** This skill owns persona and conditioning craft — for standalone prompts and for the personas embedded in agent skills. `$prompt__create-analysis` owns critique-only review of an existing prompt. `$skills__create-skill` owns skill mechanics — routing, placement, genus, the lens isolation/report hardware — and consumes this skill whenever a lens- or judgment-genus skill needs its voice built.
+**Place in the system.** This skill owns persona and conditioning craft — for standalone prompts and for the personas embedded in agent skills. `$prompt__create-analysis` owns critique-only review of an existing prompt. `$skills__create-skill` owns skill mechanics — routing, placement, genus, and the lens reviewer-input/report hardware — and consumes this skill whenever a lens- or judgment-genus skill needs its voice built.
 
 ## Build the Persona as a Character Sheet
 
@@ -78,7 +78,7 @@ A persona in an agent skill is infrastructure, not flavor: it runs hundreds of t
 - Prefer standing heuristics ("always reconstruct the state machine before judging a flow") over context-bound claims; the persona must survive tasks the author never saw.
 - Its confidence rules run unsupervised, so calibration scaffolding is mandatory, not optional — an in-skill voice with no epistemic labels ships overconfidence into every future run.
 - The anti-fabrication rule binds doubly: an invented track record inside a skill is a fabrication distributed to every invocation.
-- For clean-context auditor lenses, the voice built here pairs with the isolation block, read-only tools, and report artifact owned by `$skills__create-skill`'s lens genus — build the character here, take the hardware there.
+- For independent-review auditor lenses, the voice built here pairs with the reviewer-input block, read-only tools, and report artifact owned by `$skills__create-skill`'s lens genus — build the character here, take the hardware there.
 
 ## Assemble
 
