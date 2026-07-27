@@ -1,6 +1,6 @@
 ---
 name: prompt__reverse-engineering
-description: Reverse-engineers a system prompt from LLM output by analyzing the work just produced. Examines style, structure, constraints, and behavioral patterns to reconstruct the likely system prompt that drove the output. Use when extracting a reusable system prompt from high-quality LLM output, capturing implicit instructions from a successful generation, or creating a prompt template from observed behavior.
+description: Reconstructs reusable system prompts from successful LLM output by identifying the style, constraints, structure, and behavioral patterns behind it. Use when extracting or recreating the prompt behind observed output.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

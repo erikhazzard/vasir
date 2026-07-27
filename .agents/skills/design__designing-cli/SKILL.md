@@ -1,6 +1,6 @@
 ---
 name: design__designing-cli
-description: Designs distinctive, production-grade terminal UIs that balance aesthetics with pragmatism. Covers layout composition, color palettes for terminal environments, progress indicators, table formatting, interactive prompts, and output hierarchy. Use when building CLI tools, formatting terminal output, designing interactive prompts, or creating dashboard-style terminal interfaces.
+description: Designs production-grade command-line and terminal interfaces with clear layout, hierarchy, color, progress, tables, and prompts. Use when building or reviewing CLI output, interactive prompts, or terminal dashboards.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

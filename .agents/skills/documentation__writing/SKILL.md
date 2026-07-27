@@ -1,6 +1,6 @@
 ---
 name: documentation__writing
-description: Creates, audits, restructures, and reviews technical documentation using the Diátaxis framework. Use when a user needs to write or reorganize tutorials, how-to guides, reference docs, explanation/concept pages, API docs, quickstarts/getting-started docs, installation guides, troubleshooting docs, or broader documentation structures.
+description: Creates, restructures, and reviews technical documentation using Diátaxis. Use for tutorials, how-to guides, reference material, explanations, API docs, quickstarts, installation guides, troubleshooting, or documentation architecture.
 tools:
   - Read
   - Grep

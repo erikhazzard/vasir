@@ -153,7 +153,7 @@
     },
     {
       "name": "design__animating-interfaces",
-      "description": "Designs and implements UI animations for web and product interfaces — transition timing, easing curves, micro-interactions, feedback animations, loading states, and motion system architecture. Provides exact values, opinionated best practices, and in-depth reviews. Use when adding motion to components, building animation systems, tuning transition feel, reviewing animation performance, or establishing motion design tokens.",
+      "description": "Designs and implements interface motion through transitions, easing, feedback, loading states, and reusable motion patterns. Use when adding or reviewing UI animation, tuning interaction feel or performance, or defining motion tokens.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -183,7 +183,7 @@
     },
     {
       "name": "design__designing-cli",
-      "description": "Designs distinctive, production-grade terminal UIs that balance aesthetics with pragmatism. Covers layout composition, color palettes for terminal environments, progress indicators, table formatting, interactive prompts, and output hierarchy. Use when building CLI tools, formatting terminal output, designing interactive prompts, or creating dashboard-style terminal interfaces.",
+      "description": "Designs production-grade command-line and terminal interfaces with clear layout, hierarchy, color, progress, tables, and prompts. Use when building or reviewing CLI output, interactive prompts, or terminal dashboards.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -288,7 +288,7 @@
     },
     {
       "name": "documentation__writing",
-      "description": "Creates, audits, restructures, and reviews technical documentation using the Diátaxis framework. Use when a user needs to write or reorganize tutorials, how-to guides, reference docs, explanation/concept pages, API docs, quickstarts/getting-started docs, installation guides, troubleshooting docs, or broader documentation structures.",
+      "description": "Creates, restructures, and reviews technical documentation using Diátaxis. Use for tutorials, how-to guides, reference material, explanations, API docs, quickstarts, installation guides, troubleshooting, or documentation architecture.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -854,7 +854,7 @@
     },
     {
       "name": "prompt__improving--rewriting",
-      "description": "Rewrites a prompt based on a prior prompt__improving analysis. Takes the structured findings — intent mapping, failure criteria, domain research, and improvement opportunities — and produces a concrete rewritten prompt. Use after completing a prompt__improving analysis when ready to materialize the recommended improvements into an updated prompt.",
+      "description": "Rewrites a prompt from an existing prompt analysis while preserving its intent and applying the identified fixes. Use when the user wants the improved prompt materialized rather than further critique.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -880,7 +880,7 @@
     },
     {
       "name": "prompt__reverse-engineering",
-      "description": "Reverse-engineers a system prompt from LLM output by analyzing the work just produced. Examines style, structure, constraints, and behavioral patterns to reconstruct the likely system prompt that drove the output. Use when extracting a reusable system prompt from high-quality LLM output, capturing implicit instructions from a successful generation, or creating a prompt template from observed behavior.",
+      "description": "Reconstructs reusable system prompts from successful LLM output by identifying the style, constraints, structure, and behavioral patterns behind it. Use when extracting or recreating the prompt behind observed output.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -932,7 +932,7 @@
     },
     {
       "name": "skills__create-skill",
-      "description": "Designs, rewrites, audits, and debugs reusable AI-agent skills by compressing expert judgment into routed prior-rewrites placed at the cheapest effective layer of the system they live in.  Triggers on creating skills, fixing trigger descriptions, naming skills, pruning bloated manifests, extracting skills from repo doctrine, deciding granularity, or designing skill evals.",
+      "description": "Designs, rewrites, audits, and debugs reusable agent skills through precise routing and decision-changing expertise. Use when creating skills, fixing triggers, choosing granularity, pruning manifests, or extracting durable doctrine.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

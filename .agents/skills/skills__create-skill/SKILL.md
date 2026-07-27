@@ -1,6 +1,6 @@
 ---
 name: skills__create-skill
-description: Designs, rewrites, audits, and debugs reusable AI-agent skills by compressing expert judgment into routed prior-rewrites placed at the cheapest effective layer of the system they live in.  Triggers on creating skills, fixing trigger descriptions, naming skills, pruning bloated manifests, extracting skills from repo doctrine, deciding granularity, or designing skill evals.
+description: Designs, rewrites, audits, and debugs reusable agent skills through precise routing and decision-changing expertise. Use when creating skills, fixing triggers, choosing granularity, pruning manifests, or extracting durable doctrine.
 ---
 
 # Designing Agent Skills
@@ -71,7 +71,7 @@ Run this before extracting expertise — skipping it is how a locally-good skill
 
 ## House Conventions
 
-- Two-line description, `>-` block scalar: line 1 = what it does; line 2 = `Trigger:` the routing boundary. Always-loaded surface — spend tokens like they cost.
+- One-line plain `description` value with no block-scalar marker and no colon in the value. State what it does, then `Use when ...` for the routing boundary. This surface is always loaded, so spend tokens like they cost.
 - No `model:` pins — model tier is the operating contract's decision; note tier in the body only where load-bearing.
 - Tools inline and minimal; auditors and challengers are read-only (no Edit/Write); skills that write code or tests keep Edit/Write and say so.
 - No versioning apparatus — stale skills are synced, not versioned; the skill file is the one schema truth.
@@ -124,12 +124,10 @@ Skill evals answer one question: did the loaded skill change the model's decisio
 
 ## Contrastive Examples
 
-Routing — bad: `description: Helps create better skills.` Good:
+Routing — bad: `Helps create better skills.` Good:
 
 ```yaml
-description: >-
-  Designs and rewrites reusable AI-agent skills by extracting expert judgment, rewriting bad model defaults, and placing each rule at its cheapest effective layer.
-  Trigger: creating skills, fixing over/undertriggering, converting repo doctrine into skills, or deciding whether repeated behavior belongs in a skill.
+description: Designs and rewrites reusable agent skills by extracting expert judgment and placing each rule at its cheapest effective layer. Use when creating skills, fixing triggers, converting repo doctrine into skills, or choosing skill granularity.
 ```
 
 Root rule — bad: `Be concise and high quality.` Good: `Every root-manifest rule must carry expertise, name the default it overrides, define a routing boundary, or shape an artifact the model would otherwise produce incorrectly.`
@@ -145,7 +143,7 @@ Required elements, any readable shape: mode · should-exist (yes/no + why) · re
 - [ ] System mapped: root, siblings, genus, provenance — placement explicit.
 - [ ] Every major rule has a rewrite chain row; laws cited, shared definitions single-homed.
 - [ ] Strongest anchors placed where attention drift can reach them.
-- [ ] Description is two-line classifier text; name is activity-first.
+- [ ] Description is one-line classifier text with no colon in its value; name is activity-first.
 - [ ] References linked with when-to-read; nothing in root that belongs below.
 - [ ] Eval cases exist for meaningful skills; no validator by default.
 

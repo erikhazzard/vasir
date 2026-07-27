@@ -1,6 +1,6 @@
 ---
 name: prompt__improving--rewriting
-description: Rewrites a prompt based on a prior prompt__improving analysis. Takes the structured findings — intent mapping, failure criteria, domain research, and improvement opportunities — and produces a concrete rewritten prompt. Use after completing a prompt__improving analysis when ready to materialize the recommended improvements into an updated prompt.
+description: Rewrites a prompt from an existing prompt analysis while preserving its intent and applying the identified fixes. Use when the user wants the improved prompt materialized rather than further critique.
 model: opus
 ---
 

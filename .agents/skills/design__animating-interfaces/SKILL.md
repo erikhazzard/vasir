@@ -1,6 +1,6 @@
 ---
 name: design__animating-interfaces
-description: Designs and implements UI animations for web and product interfaces — transition timing, easing curves, micro-interactions, feedback animations, loading states, and motion system architecture. Provides exact values, opinionated best practices, and in-depth reviews. Use when adding motion to components, building animation systems, tuning transition feel, reviewing animation performance, or establishing motion design tokens.
+description: Designs and implements interface motion through transitions, easing, feedback, loading states, and reusable motion patterns. Use when adding or reviewing UI animation, tuning interaction feel or performance, or defining motion tokens.
 ---
 
 # Web Animation Design
