@@ -520,7 +520,7 @@
     },
     {
       "name": "game__orchestrating-playable-build",
-      "description": "Build director for game work — drives one coherent playable slice into the player's hand, applies the human Slap Test, names the single biggest feel blocker, and repairs it; coordinates specialist game skills as tools.  Triggers when we're building a game - \"build a game\", \"make it playable\", \"finish/ship the first playable\"; broad vertical slices, prototype rescue, polish passes, release-ready game handoffs.",
+      "description": "Directs game work toward one coherent playable slice in the player's hand and coordinates specialist game skills. Use when building a game, making it playable, rescuing a prototype, polishing a vertical slice, or shipping a playable build.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -533,7 +533,7 @@
     },
     {
       "name": "game__qa",
-      "description": "Runs browser-game feature QA end to end — owner brief, test-plan enumeration and sign-off, orchestrated parallel execution, evidence and playtest review, one verdict — via role contracts in references/; also bootstraps a project's qa rig once. Triggers on \"request QA\", \"verify X\", \"QA this\", \"make sure it works\" on game feature work. Not for tooling, build scripts, infra, or non-game code.",
+      "description": "Runs end-to-end browser-game QA and returns one release verdict from play and evidence. Use only when the user explicitly requests game QA or complete game-feature verification. Excludes tooling, build scripts, infrastructure, and non-game code.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -841,7 +841,7 @@
     },
     {
       "name": "prompt__create-analysis",
-      "description": "Analyzes an existing prompt by mapping its domain's expert knowledge first — mental models, heuristics, failure modes — then tracing every gap and fix to specific findings; analysis only, the rewrite happens separately. Triggers on any request to improve, review, or diagnose a prompt, skill, or prompt chain before rewriting it.",
+      "description": "Analyzes prompts and prompt chains by identifying domain expectations, failure modes, and concrete improvements without rewriting them. Use when the user asks to review, diagnose, or improve a prompt before a separate rewrite.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

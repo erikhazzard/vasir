@@ -1,6 +1,6 @@
 ---
 name: game__orchestrating-playable-build
-description: Build director for game work — drives one coherent playable slice into the player's hand, applies the human Slap Test, names the single biggest feel blocker, and repairs it; coordinates specialist game skills as tools.  Triggers when we're building a game - "build a game", "make it playable", "finish/ship the first playable"; broad vertical slices, prototype rescue, polish passes, release-ready game handoffs.
+description: Directs game work toward one coherent playable slice in the player's hand and coordinates specialist game skills. Use when building a game, making it playable, rescuing a prototype, polishing a vertical slice, or shipping a playable build.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

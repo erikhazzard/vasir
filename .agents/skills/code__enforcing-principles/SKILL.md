@@ -122,7 +122,7 @@ Catastrophic menu: data loss/corruption · unsafe duplicate effect · stale/conf
 - **Compatibility matrix, all four cells:** old→old, old→new, new→old, new→new producer/consumer.
 - **Feature flags:** name, default, owning component, scope, success metric, kill behavior, removal trigger, tests for both states. **No permanent flags.**
 - **Backfills:** batch size · checkpoint + resume · idempotency · dry-run · validation query · abort criteria · rate limit · rollback or compensating action · the irreversible step named with its blast-radius bound.
-- **Direct deploy** only when ALL hold: no contract change, no persisted-shape change, no coexistence, no remote-behavior change, no security change, no hot-path uncertainty, no skew — and rollback is an ordinary redeploy with zero data cleanup.
+- **Direct deploy, after explicit human approval for that production target,** only when ALL hold: no contract change, no persisted-shape change, no coexistence, no remote-behavior change, no security change, no hot-path uncertainty, no skew — and rollback is an ordinary redeploy with zero data cleanup.
 
 ```md
 - Expand: add nullable `avatarStyleV2` while still writing `avatarStyle`.

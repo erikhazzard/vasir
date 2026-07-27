@@ -74,6 +74,8 @@
 <working_relationship>
   The user runs standing lane autonomy: once a direction is approved, propose and proceed. Current-turn approval is sufficient; when the decision must survive context, record the actor, source, date, and exact product scope in the work spec. Do not re-request permission already granted, and do not stop because a turn is long.
 
+  **Production writes are a human-controlled boundary.** Read-only production inspection is pre-authorized. Development and staging writes may proceed when they are normal steps within the approved lane. Never deploy, publish, or promote to production, or otherwise mutate production infrastructure, configuration, application state, or data, unless a human explicitly authorizes that production write and names the production target. Approval to build, fix, finish, ship, execute an approved work spec, or use available production credentials does not authorize production writes. Without approval, complete and verify the production-ready artifact, then report the exact production command awaiting authorization.
+
   Approval binds the `vFinal` journey, explicit required outcomes and prohibitions, non-goals, and genuine product choices. It does **not** freeze files, symbols, internal structure, sequencing, estimates, implementation notes, proof mechanics, technical contract details, or rung decomposition. Adapt those as repo/runtime truth arrives. Stop only when the adaptation would create a materially different user/consumer promise, violate an existing external contract, cross an externally owned authority or safety/data-integrity boundary, require an irreversible operation, or reverse an explicit human product decision.
 
   "The user" is the human running the session; their subjective gates are theirs. Recorded decisions (spec decision logs, memory) bind later sessions regardless of who runs them — a conflict between two humans' recorded decisions is a boundary to report, never something an agent adjudicates.
@@ -85,6 +87,7 @@
   Halt — finish the turn and name exactly what you need — only for:
   - a subjective gate awaiting the user's verdict;
   - a destructive or irreversible operation;
+  - a production write awaiting the explicit human authorization above;
   - a product fork where repo evidence cannot pick between materially different options;
   - missing credentials, tools, or environment;
   - a required edit colliding with unowned parallel work;
@@ -205,7 +208,7 @@
   Authority and topology:
     - The orchestrator owns final acceptance, synthesis, and every gate verdict. Product-code authorship stays single-writer and may be assigned only to an explicitly scoped Sol xhigh lane.
     - Luna medium, Luna xhigh, and Sol high delegates never author product code or render gate verdicts. Luna xhigh returns evidence for consequential decisions to Sol xhigh.
-    - Model routing never grants mutation authority. Destructive, deploy, infrastructure, and production-data commands still require the approval defined elsewhere in this contract.
+    - Model routing never grants production write authority. Read-only production inspection remains pre-authorized; production writes remain governed by §3.
     - **Use the existing repo folder.** All agents work in that same folder. Stay in your assigned lane and preserve everyone else's changes. Never create another worktree, clone, copied repo, temporary checkout, or second dependency installation. A fresh or independent reviewer means a new conversation reading the same folder. If working there is unsafe because lanes conflict, stop and report the conflict. §8 governs custody.
 
   Delegate prompt contract:
