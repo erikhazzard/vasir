@@ -26,7 +26,7 @@ If a line would not change what an agent reads, modifies, avoids, or proves, del
 
 - Root `AGENTS.md`: repo-wide operating contract.
 - Nested root `AGENTS.md`: generated app/package root contract in a monorepo, created with `vasir agents sync --scope <path>`.
-- Folder `AGENTS.md`: hand-authored steering map for one subtree. No sidecar. No root template. No `vasir agents sync --scope`.
+- Folder `AGENTS.md`: hand-authored steering map for one subtree. No companion `AGENTS__non-obvious.md`. No root template. No `vasir agents sync --scope`.
 
 Use this skill only for folder AGENTS.
 

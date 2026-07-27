@@ -21,13 +21,13 @@
 - Language: **plain JavaScript** (no TypeScript)
 - Modules: **ESM only** (`import` / `export`)
 
---- 
+---
 
 # First Principle Design Mandate
 Assume the user is driving, distracted, and barely looking. Use the driver test as the minimum attention budget: one glance to understand state, one obvious action to take, and no required reading, comparing, remembering, or interpretation.
 Ground UI decisions in preattentive processing: the user should detect state, hierarchy, risk, and the next action before they consciously read anything.
 
-Guidance: 
+Guidance:
   Make the current state impossible to miss: status, selection, progress, error, or risk should be visible before any text is read.
   Give every screen one dominant next action; secondary actions should be visually quieter and never compete.
   Replace explanation with affordance: labels, icons, layout, color, and disabled states should show what is possible.

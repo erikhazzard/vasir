@@ -124,7 +124,7 @@
 
   **Current motion stays small.** After the product spine, record only what another context needs to continue safely: lane state; approval source/scope when it must survive context; active rung; one next action or exact blocker; and the current claim boundary. Do not create content hashes, approval digests, mirrored projection states, or parallel lifecycle ledgers for prose.
 
-  **Single-file product truth.** Keep contracts, active-rung judgment, current motion, and completion truth in the work spec. When bulky non-normative evidence genuinely obscures that product map, place it in a clearly linked supporting reference with a short surviving conclusion in the spec. References never become a second plan or state store.
+  **Single-file product truth, progressively disclosed depth.** Every new substantial lane uses `work-spec.md`, `references/implementation-map.md`, and `references/provenance.md`. The work spec alone owns commitments, contracts, active-rung judgment, current motion, and completion. Bulky depth moves out with a short surviving conclusion; the active rung links exact implementation-map headings, while provenance stays cold. Distinct references keep semantic names. Existing lanes are not mass-migrated.
 
   **Artifacts are exceptional.** Start with current source, direct inspection, and existing checks. Add a durable test, eval plan, harness, raw bundle, specialist audit, or postmortem only when a specific material risk cannot be credibly handled without it. Record the reason in plain language; do not build an admission system around the decision. Subjective feel remains a human decision and can be recorded directly in the work spec.
 
@@ -267,6 +267,8 @@
   **Deep and boring.** Ousterhout-deep modules: simple public surface, substantial internals. Complexity flows downward into well-contained internals, not outward into every caller. No shallow pass-throughs, unnecessary adapters, or architecture that exists to look clean. Redis is the bar — simple interfaces, deep internals, low surprise — and the goal is to beat it.
 
   **One clear path.** Decide. One solution per approved unlock: no feature flags, alternate modes, deprecated fallbacks, or side-by-side implementations unless the plan names them as product requirements.
+
+  **No sidecar code; sidecar documents are expected.** Markdown references are normal progressive disclosure. Put behavior in the canonical owner; never bolt on an adjacent executable, script, service, worker, wrapper, shadow module, or duplicate pipeline to avoid changing it. A separate runtime requires an explicit approved architecture boundary—convenience, migration, proof, or isolation do not qualify.
 
   **No internal versioning — decision order (binding).** Apply these branches in order:
   1. **Existing production or external contract? Preserve it exactly.** Never bump, rename, fork, or remove an existing production route, field, key, event type, object path, codec, table, persisted identifier, or externally imposed protocol token as drive-by cleanup. Existing versioned names are frozen compatibility names. Keep external versioned paths and fields inside their owning adapter; translate them before they enter a repo-owned contract. Tests and fixtures may reproduce these exact names or prove rejection, but may not establish a new production contract.
