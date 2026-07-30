@@ -76,6 +76,8 @@ Every rung:
 
 A rung may defer capability. It may not fake the core experience, substitute a proxy, or create work expected to be replaced. Backend, schema, tests, polish, and bounded feasibility investigation are work inside a rung, not milestones by themselves.
 
+Every user-facing rung states one **Real journey proof**: who uses the normal entrypoint to achieve what observable outcome, plus the most tempting proxy that does not count. The rung stays open until that exact journey passes.
+
 The active rung is rich enough to build. The next rung needs only enough detail to expose architecture-shaping constraints. Later rungs stay thin until they become active.
 
 ## Proof serves implementation
@@ -116,7 +118,7 @@ On rung advance, refresh or prune the implementation map instead of accumulating
 5. If the product spine and active rung are coherent, implementation is the next action. Do not create another summary or planning artifact by default.
 6. Edit the spec only for durable judgment: changed product meaning, contract, rung boundary, blocker, human decision, or coherent rung-close evidence.
 7. Re-read immediately before writing and merge concurrent changes without losing either writer's load-bearing judgment.
-8. Return the compact result below. This skill maintains the map; `$plan__prepare-goal` builds from it.
+8. Return the compact result below. This skill maintains the map; `$plan__implement-work-spec` builds from it.
 
 ## Canonical template
 
@@ -196,6 +198,7 @@ Contracts live here once. Elsewhere cite their IDs.
 - **Not in this rung:** <capability boundary>
 - **Contracts:** <C-###>
 - **Material risk:** <only a failure that could meaningfully break this slice>
+- **Real journey proof:** <who uses the normal entrypoint to achieve what observable outcome; name the most tempting proxy that does not count>
 - **Direct proof:** <shortest credible observation of the promised outcome>
 - **Done when:** <the actor can complete and observe the slice>
 
@@ -247,6 +250,7 @@ Before writing, confirm:
 - implementation details remain adaptive;
 - reference documents contain no product authority or current state, and every active link says when to read it;
 - current motion names one next action or a real blocker;
+- every user-facing rung states its Real journey proof and remains open until it passes;
 - proof is the cheapest credible direct observation, not a parallel product;
 - no digest, projection ledger, mandatory eval, or default audit was introduced.
 

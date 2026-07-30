@@ -743,6 +743,19 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "plan__implement-work-spec",
+      "description": "Builds an approved work spec's active vertical slice and continues toward vFinal while adapting implementation details to repo/runtime truth. Trigger: the user asks to begin, continue, resume, or finish a substantial lane whose product spine and active rung are clear.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/plan__implement-work-spec",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "plan__maintain-work-spec",
       "description": "Creates and updates the durable product map for a substantial lane: the request, vFinal North Star, observable contracts, vertical-slice ladder, active rung, and current motion. Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or human decision.",
       "category": "uncategorized",
@@ -755,19 +768,6 @@
         "templates/references/provenance.md"
       ],
       "path": ".agents/skills/plan__maintain-work-spec",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "plan__prepare-goal",
-      "description": "Builds an approved work spec's active vertical slice and continues toward vFinal while adapting implementation details to repo/runtime truth. Trigger: the user asks to begin, continue, resume, or finish a substantial lane whose product spine and active rung are clear.",
-      "category": "uncategorized",
-      "tags": [],
-      "version": "0.1.0",
-      "recommends": [],
-      "files": [
-        "SKILL.md"
-      ],
-      "path": ".agents/skills/plan__prepare-goal",
       "entry": "SKILL.md"
     },
     {

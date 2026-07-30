@@ -1,12 +1,12 @@
 ---
-name: plan__prepare-goal
+name: plan__implement-work-spec
 description: >-
   Builds an approved work spec's active vertical slice and continues toward vFinal while adapting implementation details to repo/runtime truth.
   Trigger: the user asks to begin, continue, resume, or finish a substantial lane whose product spine and active rung are clear.
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
-# Prepare Goal — Build the Slice
+# Implement Work Spec — Build the Slice
 
 The work spec is a map. This skill builds the product.
 
@@ -32,6 +32,7 @@ If these are clear, build. Do not manufacture another gate.
 - **Product forks stop; engineering discoveries do not.** Stop only when the new shape would materially change the user/consumer promise, violate an existing external contract, cross an externally owned authority or safety/data-integrity boundary, require an irreversible operation, or reverse an explicit human decision.
 - **Implementation is the default motion.** Continue through coherent in-boundary work rather than interrupting after every action for spec maintenance.
 - **Proof is proportional.** Inspect the shortest real value path. Reuse current source, direct observation, and existing checks first. Add or modify a durable test only when a specific material regression risk needs it. Create an eval plan, harness, artifact bundle, or independent audit only when that specific risk cannot be credibly handled more simply.
+- **User-journey proof is non-substitutable.** For a user-facing rung, run its stated Real journey proof through the normal entrypoint. Mocks, components, synthetic clients, and backend/protocol checks prove only their layer; keep the rung open until the exact journey passes.
 - **Specialists are conditional.** Invoke `$code__enforcing-principles`, `$testing__enforcing-mandate`, `$eval__design-proof-gates`, or an audit skill only when their owned judgment is actually needed. Loading a skill is not progress.
 - **Subjective truth stays human.** Stop for the user's verdict only when the active slice has an explicit feel/taste/readability/fun gate and the reviewable experience is ready.
 - **Failures stay bounded.** Fix a discovered in-boundary defect and continue. Stop after a repeated similar tool/harness failure or a real boundary above, not because the turn or rung is large.
@@ -45,7 +46,7 @@ For each coherent chunk:
 3. Inspect the direct value path and only the checks justified by the material risk.
 4. Let evidence change implementation details. If it exposes a product fork, stop; otherwise keep building.
 5. Update the work spec immediately for changed product meaning, load-bearing contract, observable rung boundary, blocker, or human decision. Batch useful implementation/evidence notes at a coherent checkpoint or rung close.
-6. When the slice works, record its observable result and advance to the next additive rung. Do not insert a mandatory summary or audit between rungs.
+6. When the slice works—and any stated Real journey proof has passed—record its observable result and advance to the next additive rung. Do not insert a mandatory summary or audit between rungs.
 
 ## Completion
 

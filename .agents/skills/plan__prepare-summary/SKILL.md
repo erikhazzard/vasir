@@ -48,4 +48,4 @@ Return:
 - when Yes, the exact next implementation action;
 - when No, the single smallest product decision, spec correction, or external unblock required.
 
-Route directly to `$plan__prepare-goal` when ready. Route to `$plan__maintain-work-spec` only when durable product judgment actually needs correction.
+Route directly to `$plan__implement-work-spec` when ready. Route to `$plan__maintain-work-spec` only when durable product judgment actually needs correction.
