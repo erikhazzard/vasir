@@ -198,9 +198,8 @@
 
   Routing order (first match wins):
     1. **Fable xhigh or gpt-5.6-sol xhigh:** product code, architecture, consequential judgment, synthesis, reviews, gate verdicts, and final decisions. Fable owns direct Claude-context work; use Sol only for an explicitly delegated lane.
-    2. **gpt-5.6-luna xhigh:** bounded file/repo reading, reconnaissance, failure investigation, log/diff interpretation, and evidence extraction.
-    3. **gpt-5.6-luna medium:** exact safe command batteries such as tests, builds, and benchmarks; return raw or capped output and make no diagnosis or verdict.
-    4. **gpt-5.6-sol high:** the routine delegated remainder that needs neither repository investigation, product-code authorship, nor consequential judgment.
+    2. **gpt-5.6-luna xhigh:** bounded file/repo reading, reconnaissance, failure investigation, log/diff interpretation, evidence extraction, and exact safe command batteries such as tests, builds, and benchmarks. Command-only tasks return raw or capped output and make no diagnosis or verdict.
+    3. **gpt-5.6-sol high:** the routine delegated remainder that needs neither repository investigation, product-code authorship, nor consequential judgment.
     A coding or judgment agent may read files and run commands needed for its own lane. The routing table governs delegation; it does not require fragmenting one coherent task across agents.
 
   Bindability gate:
@@ -209,7 +208,7 @@
 
   Authority and topology:
     - Fable owns final acceptance, synthesis, and every gate verdict. Product-code authorship stays single-writer and may be assigned only to Fable xhigh or an explicitly scoped Sol xhigh lane.
-    - Luna medium, Luna xhigh, and Sol high delegates never author product code or render gate verdicts. Luna xhigh returns evidence for consequential decisions to Fable xhigh or Sol xhigh.
+    - Luna xhigh and Sol high delegates never author product code or render gate verdicts. Luna xhigh returns evidence for consequential decisions to Fable xhigh or Sol xhigh.
     - Model routing never grants production write authority. Read-only production inspection remains pre-authorized; production writes remain governed by §3.
     - **Use the existing repo folder.** All agents work in that same folder. Stay in your assigned lane and preserve everyone else's changes. Never create another worktree, clone, copied repo, temporary checkout, or second dependency installation. A fresh or independent reviewer means a new conversation reading the same folder. If working there is unsafe because lanes conflict, stop and report the conflict. §8 governs custody.
 
@@ -220,7 +219,7 @@
   Codex invocation mechanics (this machine):
     - Always run codex with full permissions (YOLO); never downgrade delegated runs to read-only or approval-gated sandboxes.
     - A zsh function wraps `codex`, injecting `-C "$PWD" -s danger-full-access -a never` — the wrapped form is already YOLO. Do NOT pass `-C` through the wrapper (errors: "--cd cannot be used multiple times").
-    - Command runner: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="medium"' "<exact safe commands; return raw or capped output; make no verdict>"`
+    - Command runner: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="xhigh"' "<exact safe commands; return raw or capped output; make no verdict>"`
     - Read/recon: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="xhigh"' "<bounded evidence task; demand file:line evidence; cap answer length>"`
     - Routine work: `codex exec -m gpt-5.6-sol -c 'model_reasoning_effort="high"' "<bounded task; cap answer length>"`
     - Coding/judgment: `codex exec -m gpt-5.6-sol -c 'model_reasoning_effort="xhigh"' "<coding or judgment task; define authority and deliverable>"`
