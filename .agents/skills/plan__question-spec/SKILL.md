@@ -20,6 +20,10 @@ Also ask:
 
 > Could the team implement this spec perfectly and still visibly fail the user?
 
+## First-principles compression
+
+**Treat the required outcome as fixed and every proposed mechanism as replaceable.** State the outcome without solution words, then ask what the smallest credible spec would be if we knew everything we know now on day one. For every requirement or mechanism, ask whether it serves that outcome directly or only repairs another proposed choice. If B fixes A, C fixes B, or D fixes C, reopen A and collapse the chain; retain complexity only when a current product promise or real external, authority, safety, data-integrity, compatibility, or measured constraint forces it.
+
 ## Review priorities
 
 Inspect only dimensions capable of changing the product:
@@ -28,7 +32,6 @@ Inspect only dimensions capable of changing the product:
 - **vFinal and unlock:** The final journey is complete and valuable rather than a mechanism, `v0`, `v1`, MVP, or reduced substitute.
 - **Rung integrity:** Every milestone is a working vertical slice through a real entrypoint and path, uses the lasting shape, and makes the next rung additive. Backend/schema/test/polish/discovery phases are not product milestones.
 - **Experience quality:** The obviousness assumptions and design/UX bar are concrete enough to prevent a technically present but visibly wrong result.
-- **Scope and simplicity:** The plan is the smallest responsible route to `vFinal`. Challenge architecture or process only when a simpler option could satisfy the same stated constraint.
 - **Learning latitude:** Files, symbols, sequencing, internal design, technical schema details that preserve the external promise, and equivalent rung decomposition remain adaptive.
 - **Material correctness:** Examine only failure, authority, security, persistence, performance, cost, or reversibility risks that could materially change the chosen product or make the active slice unsafe.
 - **Proof restraint:** The proposed evidence observes the real slice and does not become a parallel product.

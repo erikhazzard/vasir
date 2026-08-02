@@ -87,6 +87,21 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "audit-ai-code-accretion",
+      "description": "Audits code to eliminate local maxima AI genereated code. Use when asked to grade AI-written code, find AI slop, identify what to delete, simplify generated code, or turn a complexity audit into concrete cleanup actions.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "references/eval-cases.md"
+      ],
+      "path": ".agents/skills/audit-ai-code-accretion",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "code__auditing",
       "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Triggers on code review, merge safety, production readiness, correctness, performance, or hardening requests; exhaustive hypothetical hardening is opt-in only.",
       "category": "uncategorized",

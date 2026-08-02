@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit AI Code Accretion"
+  short_description: "Grade AI code sprawl and prescribe deletion"
+  default_prompt: "Use $audit-ai-code-accretion to grade this code across the ten accretion dimensions and return a deletion-first remediation plan."
