@@ -23,7 +23,7 @@ Every substantial lane keeps these load-bearing:
 - **Non-goals:** explicit scope boundaries that do not weaken the required experience.
 - **Request anchor:** the user's required outcomes and prohibitions in near-verbatim language.
 - **Current truth:** only facts, unknowns, and decisions that can change the active or next slice.
-- **Observable contracts:** stable `C-###` statements that can visibly fail.
+- **Observable contracts:** stable `C-###` statements that can visibly fail, including a scoped failure contract when degradation, denial, unavailability, or an indeterminate effect can materially change the journey.
 - **Vertical-slice ladder:** meaningful working experiences leading to `vFinal`; the active rung is the richest build packet.
 - **Current motion:** active rung, next action or blocker, and the honest claim boundary.
 - **Acceptance:** the shortest direct value-path observation and any genuinely human feel decision.
@@ -53,6 +53,8 @@ Capture every substantial request before synthesizing it away:
 - Preferences, permissions, and questions guide implementation but do not freeze the product boundary unless the user promotes them to a requirement.
 
 Always ask: **Could an agent complete this spec while visibly failing what the user actually requested?** If yes, fix the product map before implementation. Similar colors, labels, mechanisms, or vibes are not equivalent delivery.
+
+When failure behavior is material, apply root §9 once at the contract boundary: name the subject, scope, promised terminal outcome, surviving valid state/value, externally visible non-success outcome, and recovery owner. A preserved control, completed handler, empty response, hidden action, or successful no-op never satisfies the rung unless that exact denial or emptiness is the promised terminal outcome.
 
 ## The map is not the territory
 
@@ -183,6 +185,7 @@ Keep this section scoped to the active and next rung.
 
 - `[C-001 | Must]` If <condition>, then <observable result>, otherwise the feature is broken.
 - `[C-002 | Must Not]` <forbidden observable outcome>.
+- `[C-003 | Failure]` If <material failure condition>, then <honest degraded / pending-or-unknown / denied / unavailable / failed outcome>; preserve <valid state and independent value>; recover by <owner/action>. Omit when no material failure contract is needed.
 
 Contracts live here once. Elsewhere cite their IDs.
 
@@ -245,6 +248,7 @@ Before writing, confirm:
 
 - the request anchor, `vFinal`, North Star, non-goals, contracts, and ladder describe the same product;
 - every required item maps to an observable contract or rung, with any changed/deferred treatment explicitly awaiting a human product decision;
+- every material failure contract preserves the root §9 distinction between control containment, runtime outcome, and proof claim; no non-green path counts as completion;
 - every rung is a valuable vertical slice using the lasting shape;
 - the active rung is the richest section and is buildable now;
 - implementation details remain adaptive;

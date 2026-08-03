@@ -72,7 +72,7 @@ Subjective gate:
 
 Waiting Human → Accepted or Rejected; a named authority may Waive or Retire it with a receipt. If the question, scope, or reviewed artifact changes materially, prior Accepted is no longer current and a new Waiting Human receipt is required.
 
-Harness Ready means a new/intentionally changed value is absent and the instrument correctly detects that absence; it is not product potency. Red Captured is only a faithful escaped-defect reproduction. Objectively Green requires current authority-environment evidence and the declared potency. Defective is a first-class non-green state.
+Harness Ready means a new/intentionally changed value is absent and the instrument correctly detects that absence; it is not product potency. Red Captured is only a faithful escaped-defect reproduction. Objectively Green requires current authority-environment evidence and the declared potency. Defective is a first-class non-green state. These are gate lifecycle states, not unqualified task or product outcomes: under root §9, Harness Ready and Red Captured carry a `RED` product claim, Blocked/Defective/Open carry `UNVERIFIED`, and only Objectively Green can carry `GREEN` for the gate's exact scoped claim.
 
 ## Measurement and compound probes
 

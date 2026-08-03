@@ -63,7 +63,7 @@ All generated work must obey the repo's architectural invariants before convenie
 ## Quick Reference
 
 - Route all public behavior through the canonical boundary.
-- Fail closed when invariants are unclear.
+- Enforce only invariants established by repo evidence; surface unresolved uncertainty instead of inventing one.
 
 ## Implementation Patterns
 

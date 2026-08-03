@@ -243,7 +243,7 @@ Recommended path:
    - `ANTHROPIC_API_KEY`
 6. If the terminal is interactive, rerun without `--json` and let Vasir prompt you to paste or skip a missing provider key.
 7. If the report says `INCOMPLETE`, run `vasir eval inspect <skill> [run-id]` and inspect the saved `run.json` under `.agents/vasir-evals/<skill>/...`.
-8. If the report says `hard checks only`, that means the suite is intentionally rules-only. If the suite defines `judgePrompt` and the fixed judges were unavailable, the hard-check section still renders but the top-line verdict should fail closed to `NO SIGNAL` unless the hard floor regressed. Rerun with both OpenAI and Anthropic credentials available if you need the full suite verdict.
+8. If the report says `hard checks only`, that means the suite is intentionally rules-only. If the suite defines `judgePrompt` and the fixed judges were unavailable, the hard-check section still renders. Unless the hard floor independently proves a regression, the CLI comparison remains `NO SIGNAL`; product-facing reporting maps that to `ProductClaim: UNVERIFIED` with `EvidenceReason: NO_SIGNAL`. Neither is a pass. Rerun with both OpenAI and Anthropic credentials available if you need the full suite verdict.
 9. Run `vasir eval inspect <skill>` to reopen the latest saved run and see the exact baseline/treatment outputs and judge reasons that moved the score.
 10. If you changed the scorer logic, run `vasir eval rescore <skill>` before trusting an older saved summary.
 11. If token totals show as unavailable, confirm you are running a live provider. `--model mock` does not report provider usage.

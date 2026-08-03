@@ -1,6 +1,6 @@
 ---
 name: audit__optimizing-node-backend
-description: Audits Node.js backends for latency, scalability, cost, concurrency, and failure risk across event-loop work, caches, databases, memory, saturation, and observability. Use for performance reviews, bottleneck or timeout analysis, access-pattern audits, and capacity risk.
+description: Audits Node.js backends for latency, scalability, cost, concurrency, and failure risk across event-loop work, caches, databases, memory, saturation, and observability. Use when the request explicitly frames a Node-backend latency, scale, cost, timeout, access-pattern, bottleneck, or capacity audit; a generic code performance or release review stays with code__auditing under root §6.
 ---
 # Optimizing Node Backend — Audit Skill
 
@@ -45,6 +45,7 @@ Use this skill when the user asks about Node.js backend:
 
 Do not use this skill for:
 
+- a generic code performance or release review that does not name a Node-backend runtime, latency, scale, cost, timeout, access-pattern, bottleneck, or capacity lens
 - “write a new handler” with no audit/performance framing
 - “explain what this code does”
 - frontend React render performance

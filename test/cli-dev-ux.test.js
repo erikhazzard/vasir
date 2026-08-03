@@ -257,7 +257,7 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /agents sync is the one-command generated AGENTS\/CLAUDE path/i);
   assert.match(capturedOutput.readStdout(), /Folder AGENTS files are hand-authored steering maps/i);
   assert.match(capturedOutput.readStdout(), /agents init mutates only the current repo root and writes AGENTS\.md \+ CLAUDE\.md/i);
-  assert.match(capturedOutput.readStdout(), /agents validate fails closed/i);
+  assert.match(capturedOutput.readStdout(), /agents validate exits nonzero and reports details/i);
   assert.match(capturedOutput.readStdout(), /auto-initializes the global catalog if needed/i);
   assert.match(capturedOutput.readStdout(), /remove mutates only the current repo root/i);
   assert.doesNotMatch(capturedOutput.readStdout(), /npx vasir/);
@@ -1479,7 +1479,7 @@ test("agents sync dry-run previews AGENTS reconciliation without writing", async
   assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS__non-obvious.md")));
 });
 
-test("agents validate fails closed on leftover scaffold markers and passes once the file is clean", async () => {
+test("agents validate rejects leftover scaffold markers and passes once the file is clean", async () => {
   const projectDirectory = createTemporaryDirectory();
   const capturedInvalidOutput = captureCommandWriters();
 

@@ -106,7 +106,7 @@ permanent_source_location_or_creation_envelope: "repo-specific eval/tool domain,
 raw_artifact_location: "tmp/<datetime>__mmorpg-netcode-100-concurrent-observer/"
 proposed_command: "to be created by $eval__implement-proof-gate"
 required_payload: "world seed, runId, bot identity pool, observer auth/session state, movement script, churn model, propagation/size/error budgets"
-pass_fail_condition: "Exactly the pass_fail field from MMORPG-NETCODE__M1__G1; the harness must fail closed if any observer is missing or uncorrelated."
+pass_fail_condition: "Exactly the pass_fail field from MMORPG-NETCODE__M1__G1; if any required observer is missing or uncorrelated, the proof result must be non-green and explicitly report ProductClaim UNVERIFIED."
 why_existing_harnesses_are_insufficient: "No confirmed existing harness coordinates live bots, real browser rendering, websocket/frame evidence, churn, and server metrics under one runId."
 required_before_product_code: "yes"
 ```
@@ -284,7 +284,7 @@ plausible_lie_prevented: "Typecheck or new-fixture-only tests pass while old dur
 setup: "Immutable old-schema replay fixture from production-shaped data, new-schema replay fixture, isolated test store, canonical replay loader/writer entrypoints, and expected normalized event output."
 action: "Load old fixture through canonical loader, load new fixture through canonical loader, write a new replay through canonical writer, then query raw stored event shape and normalized loader output."
 observation: "Normalized loader outputs for old/new fixtures, raw write query output, migration/compatibility logs, and rollback/read strategy result."
-pass_fail: "Pass only if old fixture loads to expected normalized events; new fixture loads to expected normalized events; new write stores only the new schemaVersion/encoding shape; no old fixture is mutated during read; malformed mixed-version records fail closed with a validation error; rollback/read compatibility is either proven by a reverse/read fixture or explicitly blocked with approved no-rollback decision."
+pass_fail: "Pass only if old fixture loads to expected normalized events; new fixture loads to expected normalized events; new write stores only the new schemaVersion/encoding shape; no old fixture is mutated during read; malformed mixed-version records return a validation error without mutating persisted state; rollback/read compatibility is either proven by a reverse/read fixture or explicitly blocked with approved no-rollback decision."
 eval_tool: "missing harness: replay-schema-compatibility-eval"
 target_env: "Local integration test environment using the canonical persistence adapter or a repo-approved recorded fixture store."
 data_payload: "old-schema replay fixture, new-schema replay fixture, malformed mixed-version fixture, expected normalized event JSON"

@@ -44,7 +44,7 @@ function createRunSummary({
   };
 }
 
-test("judge-configured runs fail closed when the fixed judges are unavailable", () => {
+test("judge-configured runs report no signal when the fixed judges are unavailable", () => {
   const summary = {
     global: {
       comparablePairCount: 1,

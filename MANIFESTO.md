@@ -122,7 +122,7 @@ Tests and scripts matter because they turn failure into structure:
 - a bug becomes a regression test
 - repeated drift becomes a sharper skill
 - a hidden assumption becomes an explicit invariant
-- an unsafe path becomes a fail-closed command
+- an unsafe path becomes a command that refuses the dangerous effect, preserves valid state, and names recovery
 
 The goal is not zero failure. The goal is for each failure to harden the system.
 

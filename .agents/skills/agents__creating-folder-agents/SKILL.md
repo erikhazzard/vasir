@@ -91,7 +91,7 @@ Capture only local facts that steer behavior:
 - **Owns**: decisions, value paths, state transitions, rendering, data transforms, jobs, boundaries, or proof harnesses owned here.
 - **Read First**: files that give the fastest trustworthy orientation.
 - **Entry Points**: handlers, routes, commands, screens, jobs, exported modules, reducers, hooks, schemas, or generators.
-- **Non-Obvious Constraints**: invariants, local hard nos, counter-mean patterns, generated artifact rules, dangerous defaults, perf/order/cost constraints, security or fail-closed behavior.
+- **Non-Obvious Constraints**: invariants, local hard nos, counter-mean patterns, generated artifact rules, dangerous defaults, perf/order/cost constraints, and any named protected effect that must be withheld when its authority or integrity cannot be established.
 - **Proof Commands**: exact commands, harnesses, artifacts, screenshots, traces, snapshots, fixtures, or manual checks needed to prove changes here.
 - **Deeper Maps**: child folders whose `AGENTS.md` files take precedence.
 

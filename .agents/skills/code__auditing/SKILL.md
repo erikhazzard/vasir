@@ -1,6 +1,6 @@
 ---
 name: code__auditing
-description: Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Triggers on code review, merge safety, production readiness, correctness, performance, or hardening requests; exhaustive hypothetical hardening is opt-in only.
+description: Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; use alone for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, while explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.
 tools: Read, Grep, Glob, Write
 ---
 
@@ -10,13 +10,25 @@ Find defects worth acting on. Possibility is not priority. A release blocker mus
 
 This is an audit skill, not a code-writing skill. Inspect and report; never rewrite the audited product code.
 
+## Place in the audit family
+
+Root §6 owns first-match request classification; do not duplicate its phrase matrix here. When it selects the standard paired audit, or an explicitly combined review containing both code/release and accretion:
+
+- this skill owns the canonical report, severity, and `SHIP` / `SHIP WITH NOTES` / `NO-SHIP` recommendation;
+- invoke `$audit-ai-code-accretion` in `EMBEDDED` mode against the same boundary;
+- use its `CHANGESET` mode for a scoped change, or the narrowest explicitly named journey, subsystem, or repository mode; never widen coverage merely because the request says "code audit";
+- structural findings remain simplification recommendations unless their underlying harm independently passes this skill's release-severity gate.
+
+A focused request selected by root §6 uses this skill alone. A named specialist audit routes to that specialist. Additional lenses run only when the user explicitly names them; do not load every installed audit skill merely because it exists.
+
 ## Operating lenses
 
-Apply all five together:
+Apply all six together:
 
 - **User-journey value:** Does the issue break the actual unlock or a supported caller contract?
 - **Evidence and reachability:** Can the claimed failure occur in the current code, topology, and product path?
 - **Systems correctness:** Are state ownership, concurrency, I/O, recovery, security, and bounds sound for the declared risk tier?
+- **Failure truth:** Under root §9, does each failure preserve valid state and independent value while exposing the honest unavailable, degraded, pending, denied, or failed outcome—or does empty data, hidden UI, a swallowed error, blocked work, or a successful no-op falsely look green?
 - **Proportionality and simplicity:** Is the proposed remedy cheaper and safer than the expected harm?
 - **Skeptical self-review:** What evidence, mitigation, or assumption could make the finding wrong or less severe?
 
@@ -40,10 +52,11 @@ State the selected mode in the report.
 
 - Review independently using the same existing repo folder (root §7). Re-derive conclusions from the candidate, lane boundary, and proof gates; do not inherit the author's conclusions.
 - When invoked as a terminal handoff overlay, require the caller to name the exact material blind spot, audit only that slice, and return findings into the one `$handoff__final-quality-gate` report. Do not create a second report or expand into a general hardening audit.
-- A standalone user-requested code audit may use the full report shape below. Skill availability alone never warrants this lens.
+- An unqualified user-requested code audit uses the paired report shape below. Write one canonical report to `tmp/<datetime>__<slug>__code-audit/report.md`; the embedded accretion lens writes no second report.
+- A focused standalone review may report inline unless the user, root contract, or handoff needs a durable artifact. Skill availability alone never warrants this lens.
 - Audit the provided scope. Briefly record adjacent hazards, but do not let unrelated pre-existing debt hijack the lane.
 - A pre-existing issue may block this change only when the change worsens it, makes it newly reachable, or the active unlock directly depends on that boundary.
-- Write the report to `tmp/<datetime>__<slug>__code-audit/report.md` when the repo contract requires an audit artifact. Return its path and verdict.
+- When a durable report is warranted, return its path and verdict.
 - The auditor recommends; the orchestrator judges and resolves findings.
 
 ## Hard constraints
@@ -54,6 +67,8 @@ State the selected mode in the report.
 - Label important claims as **FACT**, **INFERENCE**, or **ASSUMPTION**.
 - An unverified assumption cannot create a P0, P1, or `NO-SHIP` verdict. Put it under **Needs Validation** and state the cheapest discriminator.
 - Do not require S-tier perfection. The standard is fit for the declared unlock, supported journey, deployment reality, and risk tier.
+- An accretion grade or deletion opportunity never changes the release verdict unless the same underlying issue independently meets this skill's P0/P1 gate.
+- A guard, fallback, harness, or handler completing its own control flow never proves the promised user/system terminal outcome. Qualify subsystem evidence and flag any false-green promotion against root §9.
 - It is valid—and often correct—to report no material finding, no performance hotspot, or no naming problem.
 
 ## Audit method
@@ -73,7 +88,7 @@ If the unlock or deployment fact is absent, make the narrowest conservative assu
 
 ### 2. Generate candidate findings
 
-Inspect correctness, data integrity, security, authorization, concurrency, recovery, bounds, performance, observability, testability, API misuse resistance, and maintainability as relevant to the change.
+Inspect correctness, data integrity, security, authorization, concurrency, recovery, bounds, performance, observability, testability, API misuse resistance, maintainability, and false-green failure semantics as relevant to the change.
 
 Do not turn every improvement idea into a finding. A candidate becomes a reported finding only after impact calibration.
 
@@ -136,6 +151,7 @@ Use Markdown and keep the default Release Audit concise.
 ### 0) Audit Context
 
 - Selected mode
+- Composition: `FOCUSED CODE` or `PAIRED CODE + ACCRETION`
 - Declared unlock and scoped change
 - Evidence inspected
 - Current deployment/caller assumptions
@@ -169,17 +185,30 @@ Include P2 and Advisory items, ordered by expected value. Default maximum: five.
 
 Each item needs evidence, realistic impact, why it does not block, and the smallest worthwhile action—or `accept residual risk`.
 
-### 4) Needs Validation
+### 4) Structural Accretion
+
+Include this section only for the standard paired audit or an explicitly combined review containing both code/release and accretion. Apply `$audit-ai-code-accretion`; do not recreate its rubric from memory. Preserve its owned output elements inside this report:
+
+- structural disposition `NO MATERIAL ACCRETION`, `ACCRETION FOUND`, or `INCONCLUSIVE`—a summary label, not a second verdict;
+- selected accretion mode, named boundary, finding confidence, and coverage confidence;
+- material justification-island findings with exact evidence, strongest keep case, falsifier, smallest surviving shape, and deletion dividend;
+- the ten-dimension report card without averaging;
+- what must not be deleted because current evidence forces it;
+- structural actions to merge into the final Plan of Action.
+
+This section has no ship/no-ship verdict. `None observed at this coverage` is valid.
+
+### 5) Needs Validation
 
 List assumption-sensitive claims separately with the cheapest discriminator and how each possible result would affect severity. `None` is valid.
 
-### 5) Rejected or Downgraded Candidates
+### 6) Rejected or Downgraded Candidates
 
 Include only candidates whose rejection prevents likely confusion or overbuilding. State the missing forcing requirement, existing mitigation, rarity stack, lack of attribution, or unfavorable cost ledger. `None` is valid.
 
-### 6) Plan of Action
+### 7) Plan of Action
 
-The final section. Include only actions justified by the audit, in priority order. `None—ship the scoped change` is valid.
+The final section. Deduplicate release work and embedded accretion actions, preserve their different authority, and include only actions justified by the audit in priority order. Mark simplification recommendations as non-blocking unless their underlying harm independently meets the release-severity gate. `None—ship the scoped change` is valid.
 
 For each action include:
 
@@ -244,5 +273,7 @@ Before returning the audit, verify:
 - Existing mitigations and residual risk are both represented.
 - Rare-condition stacks and pre-existing issues obey the severity caps.
 - Every architecture recommendation names its forcing requirement.
+- A standard paired or explicitly combined code-plus-accretion audit actually applied `$audit-ai-code-accretion` to the same boundary, included its owned section, and emitted no second report or rival ship verdict.
+- A focused or named audit did not silently widen into the paired or expanded audit family.
 - The report permits `none` wherever evidence found nothing material.
 - The verdict reflects the declared unlock—not an abstract ideal of perfect infrastructure.

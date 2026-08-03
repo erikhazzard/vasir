@@ -534,7 +534,7 @@ Seed rng.`
   );
 });
 
-test("eval run fails closed when a suite expects judges but the fixed judge layer is unavailable", async () => {
+test("eval run reports no signal when a suite expects judges but the fixed judge layer is unavailable", async () => {
   const repositoryDirectory = createTemporaryDirectory();
   writeFile(
     path.join(repositoryDirectory, ".agents", "skills", "deterministic", "meta.json"),

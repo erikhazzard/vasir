@@ -203,7 +203,7 @@ Check:
 - key cardinality by user/IP/tenant/route
 - hot tenant/IP risk
 - clock/window semantics
-- fail-open/fail-closed behavior when Valkey is unavailable
+- documented availability policy and externally visible outcome when Valkey is unavailable; distinguish denied, unavailable, degraded, and pending or unknown states
 
 #### Lock / coordination layer
 

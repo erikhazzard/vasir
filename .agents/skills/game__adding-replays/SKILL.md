@@ -102,7 +102,7 @@ function supportsPresentation(descriptor, matchId) {
 
 Public records are already SDK-decoded `{ ordinal, atMs, type, data }`. `descriptor.tickRateHz` is the recorded input timeline rate. Dispatch on exact `{ replayFamily, sourceSchema }`; never infer semantics from a numeric record ID or a `type` without the descriptor. Encoded `payloadBase64`, `payloadBytes`, and `recordTypeId` fields must never appear in game code.
 
-Typed v2 covers every currently registered canonical player-input schema: pointer tap/release (with or without semantic UI), four-way swipe (with or without semantic UI), eight-way bullet-heaven movement/upgrades (with or without semantic UI), default humanoid controls, and SDK-header-proven authoritative `idv.analog-axes@1`. Balanced analog, unknown/custom schemas, bounded-server data, arbitrary events, raw device traces, markers, hashes, and checkpoints fail closed as `UNAVAILABLE`. Keep canonical fullscreen/PiP replay buttons available when typed presentation data is unavailable.
+Typed v2 covers every currently registered canonical player-input schema: pointer tap/release (with or without semantic UI), four-way swipe (with or without semantic UI), eight-way bullet-heaven movement/upgrades (with or without semantic UI), default humanoid controls, and SDK-header-proven authoritative `idv.analog-axes@1`. Balanced analog, unknown/custom schemas, bounded-server data, arbitrary events, raw device traces, markers, hashes, and checkpoints are unavailable for typed presentation. Report that presentation capability as `UNAVAILABLE` without guessing semantics; this is not a canonical playback failure. Keep canonical fullscreen/PiP replay buttons available.
 
 For authoritative analog, the exact SDK structurally inspects the whole page before expanding any raw/RLE record, verifies per-record framing and semantic end tick, and rejects more than 6,241 cumulative samples without returning a decoded prefix. Do not add game-owned partial decoding or raw fallback around that failure.
 
@@ -113,12 +113,15 @@ Replay-derived ghosts are non-authoritative. Never feed them into live kernel st
 ## UI state rules
 
 - Load highlights and initial history independently; one may succeed while the other fails.
-- Empty results are normal and never block Play Again/restart.
+- Model each operation as an explicit discriminated state. Never derive `EMPTY` from a caught exception, a falsey envelope, or a cleared row array.
+- `EMPTY` is a data state only after a `SUCCEEDED` discovery response with zero results. It is the only state that may say “No replays yet,” and it never blocks Play Again/restart.
+- `UNAUTHENTICATED` is a host-owned access reason accompanying a `DENIED` outcome when the host successfully establishes that required identity is absent. The game neither invents an auth flow nor relabels that result as empty. `DENIED` requires an evaluated access refusal, not an unavailable auth dependency.
+- `UNAVAILABLE` and `FAILED` remain explicit non-success outcomes with visible operation-specific recovery. An initial outage renders replay-unavailable state and retry rather than hiding the section or presenting normal empty history.
 - Handle Best/Latest pointing to the same match without duplicate indistinguishable controls.
 - Keep history order and paginate only on deliberate player action.
 - Give highlights, history, load-more, PiP, fullscreen, and typed-data reads separate failure/retry ownership.
-- Retry only the failed operation. A failed load-more keeps rendered rows and its captured cursor.
-- Non-retryable auth/unavailable failures hide or disable replay actions without creating an in-game auth flow.
+- Retry only the failed operation. Refresh or load-more failure keeps rendered rows, working playback actions, and the captured cursor; show which operation failed and who owns retry. Never clear known-good rows or claim the list refreshed.
+- If the host marks a failure non-retryable, keep its explicit visible status and recovery owner. Do not manufacture a retry, silently disable controls, or turn the result into `EMPTY`.
 - Guard every async publication with a mounted/source/request generation after the `await`, immediately before state publication.
 
 ## Proof before handoff
@@ -126,10 +129,12 @@ Replay-derived ghosts are non-authoritative. Never feed them into live kernel st
 Exercise the actual game UI seam and show:
 
 - build iteration preserves returned history while intentional generation rotation renders empty;
+- successful zero-result discovery, host-owned access refusal, and service outage render observably different `SUCCEEDED` + `EMPTY`, `DENIED` + `UNAUTHENTICATED`, and `UNAVAILABLE`/`FAILED` states;
 - Best, Latest, and a History row use returned IDs and open through `idv.replays`;
 - History PiP requests the launcher overlay; failure exposes only a later player-invoked fullscreen action;
+- failed refresh/load-more preserves existing rows, playback actions, and the captured cursor while exposing only that operation's retry;
 - a rapid double tap produces one host open request;
-- v2 dispatch uses the exact family/source schema and unsupported data degrades to no ghost;
+- v2 dispatch uses the exact family/source schema; unsupported data renders typed presentation `UNAVAILABLE` while canonical playback remains usable;
 - late pages, unmount, source/generation replacement, and new live run clear presentation state;
 - no replay value enters deterministic/live authority or persistent storage;
 - Play Again remains usable through every replay empty/failure state.

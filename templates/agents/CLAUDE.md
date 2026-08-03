@@ -146,7 +146,7 @@
 
   **Potency follows change type and consequence.** For a defect, reproduce the escaped behavior at the real boundary before the fix when feasible; do not build a permanent harness merely to satisfy ordering. For a refactor, use an existing guard or add characterization only where behavior is otherwise unknown. For new or intentionally changed behavior, build in the natural order, then run the warranted check. A critical new invariant — core-journey blocking, data/money, auth/privacy, persistence, retry/idempotency/ordering/concurrency, migration/skew, or a sourced hot-path budget — may warrant mutation, adversarial/property proof, or another realistic falsifier when that is the cheapest credible way to catch the failure. Routine behavior does not require hand-breaking.
 
-  **Real loop over proxies, when a real loop is warranted.** Trust a runtime claim only after the shortest loop that preserves the risky semantics ran in the authority environment. Static inspection, lint, typecheck, and build checks may be sufficient for mechanical/static risk; they are supporting sensors when the claim is runtime behavior. Match the medium to the failure: browser automation only for browser-specific interaction, routing, hydration, accessibility, responsive, canvas/WebGL, or browser-orchestration risk; a screenshot may be enough for a purely visual claim; public API/worker/adapter proof for system behavior; benchmark/trace for performance; real or contract-preserving storage/network paths for persistence and delivery; fail-closed denial for security/auth. Never escalate the medium merely because the surface is user-visible.
+  **Real loop over proxies, when a real loop is warranted.** Trust a runtime claim only after the shortest loop that preserves the risky semantics ran in the authority environment. Static inspection, lint, typecheck, and build checks may be sufficient for mechanical/static risk; they are supporting sensors when the claim is runtime behavior. Match the medium to the failure: browser automation only for browser-specific interaction, routing, hydration, accessibility, responsive, canvas/WebGL, or browser-orchestration risk; a screenshot may be enough for a purely visual claim; public API/worker/adapter proof for system behavior; benchmark/trace for performance; real or contract-preserving storage/network paths for persistence and delivery; explicit auth/permission-denial proof for security boundaries. Never escalate the medium merely because the surface is user-visible.
 
   **User-journey claims require user-journey proof.** If the claim is “the user can do X,” prove the actual product doing X through its normal entrypoint. Mocks, components, synthetic clients, and backend/protocol tests prove only their layer—never the user journey.
 
@@ -165,7 +165,7 @@
   - Test the value path to terminal truth. Client → API → DB connectivity is not E2E; the proof is the final data, render, packet, metric, or tool output a human or system extracts.
   - No tombstone tests: never memorialize removed surfaces. Absence assertions only guard a named contract (auth denial, PII non-exposure, duplicate suppression, retired-endpoint 404/410) and must name the harm prevented.
   - If a material value-path claim cannot be credibly observed at any practical seam, narrow the claim or change the interface/architecture; record the remaining uncertainty in the work spec.
-  - Every network/storage/worker/timer/loop path gets a bound, timeout, abort, or fail-closed strategy; side-effecting handlers are idempotent wherever retries, duplicates, or replays are possible.
+  - Every network/storage/worker/timer/loop path gets a bound, timeout, or abort plus an explicit failure contract (§9): caller-visible outcome, valid state preserved, independent value that survives, and retry/resume/reconciliation owner. Side-effecting handlers are idempotent wherever retries, duplicates, or replays are possible.
   - Place specs by feature and proof purpose (`test/<semantic-folder>/<feature-slug>__<purpose>.spec.js`; games use `games/<gameId>/tests/` absent a local convention). Extend an existing matching spec under ~500 LOC before creating files. With mocha, always pass `--exit`.
   - Do not ship a permanently skipped future-state test. Add it when the behavior and risk actually warrant it.
   - Fast loops are a feature: prefer vitest/simulation-first iteration; browser matrices are final proof, not the inner loop. A slow proof cycle is a defect worth fixing.
@@ -184,7 +184,19 @@
 <audits_and_postmortems_are_exceptional>
   Independent review is useful when the user asks for it or a specific high-regret risk benefits from a fresh conversational context in the same existing repo folder (§7). It is not automatically part of every substantial lane, rung transition, or definition of Done.
 
-  When an independent audit is warranted, run one focused read-only review against the exact product boundary and risky claim. The reviewer receives the artifact/diff and relevant evidence, not the author's conclusions. The orchestrator judges findings; the audit does not create automatic tests, reports, or follow-up lanes.
+  <independent_review_topology>
+    **Freshness exactly once.** Once an independent review is explicitly requested or specifically warranted, delegate it once to a fresh review conversation under §7 when the current conversation authored or materially shaped the candidate, or when the user explicitly asks for a fresh reviewer. If this conversation is already that fresh reviewer and received only the bounded review inputs below, run the review directly and do not delegate again. This creates no automatic review gate.
+
+    **Bounded review custody.** Give the reviewer the current request, exact boundary, candidate artifact or diff, and directly relevant evidence—not the author's trajectory or conclusions. Run one focused read-only review. The orchestrator judges findings. An invoked audit may write only its owned report artifact; its findings do not automatically create tests, additional reports, or follow-up lanes.
+  </independent_review_topology>
+
+  <code_audit_routing>
+    **Classify first match.** A request that explicitly asks for multiple distinct audit lenses uses only those named lenses. A single named specialist audit—for example security, test-suite, documentation, developer-UX, accretion, or Node-backend latency/scale/cost/capacity—uses only that named lens; the word "code" may name the boundary without adding the generic pair. A focused code review, merge-safety, correctness, general performance, hardening, production-readiness, or release-readiness request uses `$code__auditing` alone. The unqualified phrases `audit the code`, `audit this code`, `do a code audit`, and `run a code audit` mean one standard review applying both `$code__auditing` and `$audit-ai-code-accretion` to the same boundary. A boundary-only suffix such as `on this diff`, `in this package`, or `for this subsystem` retains the standard pair; a named lens or risk/outcome qualifier uses an earlier branch. Never infer every installed audit skill from broad adjectives.
+
+    **Paired and combined output.** In the standard pair, or an explicitly combined review that includes both code/release and accretion, `$code__auditing` owns the canonical report and release verdict. `$audit-ai-code-accretion` contributes the embedded structural-deletion/collapse assessment without a second report or rival ship verdict.
+
+    **One reviewer, both lenses.** The independent-review topology above owns freshness and exactly-once delegation. One reviewer applies the standard pair; do not spawn one verdict agent per lens.
+  </code_audit_routing>
 
   A postmortem exists only when the diagnosis itself would be materially expensive or dangerous to re-derive: several ruled-out causes, misleading symptoms, or cross-lane networking/persistence/infra evidence. Routine changes and obvious bugs do not qualify.
 </audits_and_postmortems_are_exceptional>
@@ -278,7 +290,7 @@
   4. **Compatible contract change? Ship it in place.** Maintain one canonical contract and one canonical write authority per owned entity or partition. Add optional fields, provide safe defaults, tolerate unknown fields, and use consumer-first rollout ordering when needed. Update every producer, consumer, policy, fixture, and proof in the same lane. Temporary tolerant reading during a rolling deployment is not a second contract and requires no special approval.
   5. **Genuine dual-contract migration? Halt.** Halt only when production correctness requires simultaneously active canonical write contracts, selectable schemas or behaviors, version-distinguished routes/keys/tables, or an irreversible data migration. That is a product/operations fork requiring explicit human approval and a bounded removal plan.
 
-  **No stopgaps — build the lasting shape.** A committed slice may be incomplete, but it must be the implementation we extend, not replace. A stopgap is any change that passes the immediate test while choosing the wrong user outcome, authority, data model, lifecycle, failure behavior, or proof path — including an easier proxy for a required experience. If the full feature is too large, reduce capability, not correctness: preserve the real entrypoint, outcome, authority, model, and path; fail closed on unsupported capability. If making the journey or system production-correct later means throwing this away, the slice is invalid.
+  **No stopgaps — build the lasting shape.** A committed slice may be incomplete, but it must be the implementation we extend, not replace. A stopgap is any change that passes the immediate test while choosing the wrong user outcome, authority, data model, lifecycle, failure behavior, or proof path — including an easier proxy for a required experience. If the full feature is too large, reduce capability, not correctness: preserve the real entrypoint, outcome, authority, model, and path. Unsupported capability remains explicit non-completion; isolate it while keeping independent supported capability working, and never disguise it as empty data, a successful no-op, or a completed rung. If making the journey or system production-correct later means throwing this away, the slice is invalid.
 
   **Design gate for non-trivial architecture.** Separate facts / assumptions / ideas (facts from repo truth or primary source; assumptions name their risk). Start with the simplest viable shape; add a moving part only when a simpler option fails a stated constraint. Kill-test the preferred option before committing: load spike and backpressure, cost curve at scale, partial-failure/duplicate-delivery behavior, 3am debuggability, reversibility. A failed kill-test disqualifies the design — it is not a footnote.
 
@@ -286,13 +298,24 @@
 
   **Codebase canon.** Plain ESM JavaScript in `.js` files absent a stronger local convention: kebab-case filenames, 2-space indent, single quotes, semicolons, braces on all blocks, imports ordered Node core → third-party → local. Long, unambiguous, repo-searchable, abbreviation-free names. Env reads and logging only through the repo's config/logger boundaries; one options object over more than 2 positional args; `async/await` by default. Files stay under ~1k LOC — split by domain before they bloat.
 
+  **Causal-history comments.** At a non-obvious fix, put the comment beside the surviving constraint a future maintainer might reasonably remove—not beside the incidental symptom. Record the escaped failure, the tempting change that would reintroduce it, and why the constraint prevents recurrence; never narrate what the code already says.
+
+  <failure_semantics>
+    **Deny narrowly; fail honestly.** `Fail closed` may describe only withholding a specifically named protected disclosure, privilege/value change, canonical write, destructive action, or other irreversible effect while its authority or integrity is unknown. It is a control posture, never an operation, journey, task, proof, or completion verdict. Deny only the smallest unsafe effect; preserve valid state and independent safe capability; expose an explicit non-success outcome; and name retry, resume, reconciliation, or operator recovery. A working control proves containment, not delivery.
+
+    **Scope before status.** Every material result must make its subject, scope, and promised terminal outcome clear. Runtime outcomes mean `SUCCEEDED`, `DEGRADED`, `PENDING_OR_UNKNOWN`, `DENIED`, `UNAVAILABLE`, or `FAILED`: success requires every promised terminal obligation; degraded requires the core promise to have occurred while a declared secondary obligation failed; denied requires an evaluated policy refusal; authority that could not be evaluated is unavailable; and a possibly committed effect stays pending/unknown until reconciliation. When a protected effect exists, its separate control state is `PRESERVED`, `VIOLATED`, or `UNVERIFIED`; omit that axis when it does not apply. Control preservation never upgrades the runtime outcome.
+
+    **Proof and task truth stay qualified.** A proof claim is `GREEN`, `RED`, or `UNVERIFIED`; `NO_SIGNAL` is an evidence reason, never a product outcome. A harness, guard, audit, or implementation task may function as intended while the product claim is red, but product-facing reporting leads with the product claim and may not promote subsystem/task success into user-journey success. Empty data, hidden controls, swallowed errors, skipped work, and successful no-ops may never substitute for explicit unavailable, failed, pending, denied, or degraded states.
+  </failure_semantics>
+
   **Errors & observability.** Operability is part of the feature: every non-trivial change defines how we know it is healthy and how we know it is broken. No exception-based flow control; no swallowed errors; a user-facing toast is not observability. Every `catch` that re-wraps or generalizes logs the original with full diagnostics first.
 
   | Category | Behavior | Logging | Example |
   | --- | --- | --- | --- |
   | Fatal | Crash / halt process | Full stack + state | Schema migration mismatch |
-  | Operational | Retry with backoff, then fail closed | Structured warning | Upstream timeout, rate limit |
-  | Validation | Reject input, 4xx or typed rejection | Request context | Malformed payload |
+  | Operational | Retry only when safe and bounded; then report the contract's degraded, pending/unknown, unavailable, or failed outcome | Structured warning | Upstream timeout, rate limit |
+  | Validation | Report `FAILED` with a typed `INVALID_INPUT` reason | Request context | Malformed payload |
+  | Known policy | Report `DENIED` after an evaluated policy refusal | Request + policy context | Evaluated authorization refusal |
   | Invariant | Log + alert; never swallow | Full diagnostics | "Should never happen" branch |
 
   **API shaping — client-first, coarse-grained, bounded.** One canonical entrypoint per user journey; the first meaningful client step is one bounded request; never force clients to assemble one conceptual object across sibling endpoints. Extend the endpoint where the client already queries related data, not where storage is convenient. Split only on hard boundaries: unbounded/paginated data, materially different auth/ACL, cache/consistency budgets, or lifecycle ownership. Aggregates carry explicit limits, pagination, or TTLs.
@@ -310,7 +333,7 @@
 
   **Blast radius over hours.** Size work by unwind cost — concepts touched, what breaks if wrong, hot-path exposure, operational cost, reversibility. Split large plans by reducing blast radius, not by calendar slices.
 
-  **Division of labor.** The model interprets and sequences; tools do exact, repeatable, auditable work; the backend owns guarantees (canonical writes, auth/ACL, quotas, idempotency, fail-closed behavior). LLMs own semantic interpretation of intent and fuzzy classification; deterministic code validates, bounds, caches, and enforces policy. Tool outputs meant for agents are machine-readable and explicit about what was resolved/fetched/written/skipped.
+  **Division of labor.** The model interprets and sequences; tools do exact, repeatable, auditable work; the backend owns guarantees (canonical writes, auth/ACL, quotas, atomicity, idempotency, truthful outcomes, state preservation, and recovery ownership). LLMs own semantic interpretation of intent and fuzzy classification; deterministic code validates, bounds, caches, and enforces policy. Tool outputs meant for agents are machine-readable and explicit about what was resolved/fetched/written/skipped.
 
   **CLI discipline.** Commands presented as runnable are literal and executable from this repo — no placeholder env vars, fake paths, or illustrative-only commands; an unknown literal value means ask. No `--yes`/`--force`/auto-confirm flags unless the user requested that exact operation. No inline env vars or flags that override repo defaults except as labeled troubleshooting overrides — prefer repo-owned config. `package.json` scripts are a six-month developer interface, not a proof log — route one-off checks through direct commands and `tmp/` artifacts. (Codex prompts: §7's bounded-deliverable contract is their literalism.)
 
@@ -355,9 +378,12 @@
 <skills>
   Skill invocation means actually running the skill, not naming it. Skills live in `.agents/skills/`. The planning/proof/audit vocabulary:
   - `plan__maintain-work-spec` — creates/updates the work spec; owns its product spine, stable contract/decision IDs, and vertical-rung shape.
+  - `plan__question-spec` — optional independent product/capability challenge when work-spec review is requested or specifically warranted; never an automatic pre-implementation gate (§6).
   - `eval__design-proof-gates` — creates/updates the eval plan; owns proof-gate design.
   - `eval__implement-proof-gate` — builds the missing runnable harness for an approved gate.
-  - `code__auditing`, `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` — audit lenses (§6).
+  - `code__auditing` — code-audit lead and release-verdict owner; standard code audits pair it with `audit-ai-code-accretion` (§6).
+  - `audit-ai-code-accretion` — implemented-code structural accretion lens; embedded in standard or explicitly combined code-plus-accretion audits and standalone for accretion-only/deletion/collapse requests.
+  - `testing__auditing`, `security__auditing-code`, `code__crafting-dev-ux` — focused audit lenses (§6).
   - `handoff__final-quality-gate` — optional independent ship judgment when requested or warranted by a specific high-regret risk.
   - `ops__maintain-incident-postmortem`, `prompt__perform-root-cause-analysis` — post-work diagnosis capture (§6).
 

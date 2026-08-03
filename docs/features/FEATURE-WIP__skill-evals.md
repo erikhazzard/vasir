@@ -118,7 +118,7 @@ Those fields are not part of the suite contract. The runtime rejects them with `
 - Hard-check regressions are always visible, even when judges prefer treatment.
 - The report must separate overall results from per-model results.
 - Historical comparisons must require matching suite hash, trial count, scorer version, harness version, model set, and evidence mode.
-- `NO SIGNAL` is a valid outcome.
+- The CLI comparison label `NO SIGNAL` maps to `EvidenceReason: NO_SIGNAL` for an `UNVERIFIED` product claim; it is never a passing outcome.
 
 ---
 
@@ -224,7 +224,7 @@ If not, the report must say `NOT COMPARABLE` and explain why.
 
 - Provider row failures do not discard successful rows.
 - Incomplete runs are persisted and shown as `INCOMPLETE`.
-- If `judgePrompt` exists but the fixed judge layer is unavailable, the hard-check section still renders, but the top-line verdict fails closed to `NO SIGNAL` unless the hard floor regressed.
+- If `judgePrompt` exists but the fixed judge layer is unavailable, the hard-check section still renders. Unless the hard floor independently proves a regression, the CLI comparison remains `NO SIGNAL`; product-facing reporting maps that to `ProductClaim: UNVERIFIED` with `EvidenceReason: NO_SIGNAL`. Neither is a pass.
 - If a suite uses unsupported suite fields, the command fails fast with `EVAL_SUITE_INVALID`.
 
 ---

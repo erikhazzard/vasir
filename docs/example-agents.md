@@ -32,7 +32,7 @@ No new runtime dependencies without human approval.
 User-owned repo files under `.agents/skills` are the canonical local source of truth. `.claude` and `.codex` are compatibility aliases only.
 
 ### Code Standards
-Fail closed when repo truth is unclear. Do not document guesses as facts.
+When repo truth is unclear, do not assert guesses as facts. Name what is unknown and the evidence needed to resolve it.
 
 ## Phase 3: Architecture Router
 

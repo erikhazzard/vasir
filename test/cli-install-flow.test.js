@@ -1035,7 +1035,7 @@ Use AbortController in async effects.`
   );
 });
 
-test("update fails closed when a Vasir-managed project-local skill has local edits", async () => {
+test("update refuses to overwrite a Vasir-managed project-local skill with local edits", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();
   const projectDirectory = createTemporaryDirectory();

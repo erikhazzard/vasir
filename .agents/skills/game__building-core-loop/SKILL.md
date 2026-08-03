@@ -1178,10 +1178,18 @@ Mobile's defining constraint. The loop must survive any interruption seamlessly.
 
 ```js
 class InterruptionManager {
-  constructor(gameState, gameLoop) {
+  constructor(gameState, gameLoop, publishPersistenceState) {
     this.gameState = gameState;
     this.gameLoop = gameLoop;
     this.saveKey = 'game_interrupt_save';
+    this.pendingSnapshot = null;
+    this.persistenceState = { state: 'NOT_SAVED_YET', retryable: false };
+
+    // Required shell boundary: render UNSAVED and wire its retry action.
+    if (typeof publishPersistenceState !== 'function') {
+      throw new TypeError('publishPersistenceState is required');
+    }
+    this.publishPersistenceState = publishPersistenceState;
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.onInterrupt();
@@ -1201,8 +1209,20 @@ class InterruptionManager {
   }
 
   onResume() {
-    const saved = this.load();
-    if (!saved) return this.gameLoop.start(); // No save — fresh start
+    const loadResult = this.load();
+    if (loadResult.state === 'EMPTY') {
+      this.gameLoop.start(); // Confirmed absence, not a read failure.
+      return loadResult;
+    }
+
+    if (!loadResult.ok) {
+      // Keep the live in-memory run playable and make the restore problem visible.
+      this.setPersistenceState(loadResult);
+      this.gameLoop.start();
+      return loadResult;
+    }
+
+    const saved = loadResult.value;
 
     const elapsedMs = Date.now() - saved.timestamp;
 
@@ -1212,6 +1232,7 @@ class InterruptionManager {
       elapsedMs,
       previousState: saved.activeState,
     });
+    return loadResult;
   }
 
   save() {
@@ -1221,27 +1242,111 @@ class InterruptionManager {
       snapshot: this.gameState.serialize(), // Game-specific serialization
       version: 1,
     };
+
+    return this.persistSnapshot(snapshot);
+  }
+
+  retrySave() {
+    if (!this.pendingSnapshot) {
+      return {
+        ok: false,
+        outcome: 'FAILED',
+        state: 'NOTHING_TO_RETRY',
+        retryable: false,
+      };
+    }
+    return this.persistSnapshot(this.pendingSnapshot);
+  }
+
+  persistSnapshot(snapshot) {
+    // Retain the exact attempted snapshot in memory until persistence succeeds.
+    this.pendingSnapshot = snapshot;
     try {
       localStorage.setItem(this.saveKey, JSON.stringify(snapshot));
-    } catch (e) {
-      // localStorage full or unavailable — fail silently
-      console.warn('Save failed:', e);
+      this.pendingSnapshot = null;
+      return this.setPersistenceState({
+        ok: true,
+        outcome: 'SUCCEEDED',
+        state: 'SAVED',
+        retryable: false,
+        savedAt: snapshot.timestamp,
+      });
+    } catch (error) {
+      // The live game state and pending snapshot remain intact. This is not saved.
+      return this.setPersistenceState({
+        ok: false,
+        outcome: 'FAILED',
+        state: 'UNSAVED',
+        retryable: true,
+        recovery: 'retry-save',
+        message: 'Progress remains in this open session but has not been saved.',
+        error,
+      });
     }
+  }
+
+  setPersistenceState(next) {
+    this.persistenceState = next;
+    this.publishPersistenceState(next);
+    return next;
   }
 
   load() {
     try {
       const json = localStorage.getItem(this.saveKey);
-      if (!json) return null;
-      const data = JSON.parse(json);
+      if (!json) {
+        return {
+          ok: true,
+          outcome: 'SUCCEEDED',
+          state: 'EMPTY',
+          retryable: false,
+        };
+      }
 
-      // Validate: reject saves older than 24 hours or wrong version
-      if (Date.now() - data.timestamp > 86400000) return null;
-      if (data.version !== 1) return null;
+      let data;
+      try {
+        data = JSON.parse(json);
+      } catch (error) {
+        return {
+          ok: false,
+          outcome: 'FAILED',
+          state: 'LOAD_FAILED',
+          retryable: false,
+          recovery: 'ask-before-starting-over',
+          message: 'Saved progress exists but could not be read. The live session was preserved.',
+          error,
+        };
+      }
 
-      return data;
-    } catch (e) {
-      return null;
+      // Incompatible or expired data is not the same thing as no saved data.
+      if (Date.now() - data.timestamp > 86400000 || data.version !== 1) {
+        return {
+          ok: false,
+          outcome: 'UNAVAILABLE',
+          state: 'SAVE_INCOMPATIBLE',
+          retryable: false,
+          recovery: 'ask-before-starting-over',
+          message: 'Saved progress cannot be restored by this version. The live session was preserved.',
+        };
+      }
+
+      return {
+        ok: true,
+        outcome: 'SUCCEEDED',
+        state: 'LOADED',
+        retryable: false,
+        value: data,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        outcome: 'UNAVAILABLE',
+        state: 'LOAD_UNAVAILABLE',
+        retryable: true,
+        recovery: 'retry-load',
+        message: 'Saved progress could not be checked. The live session was preserved.',
+        error,
+      };
     }
   }
 
@@ -1250,6 +1355,8 @@ class InterruptionManager {
   }
 }
 ```
+
+`UNSAVED` is a player-visible, retryable state owned by the game shell, not a console-only diagnostic. The save operation's outcome is `FAILED`: the promised terminal persistence did not occur. A failed write keeps both the live game state and the exact attempted snapshot in memory, must never emit `SAVED`, and remains unresolved until retry succeeds or the player knowingly leaves. A read, parse, expiry, or version failure must likewise remain distinct from confirmed `EMPTY`; keep live state playable and require an explicit player decision before starting over. Do not promise recovery after process termination when persistence never succeeded.
 
 ---
 
@@ -1270,6 +1377,7 @@ Name these explicitly when you find them:
 | **Agency illusion** | Player makes choices but outcomes are predetermined or negligibly different | Make choices produce visibly different outcomes; minimum 15% mechanical difference between options |
 | **Restart friction** | After failure, there's too much friction before the next attempt | One tap from failure to retry. Minimize loading, menus, and unskippable screens between attempts. |
 | **Warm-up punishment** | Full difficulty immediately after loading / returning to the game | Start encounters slightly below the player's skill level, ramp up over 15-30 seconds |
+| **Silent save failure** | Storage throws, but the shell still looks saved or says nothing | Keep live state plus the attempted snapshot, publish `UNSAVED`, and give the player an owned retry path |
 
 ---
 
@@ -1364,6 +1472,7 @@ When responding to any loop design request, structure your answer:
 - [ ] Game loop uses fixed timestep with interpolated rendering
 - [ ] Object pooling prevents GC pauses
 - [ ] Save/load handles version migration
+- [ ] A failed save preserves live state and the attempted snapshot, renders `UNSAVED`, and never claims persistence succeeded
 - [ ] Performance stays within frame budget on target minimum device
 
 ### Economy interface

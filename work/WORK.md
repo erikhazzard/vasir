@@ -56,7 +56,7 @@ Rules:
 - `~/.agents/vasir` is the only mutable global source of truth.
 - `~/.claude/vasir` and `~/.codex/vasir` must be links to that directory, never copies.
 - `init` and `update` may mutate only the canonical global clone plus compatibility aliases.
-- If the global clone is dirty, `update` fails closed.
+- If the global clone is dirty, `update` must not modify it in place; move it to a timestamped backup before rebuilding a clean cache.
 
 ### 4.2 Project Install
 
@@ -95,7 +95,7 @@ Rules:
    - POSIX: create relative directory symlinks.
    - Windows: attempt a directory symlink first; if unavailable, create a directory junction.
 4. Alias creation must verify the resulting target with `realpath`.
-5. If link creation cannot produce a true alias, fail closed with a clear error.
+5. If link creation cannot produce a true alias, return a clear nonzero error and do not substitute a copied directory.
 6. Re-running `init` or `add` must repair broken aliases.
 
 ## 6. CLI Contract
@@ -117,7 +117,7 @@ CLI rules:
 - Errors must expose a stable `code`, a human-readable `message`, a concrete recovery `suggestion`, and a `docsRef` URL back into the public docs.
 - The public command surface stays minimal: `init`, `update`, `list`, and `add`.
 - `--replace` is the explicit overwrite path for refreshing an existing project-local skill copy.
-- `--replace` must fail closed if the existing project-local skill has local edits, unexpected files, or no tracked Vasir install snapshot.
+- `--replace` must refuse the overwrite and preserve the existing directory if the project-local skill has local edits, unexpected files, or no tracked Vasir install snapshot.
 - `VASIR_REPOSITORY_URL` is a troubleshooting override for redirecting the global clone source during local testing or mirror scenarios. Defaults must not depend on it.
 
 ### 6.1 `init`
@@ -163,7 +163,7 @@ Behavior:
 - If root contracts are missing, copy `AGENTS.md` and `CLAUDE.md` templates into place.
 - Support `--json` with the installed skill names, replaced skill names, the resolved project root path, the project skills path, and generated root contract paths.
 - `--replace` refreshes an existing project-local skill copy from the global catalog only when the local directory still matches the last Vasir-managed snapshot.
-- If the project-local skill has local edits, unexpected files, or missing tracked state, `--replace` must fail closed and instruct the user to back up/delete manually.
+- If the project-local skill has local edits, unexpected files, or missing tracked state, `--replace` must refuse the overwrite, preserve the existing directory, and instruct the user to back it up or delete it manually.
 
 ## 7. Repo Structure
 
@@ -282,7 +282,7 @@ Required test surfaces:
    - `list` reads the catalog from the canonical global clone.
    - `add` copies the requested skill into `.agents/skills`, repairs `.claude/skills` and `.codex/skills`, and seeds `AGENTS.md` + `CLAUDE.md` when no root contract already exists.
    - `add --replace` refreshes an existing project-local skill from the global catalog.
-   - `add --replace` fails closed when the project-local skill has local divergence from the last Vasir-managed snapshot.
+   - `add --replace` refuses to overwrite and leaves the project-local skill unchanged when it has diverged from the last Vasir-managed snapshot.
    - `--json` success and error envelopes stay stable.
    - the packaged binary can execute the documented `add` journey against a local fixture clone source.
 2. `repository layout`

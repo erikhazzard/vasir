@@ -1,6 +1,6 @@
 {
   "id": "game-adding-replays-core",
-  "judgePrompt": "Judge the executable player-facing contract. Prefer the treatment only when in-scope replay UI uses idv.replays for Best, Latest, newest-first bounded History, typed input, and fullscreen/PiP; keeps player, game, stable generation, exact recorded build, auth, optional launch compatibility metadata, storage, URLs, and navigation host-owned; preserves history across iterative builds inside one generation; treats only an intentional generation rotation as a fresh empty scope; preserves exact-build compatibility for legacy releases; validates the typed descriptor including tickRateHz and exact replayFamily/sourceSchema; keeps encoded record fields out of game code; returns no typed presentation for unknown/custom schemas while preserving canonical playback; and keeps all replay-derived state presentation-only, bounded, cancellable, and unpersisted. For platform capture/storage/playback-engine or public-sharing-only tasks, prefer a treatment that fails closed and names the owning lane.",
+  "judgePrompt": "Judge the executable player-facing contract. Prefer the treatment only when in-scope replay UI uses idv.replays for Best, Latest, newest-first bounded History, typed input, and fullscreen/PiP; keeps player, game, stable generation, exact recorded build, auth, optional launch compatibility metadata, storage, URLs, and navigation host-owned; preserves history across iterative builds inside one generation; treats only an intentional generation rotation as a fresh empty scope; preserves exact-build compatibility for legacy releases; validates the typed descriptor including tickRateHz and exact replayFamily/sourceSchema; keeps encoded record fields out of game code; returns no typed presentation for unknown/custom schemas while preserving canonical playback; and keeps all replay-derived state presentation-only, bounded, cancellable, and unpersisted. EMPTY is a data state only after a SUCCEEDED zero-result response; UNAUTHENTICATED is a host-owned access reason accompanying DENIED, while UNAVAILABLE and FAILED remain explicit distinct non-success outcomes. Outages stay visible, preserve known-good rows and actions, expose operation-specific recovery, and never count as empty or success. Host auth ownership does not excuse collapsing an access result into no replay. For platform capture/storage/playback-engine or public-sharing-only tasks, prefer a treatment that declines the task and names the owning lane.",
   "cases": [
     {
       "id": "best-latest-and-bounded-history",
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "id": "unknown-custom-schema-fails-closed",
+      "id": "unknown-custom-schema-presentation-unavailable",
       "task": "The typed replay descriptor reports an unknown custom source schema, but the record types look familiar. Make the ghost work by guessing their meanings.",
       "outputHint": "Refuse semantic inference. Return a concrete no-ghost branch with UNAVAILABLE behavior while preserving Best/Latest/History, fullscreen/PiP playback, and Play Again.",
       "requiredSubstrings": [
@@ -107,12 +107,15 @@
     {
       "id": "preview-authority-boundary",
       "task": "Make the same replay UI work in authenticated Studio preview and anonymous preview. Add whatever replay token handling the game needs.",
-      "outputHint": "Reject game-owned token handling. Explain that authenticated preview records and reads only its isolated preview generation without a launch token, while anonymous preview remains publicly loadable and may have no authenticated replay calls. The game uses idv.replays and handles UNAUTHENTICATED/UNAVAILABLE as normal no-replay states.",
+      "outputHint": "Reject game-owned token handling. Explain that authenticated preview records and reads only its isolated preview generation without a launch token, while anonymous preview remains publicly loadable and may have no authenticated replay calls. The game uses idv.replays; UNAUTHENTICATED is the host-owned access reason for DENIED, UNAVAILABLE is an explicit outage, and EMPTY appears only with a SUCCEEDED zero-result response.",
       "requiredSubstrings": [
         "isolated",
         "anonymous",
         "idv.replays",
-        "launch token"
+        "launch token",
+        "UNAUTHENTICATED",
+        "UNAVAILABLE",
+        "EMPTY"
       ],
       "forbiddenSubstrings": [
         "replayLaunchAuthorityToken",
@@ -123,7 +126,7 @@
     {
       "id": "should-not-own-replay-platform",
       "task": "Design and implement the backend replay capture format, archive storage, retention policy, and deterministic playback engine for all games.",
-      "outputHint": "Fail closed: this skill does not own platform replay architecture. Name that lane and do not implement the requested system.",
+      "outputHint": "Decline the implementation because this skill does not own platform replay architecture. Name that lane and do not implement the requested system.",
       "requiredSubstrings": [
         "outside",
         "scope",
@@ -146,6 +149,59 @@
       "forbiddenSubstrings": [
         "idv.replays.open",
         "construct the replay URL"
+      ]
+    },
+    {
+      "id": "access-outcomes-remain-host-owned-and-distinct",
+      "task": "Implement the replay-history state reducer for four SDK envelopes: a successful response with zero rows, UNAUTHENTICATED, DENIED, and UNAVAILABLE. The game must not add token or sign-in handling.",
+      "outputHint": "Map only the SUCCEEDED zero-row response to EMPTY. Preserve UNAUTHENTICATED as the host-owned reason for DENIED and UNAVAILABLE as an outage with explicit recovery; none of the non-success outcomes may say no replays or success.",
+      "requiredSubstrings": [
+        "SUCCEEDED",
+        "EMPTY",
+        "UNAUTHENTICATED",
+        "DENIED",
+        "UNAVAILABLE",
+        "host-owned"
+      ],
+      "forbiddenSubstrings": [
+        "replay token",
+        "login form",
+        "No replays yet",
+        "Loaded successfully"
+      ]
+    },
+    {
+      "id": "history-outage-is-not-empty",
+      "task": "The initial History request returns an UNAVAILABLE failure before any replay rows have loaded. Implement the result-screen state without making the outage look like a player with no replay history.",
+      "outputHint": "Render an explicit UNAVAILABLE replay state with operation-owned retry and keep Play Again usable. EMPTY and 'No replays yet' are valid only after a successful zero-result response; do not hide the replay section or report success.",
+      "requiredSubstrings": [
+        "UNAVAILABLE",
+        "Retry",
+        "Play Again",
+        "EMPTY"
+      ],
+      "forbiddenSubstrings": [
+        "setHistory([])",
+        "No replays yet",
+        "Loaded successfully",
+        "display: none"
+      ]
+    },
+    {
+      "id": "refresh-failure-preserves-known-good-history",
+      "task": "History already shows five playable rows. A player-triggered load-more request fails after capturing nextCursor. Implement the failure state and retry behavior.",
+      "outputHint": "Keep the five existing rows and playback actions, retain the captured cursor, mark only load-more as FAILED, and let that operation own Retry. Do not clear history, consume the cursor, or claim the list refreshed.",
+      "requiredSubstrings": [
+        "existing rows",
+        "captured cursor",
+        "FAILED",
+        "Retry"
+      ],
+      "forbiddenSubstrings": [
+        "setHistory([])",
+        "nextCursor = null",
+        "Loaded successfully",
+        "No replays yet"
       ]
     },
     {

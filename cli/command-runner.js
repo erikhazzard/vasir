@@ -1370,7 +1370,7 @@ Usage:
   vasir agents init <profile> [--json] [--replace] [--repo-root <path>] Write AGENTS.md from the canonical template plus a stack snippet
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
-  vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Fail closed when AGENTS.md still contains scaffold placeholders
+  vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md still contains scaffold placeholders
   vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run the built-in baseline vs treatment eval for a skill
   vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>] Inspect the latest or named eval artifact for a skill
   vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>] Rescore an existing eval artifact with the current scorer
@@ -1402,7 +1402,7 @@ Notes:
   agents init mutates only the current repo root and writes AGENTS.md + CLAUDE.md from the selected profile.
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
-  agents validate fails closed when AGENTS.md still contains known scaffold placeholders or broken repo routes.
+  agents validate exits nonzero and reports details when AGENTS.md still contains known scaffold placeholders or broken repo routes.
   Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md + CLAUDE.md during vasir agents init.
   remove mutates only the current repo root and also updates .agents/vasir.json and .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
@@ -3444,7 +3444,7 @@ function runUpdate({
           ui.formatStatusLine({
             kind: "warn",
             text: "Dry run found blocked skills",
-            detail: "Actual `vasir update` would fail closed until those local changes are resolved."
+            detail: "Actual `vasir update` would refuse to overwrite those locally changed skills."
           })
         );
       }

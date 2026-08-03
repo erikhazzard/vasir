@@ -69,7 +69,7 @@
     },
     {
       "name": "audit__optimizing-node-backend",
-      "description": "Audits Node.js backends for latency, scalability, cost, concurrency, and failure risk across event-loop work, caches, databases, memory, saturation, and observability. Use for performance reviews, bottleneck or timeout analysis, access-pattern audits, and capacity risk.",
+      "description": "Audits Node.js backends for latency, scalability, cost, concurrency, and failure risk across event-loop work, caches, databases, memory, saturation, and observability. Use when the request explicitly frames a Node-backend latency, scale, cost, timeout, access-pattern, bottleneck, or capacity audit; a generic code performance or release review stays with code__auditing under root §6.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -88,14 +88,14 @@
     },
     {
       "name": "audit-ai-code-accretion",
-      "description": "Audits code to eliminate local maxima AI genereated code. Use when asked to grade AI-written code, find AI slop, identify what to delete, simplify generated code, or turn a complexity audit into concrete cleanup actions.",
+      "description": "Audits implemented code for structural accretion and produces evidence-backed deletion or collapse plans. Use for explicit audits, diagnoses, or cleanup plans about AI-slop, justification islands, duplicate authority, obsolete modes, compatibility buildup, structural deletion, or collapse opportunities, and as the embedded structural lens in the standard or explicitly combined code-plus-accretion audit under root §6; do not use for implementation-only deletion/refactor requests or narrower release, bug, test-suite, or proposed-architecture questions.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
-        "agents/openai.yaml",
+        "references/audit-method-and-report.md",
         "references/eval-cases.md"
       ],
       "path": ".agents/skills/audit-ai-code-accretion",
@@ -103,7 +103,7 @@
     },
     {
       "name": "code__auditing",
-      "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Triggers on code review, merge safety, production readiness, correctness, performance, or hardening requests; exhaustive hypothetical hardening is opt-in only.",
+      "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; use alone for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, while explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -330,13 +330,14 @@
     },
     {
       "name": "eval__implement-proof-gate",
-      "description": "Builds and runs a missing proof harness explicitly warranted by a current eval card, then records the honest gate result without changing product behavior. Trigger: a current eval plan names a concrete missing harness need and envelope, or an existing required instrument is Defective.",
+      "description": "Builds and runs a missing proof harness explicitly warranted by a current eval card, then records qualified harness, run, and product-claim status without changing product behavior. Use when a current eval plan names a concrete missing harness need and envelope, or an existing required instrument is Defective.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "references/eval-cases.md"
       ],
       "path": ".agents/skills/eval__implement-proof-gate",
       "entry": "SKILL.md"
@@ -800,13 +801,14 @@
     },
     {
       "name": "plan__question-spec",
-      "description": "Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices. Trigger: explicit request for adversarial review, or a concrete product mismatch, proxy substitution, or high-regret ambiguity found during cold-context recovery; never an automatic pre-implementation audit.",
+      "description": "Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices and whether its proposed capabilities are necessary. Use for explicit product-journey or capability-necessity review, generic requests to audit, question, or adversarially review a work spec, or cold-context recovery exposing a concrete product mismatch, proxy substitution, or high-regret ambiguity; focused architecture or moving-parts-only requests and performance, scale, or cost-only requests stay with their named sibling skills, and this never runs as an automatic pre-implementation gate.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "references/eval-cases.md"
       ],
       "path": ".agents/skills/plan__question-spec",
       "entry": "SKILL.md"

@@ -35,7 +35,7 @@ vasir --version
 | `agents init` | `vasir agents init <backend\|frontend\|ios\|generic> [--json] [--replace] [--repo-root <path>]` | Write canonical `AGENTS.md` and `CLAUDE.md` starters in the current repo root |
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
-| `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Fail closed when a root or nested root `AGENTS.md` still contains scaffold placeholders or broken repo routes |
+| `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Exit nonzero and identify any root or nested root `AGENTS.md` that still contains scaffold placeholders or broken repo routes |
 | `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment eval for a skill |
 | `eval inspect` | `vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>]` | Inspect the latest or named saved eval artifact for a skill |
 | `eval rescore` | `vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>]` | Recompute a saved eval artifact with the current scorer |
@@ -99,7 +99,7 @@ vasir context --repo-root packages/web
   - checks whether tracked skills are blocked from safe replacement
 - Notes:
   - `doctor` is read-only.
-  - Use it when `status` says a repo needs attention or when `update` fails closed.
+  - Use it when `status` says a repo needs attention or when `update` reports dirty-cache handling.
 
 Examples:
 
@@ -181,13 +181,13 @@ vasir init --repo-root packages/web
   - If the current repo tracks the full catalog, `update` refreshes existing skills and installs any new Vasir skills added since the last repo sync.
   - If the current repo tracks only a selected installed subset, `update` refreshes only that subset.
 - Notes:
-  - Fails closed if the existing global cache is dirty.
+  - Refuses to update a dirty existing global cache in place; the cache is moved to a timestamped backup before Vasir rebuilds it.
   - Uses the current repo root as the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
   - `vasir init` marks a repo as full-catalog tracking.
   - `vasir add <skill>` preserves an existing explicit `tracking.mode: all`; otherwise it creates or extends selected-subset tracking, so a new or unmanaged repo becomes `selected`.
   - `vasir add all` also marks a repo as full-catalog tracking.
   - `vasir remove <skill>` from a full-catalog repo switches that repo back to selected-subset tracking so the removed skill does not come back unexpectedly.
-  - Local edits to a managed skill still fail closed, the same way `vasir add <skill> --replace` does.
+  - Local edits to a managed skill block replacement and remain untouched, the same way `vasir add <skill> --replace` behaves.
   - If the global cache is dirty or contains manual files, `update` moves it aside to `~/.agents/vasir.dirty-backup.<timestamp>` and rebuilds a clean cache.
   - `--dry-run` shows which repo-local skills would update, which are already current, which are blocked by local edits, and whether the global cache would be quarantined, without mutating the cache or repo.
 
@@ -228,7 +228,7 @@ vasir list
   - `vasir add <specific skills>` preserves an existing explicit `tracking.mode: all`; otherwise it creates or extends selected-subset tracking for later `vasir update` runs, so a new or unmanaged repo becomes `selected`.
   - Existing project-local skills are never overwritten unless `--replace` is explicitly provided.
   - Pass `--agents-profile backend`, `--agents-profile frontend`, `--agents-profile ios`, or `--agents-profile generic` when you want to override inference and force a specific root-contract profile.
-  - If you pass `--agents-profile` and `AGENTS.md` or `CLAUDE.md` already exists, the command fails closed unless `--replace` is explicitly provided.
+  - If you pass `--agents-profile` and `AGENTS.md` or `CLAUDE.md` already exists, the command refuses to overwrite either file unless `--replace` is explicitly provided.
   - `all` cannot be combined with specific skill names in the same command.
 
 Examples:
@@ -335,7 +335,7 @@ vasir agents sync --scope services/api --profile backend
 - Notes:
   - Supported profiles are `backend`, `frontend`, `ios`, and `generic`.
   - The repo root is the nearest parent containing `.git`, unless `--repo-root <path>` is provided.
-  - If `AGENTS.md` or `CLAUDE.md` already exists, the command fails closed unless `--replace` is explicitly provided.
+  - If `AGENTS.md` or `CLAUDE.md` already exists, the command refuses to overwrite either file unless `--replace` is explicitly provided.
 
 Examples:
 
@@ -354,7 +354,7 @@ vasir agents init frontend --replace
   - Reads repo-local context such as the root name, top-level entries, `package.json`, and the first screen of `README.md` when present.
   - Defaults to `openai:gpt-5.4`.
   - Accepts the same single-model override surface as eval: `--model openai`, `--model opus`, `--model mock`, or `--model <provider:model>`.
-  - `--write` fails closed if the purpose placeholder has already been edited. In that case, paste the printed draft manually.
+  - `--write` refuses to modify an already edited purpose block and leaves it unchanged. In that case, paste the printed draft manually.
   - `--model mock` is the zero-cost local smoke-test path for the command.
 
 Examples:
@@ -388,7 +388,7 @@ vasir agents draft-routing --write
 - Purpose: catch leftover scaffold markers and broken repo routes before you treat `AGENTS.md` as finished.
 - Result:
   - Succeeds cleanly when `AGENTS.md` no longer contains known placeholders, write-back markers, or broken repo routes.
-  - Fails closed with structured issue details when scaffold markers are still present or a routed directory is missing its required local `AGENTS.md`.
+  - Exits nonzero with structured issue details when scaffold markers are still present or a routed directory is missing its required local `AGENTS.md`.
 - Notes:
   - `agents sync` runs this check automatically.
   - Use `--scope <path>` to validate a generated nested root AGENTS file such as `frontend/AGENTS.md`.
@@ -495,7 +495,7 @@ Notes:
 - The built-in eval path is suite-owned and single-shape:
   - every suite defines case-level hard checks
   - a suite may add `judgePrompt` to turn on the fixed OpenAI + Anthropic judge layer
-- If the fixed judges are unavailable, the hard-check section still renders, but the top-line verdict fails closed to `NO SIGNAL` unless the hard floor itself regresses.
+- If the fixed judges are unavailable, the hard-check section still renders. Unless the hard floor independently proves a regression, the CLI comparison remains `NO SIGNAL`; product-facing reporting maps that to `ProductClaim: UNVERIFIED` with `EvidenceReason: NO_SIGNAL`. Neither is a pass.
 - Older `mode: "command"` and `mode: "judge"` suites are rejected with a migration error. Rewrite them as hard checks plus optional `judgePrompt`.
 - The `run` command now optimizes for a short verdict first; use `inspect` when you want the per-pair evidence.
 - `run` now defaults to 3 trials per model/case pair. Use `--trials 1` if you want the fastest or cheapest possible check.
@@ -537,7 +537,7 @@ Facts:
 - `--replace` is supported only by `vasir add`.
 - Vasir refreshes from the global catalog only when the existing project-local skill still matches the last Vasir-managed snapshot.
 - That snapshot lives at `.agents/vasir-install-state.json` in the resolved repo root.
-- If the skill directory has local edits, unexpected files, or no tracked snapshot, the command fails closed and tells you to back up or delete the directory manually first.
+- If the skill directory has local edits, unexpected files, or no tracked snapshot, the command refuses to overwrite it, preserves its files, and tells you to back up or delete the directory manually first.
 
 ## JSON Output
 
@@ -677,7 +677,7 @@ Project-local:
 
 Project-local skills are copied files that you own and can edit. They are never linked back to the global catalog.
 `.agents/vasir.json` is the committed repo-level source of truth for what the repo wants Vasir to track and which root AGENTS profile it should preserve.
-`.agents/vasir-install-state.json` is Vasir's operational snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` fail closed on edited copies, prunes entries automatically when the matching skill directory is gone, and records catalog provenance such as the installed Vasir version, catalog hash, and per-skill source version so `vasir update --dry-run` can explain pending refreshes.
+`.agents/vasir-install-state.json` is Vasir's operational snapshot of which files it last installed for each project-local skill. Vasir uses it to make `add --replace` refuse to overwrite edited copies and preserve their files, prunes entries automatically when the matching skill directory is gone, and records catalog provenance such as the installed Vasir version, catalog hash, and per-skill source version so `vasir update --dry-run` can explain pending refreshes.
 
 ## Advanced Override
 
