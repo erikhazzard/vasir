@@ -88,6 +88,8 @@ For deterministic-lane surfaces, root §2 binds on top of all of this (kernel RN
 
 Inspect the minimum relevant set: symbols/callers/generated sources · tests at the boundary · config/flags/build scripts · existing logs/metrics/traces/alerts · migration and rollback patterns · dependency files when C8 · docs/decision logs · recent *adjacent* precedent (never extrapolate from unrelated legacy code). Then state: problem check · risk boundary · existing path, contract, tests, observability, rollout · precedent with file paths · `Unknowns` · `Tentatives`.
 
+**Safe-design comparison (root §9).** First fix the explicit outcome and evidenced invariants at the named risk boundary. If repo evidence does not otherwise distinguish among safe candidates, prefer the candidate introducing fewer material commitments across this protocol's owned surfaces: contracts, authority, persisted state, topology, rollout/skew, dependencies, and operations. Each additional commitment needs an explicit requirement or forcing fact. Line count and configurability are not proxies.
+
 **Never write:** "the repo standard is…" without file evidence · "this is safe because it is simple" · "this should not affect performance" without naming the boundary · "add tests later" · "rollback is redeploy" when data, flags, caches, clients, queues, or generated artifacts are involved.
 
 ---

@@ -92,6 +92,8 @@ Inspect correctness, data integrity, security, authorization, concurrency, recov
 
 Do not turn every improvement idea into a finding. A candidate becomes a reported finding only after impact calibration.
 
+**Causal claim boundary.** Be specific about the observed trigger, broken contract, and impact, but remain agnostic about cause when several mechanisms fit the evidence. Name a causal mechanism only when current evidence distinguishes it. If plausible mechanisms require different remedies, put the causal fork and cheapest discriminator under **Needs Validation**; do not choose the cause that yields the cleanest story.
+
 ### 3. Run the impact calibration gate
 
 For every candidate, answer:
