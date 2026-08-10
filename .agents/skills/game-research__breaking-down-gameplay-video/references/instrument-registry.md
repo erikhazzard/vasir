@@ -75,7 +75,7 @@ Each instrument declares:
 
 **Not evidence by itself for:** deliberation, hit stop, performance hitch, game pause, damage, or importance.
 
-**Validation:** decoded frame count equals PTS count; otherwise fail closed. Review known pause and active windows.
+**Validation:** decoded frame count equals PTS count; otherwise return `FAILED` and no normal-looking measurement artifact. Review known pause and active windows.
 
 ### `audio_features.py`
 

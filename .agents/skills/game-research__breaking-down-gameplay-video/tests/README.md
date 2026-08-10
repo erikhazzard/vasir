@@ -8,7 +8,7 @@ The suite exercises the failures that motivated the rebuilt skill:
 - verified film-strip PTS labels, including the old 30-fps half-time regression;
 - real-frame sampling and contact-sheet lineage;
 - typed missing audio;
-- fail-closed invalid input;
+- explicit `FAILED` invalid-input behavior;
 - camera-transform output that does not silently become player motion;
 - unknown inter-file gaps;
 - schema-valid examples and workspace indexes.

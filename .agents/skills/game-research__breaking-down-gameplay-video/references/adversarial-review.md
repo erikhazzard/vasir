@@ -7,7 +7,6 @@ Severity:
 - `P0` — invalidates a headline conclusion, canonical model, timing, or clone behavior;
 - `P1` — material error or missing scope likely to mislead implementation/interpretation;
 - `P2` — local weakness, ambiguity, or presentation defect;
-- `P3` — optional improvement.
 
 ## Gate 1 — Acquisition adversary
 
@@ -91,19 +90,10 @@ Render-check at desktop and narrow/mobile width.
 
 ## Finding format
 
-```json
-{
-  "finding_id": "rev_inf_007",
-  "gate": "inference",
-  "severity": "P0",
-  "summary": "Boss trigger is presented as time-based although kill-threshold remains observationally equivalent.",
-  "evidence_ids": ["ev_..."],
-  "affected_claim_ids": ["clm_..."],
-  "affected_surfaces": ["report#hero", "spec:spawn.boss_trigger"],
-  "required_action": "Reclassify model, preserve both candidates, and use a reference implementation in the clone spec.",
-  "resolution_status": "open"
-}
-```
+Write each finding against `schemas/review-finding.schema.json`, starting from
+`templates/review-finding.example.json`. Those files own the canonical field names,
+uppercase gate values, severity set, and dispositions; do not create a parallel
+finding shape in review prose.
 
 ## Resolution rules
 

@@ -4,7 +4,7 @@ These tools acquire and preserve evidence. They never decide what a mechanic mea
 
 ## Guarantees
 
-- Fail closed on missing inputs, decoder errors, empty outputs, non-monotonic timing, frame/PTS mismatches, and invalid parameters.
+- Return `FAILED` on missing or invalid input, decoder errors, invalid empty outputs, non-monotonic timing, and frame/PTS mismatches.
 - Use presentation timestamps rather than `frame_index / assumed_fps`.
 - Preserve display aspect ratio and record every transform.
 - Store source hashes, commands, tool versions, units, semantics, and limitations in manifests or sidecars.
@@ -32,7 +32,7 @@ python validate_package.py
 
 ### `media_probe.py`
 
-Records source hash, stream metadata, coded and square-pixel display dimensions, timebase, nominal rates, audio streams, optional full decoded-frame PTS cadence, and optional fail-closed full decode verification. `CFR_EVIDENCE` does not prove the game simulation rate; `VFR_EVIDENCE` means all timing must remain timestamp-based.
+Records source hash, stream metadata, coded and square-pixel display dimensions, timebase, nominal rates, audio streams, optional full decoded-frame PTS cadence, and optional full decode verification that returns `FAILED` on integrity errors. `CFR_EVIDENCE` does not prove the game simulation rate; `VFR_EVIDENCE` means all timing must remain timestamp-based.
 
 ### `compose_timeline.py`
 

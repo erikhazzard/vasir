@@ -243,7 +243,9 @@ def validate_workspace(workspace: Path, verify_hashes: bool) -> ValidationReport
         if not artifact_path.is_absolute():
             artifact_path = workspace / artifact_path
         if not artifact_path.is_file():
-            report.warn(f"evidence artifact missing: {item['id']} -> {artifact_path}")
+            (report.error if verify_hashes else report.warn)(
+                f"evidence artifact missing: {item['id']} -> {artifact_path}"
+            )
         elif verify_hashes and sha256_file(artifact_path) != item["artifact"]["sha256"]:
             report.error(f"evidence artifact hash mismatch: {item['id']}")
 

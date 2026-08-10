@@ -9,7 +9,7 @@ These are defaults to actively invert.
 | Frame index ÷ 60 = time | Sources may be 24/30/50/60/120/VFR, duplicated, edited, or resampled | Source PTS, unique-frame checks, clock-domain labels |
 | 60 fps = 16.7 ms input feel | Frame spacing is not input-to-photon latency | Report visible response timing unless synchronized input is present |
 | Resize to fixed width/height | Aspect distortion corrupts geometry and motion | Aspect-preserving scale; record transforms |
-| Tool failure returns zeros | Plausible empty output poisons the graph | Fail closed; typed `unavailable` only where semantically valid |
+| Tool failure returns zeros | Plausible empty output poisons the graph | Return `FAILED`; use `UNAVAILABLE` only when a required signal is absent; never report normal-looking success |
 | Background flow = player movement | Camera can lag, dead-zone, zoom, rotate, shake, or move independently | Validate camera model; report background translation first |
 | Dwell = deliberation | Pause, frozen simulation, interruption, reading, or disconnect can dominate | Separate wall/game time; interruption and pause forensics first |
 | Shape/color OCR alone | Sprites, particles, multiple font classes, and morphology create confident false reads | Measure glyph geometry; temporal tracking; raw crops; arithmetic and repeated cross-checks |
@@ -31,6 +31,6 @@ These are defaults to actively invert.
 | Editorial thesis selected first | Acquisition and interpretation become confirmation-seeking | Stabilize graph/models before choosing the hook |
 | Cross-surface consistency = correctness | A wrong value can be repeated perfectly | Acquisition/inference validation before presentation consistency |
 | JSON = clone spec | Machine-readable values may lack semantics, order, units, and tests | Global semantics, state/formula detail, provenance, and source-backed fixtures |
-| Hidden ambiguity patched with extra code | Local fixes create A→B→C→D complexity around a wrong premise | Reopen the upstream model; choose the simplest footage-faithful implementation |
+| Hidden ambiguity patched with extra code | Local fixes create A→B→C→D complexity around a wrong premise | Reopen the upstream model; choose the least-specific footage-faithful completion and label any runnable default |
 | Genre convention fills gaps | Familiar systems feel obvious but may not exist here | Universal pass + observed adapter evidence; unknowns remain unknown |
 | “Generic” means same algorithm on every video | Inputs differ in camera, topology, timing, and observability | Capability negotiation and adapter-specific measures |

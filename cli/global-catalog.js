@@ -4,6 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { isIgnoredCatalogEntry } from "./catalog-file-policy.js";
 import { VasirCliError } from "./cli-error.js";
 import { GLOBAL_CATALOG_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 import { ensureDirectoryAlias } from "./link-directory.js";
@@ -16,7 +17,6 @@ const CATALOG_REQUIRED_ROOT_FILES = Object.freeze(["registry.json"]);
 const CATALOG_OPTIONAL_ROOT_FILES = Object.freeze([CATALOG_MANIFEST_FILE_NAME]);
 const GLOBAL_CATALOG_STATE_FILE_NAME = ".vasir-catalog-state.json";
 const GLOBAL_CATALOG_DIRTY_BACKUP_LABEL = "dirty-backup";
-const IGNORED_CATALOG_FILE_NAMES = new Set([".DS_Store"]);
 const ALLOWED_GLOBAL_CATALOG_ROOT_ENTRIES = new Set([
   ...new Set(CATALOG_DIRECTORY_PATHS.map((directoryPath) => directoryPath.split("/")[0])),
   ...CATALOG_REQUIRED_ROOT_FILES,
@@ -120,7 +120,10 @@ function readCatalogSnapshotEntries(catalogDirectory) {
 
     function walk(currentDirectoryPath, currentRelativeDirectoryPath) {
       for (const directoryEntry of readSortedDirectoryEntries(currentDirectoryPath)) {
-        if (IGNORED_CATALOG_FILE_NAMES.has(directoryEntry.name)) {
+        if (isIgnoredCatalogEntry({
+          entryName: directoryEntry.name,
+          isDirectory: directoryEntry.isDirectory()
+        })) {
           continue;
         }
 
@@ -142,7 +145,10 @@ function readCatalogSnapshotEntries(catalogDirectory) {
     }
 
     for (const directoryEntry of readSortedDirectoryEntries(rootDirectoryPath)) {
-      if (IGNORED_CATALOG_FILE_NAMES.has(directoryEntry.name)) {
+      if (isIgnoredCatalogEntry({
+        entryName: directoryEntry.name,
+        isDirectory: directoryEntry.isDirectory()
+      })) {
         continue;
       }
 
@@ -283,7 +289,13 @@ function copyCatalogSnapshot({
       targetDirectoryPath,
       {
         recursive: true,
-        filter: (sourcePath) => !IGNORED_CATALOG_FILE_NAMES.has(path.basename(sourcePath))
+        filter: (sourcePath) => {
+          const sourceStat = fs.lstatSync(sourcePath);
+          return !isIgnoredCatalogEntry({
+            entryName: path.basename(sourcePath),
+            isDirectory: sourceStat.isDirectory()
+          });
+        }
       }
     );
   }

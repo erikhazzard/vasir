@@ -8,6 +8,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { runCommandLine } from "../cli/command-runner.js";
+import { inspectGlobalCatalog, readCatalogSourceRegistry } from "../cli/global-catalog.js";
 
 function createTemporaryDirectory() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "vasir-"));
@@ -1421,6 +1422,72 @@ test("add --replace refuses to delete unexpected local files inside a project sk
 
   assert.equal(replaceStatusCode, 1);
   assert.match(replaceCommandOutput.readStderr(), /PROJECT_SKILL_MODIFIED/);
+});
+
+test("generated Python caches do not enter catalog snapshots or block project skill replacement", async () => {
+  const { repositoryDirectory, repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const sourceSkillDirectory = path.join(repositoryDirectory, ".agents", "skills", "react");
+  const baselineSourceHash = readCatalogSourceRegistry({ repositoryUrl }).catalogState.sourceHash;
+
+  writeFile(path.join(sourceSkillDirectory, "__pycache__", "analysis.cpython-313.pyc"), "cache\n");
+  writeFile(path.join(sourceSkillDirectory, ".pytest_cache", "v", "cache", "nodeids"), "[]\n");
+  writeFile(path.join(sourceSkillDirectory, "scripts", "loose.pyc"), "compiled cache\n");
+
+  assert.equal(readCatalogSourceRegistry({ repositoryUrl }).catalogState.sourceHash, baselineSourceHash);
+
+  const addOutput = captureCommandWriters();
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+  assert.equal(addStatusCode, 0);
+
+  const globalSkillDirectory = path.join(homeDirectory, ".agents", "vasir", ".agents", "skills", "react");
+  const projectSkillDirectory = path.join(projectDirectory, ".agents", "skills", "react");
+  for (const skillDirectory of [globalSkillDirectory, projectSkillDirectory]) {
+    assert.ok(!fs.existsSync(path.join(skillDirectory, "__pycache__")));
+    assert.ok(!fs.existsSync(path.join(skillDirectory, ".pytest_cache")));
+    assert.ok(!fs.existsSync(path.join(skillDirectory, "scripts", "loose.pyc")));
+  }
+
+  const installState = JSON.parse(
+    fs.readFileSync(path.join(projectDirectory, ".agents", "vasir-install-state.json"), "utf8")
+  );
+  assert.deepEqual(installState.skills.react.managedFiles, ["SKILL.md"]);
+  assert.deepEqual(Object.keys(installState.skills.react.fileHashes), ["SKILL.md"]);
+
+  for (const skillDirectory of [globalSkillDirectory, projectSkillDirectory]) {
+    writeFile(path.join(skillDirectory, "__pycache__", "analysis.cpython-313.pyc"), "local cache\n");
+    writeFile(path.join(skillDirectory, ".pytest_cache", "v", "cache", "nodeids"), "[]\n");
+    writeFile(path.join(skillDirectory, "scripts", "loose.pyc"), "local compiled cache\n");
+  }
+
+  const catalogInspection = inspectGlobalCatalog({
+    homeDirectory,
+    repositoryUrl,
+    allowDirty: true
+  });
+  assert.equal(catalogInspection.catalogState.needsQuarantine, false);
+
+  const replaceOutput = captureCommandWriters();
+  const replaceStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--replace"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...replaceOutput
+  });
+
+  assert.equal(replaceStatusCode, 0);
+  assert.match(replaceOutput.readStdout(), /Replaced react/);
+  assert.deepEqual(
+    fs.readdirSync(path.join(homeDirectory, ".agents"))
+      .filter((entryName) => entryName.startsWith("vasir.dirty-backup.")),
+    []
+  );
 });
 
 test("init quarantines a dirty global catalog cache and rebuilds it", async () => {

@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { isIgnoredCatalogEntry } from "./catalog-file-policy.js";
+
 export const DEFAULT_SKILL_CATEGORY = "uncategorized";
 export const DEFAULT_SKILL_VERSION = "0.1.0";
 export const SKILL_MANIFEST_FILE_NAME = "SKILL.md";
@@ -10,6 +12,13 @@ function listRelativeFilePathsRecursively(rootDirectoryPath, currentDirectoryPat
   const directoryEntries = fs.readdirSync(currentDirectoryPath, { withFileTypes: true });
 
   for (const directoryEntry of directoryEntries) {
+    if (isIgnoredCatalogEntry({
+      entryName: directoryEntry.name,
+      isDirectory: directoryEntry.isDirectory()
+    })) {
+      continue;
+    }
+
     const entryPath = path.join(currentDirectoryPath, directoryEntry.name);
     if (directoryEntry.isDirectory()) {
       relativeFilePaths.push(...listRelativeFilePathsRecursively(rootDirectoryPath, entryPath));

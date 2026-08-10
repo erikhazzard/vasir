@@ -11,7 +11,7 @@ Before analyzing user footage:
 - all internal file references resolve;
 - every Python module compiles;
 - the regression suite passes on the installed FFmpeg/OpenCV versions;
-- extractors fail closed and leave no plausible partial output after invalid input.
+- invalid input or integrity failure returns `FAILED` and leaves no plausible partial success artifact; a missing signal may return typed `UNAVAILABLE`.
 
 The bundled suite covers the scars that motivated this package: 24/30/50/60/120 fps, VFR, widescreen/4:3/vertical/non-square pixels, verified film-strip PTS, real-frame sampling, missing audio, malformed input, unknown source gaps, and camera/player-motion separation.
 
@@ -98,7 +98,7 @@ A package release requires:
 - green package validation and regression tests;
 - no known P0/P1 instrument defect;
 - a changelog entry for schema or semantic changes;
-- version increments when an output meaning changes;
+- compatible output changes update the one canonical contract, producers, consumers, examples, and proofs together; new fields remain optional and readers tolerate unknown fields;
 - retained regression media or reproducible synthetic generation commands.
 
 A delivery requires the four adversarial gates in `adversarial-review.md`, green schema/reference validation, complete baseline choices, fixture coverage, and no unresolved P0/P1 finding.

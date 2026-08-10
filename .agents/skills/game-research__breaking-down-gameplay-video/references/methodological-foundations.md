@@ -20,4 +20,4 @@ sequence → source-grounded evidence → measurement → candidate models
          → behavioral fixture → report and reconstruction spec
 ```
 
-The report may be decisive; the evidence graph may not be dishonest. When original internals remain non-identifiable, preserve the equivalence class and choose the smallest footage-faithful implementation for the baseline clone.
+The report may be decisive; the evidence graph may not be dishonest. When original internals remain non-identifiable, preserve the equivalence class. If a requested clone requires a runnable choice, prefer the least-specific footage-faithful completion; when no candidate is clearly weaker, keep the unresolved dimension configurable and label the fixture default as arbitrary rather than evidentiary.

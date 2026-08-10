@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { isIgnoredCatalogEntry } from "../cli/catalog-file-policy.js";
 import { buildRegistry } from "../registry/build.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,6 +27,13 @@ const ROOT_CONTRACT_MARKER_PAIRS = Object.freeze([
 function walkFiles(directoryPath) {
   const discoveredFiles = [];
   for (const directoryEntry of fs.readdirSync(directoryPath, { withFileTypes: true })) {
+    if (isIgnoredCatalogEntry({
+      entryName: directoryEntry.name,
+      isDirectory: directoryEntry.isDirectory()
+    })) {
+      continue;
+    }
+
     const absoluteEntryPath = path.join(directoryPath, directoryEntry.name);
     if (directoryEntry.isDirectory()) {
       discoveredFiles.push(...walkFiles(absoluteEntryPath));

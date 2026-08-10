@@ -4,7 +4,7 @@ This skill turns supplied gameplay footage into three linked products:
 
 1. a temporally grounded evidence corpus;
 2. a maximal forensic web report explaining the game, run, systems, feel, and player behavior;
-3. a reconstruction-grade baseline specification and behavioral fixtures sufficient to build the smallest observationally faithful clone.
+3. when explicitly requested, a reconstruction-grade baseline specification and behavioral fixtures sufficient to build an observationally faithful clone.
 
 The footage is the complete primary input. The pipeline never fills evidentiary gaps with unmarked game knowledge. When several hidden implementations fit the same trace, it preserves the candidates and makes an explicit `BASELINE_CHOICE` so the clone remains implementable.
 
@@ -22,7 +22,7 @@ The footage is the complete primary input. The pipeline never fills evidentiary 
 - `references/` — evidence model, system identification, genre adapters, instruments, player modeling, rebuild contract, report design, and reviews.
 - `schemas/` — canonical JSON contracts.
 - `templates/` — examples and report/ledger scaffolds.
-- `scripts/` — fail-closed PTS-aware media tools.
+- `scripts/` — PTS-aware media tools with explicit `FAILED` and `UNAVAILABLE` outcomes.
 - `tests/` — smoke/regression tests for cadence, aspect ratio, missing audio, invalid input, schemas, and camera interpretation.
 
 ## Local prerequisites

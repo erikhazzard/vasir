@@ -110,6 +110,32 @@ Use local state first.`
   assert.deepEqual(listSkillPromptMarkdownFiles(skillDirectoryPath), ["SKILL.md", "references/patterns.md"]);
 });
 
+test("skill inventories ignore generated Python cache artifacts", () => {
+  const repositoryDirectory = createTemporaryDirectory();
+  const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "video-analysis");
+
+  writeFile(
+    path.join(skillDirectoryPath, "SKILL.md"),
+    `---
+name: video-analysis
+description: Analyze gameplay footage.
+---
+
+# Video analysis
+`
+  );
+  writeFile(path.join(skillDirectoryPath, "scripts", "analyze.py"), "print('analyze')\n");
+  writeFile(path.join(skillDirectoryPath, "scripts", "loose.pyc"), "compiled cache\n");
+  writeFile(path.join(skillDirectoryPath, "scripts", "__pycache__", "analyze.cpython-313.pyc"), "cache\n");
+  writeFile(path.join(skillDirectoryPath, ".pytest_cache", "README.md"), "pytest cache\n");
+  writeFile(path.join(skillDirectoryPath, ".pytest_cache", "v", "cache", "nodeids"), "[]\n");
+
+  const skillMetadata = readSkillMetadata(skillDirectoryPath);
+
+  assert.deepEqual(skillMetadata.files, ["SKILL.md", "scripts/analyze.py"]);
+  assert.deepEqual(listSkillPromptMarkdownFiles(skillDirectoryPath), ["SKILL.md"]);
+});
+
 test("readSkillMetadata folds multiline frontmatter descriptions", () => {
   const repositoryDirectory = createTemporaryDirectory();
   const skillDirectoryPath = path.join(repositoryDirectory, ".agents", "skills", "react");

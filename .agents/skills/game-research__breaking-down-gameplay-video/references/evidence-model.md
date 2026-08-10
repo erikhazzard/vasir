@@ -74,7 +74,7 @@ A hidden rule/system that predicts visible behavior. Required:
 - formula/state machine/table;
 - predictions for observed events;
 - support and contradiction IDs;
-- complexity rationale;
+- unsupported-commitment analysis;
 - validation status;
 - observationally equivalent alternatives.
 
@@ -84,7 +84,7 @@ An implementation decision used when the source does not identify the original. 
 
 - chosen model/value;
 - alternatives retained;
-- minimum-complexity rationale;
+- least-specific valid-completion rationale;
 - visible behavior preserved;
 - extrapolation risk;
 - fixtures covering the choice.

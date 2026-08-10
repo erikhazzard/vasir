@@ -4,7 +4,8 @@ The mode changes scope, not epistemic standards. Infer the mode from the request
 
 | Mode | Trigger | Required output | Stop condition |
 |---|---|---|---|
-| `FULL_RECONSTRUCTION` | Broad “break down/analyze/reverse-engineer” request | Full corpus, maximal report, complete baseline spec, fixtures, preservation/better/new | Every visible major system has a model or typed unknown; every implementation-required unknown has a baseline choice; every major mechanic has a fixture; all four reviews pass |
+| `FORENSIC_REPORT` | Broad “break down/analyze this footage” request without an implementation ask | Evidence corpus and report covering the requested breadth; no clone, coaching, or redesign artifacts by default | Every load-bearing report claim has evidence or a typed unknown; acquisition, inference, and presentation reviews pass |
+| `FULL_RECONSTRUCTION` | Explicit “fully reconstruct/reverse-engineer” request | Full corpus, maximal report, complete baseline spec and fixtures; preservation or redesign artifacts only when requested | Every visible major system has a model or typed unknown; every implementation-required unknown has a baseline choice; every major mechanic has a fixture; all applicable reviews pass |
 | `SYSTEMS_RECONSTRUCTION` | “Systems spreadsheet,” “clone,” “spec,” “numbers/rules” | Corpus, machine/system report modules, complete spec and fixtures | Same reconstruction gates; omit only non-load-bearing editorial sections |
 | `FEEL_FORENSICS` | “Why does it feel like this?” | Control/camera/animation/VFX/audio timing corpus, feel report, preservation rules; spec fragments if requested | Every feel claim has an interval, visible timing method, and channel decomposition; no input-latency claim without visible input |
 | `PLAYER_REVIEW` | “How well did I play?” | Decision episodes, execution/decision/outcome separation, performance report, bounded system context | Every judgment reconstructs information available at the time and names alternatives; psychology remains hypothetical |
@@ -13,7 +14,7 @@ The mode changes scope, not epistemic standards. Infer the mode from the request
 
 ## Default depth
 
-A broad request defaults to `FULL_RECONSTRUCTION`; do not ask the user to choose “quick versus deep.” A narrow request remains focused unless answering it correctly requires a broader system reconstruction.
+A generic broad breakdown defaults to `FORENSIC_REPORT`; do not infer a future clone, coaching, comparison, preservation, or redesign need. Use reconstruction modes only when the request asks for an implementable clone, rebuild, reverse engineering, systems specification, or fixtures. A narrow request remains focused unless answering it correctly requires broader evidence.
 
 ## Comparative rule
 

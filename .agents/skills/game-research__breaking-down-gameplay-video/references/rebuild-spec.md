@@ -9,7 +9,7 @@ Define fidelity in layers:
 - **Trace exact:** event order, visible values, timings, states, and outcomes that the footage establishes tightly.
 - **Bounded:** behavior must remain within a measured interval or relation.
 - **Functional:** recreate the visible player-facing effect when the hidden implementation is unknowable.
-- **Reference implementation:** selected parsimonious behavior among observationally equivalent models.
+- **Reference implementation:** selected least-committing runnable behavior among observationally equivalent models.
 - **Free:** unconstrained by the footage and non-load-bearing for the observed experience.
 
 The spec README states which layer applies to every major subsystem.
@@ -19,7 +19,6 @@ The spec README states which layer applies to every major subsystem.
 `spec/rebuild-spec.json` contains:
 
 ```text
-schema_version
 spec_id
 source_context
 fidelity_target
@@ -33,7 +32,7 @@ unknowns
 validation_fixtures
 ```
 
-Large projects may split arrays into `spec/systems/*.json`; `rebuild-spec.json` remains the index and all references remain resolvable.
+Large projects may split arrays into `spec/systems/*.json`; `rebuild-spec.json` remains the single canonical index and all references remain resolvable. Evolve this contract in place with optional additive fields and tolerate unknown fields; do not create a schema selector or parallel versioned shape.
 
 ## Global semantics
 

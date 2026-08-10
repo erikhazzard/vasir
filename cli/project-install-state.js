@@ -2,6 +2,10 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
+import {
+  isIgnoredCatalogEntry,
+  isIgnoredCatalogRelativeFilePath
+} from "./catalog-file-policy.js";
 import { VasirCliError } from "./cli-error.js";
 import { REPLACE_SAFETY_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 
@@ -28,9 +32,17 @@ function normalizeTrackedSkillEntry(rawSkillEntry) {
     throw new Error("Unexpected fileHashes shape.");
   }
 
+  const managedFiles = rawSkillEntry.managedFiles
+    .filter((relativeFilePath) => !isIgnoredCatalogRelativeFilePath(relativeFilePath))
+    .sort();
+  const fileHashes = Object.fromEntries(
+    Object.entries(rawSkillEntry.fileHashes)
+      .filter(([relativeFilePath]) => !isIgnoredCatalogRelativeFilePath(relativeFilePath))
+  );
+
   return {
-    managedFiles: [...rawSkillEntry.managedFiles].sort(),
-    fileHashes: { ...rawSkillEntry.fileHashes },
+    managedFiles,
+    fileHashes,
     provenance:
       rawSkillEntry.provenance && typeof rawSkillEntry.provenance === "object" && !Array.isArray(rawSkillEntry.provenance)
         ? {
@@ -122,6 +134,13 @@ function listRelativeFilePathsRecursively(rootDirectory, currentDirectory = root
   const directoryEntries = fs.readdirSync(currentDirectory, { withFileTypes: true });
 
   for (const directoryEntry of directoryEntries) {
+    if (isIgnoredCatalogEntry({
+      entryName: directoryEntry.name,
+      isDirectory: directoryEntry.isDirectory()
+    })) {
+      continue;
+    }
+
     const entryPath = path.join(currentDirectory, directoryEntry.name);
     if (directoryEntry.isDirectory()) {
       relativeFilePaths.push(...listRelativeFilePathsRecursively(rootDirectory, entryPath));
@@ -195,7 +214,9 @@ export function createProjectSkillInstallStateEntry({
   managedRelativeFilePaths,
   provenance = null
 }) {
-  const sortedManagedRelativeFilePaths = [...managedRelativeFilePaths].sort();
+  const sortedManagedRelativeFilePaths = managedRelativeFilePaths
+    .filter((relativeFilePath) => !isIgnoredCatalogRelativeFilePath(relativeFilePath))
+    .sort();
   const fileHashes = {};
 
   for (const relativeFilePath of sortedManagedRelativeFilePaths) {
@@ -229,7 +250,9 @@ export function inspectProjectSkillReplaceSafety({
   }
 
   const actualRelativeFilePaths = listRelativeFilePathsRecursively(targetSkillDirectory);
-  const expectedRelativeFilePaths = [...trackedSkillEntry.managedFiles].sort();
+  const expectedRelativeFilePaths = trackedSkillEntry.managedFiles
+    .filter((relativeFilePath) => !isIgnoredCatalogRelativeFilePath(relativeFilePath))
+    .sort();
   const unexpectedRelativeFilePaths = actualRelativeFilePaths.filter(
     (relativeFilePath) => !expectedRelativeFilePaths.includes(relativeFilePath)
   );
