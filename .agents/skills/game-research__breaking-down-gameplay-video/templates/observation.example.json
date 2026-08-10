@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0.0",
+  "id": "obs_reload_007",
+  "statement": "The ammo display reaches zero, the weapon enters a reload animation, player displacement continues at a visibly lower rate, and the ammo display refills before firing resumes.",
+  "evidence_ids": [
+    "ev_reload_007"
+  ],
+  "actors": [
+    "player",
+    "weapon",
+    "ammo_hud"
+  ],
+  "visibility": "CLEAR",
+  "ambiguities": [
+    "The exact input time and internal reload-complete frame are not visible."
+  ],
+  "supersedes": null
+}

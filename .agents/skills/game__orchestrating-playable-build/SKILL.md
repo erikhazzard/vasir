@@ -51,7 +51,8 @@ Do not use this skill for:
 - pure design before implementation; use `game__directing`
 - a narrow bug with a known failure path; use `code__fixing-bugs` plus the relevant game skill
 - isolated HUD/menu/results work; use `ui__revamping-game-shell-ui` or `design__designing-end-screen`
-- isolated performance diagnosis; use `threejs__improve-performance` or `code__threejs-rapier-performance`
+- isolated performance diagnosis; use `threejs__improve-performance`
+- pre-change mobile Three.js or Rapier performance architecture; use `code__threejs-rapier-performance`
 - first-fun judgment after a runnable game already exists; use `game-proof__auditing-first-playable-comprehension`
 
 When a narrower genre, movement, combat, UI, art, juice, or proof skill applies,
@@ -83,7 +84,9 @@ For broad playable builds, the usual tool map is:
 | Feel | `game__adding-juice` | Input response, feedback channels, camera, hitstop, particles, comfort. |
 | Art direction | `game__art-directing` | Visual language, readability, active-play slap review. |
 | UI shell | `ui__revamping-game-shell-ui` or the relevant UI skill | HUD/menus/results without breaking deterministic boundaries. |
-| 3D/physics/perf | `physics__creating-interaction-system`, `threejs__improve-performance`, `code__threejs-rapier-performance` as applicable | Deterministic interaction, frame budget, mobile/browser runtime sanity. |
+| 3D/physics interaction | `physics__creating-interaction-system` | Deterministic object interaction and simulation semantics. |
+| Observed 3D performance problem | `threejs__improve-performance` | Reproducible diagnosis and measured remediation. |
+| Planned mobile 3D architecture | `code__threejs-rapier-performance` | Pre-change render, physics, asset, tier, and threading constraints. |
 | First-fun judgment | `game-proof__auditing-first-playable-comprehension` | First act, response, consequence, better next try. |
 
 If one phase is irrelevant, mark it `not-needed` with one sentence. Do not load skills just to make the notes look full.

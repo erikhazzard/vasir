@@ -9,7 +9,7 @@ description: >-
 
 Use this protocol when a change has a material non-local risk boundary. The job is the smallest safe diff that solves the evidenced problem, protects that boundary, and preserves repo coherence.
 
-**Place in the system.** Root owns workflow, proof proportionality, lifecycle, and completion. This protocol owns material-risk classification, contract vocabulary, migration, and observability judgment. Tags identify risks; they never create a test, gate, harness, eval plan, artifact, audit, substantial lane, or extra stop. For a substantial lane, surviving risk/contract judgment lands in work-spec §4–§5; an eval plan is used only when durable proof coordination is genuinely warranted. It never spawns a rival plan.
+**Place in the system.** Root owns workflow, proof proportionality, lifecycle, and completion. This protocol owns material-risk classification, contract vocabulary, migration, and observability judgment. Accepted findings from `$audit-ai-code-accretion` are implementation inputs, never authority to bypass this protocol when deletion crosses a material boundary. Tags identify risks; they never create a test, gate, harness, eval plan, artifact, audit, substantial lane, or extra stop. For a substantial lane, surviving risk/contract judgment lands in work-spec §4–§5; an eval plan is used only when durable proof coordination is genuinely warranted. It never spawns a rival plan.
 
 ---
 

@@ -155,7 +155,7 @@
     },
     {
       "name": "code__threejs-rapier-performance",
-      "description": "Enforces deterministic, measurement-driven mobile-web performance architecture for Three.js + Rapier before code or asset changes, covering render and physics budgets, frame stability, loading/streaming, memory, quality tiers, off-main-thread decisions, and proof via observability. Use for any change touching Three.js, Rapier, WebXR/WebGL/WebGPU rendering, shaders, scene graph, cameras, controls, physics, colliders/controllers, glTF/KTX2/meshopt assets, or fps, jank, stutter, and load-time issues.",
+      "description": "Enforces deterministic, measurement-driven mobile-web performance architecture before material Three.js or Rapier code and asset changes. Use when planning renderer, physics, quality-tier, loading, memory, asset-pipeline, or threading architecture before implementation; for an observed performance symptom, use $threejs__improve-performance first.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -995,17 +995,22 @@
     },
     {
       "name": "threejs__improve-performance",
-      "description": "Profiles and improves Three.js + Rapier runtime performance while preserving determinism and gameplay semantics. Use for low FPS, stutter, load-time, GPU, CPU, GC, scene graph, shader, asset, physics, collider, or memory issues in Three.js/Rapier apps.",
+      "description": "Diagnose and improve Three.js / Rapier performance through reproducible benchmark/replay proof and stack-native fixes. Use for observed low FPS, bad frame pacing, periodic stutter, rare hitches, load or first-use stalls, GPU/CPU/GC pressure, scene-graph, shader, material, animation, particle, asset, Rapier, worker-handoff, XR, memory, or lifecycle problems; for pre-change mobile performance architecture, use $code__threejs-rapier-performance.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
-        "references/observability-and-instrumentation.md",
-        "references/perf-regression-and-acceptance-tests.md",
-        "references/rapier-optimization-playbook.md",
-        "references/rendering-optimization-playbook.md"
+        "references/animation-particles-queries.md",
+        "references/benchmark-replay.md",
+        "references/frame-pacing-attribution.md",
+        "references/load-first-use-assets.md",
+        "references/memory-lifecycle.md",
+        "references/rapier-physics.md",
+        "references/three-rendering-gpu.md",
+        "references/worker-handoff.md",
+        "references/xr.md"
       ],
       "path": ".agents/skills/threejs__improve-performance",
       "entry": "SKILL.md"

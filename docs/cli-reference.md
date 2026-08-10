@@ -52,6 +52,7 @@ vasir --version
 - Notes:
   - Plain `vasir` defaults to `vasir status`.
   - `status` never copies, deletes, or repairs files.
+  - Extra local skill directories remain visible in `unmanagedSkills`. In a repo with a valid tracking policy they are informational and do not, by themselves, require adoption or make `overallStatus` attention.
   - Pass `--repo-root <path>` when you want to inspect an explicit subproject root.
 
 Examples:

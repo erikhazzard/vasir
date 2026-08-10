@@ -1,9 +1,13 @@
 ---
 name: code__threejs-rapier-performance
-description: Enforces deterministic, measurement-driven mobile-web performance architecture for Three.js + Rapier before code or asset changes, covering render and physics budgets, frame stability, loading/streaming, memory, quality tiers, off-main-thread decisions, and proof via observability. Use for any change touching Three.js, Rapier, WebXR/WebGL/WebGPU rendering, shaders, scene graph, cameras, controls, physics, colliders/controllers, glTF/KTX2/meshopt assets, or fps, jank, stutter, and load-time issues.
+description: Enforces deterministic, measurement-driven mobile-web performance architecture before material Three.js or Rapier code and asset changes. Use when planning renderer, physics, quality-tier, loading, memory, asset-pipeline, or threading architecture before implementation; for an observed performance symptom, use $threejs__improve-performance first.
 ---
 
 Before writing code or changing assets, adopt this as law.
+
+## Routing boundary
+
+Use this skill to frame a planned mobile Three.js or Rapier architecture, asset-pipeline, quality-tier, or threading change before implementation. Use `$threejs__improve-performance` when low FPS, stutter, hitches, load stalls, memory growth, or another observed symptom needs causal diagnosis or measured remediation. If that diagnosis earns a material architecture change, return here with the bounded finding and proof target; do not load both skills speculatively.
 
 Mobile-web performance is not “higher FPS.” It is stable frame time, low touch/input latency, bounded memory, controlled download size, thermal resilience, and deterministic simulation on real phones. The goal is not to make one device look impressive. The goal is to ship a game that feels responsive, stays correct, and degrades intentionally across mobile browsers.
 

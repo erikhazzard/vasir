@@ -483,6 +483,51 @@ test("status supports structured json output for automation consumers", async ()
   assert.ok(parsedOutput.nextSteps.some((step) => step.includes("vasir repair")));
 });
 
+test("tracked repos report extra local skills without requiring adoption", async () => {
+  const { repositoryUrl } = createFixtureRepository();
+  const homeDirectory = createTemporaryDirectory();
+  const projectDirectory = createTemporaryDirectory();
+  const addOutput = captureCommandWriters();
+
+  const addStatusCode = await runCommandLine(["node", "vasir", "add", "react", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...addOutput
+  });
+
+  assert.equal(addStatusCode, 0, addOutput.readStderr());
+  writeFile(path.join(projectDirectory, ".agents", "skills", "project-only", "SKILL.md"), "# Project-only skill\n");
+
+  const statusOutput = captureCommandWriters();
+  const statusCode = await runCommandLine(["node", "vasir", "status", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...statusOutput
+  });
+
+  assert.equal(statusCode, 0, statusOutput.readStderr());
+  const parsedStatus = JSON.parse(statusOutput.readStdout());
+  assert.equal(parsedStatus.repoStatus, "tracked");
+  assert.equal(parsedStatus.overallStatus, "healthy");
+  assert.deepEqual(parsedStatus.unmanagedSkills, ["project-only"]);
+  assert.ok(!parsedStatus.issues.some((issue) => issue.code === "PROJECT_ADOPTION_REQUIRED"));
+
+  const doctorOutput = captureCommandWriters();
+  const doctorStatusCode = await runCommandLine(["node", "vasir", "doctor", "--json"], {
+    homeDirectory,
+    currentWorkingDirectory: projectDirectory,
+    repositoryUrl,
+    ...doctorOutput
+  });
+
+  assert.equal(doctorStatusCode, 0, doctorOutput.readStderr());
+  const parsedDoctor = JSON.parse(doctorOutput.readStdout());
+  assert.equal(parsedDoctor.overallStatus, "healthy");
+  assert.ok(!parsedDoctor.issues.some((issue) => issue.code === "PROJECT_ADOPTION_REQUIRED"));
+});
+
 test("context returns a purely local repo handshake for llm consumers", async () => {
   const { repositoryUrl } = createFixtureRepository();
   const homeDirectory = createTemporaryDirectory();

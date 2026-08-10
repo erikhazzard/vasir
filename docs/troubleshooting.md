@@ -68,6 +68,8 @@ Use this section when:
 - `vasir doctor` reports alias drift or blocked updates
 - a repo already has `.agents/skills/` but `vasir update` says it is not initialized
 
+Extra local skill directories in an already tracked repo are reported for visibility but do not require adoption. `adopt` is for a tree that lacks a valid Vasir tracking policy, not for registering catalog-unknown local skills.
+
 Recommended path:
 
 1. Start with `vasir status` for the high-level state.

@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "spec_schema_version": "1.0.0",
+  "fixtures": [
+    {
+      "id": "fixture_reload_movement_01",
+      "class": "REPRODUCTION",
+      "purpose": "Reproduce visible empty-reload duration and movement slowdown.",
+      "setup": {
+        "player_state": "normal",
+        "weapon_ammo": 0,
+        "base_move_speed": 1.0
+      },
+      "stimulus": [
+        {
+          "at_s": 0.0,
+          "action": "reload"
+        },
+        {
+          "from_s": 0.0,
+          "to_s": 1.2,
+          "action": "move_right"
+        }
+      ],
+      "expected": [
+        {
+          "metric": "state",
+          "at_s": 0.1,
+          "equals": "reload"
+        },
+        {
+          "metric": "effective_move_speed",
+          "from_s": 0.0,
+          "to_s": 1.15,
+          "equals": 0.74,
+          "unit": "viewport_width/s",
+          "tolerance": 0.04
+        },
+        {
+          "event": "ammo_refill",
+          "time_s": 1.15,
+          "tolerance_s": 0.05
+        }
+      ],
+      "evidence_ids": [
+        "ev_reload_007"
+      ],
+      "claim_ids": [
+        "claim_reload_slowdown_004"
+      ],
+      "tolerance_policy": {
+        "basis": "source cadence plus visible boundary ambiguity"
+      },
+      "notes": [
+        "This fixture validates the baseline choice, not the original hidden implementation."
+      ]
+    }
+  ],
+  "coverage_by_system": {
+    "movement": [
+      "fixture_reload_movement_01"
+    ],
+    "reload": [
+      "fixture_reload_movement_01"
+    ]
+  }
+}

@@ -1,0 +1,395 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.:-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "format": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "duration_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "start_time_s": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "format_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "creation_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "duration_s"
+      ]
+    },
+    "video": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "stream_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coded_width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "coded_height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "display_width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "display_height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rotation_degrees": {
+          "type": "integer"
+        },
+        "sample_aspect_ratio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "display_aspect_ratio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "codec_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pixel_format": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "color_space": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "color_transfer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "color_primaries": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "avg_frame_rate": {
+          "type": "string"
+        },
+        "r_frame_rate": {
+          "type": "string"
+        },
+        "time_base": {
+          "type": "string"
+        },
+        "nominal_frame_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "stream_index",
+        "coded_width",
+        "coded_height",
+        "display_width",
+        "display_height",
+        "rotation_degrees",
+        "codec_name",
+        "pixel_format",
+        "avg_frame_rate",
+        "r_frame_rate",
+        "time_base"
+      ]
+    },
+    "audio": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "stream_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "codec_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sample_rate_hz": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "channels": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "channel_layout": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "duration_s": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
+        },
+        "required": [
+          "stream_index",
+          "codec_name",
+          "sample_rate_hz",
+          "channels"
+        ]
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pts_scan_status": {
+          "enum": [
+            "NOT_SCANNED",
+            "SCANNED",
+            "FAILED"
+          ]
+        },
+        "frame_count_scanned": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "first_pts_s": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "last_pts_s": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "median_delta_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "min_delta_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "max_delta_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "delta_mad_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "non_monotonic_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "discontinuity_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cadence_classification": {
+          "enum": [
+            "CFR_EVIDENCE",
+            "VFR_EVIDENCE",
+            "DISCONTINUOUS",
+            "UNKNOWN"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "pts_scan_status",
+        "cadence_classification"
+      ]
+    },
+    "audio_status": {
+      "enum": [
+        "AVAILABLE",
+        "NEAR_SILENT",
+        "UNAVAILABLE",
+        "NOT_ANALYZED"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "ffmpeg_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "command"
+      ]
+    },
+    "decode_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "PASSED",
+            "NOT_RUN"
+          ]
+        },
+        "command": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "command",
+        "notes"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_id",
+    "sha256",
+    "path",
+    "format",
+    "video",
+    "audio",
+    "timing",
+    "decode_check",
+    "tool",
+    "audio_status",
+    "limitations"
+  ],
+  "title": "Gameplay video source manifest"
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "observed_scope": "One source, starter weapon, four empty reloads.",
+  "systems": [
+    {
+      "system": "reload",
+      "coverage": "STRONG",
+      "notes": [
+        "Four complete empty reloads visible."
+      ]
+    },
+    {
+      "system": "movement_during_reload",
+      "coverage": "MODERATE",
+      "notes": [
+        "Small base-speed range leaves multiplier versus cap unresolved."
+      ]
+    }
+  ],
+  "capture_limitations": [
+    "Input onset not visible."
+  ],
+  "model_forks": [
+    "model_reload_multiplier_001"
+  ],
+  "baseline_choices": [
+    "model_reload_multiplier_001"
+  ],
+  "fixture_coverage": {
+    "reload": [
+      "fixture_reload_movement_01"
+    ],
+    "movement": [
+      "fixture_reload_movement_01"
+    ]
+  }
+}

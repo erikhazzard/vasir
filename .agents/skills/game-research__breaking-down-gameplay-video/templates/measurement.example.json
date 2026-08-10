@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "id": "measure_reload_duration_003",
+  "measurand": "visible interval from reload-animation onset to ammo-display refill",
+  "estimate": 1.15,
+  "unit": "s",
+  "clock_domain": "video_pts",
+  "coordinate_space": null,
+  "method": "PTS difference between manually adjudicated onset and HUD refill across repeated reloads",
+  "parameters": {
+    "onset_rule": "first unique reload pose",
+    "completion_rule": "first frame with refilled ammo"
+  },
+  "evidence_ids": [
+    "ev_reload_007"
+  ],
+  "observation_count": 4,
+  "run_count": 1,
+  "uncertainty": {
+    "kind": "RANGE",
+    "low": 1.1,
+    "high": 1.2,
+    "plus_minus": null,
+    "confidence_level": null,
+    "basis": "state-boundary ambiguity plus source cadence",
+    "distribution": null
+  },
+  "scope": {
+    "weapon": "starter_weapon",
+    "reload_type": "empty_reload",
+    "observed_ammo_before": 0
+  },
+  "invalidating_conditions": [
+    "Different weapon",
+    "tactical reload",
+    "animation cancel"
+  ],
+  "supersedes": null
+}

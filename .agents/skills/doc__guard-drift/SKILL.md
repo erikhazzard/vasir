@@ -22,6 +22,8 @@ Your goal is to produce an evidence-backed audit and, when appropriate, precise 
 
 This is not a prose-polish task. It is a truth-maintenance task.
 
+Documentation-only duplication and stale claims stay here. Route to `$audit-ai-code-accretion` only when duplicated documentation reflects or protects competing code owners, paths, or sources of truth.
+
 ## OPERATING PRINCIPLES
 
 1. **Primary-source first.**  

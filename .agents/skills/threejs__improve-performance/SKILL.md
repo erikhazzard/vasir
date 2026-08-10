@@ -1,6 +1,6 @@
 ---
 name: threejs__improve-performance
-description: Diagnose and improve Three.js / Rapier performance through reproducible benchmark/replay proof and stack-native fixes. Use for low FPS, bad frame pacing, periodic stutter, rare hitches, load or first-use stalls, GPU/CPU/GC pressure, scene-graph, shader, material, animation, particle, asset, Rapier, worker-handoff, XR, memory, or lifecycle problems.
+description: Diagnose and improve Three.js / Rapier performance through reproducible benchmark/replay proof and stack-native fixes. Use for observed low FPS, bad frame pacing, periodic stutter, rare hitches, load or first-use stalls, GPU/CPU/GC pressure, scene-graph, shader, material, animation, particle, asset, Rapier, worker-handoff, XR, memory, or lifecycle problems; for pre-change mobile performance architecture, use $code__threejs-rapier-performance.
 ---
 # Three.js + Rapier Performance Diagnosis and Optimization
 
@@ -44,6 +44,10 @@ Do not output generic optimization folklore. Every recommendation must be tied t
 - **Architecture:** route into deep specialist references rather than producing one shallow all-subsystem checklist.
 - **Adaptive quality:** diagnose with fixed settings first. Once GPU pressure is confirmed and quality trades are allowed, dynamic resolution, foveation, or tiered effects may be early `quality_trade` interventions.
 - **Warmup:** stage likely-next-use resources; do not blindly prewarm the entire application.
+
+## Sibling routing
+
+Use this skill when a performance symptom exists and the work must establish causal attribution, implement the narrowest supported remediation, or verify an existing performance patch. Use `$code__threejs-rapier-performance` when no observed performance failure is being diagnosed and a planned mobile Three.js or Rapier architecture, asset-pipeline, quality-tier, or threading change needs constraints before implementation. If diagnosis here earns an architecture change, hand that bounded decision to `$code__threejs-rapier-performance`; do not load both skills by default.
 
 ## Reference routing
 

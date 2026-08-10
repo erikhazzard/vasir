@@ -13,6 +13,8 @@ You are a Staff+ engineer whose specialty is predicting the next production inci
 
 Review independently using the same existing repo folder. This lens never modifies audited code, tests, specs, or gate state. It has two modes:
 
+AI-accretion audits route to `$audit-ai-code-accretion`; this skill joins only for an explicitly requested full-suite audit or a named material proof blind spot, and retains ownership of oracle strength, fidelity, and test-debt depth.
+
 - **Terminal overlay (default when called by handoff):** requires the exact material test/proof blind spot. Audit only that scope and return one bounded section to `$handoff__final-quality-gate`; do not create a separate report, grade the whole suite, inventory unrelated guarantees, or spawn follow-up work.
 - **Full suite audit:** only when the user explicitly asks to audit/grade a test suite or coverage system. The full report shape below applies; it may write `tmp/<datetime>__<slug>__test-audit/report.md` when the user/repo requests a durable artifact.
 

@@ -6,7 +6,7 @@ tools: Read, Grep, Glob, Write
 
 # Architecture Zoom-Out Brake Pedal
 
-**Place in the family.** This challenges whether proposed moving parts should exist. The product and infra sibling reviews are separate user-requested or specifically warranted lenses; do not run them just because their surface exists. Work fresh-eyed and read-only. Accepted semantic decisions route through `$plan__maintain-work-spec`; proof changes reach `$eval__design-proof-gates` only when durable proof coordination is warranted.
+**Place in the family.** This challenges whether proposed moving parts should exist; `$audit-ai-code-accretion` grades accretion already present in code and produces a deletion-first remediation plan. The product and infra sibling reviews are separate user-requested or specifically warranted lenses; do not run them just because their surface exists. Work fresh-eyed and read-only. Accepted semantic decisions route through `$plan__maintain-work-spec`; proof changes reach `$eval__design-proof-gates` only when durable proof coordination is warranted.
 
 ## Core stance
 

@@ -429,7 +429,9 @@ function inspectProjectSurface({
     }
   }
 
-  if (repoDetected && unmanagedInstalledSkillNames.length > 0) {
+  const hasConfiguredTrackingPolicy =
+    projectConfig?.tracking?.mode === "all" || projectConfig?.tracking?.mode === "selected";
+  if (repoDetected && unmanagedInstalledSkillNames.length > 0 && !hasConfiguredTrackingPolicy) {
     issues.push(
       createStatusIssue({
         scope: "repo",
@@ -2391,7 +2393,7 @@ function runStatus({
       if (projectState.unmanagedInstalledSkillNames.length > 0) {
         renderedLines.push(
           ui.formatStatusLine({
-            kind: "warn",
+            kind: projectState.repoStatus === "tracked" ? "info" : "warn",
             text: "Unmanaged local skills",
             detail: projectState.unmanagedInstalledSkillNames.join(", ")
           })

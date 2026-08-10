@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "coverage.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "observed_scope": {
+      "type": "string"
+    },
+    "systems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "system": {
+            "type": "string"
+          },
+          "coverage": {
+            "enum": [
+              "STRONG",
+              "MODERATE",
+              "WEAK",
+              "NONE",
+              "INAPPLICABLE"
+            ]
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "system",
+          "coverage",
+          "notes"
+        ]
+      }
+    },
+    "capture_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "model_forks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_.:-]*$"
+      },
+      "uniqueItems": true
+    },
+    "baseline_choices": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_.:-]*$"
+      },
+      "uniqueItems": true
+    },
+    "fixture_coverage": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:-]*$"
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "observed_scope",
+    "systems",
+    "capture_limitations",
+    "model_forks",
+    "baseline_choices",
+    "fixture_coverage"
+  ],
+  "title": "Reconstruction coverage"
+}

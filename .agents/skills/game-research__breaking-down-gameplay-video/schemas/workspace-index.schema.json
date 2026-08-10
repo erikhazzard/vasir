@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "workspace-index.schema.json",
+  "title": "Gameplay analysis workspace index",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "slug": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string"},
+    "tool": {"type": "object", "additionalProperties": false, "properties": {"name": {"type": "string"}, "version": {"type": "string"}}, "required": ["name", "version"]},
+    "route": {"type": ["string", "null"], "enum": [null, "FULL_RECONSTRUCTION", "SYSTEMS_RECONSTRUCTION", "FEEL_FORENSICS", "PLAYER_REVIEW", "COMPARATIVE", "FOCUSED"]},
+    "source_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "timeline_id": {"type": ["string", "null"]},
+    "corpus_revision": {"type": "integer", "minimum": 0}
+  },
+  "required": ["schema_version", "slug", "created_at", "tool", "route", "source_ids", "timeline_id", "corpus_revision"]
+}

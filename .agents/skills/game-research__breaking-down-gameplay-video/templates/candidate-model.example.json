@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "id": "model_reload_multiplier_001",
+  "target_claim_ids": [
+    "claim_reload_slowdown_004"
+  ],
+  "kind": "FORMULA",
+  "description": "Reload multiplies normal movement speed by a fixed factor until ammo refill.",
+  "assumptions": [
+    "Camera segment is stable",
+    "Visible displacement approximates player displacement in this interval"
+  ],
+  "variables": [
+    {
+      "name": "normal_speed",
+      "unit": "normalized_viewport_width/s",
+      "domain": {
+        "minimum": 0
+      }
+    },
+    {
+      "name": "reload_multiplier",
+      "unit": "ratio",
+      "domain": {
+        "minimum": 0,
+        "maximum": 1
+      }
+    }
+  ],
+  "model": {
+    "expression": "speed = normal_speed * reload_multiplier",
+    "reload_multiplier": 0.74
+  },
+  "predictions": [
+    {
+      "event_or_fixture_id": "ev_reload_007",
+      "expected": {
+        "displacement_ratio": 0.74
+      },
+      "observed": {
+        "displacement_ratio_range": [
+          0.7,
+          0.78
+        ]
+      },
+      "result": "SUPPORT"
+    }
+  ],
+  "supporting_evidence_ids": [
+    "ev_reload_007"
+  ],
+  "contradicting_evidence_ids": [],
+  "complexity": {
+    "hidden_variables": 1,
+    "special_cases": 0,
+    "rationale": "One scalar modifier applies to all observed reloads."
+  },
+  "validation": "OBSERVATIONALLY_EQUIVALENT",
+  "scope": {
+    "weapon": "starter_weapon",
+    "reload_type": "empty_reload"
+  },
+  "alternatives": [],
+  "supersedes": null
+}

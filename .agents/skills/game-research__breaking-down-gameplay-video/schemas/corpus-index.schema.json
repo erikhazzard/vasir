@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "corpus-index.schema.json",
+  "title": "Canonical gameplay evidence corpus index",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "corpus_revision": {"type": "integer", "minimum": 0},
+    "source_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "timeline_id": {"type": ["string", "null"]},
+    "observability_path": {"type": ["string", "null"]},
+    "files": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "evidence": {"type": "string"}, "observations": {"type": "string"}, "events": {"type": "string"},
+        "measurements": {"type": "string"}, "claims": {"type": "string"}, "models": {"type": "string"},
+        "conflicts": {"type": "string"}, "unknowns": {"type": "string"}
+      },
+      "required": ["evidence", "observations", "events", "measurements", "claims", "models", "conflicts", "unknowns"]
+    },
+    "counts": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"evidence": {"type": "integer", "minimum": 0}, "observations": {"type": "integer", "minimum": 0}, "events": {"type": "integer", "minimum": 0}, "measurements": {"type": "integer", "minimum": 0}, "claims": {"type": "integer", "minimum": 0}, "models": {"type": "integer", "minimum": 0}, "conflicts": {"type": "integer", "minimum": 0}, "unknowns": {"type": "integer", "minimum": 0}},
+      "required": ["evidence", "observations", "events", "measurements", "claims", "models", "conflicts", "unknowns"]
+    },
+    "generated_at": {"type": "string"},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["schema_version", "corpus_revision", "source_ids", "timeline_id", "observability_path", "files", "counts", "generated_at", "notes"]
+}

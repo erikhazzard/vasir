@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "source_id": "source_001",
+  "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "source_path": "/analysis/source/gameplay.mp4",
+  "sampling": {
+    "requested_interval_s": 2.0,
+    "requested_start_s": 0.0,
+    "requested_duration_s": null,
+    "actual_first_pts_s": 0.0,
+    "actual_last_pts_s": 10.0
+  },
+  "transform": {
+    "max_width": 960,
+    "preserve_aspect_ratio": true,
+    "selection_semantics": "minimum elapsed source-PTS interval between selected real input frames"
+  },
+  "format": "jpg",
+  "frames": [
+    {
+      "index": 0,
+      "path": "../frames/coarse/frame_000001.jpg",
+      "pts_s": 0.0,
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "width": 960,
+      "height": 540
+    },
+    {
+      "index": 1,
+      "path": "../frames/coarse/frame_000002.jpg",
+      "pts_s": 2.0,
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "width": 960,
+      "height": 540
+    }
+  ],
+  "tool": {
+    "name": "extract_frames.py",
+    "version": "1.0.0",
+    "command": ["extract_frames.py", "gameplay.mp4", "frames/coarse", "coarse_manifest.json", "--interval", "2"],
+    "created_at": "2026-08-07T16:00:00Z"
+  }
+}

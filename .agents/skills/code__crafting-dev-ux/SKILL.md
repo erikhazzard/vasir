@@ -43,6 +43,8 @@ State both at the top of your response.
 ## 0.5) Audit Mode (root §6 optional overlay)
 When running inside terminal handoff, this file is an independent-review brief for the exact named blind spot. Review using the same existing repo folder (root §7). Stance: you are the consumer who has never seen this code and has no one to ask.
 
+Route broad AI-accretion, deletion, or generated-code simplification report cards to `$audit-ai-code-accretion`. This lens joins only when public-API consumption is itself the named blind spot and retains ownership of the four green tests.
+
 - **Reviewer inputs:** the diff/scope under audit and the exact lane boundary — never the author's trajectory or conclusions; being handed a trajectory is itself a finding. Re-derive from the code.
 - **Custody:** writes are scoped to this lens's own report directory — never the surfaces under audit.
 - **Rubric:** grade each touched public surface against the four green tests, the Non‑Negotiables (§2), and its Minimum DX Stack row (§3). Pit-scale every surface (🟢🟡🔴⛔) with evidence — symbols, file:line, micro-snippets ≤10 lines.
