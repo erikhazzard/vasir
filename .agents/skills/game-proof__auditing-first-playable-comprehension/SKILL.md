@@ -82,7 +82,7 @@ Do not use this skill for:
 - pre-code ideation before a runnable game exists; use `game__directing` and `game__building-core-loop`;
 - broad system design; use the relevant genre/system skill;
 - platformer curriculum design; use `game-onboarding__designing-game-onboarding`;
-- broad visual redesign; use `game__art-directing`, `design__designing-game-ui-for-idavoll`, or `ui__revamping-game-shell-ui`;
+- broad visual redesign; use `game__art-directing` or `ui__revamping-game-shell-ui`;
 - final release certification after first-fun judgment exists; use `handoff__final-quality-gate`.
 
 ## Definitions

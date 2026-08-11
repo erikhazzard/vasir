@@ -1,1 +1,0 @@
-"""Gameplay-video forensic utilities."""

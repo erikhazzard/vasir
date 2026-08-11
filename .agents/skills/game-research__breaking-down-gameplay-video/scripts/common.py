@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared fail-closed media/provenance utilities."""
+"""Shared media and provenance utilities."""
 from __future__ import annotations
 
 import hashlib
@@ -12,7 +12,7 @@ import subprocess
 from datetime import datetime, timezone
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 SCRIPT_VERSION = "1.0.0"
 SHOWINFO_RE = re.compile(r"\bn:\s*(\d+).*?\bpts_time:([\-0-9.eE]+)")
@@ -177,7 +177,10 @@ def scan_video_pts(
     require_executable("ffprobe")
     cmd = ["ffprobe", "-v", "error", "-select_streams", "v:0"]
     if start_s is not None:
-        interval = f"{start_s}%" if duration_s is None else f"{start_s}%+{duration_s}"
+        # ffprobe may seek to a keyframe before start_s. A relative `%+duration`
+        # is measured from that actual seek point and can end before the requested
+        # window, so bounded scans use an absolute end timestamp.
+        interval = f"{start_s}%" if duration_s is None else f"{start_s}%{start_s + duration_s}"
         cmd += ["-read_intervals", interval]
     cmd += [
         "-show_entries", "frame=best_effort_timestamp_time,pkt_duration_time",
@@ -249,12 +252,3 @@ def format_timestamp(seconds: float, milliseconds: bool = True) -> str:
     if milliseconds:
         return f"{hours:02d}:{minutes:02d}:{sec:06.3f}"
     return f"{hours:02d}:{minutes:02d}:{int(sec):02d}"
-
-
-def iter_jsonl(path: str | os.PathLike[str]) -> Iterable[tuple[int, dict[str, Any]]]:
-    with open(path, "r", encoding="utf-8") as f:
-        for number, line in enumerate(f, 1):
-            line = line.strip()
-            if not line:
-                continue
-            yield number, json.loads(line)

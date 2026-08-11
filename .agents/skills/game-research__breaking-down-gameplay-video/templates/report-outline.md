@@ -1,20 +1,18 @@
-# Maximal report outline
+# Evidence-cited report outline
 
-1. Hero conclusion
-2. Reconstruction summary
-3. Source, method, observability, and coverage
-4. Run anatomy
-5. Core loop and session state machine
-6. Systems spreadsheet
-7. Entities, AI, and spawning
-8. Combat/interaction model
-9. Movement, space, camera, and controls
-10. Progression and economy
-11. Audiovisual feel grammar
-12. Difficulty/director and run-specific curves
-13. Player decision review
-14. Reconstruction contract and baseline choices
-15. Behavioral fixtures and fidelity boundary
-16. Conflicts, corrections, and unknowns
-17. Preservation contract
-18. Baseline → Better → New
+Include only modules supported by the selected route and evidence.
+
+1. Bottom line
+2. Source, method, observability, and coverage
+3. Run anatomy
+4. Core loop and session state machine
+5. Systems spreadsheet
+6. Entities, AI, combat, and spawning
+7. Movement, space, camera, and controls
+8. Progression and economy
+9. Audiovisual feel grammar
+10. Difficulty/director and run-specific curves
+11. Player decision review — only when requested
+12. Reconstruction choices and observable fixtures — only when requested
+13. Conflicts, corrections, alternatives, and unknowns
+14. Preservation, critique, or redesign — only when requested

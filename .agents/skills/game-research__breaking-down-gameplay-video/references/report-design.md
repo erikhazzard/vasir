@@ -1,6 +1,6 @@
 # Evidence-Led Report Design
 
-The report is both a research artifact and a compelling editorial explanation. The evidence graph constrains it; the report does not retroactively shape the graph.
+The report is both a research artifact and a compelling editorial explanation. The evidence ledger constrains it; the report does not retroactively shape the evidence.
 
 ## Thesis selection
 
@@ -19,7 +19,7 @@ The ending, death, victory, or loudest event is eligible—not mandatory.
 Include modules only when evidence supports them, but a full reconstruction normally contains:
 
 1. **Hero finding:** outcome plus the highest-leverage reconstruction insight.
-2. **What the source can and cannot reveal:** manifest, timing, observability, coverage, method, chip legend.
+2. **What the source can and cannot reveal:** timing, observability, coverage, method, and epistemic legend.
 3. **Run/session chronology:** acts, phases, decisions, transitions, terminal state.
 4. **The core loop:** action → feedback → resource/state change → next decision.
 5. **The machine:** clocks, state machines, formulas, entities, AI, spawning, economy, progression.
@@ -28,11 +28,11 @@ Include modules only when evidence supports them, but a full reconstruction norm
 8. **Feel grammar:** synchronized control/animation/camera/VFX/audio/UI timelines.
 9. **Pacing and pressure:** power/threat/resource/decision curves scoped to the source.
 10. **World and encounter logic:** topology, spatial incentives, camera, navigation.
-11. **Player model:** information state, choices, execution, habits, alternatives, coaching.
-12. **Baseline-clone blueprint:** preservation contract, reference implementations, fixture coverage.
+11. **Player model:** information state, choices, execution, habits, and alternatives; coaching only when requested.
+12. **Baseline-clone blueprint, for reconstruction:** reference implementations and fixture coverage; preservation contract only when explicitly in scope.
 13. **Corrections and conflicts:** what changed and why.
 14. **Coverage boundary and unknowns:** opportunity counts, blind spots, observational equivalence, unidentifiable internals.
-15. **Design verdict:** load-bearing systems, engagement logic, portable lessons, and what a “better” version could change after the baseline is faithful.
+15. **Design verdict, when critique or redesign was requested:** load-bearing systems, engagement logic, portable lessons, and what a “better” version could change after the baseline is faithful.
 
 ## Evidence presentation
 
@@ -41,7 +41,7 @@ Include modules only when evidence supports them, but a full reconstruction norm
 - Include context before/after the focal event when causality or reaction matters.
 - Place conflicts and alternatives at the point of attribution, not only in an appendix.
 - Make `n=1` and scope visible wherever the claim reappears.
-- Every table/chart cell that influences an argument resolves to claim/model IDs in machine data.
+- Every table/chart value that influences an argument resolves to an evidence-ledger entry.
 
 ## Reader-facing epistemic language
 
@@ -82,7 +82,7 @@ Required high-value tables include as applicable:
 - AI opportunity/cycle table;
 - player decision table;
 - unknown/reference-implementation table;
-- clone preservation contract and fixture matrix.
+- clone fixture matrix for reconstruction, plus a preservation contract only when explicitly in scope.
 
 Every rate table names clock, window, numerator, denominator, and aggregation.
 
@@ -113,7 +113,7 @@ Rules:
 
 ## Visual structure
 
-Default to a self-contained evidence-first web report:
+Default to a self-contained evidence-first Markdown report. Use a web report when interaction, dense media, or the requested delivery materially benefits:
 
 - strong typography and restrained surfaces;
 - one readable prose measure;
@@ -126,7 +126,7 @@ Style is configurable. Analytical semantics are not.
 
 ## Cross-surface generation rule
 
-Generate report facts from canonical claims/models/spec IDs. Do not manually retype values into hero text, tables, charts, and spec. The presentation adversary must compare rendered claims against canonical records and flag drift.
+Reuse settled ledger entries across prose, tables, charts, and reconstruction. Do not maintain independent versions of the same value. The presentation adversary compares rendered claims against the ledger and flags drift.
 
 ## Corrections
 

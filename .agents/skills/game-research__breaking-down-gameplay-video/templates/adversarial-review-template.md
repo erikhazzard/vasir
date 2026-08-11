@@ -6,21 +6,20 @@
 
 ## Scope
 
-Artifacts, source IDs, corpus revision, and reviewer context.
+Requested output, source files and PTS scope, evidence-ledger revision, and reviewer context.
 
 ## Findings
 
-### `review_<gate>_<nnn>` — `<P0|P1|P2>`
+### Finding — `<P0|P1|P2>`
 
-- **Affected object IDs:**
+- **Affected claims or surfaces:**
 - **Problem:**
 - **Evidence:**
 - **Best counter-read:**
-- **Proposed fix:**
+- **Required action:**
 - **Disposition:** `OPEN | FIXED | PARTIALLY_FIXED | DECLINED`
 - **Rationale:**
-- **Changed artifacts:**
-- **Regression fixture:**
+- **Changed output or fixture, when applicable:**
 
 ## Gate verdict
 

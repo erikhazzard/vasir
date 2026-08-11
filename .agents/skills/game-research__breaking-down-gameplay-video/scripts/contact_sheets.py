@@ -59,7 +59,6 @@ def run(manifest_path: Path, out_dir: Path, tag: str, cols: int, rows: int, thum
         })
 
     output = {
-        "schema_version": "1.0.0",
         "source_frame_manifest": str(manifest_path.resolve()),
         "source_id": manifest["source_id"],
         "source_sha256": manifest["source_sha256"],

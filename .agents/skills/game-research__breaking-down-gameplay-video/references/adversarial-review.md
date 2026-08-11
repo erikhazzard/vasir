@@ -1,6 +1,6 @@
 # Four Adversarial Review Gates
 
-Each review runs in fresh context after receiving the artifacts listed below. The reviewer’s job is to find failure, not improve tone. Every finding has severity, evidence, affected IDs/surfaces, required action, and resolution.
+Apply only the gates warranted by the requested output and the consequence of being wrong. Focused answers may use a proportional self-review. Use a fresh-context reviewer for substantive reports, reconstruction deliverables, or material conclusions where independence changes confidence. Acquisition and inference apply to every route; specification applies when a spec or fixtures are delivered; presentation applies when a report is delivered. The reviewer’s job is to find failure, not improve tone. Every durable finding has severity, evidence, affected IDs/surfaces, required action, and resolution.
 
 Severity:
 
@@ -10,11 +10,11 @@ Severity:
 
 ## Gate 1 — Acquisition adversary
 
-Inputs: source manifest, observability, events, evidence, instrument outputs, coverage.
+Inputs: source scope, capture limits, chronology, evidence ledger, instrument outputs, and coverage notes.
 
 Attack:
 
-- Was every source watched uninterrupted with audio?
+- For run-spanning or whole-source claims, was every relevant source watched uninterrupted with audio? For a focused claim, was enough lead-in and aftermath inspected to establish state and consequence?
 - Did contact sheets or detector spikes substitute for sequence understanding?
 - Are low-motion, low-luma, audio-only, and detector-disagreement windows represented?
 - Were random/stratified intervals audited outside the emerging thesis?
@@ -43,18 +43,18 @@ Attack:
 - Are mechanics, dynamics, experience, and player intent circularly validating one another?
 - Does outcome/hindsight bias contaminate coaching or design judgments?
 - Did agent consensus arise from shared evidence and assumptions rather than independent methods?
-- Did game-specific remembered knowledge leak into the footage-only graph?
+- Did game-specific remembered knowledge leak into the footage-grounded analysis?
 - Do selected models jointly reconcile damage/HP/kills, economy/inventory, spawn/population, movement/camera, and pause/timers?
 
 Require alternative models or an explanation of why none are materially distinct.
 
 ## Gate 3 — Specification adversary
 
-Inputs: schemas, spec, models, claims, fixtures, conflict/unknown records.
+Inputs: reconstruction, candidate models, claims, fixtures, conflicts, and unknowns.
 
 Attack:
 
-- Does every file validate and every ID resolve?
+- Does every citation resolve and every material term remain internally consistent?
 - Is each field evidenced, model-backed, a labeled reference implementation, or explicitly open?
 - Are units, coordinate systems, clocks, denominators, ranges, and scope complete?
 - Are timestep, pause, update order, event priority, rounding, stacking, caps, and RNG semantics defined enough to implement?
@@ -65,13 +65,13 @@ Attack:
 - Do fixture tolerances reflect source cadence/measurement uncertainty?
 - Would two implementers make incompatible systems from the same text?
 - Can selected fixtures detect the most consequential wrong implementations?
-- Does the README distinguish source fidelity from historical-code claims?
+- Does the reconstruction distinguish source fidelity from historical-code claims?
 
-A schema-valid but behaviorally ambiguous spec fails this gate.
+A well-formatted but behaviorally ambiguous reconstruction fails this gate.
 
 ## Gate 4 — Presentation adversary
 
-Inputs: rendered report, canonical graph, spec, reviews.
+Inputs: rendered report, evidence ledger, reconstruction when present, and review notes.
 
 Attack:
 
@@ -84,16 +84,13 @@ Attack:
 - Are labels clipped, colliding, unreadable, or visually implying false precision/continuity?
 - Does narrative framing suppress contrary evidence or force the ending into a thesis?
 - Are player-state and design-purpose interpretations written as facts?
-- Does the report explain what the clone implements versus what the original game is known to do?
+- When a reconstruction is present, does the report distinguish its baseline choices from what the original game is known to do?
 
 Render-check at desktop and narrow/mobile width.
 
 ## Finding format
 
-Write each finding against `schemas/review-finding.schema.json`, starting from
-`templates/review-finding.example.json`. Those files own the canonical field names,
-uppercase gate values, severity set, and dispositions; do not create a parallel
-finding shape in review prose.
+Use `templates/adversarial-review-template.md` when a durable review record is warranted. A finding names the affected claim or surface, problem, evidence, best counter-read, required action, disposition, and rationale. Focused work may apply the same questions without creating a review artifact.
 
 ## Resolution rules
 
@@ -101,4 +98,4 @@ finding shape in review prose.
 - Re-run every downstream artifact touched by a canonical change.
 - A declined P0/P1 remains visible in final limitations.
 - The same reviewer may verify a mechanical fix; a fresh pass should verify a changed headline conclusion.
-- Completion requires zero unresolved P0 and no hidden P1.
+- A delivered headline or reconstruction must not conceal an unresolved P0/P1; fix it, narrow the claim, or disclose it as a limitation.

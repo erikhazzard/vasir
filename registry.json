@@ -223,19 +223,6 @@
       "entry": "SKILL.md"
     },
     {
-      "name": "design__designing-game-ui-for-idavoll",
-      "description": "Designs mobile-native portrait game HUDs, menus, overlays, controls, and results screens for Idavoll. Use for touch targets, safe areas, HUD hierarchy, controls, and result flows.",
-      "category": "uncategorized",
-      "tags": [],
-      "version": "0.1.0",
-      "recommends": [],
-      "files": [
-        "SKILL.md"
-      ],
-      "path": ".agents/skills/design__designing-game-ui-for-idavoll",
-      "entry": "SKILL.md"
-    },
-    {
       "name": "design__designing-typography",
       "description": "Designs and implements typography systems for web interfaces and mobile game UI. Use when choosing fonts, type scales, hierarchy, readability, numerals, localization behavior, web-font loading, or layout-shift-safe text.",
       "category": "uncategorized",
@@ -250,7 +237,7 @@
     },
     {
       "name": "design__implementing-frontend-css-html",
-      "description": "CSS/HTML implementation rules for stable, intentional frontend markup and styles. Use when editing selectors, layout, responsive CSS, states, typography, visual polish, or HTML structure.",
+      "description": "CSS/HTML implementation rules for stable, intentional frontend markup and styles. Use when writing HTML or CSS",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -704,6 +691,48 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "game-research__breaking-down-gameplay-video",
+      "description": "Manually invoked to turn supplied gameplay footage into evidence-cited analysis and, when explicitly requested, an observationally faithful reconstruction spec; not for release QA, design critique without footage, or standalone visualization work.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/adversarial-review.md",
+        "references/camera-and-space-adapters.md",
+        "references/evidence-model.md",
+        "references/genre-adapters.md",
+        "references/instrument-registry.md",
+        "references/intake-and-observability.md",
+        "references/player-modeling.md",
+        "references/rebuild-spec.md",
+        "references/report-design.md",
+        "references/system-identification.md",
+        "references/universal-forensics.md",
+        "references/validation-and-benchmarking.md",
+        "requirements.txt",
+        "scripts/audio_features.py",
+        "scripts/common.py",
+        "scripts/compose_timeline.py",
+        "scripts/contact_sheets.py",
+        "scripts/extract_frames.py",
+        "scripts/film_strip.py",
+        "scripts/media_probe.py",
+        "scripts/metrics_video.py",
+        "templates/adversarial-review-template.md",
+        "templates/agent-assignment-template.md",
+        "templates/evidence-ledger.md",
+        "templates/reconstruction-spec.md",
+        "templates/report-outline.md",
+        "templates/run-ledger-template.md",
+        "tests/conftest.py",
+        "tests/test_smoke.py"
+      ],
+      "path": ".agents/skills/game-research__breaking-down-gameplay-video",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "handoff__final-quality-gate",
       "description": "Optional independent ship/no-ship judgment for a high-regret lane in the same existing repo folder — verifies the current product boundary, terminal user value, warranted evidence, and human acceptance without becoming part of every lane.",
       "category": "uncategorized",
@@ -1017,7 +1046,7 @@
     },
     {
       "name": "ui__revamping-game-shell-ui",
-      "description": "Revamps Idavoll game HUDs, menus, overlays, and results screens while preserving deterministic kernel and replay boundaries. Use when redesigning shell UI, migrating to @idavoll/game-ui-kit, fixing UI breakage, or changing HUD/menu/results layout without altering gameplay simulation.",
+      "description": "Designs and revamps Idavoll game HUDs, menus, overlays, and results screens while preserving deterministic kernel and replay boundaries. Use when creating or redesigning shell UI, migrating to @idavoll/game-ui-kit, fixing UI breakage, or changing HUD/menu/results layout without altering gameplay simulation.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

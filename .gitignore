@@ -11,6 +11,9 @@ Thumbs.db
 
 node_modules/
 packages/cli/dist/
+__pycache__/
+.pytest_cache/
+*.pyc
 
 .agents/vasir-evals/
 keys.json

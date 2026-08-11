@@ -1,6 +1,6 @@
 # Genre-Specific Forensic Adapters
 
-Adapters extend the universal pass; they never replace it. Activate by observed mechanics and camera topology, not marketing genre. Hybrid footage can activate several adapters. Each adapter names the extra hidden spreadsheet, the best natural experiments in passive footage, clone outputs, and common false conclusions.
+Adapters extend the universal pass; they never replace it. Activate by observed mechanics and camera topology, not marketing genre. Hybrid footage can activate several adapters. Each adapter names the extra hidden spreadsheet, the best natural experiments in passive footage, reconstruction outputs when that route is requested, and common false conclusions.
 
 ## 1. Survivor / bullet-heaven / horde action / action roguelite
 
@@ -23,7 +23,7 @@ Adapters extend the universal pass; they never replace it. Activate by observed 
 - Normalize damage-event timestamps to known totals only as a modeled kill-rate proxy with error bounds.
 - For spawn/density, distinguish camera-relative spawning from world-relative persistence and offscreen despawn.
 
-### Clone outputs
+### When reconstruction is requested
 
 Weapons, upgrade graph, stat pipeline, spawn/population controller, enemy tables, XP economy, targeting, drop candidates, run scaling, event presentation.
 
@@ -62,7 +62,7 @@ Weapons, upgrade graph, stat pipeline, spawn/population controller, enemy tables
 
 Use source PTS for shot/audio/VFX/hit-marker order. Report visible response and shot-to-confirmation timing, not input latency or server latency without synchronized input/network evidence. In first person, visible angular motion is not controller sensitivity.
 
-### Clone outputs
+### When reconstruction is requested
 
 Weapon state machines, fire/reload pipeline, recoil/spread presentation and candidate stochastic model, movement states, damage model, target/AI behavior, camera/ADS feedback.
 
@@ -100,7 +100,7 @@ Weapon state machines, fire/reload pipeline, recoil/spread presentation and cand
 
 Fit position over PTS in a world-relative or tile basis; model piecewise acceleration rather than two-point speed. Derive jump curves with uncertainty and camera removal. Without visible input, coyote/buffer are candidate explanations, not measured windows.
 
-### Clone outputs
+### When reconstruction is requested
 
 Movement equations/state machine, collision rules, camera model, traversal abilities, reset/checkpoint behavior, animation/feedback timing.
 
@@ -136,7 +136,7 @@ Movement equations/state machine, collision rules, camera model, traversal abili
 
 Use PTS-bounded visible frames; distinguish animation pose from functional active frame. Without input notation, report visible startup/cancel evidence, not exact command buffer or frame advantage. Correct for duplicate frames, slow motion, replay, and variable capture cadence.
 
-### Clone outputs
+### When reconstruction is requested
 
 Move/state tables, timing windows, hit interaction rules, damage/meter scaling, cancel graph, movement/camera, round state.
 
@@ -175,7 +175,7 @@ Move/state tables, timing windows, hit interaction rules, damage/meter scaling, 
 
 Track multiple entities with IDs and confidence. Use map/grid coordinates or landmarks; never infer unit speed from free-camera screen motion. Distinguish command issue, command acknowledgment, movement onset, and attack onset.
 
-### Clone outputs
+### When reconstruction is requested
 
 Economy and tech graph, unit/content tables, production queues, combat formulas, AI/targeting/pathing, vision, wave/objective schedules, camera/selection UI.
 
@@ -211,9 +211,9 @@ Economy and tech graph, unit/content tables, production queues, combat formulas,
 
 State snapshots and transition diffs matter more than motion. Build an explicit state ledger before formulas. Never infer unseen cards, random seed, or AI knowledge. Observed draw frequencies are not deck probabilities unless the visible deck/state supports the denominator.
 
-### Clone outputs
+### When reconstruction is requested
 
-Phase/state machine, legal-action rules, zones, card/content schema, trigger stack/order, formula pipeline, AI reference policy, UI flow.
+Phase/state machine, legal-action rules, zones, card/content model, trigger stack/order, formula pipeline, AI reference policy, UI flow.
 
 ### Traps
 
@@ -246,7 +246,7 @@ Phase/state machine, legal-action rules, zones, card/content schema, trigger sta
 
 Prefer HUD speed, lap timing, track markers, and `track_s` over screen pixels. Separate camera FOV/zoom from acceleration. Without visible control, infer vehicle response from state transitions, not throttle curves.
 
-### Clone outputs
+### When reconstruction is requested
 
 Vehicle dynamics approximation, control states, gear/boost/resource model, track/checkpoint system, AI lines, camera and feedback.
 
@@ -280,7 +280,7 @@ Vehicle dynamics approximation, control states, gear/boost/resource model, track
 
 Calibrate to field/court landmarks or use normalized field coordinates. Raw screen speed is depth-dependent under broadcast perspective. Distinguish attribute effect from animation selection and contextual assistance.
 
-### Clone outputs
+### When reconstruction is requested
 
 Match state, field coordinates, player/ball physics approximation, action state machines, AI roles, rules/scoring, camera, HUD.
 
@@ -314,7 +314,7 @@ Match state, field coordinates, player/ball physics approximation, action state 
 
 Use exposure duration and state-transition timing, not just cone geometry. Negative detection requires opportunities with guard active, facing/LOS valid, and no confounding disguise or scripted immunity.
 
-### Clone outputs
+### When reconstruction is requested
 
 Perception model, awareness state machine, patrol/search behavior, sound events, world interaction graph, feedback UI/audio.
 
@@ -343,7 +343,7 @@ Perception model, awareness state machine, patrol/search behavior, sound events,
 - distinguish deterministic transformation from random generation;
 - sample low-motion periods heavily—critical reasoning can be visually quiet.
 
-### Clone outputs
+### When reconstruction is requested
 
 State model, legal-move generator, transition rules, scoring/timer, content-generation candidates, UI/tutorial flow.
 
@@ -371,9 +371,9 @@ State model, legal-move generator, transition rules, scoring/timer, content-gene
 - separate visual scroll timing, audio event, input indicator, and judgment feedback;
 - use actual PTS and account for capture audio/video skew.
 
-### Clone outputs
+### When reconstruction is requested
 
-Beat/timeline model, chart schema, judgment windows supported by footage, scoring/gauge, presentation synchronization.
+Beat/timeline model, chart format, judgment windows supported by footage, scoring/gauge, presentation synchronization.
 
 ### Traps
 
@@ -405,7 +405,7 @@ Beat/timeline model, chart schema, judgment windows supported by footage, scorin
 
 Use long stable windows and visible counters. Separate stock from flow, gross from net, nominal cycle from realized throughput, and bottleneck from UI averaging.
 
-### Clone outputs
+### When reconstruction is requested
 
 Resource graph, recipes/rates, capacity/queue semantics, time-scale system, agent policy, unlock graph, UI aggregation.
 
@@ -436,9 +436,9 @@ Resource graph, recipes/rates, capacity/queue semantics, time-scale system, agen
 - aggro shifts after damage/heal/proximity;
 - loot/results reconciliation.
 
-### Clone outputs
+### When reconstruction is requested
 
-Stat pipeline, combat/ability state machines, content/item schema, AI/encounter phases, quest/session states, UI, camera/controls.
+Stat pipeline, combat/ability state machines, content/item model, AI/encounter phases, quest/session states, UI, camera/controls.
 
 ### Traps
 
@@ -459,7 +459,7 @@ Apply this in addition to the moment-to-moment genre.
 - reward cadence, branching, rerolls, shops, risk/reward, escalating constraints;
 - whether repeated patterns indicate deterministic schedule, seeded RNG, weighted pool, or curated sequence.
 
-### Clone outputs
+### When reconstruction is requested
 
 Run state machine, generation/content-pool candidates, reward/choice scheduler, reset/persistence contract, baseline seed policy.
 
@@ -481,7 +481,7 @@ Apply when multiple human-controlled actors or online artifacts are visible.
 - target/nameplate/team UI, spectator/replay state, voice/chat timing;
 - coordination, information asymmetry, social incentives, grief/assist systems.
 
-### Clone outputs
+### When reconstruction is requested
 
 Visible multiplayer rules and presentation. Do not claim backend topology, tick rate, matchmaking, anti-cheat, or authoritative ownership from ordinary footage unless directly evidenced.
 
@@ -512,7 +512,7 @@ Apply in addition to the moment-to-moment genre whenever head, hand, controller,
 
 Visible pose/camera timing, angular displacement, endpoint error, controller-to-object offset in display/world-relative units, throw trajectory, grab acquisition envelope, locomotion speed between landmarks, turn increment, fade duration, UI angular/viewport size, and body/weapon stabilization. Report physical-input latency, haptic timing, stereo depth, and real-world meters as unsupported unless directly instrumented in the video.
 
-### Clone outputs
+### When reconstruction is requested
 
 Capture-view contract, head/hand/controller proxy state, locomotion state machines, grab/constraint rules, spatial UI anchors, interaction layers, comfort presentation, avatar/IK presentation, and source-backed fixtures for repeated manipulations.
 
@@ -546,7 +546,7 @@ Capture-view contract, head/hand/controller proxy state, locomotion state machin
 
 Text reveal rate, input lockout, choice dwell/timer, transition timing, QTE window bounds, subtitle onset/offset, camera shot duration, and visible branch effects.
 
-### Clone outputs
+### When reconstruction is requested
 
 Dialogue/scene state machines, flag and condition table, choice/QTE contract, text/camera/audio presentation, visible branch graph, and explicit baseline choices for unobserved branches.
 
@@ -574,7 +574,7 @@ Dialogue/scene state machines, flag and condition table, choice/QTE contract, te
 - tool-mode changes over one target;
 - resource cost/refund and persistence checks visible within the supplied footage.
 
-### Clone outputs
+### When reconstruction is requested
 
 Observed world-partition and persistence contract, construction/tool state machines, placement predicates, resource transactions, object lifecycle, and conservative offscreen-simulation baseline choices.
 
@@ -587,12 +587,12 @@ Observed world-partition and persistence contract, construction/tool state machi
 
 ## Adapter completion rule
 
-For each activated adapter produce:
+For each activated adapter produce only the applicable outputs:
 
 1. measured constants and intervals;
 2. state/formula/schedule candidates;
 3. natural experiments found in the supplied footage;
 4. selected or unresolved models;
-5. clone modules and fixtures;
+5. clone modules and fixtures when reconstruction is requested;
 6. genre-specific blind spots;
-7. the smallest preservation contract that recreates the observed experience.
+7. the smallest preservation contract that recreates the observed experience when preservation is requested.

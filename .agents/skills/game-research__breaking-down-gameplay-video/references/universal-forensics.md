@@ -1,6 +1,6 @@
 # Universal Gameplay Forensics
 
-Every game has hidden tables, clocks, state, formulas, and schedules. Run this decomposition before genre-specific work. For each module output: direct observations, measurements, candidate mechanics, contradictions, coverage, clone requirements, and open fields.
+Every game has hidden tables, clocks, state, formulas, and schedules. Use only the modules relevant to the requested question before genre-specific work. For each active module record direct observations, measurements, candidate mechanics, contradictions, coverage, and open questions. Add implementation requirements only when reconstruction was explicitly requested.
 
 ## 1. Temporal system and clock domains
 
@@ -18,7 +18,7 @@ Methods:
 - detect duplicate frames and distinguish intentional freeze from capture hitch using audio, UI clocks, and surrounding cadence;
 - report onset and duration as PTS intervals with at least one-frame uncertainty.
 
-Clone outputs: clock registry, pause matrix, update/timing order, periodic schedules, time-scale states.
+If reconstruction is requested, specify the clock registry, pause matrix, update/timing order, periodic schedules, and time-scale states.
 
 ## 2. Session loop, objectives, scoring, and terminal conditions
 
@@ -30,7 +30,7 @@ Map:
 - objective priority and whether progress is time-, event-, resource-, location-, or state-gated;
 - what persists across phase and session boundaries.
 
-Do not infer an unseen meta loop from genre convention. Clone outputs: session state machine, objective conditions, score formulas, terminal transitions, persistence observed.
+Do not infer an unseen meta loop from genre convention. If reconstruction is requested, specify the session state machine, objective conditions, score formulas, terminal transitions, and observed persistence.
 
 ## 3. Input actions and visible response semantics
 
@@ -43,7 +43,7 @@ Inventory every visible action channel:
 
 Without synchronized input evidence, report **visible response timing**, not input latency. If a cursor, reticle, touch indicator, or controller overlay is visible, treat it as another stream with its own timing uncertainty.
 
-Clone outputs: action vocabulary, action-state guards, buffering/cancel rules supported by footage, visible response windows.
+If reconstruction is requested, specify the action vocabulary, action-state guards, buffering/cancel rules supported by footage, and visible response windows.
 
 ## 4. Camera, coordinates, movement, physics, and collision
 
@@ -62,7 +62,7 @@ Methods:
 - preserve source pixels if no world scale exists;
 - do not integrate low-confidence optical flow as zero.
 
-Clone outputs: coordinate registry, camera model, locomotion/physics parameters, collision/state rules, uncertainty and validity ranges.
+If reconstruction is requested, specify the coordinate registry, camera model, locomotion/physics parameters, collision/state rules, uncertainty, and validity ranges.
 
 ## 5. Entities, components, state machines, and event priority
 
@@ -73,7 +73,7 @@ Build an entity inventory from repeated visual identity and behavior:
 - states, transitions, guards, timers, interrupts, invulnerability, death/despawn, priority, and concurrent substates;
 - whether transitions persist through pause, hit stop, offscreen time, or phase changes.
 
-Do not call a visual pose a state until behavior or transition evidence supports it. Clone outputs: entity definitions, component parameters, state-machine diagrams, transition precedence, lifecycle.
+Do not call a visual pose a state until behavior or transition evidence supports it. If reconstruction is requested, specify entity definitions, component parameters, state transitions and precedence, and lifecycle.
 
 ## 6. Combat, damage, healing, status, and interaction
 
@@ -94,7 +94,7 @@ Name every damage currency and denominator:
 - displayed versus actual damage;
 - gross damage versus post-mitigation HP loss.
 
-Never compare unlike currencies. Use arithmetic model forks for stacking/order/rounding. Clone outputs: attack pipelines, formulas, hit rules, status system, timing, presentation hooks.
+Never compare unlike currencies. Use arithmetic model forks for stacking/order/rounding. If reconstruction is requested, specify attack pipelines, formulas, hit rules, status behavior, timing, and presentation hooks.
 
 ## 7. Resources, currencies, inventory, progression, and upgrades
 
@@ -114,7 +114,7 @@ Methods:
 - reconcile inventory/result summaries against chronological picks;
 - separate resource appearance from collection and credit time.
 
-Clone outputs: economy table, progression thresholds, content inventory, upgrade graph, formula ordering, UI-display rules.
+If reconstruction is requested, specify the economy table, progression thresholds, content inventory, upgrade relationships, formula ordering, and UI-display rules.
 
 ## 8. Spawn, population, RNG candidates, and difficulty scaling
 
@@ -127,7 +127,7 @@ Extract:
 
 Do not convert one observed frequency into a true probability. Candidate RNG models may include fixed schedules, weighted tables, pity/cooldown, without-replacement draws, seed scripts, state gating, or deterministic sequences.
 
-Clone outputs: spawn scheduler, population controller, scaling curves, candidate RNG policy, reference implementation, content tables.
+If reconstruction is requested, specify the spawn scheduler, population controller, scaling curves, selected RNG baseline, and content tables while preserving viable alternatives.
 
 ## 9. AI, navigation, targeting, and group behavior
 
@@ -140,7 +140,7 @@ For each behavior class measure:
 - group behavior: spawn roles, crowd pressure, clustering, lane assignment, aggro sharing, reinforcement;
 - offscreen and pause behavior.
 
-Fit repeated trajectories or cycles rather than narrating one. Negative behavior claims require valid opportunities. Clone outputs: behavior trees/state machines/utility rules, timers, ranges, navigation assumptions.
+Fit repeated trajectories or cycles rather than narrating one. Negative behavior claims require valid opportunities. If reconstruction is requested, specify the selected behavior model, timers, ranges, and navigation assumptions while preserving viable alternatives.
 
 ## 10. World, level, encounter, and spatial incentive structure
 
@@ -151,7 +151,7 @@ Map what the footage supports:
 - camera reveal, offscreen persistence, room reset, backtracking, checkpoint, procedural repetition;
 - how geometry changes threat, resource collection, routing, kiting, visibility, and decision cost.
 
-Separate a world map reconstructed from stable landmarks from a screen-space path. Clone outputs: topology, collision geometry approximation, encounter placement logic, spatial rules, procedural candidates.
+Separate a world map reconstructed from stable landmarks from a screen-space path. If reconstruction is requested, specify topology, collision geometry approximation, encounter placement logic, spatial rules, and procedural candidates.
 
 ## 11. HUD, menus, information flow, and decision interfaces
 
@@ -163,7 +163,7 @@ Inventory:
 - selection controls, default focus, dwell, confirmation, cancel, timeout, pause behavior;
 - decision frequency, option count, comparability, preview, tradeoff clarity, and interruption risk.
 
-Dwell is not deliberation until interruption, pause state, frozen simulation, and input inactivity are separated. Clone outputs: UI state machine, visible fields, formatting/rounding, transitions, decision flow.
+Dwell is not deliberation until interruption, pause state, frozen simulation, and input inactivity are separated. If reconstruction is requested, specify UI states, visible fields, formatting/rounding, transitions, and decision flow.
 
 ## 12. Feel grammar: animation, VFX, audio, camera, and feedback stack
 
@@ -179,7 +179,7 @@ Decompose each consequential action into a synchronized timeline:
 - UI confirmation and resource change;
 - recovery and return to control.
 
-Measure visible timing across repeated samples. Audio energy only proposes events; listen before describing source. Distinguish control feel, combat readability, impact, rhythm, clarity, and spectacle. Clone outputs: feedback event graph, animation/VFX/audio timings, camera impulses, presentation priorities.
+Measure visible timing across repeated samples. Audio energy only proposes events; listen before describing source. Distinguish control feel, combat readability, impact, rhythm, clarity, and spectacle. If reconstruction is requested, specify feedback ordering, animation/VFX/audio timings, camera impulses, and presentation priorities.
 
 ## 13. Pacing, pressure, power curves, and run-specific balance
 
@@ -192,7 +192,7 @@ Construct time- or state-indexed curves for:
 
 Every curve names its model assumptions and uncertainty. A “winnable band” is a run-specific explanatory model unless multiple equivalent conditions are present in the supplied footage. Do not infer global fairness or optimal balance from one trace.
 
-Clone outputs: scaling schedules, pressure phases, pacing targets, encounter cadence, run-specific balance model.
+If reconstruction is requested, specify scaling schedules, pressure phases, pacing targets, encounter cadence, and the run-specific balance model.
 
 ## 14. Persistence, meta, live-service, and content structure
 
@@ -203,7 +203,7 @@ Only record what appears:
 - content taxonomies and gating;
 - menu-to-session transitions.
 
-Unknown backend rules remain open. Clone outputs: visible meta state machine and content schema, not imagined services.
+Unknown backend rules remain open. If reconstruction is requested, specify only the visible meta states and content taxonomy, not imagined services.
 
 ## 15. Network and performance artifacts
 
@@ -214,7 +214,7 @@ When visible, distinguish candidates:
 - animation desync, input queue, dropped visual frames, audio continuity;
 - loading, streaming, LOD, pop-in, shader compilation, frame pacing.
 
-Video alone rarely identifies the network architecture. Record the visible artifact and candidate causes. Clone outputs: presentation tolerance or replication targets only when justified.
+Video alone rarely identifies the network architecture. Record the visible artifact and candidate causes. If reconstruction is requested, specify presentation tolerances or replication targets only when justified.
 
 ## 16. Player behavior, information state, and decision quality
 
@@ -229,9 +229,9 @@ Use `player-modeling.md`. Record:
 
 Do not let the final outcome rewrite what was knowable at decision time.
 
-## 17. Design grammar, preservation contract, and portable lessons
+## 17. Design grammar and portable lessons; preservation when requested
 
-Only after system reconstruction, ask:
+Only when design lessons or preservation are explicitly in scope, and after the relevant system evidence has stabilized, ask:
 
 - Which repeated rule interactions create the game’s signature decisions?
 - What tension, rhythm, readability, mastery, or compulsion emerges from those dynamics?
@@ -239,7 +239,7 @@ Only after system reconstruction, ask:
 - What must a clone preserve exactly, approximately, or only functionally?
 - Which design lessons generalize, and which depend on this content/camera/genre?
 
-Output a preservation contract:
+When preservation is explicitly in scope, output a preservation contract:
 
 - **Exact:** observable constants or sequences where deviation breaks fidelity.
 - **Bounded:** a range or relationship matters more than the exact hidden value.

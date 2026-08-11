@@ -119,7 +119,6 @@ def run(video_path: Path, out_path: Path, max_width: int = 320) -> dict:
     )
     sidecar = out_path.with_suffix(out_path.suffix + ".json")
     metadata = {
-        "schema_version": "1.0.0",
         "status": "VALID",
         "source_path": str(video_path.resolve()),
         "source_sha256": sha256_file(video_path),

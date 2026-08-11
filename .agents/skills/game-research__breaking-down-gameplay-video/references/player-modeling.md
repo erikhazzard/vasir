@@ -1,4 +1,4 @@
-# Player Modeling and Coaching from Supplied Video
+# Player Modeling from Supplied Video; Coaching When Requested
 
 Player analysis is part of the skill, but video does not grant direct access to intention, attention, emotion, or belief. Separate behavior, context, model, report, and evaluation.
 
@@ -67,7 +67,7 @@ For each choice evaluate:
 
 Do not infer a mistake merely because the run ended badly. Do not infer good play merely because the action succeeded.
 
-## Coaching output
+## When coaching is requested
 
 Produce a decision table:
 

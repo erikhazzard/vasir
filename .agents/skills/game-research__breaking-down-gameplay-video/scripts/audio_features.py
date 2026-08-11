@@ -27,7 +27,6 @@ def run(video_path: Path, out_path: Path, sample_rate: int = 16000, window_ms: f
     probe = ffprobe_json(video_path)
     audio = first_stream(probe, "audio")
     base_meta = {
-        "schema_version": "1.0.0",
         "source_path": str(video_path.resolve()),
         "source_sha256": sha256_file(video_path),
         "sample_rate_hz": sample_rate,

@@ -60,7 +60,7 @@ If any layer drifts, the game becomes "technically works but spiritually flatlin
 
    * Do **not** claim "no linear interpolation ever." Some motion should be predictable (bullets, conveyors). The rule is: **motion must be intentional and readable**.
 5. **No fake playtesting**: Never imply you tested. You may *predict* and create a *test plan* with acceptance criteria.
-6. **Platform reality**: Must include safe-area layout (`env(safe-area-inset-*)`), ≥44px touch targets, reduced-motion option, and interruption resilience (background/tab-switch/call).
+6. **Platform reality**: In the Idavoll launcher iframe, use in-frame edge spacing and do not read physical safe-area insets; the launcher owns them. A standalone/full-page PWA may own `env(safe-area-inset-*)`. In both cases include ≥44px touch targets, reduced-motion posture, and interruption resilience (background/tab-switch/call).
 7. **Repo physics (root §2)**: randomness that can feed back into gameplay-visible state runs on seeded kernel RNG; unseeded sources are allowed only for pure presentation that cannot feed back.
 
 ---
@@ -355,7 +355,7 @@ Also define a **clarity budget**:
 * Effects cannot obscure collisions, UI state, or focal object.
 * If effects conflict with readability, readability wins.
 
-## 10) Spatial Composition + Mobile Layout (safe-area aware)
+## 10) Spatial Composition + Mobile Layout (host-framing aware)
 
 Define 3 layers:
 
@@ -365,7 +365,7 @@ Define 3 layers:
 
 Mobile layout constraints:
 
-* Respect safe areas (`env(safe-area-inset-*)`, notch/home indicator).
+* Match the host boundary: Idavoll launcher iframe content starts at the usable iframe origin and uses in-frame edge spacing without `env(safe-area-inset-*)`; standalone/full-page PWA layout may own physical inset handling.
 * Touch targets ≥ 44px (~44pt guideline).
 * Thumb zone: bottom region for frequent actions; top is glance-only.
 * UI grid: define base unit (e.g., 8px) and snap all spacing to it.
@@ -544,7 +544,7 @@ SHAPES:        [silhouettes pass black-fill test]             ☐ all distinct
 MOTION:        [named tokens, dt-stable]                      ☐ includes ambient life
 AUDIO:         [≥ 3 sounds + haptic map]                      ☐ gated by gesture
 FEEDBACK:      [sandwich for verb + success + failure]        ☐ 3+ channels each
-COMPOSITION:   [focal / state / ambient layers]               ☐ safe-area aware
+COMPOSITION:   [focal / state / ambient layers]               ☐ host-framing aware
 ONBOARDING:    [0-10s / 10-30s / 30-90s ladder]              ☐ no text tutorials
 STRATEGIES:    [≥ 2 viable, no dominant]                      ☐ both communicable
 VALIDATION:    [acceptance criteria + warranted evidence]     ☐ falsifiable

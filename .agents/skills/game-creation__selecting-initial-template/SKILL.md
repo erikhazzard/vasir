@@ -25,7 +25,7 @@ After reading the approved `README__game-spec.md`, load only the local skills wh
 2. **Game direction**: use `game__directing` for coherence unless a narrower genre skill is clearly the stronger fit.
 3. **Genre/system skill**: use `game__genre-routing`, combat, loot, inventory, economy, or procedural skills when the spec meaningfully depends on that domain. Route auto-battlers, tactics drafts, shop/bench/board games, party synergies, or automated combat after player setup through `game__genre-routing`.
 4. **Art direction**: use `game__art-directing` before implementing the first screen if the game has any visual world, characters, enemies, cards, pieces, board, arena, or branded object language.
-5. **Player-facing shell UI**: use `design__designing-game-ui-for-idavoll` for any HUD, card row, upgrade/draft surface, controls, pause, results, or runtime overlay. A first playable is not complete if the first screen is generic debug chrome.
+5. **Player-facing shell UI**: use `ui__revamping-game-shell-ui` for any HUD, card row, upgrade/draft surface, controls, pause, results, or runtime overlay. A first playable is not complete if the first screen is generic debug chrome.
 6. **First-playable comprehension proof**: when the user requests an audit or a specific false-first-playable/mobile-comprehension risk warrants independent review, `game-proof__auditing-first-playable-comprehension` can own that focused review. Do not add another audit merely because the skill exists.
 7. **Juice/polish**: use `game__adding-juice` once the loop is readable, especially for taps, hits, kills, rewards, transitions, and failure.
 
@@ -81,7 +81,7 @@ Before calling initialization done, inspect the first playable screen through th
 - Live HUD/status appears as detached pill/card/dashboard clutter instead of stage-first overlay posture.
 - Touch targets, labels, or card text are too small at 390 x 844 portrait; 320-430px width variants are secondary stress checks, not replacements.
 - The palette is a one-note dark blue/purple/neon or beige/brown theme without a deliberate art-direction reason.
-- A player-facing control, result, draft, or upgrade surface bypasses the Idavoll UI-kit posture expected by `design__designing-game-ui-for-idavoll`.
+- A player-facing control, result, draft, or upgrade surface bypasses the Idavoll UI-kit posture expected by `ui__revamping-game-shell-ui`.
 
 The check is done only when the player loop and first-screen visual quality agree at the claimed authority surface. Deterministic proof is required only for a deterministic claim or risk.
 

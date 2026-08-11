@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import json
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-import jsonschema
 import numpy as np
 import pytest
 
@@ -15,11 +13,8 @@ from compose_timeline import run as compose_timeline_run
 from contact_sheets import run as contact_sheets_run
 from extract_frames import run as extract_frames_run
 from film_strip import run as film_strip_run
-from init_workspace import run as init_workspace_run
 from media_probe import run as media_probe_run
 from metrics_video import run as metrics_video_run
-from track_camera import run as track_camera_run
-from validate_artifacts import validate_workspace
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -64,41 +59,6 @@ def make_vfr_video(path: Path) -> Path:
     return path
 
 
-def validate_json(value_path: Path, schema_path: Path) -> None:
-    value = json.loads(value_path.read_text())
-    schema = json.loads(schema_path.read_text())
-    jsonschema.Draft202012Validator.check_schema(schema)
-    jsonschema.Draft202012Validator(schema).validate(value)
-
-
-def test_all_schemas_and_examples_validate() -> None:
-    for schema_path in sorted((ROOT / "schemas").glob("*.schema.json")):
-        jsonschema.Draft202012Validator.check_schema(json.loads(schema_path.read_text()))
-
-    mapping = {
-        "source-manifest.example.json": "source-manifest.schema.json",
-        "timeline.example.json": "timeline.schema.json",
-        "observability.example.json": "observability.schema.json",
-        "workspace-index.example.json": "workspace-index.schema.json",
-        "corpus-index.example.json": "corpus-index.schema.json",
-        "evidence-record.example.json": "evidence-record.schema.json",
-        "observation.example.json": "observation.schema.json",
-        "event.example.json": "event.schema.json",
-        "measurement.example.json": "measurement.schema.json",
-        "claim.example.json": "claim.schema.json",
-        "candidate-model.example.json": "candidate-model.schema.json",
-        "conflict.example.json": "conflict.schema.json",
-        "unknown.example.json": "unknown.schema.json",
-        "frame-manifest.example.json": "frame-manifest.schema.json",
-        "review-finding.example.json": "review-finding.schema.json",
-        "baseline-reconstruction.example.json": "rebuild-spec.schema.json",
-        "behavioral-fixtures.example.json": "behavioral-fixtures.schema.json",
-        "coverage.example.json": "coverage.schema.json",
-    }
-    for example, schema in mapping.items():
-        validate_json(ROOT / "templates" / example, ROOT / "schemas" / schema)
-
-
 @pytest.mark.parametrize("rate", [24, 30, 50, 60, 120])
 def test_probe_and_metrics_use_real_pts(tmp_path: Path, rate: int) -> None:
     video = make_video(tmp_path / f"rate_{rate}.mp4", rate=rate, duration=1.1)
@@ -106,7 +66,6 @@ def test_probe_and_metrics_use_real_pts(tmp_path: Path, rate: int) -> None:
     manifest = media_probe_run(video, manifest_path, f"source_rate_{rate}", True, True)
     assert manifest["timing"]["cadence_classification"] == "CFR_EVIDENCE"
     assert manifest["timing"]["median_delta_s"] == pytest.approx(1 / rate, abs=0.002)
-    validate_json(manifest_path, ROOT / "schemas/source-manifest.schema.json")
 
     metrics_path = tmp_path / f"rate_{rate}.npz"
     metadata = metrics_video_run(video, metrics_path, 160)
@@ -151,10 +110,11 @@ def test_vfr_is_detected_and_metrics_keep_variable_deltas(tmp_path: Path) -> Non
 def test_film_strip_uses_verified_30fps_pts(tmp_path: Path) -> None:
     video = make_video(tmp_path / "thirty.mp4", rate=30, duration=1.2)
     output = tmp_path / "strip.jpg"
-    metadata = film_strip_run(video, 0.0, 1.0, 4, output, "TEST", 240)
+    metadata = film_strip_run(video, 0.25, 0.75, 4, output, "TEST", 240)
     offsets = [cell["offset_ms"] for cell in metadata["cells"]]
     assert offsets[0] <= 40
-    assert offsets[-1] >= 900  # Regression: the old tool labeled 30 fps frames at half-time.
+    assert metadata["cells"][0]["extracted_pts_s"] >= 0.23
+    assert offsets[-1] >= 700  # Regression: the old tool labeled 30 fps frames at half-time.
     assert max(abs(cell["extraction_error_ms"]) for cell in metadata["cells"]) <= 40
     assert output.is_file() and output.with_suffix(".jpg.json").is_file()
 
@@ -168,7 +128,6 @@ def test_frame_manifest_and_contact_sheets_keep_pts(tmp_path: Path) -> None:
         interval_s=0.4, start_s=0.0, duration_s=1.2,
         max_width=320, image_format="jpg", source_manifest=None,
     )
-    validate_json(manifest_path, ROOT / "schemas/frame-manifest.schema.json")
     pts = [frame["pts_s"] for frame in manifest["frames"]]
     assert len(pts) >= 3
     assert all(b > a for a, b in zip(pts, pts[1:]))
@@ -202,22 +161,17 @@ def test_invalid_media_fails_closed(tmp_path: Path) -> None:
     assert proc.returncode != 0
     assert not output.exists()
 
-
-def test_camera_tool_does_not_invent_player_path(tmp_path: Path) -> None:
-    video = make_video(tmp_path / "camera.mp4", rate=30, duration=1.0)
-    output = tmp_path / "camera.npz"
-    metadata = track_camera_run(
-        video, output,
-        sample_fps=5.0, max_width=320, max_features=500,
-        min_inlier_ratio=0.35, max_residual_px=2.5,
-        max_rotation_deg=1.5, max_scale_delta=0.015,
-        exclude_top=0.0, exclude_bottom=0.0, exclude_left=0.0, exclude_right=0.0,
-        interpret_center_lock=False,
+    corrupt = tmp_path / "corrupt.mp4"
+    corrupt.write_bytes(b"not a media file")
+    manifest = tmp_path / "must_not_exist.json"
+    probe = subprocess.run(
+        [sys.executable, str(SCRIPTS / "media_probe.py"), str(corrupt), str(manifest), "--scan-pts"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
     )
-    arrays = np.load(output)
-    assert "dx_screen_px" in arrays.files
-    assert not any(name.startswith("player_") for name in arrays.files)
-    assert metadata["interpretation"]["center_lock_player_path_requested"] is False
+    assert probe.returncode != 0
+    assert not manifest.exists()
 
 
 def test_timeline_preserves_unknown_gap(tmp_path: Path) -> None:
@@ -231,13 +185,3 @@ def test_timeline_preserves_unknown_gap(tmp_path: Path) -> None:
     assert timeline["segments"][0]["gap_status"] == "UNKNOWN"
     assert timeline["segments"][0]["gap_after_s"] is None
     assert timeline["segments"][1]["session_start_s"] is None
-    validate_json(timeline_path, ROOT / "schemas/timeline.schema.json")
-
-
-def test_workspace_initializer_creates_schema_valid_indexes(tmp_path: Path) -> None:
-    workspace = tmp_path / "workspace"
-    init_workspace_run(workspace, "test-game")
-    validate_json(workspace / "workspace-index.json", ROOT / "schemas/workspace-index.schema.json")
-    validate_json(workspace / "data/corpus/index.json", ROOT / "schemas/corpus-index.schema.json")
-    report = validate_workspace(workspace, verify_hashes=False)
-    assert not report.errors

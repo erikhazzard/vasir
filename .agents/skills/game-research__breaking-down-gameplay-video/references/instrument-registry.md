@@ -1,260 +1,117 @@
-# Instrument registry: capability, provenance, and refusal rules
+# Media tools and refusal rules
 
-An instrument is a measurement proposal with declared preconditions—not an oracle. Every run records tool version, command, parameters, source hash, transforms, output units, quality metrics, and known blind spots.
+An instrument proposes a measurement under declared preconditions; it is not an oracle. Record the command, parameters, source, transforms, units, quality checks, and known blind spots whenever its output supports a claim.
 
-## Instrument manifest contract
+For any tool, ask:
 
-Each instrument declares:
+- What exact measurand does it produce?
+- Which capture/topology preconditions must hold?
+- What makes the interpretation invalid?
+- Which clock or coordinate domain does the output use?
+- What sanity check must pass before the output supports a claim?
+- Does failure return an error or an honest unavailable state?
 
-- `measures` — exact measurand;
-- `requires` — source/topology preconditions;
-- `invalid_when` — conditions that break interpretation;
-- `output` — units, clock/coordinate domain, and artifacts;
-- `quality` — confidence/signal metrics;
-- `false_positives` and `false_negatives`;
-- `failure_behavior` — hard failure or typed unavailable result;
-- `validation` — calibration or sanity checks before claims may use it.
-
-## Base instruments
+## Bundled tools
 
 ### `media_probe.py`
 
-**Measures:** source identity, stream structure, cadence, PTS deltas, orientation, audio availability, and capture limitations.
+**Measures:** source identity, stream structure, display geometry, cadence, PTS deltas, audio availability, and decode integrity.
 
-**Always run.** Use `--scan-pts` for reconstruction-grade work.
-
-**Validation:** source SHA-256 matches every downstream manifest; scanned PTS are monotonic within declared discontinuities; duration and frame count are plausible.
-
-**Refuse:** unreadable or absent source. Do not create a zero-duration manifest.
+Use `--scan-pts` whenever timing matters and `--decode-check` for a durable reconstruction. Confirm monotonic PTS within declared discontinuities and plausible duration/frame count. Unreadable or absent sources must not create a normal-looking manifest.
 
 ### `compose_timeline.py`
 
-**Measures:** mapping from multiple source PTS domains into session segments and explicit gaps.
+**Measures:** relationships among multiple source PTS domains and explicit gaps.
 
-**Requires:** source manifests in intended order. Creation timestamps may support gap inference but never override visible contradictions.
-
-**Output:** `timeline.json` with `KNOWN`, `INFERRED`, `UNKNOWN`, or `NOT_SAME_SESSION` gaps.
+Provide source manifests in intended order. Creation timestamps may support an inferred gap but never override visible contradictions. Preserve `KNOWN`, `INFERRED`, `UNKNOWN`, and `NOT_SAME_SESSION` rather than silently compressing time.
 
 ### `extract_frames.py`
 
-**Measures:** none; creates navigational/evidence artifacts with exact sampled output PTS.
+**Measures:** no gameplay property; creates navigational/evidence images with actual source PTS.
 
-**Requires:** valid video source and ffmpeg `showinfo` timestamps.
-
-**Output:** images plus manifest containing actual PTS, source ID/hash, filter graph, scale transform, and checksum.
-
-**Rule:** JPG is acceptable for coarse navigation; use PNG for glyph/value/geometry evidence.
+Require a decodable source and FFmpeg `showinfo` timestamps. Preserve display aspect ratio. JPEG is acceptable for coarse navigation; use PNG for glyph, value, or geometry evidence.
 
 ### `contact_sheets.py`
 
-**Measures:** none; visual index only.
+**Measures:** no gameplay property; creates a visual index from a frame manifest.
 
-**Requires:** a frame manifest. Never infer time from filename order or `seconds_per_frame`.
-
-**Invalid use:** calling the sheets a complete sequence analysis.
+Never infer time from filename order or treat the sheet as complete sequence analysis.
 
 ### `film_strip.py`
 
 **Measures:** visible state sequence at selected actual source frames.
 
-**Requires:** source frame PTS enumeration inside the requested interval.
-
-**Output:** strip plus sidecar containing target and selected PTS, offsets, checksums, and commands.
-
-**Rule:** labels reflect actual source PTS, not a hard-coded frame rate.
+Retain target, selected, and extracted PTS and timing error for every cell. Labels use actual source PTS, never a hard-coded frame rate.
 
 ### `metrics_video.py`
 
 **Measures:** per-frame mean luma, raw motion energy, motion normalized by elapsed PTS, duplicate evidence, and PTS delta.
 
-**Requires:** decodable video frames and matching PTS enumeration.
+Useful for candidate cuts, pauses/freezes, flashes, shake, cadence anomalies, and audit sampling. It does not by itself prove deliberation, hit stop, game pause, performance hitch, damage, or importance.
 
-**Output:** NPZ plus metadata sidecar; aspect ratio preserved.
-
-**Useful for:** candidate pauses/freezes, cuts, flashes, shake, duplicate/cadence anomalies, and audit sampling.
-
-**Not evidence by itself for:** deliberation, hit stop, performance hitch, game pause, damage, or importance.
-
-**Validation:** decoded frame count equals PTS count; otherwise return `FAILED` and no normal-looking measurement artifact. Review known pause and active windows.
+Decoded-frame and PTS counts must agree. A mismatch is `FAILED`, not a partial measurement.
 
 ### `audio_features.py`
 
-**Measures:** RMS, peak, zero-crossing, spectral centroid, and spectral flux on a PTS-like sample-time grid.
+**Measures:** RMS, peak, zero-crossing, spectral centroid, and spectral flux on a sample-time grid.
 
-**Requires:** an audio stream.
+Useful for event proposals, impact/stinger cadence, silence transitions, and audio-only audit windows. It does not identify semantic sound class, quality, source, or player perception. Listen to the interval.
 
-**Output:** typed `AVAILABLE`, `NEAR_SILENT`, or `UNAVAILABLE`; NPZ plus metadata.
+No audio stream is `UNAVAILABLE`, not an empty successful semantic analysis.
 
-**Useful for:** event proposals, impact/stinger cadence, silence transitions, and audio-only audit windows.
+## Analyst methods that are not bundled universal tools
 
-**Not evidence by itself for:** semantic sound identity, quality, source, or player perception. Listen to the interval.
+These methods may be useful, but the package does not claim a generally validated implementation for them.
 
-## Camera and spatial instruments
+### Camera and landmark analysis
 
-### `track_camera.py`
-
-**Measures:** inter-frame screen-space global affine transform—translation, rotation, scale, residual, and inlier ratio—over sampled PTS.
-
-**Requires:** enough stable visual features and a transform approximated by one global affine motion within the analysis mask.
-
-**Invalid when:** cuts, zoom discontinuities, heavy parallax, dominant independent motion, repeating texture, full-screen VFX, motion blur, or insufficient features.
-
-**Output:** transform segments in source-display pixel units. Low-quality pairs are invalid and never integrated through.
-
-**Critical rule:** the script does not call the transform player movement. `--interpret-center-lock` may derive a provisional player path only after the analyst has separately validated fixed zoom, player center lock, static landmarks, and opposite background/player displacement. The output records that interpretation as an assumption.
-
-**Validation:** pause/static windows near zero; landmark re-sighting; transform residual; rotation/scale thresholds; independent wall/transit arithmetic.
-
-### Landmark/world registration
-
-Use manual or learned landmarks when the world matters. Record:
+Estimate camera/world relationships only after identifying stable landmarks and a topology-compatible transform. Record:
 
 - landmark identity and repeatability;
 - source coordinates and uncertainty;
-- camera segment;
-- parallax layer;
-- transformation model;
-- loop-closure error.
+- camera segment and parallax layer;
+- transformation model and residual;
+- invalid windows such as cuts, zoom discontinuities, dominant independent motion, repeating texture, full-screen VFX, or motion blur.
 
-Repeating decor can produce false loop closure. Preserve disagreement between global-flow and landmark estimates.
+Background translation is not player movement. Read `camera-and-space-adapters.md` before making a world-space claim.
 
-### Object/entity tracking
+### OCR and UI values
 
-Track only after archetype identification and occlusion rules are defined. Store raw detections and track association separately. A track gap is not a despawn unless the entity’s visibility opportunity supports it.
+Use source-resolution crops and record language, font class, preprocessing, and raw evidence. UI text is a visible statement, not automatic mechanic truth.
 
-## Value and UI instruments
+Avoid one global threshold across font sizes, outlines, blur, animation, icon-like glyphs, and compression-distorted values. Cross-check tiny values through repeated clean instances, temporal lifecycle, and arithmetic. State when the source is unreadable.
 
-### OCR and UI extraction
+### Visible timing and feel
 
-Use high-resolution source crops; record language, font class, preprocessing, and raw crop. UI text is `VISIBLE_UI_STATEMENT`, not automatic mechanic truth.
+Use actual PTS for animation startup/contact/recovery bounds, hit-stop candidates, flash/shake duration, attack/reload cadence, audio-visual offset, and state transitions.
 
-Never apply one global OCR threshold to:
+A motion dip may be intentional hit stop, pause, repeated encoded frames, low-motion composition, a performance hitch, or a scene hold. Compare event alignment, local versus background behavior, clocks, audio continuity, and repeated examples.
 
-- multiple font sizes;
-- outlined and filled text;
-- animated/blurred text;
-- icons resembling glyphs;
-- compression-distorted tiny values.
+### State and event inference
 
-### Floating-value mining
+Build event sequences from observations; infer recurring states only when they improve prediction. Preserve event order, duration distributions, guards, interrupts, pause semantics, opportunities, and unobserved exits. A frequent sequence is not a universal protocol.
 
-Pipeline:
+Event counts may proxy kills, shots, actions, or spawns only after precision/recall is understood. Label modeled rates rather than measured ground truth.
 
-1. discover real glyph geometry from known instances;
-2. retain raw aspect-preserved crops;
-3. detect candidate components across multiple size/stroke classes;
-4. group into rows;
-5. track temporally;
-6. require lifecycle/motion behavior appropriate to the game—e.g. short-lived, rising, x-stable numbers;
-7. audit enemy sprites, eyes, pips, particles, and UI as false positives;
-8. decode using UI anchors, arithmetic era predictions, and repeated clean reads;
-9. attach each decoded value to a track and source interval.
+## Audit sampling
 
-One pixel read can distinguish a specific model fork; it cannot prove no other model exists.
+Instrument-selected events must be supplemented as applicable by:
 
-### HUD time series
-
-For health, ammo, mana, currency, score, clocks, and bars:
-
-- define ROI per calibrated segment;
-- distinguish value OCR from bar geometry;
-- retain transition frames;
-- model animation/lag between internal-looking state and display;
-- reconcile against independent events.
-
-## Temporal and feel instruments
-
-### Visible timing
-
-Use actual PTS for:
-
-- animation startup/contact/recovery bounds;
-- hit stop/freeze candidate duration;
-- flash/shake/feedback duration;
-- attack/reload/cooldown cadence;
-- audio-visual offset;
-- state-transition intervals.
-
-Report source-frame granularity and state-visibility ambiguity. Do not call a visible delay “input latency” without synchronized input.
-
-### Hit stop and freeze
-
-A motion dip may be:
-
-- intentional hit stop;
-- pause/menu freeze;
-- repeated encoded frames;
-- low-motion composition;
-- capture/game performance hitch;
-- scene hold.
-
-Require event alignment, local entity/background behavior, timer behavior, audio continuity, and repeated examples.
-
-### Camera shake and flash
-
-Measure transform/luma envelope, onset, peak, decay, spatial extent, and channel overlap. Separate global camera transform from sprite displacement and full-screen overlay.
-
-### Audio-visual grammar
-
-For each action, align:
-
-- anticipation pose/sound;
-- action release;
-- contact/impact;
-- state change;
-- hit stop;
-- flash/VFX;
-- shake;
-- damage/UI confirmation;
-- recovery.
-
-This channel decomposition explains feel more reliably than adjectives alone.
-
-## Behavior/state instruments
-
-### State-machine mining
-
-Build event sequences from observations; infer recurring states and transitions only when they improve prediction. Preserve:
-
-- event order;
-- duration distributions;
-- guards;
-- interrupts;
-- pause semantics;
-- opportunity counts;
-- unobserved exits.
-
-A frequent sequence is not a universal protocol. Validate on held-out instances.
-
-### AI behavior fitting
-
-Possible models include pursuit, separation, alignment, orbit, flee, range bands, target priority, line-of-sight, scripted phases, and utility/state-machine selection. Use repeated trajectories and context, not one path. Explicitly model camera transform before screen-space AI conclusions.
-
-### Event-rate models
-
-Event counts may proxy kills, shots, actions, or spawns only after precision/recall calibration. If normalized to a known total, propagate normalization uncertainty. Label modeled rates, not measured ground truth.
-
-## Universal audit sampling
-
-Instrument-selected events must be supplemented by:
-
-- uniform random windows;
-- stratified windows per act/round/phase;
+- uniform or stratified windows across the relevant sequence;
 - low-salience windows;
-- detector disagreement windows;
-- source-boundary windows;
-- manually chosen ordinary gameplay;
-- windows where the emerging model predicts an event that did not occur.
+- audio events without visual spikes and visual spikes without audio events;
+- detector-disagreement windows;
+- source boundaries and cuts;
+- ordinary gameplay;
+- windows where the emerging model predicts an event that does not occur.
 
-## Instrument result states
+## Result states
 
-Every instrument ends as one of:
+- `VALID` — preconditions and sanity checks pass.
+- `VALID_WITH_LIMITATIONS` — usable only within recorded limits.
+- `UNAVAILABLE` — required signal is absent.
+- `INVALID_FOR_TOPOLOGY` — method does not apply to this capture.
+- `FAILED` — execution or integrity failure.
+- `REJECTED_AFTER_VALIDATION` — output was produced but failed a sanity check.
 
-- `VALID` — preconditions and validation pass;
-- `VALID_WITH_LIMITATIONS` — output usable within recorded scope;
-- `UNAVAILABLE` — signal absent;
-- `INVALID_FOR_TOPOLOGY` — model does not apply;
-- `FAILED` — execution or integrity failure;
-- `REJECTED_AFTER_VALIDATION` — output ran but failed sanity checks.
-
-Only the first two may support claims.
+Only `VALID` and `VALID_WITH_LIMITATIONS` may support claims.

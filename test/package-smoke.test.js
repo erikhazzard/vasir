@@ -17,6 +17,23 @@ function writeFile(filePath, fileContents) {
   fs.writeFileSync(filePath, fileContents);
 }
 
+function listRelativeFiles(rootDirectory) {
+  const relativeFilePaths = [];
+  const pendingDirectories = [rootDirectory];
+  while (pendingDirectories.length > 0) {
+    const currentDirectory = pendingDirectories.pop();
+    for (const directoryEntry of fs.readdirSync(currentDirectory, { withFileTypes: true })) {
+      const absolutePath = path.join(currentDirectory, directoryEntry.name);
+      if (directoryEntry.isDirectory()) {
+        pendingDirectories.push(absolutePath);
+      } else if (directoryEntry.isFile()) {
+        relativeFilePaths.push(path.relative(rootDirectory, absolutePath));
+      }
+    }
+  }
+  return relativeFilePaths;
+}
+
 function runCommand(commandName, argumentList, currentWorkingDirectory, environmentVariables = {}) {
   const commandResult = childProcess.spawnSync(commandName, argumentList, {
     cwd: currentWorkingDirectory,
@@ -64,6 +81,23 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   );
   assert.ok(
     fs.existsSync(path.join(installPrefixDirectory, "node_modules", "vasir", ".vasir-catalog-manifest.json"))
+  );
+  const installedPackageDirectory = path.join(installPrefixDirectory, "node_modules", "vasir");
+  const installedFilePaths = listRelativeFiles(installedPackageDirectory);
+  assert.ok(
+    installedFilePaths.every(
+      (relativeFilePath) =>
+        !relativeFilePath.split(path.sep).some((pathSegment) => pathSegment === "__pycache__" || pathSegment === ".pytest_cache") &&
+        !relativeFilePath.endsWith(".pyc")
+    ),
+    "npm package contains generated Python cache files:\n" +
+      installedFilePaths
+        .filter(
+          (relativeFilePath) =>
+            relativeFilePath.split(path.sep).some((pathSegment) => pathSegment === "__pycache__" || pathSegment === ".pytest_cache") ||
+            relativeFilePath.endsWith(".pyc")
+        )
+        .join("\n")
   );
 
   const helpResult = runCommand(binaryPath, ["--help"], packDirectory);

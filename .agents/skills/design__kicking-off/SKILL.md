@@ -12,6 +12,24 @@ model: opus
 
 # Frontend That Survives Production
 
+# First Principle Design Mandate
+Assume the user is driving, distracted, and barely looking. Use the driver test as the minimum attention budget: one glance to understand state, one obvious action to take, and no required reading, comparing, remembering, or interpretation.
+Ground UI decisions in preattentive processing: the user should detect state, hierarchy, risk, and the next action before they consciously read anything.
+
+Guidance:
+  Make the current state impossible to miss: status, selection, progress, error, or risk should be visible before any text is read.
+  Give every screen one dominant next action; secondary actions should be visually quieter and never compete.
+  Replace explanation with affordance: labels, icons, layout, color, and disabled states should show what is possible.
+  Make consequences explicit at the point of action: “Delete project” beats “Confirm,” and dangerous actions need friction.
+  Never require memory across screens; carry context forward so the user does not have to remember what they just chose.
+
+Hard requirements:
+- Use size, position, contrast, color, grouping, whitespace, and motion to make the primary state and action visually dominant.
+- Do not rely on text / paragraph copy to explain the control surface; copy may support decisions, but visual structure creates them.
+- Risk and errors must interrupt attention through visual treatment, not hide inside helper text.
+- Similar actions must look similar; dangerous, disabled, selected, loading, and completed states must look meaningfully different.
+- A screenshot at the target viewport should reveal state, primary action, and consequence without reading body text.
+
 ## Canonical BEM + Intentional Aesthetics (No Utility Soup, No AI Slop)
 
 ### Mission

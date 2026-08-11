@@ -1,104 +1,80 @@
 # Validation and benchmarking
 
-“Valid JSON,” “internally consistent report,” and “correct reconstruction” are different claims. Validate each layer separately.
+Use this when validating a retained media tool or an implemented reconstruction. Tool execution, analytically supportable claims, and observationally faithful behavior are different claims; test the layer actually at risk.
 
-## 1. Package and instrument validity
+## Media-tool validity
 
-Before analyzing user footage:
+The bundled regression suite protects:
 
-- every schema passes Draft 2020-12 validation;
-- every example validates against its named schema;
-- all internal file references resolve;
-- every Python module compiles;
-- the regression suite passes on the installed FFmpeg/OpenCV versions;
-- invalid input or integrity failure returns `FAILED` and leaves no plausible partial success artifact; a missing signal may return typed `UNAVAILABLE`.
+- exact PTS behavior across 24/30/50/60/120 fps and VFR footage;
+- widescreen, 4:3, vertical, and non-square-pixel display geometry;
+- film-strip extraction timing;
+- frame-manifest to contact-sheet PTS lineage;
+- missing versus present audio behavior;
+- malformed-media refusal without plausible partial output;
+- explicit unknown gaps across multiple source files.
 
-The bundled suite covers the scars that motivated this package: 24/30/50/60/120 fps, VFR, widescreen/4:3/vertical/non-square pixels, verified film-strip PTS, real-frame sampling, missing audio, malformed input, unknown source gaps, and camera/player-motion separation.
+Run from the skill directory:
 
-## 2. Instrument-specific acceptance criteria
+```bash
+PYTHONDONTWRITEBYTECODE=1 python -m pytest -p no:cacheprovider -q tests/test_smoke.py
+```
 
-Each instrument needs a declared ground truth and error metric.
+FFmpeg and FFprobe must be installed. The suite uses synthetic media and no external network.
 
-| Instrument | Ground truth | Minimum acceptance record |
+## Instrument-specific acceptance
+
+| Tool | Ground truth | Minimum useful acceptance |
 |---|---|---|
-| Source probe | synthetic media metadata and enumerated frame PTS | timestamp count, median delta error, VFR/CFR classification, decode status |
-| Frame sampler | known source PTS sequence | selected PTS error, monotonicity, minimum requested separation, aspect-ratio error |
-| Film strip | enumerated source frames | target→selected→extracted timestamp error for every cell |
-| Visual metrics | known frames and PTS | decoded-frame count equality, delta equality, duplicate detection behavior |
-| Audio features | synthetic silence, tones, impulses | availability state, hop timing, onset localization; never semantic class accuracy |
-| OCR/value miner | hand-labeled crops and lifecycles | precision/recall by glyph size and UI state, numeric error, false-positive classes |
-| Camera transform | synthetic translation/rotation/scale plus annotated real clips | transform error, inlier ratio, rejection rate, segment-reset behavior |
-| Event detector | hand-labeled intervals | interval precision/recall and boundary error, stratified by event type |
+| Source probe | Synthetic metadata and enumerated frame PTS | Timestamp count, median delta error, VFR/CFR classification, display geometry, decode status |
+| Timeline composer | Ordered source manifests with known or absent wall-clock relations | Source order preserved; known, inferred, and unknown gaps remain distinct |
+| Frame sampler | Known source PTS sequence | Selected PTS monotonicity, requested separation, aspect-ratio preservation |
+| Contact sheet | PTS-bearing sampled frames | Cell labels and order match the frame manifest |
+| Film strip | Enumerated source frames | Target, selected, and extracted timestamp error for every cell |
+| Visual metrics | Known frames and PTS | Decoded-frame count equality, delta equality, aspect preservation, duplicate behavior |
+| Audio features | Synthetic missing audio and tones | Honest availability state, hop timing, and non-empty measured signal when present |
 
-A script accepting a file is not evidence that its output is valid for that file. Capability gates and rejection behavior are part of accuracy.
+A script accepting a file is not evidence that its output is valid for that file. Preconditions, sanity checks, and refusal behavior are part of accuracy.
 
-## 3. Analytical validity
+## Analytical validity
 
-For a completed corpus:
+For a substantive analysis:
 
-- blind observation passes agree on the visible event before causal reconciliation;
-- detector-selected evidence is supplemented by stratified random and low-salience audits;
-- load-bearing measurements are repeated across valid opportunities;
-- negative claims include opportunity counts and coverage conditions;
-- candidate models are tested against all relevant events, including held-out repetitions where the footage contains them;
-- agreement from correlated agents is not scored as independent evidence;
-- every correction supersedes rather than silently overwrites the earlier record.
+- view the complete relevant sequence before detector-selected close reading;
+- supplement detector-selected evidence with quiet, random, and disagreement intervals;
+- repeat load-bearing measurements across valid opportunities when the footage permits;
+- give negative claims an opportunity definition and count;
+- compare candidate models against all relevant events and held-out repetitions available in the footage;
+- do not score correlated agents as independent evidence;
+- propagate material corrections to every affected conclusion.
 
-Track inter-rater agreement only for defined annotation tasks. A high agreement score on a bad ontology does not establish truth.
+Track inter-rater agreement only for a defined annotation task. Agreement on a bad ontology does not establish truth.
 
-## 4. Reconstruction validity
+## Reconstruction validity
 
-The baseline is accepted by observable behavior, not by resemblance of code structure to an unknowable original.
+Accept a baseline by observable behavior, not resemblance to unknowable source code.
 
-For each major system:
+For each major requested system:
 
-1. Build at least one fixture from an observed interval.
-2. Run the implementation from the fixture’s declared setup and stimulus.
-3. Compare event order, state transitions, numeric outputs, visible timing, and presentation signals within the fixture tolerances.
-4. Record pass/fail, implementation build hash, seed, clock configuration, and observed deviations.
-5. Add a discriminating fixture for every high-impact candidate-model fork when the footage supplies a condition on which the models diverge.
+1. Derive at least one fixture from a cited source interval.
+2. Run the implementation from the fixture setup and stimulus.
+3. Compare event order, visible state transitions, numeric outputs, timing, and presentation signals within declared tolerances.
+4. Record the implementation build, seed when relevant, clock configuration, and material deviations.
+5. Exercise high-impact candidate-model forks when the footage provides a discriminating condition.
 
-A reconstruction can pass every fixture and still differ internally from the original. Call it **observationally faithful within the coverage boundary**, never source-code equivalent.
+Passing fixtures establishes observational fidelity only within their coverage boundary.
 
-## 5. Cross-genre validation matrix
+## Report usefulness
 
-Do not call the skill universal until it has been exercised across materially different observability regimes. Maintain fixtures for at least:
+Check that:
 
-- center-locked survivor/action footage;
-- first-person shooter;
-- third-person free/orbit camera;
-- side-scrolling platformer;
-- fixed-camera fighter;
-- RTS/tactics free-map camera;
-- racing/track-progress game;
-- sports/broadcast camera;
-- card or turn-based hidden-information game;
-- puzzle or low-motion game;
-- rhythm game with audio timing;
-- edited/streamed/discontinuous footage;
-- multiple frame rates, VFR, aspect ratios, HUD scales, languages, and compression levels.
+- each load-bearing citation resolves to the claimed interval;
+- labels and uncertainty remain legible in the delivered form;
+- candidate models are not hardened into historical facts;
+- reconstruction choices trace to evidence and observable fixtures;
+- `BASELINE`, `BETTER`, and `NEW` remain distinct whenever critique or redesign was requested;
+- another analyst can reproduce the important measurements from recorded methods and artifacts.
 
-The matrix is capability evidence, not proof that every future game is supported. New camera, control, information, or session topology requires a new adapter test.
+## Delivery decision
 
-## 6. Report and decision usefulness
-
-A presentation review checks more than visual polish:
-
-- every citation resolves to the claimed interval;
-- labels and uncertainty remain legible at actual reading size;
-- the report does not harden candidate models into facts;
-- a developer can trace each spec field to claims and fixtures;
-- a designer can distinguish `BASELINE`, `BETTER`, and `NEW` without ambiguity;
-- a second analyst can reproduce load-bearing measurements from stored commands and artifacts.
-
-## 7. Release rule
-
-A package release requires:
-
-- green package validation and regression tests;
-- no known P0/P1 instrument defect;
-- a changelog entry for schema or semantic changes;
-- compatible output changes update the one canonical contract, producers, consumers, examples, and proofs together; new fields remain optional and readers tolerate unknown fields;
-- retained regression media or reproducible synthetic generation commands.
-
-A delivery requires the four adversarial gates in `adversarial-review.md`, green schema/reference validation, complete baseline choices, fixture coverage, and no unresolved P0/P1 finding.
+A delivery is ready when the route-applicable adversarial review finds no concealed material acquisition or inference defect, reconstruction choices are explicit when present, and the requested output is internally consistent. Do not require unrelated genre fixtures, validators, or output formats merely to make the package look rigorous.

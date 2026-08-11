@@ -175,7 +175,6 @@ def run(input_path: Path, output_path: Path, source_id: str, scan_pts: bool, dec
     if decode_check:
         tool_command.append("--decode-check")
     manifest = {
-        "schema_version": "1.0.0",
         "source_id": source_id,
         "sha256": sha256_file(input_path),
         "path": str(input_path.resolve()),
@@ -223,10 +222,6 @@ def run(input_path: Path, output_path: Path, source_id: str, scan_pts: bool, dec
             "pts_scan_command": pts_command,
         },
     }
-    # source-manifest.schema.json allows only declared tool fields; keep PTS command in timing notes/provenance instead.
-    manifest["tool"].pop("pts_scan_command")
-    if pts_command:
-        manifest["timing"]["notes"].append("PTS scan command: " + " ".join(pts_command))
     write_json(output_path, manifest)
     return manifest
 

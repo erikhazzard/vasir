@@ -1,18 +1,18 @@
-# Canonical evidence model
+# Evidence ledger model
 
-The corpus is an evidence graph, not a folder of prose. The report and spec are projections of this graph.
+Keep one human-readable ledger behind the analysis. The report and, when requested, the reconstruction cite the same settled entries rather than maintaining competing values.
 
 ```text
 source → interval → extraction activity → evidence artifact → observation
       → measurement → claim → candidate model → validation/conflict
-      → baseline implementation object → behavioral fixture
+      → [when reconstruction is requested: baseline implementation object → behavioral fixture]
 ```
 
-## Object types
+## Analytical layers
 
 ### Evidence
 
-A source-grounded interval or artifact. Required fields:
+A source-grounded interval or artifact. Record these fields when material:
 
 - `id`;
 - source ID and hash lineage;
@@ -42,7 +42,7 @@ The latter is a claim/model requiring additional support.
 
 ### Measurement
 
-A numerical estimate tied to a defined measurand. Required:
+A numerical estimate tied to a defined measurand. Record:
 
 - estimate or bound;
 - unit;
@@ -63,11 +63,11 @@ A proposition supported by observations/measurements. Claims may describe:
 - design interpretations;
 - player hypotheses.
 
-A claim must retain alternatives, conflicts, validation status, scope, and reconstruction consequence.
+A load-bearing claim retains alternatives, conflicts, validation status, scope, and any reconstruction consequence.
 
 ### Candidate model
 
-A hidden rule/system that predicts visible behavior. Required:
+A hidden rule/system that predicts visible behavior. Record:
 
 - assumptions;
 - variables and units;
@@ -78,9 +78,9 @@ A hidden rule/system that predicts visible behavior. Required:
 - validation status;
 - observationally equivalent alternatives.
 
-### Baseline choice
+### Baseline choice, when reconstruction is requested
 
-An implementation decision used when the source does not identify the original. Required:
+An implementation decision used when the source does not identify the original. Record:
 
 - chosen model/value;
 - alternatives retained;
@@ -157,16 +157,9 @@ A negative claim needs:
 
 Example:
 
-```json
-{
-  "claim": "The sentry did not fire while the player was outside the inner ring.",
-  "opportunity_definition": "sentry active, line of sight visible, cooldown could have elapsed, player outside ring",
-  "opportunities": 8,
-  "occurrences": 0,
-  "scope": "source_001, sentry archetype A",
-  "validation": "SUPPORTED"
-}
-```
+| Claim | Valid opportunity | Opportunities | Occurrences | Scope |
+|---|---|---:|---:|---|
+| The sentry was not observed firing while the player was outside the inner ring | Sentry active, line of sight visible, cooldown could have elapsed, player outside ring | 8 | 0 | `source_001`, sentry archetype A |
 
 This supports a bounded relationship; it does not prove the sentry can never fire outside the ring.
 
@@ -180,10 +173,10 @@ Reader-facing claims should expose:
 
 A still may be shown, but the link resolves to the interval, crop/clip, extraction provenance, and context.
 
-## Corpus consistency
+## Ledger consistency
 
-- IDs are stable and never reused.
-- Corrections create a new object linked by `supersedes`; do not mutate history invisibly.
-- Conflicts link both objects.
-- Report/spec values reference claim IDs; they do not copy epistemic metadata by hand.
-- All derived artifacts retain source hashes and tool versions.
+- Use stable local IDs for claims that recur across the report or reconstruction.
+- Corrections visibly supersede an earlier entry; do not mutate history invisibly.
+- Conflicts point to both reads.
+- Report/reconstruction values cite the ledger entry instead of restating a second confidence story.
+- Durable derived artifacts retain source hashes and tool provenance when those details affect reproducibility.

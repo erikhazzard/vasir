@@ -2,9 +2,8 @@
 
 ## Source scope
 
-- Timeline ID:
-- Source IDs/hashes:
-- Route:
+- Source files/IDs and hashes when recorded:
+- Requested scope:
 - Observability summary:
 - Gaps/discontinuities:
 
@@ -30,5 +29,5 @@
 
 ## Unknowns and coverage
 
-| Unknown ID | Type | What footage supports | Baseline resolution | Risk |
+| Unknown ID | Type | What footage supports | Baseline choice when reconstruction requires one | Risk |
 |---|---|---|---|---|

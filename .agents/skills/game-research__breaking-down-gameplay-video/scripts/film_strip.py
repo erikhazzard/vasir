@@ -133,7 +133,6 @@ def run(video: Path, start_s: float, duration_s: float, count: int, output: Path
 
     sidecar = output.with_suffix(output.suffix + ".json")
     metadata = {
-        "schema_version": "1.0.0",
         "source_path": str(video.resolve()),
         "source_sha256": sha256_file(video),
         "window": {"start_pts_s": start_s, "duration_s": duration_s, "end_pts_s": start_s + duration_s},

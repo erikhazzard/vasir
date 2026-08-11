@@ -91,7 +91,7 @@ def run(manifest_paths: list[Path], output: Path, timeline_id: str, relationship
             else:
                 session_cursor = end + (gap_after or 0.0)
 
-    timeline = {"schema_version": "1.0.0", "timeline_id": timeline_id, "segments": segments, "notes": []}
+    timeline = {"timeline_id": timeline_id, "segments": segments, "notes": []}
     write_json(output, timeline)
     return timeline
 

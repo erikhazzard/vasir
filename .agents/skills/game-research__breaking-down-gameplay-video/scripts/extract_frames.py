@@ -110,7 +110,6 @@ def run(
         })
 
     manifest = {
-        "schema_version": "1.0.0",
         "source_id": source_id,
         "source_sha256": source_hash,
         "source_path": str(video.resolve()),

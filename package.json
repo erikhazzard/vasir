@@ -29,6 +29,9 @@
     "registry.json",
     ".vasir-catalog-manifest.json",
     ".agents/skills/",
+    "!**/__pycache__/**",
+    "!**/.pytest_cache/**",
+    "!**/*.pyc",
     "templates/"
   ],
   "engines": {
