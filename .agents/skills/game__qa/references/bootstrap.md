@@ -2,13 +2,13 @@
 
 **Binding:** the Laws in `../SKILL.md` apply throughout — including Law 1's project boundary. This file is the one-time setup.
 
-You are setting up game-qa infrastructure for a browser-game project. The skill ships three reference artifacts you'll copy and adapt:
+You are setting up game-qa infrastructure for a browser-game project. The following packaged files are siblings of this document in the skill's `references/` directory:
 
-- `runner.ts` — project-agnostic runner (copy as-is, do not modify)
+- `runner.ts` — shared runner starting point; preserve existing step semantics
 - `qa-adapter.template.ts` — adapter skeleton (copy and fill in)
 - `journey-schema.md` — the YAML contract the runner consumes (don't copy; engineers read it to author journeys)
 
-**The seam:** the runner is **framework-fixed**, the adapter is **project-specific**. New behavior means a new adapter primitive or a schema extension — never a forked runner.
+**The seam:** game state setup and observation belong in the project-specific adapter. New input modes or evidence kinds belong in the runner's documented extension points. Preserve existing step semantics in both places.
 
 **Run once per project.** If parts exist, gap-fill — don't rebuild.
 
@@ -24,9 +24,9 @@ A RIG THAT HASN'T EXERCISED REAL INPUT ISN'T BOOTSTRAPPED.
 
 1. **Debug system.** An action registry (server-authoritative for multiplayer projects; client-side for single-player), reflection-driven catalog (`debug.help()`), `window.debug.<action>` proxy on the client, and a one-shot `console.log("[debug-ready]")` once it's wired. If the project has these, verify and move on. If not, build the minimum: a `window.debug` object exposing project actions plus the ready marker.
 
-2. **Drop the runner.** Copy `runner.ts` to `<project>/qa/runner.ts`. Start unmodified. The runner is extensible — add new `perform:` types or `capture: at:` kinds your game needs (see "Extending the framework") — but don't silently change existing semantics. Plain-JS projects: run via `tsx` / `ts-node` / `vite-node`, or strip type annotations after copy. The runner imports `./adapter.ts` — the next step creates it.
+2. **Drop the runner.** First verify Node 18 or newer, Playwright 1.59 or newer, its matching Chromium browser, `yaml`, and a TypeScript executor such as `tsx`, `ts-node`, or `vite-node`; add only missing dependencies/browser binaries through the project's package manager and Playwright install command. Node 18 is Playwright's runtime floor, and Playwright 1.59 is required by `page.ariaSnapshot()`. Copy the packaged `runner.ts` to `<project>/qa/runner.ts`. Add only evidenced `perform:` or `capture: at:` extensions required by this game's form factor; don't change existing step semantics. Plain-JS projects may instead strip type annotations after copying. The runner imports `./adapter.ts` — the next step creates it.
 
-3. **Adapt the adapter.** Copy `qa-adapter.template.ts` to `<project>/qa/adapter.ts`. Fill in:
+3. **Adapt the adapter.** Copy the packaged `qa-adapter.template.ts` to `<project>/qa/adapter.ts`. Fill in:
    - `url` — the project's dev URL
    - `readyMarker` — the console string the project emits when `window.debug` is wired
    - `hudSelector` — optional CSS selector so `capture: at: [hud]` works
@@ -40,7 +40,7 @@ A RIG THAT HASN'T EXERCISED REAL INPUT ISN'T BOOTSTRAPPED.
 
 5. **Sentinel primitives.** A handful of starter `arrange.*` and `probe.*` per major system — enough to prove the wiring. The catalog grows organically as features land; engineers add what they need via capability-gap tickets. Don't pre-build it.
 
-6. **Arrange-vs-shortcut taxonomy doc** at `<project>/docs/qa/arrange-vs-shortcut.md`, seeded from `../references/arrange-vs-shortcut.md`. The discipline: `arrange.*` sets state; it never bypasses the chain the *current case* is verifying. The same primitive may be allowed in one case and forbidden in another — the case defines what's a shortcut. Setup verbs (`set`, `spawn`, `give`, `grant`, `clear`) are usually safe; ban anything that performs the action a case exists to verify.
+6. **Arrange-vs-shortcut taxonomy doc** at `<project>/docs/qa/arrange-vs-shortcut.md`, seeded from the packaged sibling `arrange-vs-shortcut.md`. The discipline: `arrange.*` sets state; it never bypasses the chain the *current case* is verifying. The same primitive may be allowed in one case and forbidden in another — the case defines what's a shortcut. Setup verbs (`set`, `spawn`, `give`, `grant`, `clear`) are usually safe; ban anything that performs the action a case exists to verify.
 
 7. **Smoke-test the rig — both halves.** Author `qa-runs/smoke/journeys/smoke/journey.yaml`: capture initial → one `perform:` against a known element or key → capture after. Run it. Confirm the evidence bundle appears (`output.json`, `screenshots/`) *and* that the perform visibly changed something between the two captures. A capture-only smoke proves the camera works and says nothing about the hands. If this fails, nothing downstream can work — fix it before declaring done.
 
@@ -51,7 +51,7 @@ A RIG THAT HASN'T EXERCISED REAL INPUT ISN'T BOOTSTRAPPED.
 The skill ships a skeleton. **Extend it for your game.** The cross-project contract is the *shape*:
 
 - The four-namespace adapter (`arrange` / `probe` / `events` / `reset`)
-- The step-vocabulary categories (`arrange`, `perform`, `capture`, `waitForEvent`, `waitForState`, `waitMs`, `expect`, `loop`, `js`)
+- The step-vocabulary categories (`arrange`, `perform`, `capture`, `subscribeEvent`, `waitForEvent`, `waitForState`, `waitMs`, `expect`, `loop`, `js`)
 - The evidence-bundle layout (`output.json` + screenshots + dom + console + tickets)
 
 What's *not* fixed — extend in your project copy as your game needs:
@@ -68,16 +68,16 @@ If an extension feels broadly useful, propose it upstream. Otherwise live with t
 - All eight items above shipped (or gap-filled)
 - Smoke journey runs end-to-end, exercises one real input, and emits an evidence bundle
 - Sentinel `arrange.*` and `probe.*` callable from both browser console and runner
-- Tell the user: *"Game-QA bootstrapped. The runner at `qa/runner.ts` is framework code — don't modify it; extend `qa/adapter.ts` instead. Request QA through the game-qa skill. Add `arrange.*` / `probe.*` primitives as features land — never one that shortcuts an action under test; see `docs/qa/arrange-vs-shortcut.md`."*
+- Tell the caller: *"Game-QA bootstrapped. Preserve the existing runner semantics; add state seams in `qa/adapter.ts` and only evidenced input/capture extensions in `qa/runner.ts`. Request QA through the game-qa skill. Add `arrange.*` / `probe.*` primitives as features land — never one that shortcuts an action under test; see `docs/qa/arrange-vs-shortcut.md`."*
 
-Then exit.
+Return that handoff to the caller. If bootstrap was the first step of a complete-QA request, the Owner resumes the pipeline; bootstrap does not assume another role itself.
 
 ## Hard Rules
 
 - **Don't break existing debug actions.** Gap-fill, don't rebuild.
 - **Never add primitives that bypass an action under test.** A primitive that performs what a case is supposed to verify is not a test — it's a shortcut. Only `arrange.*` (preconditions) and `probe.*` (observation).
 - **Extend, don't fork.** New `perform:` types and `capture:` kinds: encouraged. Silently changing existing semantics (e.g., making `arrange:` do real player input): forking — don't.
-- **Don't reconstruct the runner.** The skill ships one; copy it and extend in place.
+- **Don't reconstruct or reinterpret the runner.** Copy it; add only required input/capture cases at its named extension points.
 - **Land starter content, not the full catalog.** 2–3 sentinel primitives per system. Features add the rest.
 - **Don't run continuously.** Setup, not watcher.
 
@@ -85,7 +85,8 @@ Then exit.
 
 - Replacing the project's existing transport → gap-fill instead
 - Adding an arrangement whose name verbs a case's action under test → arrange-vs-shortcut violation
-- Forking the runner for project-specific reasons → use the adapter
+- Adding project state access to the runner → use the adapter
+- Changing an existing step's meaning while adding a new input/capture case → preserve the existing case and add a distinct one
 - A touch game whose smoke journey clicks with a mouse → step 4 was skipped
 - Continuing past 2–3 sentinel primitives per system → over-anticipates
 

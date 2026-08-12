@@ -543,13 +543,21 @@
       "recommends": [],
       "files": [
         "SKILL.md",
+        "references/adapter-contract.md",
+        "references/arrange-vs-shortcut.md",
         "references/bootstrap.md",
+        "references/brief-schema.md",
+        "references/case-schema.md",
+        "references/journey-schema.md",
+        "references/qa-adapter.template.ts",
         "references/role-engineer.md",
         "references/role-enumerator.md",
         "references/role-lead.md",
         "references/role-owner.md",
         "references/role-playtest.md",
-        "references/role-reviewer.md"
+        "references/role-reviewer.md",
+        "references/runner.ts",
+        "references/ticket-schema.md"
       ],
       "path": ".agents/skills/game__qa",
       "entry": "SKILL.md"

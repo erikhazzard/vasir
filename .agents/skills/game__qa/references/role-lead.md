@@ -22,14 +22,14 @@ Read `test-cases.json`. For every case, verify the project's `qa/adapter.ts` exp
 ### Phase 2: Journey planning
 Group cases by what evidence they need. Build the minimum journey set covering all `evidence`-mode cases. Validate every action-under-test case maps to a journey containing a `perform:` step. Mark `live`-mode cases for playtest dispatch. Write `journey-plan.json`.
 
-### Phase 3: Parallel dispatch
-One wave, three dispatch templates. Every prompt names the role file, `../SKILL.md` for the Laws, and the inputs:
+### Phase 3: Dependency-aware dispatch
+Use three dispatch templates. Every prompt names the role file, `../SKILL.md` for the Laws, and the inputs:
 
 - **N Engineers** — one per journey. Inputs: `role-engineer.md`, domain, case-slice, artifact dir, adapter path, screenshot prefix.
-- **M Reviewers** — case-slices. Inputs: `role-reviewer.md`, case-slice, pointers to the journey output(s) that cover it.
 - **K Playtest sessions** — one per `live` case. Inputs: `role-playtest.md`, the case with its charter, REPL/dev-URL access, a tool budget.
+- **M Reviewers** — case-slices. Inputs: `role-reviewer.md`, case-slice, pointers to the completed journey output(s) that cover it.
 
-Send all dispatches in parallel. Turnaround = slowest agent.
+Start Engineers and Playtest sessions in parallel. As each case-slice's complete evidence set lands, dispatch its Reviewer; do not wait for unrelated journeys, and never dispatch a Reviewer before every named input exists. Parallelize independent work while preserving the evidence dependency.
 
 ### Phase 4: Rollup
 Collect per-case reviews and session sheets from `<artifactDir>/reviews/`. Aggregate tickets from `<artifactDir>/tickets/` — they streamed; don't re-derive them. Write `verdict.json`: per-case verdicts, ticket counts by severity, pointers to evidence.
@@ -44,7 +44,7 @@ Return to the Owner: one paragraph — pass/soft/fail/unverified counts, blocker
 - **You don't enumerate cases.** They're signed off in the brief.
 - **You don't author journeys.** Engineers do.
 - **You don't judge evidence.** Reviewers and Playtest do.
-- **Dispatch parallel wherever possible.** Sequential is the default failure mode.
+- **Parallelize independent work.** A Reviewer remains sequenced behind the evidence it judges.
 - **Trust the streaming tickets.** Don't re-fetch what's already in `tickets/`.
 
 ## Red Flags — STOP
@@ -54,7 +54,8 @@ Return to the Owner: one paragraph — pass/soft/fail/unverified counts, blocker
 - Authoring a case or journey inline because "this one is small" → even small ones get dispatched
 - Judging evidence yourself → Reviewer's job
 - A `live` case handed to an evidence Reviewer → it needs a session, not a bundle
-- Sequential dispatch → parallel; turnaround = slowest agent
+- Reviewer dispatched before its evidence exists → dependency violation; wait for that slice
+- Completed evidence waits for unrelated journeys before review → dispatch its Reviewer now
 
 ## Common Rationalizations
 
@@ -64,3 +65,4 @@ Return to the Owner: one paragraph — pass/soft/fail/unverified counts, blocker
 | "Gaps will turn up during dispatch anyway" | Yes — N times, in parallel, expensively. File once at Phase 1 |
 | "I can write a tighter plan than the Architect" | Not your role; the plan is signed off |
 | "The probe's obviously there, skip the check" | Obvious probes are the ones nobody verified |
+| "All agents should start in one wave" | Review is parallel across ready slices, not ahead of its own evidence |

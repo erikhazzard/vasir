@@ -50,6 +50,14 @@ function findLocalMarkdownLinks(filePath) {
   return linkMatches.map((matchEntry) => matchEntry[1]);
 }
 
+function findConcreteSkillResourceReferences(filePath) {
+  const fileContents = fs.readFileSync(filePath, "utf8");
+  const referenceMatches = [
+    ...fileContents.matchAll(/^\s*-\s+`((?:references|scripts|templates|assets)\/[^`*<>]+)`/gm)
+  ];
+  return referenceMatches.map((matchEntry) => matchEntry[1]);
+}
+
 function extractUniqueTaggedBlock(documentText, tagName) {
   const blockPattern = new RegExp(`<${tagName}>[\\s\\S]*?</${tagName}>`, "g");
   const matches = documentText.match(blockPattern) ?? [];
@@ -378,7 +386,7 @@ test("question-spec routing, capability compression, and fresh-review contracts 
   assert.match(questionSpecEvalText, /A coherent approved spec[\s\S]*do not invent a gate/);
 });
 
-test("local markdown links resolve", () => {
+test("local markdown links and declared skill resources resolve", () => {
   const documentPathsToCheck = [
     "README.md",
     "MANIFESTO.md",
@@ -401,6 +409,22 @@ test("local markdown links resolve", () => {
       const [relativeFilePath] = relativeLinkPath.split("#");
       const resolvedLinkPath = path.resolve(path.dirname(absoluteDocumentPath), relativeFilePath);
       assert.ok(fs.existsSync(resolvedLinkPath), `${relativeDocumentPath} references missing path ${relativeLinkPath}`);
+    }
+  }
+
+  const rootSkillManifestPaths = walkFiles(SKILLS_ROOT).filter((filePath) => {
+    const relativeSkillPath = path.relative(SKILLS_ROOT, filePath);
+    return path.basename(filePath) === "SKILL.md" && relativeSkillPath.split(path.sep).length === 2;
+  });
+
+  for (const manifestPath of rootSkillManifestPaths) {
+    const relativeManifestPath = path.relative(REPO_ROOT, manifestPath).replace(/\\/g, "/");
+    for (const relativeResourcePath of findConcreteSkillResourceReferences(manifestPath)) {
+      const resolvedResourcePath = path.resolve(path.dirname(manifestPath), relativeResourcePath);
+      assert.ok(
+        fs.existsSync(resolvedResourcePath),
+        `${relativeManifestPath} references missing packaged resource ${relativeResourcePath}`
+      );
     }
   }
 });

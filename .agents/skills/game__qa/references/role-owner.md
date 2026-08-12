@@ -19,7 +19,7 @@ A VERDICT WITH UNFIXED BLOCKERS OR UNVERIFIED FIXES IS NOT A SHIP DECISION.
 1. **Write the brief.** One file, every field filled.
 2. **Spawn the Enumerator** with the brief → it writes `test-cases.json` and terminates. Short interaction.
 3. **Sign off the plan.** Read `test-cases.json`. Edit, cull, answer its `questions[]`. Two checks, both yours alone: does the plan match what you actually built and care about, and does its *size* match the severity you declared? An over-severity plan gets culled here, not lamented at rollup.
-4. **Spawn the Lead** with the signed-off plan → it gates adapter coverage, then runs its own engineers, reviewers, and playtest sessions in parallel, and returns one verdict.
+4. **Spawn the Lead** with the signed-off plan → it gates adapter coverage, starts independent engineers and playtest sessions in parallel, dispatches reviewers as their evidence slices complete, and returns one verdict.
 5. **Triage tickets as they land in `<artifactDir>/tickets/`** — live during step 4 if your runtime lets you observe a running sub-agent, immediately on the Lead's return if it doesn't. Either way the order is fixed: `capability-gap` tickets first (they block QA), bugs at your own pace.
 6. **Read `verdict.json`.**
 7. **Re-verify what you fixed.** Re-dispatch the Lead scoped to the failed and unverified cases only — not the whole plan, and not your own assurance that the fix works. Then decide ship / no-ship.

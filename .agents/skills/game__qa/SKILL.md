@@ -7,7 +7,7 @@ description: Runs end-to-end browser-game QA and returns one release verdict fro
 
 One skill, seven roles, one pipeline. The default it replaces: an engineer verifying their own feature, in their own context, against their own expectations — which produces the same artifact every time, a green run that proves the engineer's assumptions. This skill installs a division of labor instead. The builder sets the bar. An architect turns promises into cases. Engineers produce evidence without judging it. Judges who never saw the code deliver verdicts from evidence alone. The roles are connected by artifacts, never by trust.
 
-Every participant reads this file's Laws plus exactly one role file. Nothing else in this skill is for you.
+Every participant reads this file's Laws plus exactly one role file, then loads only the resource contracts that role or the routing table names.
 
 ## The Laws — bind every role; cited, never cloned
 
@@ -34,13 +34,13 @@ Every participant reads this file's Laws plus exactly one role file. Nothing els
 ```
 Owner ── brief ──▶ Enumerator ── test-cases.json ──▶ Owner signs off
 Owner ──▶ Lead ── coverage gate ──▶ ∥ Engineers   (journeys → evidence)
-                                    ∥ Reviewers   (evidence → verdicts)
                                     ∥ Playtest    (charters → sessions)
+completed journey output ─────────▶ ∥ Reviewers   (evidence → verdicts)
         ◀────────── tickets stream throughout ──────────
 Lead ── verdict.json ──▶ Owner ── fixes ──▶ re-verify failed slice ──▶ ship / no-ship
 ```
 
-The Owner spawns the Enumerator, then the Lead. The Lead spawns Engineers, Reviewers, and Playtest sessions in parallel. Leaves spawn nothing. A verdict with fixes behind it is re-verified by re-dispatching the failed and unverified slice — not the whole plan, and not by taking the fixer's word.
+The Owner spawns the Enumerator, then the Lead. The Lead starts Engineers and Playtest sessions in parallel, then dispatches each Reviewer only after that reviewer's required journey output exists. Reviewers for completed case slices may overlap Engineers still producing unrelated evidence. Leaves spawn nothing. A verdict with fixes behind it is re-verified by re-dispatching the failed and unverified slice — not the whole plan, and not by taking the fixer's word.
 
 ## Routing — read exactly one
 
@@ -79,3 +79,5 @@ qa-runs/<date>_<feature>/
 - `references/brief-schema.md` — owner writing the brief.
 - `references/adapter-contract.md` — bootstrap; engineer validating primitives.
 - `references/arrange-vs-shortcut.md` — enumerator and engineer, any time a primitive smells like the action under test.
+- `references/runner.ts` — bootstrap copies this framework runner to the project QA rig.
+- `references/qa-adapter.template.ts` — bootstrap copies and adapts this project bridge.

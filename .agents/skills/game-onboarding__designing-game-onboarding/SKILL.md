@@ -232,5 +232,5 @@ Before finalizing:
 - `references/onboarding-beat-canvas.md` — Read when producing a new onboarding sequence, level outline, or first-minutes blueprint.
 - `references/review-rubric.md` — Read when auditing or scoring an existing level, prototype, tutorial, or first playable slice.
 - `references/eval-cases.md` — Read when testing this skill, designing skill evals, or checking routing boundaries.
-- `references/hades-first-death-loop-gold-star.md` — S-tier roguelite/action onboarding reference covering Hades' first escape attempt, first likely death, House of Hades return, and second-run setup.
+- `references/hades-first-run-gold-star.md` — S-tier roguelite/action onboarding reference covering Hades' first escape attempt, first likely death, House of Hades return, and second-run setup.
 - `references/plants-vs-zombies-day-world-gold-star.md` — S-tier casual strategy / tower-defense onboarding reference covering Plants vs. Zombies' first Day world, from Level 1-1 through the Day finale and transition to Night.
