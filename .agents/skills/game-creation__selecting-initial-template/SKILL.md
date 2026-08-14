@@ -19,7 +19,7 @@ When a creator explicitly asks to make, build, create, initialize, or finish a g
 
 ## Applicable Initialization Skill Routes
 
-After reading the approved `README__game-spec.md`, load only the local skills whose judgment the game actually needs. This list is routing, not an artifact or skill-count quota:
+After reading the approved `README__game-spec.md`, route only the skills whose judgment the game needs under root §7. This list is routing, not an artifact or skill-count quota:
 
 1. **Template substrate**: this skill chooses the starter template and states `Selected template: <template path> - <reason>.`
 2. **Game direction**: use `game__directing` for coherence unless a narrower genre skill is clearly the stronger fit.
@@ -29,7 +29,7 @@ After reading the approved `README__game-spec.md`, load only the local skills wh
 6. **First-playable comprehension proof**: when the user requests an audit or a specific false-first-playable/mobile-comprehension risk warrants independent review, `game-proof__auditing-first-playable-comprehension` can own that focused review. Do not add another audit merely because the skill exists.
 7. **Juice/polish**: use `game__adding-juice` once the loop is readable, especially for taps, hits, kills, rewards, transitions, and failure.
 
-Do not paste these skill bodies into the prompt. Let Codex load the skills normally from `.codex/skills` or `.agents/skills`. If a required skill is missing, say which skill is missing, use the nearest available repo guidance, and treat that as a skill-sync bug to fix rather than a reason to invent backend prompt choreography.
+Do not paste skill bodies into prompts; root §7 owns execution routing. If a required skill is missing, name it, use the nearest repo guidance, and treat the omission as a skill-sync bug.
 
 ## Autonomous First-Playable Algorithm
 
@@ -38,7 +38,7 @@ Run this algorithm until the workspace reaches exactly one terminal state: `Read
 0. **Authority pass**: confirm the creator requested make/build/create/initialize/finish or otherwise approved autonomous implementation. If the creator asked for spec-only or approval-first work, do not run this algorithm.
 1. **Spec pass**: read `README__game-spec.md`. If it is missing, placeholder, vague, or contradicted by the creator request, invoke `game-creation__writing-game-spec`; after the spec is written, continue unless that skill stopped for explicit approval-first handling.
 2. **Template pass**: inspect local template inventory, choose the smallest viable substrate, and emit `Selected template: <template path> - <reason>.`
-3. **Skill-routing pass**: load the applicable routes above. Record only decisions a skill materially changes; no ledger entry exists just to prove a skill was mentioned.
+3. **Skill-routing pass**: route the applicable skills under root §7. Record only decisions a skill materially changes; no ledger entry exists just to prove a skill was mentioned.
 4. **Build pass**: adapt or create the actual game loop, controls, feedback, UI, and assets required by the approved spec. Add tests, simulations, metadata hooks, or new harness code only when a specific material failure cannot be guarded more simply.
 5. **Proof pass**: map plausible material failures to sufficient existing evidence, the cheapest warranted proof, or an authorized narrowed claim. Observe the real player loop at its public surface. A 390 x 844 portrait render is the mobile authority seam when visual/mobile truth is being proved; a stored screenshot, video, browser harness, simulation, or durable test is not automatic.
 6. **Optional audit pass**: run one focused independent review only when the user requests it or a named high-regret risk warrants independent judgment. Add gameplay/UI/art/QA lenses only for the specific blind spot; otherwise proceed without an audit.
@@ -50,7 +50,7 @@ Run this algorithm until the workspace reaches exactly one terminal state: `Read
 
 ### Subagent Lanes
 
-Delegate only when a bounded lane repays spawn overhead or a warranted audit requires independent conversational review. The root agent remains responsible for integration, final files, and the terminal state. The lanes below are optional lenses, not a mandatory four-agent fan-out.
+Delegate bounded lanes under root §7. The root agent remains responsible for integration, final files, and the terminal state. The lanes below are optional lenses, not a mandatory four-agent fan-out.
 
 - **Gameplay/agency auditor**: checks core verb, meaningful choice, feedback, state consequence, and renewed intent.
 - **UI/comprehension auditor**: checks first frame, controls, HUD, overlays, results, labels, and mobile readability.

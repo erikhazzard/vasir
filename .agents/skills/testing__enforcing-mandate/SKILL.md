@@ -1,6 +1,6 @@
 ---
 name: testing__enforcing-mandate
-description: Chooses whether proof is needed, then the cheapest credible seam and size that protects the user or system value path without redundant test debt. Triggers when writing or changing tests, planning proof, choosing browser/integration/unit seams, reproducing a defect, or guarding a critical path.
+description: Chooses durable test retention and the cheapest credible proof seam. Use when the requested work is test strategy or test authorship, not temporary bug reproduction or routine test execution.
 tools: Read, Grep, Glob, Edit, Write
 ---
 

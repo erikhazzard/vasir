@@ -1,6 +1,6 @@
 ---
 name: art-direction__defining-game-art
-description: Routes game-art work to reusable art-direction references for premium 2D pixel RPGs and stylized 3D hero action. Use when creating, critiquing, or specifying characters, environments, weapons, VFX, animation, maps, asset pipelines, or art quality bars.
+description: Creates bounded game-art briefs and critiques using premium 2D pixel-RPG or stylized 3D hero-action references. Use when the deliverable is art direction for characters, environments, weapons, VFX, animation, maps, assets, or quality bars.
 ---
 
 # Game Art Direction Router

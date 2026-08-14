@@ -1,142 +1,27 @@
 ---
 name: code__threejs-rapier-performance
-description: Enforces deterministic, measurement-driven mobile-web performance architecture before material Three.js or Rapier code and asset changes. Use when planning renderer, physics, quality-tier, loading, memory, asset-pipeline, or threading architecture before implementation; for an observed performance symptom, use $threejs__improve-performance first.
+description: Plans deterministic mobile-web performance architecture for Three.js and Rapier rendering, physics, quality tiers, loading, memory, assets, and threading. Use for system-level design before implementation; use $threejs__improve-performance for observed performance symptoms.
 ---
 
-Before writing code or changing assets, adopt this as law.
+Use this skill before committing to system-level mobile performance architecture.
 
 ## Routing boundary
 
-Use this skill to frame a planned mobile Three.js or Rapier architecture, asset-pipeline, quality-tier, or threading change before implementation. Use `$threejs__improve-performance` when low FPS, stutter, hitches, load stalls, memory growth, or another observed symptom needs causal diagnosis or measured remediation. If that diagnosis earns a material architecture change, return here with the bounded finding and proof target; do not load both skills speculatively.
+Use this skill for planned renderer, physics, asset-pipeline, quality-tier, loading, memory, or threading architecture. Use `$threejs__improve-performance` for observed low FPS, stutter, hitches, load stalls, or memory growth; return here only if diagnosis earns an architecture change. Do not load both skills speculatively.
 
 Mobile-web performance is not “higher FPS.” It is stable frame time, low touch/input latency, bounded memory, controlled download size, thermal resilience, and deterministic simulation on real phones. The goal is not to make one device look impressive. The goal is to ship a game that feels responsive, stays correct, and degrades intentionally across mobile browsers.
 
-# 0) Operating Order (required for every meaningful change)
+# 0) Operating Order
 
-## 0.1 The required “Mobile Perf Note” (put in the first response before code)
+Before choosing architecture:
 
-Output **exactly** these sections, in this order, with bullet points:
+1. Name the player journey and the controls, readability, camera, hit timing, and deterministic outcomes that must survive every quality tier.
+2. Name the target device classes and only the budgets supported by repo evidence or measurements; label consequential assumptions.
+3. Classify the likely cost and state the first measurement or falsifier that can disprove it.
+4. Prefer removing, simplifying, delaying, batching, or moving work before optimizing it.
+5. Define the cheapest device-level proof for frame time, input response, memory, loading, thermals, and replay correctness that the change can affect.
 
-1) **Game Form & Player Journey**
-   - Game archetype: **[corridor racer / arena brawler / top-down shooter / platformer / builder-sim / physics puzzler / exploration / other]**
-   - Camera/view: **[first-person / third-person / top-down / isometric / side-view / mixed]**
-   - Visibility pattern: **[room-based / arena / corridor / open / streamed]**
-   - Physics role: **[authoritative gameplay / hybrid / mostly cosmetic]**
-   - This unlocks: **[player journey one level above the feature]**
-   - Within that journey, this enables: **[specific step]**
-   - The next obvious player action is: **[next step]**
-   - On mobile, what must stay perfect: **[controls / readability / hit timing / replay correctness / camera / etc.]**
-   - On mobile, what may degrade by tier: **[resolution / shadows / particles / density / post / decals / etc.]**
-
-2) **Target Matrix & Tiering**
-   - Supported browsers/platforms: **[iOS Safari / Chrome Android / Samsung Internet / etc.]**
-   - Minimum supported device class: **[lowest target that must still be good enough]**
-   - Representative device matrix: **[low / medium / high examples]**
-   - Quality tiers: **Low / Medium / High**
-   - Device auto-select source: **[existing repo heuristic / benchmark / capability score / prior telemetry / explicit assumption]**
-   - User override: **[where stored, whether sticky, whether gameplay-safe]**
-   - Hard exclusions / unsupported combinations: **[what we explicitly do not support]**
-
-3) **Determinism Contract**
-   - Simulation step: **[fixed timestep and exact rate]**
-   - Render/sim relationship: **[interpolate / extrapolate / lockstep / none]**
-   - Authoritative time source: **[simulation time, not frame delta]**
-   - Replay/network contract: **[what must reproduce exactly]**
-   - Sources of nondeterminism touched: **[randomness, unordered iteration, time, async ordering, floating point boundaries, browser feature differences]**
-   - How this change preserves determinism: **[specific guardrails]**
-   - What is allowed to vary by tier: **[presentation only]**
-   - What must never vary by tier: **[authoritative gameplay and replay outcomes]**
-
-4) **Budget Map**
-   - FPS target by tier: **[e.g. High 60 / Medium 60 / Low 30, or 60 across all tiers if required]**
-   - Frame budget split: **[render ms / physics ms / game update ms / main-thread margin]**
-   - Interaction budget: **[tap/drag responsiveness target]**
-   - Memory budget: **[JS heap + GPU/texture/render-target budget if known]**
-   - Load budget: **[initial download / first playable / streaming budget]**
-   - Thermal/soak expectation: **[what must still hold after several minutes]**
-   - Battery/power constraints: **[if relevant]**
-
-5) **Bottleneck Classification**
-   - Primary suspected bottleneck: **[fill-rate / draw-call CPU / scene traversal / shader/material / shadows/post / texture bandwidth / memory pressure / asset parse/decode / main-thread blocking / GC / JS↔WASM boundary / physics broad-phase / narrow-phase / solver / joints / CCD / queries]**
-   - Secondary bottleneck(s): **[...]**
-   - Evidence currently available: **[trace, stats, code shape, asset facts, symptom pattern]**
-   - First measurement to confirm: **[exact profile or stat]**
-   - What would disprove this hypothesis: **[specific observation]**
-
-6) **Asset & Content Audit**
-   - Geometry strategy: **[unique meshes, repeated props, instancing/batching candidates, LOD]**
-   - Texture strategy: **[formats, sizes, compression, atlases, mip policy]**
-   - Material strategy: **[material count, expensive materials, transparency use]**
-   - Animation strategy: **[bones, clips, compression/resampling, update frequency]**
-   - Streaming/lifecycle: **[what loads at boot, what streams, what unloads]**
-   - Cleanup/disposal plan: **[GPU + WASM + JS ownership]**
-
-7) **Render Strategy**
-   - Renderer path: **[WebGL-first / WebGPURenderer evaluated / WebGPU used with fallback story]**
-   - Internal-resolution policy: **[explicit render size, DPR cap, dynamic scale, max pixel count]**
-   - Culling/visibility strategy: **[frustum / distance / room / corridor / sector / portal / manual]**
-   - Draw-call strategy: **[InstancedMesh / BatchedMesh / merged geometry / material reduction]**
-   - Material/shader strategy: **[what gets cheap materials vs expensive ones]**
-   - Shadow strategy: **[baked / static / selective dynamic / off]**
-   - Postprocessing strategy: **[none / minimal / selective / justified]**
-   - GPU resource lifecycle: **[render targets, textures, materials, geometries, shader warmup if relevant]**
-   - Fallback behavior: **[how visuals degrade safely when a feature is unavailable or too slow]**
-
-8) **Physics Strategy**
-   - World scale: **[meters ↔ render units mapping]**
-   - Body/collider/joint inventory: **[counts or estimates]**
-   - Body-type choices: **[fixed / kinematic / dynamic / character controller and why]**
-   - Collider strategy: **[primitives / compound / hull / trimesh and why]**
-   - Sleeping policy: **[where enabled, where forbidden]**
-   - Collision filtering strategy: **[collision groups / query groups / solver groups]**
-   - CCD scope: **[only which bodies, and why]**
-   - Event/query policy: **[what collisions, contacts, or casts are truly needed]**
-   - Render sync path: **[how transforms move from Rapier to rendering]**
-   - WASM interaction strategy: **[how per-frame crossings are minimized]**
-
-9) **Threading & Main-Thread Strategy**
-   - What runs on the main thread each frame: **[...]**
-   - What can move off-main-thread: **[rendering / asset parse / texture transcode / physics / pathfinding / scene prep]**
-   - OffscreenCanvas / worker evaluation: **[use or explicitly reject with reason]**
-   - DOM/input/UI separation: **[how canvas work avoids hurting input]**
-   - Cross-thread ownership and message cost: **[what data moves, how often, why]**
-   - Resize/orientation/visibility handling: **[what happens on pause/resume/tab hidden/orientation change]**
-
-10) **Quality Tier Implementation**
-   - Low tier knobs: **[exact settings]**
-   - Medium tier knobs: **[exact settings]**
-   - High tier knobs: **[exact settings]**
-   - Auto-select algorithm: **[existing repo heuristic first; otherwise explicit temporary heuristic]**
-   - Persistence and override: **[how stored and surfaced to player]**
-   - Guardrail: **[tiers never change deterministic gameplay]**
-
-11) **Observability & Proof**
-   - Runtime stats to capture: **[draw calls, triangles, textures, render targets, frame time, long tasks, input latency, physics step time, body/collider counts, query counts, memory, download size]**
-   - Profiling method: **[DevTools trace / in-game counters / device test / synthetic benchmark]**
-   - Proof plan: **[before/after measurements, device matrix, soak test]**
-   - Acceptance criteria: **[what must measurably improve and on which devices]**
-   - Rollback trigger: **[what regression invalidates the change]**
-
-12) **Tests Portfolio**
-   - Deterministic replay test: **[same seed + same inputs => same authoritative result]**
-   - Regression integration test: **[real pipeline, not mocked away]**
-   - Perf regression test or benchmark: **[what metric must not regress]**
-   - Tier-selection test: **[same capability vector => same tier]**
-   - Fallback-path test: **[WebGL path still correct if WebGPU unavailable; or equivalent fallback]**
-   - Resource-lifecycle test: **[load/unload leaves no retained GPU/WASM resources]**
-   - Flake control: **[fixed clocks, seeded randomness, bounded waits, no sleeps for correctness]**
-
-13) **Migration Plan (if behavior, pipeline, or content shape changes)**
-   - **Expand → Migrate → Contract**
-   - Compatibility window: **[which assets/clients/settings must coexist]**
-   - Deletion trigger: **[date/version/repo milestone]**
-
-If essential context is missing, mark it **[ASSUMED]**, choose conservative mobile-first defaults, and list alternatives + tradeoffs before code. Do not guess silently.
-
-Stop and rethink if you cannot say what work is being **removed**, **simplified**, **delayed**, or **moved off the hot path**.
-
----
-
+Record durable decisions in the active work spec when one exists. Report only the conclusions that change implementation.
 # 1) Non-Negotiables (mobile-web constitution)
 
 ## 1.1 Measure before prescribing
@@ -607,7 +492,6 @@ No second renderer or second device scorer without a deletion plan.
 
 A change is not done unless all apply:
 
-* ✅ Mobile Perf Note included, in the required order
 * ✅ Game form / camera / visibility / physics role explicitly stated
 * ✅ Determinism contract explicitly preserved
 * ✅ Bottleneck classification stated with evidence

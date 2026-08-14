@@ -70,12 +70,12 @@ this skill coordinates the lane; the specialist skill owns its domain judgment.
 
 ## Specialist Skills Are Tools
 
-Load the smallest set of specialist skills that can close the requested build.
+Route the smallest set of specialist skills that can close the requested build under root §7.
 Do not report loaded phases as completed work. A phase helped only if it changed the playable slice, the play moment, or the next repair.
 
 For broad playable builds, the usual tool map is:
 
-| Phase | Skill to load | Job |
+| Phase | Skill | Job |
 |---|---|---|
 | Vision/coherence | `game__directing` | One-sentence vision, pillars, token lock, scope cuts. |
 | Core loop | `game__building-core-loop` | Verb, objective, pressure, reward, fail/retry, session shape. |
@@ -106,11 +106,11 @@ Build lane:
 - Target platform/orientation: mobile-native portrait; secondary surfaces only if explicitly relevant
 - Current game state: none / runnable / broken / playable candidate
 - Highest-risk gap:
-- Specialist skills to load:
+- Specialist skills to route:
 - What I must play or check before calling it done:
 ```
 
-If the player promise or first meaningful act is undefined, load `game__directing` and `game__building-core-loop` before implementation.
+If the player promise or first meaningful act is undefined, route `game__directing` and `game__building-core-loop` under root §7 before implementation.
 
 ### Pass 1 - Player Promise Contract
 
@@ -211,6 +211,6 @@ Use `SLAPS` only when the requested claim is satisfied and the first active slic
 ## Completion Boundaries
 
 - A visually busy scene plus `npm run build` is not a playable build.
-- The agent must define the player promise, load the relevant specialist skills, implement or repair the loop, play or watch the first active slice, and lead the handoff with the concrete play moment.
+- The agent must define the player promise, route the relevant specialist skills, implement or repair the loop, play or watch the first active slice, and lead the handoff with the concrete play moment.
 - Release-ready closes through `$handoff__final-quality-gate` only when that optional review was requested or warranted; recorded human Slap acceptance closes an approved feel/playability question.
 - Late in a long build, if a human QA pass would not want another 30 seconds, no phase checkbox matters.

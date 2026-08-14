@@ -206,13 +206,17 @@
 # 7. Multi-Agent & Model Routing
 
 <multi_agent_routing>
-  Default: do the work in the current agent. Delegate only when a bounded task is large enough to repay spawn overhead or §6 requires independent conversational review. Never spawn a helper for one file read, one search, one command, or context the current coding/judgment agent needs to own its lane.
+  Default: keep coherent lane ownership and final synthesis in the current agent. Delegate separable work when a compact result protects parent context or repays spawn overhead. Never spawn for one trivial read, search, or command, or for context the current agent must continuously interleave with its lane.
 
   Routing order (first match wins):
     1. **gpt-5.6-sol xhigh:** product code, architecture, consequential judgment, synthesis, reviews, gate verdicts, and final decisions.
     2. **gpt-5.6-luna max:** bounded file/repo reading, reconnaissance, failure investigation, log/diff interpretation, evidence extraction, and exact safe command batteries such as tests, builds, and benchmarks. Command-only tasks return raw or capped output and make no diagnosis or verdict.
-    3. **gpt-5.6-sol high:** the routine remainder that needs neither repository investigation, product-code authorship, nor consequential judgment.
+    3. **gpt-5.6-sol high:** bounded advisory specialist work and routine tasks that need neither repo investigation, product-code authorship, architecture selection, nor a gate verdict.
     A coding or judgment agent may read files and run commands needed for its own lane. The routing table governs delegation; it does not require fragmenting one coherent task across agents.
+
+  <skill_activation_routing>
+    Skill matches are candidates, not a checklist. Keep the lane orchestrator, active code owner, and final synthesis in the parent. When optional specialist work is separable, delegate it using the routing order above; the worker selects the smallest applicable skill set and returns a capped result. Workers do not recursively delegate. Host-required parent skill loading still wins.
+  </skill_activation_routing>
 
   Bindability gate:
     - Never delegate through a surface that cannot explicitly bind the required model and reasoning effort. In-harness `spawn_agent`/subagent surfaces without those controls are forbidden for routed work.

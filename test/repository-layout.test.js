@@ -241,6 +241,42 @@ test("root contract twins preserve exactly-once independent-review topology", ()
   assert.match(agentsTopologyBlock, /not the author's trajectory or conclusions/);
 });
 
+test("root contract twins share a compact skill-routing law", () => {
+  const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
+  const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
+  const agentsSkillRoutingBlock = extractUniqueTaggedBlock(agentsTemplateText, "skill_activation_routing");
+  const claudeSkillRoutingBlock = extractUniqueTaggedBlock(claudeTemplateText, "skill_activation_routing");
+
+  assert.equal(agentsSkillRoutingBlock, claudeSkillRoutingBlock);
+  assert.match(agentsSkillRoutingBlock, /candidates, not a checklist/);
+  assert.match(agentsSkillRoutingBlock, /lane orchestrator, active code owner, and final synthesis in the parent/);
+  assert.match(agentsSkillRoutingBlock, /worker selects the smallest applicable skill set/);
+  assert.match(agentsSkillRoutingBlock, /do not recursively delegate/);
+  assert.match(agentsSkillRoutingBlock, /Host-required parent skill loading still wins/);
+  assert.ok(agentsSkillRoutingBlock.split(/\s+/).length <= 75, "skill routing law must stay compact");
+});
+
+test("specialist descriptions stay narrow and performance has no forced preamble", () => {
+  const skillNames = [
+    "art-direction__defining-game-art",
+    "code__threejs-rapier-performance",
+    "testing__enforcing-mandate"
+  ];
+  const skillTexts = Object.fromEntries(skillNames.map((skillName) => [
+    skillName,
+    fs.readFileSync(path.join(SKILLS_ROOT, skillName, "SKILL.md"), "utf8")
+  ]));
+
+  for (const [skillName, skillText] of Object.entries(skillTexts)) {
+    const description = skillText.match(/^description: (.+)$/m)?.[1] ?? "";
+    assert.ok(description.split(/\s+/).length <= 40, `${skillName} description must stay under 40 words`);
+  }
+
+  const performanceSkillText = skillTexts["code__threejs-rapier-performance"];
+  assert.match(performanceSkillText, /Use for system-level design before implementation/);
+  assert.doesNotMatch(performanceSkillText, /Mobile Perf Note|Game Form & Player Journey|Output \*\*exactly\*\*/);
+});
+
 test("root contract twins preserve scoped failure semantics without false-green outcomes", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
   const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");

@@ -38,7 +38,7 @@
     },
     {
       "name": "art-direction__defining-game-art",
-      "description": "Routes game-art work to reusable art-direction references for premium 2D pixel RPGs and stylized 3D hero action. Use when creating, critiquing, or specifying characters, environments, weapons, VFX, animation, maps, asset pipelines, or art quality bars.",
+      "description": "Creates bounded game-art briefs and critiques using premium 2D pixel-RPG or stylized 3D hero-action references. Use when the deliverable is art direction for characters, environments, weapons, VFX, animation, maps, assets, or quality bars.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -155,7 +155,7 @@
     },
     {
       "name": "code__threejs-rapier-performance",
-      "description": "Enforces deterministic, measurement-driven mobile-web performance architecture before material Three.js or Rapier code and asset changes. Use when planning renderer, physics, quality-tier, loading, memory, asset-pipeline, or threading architecture before implementation; for an observed performance symptom, use $threejs__improve-performance first.",
+      "description": "Plans deterministic mobile-web performance architecture for Three.js and Rapier rendering, physics, quality tiers, loading, memory, assets, and threading. Use for system-level design before implementation; use $threejs__improve-performance for observed performance symptoms.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1017,7 +1017,7 @@
     },
     {
       "name": "testing__enforcing-mandate",
-      "description": "Chooses whether proof is needed, then the cheapest credible seam and size that protects the user or system value path without redundant test debt. Triggers when writing or changing tests, planning proof, choosing browser/integration/unit seams, reproducing a defect, or guarding a critical path.",
+      "description": "Chooses durable test retention and the cheapest credible proof seam. Use when the requested work is test strategy or test authorship, not temporary bug reproduction or routine test execution.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
