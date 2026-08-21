@@ -40,7 +40,7 @@ This skill owns at most one report for the requested judgment. Apply $code__audi
 
 ### 1. Approved scope and custody
 
-Verify the current user instruction or durable actor/source/date/scope. Changed files serve the unlock and remain inside the user/consumer promise, existing external contracts, externally owned authority, safety/data-integrity, irreversible-operation, and explicit product-decision boundaries. A newly discovered in-boundary file is not scope creep.
+Verify the current user instruction or durable decision record under root §1. Changed files serve the unlock and remain inside the user/consumer promise, existing external contracts, externally owned authority, safety/data-integrity, irreversible-operation, and explicit product-decision boundaries. A newly discovered in-boundary file is not scope creep.
 
 ### 2. Product forest and semantic coherence
 
@@ -63,7 +63,7 @@ When no eval plan exists, inspect the direct value path and the cheapest credibl
 
 ### 5. Subjective acceptance
 
-Every required subjective gate is Accepted, Waived with authority, or Retired. Accepted includes actor, source, date, exact question/scope, and the reviewed experience/artifact identity. Waiting Human or Rejected blocks. Automation never substitutes.
+Every required subjective gate is Accepted, Waived with authority, or Retired. Accepted records the verdict, affected criterion, and reviewed experience/artifact identity once under root §1. Waiting Human or Rejected blocks. Automation never substitutes.
 
 ### 6. Terminal “so what”
 

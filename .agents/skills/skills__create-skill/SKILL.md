@@ -106,9 +106,7 @@ Do not let heuristics masquerade as laws: **hard constraint** (safety, integrity
 
 ## Workflow
 
-Map the system → extract the payload → build the rewrite chain → place each rule → design routing → draft the manifest → add eval cases → emit the smallest artifact for the mode (full manifest, ranked audit, revised frontmatter, distillation map, or metadata answer). The full arc with fill-in maps, the mechanism and component matrices, and the annotated skeleton live in `references/skill-template.md`.
-
-Skill evals answer one question: did the loaded skill change the model's decision in the intended direction? Meaningful skills get seven case types — baseline-without-skill failure, with-skill behavior, should-trigger, should-not-trigger, borderline, collision/coexistence, attention-drift. Worked cases and grading live in `references/eval-case-library.md`. No validators by default.
+Map the system → extract the payload → build the rewrite chain → place each rule → design routing → draft the manifest → emit the smallest artifact for the mode (full manifest, ranked audit, revised frontmatter, distillation map, or metadata answer). The full arc with fill-in maps, the mechanism and component matrices, and the annotated skeleton live in `references/skill-template.md`.
 
 ## Anti-Patterns
 
@@ -145,10 +143,8 @@ Required elements, any readable shape: mode · should-exist (yes/no + why) · re
 - [ ] Strongest anchors placed where attention drift can reach them.
 - [ ] Description is one-line classifier text with no colon in its value; name is activity-first.
 - [ ] References linked with when-to-read; nothing in root that belongs below.
-- [ ] Eval cases exist for meaningful skills; no validator by default.
 
 ## References
 
 - `references/skill-template.md` — read when producing a complete new skill or full rewrite: the eight-pass arc, mechanism and component matrices, annotated skeleton with per-genus blocks.
-- `references/eval-case-library.md` — read when designing eval cases for important, broad, or collision-prone skills: the seven case types worked, with grading.
 - `references/agent-context-extraction.md` — read when extracting skills from a root contract or large agent-context file: boundary test, distillation table, split method, re-grounding.

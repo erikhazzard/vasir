@@ -2,7 +2,7 @@
 name: plan__maintain-work-spec
 description: >-
   Creates and updates the durable product map for a substantial lane: the request, vFinal North Star, observable contracts, vertical-slice ladder, active rung, and current motion.
-  Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or human decision.
+  Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or load-bearing product decision.
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -21,8 +21,8 @@ Every substantial lane keeps these load-bearing:
 - **Primary entrypoints:** the exact API, route, event, command, or user action where the journey begins.
 - **North Star:** actor, steps, observable success, obvious next action, experience invariants, obviousness assumptions, and the design/UX bar.
 - **Non-goals:** explicit scope boundaries that do not weaken the required experience.
-- **Request anchor:** the user's required outcomes and prohibitions in near-verbatim language.
-- **Current truth:** only facts, unknowns, and decisions that can change the active or next slice.
+- **Request anchor:** the user's required outcomes and prohibitions in semantically faithful, compact language.
+- **Current truth:** only repo/runtime facts, unknowns, and current consequences that can change the active or next slice; binding product decisions live once in §9.
 - **Observable contracts:** stable `C-###` statements that can visibly fail, including a scoped failure contract when degradation, denial, unavailability, or an indeterminate effect can materially change the journey.
 - **Vertical-slice ladder:** meaningful working experiences leading to `vFinal`; the active rung is the richest build packet.
 - **Current motion:** active rung, next action or blocker, and the honest claim boundary.
@@ -46,10 +46,10 @@ Administrative neatness never outranks product meaning. A perfectly formatted sp
 
 Capture every substantial request before synthesizing it away:
 
-- Use one near-verbatim bullet for a single critical request.
+- Use one semantically faithful, compact bullet for a single critical request.
 - For multi-item intake, use one bullet per `Must`, `Must Not`, `Preference`, `Permission`, or `Question`.
 - `Must` and `Must Not` items must map to the North Star, a `C-###`, or a rung that observably delivers them.
-- A required item cannot be omitted, weakened, deferred, made a non-goal, or replaced by an easier non-equivalent proxy without an explicit human product decision naming that item.
+- A required item cannot be omitted, weakened, deferred, made a non-goal, or replaced by an easier non-equivalent proxy without an explicit human product decision addressing that item.
 - Preferences, permissions, and questions guide implementation but do not freeze the product boundary unless the user promotes them to a requirement.
 
 Always ask: **Could an agent complete this spec while visibly failing what the user actually requested?** If yes, fix the product map before implementation. Similar colors, labels, mechanisms, or vibes are not equivalent delivery.
@@ -63,7 +63,7 @@ Approval protects product meaning, not guesses:
 - **Human decision required:** a materially different `vFinal`; a changed `Must` or `Must Not`; a non-goal reversal; a materially different user/consumer promise; violation of an existing external contract; a new externally owned authority or safety/data-integrity boundary; an irreversible operation; or reversal of an explicit product decision.
 - **Adaptive by default:** files, symbols, internal architecture, technical schema details that preserve the same external promise, sequencing, estimates, implementation notes, discovered touchpoints, proof mechanics, and splitting/merging/reordering equivalent rungs.
 
-Change adaptive details as implementation teaches you more. Update the spec immediately only when product meaning, a load-bearing contract, the observable rung boundary, a blocker, or a human decision changes. Otherwise batch useful implementation truth at a coherent checkpoint or rung close. Never stop delivery for wording polish or mechanical synchronization.
+Change adaptive details as implementation teaches you more. Update the spec immediately only when product meaning, a load-bearing contract, the observable rung boundary, a blocker, or a load-bearing product decision changes. Otherwise batch useful implementation truth at a coherent checkpoint or rung close. Never stop delivery for wording polish or mechanical synchronization.
 
 ## Rungs are working experiences
 
@@ -86,7 +86,7 @@ The active rung is rich enough to build. The next rung needs only enough detail 
 
 Start with direct inspection, current source, and existing checks. Add a durable test, eval plan, harness, artifact bundle, or independent audit only when a specific material risk cannot be credibly handled without it. The work spec records the surviving conclusion and honest claim boundary, not a second proof system.
 
-Subjective feel, taste, readability, motion, and fun remain human decisions. Record the exact question and response when they matter; do not invent automated acceptance.
+Subjective feel, taste, readability, motion, and fun remain human decisions. Record the verdict and affected acceptance or rejection criterion when they matter; do not invent automated acceptance.
 
 ## One product file, progressively disclosed depth
 
@@ -103,7 +103,7 @@ For every new substantial lane, create this small bundle from the skill template
 ```
 
 - `implementation-map.md` is warm, adaptive engineering depth: current source maps, flows, likely touchpoints, interface or payload examples, calculations, and sharp edges. Repository and runtime truth win when it drifts.
-- `provenance.md` is cold context worth recovering: material rationale, superseded approaches, useful completed-rung detail, and source lineage. It is not normal build context or a changelog; Git owns exhaustive history.
+- `provenance.md` is cold context worth recovering: material rationale, superseded approaches, useful completed-rung detail, and retained source evidence. It is not request lineage, normal build context, or a changelog; Git owns exhaustive history.
 
 The active rung keeps its compact implementation direction in the work spec and links the exact implementation-map headings needed to build it. Every link says when to read it. Product commitments, requirements, contracts, rung state, `Done when`, approvals, blockers, acceptance, and completion never move into references.
 
@@ -118,7 +118,7 @@ On rung advance, refresh or prune the implementation map instead of accumulating
 3. Repair any missing required outcome, proxy substitution, horizontal milestone, stale product assumption, or material contradiction.
 4. Keep only current truth that changes the active or next rung. Put bulky current technical depth in `references/implementation-map.md`, cold retained context in `references/provenance.md`, and leave a short conclusion plus exact read-when link in the work spec.
 5. If the product spine and active rung are coherent, implementation is the next action. Do not create another summary or planning artifact by default.
-6. Edit the spec only for durable judgment: changed product meaning, contract, rung boundary, blocker, human decision, or coherent rung-close evidence.
+6. Edit the spec only for durable judgment: changed product meaning, contract, rung boundary, blocker, load-bearing product decision, or coherent rung-close evidence. Single-home each binding product decision in §9; Facts and provenance never restate it.
 7. Re-read immediately before writing and merge concurrent changes without losing either writer's load-bearing judgment.
 8. Return the compact result below. This skill maintains the map; `$plan__implement-work-spec` builds from it.
 
@@ -134,7 +134,7 @@ On rung advance, refresh or prune the implementation map instead of accumulating
 **Primary entrypoint(s):** <exact API/event/command/route/user action>
 **Reference routing:**
 - [Implementation map](references/implementation-map.md) — follow only the headings linked by the active rung before building.
-- [Provenance](references/provenance.md) — read only when prior rationale, retired paths, or source lineage matters.
+- [Provenance](references/provenance.md) — read only when prior rationale, retired paths, or retained source evidence matters.
 - <earned semantic reference and exactly when to read it>
 
 ## 1) North Star — vFinal
@@ -165,8 +165,8 @@ On rung advance, refresh or prune the implementation map instead of accumulating
 
 ## 3) Request Anchor
 
-- **Must:** <near-verbatim required outcome>
-- **Must Not:** <near-verbatim prohibition>
+- **Must:** <semantically faithful, compact required outcome>
+- **Must Not:** <semantically faithful, compact prohibition>
 - **Preference:** <guidance, only when material>
 - **Permission:** <allowed option, not a requirement>
 - **Question:** <unresolved choice that could change the product>
@@ -175,9 +175,8 @@ Omit unused force types. A changed required item needs an explicit human product
 
 ## 4) Current Truth
 
-- **Fact:** <decision-relevant truth> — <source>
+- **Fact:** <decision-relevant repo/runtime evidence> — <source>
 - **Unknown:** <what is not yet known> — matters because <effect on active/next rung>
-- **Decision:** <binding choice and why> — <human or repo authority>
 
 Keep this section scoped to the active and next rung.
 
@@ -222,7 +221,6 @@ Collapse completed rungs so the active rung remains richest:
 ## 7) Current Motion
 
 - **Lane state:** Proposed | Active | Blocked | Parked | Complete | Superseded
-- **Approval:** <current-turn instruction or durable actor/source/date/scope when needed>
 - **Active rung:** <ID> | None
 - **Next action:** <one meaningful implementation action> | Blocked by <condition> | None
 - **Claim boundary:** <what current implementation/evidence supports and does not support>
@@ -231,12 +229,12 @@ Collapse completed rungs so the active rung remains richest:
 
 - **Terminal value-path observation:** <actor → entrypoint → terminal result, or pending>
 - **Material unproven risk:** <risk and cheapest credible next check> | None
-- **Human acceptance:** <exact question and response> | None required | Waiting
+- **Human acceptance:** <verdict and affected acceptance or rejection criterion> | None required | Waiting
 - **Optional proof artifact:** <path and why it is necessary> | None
 
 ## 9) Decisions & Supporting References
 
-- **Binding decision:** <date / decision / rationale / authority / what would reopen it>
+- **Binding decision:** <resulting choice / authorized scope / rationale / reopen condition / role-neutral authorization basis only when material>
 - **Supporting reference:** <path / surviving conclusion / when to read> | None
 ~~~
 

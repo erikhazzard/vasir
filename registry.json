@@ -810,7 +810,7 @@
     },
     {
       "name": "plan__maintain-work-spec",
-      "description": "Creates and updates the durable product map for a substantial lane: the request, vFinal North Star, observable contracts, vertical-slice ladder, active rung, and current motion. Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or human decision.",
+      "description": "Creates and updates the durable product map for a substantial lane: the request, vFinal North Star, observable contracts, vertical-slice ladder, active rung, and current motion. Trigger: substantial work whose product judgment must survive context, or a material change to its promised journey, contracts, rung boundary, blocker, or load-bearing product decision.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

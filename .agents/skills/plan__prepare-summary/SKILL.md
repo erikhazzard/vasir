@@ -14,7 +14,7 @@ This is a read-only recovery tool, not a gate every implementation turn must pas
 
 Load the work spec and the smallest current repo/runtime evidence needed to catch a stale map. Re-derive rather than copy its summary fields:
 
-1. **Request:** the near-verbatim `Must` and `Must Not` outcomes.
+1. **Request:** the semantically faithful, compact `Must` and `Must Not` outcomes.
 2. **vFinal:** the complete intended journey, not a lesser `v0`, `v1`, MVP, or proxy.
 3. **User Journey Unlock:** actor, real entrypoint, observable success, and obvious next action.
 4. **Engineering System Unlock:** only the real capability or reliability truth.

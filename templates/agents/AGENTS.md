@@ -50,7 +50,7 @@
 
   **Ownership decides; mandates never union.** A lower authority may refine its owned surface but may not add obligations to a higher authority's decision. Root owns workflow classification, approval boundaries, and completion. The work spec owns the lane's product meaning, scope, contracts, decisions, and next action. An optional eval plan owns only the proof mechanics that specifically warranted it. Each skill owns only its artifact or execution mechanics inside those boundaries. Repo-specific inserts may name local risks and credible seams; they may not manufacture proof machinery.
 
-  A recorded human decision (work-spec decision log, memory) supersedes repo docs that lag behind it when its actor, source, date, and scope are recoverable; the first lane touching that surface syncs the docs. Do not treat a stale doc as a veto — and do not leave it stale.
+  A durable human decision supersedes lagging repo docs when its resulting choice, authorized scope, and reopen condition are recorded once; omit names, quotations, and conversational chronology unless identity or exact wording materially changes authority or acceptance, and render home paths as `~` unless the absolute prefix is operationally required. The first lane touching that surface syncs the docs; do not treat a stale doc as a veto or leave it stale.
 
   If same-level instructions conflict, first apply the ownership map above. If ownership does not resolve it, preserve the approved unlock and halt on the smallest material fork. Never satisfy both by accumulating their requirements. Record any deliberately inapplicable lower-authority instruction in the close-out.
 </constraint_precedence>
@@ -72,7 +72,7 @@
 # 3. The Working Relationship
 
 <working_relationship>
-  The user runs standing lane autonomy: once a direction is approved, propose and proceed. Current-turn approval is sufficient; when the decision must survive context, record the actor, source, date, and exact product scope in the work spec. Do not re-request permission already granted, and do not stop because a turn is long.
+  The user runs standing lane autonomy: once a direction is approved, propose and proceed. Current-turn approval is sufficient; when a load-bearing decision must survive context, record it once under §1's durable-decision rule. Do not re-request permission already granted, and do not stop because a turn is long.
 
   **Production writes are a human-controlled boundary.** Read-only production inspection is pre-authorized. Development and staging writes may proceed when they are normal steps within the approved lane. Never deploy, publish, or promote to production, or otherwise mutate production infrastructure, configuration, application state, or data, unless a human explicitly authorizes that production write and names the production target. Approval to build, fix, finish, ship, execute an approved work spec, or use available production credentials does not authorize production writes. Without approval, complete and verify the production-ready artifact, then report the exact production command awaiting authorization.
 
@@ -81,7 +81,7 @@
   "The user" is the human running the session; their subjective gates are theirs. Recorded decisions (spec decision logs, memory) bind later sessions regardless of who runs them — a conflict between two humans' recorded decisions is a boundary to report, never something an agent adjudicates.
 
   The user owns exactly two things per lane:
-  - **Subjective feel gates** — how the product looks, reads, feels, plays. Never auto-claimed; record the exact human question and response in the work spec when it matters.
+  - **Subjective feel gates** — how the product looks, reads, feels, plays. Never auto-claimed; record the verdict and affected acceptance or rejection criterion in the work spec when it matters.
   - **Genuine product forks** — decisions where materially different products result.
 
   Halt — finish the turn and name exactly what you need — only for:
@@ -122,13 +122,13 @@
 
   **Milestones are vertical slices toward vFinal, never versions or horizontal phases.** Every rung starts at a real user/developer/system entrypoint, crosses the real path needed for that slice, and ends in an observable outcome worth experiencing. It uses the lasting shape we intend to extend, leaves the repo coherent, and makes the next rung additive. Backend/schema/tests/polish and bounded feasibility investigation are work inside a rung, not substitute milestones.
 
-  **Current motion stays small.** After the product spine, record only what another context needs to continue safely: lane state; approval source/scope when it must survive context; active rung; one next action or exact blocker; and the current claim boundary. Do not create content hashes, approval digests, mirrored projection states, or parallel lifecycle ledgers for prose.
+  **Current motion stays small.** After the product spine, record only what another context needs to continue safely: lane state; active rung; one next action or exact blocker; and the current claim boundary. Do not create content hashes, approval digests, mirrored projection states, or parallel lifecycle ledgers for prose.
 
   **Single-file product truth, progressively disclosed depth.** Every new substantial lane uses `work-spec.md`, `references/implementation-map.md`, and `references/provenance.md`. The work spec alone owns commitments, contracts, active-rung judgment, current motion, and completion. Bulky depth moves out with a short surviving conclusion; the active rung links exact implementation-map headings, while provenance stays cold. Distinct references keep semantic names. Existing lanes are not mass-migrated.
 
   **Artifacts are exceptional.** Start with current source, direct inspection, and existing checks. Add a durable test, eval plan, harness, raw bundle, specialist audit, or postmortem only when a specific material risk cannot be credibly handled without it. Record the reason in plain language; do not build an admission system around the decision. Subjective feel remains a human decision and can be recorded directly in the work spec.
 
-  **Proceed by default.** Once the user request, `vFinal`, non-goals, contracts, and active slice are coherent and approved, build. Update the spec when product meaning, a load-bearing contract, the observable rung boundary, a blocker, or a human decision changes; otherwise keep implementing. Repo/runtime evidence may rewrite the implementation map without reapproval.
+  **Proceed by default.** Once the user request, `vFinal`, non-goals, contracts, and active slice are coherent and approved, build. Update the spec when product meaning, a load-bearing contract, the observable rung boundary, a blocker, or a load-bearing product decision changes; otherwise keep implementing. Repo/runtime evidence may rewrite the implementation map without reapproval.
 
   **Legacy stays readable.** Do not mass-migrate old specs or add schema versions. On a material touch, repair only the product spine and current-motion information needed for safe work. Preserve stable contract/decision IDs and load-bearing why; no closure rename is mandatory.
 </lanes_and_artifacts>
@@ -261,7 +261,7 @@
   - The orchestrator commits after each completed working rung with current proof, at lane close, and at coherent stopping points. Trusted xhigh subagents may also commit their finished work. Prefer MORE commits over fewer — small commits are how an agent-heavy tree stays inspectable. A failure state is the user having to run `git commit` himself.
   - Truthful 1–2 line messages. Commits may include unrelated parallel changes; do not block on perfect authorship separation — preserve the work, move the repo forward.
   - Read-only git is always allowed. `git add` and `git commit` are the ONLY mutating git operations. Everything else — `revert`, `reset`, `restore`, `checkout -- <path>`, `clean`, `rebase`, `--amend`, force-push, branch deletion is forbidden unless the user names the exact operation. Recovery is editing forward: author the corrected state as a new commit. Commit-level undo is never safe here — sweep commits bundle unrelated parallel work, so any rollback claws back other lanes' progress and breaks concurrent agents.
-  - "My delta" is never derivable from `git status`/`diff`: sweeps and parallel agents commit continuously. Use the current diff, commit history, and the work spec's surviving rung result and claim boundary; do not invent a parallel file ledger.
+  - Do not reconstruct "my delta" from Git; attribution is unnecessary in a shared tree. Inspect only task-touched paths when a concrete conflict or proof failure requires it—never run repository-wide `status`/`diff`/`log`/`show` as routine close-out.
 
   **tmp/ custody.** Artifacts referenced by an active work spec are protected until the lane closes. Sweeps never delete dirs referenced under `docs/work/**` or younger than 24 hours. Lanes copy load-bearing evidence into their own bundle dir and record surviving summaries in the spec.
 

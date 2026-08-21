@@ -51,9 +51,9 @@ Legacy adoption follows root §4:
 3. **Smallest coherent stack.** Prefer one terminal value-path gate over several mechanism checks. A gate earns existence only if it kills a plausible lie that existing evidence cannot.
 4. **Potency follows consequence.** Defect: faithful watched-red. Refactor: existing guard or characterization where behavior is unknown. Critical invariant: realistic mutation, adversarial/property proof, or equivalent falsifier unless equivalent protection already exists. Routine behavior: a credible terminal oracle may be enough. Never manufacture an absence-red.
 5. **Same-run compound proof.** When the value requires truths concurrently, use one coordinator/run ID and pass only if every required observer passes in the same window. Disconnected greens cannot prove a compound journey.
-6. **Subjective truth stays human.** Feel, taste, trust, readability, motion, fun, and dev ergonomics use a Subjective gate only when an eval plan already needs to coordinate that decision. Acceptance records actor, source, date, exact question/scope, and reviewed artifact identity. A lone feel decision can remain directly in the work spec. Automation may prove artifact health; it never accepts.
+6. **Subjective truth stays human.** Feel, taste, trust, readability, motion, fun, and dev ergonomics use a Subjective gate only when an eval plan already needs to coordinate that decision. Acceptance records the verdict, affected criterion, and reviewed artifact identity once under root §1. A lone feel decision can remain directly in the work spec. Automation may prove artifact health; it never accepts.
 7. **State is basis-bound.** A green receipt names the guarded claim/contracts, exact current basis, action/command, environment, result, owner, date, and claim boundary. If the claim or basis changes materially, state returns Open. A realistic harness defect moves it to Defective and invalidates prior green until repair/rerun.
-8. **Waivers are authority acts.** Waived records authority, source, date, reason, exact scope/claim, residual risk, and expiry/revisit condition. It does not make behavior green.
+8. **Waivers are authority acts.** Waived records a role-neutral authorization basis, reason, exact scope/claim, residual risk, and expiry/revisit condition once under root §1. It does not make behavior green.
 9. **IDs are namespaced and append-only.** Use <SLUG>__GLOBAL-G1, <SLUG>__M2__G1, and <SLUG>__M2__S1. Retire with replacement pointer.
 10. **No invented machinery.** Discovery is read-only. Commands, routes, fixtures, thresholds, paths, and environments come from repo truth or are labeled missing/assumed. A missing harness is a boundary, not an invitation to improvise.
 11. **Proof medium follows the failure.** Browser, packet, persistence, benchmark, replay, or human media exists only when the material failure requires that fidelity. User visibility alone selects none.
@@ -186,7 +186,7 @@ receipt:
   environment: none | <identity>
   owner: none | <actor>
   claim_boundary: none | <supported boundary>
-waiver: none | <authority/source/date/reason/scope/residual risk/expiry>
+waiver: none | <role-neutral authorization basis/reason/scope/residual risk/revisit condition>
 refs: [<C-###>, <rung IDs>]
 ~~~
 
@@ -196,18 +196,16 @@ For a compound gate add coordinator, run_id, actors, scale/load shape, duration,
 
 ~~~yaml
 id: <SLUG>__M1__S1
-question: <one exact human acceptance question>
+criterion: <one human acceptance or rejection criterion>
 scope: <what acceptance covers>
 artifact: <reviewed media path or live experience identity>
 support: <technical-health evidence>
 state: Waiting Human | Accepted | Rejected | Waived | Retired
 receipt:
-  actor: none | <human>
-  source: none | <durable source>
-  date: none | <date>
+  verdict: none | Accepted | Rejected
+  affected_criterion: <accepted or rejected criterion>
   reviewed_artifact: <path/build/run identity>
-  response: none | <accepted/rejected wording>
-waiver: none | <authority/source/date/reason/scope/residual risk/expiry>
+waiver: none | <role-neutral authorization basis/reason/scope/residual risk/revisit condition>
 refs: [<C-###>, <rung IDs>]
 ~~~
 

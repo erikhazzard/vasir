@@ -15,7 +15,7 @@ All games are mobile-native portrait products. Desktop, web, and landscape are s
 
 This skill is also the create-game initialization root. Studio and local Codex must use the same skill stack; Studio may prepare the workspace, but it must not secretly route prompts, choose templates, or inject hidden design rules that local Codex cannot run.
 
-When a creator explicitly asks to make, build, create, initialize, or finish a game, that request is durable approval evidence for the named first-playable scope — not “full approval.” Record the actor, source, date, exact scope, and current spec revision; exclude publish/deploy, destructive, external-message, and unrelated product decisions unless the request includes them. Within that current scope, proceed through implementation and proportional proof without repeatedly asking permission. If the creator requested spec-only or approval-first work, do not launch.
+When a creator explicitly asks to make, build, create, initialize, or finish a game, that request is durable approval evidence for the named first-playable scope — not “full approval.” Record the resulting choice, authorized scope, current spec revision, and reopen condition once under root §1; exclude publish/deploy, destructive, external-message, and unrelated product decisions unless the request includes them. Within that current scope, proceed through implementation and proportional proof without repeatedly asking permission. If the creator requested spec-only or approval-first work, do not launch.
 
 ## Applicable Initialization Skill Routes
 

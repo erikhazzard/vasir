@@ -2,12 +2,12 @@
 
 > Cold, non-authoritative reference. [`work-spec.md`](../work-spec.md) owns every current decision, contract, rung, blocker, and completion claim. This file is not loaded for normal implementation.
 >
-> Git is the full changelog. Retain only context that would be costly or dangerous to rediscover.
+> Git is the full changelog. Do not retain request lineage or conversational chronology; keep only context that would be costly or dangerous to rediscover.
 
 ## Material rationale
 
 - **Current binding summary:** <pointer to the decision in `work-spec.md`>
-- **Retained why:** <the deeper rationale or source lineage worth preserving>
+- **Retained why:** <the deeper rationale or source evidence worth preserving>
 
 ## Retired paths and ruled-out assumptions
 
@@ -17,7 +17,7 @@
 
 - <detail useful beyond the compact surviving result in `work-spec.md`>
 
-## Source trail
+## Retained sources
 
 - <semantic source document, original brief, research corpus, media index, or external source and what it establishes>
 

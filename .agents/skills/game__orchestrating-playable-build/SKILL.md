@@ -35,7 +35,7 @@ Before calling a game playable, watch or play the first active 15 seconds and an
 
 If the answer to 5 is no, the build does not slap yet. Name the single biggest reason and repair that before polishing around it.
 
-**The verdict is evidence, not acceptance.** When the approved claim includes feel/playability, use active play and an exact human question; a static screenshot cannot carry that claim. The agent's SLAPS/CLOSE read is only a recommendation. Acceptance records the human, exact question/scope, source/date, and reviewed experience identity.
+**The verdict is evidence, not acceptance.** When the approved claim includes feel/playability, use active play and ask for a human verdict on the affected criterion; a static screenshot cannot carry that claim. The agent's SLAPS/CLOSE read is only a recommendation. Acceptance records the verdict, affected criterion, and reviewed experience identity once under root §1.
 
 ## Trigger Boundary
 
