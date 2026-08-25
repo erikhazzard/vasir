@@ -2,7 +2,7 @@
   "kind": "catalogManifest",
   "schemaVersion": 1,
   "packageVersion": "0.1.0",
-  "sourceHash": "588b1418e1349fe7a887e715300d24c2fbdc34c3d3e7bb133d68ad6c6f1309db",
+  "sourceHash": "c77b93e59ff9d62caa56c35c6cf7f145a70c843b0d07f490a73512b13d104bed",
   "includedRoots": [
     "registry.json",
     ".agents/skills",

@@ -167,6 +167,19 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "coding__material-decision-ledger",
+      "description": "Captures and audits AI agent decisions. Do not trigger automatically, only called manually",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/coding__material-decision-ledger",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "design__animating-interfaces",
       "description": "Designs and implements interface motion through transitions, easing, feedback, loading states, and reusable motion patterns. Use when adding or reviewing UI animation, tuning interaction feel or performance, or defining motion tokens.",
       "category": "uncategorized",
@@ -852,7 +865,7 @@
     },
     {
       "name": "plan__question-spec-architecture",
-      "description": "Adversarial architecture review run when explicitly requested or when a specific high-regret moving-parts blind spot warrants independent conversational judgment in the same repo folder; challenges whether queues, workers, services, datastores, caches, protocols, or async state are forced without becoming automatic spec ceremony.",
+      "description": "Designs and challenges non-trivial technical solution shapes by finding the smallest lasting horizontally scalable topology and proving every moving part is forced. Use for architecture or scalability design and review, or when a change adds durable state owners, services, workers, protocols, datastores, projections, transports, or deployment topology; skip routine local edits and implementation of an already approved shape unless new architecture appears.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
