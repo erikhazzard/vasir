@@ -11,7 +11,7 @@ cli/eval/skill-source.js                 separately selected skill treatment res
 cli/eval/benchmark-models.js             27 provider/model/reasoning configurations
 cli/eval/agent-runtime.js                fresh isolated Codex and Claude CLI sessions
 cli/eval/run-benchmark-eval.js           matrix planning, generation, judging, artifact/report write
-cli/eval/benchmark-judge.js              configurable blinded panel plus fresh synthesis
+cli/eval/benchmark-judge.js              configurable blinded bounded panel plus bounded fresh synthesis
 cli/eval/history.js                      atomic authoritative run.json history
 cli/eval/benchmark-report.js             self-contained editorial report renderer
 cli/eval/benchmark-catalog.js            derived multi-prompt catalog renderer
@@ -25,7 +25,7 @@ test/eval-benchmark-*.test.js            active benchmark harness/report coverag
 .agents/vasir-evals/<benchmark>/<run>/   ignored local run.json and report.html evidence
 ```
 
-The implemented topology remains synchronous and local: command router → benchmark and treatment resolvers → fresh Codex/Claude generation processes → configured independent judge processes → one fresh synthesis process → atomic local artifact → derived static report and catalog. No server, database, worker queue, or runtime frontend dependency is required by the benchmark pages.
+The implemented topology remains synchronous and local: command router → benchmark and treatment resolvers → fresh Codex/Claude generation processes → bounded configured judge and synthesis processes → atomic local artifact → derived static report and catalog. No server, database, worker queue, or runtime frontend dependency is required by the benchmark pages.
 
 ## 2) Active-rung flow
 
@@ -37,9 +37,10 @@ Author
   -> execute each row in its own temporary directory and fresh, non-persisted Codex or Claude CLI session
   -> preserve complete, unavailable, and failed rows with exact prompts and runtime receipts
   -> derive one stable anonymous candidate order from the cohort contents
-  -> send the exact same blinded cohort independently to fresh claude:opus@max and codex:gpt-5.6-sol@ultra judges
-  -> preserve each complete anchored 0-100 judgment, reason, runtime receipt, and disagreement
-  -> give anonymous compact judgment records to a separate fresh codex:gpt-5.6-sol@ultra synthesizer
+  -> keep each matched clean/treatment group intact and derive deterministic batches of at most 3 groups and 6 candidates whose exact panel and worst-case synthesis prompts each fit within 64 KiB
+  -> send the same batch plan independently to fresh claude:opus@max and codex:gpt-5.6-sol@ultra sessions, at concurrency 4 and a 10-minute per-call deadline
+  -> preserve each complete anchored 0-100 judgment, reason, runtime receipt, batch result, and disagreement
+  -> give each batch's anonymous compact judgment records to a separate fresh codex:gpt-5.6-sol@ultra synthesis session
   -> select the most rubric-faithful internally complete judgment per candidate; never average or invent a hybrid
   -> persist one complete-or-incomplete run.json atomically
   -> derive a self-contained vendored-D3 report.html and open it when --open was supplied
@@ -49,7 +50,7 @@ Author
   -> author inspects lift, ranking, full answers, rubric, cohort basis, and calibration status
 ```
 
-The 54-row generation path completed its first full live traversal in run `2026-08-26T03-51-51Z__dd6d985de7f7`. Its original clean `51.6`, treatment `66.0`, and mean `+14.4` lift came from the superseded single Sol-max judge. Immutable rejudge `2026-08-26T13-33-06Z__rejudge__d32ad50440bf` completed the two-judge plus synthesis path over the same answers and observed clean `52.7`, treatment `79.1`, mean `+26.5` lift, 26 wins / 0 ties / 1 loss, and `claude:opus@max` as the best configuration. M1B extends this same path to a novel feed prompt plus artifact-scanned navigation; chat scorer calibration remains pending.
+The 54-row generation path completed its first full live traversal in run `2026-08-26T03-51-51Z__dd6d985de7f7`. Its original clean `51.6`, treatment `66.0`, and mean `+14.4` lift came from the superseded single Sol-max judge. Immutable rejudge `2026-08-26T13-33-06Z__rejudge__d32ad50440bf` completed the v1 two-judge plus synthesis path over the same answers and observed clean `52.7`, treatment `79.1`, mean `+26.5` lift, 26 wins / 0 ties / 1 loss, and `claude:opus@max` as the best configuration. Feed run `2026-08-26T14-28-16Z__58e3391437f7` then proved that the v1 all-candidate call did not scale: its 210,542-character prompt took Sol 17.6 minutes and timed Opus out at 40 minutes. V2 maps that exact cohort to nine 25–33 KiB matched batches instead of extending the timeout. Feed rejudge `2026-08-26T16-19-35Z__rejudge__1f4c92f2c0e3` completed all 18 panel and nine synthesis executions, observed clean `65.6`, treatment `72.3`, mean `+6.7` lift, and named `claude:opus@high` best overall at `95.0`. Scorer calibration remains pending for both prompts.
 
 ## 3) Run artifact shape
 
@@ -67,7 +68,7 @@ The current M1 artifact is schema version 1 and uses this implemented shape; nes
   "configurations": [{ "id": "codex:gpt-5.6-sol@low", "provider": "codex", "model": "gpt-5.6-sol", "reasoning": "low" }],
   "generation": { "trialCount": 1, "concurrency": 4, "freshAgentSessions": true },
   "judging": {
-    "strategy": "panel-synthesis-v1",
+    "strategy": "panel-synthesis-v2",
     "judgeConfigurations": [{ "id": "codex:gpt-5.6-sol@ultra" }, { "id": "claude:opus@max" }],
     "synthesizerConfiguration": { "id": "codex:gpt-5.6-sol@ultra" },
     "freshContext": true,
@@ -75,10 +76,11 @@ The current M1 artifact is schema version 1 and uses this implemented shape; nes
     "calibrationStatus": "author-calibration-pending",
     "cohortHash": "...",
     "candidateOrder": [],
-    "panelPromptText": "...",
-    "judges": [{ "reviewerId": "reviewer-001", "configuration": {}, "evaluations": [], "outputText": "..." }],
+    "batchPlan": { "version": "matched-groups-v1", "hash": "...", "maxGroups": 3, "maxCandidates": 6, "maxPromptBytes": 65536, "reviewerCount": 2, "batches": [{ "worstCaseSynthesisPromptBytes": 0 }] },
+    "panelPromptText": "concatenated compatibility view",
+    "judges": [{ "reviewerId": "reviewer-001", "configuration": {}, "evaluations": [], "batches": [], "outputText": "concatenated compatibility view" }],
     "disagreement": { "candidateCount": 54, "candidatesWithDisagreement": 0, "maxScoreSpread": 0 },
-    "synthesis": { "configuration": {}, "selections": [], "promptText": "...", "outputText": "..." },
+    "synthesis": { "configuration": {}, "selections": [], "batches": [], "promptText": "concatenated compatibility view", "outputText": "concatenated compatibility view" },
     "basisHash": "..."
   },
   "rows": [
@@ -108,7 +110,7 @@ Required provenance details:
 
 - Save full harness-controlled request messages, not reconstructed excerpts.
 - Save the treatment content as well as its hash so a historical report survives later skill edits.
-- Save the shared panel prompt, every exact panel output, anonymous reviewer mapping, per-candidate disagreement, compact synthesis prompt, selections/reasons, candidate cohort hash, and final basis; no rubric content enters generation messages.
+- Save the deterministic batch plan, every exact per-batch panel/synthesis prompt and output, anonymous reviewer mapping, status/reuse/error/usage evidence, per-candidate disagreement, selections/reasons, candidate cohort hash, and final basis; concatenated top-level text exists only for v1 report compatibility, and no rubric content enters generation messages.
 - Save provider usage as returned. Estimated cost needs a named price snapshot and date; otherwise render `Unavailable`, never `$0`.
 - Preserve failed rows and judge failures as typed records instead of dropping them.
 - Escape all model and rubric content when producing HTML. Inline JavaScript receives serialized data through a safe encoding, not raw string interpolation.
@@ -127,7 +129,7 @@ The independent benchmark contract permits task-owned gates and anchored dimensi
 - artifact or executable checks in a later workspace task;
 - explicit human questions for taste or embodied use.
 
-The active `hyper-scale-chat` fixture contains the exact 10M-concurrent-user prompt plus an outcome-based rubric independent from the architecture skill. It defines four fail-closed architecture gates and seven weighted 0–4 dimensions that produce a capped 0–100 score.
+The active `hyper-scale-chat` fixture contains the exact 10M-concurrent-user prompt plus an outcome-based rubric independent from the architecture skill. It defines four claim-capping architecture gates and seven weighted 0–4 dimensions that produce a capped 0–100 score.
 
 Architecture gates should test outcomes, not technology words:
 
@@ -147,9 +149,9 @@ Useful anchored dimensions:
 
 Do not require `Redis`, `Valkey`, `GET`, `BullMQ`, or any other preferred noun. A non-Vasir topology can win when it satisfies the contract with lower justified rent; a Redis-heavy answer can fail when it is unforced or incorrect.
 
-The current path derives candidate order deterministically from the row keys and output hashes, so identical saved cohorts keep the same blinded mapping across rejudges. Every configured panel member receives the exact same prompt in a separate fresh session and sees neither model nor condition identity. The synthesizer receives no reviewer model identities and no candidate prose; it receives the rubric plus compact anonymous records containing totals, gate statuses, dimension ratings, and one overall reason. It selects one whole panel evaluation per candidate. This keeps the synthesis input bounded, preserves an internally consistent gate/dimension/total record, and prevents a mechanical average from laundering disagreement. The default panel is Opus max plus Sol ultra, with a separate Sol-ultra synthesizer, but the runner contains no branch for those identities.
+The current path derives candidate order deterministically from row keys and output hashes, then groups matched conditions by configuration, case, and trial. Identical saved cohorts therefore keep the same blinded mapping and batch plan across rejudges. Every configured panel member receives identical bounded batch prompts in fresh sessions and sees neither model nor condition identity. Synthesis uses the same batches and receives no reviewer model identities; it sees the anonymous candidate bodies plus compact totals, gate statuses, dimension ratings, and one UTF-8-byte-bounded overall rationale per judgment. Full original evidence remains in the artifact. It selects one whole panel evaluation per candidate. The default panel is Opus max plus Sol ultra, with Sol-ultra synthesis, but the runner contains no branch for those identities.
 
-All configured judges are required. If any judge fails or omits a candidate, synthesis is skipped and no final row scores exist. If synthesis fails or omits a selection, no panel score is used as fallback. Successful individual judgments and failures remain in the artifact for retry and diagnosis.
+All configured judge and synthesis batches are required. If a judge batch fails or omits a candidate, synthesis is skipped and no final row scores exist. If a synthesis batch fails or omits a selection, no panel score is used as fallback. Successful compatible batches remain reusable; failures and exact evidence remain in the artifact for retry and diagnosis.
 
 Calibration before the first claim:
 
@@ -169,16 +171,15 @@ Top-to-bottom layout:
 1. **Editorial hero**: observed Vasir lift, exact prompt, best observed answer, completion counts, and calibration warning.
 2. **Configuration ranking**: every scored model/reasoning/condition cell on the synthesized 0–100 axis.
 3. **Treatment lift**: clean-to-skill movement for each matched configuration.
-4. **Raw trials**: every scored row rather than means alone.
-5. **Answer inspector**: side-by-side complete answers with gates, dimensions, reasons, usage, and exact prompts.
-6. **Complete matrix**: visible complete, unavailable, and failed rows plus non-visual evidence tables.
-7. **Measurement contract**: panel members, synthesis authority, disagreement, freshness, blinding, calibration, cohort hash/size, rubric, and limitations.
+4. **Answer inspector**: permanent clean-versus-treatment score spreads for any three configurations, plus a condition control for the complete answer, gates, dimensions, reasons, usage, and exact prompts shown below.
+5. **Complete matrix**: visible complete, unavailable, and failed rows with exact trial evidence and human-readable latency.
+6. **Measurement contract**: panel members, synthesis authority, disagreement, freshness, blinding, calibration, cohort hash/size, rubric, and limitations.
 
 Visual rules:
 
 - Color never carries verdict alone; pair it with labels/icons and accessible text.
 - `INCOMPLETE`, `NO SIGNAL`, and judge disagreement must be visually louder than small score differences.
-- Show sample counts and raw dots wherever an aggregate appears.
+- Show sample counts and preserve every exact trial row beneath aggregates; do not add a separate chart when it does not improve a real comparison.
 - Never rank across incompatible cells.
 - Default to the bottom line, but never truncate away the full output in drill-down.
 - The report must open correctly from `file://`; `--open` is convenience, not a server dependency.
@@ -198,7 +199,7 @@ harness version
 
 Generation identity now hashes only generation-facing cases, output contract, model configuration, trial/harness basis, and condition snapshot. Judge configuration and rubric changes affect `benchmark.scoringHash`, not `benchmark.generationHash`, so saved answers can be rejudged without pretending they were regenerated.
 
-The numeric score basis includes the scorer/rubric, exact candidate `cohortHash`, configured panel member bases, their complete evaluation hashes, the compact synthesis prompt, and synthesizer configuration. The cohort hash covers the ordered row keys and output hashes given to every judge. Thus the complete candidate set and actual panel evidence are part of score comparability even though they are not part of generation comparability.
+The numeric score basis includes the scorer/rubric, exact candidate `cohortHash`, batch policy and plan hash, configured panel member batch bases and evaluation hashes, synthesis batch prompts and selections, and synthesizer configuration. The cohort hash covers the ordered row keys and output hashes; the plan hash covers matched grouping, candidate membership, limits, and exact panel prompts. Thus the complete candidate set, batching, and actual panel evidence are part of score comparability even though they are not part of generation comparability.
 
 `vasir eval rescore <benchmark> [run-id]` reads the saved outputs, applies the current panel configuration, and writes a new run with `rescoredFromRunId` plus `generation.sourceRunId`; it never overwrites the source artifact. A later model can generate a new row without invalidating old outputs, but its score cannot be appended to an old ranking: adding the answer changes the judge cohort. Compare old and new only after rejudging one shared cohort. Append-only score history still requires a later calibrated fixed-anchor independent scorer.
 

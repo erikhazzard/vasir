@@ -618,10 +618,78 @@ function normalizeRubric(run, rows) {
   return { summary: "", criteria: firstCriteria.map(({ id, label }) => ({ id, label, score: null, rationale: "" })) };
 }
 
-function normalizeJudgeRecord({ record = {}, configuration = {}, run, candidateOrder = [] }) {
+function normalizeJudgeBatchRecord(batch = {}) {
+  return {
+    batchId: readText(batch.batchId, batch.id) || "Unidentified batch",
+    reviewerId: readText(batch.reviewerId, batch.panelMemberId) || null,
+    status: readText(batch.status) || "unknown",
+    candidateIds: Array.isArray(batch.candidateIds)
+      ? batch.candidateIds.map((value) => readText(value)).filter(Boolean)
+      : [],
+    groupHashes: Array.isArray(batch.groupHashes)
+      ? batch.groupHashes.map((value) => readText(value)).filter(Boolean)
+      : [],
+    basisHash: readText(batch.basisHash) || "Not recorded",
+    evidenceHash: readText(batch.evaluationHash, batch.selectionHash) || "Not recorded",
+    panelEvidenceHash: readText(batch.panelEvidenceHash) || null,
+    promptHash: readText(batch.promptHash) || "Not recorded",
+    promptText: readText(batch.promptText),
+    promptBytes: readFiniteNumber(batch.promptBytes),
+    outputText: readText(batch.outputText),
+    summary: readText(batch.comparativeNote, batch.summary),
+    error: readText(batch.error?.message, batch.error),
+    reused: batch.reused === true,
+    usage: normalizeUsage(batch),
+    costUsd: readFiniteNumber(batch.costUsd),
+    durationMs: readFiniteNumber(batch.durationMs)
+  };
+}
+
+function normalizeJudgeBatchPlan(batchPlanValue) {
+  if (!batchPlanValue || typeof batchPlanValue !== "object") {
+    return null;
+  }
+  const batches = Array.isArray(batchPlanValue.batches)
+    ? batchPlanValue.batches.map((batch) => ({
+        batchId: readText(batch?.batchId, batch?.id) || "Unidentified batch",
+        candidateIds: Array.isArray(batch?.candidateIds)
+          ? batch.candidateIds.map((value) => readText(value)).filter(Boolean)
+          : [],
+        groupHashes: Array.isArray(batch?.groupHashes)
+          ? batch.groupHashes.map((value) => readText(value)).filter(Boolean)
+          : [],
+        promptHash: readText(batch?.promptHash) || "Not recorded",
+        promptBytes: readFiniteNumber(batch?.promptBytes)
+      }))
+    : [];
+  return {
+    version: readText(batchPlanValue.version) || "Not recorded",
+    hash: readText(batchPlanValue.hash) || "Not recorded",
+    maxGroups: readFiniteNumber(batchPlanValue.maxGroups),
+    maxCandidates: readFiniteNumber(batchPlanValue.maxCandidates),
+    maxPromptBytes: readFiniteNumber(batchPlanValue.maxPromptBytes),
+    batches
+  };
+}
+
+function normalizeJudgeRecord({
+  record = {},
+  configuration = {},
+  run,
+  candidateOrder = [],
+  expectedBatchCount = null
+}) {
   const judgeModels = Array.isArray(run.judgeModels) ? run.judgeModels : [];
   const judgeConfiguration = record.configuration ?? configuration;
   const configurationId = readText(judgeConfiguration.id, record.configurationId, record.id) || "Not recorded";
+  const batches = Array.isArray(record.batches)
+    ? record.batches.map(normalizeJudgeBatchRecord)
+    : [];
+  const requestedBatchCount = expectedBatchCount ?? (batches.length > 0 ? batches.length : null);
+  const completedBatchCount = batches.filter((batch) => batch.status === "complete").length;
+  const failedBatchCount = requestedBatchCount === null
+    ? batches.filter((batch) => batch.status !== "complete").length
+    : Math.max(0, requestedBatchCount - completedBatchCount);
   return {
     id: readText(record.reviewerId, record.panelMemberId, record.id, judgeConfiguration.id) || "Not recorded",
     reviewerId: readText(record.reviewerId, record.panelMemberId) || null,
@@ -681,7 +749,13 @@ function normalizeJudgeRecord({ record = {}, configuration = {}, run, candidateO
       run.judgeSummary,
       run.bottomLine?.summary
     ),
+    promptText: readText(record.promptText),
     outputText: readText(record.outputText),
+    batches,
+    requestedBatchCount,
+    completedBatchCount,
+    failedBatchCount,
+    reusedBatchCount: batches.filter((batch) => batch.reused).length,
     candidateOrder: Array.isArray(record.candidateOrder) ? record.candidateOrder : candidateOrder,
     sourceReviewerIds: Array.isArray(record.sourceReviewerIds)
       ? record.sourceReviewerIds.map((value) => readText(value)).filter(Boolean)
@@ -717,14 +791,18 @@ function normalizeJudging(run) {
     : [];
   const synthesisSource = run.judging?.synthesis ?? run.judging?.synthesizer ?? null;
   const judgingStrategy = readText(run.judging?.strategy);
-  const hasPanelShape = judgingStrategy === "panel-synthesis-v1" || memberSources.length > 1 || Boolean(synthesisSource);
+  const batchPlan = normalizeJudgeBatchPlan(run.judging?.batchPlan);
+  const expectedBatchCount = batchPlan?.batches.length ?? null;
+  const isBatched = judgingStrategy.includes("batched") || judgingStrategy === "panel-synthesis-v2" || Boolean(batchPlan);
+  const hasPanelShape = judgingStrategy.startsWith("panel-synthesis-") || memberSources.length > 1 || Boolean(synthesisSource);
 
   if (hasPanelShape) {
     const members = memberSources.map((record, index) => normalizeJudgeRecord({
       record,
       configuration: configuredMembers[index] ?? {},
       run,
-      candidateOrder: topLevelCandidateOrder
+      candidateOrder: topLevelCandidateOrder,
+      expectedBatchCount
     })).sort((left, right) => {
       const leftIsSolUltra = left.model.toLowerCase().endsWith("gpt-5.6-sol") && left.reasoningEffort.toLowerCase() === "ultra";
       const rightIsSolUltra = right.model.toLowerCase().endsWith("gpt-5.6-sol") && right.reasoningEffort.toLowerCase() === "ultra";
@@ -738,22 +816,61 @@ function normalizeJudging(run) {
         record: synthesisSource,
         configuration: synthesisConfiguration,
         run,
-        candidateOrder: topLevelCandidateOrder
+        candidateOrder: topLevelCandidateOrder,
+        expectedBatchCount
       })
       : null;
     const effective = synthesis ?? members[0] ?? normalizeJudgeRecord({
       record: run.judging ?? {},
       configuration: run.judging?.judgeConfiguration ?? {},
       run,
-      candidateOrder: topLevelCandidateOrder
+      candidateOrder: topLevelCandidateOrder,
+      expectedBatchCount
     });
+    const requestedCount = configuredMembers.length || members.length;
+    const completedCount = members.filter((member) => member.status === "complete").length;
+    const panelBatchRequestedCount = isBatched && expectedBatchCount !== null
+      ? expectedBatchCount * requestedCount
+      : members.reduce((total, member) => total + Number(member.requestedBatchCount ?? 0), 0);
+    const panelBatchCompletedCount = members.reduce(
+      (total, member) => total + member.completedBatchCount,
+      0
+    );
+    const synthesisBatchRequestedCount = isBatched
+      ? expectedBatchCount ?? synthesis?.requestedBatchCount ?? 0
+      : 0;
+    const synthesisBatchCompletedCount = isBatched
+      ? synthesis?.completedBatchCount ?? 0
+      : 0;
+    const judgingComplete = readText(run.judging?.status) === "complete";
+    const panelComplete = completedCount === requestedCount && (
+      !isBatched || panelBatchCompletedCount === panelBatchRequestedCount
+    );
+    const synthesisComplete = synthesis?.status === "complete" && (
+      !isBatched || synthesisBatchCompletedCount === synthesisBatchRequestedCount
+    );
     return {
       mode: "panel",
+      strategy: judgingStrategy || "Not recorded",
+      isBatched,
+      batchPlan,
       members,
-      requestedCount: configuredMembers.length || members.length,
-      completedCount: members.filter((member) => member.status === "complete").length,
+      requestedCount,
+      completedCount,
+      panelBatchRequestedCount,
+      panelBatchCompletedCount,
+      panelBatchReusedCount: members.reduce((total, member) => total + member.reusedBatchCount, 0),
+      synthesisBatchRequestedCount,
+      synthesisBatchCompletedCount,
+      synthesisBatchReusedCount: synthesis?.reusedBatchCount ?? 0,
       synthesis,
-      scoreAuthority: synthesis?.status === "complete" ? "synthesizer" : "none",
+      scoreAuthority: isBatched
+        ? judgingComplete && panelComplete && synthesisComplete
+          ? "synthesizer"
+          : "none"
+        : synthesis?.status === "complete"
+          ? "synthesizer"
+          : "none",
       disagreement: run.judging?.disagreement ?? null,
       panelPromptHash: readText(run.judging?.panelPromptHash) || "Not recorded",
       basisHash: readText(run.judging?.basisHash) || "Not recorded",
@@ -765,15 +882,31 @@ function normalizeJudging(run) {
     record: memberSources[0] ?? run.judging ?? {},
     configuration: run.judging?.judgeConfiguration ?? run.judge?.judgeConfiguration ?? {},
     run,
-    candidateOrder: topLevelCandidateOrder
+    candidateOrder: topLevelCandidateOrder,
+    expectedBatchCount
   });
+  const singleBatchComplete = !isBatched || (
+    effective.completedBatchCount === effective.requestedBatchCount &&
+    readText(run.judging?.status) === "complete"
+  );
   return {
     mode: "single",
+    strategy: judgingStrategy || "Not recorded",
+    isBatched,
+    batchPlan,
     members: [effective],
     requestedCount: 1,
     completedCount: effective.status === "complete" ? 1 : 0,
+    panelBatchRequestedCount: isBatched ? effective.requestedBatchCount ?? 0 : 0,
+    panelBatchCompletedCount: isBatched ? effective.completedBatchCount : 0,
+    panelBatchReusedCount: isBatched ? effective.reusedBatchCount : 0,
+    synthesisBatchRequestedCount: 0,
+    synthesisBatchCompletedCount: 0,
+    synthesisBatchReusedCount: 0,
     synthesis: null,
-    scoreAuthority: "single-judge",
+    scoreAuthority: !isBatched || (effective.status === "complete" && singleBatchComplete)
+      ? "single-judge"
+      : "none",
     disagreement: null,
     panelPromptHash: effective.promptHash,
     basisHash: readText(run.judging?.basisHash) || "Not recorded",
@@ -952,6 +1085,13 @@ export function normalizeBenchmarkReportData(runArtifact) {
       member.candidateOrder,
       rows
     );
+    for (const batch of member.batches) {
+      batch.summary = resolveJudgeCandidateReferences(
+        batch.summary,
+        member.candidateOrder,
+        rows
+      );
+    }
   }
   if (judging.synthesis) {
     judging.synthesis.summary = resolveJudgeCandidateReferences(
@@ -959,6 +1099,13 @@ export function normalizeBenchmarkReportData(runArtifact) {
       judging.synthesis.candidateOrder,
       rows
     );
+    for (const batch of judging.synthesis.batches) {
+      batch.summary = resolveJudgeCandidateReferences(
+        batch.summary,
+        judging.synthesis.candidateOrder,
+        rows
+      );
+    }
   }
   judge.summary = resolveJudgeCandidateReferences(
     judge.summary,
@@ -1080,6 +1227,30 @@ function formatDate(dateText) {
   });
 }
 
+function formatByteCount(byteCount) {
+  if (!Number.isFinite(byteCount)) {
+    return "Not recorded";
+  }
+  if (byteCount >= 1024) {
+    const kibibytes = byteCount / 1024;
+    return `${Number.isInteger(kibibytes) ? kibibytes.toFixed(0) : kibibytes.toFixed(1)} KiB`;
+  }
+  return `${byteCount} B`;
+}
+
+function formatLatency(durationMs) {
+  if (!Number.isFinite(durationMs)) {
+    return "Not recorded";
+  }
+  if (durationMs < 60_000) {
+    return `${(durationMs / 1000).toFixed(1)}s`;
+  }
+  const totalSeconds = Math.round(durationMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m ${seconds}s`;
+}
+
 function renderCriteriaList(criteria) {
   if (criteria.length === 0) {
     return '<p class="benchmark-method__empty">No criterion-level rubric was recorded.</p>';
@@ -1097,8 +1268,72 @@ function renderLimitations(limitations) {
   return limitations.map((limitation) => `<li class="benchmark-method__limitation">${escapeHtml(limitation)}</li>`).join("");
 }
 
+function renderJudgeBatchEvidence(batch, roleLabel) {
+  const candidateCount = batch.candidateIds.length;
+  const statusLabel = `${batch.status}${batch.reused ? " · reused" : ""}`;
+  const promptHash = batch.promptHash === "Not recorded" ? batch.promptHash : batch.promptHash.slice(0, 12);
+  const basisHash = batch.basisHash === "Not recorded" ? batch.basisHash : batch.basisHash.slice(0, 12);
+  const evidenceHash = batch.evidenceHash === "Not recorded" ? batch.evidenceHash : batch.evidenceHash.slice(0, 12);
+  const totalTokens = batch.usage.totalTokens === null
+    ? "Not recorded"
+    : batch.usage.totalTokens.toLocaleString("en-US");
+  const duration = batch.durationMs === null
+    ? "Not recorded"
+    : formatLatency(batch.durationMs);
+  const exactPrompt = batch.promptText ? `
+        <details class="benchmark-method__batch-payload">
+          <summary class="benchmark-method__judge-output-summary">Read exact ${escapeHtml(roleLabel.toLowerCase())} prompt</summary>
+          <pre class="benchmark-method__judge-output-text">${escapeHtml(batch.promptText)}</pre>
+        </details>` : "";
+  const exactOutput = batch.outputText ? `
+        <details class="benchmark-method__batch-payload">
+          <summary class="benchmark-method__judge-output-summary">Read exact ${escapeHtml(roleLabel.toLowerCase())} output</summary>
+          <pre class="benchmark-method__judge-output-text">${escapeHtml(batch.outputText)}</pre>
+        </details>` : "";
+
+  return `
+      <details class="benchmark-method__batch">
+        <summary class="benchmark-method__batch-toggle">
+          <span>${escapeHtml(batch.batchId)} · ${escapeHtml(candidateCount)} candidate${candidateCount === 1 ? "" : "s"}</span>
+          <span class="benchmark-method__batch-status">${escapeHtml(statusLabel)}</span>
+        </summary>
+        <dl class="benchmark-method__batch-facts">
+          <dt>Prompt</dt><dd>${escapeHtml(promptHash)} · ${escapeHtml(formatByteCount(batch.promptBytes))}</dd>
+          <dt>Basis</dt><dd>${escapeHtml(basisHash)}</dd>
+          <dt>${escapeHtml(roleLabel)} evidence</dt><dd>${escapeHtml(evidenceHash)}</dd>
+          <dt>Runtime</dt><dd>${escapeHtml(duration)} · ${escapeHtml(totalTokens)} tokens</dd>
+          <dt>Candidates</dt><dd>${batch.candidateIds.length > 0 ? escapeHtml(batch.candidateIds.join(", ")) : "Not recorded"}</dd>
+        </dl>
+        ${batch.error ? `<p class="benchmark-method__batch-error">Failure: ${escapeHtml(batch.error)}</p>` : ""}
+        ${batch.summary ? `<p class="benchmark-method__panel-copy">${escapeHtml(batch.summary)}</p>` : ""}
+        ${exactPrompt}
+        ${exactOutput}
+      </details>`;
+}
+
+function renderBatchedJudgeRecord(record, { roleLabel, includeReviewer = false }) {
+  const identity = includeReviewer && record.reviewerId
+    ? `${record.reviewerId} · ${record.model} · ${record.reasoningEffort}`
+    : `${record.model} · ${record.reasoningEffort}`;
+  const requested = record.requestedBatchCount ?? record.batches.length;
+  const coverage = `${record.completedBatchCount}/${requested} batches complete`;
+  const batches = record.batches.length > 0
+    ? record.batches.map((batch) => renderJudgeBatchEvidence(batch, roleLabel)).join("")
+    : `<p class="benchmark-method__panel-copy">No ${escapeHtml(roleLabel.toLowerCase())} batch records were persisted.</p>`;
+  return `
+    <article class="benchmark-method__panel-member">
+      <div class="benchmark-method__panel-heading">
+        <span class="benchmark-method__panel-model">${escapeHtml(identity)}</span>
+        <span class="benchmark-method__panel-status">${escapeHtml(record.status)} · ${escapeHtml(coverage)}</span>
+      </div>
+      ${record.error ? `<p class="benchmark-method__batch-error">Failure: ${escapeHtml(record.error)}</p>` : ""}
+      ${record.summary ? `<p class="benchmark-method__panel-copy">${escapeHtml(record.summary)}</p>` : ""}
+      <div class="benchmark-method__batches">${batches}</div>
+    </article>`;
+}
+
 function renderJudgePanelEvidence(judging) {
-  if (judging.mode !== "panel") {
+  if (judging.mode !== "panel" && !judging.isBatched) {
     return "";
   }
   const disagreement = judging.disagreement;
@@ -1111,6 +1346,38 @@ function renderJudgePanelEvidence(judging) {
         : ""
     }.`
     : "Per-candidate disagreement was not recorded.";
+  if (judging.isBatched) {
+    const panelMembers = judging.members.map((member) => renderBatchedJudgeRecord(member, {
+      roleLabel: "Judge",
+      includeReviewer: judging.mode === "panel"
+    })).join("");
+    const batchPlan = judging.batchPlan;
+    const planSummary = batchPlan
+      ? `${batchPlan.batches.length} deterministic matched ${batchPlan.batches.length === 1 ? "batch" : "batches"} · ` +
+        `up to ${batchPlan.maxGroups ?? "?"} groups / ${batchPlan.maxCandidates ?? "?"} candidates / ${formatByteCount(batchPlan.maxPromptBytes)}`
+      : "The batch plan was not recorded.";
+    const panelToggle = judging.mode === "panel"
+      ? `Panel evidence · ${judging.panelBatchCompletedCount}/${judging.panelBatchRequestedCount} batch executions complete`
+      : `Judge evidence · ${judging.panelBatchCompletedCount}/${judging.panelBatchRequestedCount} batches complete`;
+    const synthesisEvidence = judging.synthesis
+      ? `
+      <details class="benchmark-method__panel">
+        <summary class="benchmark-method__panel-toggle">Synthesis evidence · ${escapeHtml(judging.synthesisBatchCompletedCount)}/${escapeHtml(judging.synthesisBatchRequestedCount)} batches complete</summary>
+        <div class="benchmark-method__panel-members">${renderBatchedJudgeRecord(judging.synthesis, {
+          roleLabel: "Synthesis"
+        })}</div>
+      </details>`
+      : "";
+    return `
+      ${judging.mode === "panel" ? `<p class="benchmark-method__panel-summary">${escapeHtml(disagreementText)}</p>` : ""}
+      <p class="benchmark-method__batch-plan">Batch contract · ${escapeHtml(planSummary)}</p>
+      <details class="benchmark-method__panel">
+        <summary class="benchmark-method__panel-toggle">${escapeHtml(panelToggle)}</summary>
+        <div class="benchmark-method__panel-members">${panelMembers}</div>
+      </details>
+      ${synthesisEvidence}`;
+  }
+
   const members = judging.members.map((member) => `
     <article class="benchmark-method__panel-member">
       <div class="benchmark-method__panel-heading">
@@ -1158,7 +1425,7 @@ function renderTableRows(rows) {
       <td class="benchmark-table__cell">${escapeHtml(row.status)}</td>
       <td class="benchmark-table__cell benchmark-table__cell--numeric">${row.usage.totalTokens === null ? "—" : escapeHtml(row.usage.totalTokens.toLocaleString("en-US"))}</td>
       <td class="benchmark-table__cell benchmark-table__cell--numeric">${row.costUsd === null ? "—" : escapeHtml(`$${row.costUsd.toFixed(4)}`)}</td>
-      <td class="benchmark-table__cell benchmark-table__cell--numeric">${row.durationMs === null ? "—" : escapeHtml(`${Math.round(row.durationMs).toLocaleString("en-US")} ms`)}</td>
+      <td class="benchmark-table__cell benchmark-table__cell--numeric">${row.durationMs === null ? "—" : escapeHtml(formatLatency(row.durationMs))}</td>
       <td class="benchmark-table__cell">
         <details class="benchmark-table__response">
           <summary class="benchmark-table__summary">Read full answer</summary>
@@ -1256,6 +1523,7 @@ const REPORT_STYLES = String.raw`
     --focus-width: 3px;
     --point-size: 0.45rem;
     --chart-stroke: 2px;
+    --diamond-scale: 0.72;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -1764,7 +2032,14 @@ const REPORT_STYLES = String.raw`
   .benchmark-chart__axis line { stroke: var(--color-grid); }
   .benchmark-chart__axis path { stroke: var(--color-border-strong); }
   .benchmark-chart__label { fill: var(--color-text-secondary); }
-  .benchmark-chart__sublabel { fill: var(--color-text-muted); font-size: var(--text-xs); }
+  .benchmark-chart__condition-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-label);
+  }
+  .benchmark-chart__condition-label--clean { fill: var(--color-clean-soft); }
+  .benchmark-chart__condition-label--vasir { fill: var(--color-accent); }
   .benchmark-chart__value { fill: var(--color-text-primary); font-weight: var(--weight-bold); }
   .benchmark-chart__empty { fill: var(--color-text-muted); }
   .benchmark-chart__line { stroke: var(--color-border-strong); stroke-width: var(--chart-stroke); }
@@ -1889,27 +2164,25 @@ const REPORT_STYLES = String.raw`
     border-left: var(--hairline) solid var(--color-border);
   }
 
-  .benchmark-answer[data-condition="clean"] .benchmark-answer__card {
-    border-top: var(--space-1) solid var(--color-clean);
-  }
-
-  .benchmark-answer[data-condition="vasir"] .benchmark-answer__card {
-    border-top: var(--space-1) solid var(--color-accent);
-  }
-
-  .benchmark-answer__metrics {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
+  .benchmark-answer__comparison {
+    display: grid;
     gap: var(--space-4);
     margin-top: var(--space-6);
+    padding: var(--space-4);
+    background: var(--color-surface-deep);
   }
 
-  .benchmark-answer__score {
+  .benchmark-answer__comparison-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  .benchmark-answer__delta {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(2.25rem, 3.5vw, 3.5rem);
+    font-size: clamp(1.5rem, 2.2vw, 2.1rem);
     font-style: italic;
     font-weight: 900;
     letter-spacing: var(--tracking-tight);
@@ -1917,13 +2190,124 @@ const REPORT_STYLES = String.raw`
     font-variant-numeric: tabular-nums;
   }
 
-  .benchmark-answer__delta {
-    margin: 0 0 var(--space-1);
+  .benchmark-answer__delta--positive { color: var(--color-accent); }
+  .benchmark-answer__delta--negative { color: var(--color-clean-soft); }
+  .benchmark-answer__delta--neutral { color: var(--color-text-primary); }
+
+  .benchmark-answer__score-pair {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .benchmark-answer__score-row {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2) var(--space-3);
+  }
+
+  .benchmark-answer__score-name {
+    min-width: 0;
     color: var(--color-text-secondary);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);
+  }
+
+  .benchmark-answer__score-name::before {
+    display: inline-block;
+    width: var(--space-3);
+    margin-right: var(--space-2);
+    content: "";
+  }
+
+  .benchmark-answer__score-row--clean .benchmark-answer__score-name::before {
+    height: var(--space-3);
+    border: var(--chart-stroke) solid var(--color-clean);
+    border-radius: var(--radius-full);
+    vertical-align: calc(var(--hairline) * -1);
+  }
+
+  .benchmark-answer__score-row--vasir .benchmark-answer__score-name::before {
+    height: var(--space-3);
+    background: var(--color-accent);
+    transform: rotate(45deg) scale(var(--diamond-scale));
+    vertical-align: calc(var(--hairline) * -1);
+  }
+
+  .benchmark-answer__score-data { display: contents; }
+
+  .benchmark-answer__score-value {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
     font-variant-numeric: tabular-nums;
+  }
+
+  .benchmark-answer__score-rail {
+    position: relative;
+    height: var(--space-1);
+    overflow: hidden;
+    background: var(--color-grid);
+    grid-column: 1 / -1;
+  }
+
+  .benchmark-answer__score-fill {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  .benchmark-answer__score-fill--clean { background: var(--color-clean); }
+  .benchmark-answer__score-fill--vasir { background: var(--color-accent); }
+
+  .benchmark-answer__selection {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: var(--space-1) solid var(--color-border-strong);
+  }
+
+  .benchmark-answer.is-showing-clean .benchmark-answer__selection {
+    border-top-color: var(--color-clean);
+  }
+
+  .benchmark-answer.is-showing-vasir .benchmark-answer__selection {
+    border-top-color: var(--color-accent);
+  }
+
+  .benchmark-answer__selection-label {
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .benchmark-answer.is-showing-clean .benchmark-answer__selection-label {
+    color: var(--color-clean-soft);
+  }
+
+  .benchmark-answer.is-showing-vasir .benchmark-answer__selection-label {
+    color: var(--color-accent);
+  }
+
+  .benchmark-answer__score {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .benchmark-answer__status {
@@ -2290,6 +2674,75 @@ const REPORT_STYLES = String.raw`
     font-size: var(--text-sm);
   }
 
+  .benchmark-method__batch-plan {
+    margin: var(--space-4) 0 0;
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+  }
+
+  .benchmark-method__batches {
+    margin-top: var(--space-3);
+    border-bottom: var(--hairline) solid var(--color-border);
+  }
+
+  .benchmark-method__batch {
+    border-top: var(--hairline) solid var(--color-border);
+  }
+
+  .benchmark-method__batch-toggle {
+    display: flex;
+    min-height: var(--control-height);
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+  }
+
+  .benchmark-method__batch-toggle:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--space-2);
+  }
+
+  .benchmark-method__batch-status {
+    flex: 0 0 auto;
+    color: var(--color-accent);
+    text-transform: uppercase;
+  }
+
+  .benchmark-method__batch-facts {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2) var(--space-4);
+    margin: 0 0 var(--space-3);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+
+  .benchmark-method__batch-facts dd {
+    margin: 0;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .benchmark-method__batch-error {
+    margin: var(--space-2) 0;
+    color: var(--color-danger);
+    font-size: var(--text-sm);
+  }
+
+  .benchmark-method__batch-payload {
+    margin-top: var(--space-2);
+  }
+
   .benchmark-method__judge-output { margin-top: var(--space-2); }
 
   .benchmark-method__judge-output-text {
@@ -2588,10 +3041,16 @@ const REPORT_SCRIPT = String.raw`
         .attr("x", chartMargin.left - 12)
         .text(function(item) { return item.configurationLabel; });
       labels.append("tspan")
-        .attr("class", "benchmark-chart__sublabel")
+        .attr("class", function(item) {
+          return "benchmark-chart__condition-label benchmark-chart__condition-label--" + (item.conditionId === "vasir" ? "vasir" : "clean");
+        })
         .attr("x", chartMargin.left - 12)
         .attr("dy", 14)
-        .text(function(item) { return item.conditionLabel; });
+        .text(function(item) {
+          return item.conditionId === "vasir"
+            ? "WITH VASIR"
+            : report.treatment.type === "skill" ? "WITHOUT SKILL" : "CLEAN";
+        });
       svg.selectAll(".benchmark-chart__value")
         .data(data)
         .join("text")
@@ -2664,64 +3123,6 @@ const REPORT_SCRIPT = String.raw`
         .attr("x", width - chartMargin.right + 12)
         .attr("y", function(item) { return y(item.modelKey) + y.bandwidth() / 2 + 4; })
         .text(function(item) { return formatLift(item.lift); });
-    }
-
-    function hashText(value) {
-      let hash = 2166136261;
-      for (let index = 0; index < value.length; index += 1) {
-        hash ^= value.charCodeAt(index);
-        hash = Math.imul(hash, 16777619);
-      }
-      return hash >>> 0;
-    }
-
-    function drawTrials(element, width) {
-      const chartMargin = getChartMargin(width);
-      const data = report.rows.filter(function(item) { return Number.isFinite(item.score); });
-      const groups = Array.from(new Set(data.map(function(item) { return item.modelKey; })));
-      const rowHeight = 48;
-      const plotHeight = Math.max(110, groups.length * rowHeight);
-      const height = chartMargin.top + plotHeight + chartMargin.bottom;
-      const svg = d3.select(element).html("").append("svg")
-        .attr("class", "benchmark-chart__svg")
-        .attr("viewBox", "0 0 " + width + " " + height);
-      addChartSemantics(
-        svg,
-        "Raw trial scores",
-        data.length ? "Every scored generation is shown. Circles are clean runs and diamonds are " + report.treatment.label + " runs; vertical offset only prevents overlap." : "No scored trial data were recorded."
-      );
-      if (!data.length) {
-        addEmptyState(svg, width, "No scored trial data were recorded.");
-        return;
-      }
-      const x = d3.scaleLinear().domain([0, 100]).range([chartMargin.left, width - chartMargin.right]);
-      const y = d3.scaleBand().domain(groups).range([chartMargin.top, chartMargin.top + plotHeight]).padding(0.38);
-      drawScoreAxis(svg, x, plotHeight, width, chartMargin);
-      svg.selectAll(".benchmark-chart__label")
-        .data(groups)
-        .join("text")
-        .attr("class", "benchmark-chart__label")
-        .attr("x", chartMargin.left - 12)
-        .attr("y", function(modelKey) { return y(modelKey) + y.bandwidth() / 2 + 4; })
-        .attr("text-anchor", "end")
-        .text(function(modelKey) {
-          const row = data.find(function(item) { return item.modelKey === modelKey; });
-          return row ? row.configurationLabel : modelKey;
-        });
-      svg.selectAll(".benchmark-chart__point")
-        .data(data)
-        .join("path")
-        .attr("class", function(item) { return "benchmark-chart__point benchmark-chart__point--" + (item.conditionId === "vasir" ? "vasir" : "clean"); })
-        .attr("d", function(item) { return d3.symbol().type(item.conditionId === "vasir" ? d3.symbolDiamond : d3.symbolCircle).size(75)(); })
-        .attr("transform", function(item) {
-          const offset = ((hashText(item.id) % 1000) / 999 - 0.5) * 18;
-          return "translate(" + x(item.score) + "," + (y(item.modelKey) + y.bandwidth() / 2 + offset) + ")";
-        })
-        .attr("tabindex", 0)
-        .attr("role", "img")
-        .attr("aria-label", function(item) { return item.configurationLabel + ", " + item.conditionLabel + ", trial " + item.trialNumber + ", " + formatScore(item.score) + " points"; })
-        .append("title")
-        .text(function(item) { return item.configurationLabel + " · " + item.conditionLabel + " · Trial " + item.trialNumber + ": " + formatScore(item.score); });
     }
 
     function renderCriteria(container, criteria) {
@@ -2937,12 +3338,14 @@ const REPORT_SCRIPT = String.raw`
       function renderCard(slot, modelSelect) {
         const trial = Number(trialSelect.value);
         const conditionId = selectedCondition();
-        const oppositeConditionId = conditionId === "vasir" ? "clean" : "vasir";
+        const cleanRow = report.rows.find(function(candidate) {
+          return candidate.modelKey === modelSelect.value && candidate.trialNumber === trial && candidate.conditionId === "clean";
+        });
+        const vasirRow = report.rows.find(function(candidate) {
+          return candidate.modelKey === modelSelect.value && candidate.trialNumber === trial && candidate.conditionId === "vasir";
+        });
         const row = report.rows.find(function(candidate) {
           return candidate.modelKey === modelSelect.value && candidate.trialNumber === trial && candidate.conditionId === conditionId;
-        });
-        const oppositeRow = report.rows.find(function(candidate) {
-          return candidate.modelKey === modelSelect.value && candidate.trialNumber === trial && candidate.conditionId === oppositeConditionId;
         });
         const prefix = "benchmark-answer-";
         const cleanConditionLabel = report.treatment.type === "skill" ? "Without skill" : "Clean";
@@ -2950,16 +3353,27 @@ const REPORT_SCRIPT = String.raw`
           ? "With " + report.treatment.label
           : report.treatment.label;
         const conditionLabel = conditionId === "vasir" ? treatmentConditionLabel : cleanConditionLabel;
-        document.getElementById(prefix + "condition-" + slot).textContent = conditionLabel;
+        const cleanScore = cleanRow && Number.isFinite(cleanRow.score) ? cleanRow.score : null;
+        const vasirScore = vasirRow && Number.isFinite(vasirRow.score) ? vasirRow.score : null;
+        const delta = cleanScore !== null && vasirScore !== null ? vasirScore - cleanScore : null;
+        const deltaElement = document.getElementById(prefix + "delta-" + slot);
+        const deltaTone = delta === null || Math.abs(delta) < 0.05
+          ? "neutral"
+          : delta > 0 ? "positive" : "negative";
+        document.getElementById(prefix + "clean-score-" + slot).textContent = cleanScore === null
+          ? "Not measured"
+          : formatScore(cleanScore);
+        document.getElementById(prefix + "vasir-score-" + slot).textContent = vasirScore === null
+          ? "Not measured"
+          : formatScore(vasirScore);
+        document.getElementById(prefix + "clean-fill-" + slot).style.transform = "scaleX(" + (cleanScore === null ? 0 : cleanScore / 100) + ")";
+        document.getElementById(prefix + "vasir-fill-" + slot).style.transform = "scaleX(" + (vasirScore === null ? 0 : vasirScore / 100) + ")";
+        deltaElement.className = "benchmark-answer__delta benchmark-answer__delta--" + deltaTone;
+        deltaElement.textContent = delta === null ? "No match" : formatLift(delta);
+        document.getElementById(prefix + "condition-" + slot).textContent = conditionLabel + " answer";
         document.getElementById(prefix + "score-" + slot).textContent = row && Number.isFinite(row.score)
           ? formatScore(row.score) + " / 100"
           : "Not measured";
-        const delta = row && oppositeRow && Number.isFinite(row.score) && Number.isFinite(oppositeRow.score)
-          ? row.score - oppositeRow.score
-          : null;
-        document.getElementById(prefix + "delta-" + slot).textContent = delta === null
-          ? "No matched comparison"
-          : formatLift(delta) + (conditionId === "vasir" ? " vs clean" : " vs treatment");
         document.getElementById(prefix + "status-" + slot).textContent = gateSummary(row);
         document.getElementById(prefix + "output-" + slot).textContent = row
           ? (row.outputText || row.error || "No response text recorded.")
@@ -2976,11 +3390,12 @@ const REPORT_SCRIPT = String.raw`
 
       function renderInspector() {
         const conditionId = selectedCondition();
-        answerRoot.dataset.condition = conditionId;
+        answerRoot.classList.toggle("is-showing-clean", conditionId === "clean");
+        answerRoot.classList.toggle("is-showing-vasir", conditionId === "vasir");
         const cleanConditionLabel = report.treatment.type === "skill" ? "without-skill" : "clean";
         scope.textContent = conditionId === "vasir"
-          ? "Showing " + report.treatment.label + " responses for the same trial across all three models."
-          : "Showing " + cleanConditionLabel + " responses for the same trial across all three models.";
+          ? "Both scores stay visible. Showing the " + report.treatment.label + " full answers and evidence below."
+          : "Both scores stay visible. Showing the " + cleanConditionLabel + " full answers and evidence below.";
         modelSelects.forEach(function(select, index) { renderCard(index + 1, select); });
       }
 
@@ -3000,7 +3415,6 @@ const REPORT_SCRIPT = String.raw`
 
     observeChart("#benchmark-ranking-chart", drawRanking);
     observeChart("#benchmark-lift-chart", drawLift);
-    observeChart("#benchmark-trials-chart", drawTrials);
     initializeAnswerInspector();
   })();
 `;
@@ -3041,7 +3455,15 @@ export function renderBenchmarkReportHtml(runArtifact) {
     : "No scored configuration";
   const bestScore = report.bestConfiguration ? formatScore(report.bestConfiguration.score) : "—";
   const rubricSummary = report.rubric.summary || "The artifact did not record a prose rubric summary; criterion labels are shown when available.";
-  const judgeContextTitle = isPanelJudging
+  const isBatchedJudging = report.judging.isBatched;
+  const batchPlanCount = report.judging.batchPlan?.batches.length ?? 0;
+  const panelBatchCoverage = `${report.judging.panelBatchCompletedCount}/${report.judging.panelBatchRequestedCount}`;
+  const synthesisBatchCoverage = `${report.judging.synthesisBatchCompletedCount}/${report.judging.synthesisBatchRequestedCount}`;
+  const judgeContextTitle = isBatchedJudging
+    ? hasSynthesizedScores
+      ? `${report.judging.requestedCount} independent judges × ${batchPlanCount} bounded batches → batched synthesis`
+      : `${panelBatchCoverage} panel executions · ${synthesisBatchCoverage} synthesis batches · no final score`
+    : isPanelJudging
     ? hasSynthesizedScores
       ? `${report.judging.requestedCount} independent judges → one synthesis`
       : `${report.judging.completedCount}/${report.judging.requestedCount} judges complete · synthesis unavailable`
@@ -3053,21 +3475,39 @@ export function renderBenchmarkReportHtml(runArtifact) {
   const calibrationNote = report.judge.calibrationStatus === "author-calibration-pending"
     ? "Judge calibration is pending; numeric scores are directional evidence, not ground truth."
     : `Judge calibration: ${report.judge.calibrationStatus}.`;
-  const judgeAsideNote = isPanelJudging
+  const judgeAsideNote = isBatchedJudging
+    ? `${panelBatchCoverage} panel executions · ${synthesisBatchCoverage} synthesis batches`
+    : isPanelJudging
     ? hasSynthesizedScores
       ? `${report.judging.requestedCount}-judge panel · ${report.judge.model} synthesis`
       : `${report.judging.completedCount}/${report.judging.requestedCount} judges · no final score`
     : `${report.judge.model} judge`;
-  const judgeContractNote = isPanelJudging
+  const judgeContractNote = isBatchedJudging
+    ? `${panelBatchCoverage} panel batch executions · ${synthesisBatchCoverage} synthesis batches · ${hasSynthesizedScores ? "final synthesis complete" : "no final score"}.`
+    : isPanelJudging
     ? `${report.judging.completedCount}/${report.judging.requestedCount} independent judgments · ${
       report.judging.synthesis?.status === "complete" ? "fresh synthesis complete" : "no final synthesis"
     }.`
     : `${report.judge.freshContext === true ? "Fresh context" : "Freshness not proven"} · ${report.judge.blinded === true ? "blinded identities" : "blinding not proven"} · ${report.judge.reasoningEffort} effort.`;
-  const judgeMethodSummary = isPanelJudging
+  const judgeMethodSummary = isBatchedJudging
+    ? hasSynthesizedScores
+      ? "The page reports scores synthesized from bounded, fresh judge batches. Every exact batch prompt, output, status, and retry result remains inspectable below."
+      : "At least one required judge or synthesis batch did not complete, so this page publishes no final score. Successful batch evidence remains inspectable for a bounded retry."
+    : isPanelJudging
     ? hasSynthesizedScores
       ? "The page reports synthesized scores from independent blinded judgments. It does not turn that panel or a small sample into ground truth."
       : "The configured judge panel did not complete, so this page publishes no final score. Completed judge evidence remains inspectable for a safe retry."
     : "The page reports what this run observed. It does not turn one model judge or a small sample into ground truth.";
+  const judgingPromptFacts = isBatchedJudging
+    ? `
+              <dt class="benchmark-method__term">Batch plan</dt><dd class="benchmark-method__definition">${escapeHtml(`${batchPlanCount} matched batches · ${report.judging.batchPlan?.version ?? "Not recorded"}`)}</dd>
+              <dt class="benchmark-method__term">Panel executions</dt><dd class="benchmark-method__definition">${escapeHtml(`${panelBatchCoverage} complete`)}</dd>
+              ${isPanelJudging ? `<dt class="benchmark-method__term">Synthesis batches</dt><dd class="benchmark-method__definition">${escapeHtml(`${synthesisBatchCoverage} complete`)}</dd>` : ""}
+              <dt class="benchmark-method__term">Batch bound</dt><dd class="benchmark-method__definition">${escapeHtml(`≤${report.judging.batchPlan?.maxGroups ?? "?"} groups · ≤${report.judging.batchPlan?.maxCandidates ?? "?"} candidates · ≤${formatByteCount(report.judging.batchPlan?.maxPromptBytes)}`)}</dd>
+              <dt class="benchmark-method__term">Plan basis</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.batchPlan?.hash && report.judging.batchPlan.hash !== "Not recorded" ? report.judging.batchPlan.hash.slice(0, 12) : "Not recorded")}</dd>`
+    : `
+              ${isPanelJudging ? `<dt class="benchmark-method__term">Panel prompt</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.panelPromptHash === "Not recorded" ? report.judging.panelPromptHash : report.judging.panelPromptHash.slice(0, 12))}</dd>` : ""}
+              <dt class="benchmark-method__term">${isPanelJudging ? "Synthesis prompt" : "Judge prompt"}</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.promptHash === "Not recorded" ? report.judge.promptHash : report.judge.promptHash.slice(0, 12))}</dd>`;
   const judgePanelEvidence = renderJudgePanelEvidence(report.judging);
   const tableRows = renderTableRows(report.rows);
 
@@ -3096,7 +3536,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
       </div>
       <nav class="benchmark-report__local-nav layout-frame" aria-label="On this report">
         <a class="benchmark-report__local-link" href="#ranking">The winner</a>
-        <a class="benchmark-report__local-link" href="#trials">Raw trials</a>
+        <a class="benchmark-report__local-link" href="#lift">Treatment lift</a>
         <a class="benchmark-report__local-link" href="#answers">Full responses</a>
         <a class="benchmark-report__local-link" href="#method">Measurement contract</a>
         <span class="benchmark-report__meta">${escapeHtml(report.runId)} · ${escapeHtml(formatDate(report.completedAt))}</span>
@@ -3109,7 +3549,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
           <span class="benchmark-hero__eyebrow">${report.source.matrixComplete ? "The Vasir benchmark standard" : `Partial observed ${escapeHtml(report.treatment.label)} lift`} · ${escapeHtml(report.benchmarkTitle)}</span>
           <h1 class="benchmark-hero__headline" id="benchmark-hero-title">${escapeHtml(heroDisplayHeadline)}</h1>
           <p class="benchmark-hero__copy benchmark-hero__copy--strong">${escapeHtml(liftHeadline)}</p>
-          <p class="benchmark-hero__copy">Score lift is the mean matched score difference: ${escapeHtml(report.treatment.label)} minus clean, on the ${isPanelJudging ? "synthesized" : "judge’s"} 0–100 scale. ${escapeHtml(calibrationNote)} The raw trials, full answers, rubric, and caveats remain visible below.</p>
+          <p class="benchmark-hero__copy">Score lift is the mean matched score difference: ${escapeHtml(report.treatment.label)} minus clean, on the ${isPanelJudging ? "synthesized" : "judge’s"} 0–100 scale. ${escapeHtml(calibrationNote)} Every complete answer, rubric result, and caveat remains visible below.</p>
           <nav class="benchmark-hero__actions" aria-label="Explore benchmark evidence">
             <a class="ui-action ui-action--primary" href="#ranking"><span>See model ranking</span><span aria-hidden="true">→</span></a>
             <a class="ui-action ui-action--secondary" href="#answers"><span>Compare full answers</span><span aria-hidden="true">→</span></a>
@@ -3146,7 +3586,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
             <span class="benchmark-section__eyebrow">01 / answer the winner question</span>
             <h2 class="benchmark-section__title" id="ranking-title">Which configuration answered best?</h2>
           </div>
-          <p class="benchmark-section__summary">Every scored model × reasoning × condition cell, ranked on one honest 0–100 axis. Diamonds are ${escapeHtml(report.treatment.label)}; outlined circles are clean. Means never hide the raw trials below.</p>
+          <p class="benchmark-section__summary">Every scored model × reasoning × condition cell, ranked on one honest 0–100 axis. Lime diamonds and labels are with Vasir; coral circles and labels are without skill. Every exact response remains in the evidence matrix below.</p>
         </header>
         <div class="benchmark-chart" id="benchmark-ranking-chart"></div>
       </section>
@@ -3162,29 +3602,18 @@ export function renderBenchmarkReportHtml(runArtifact) {
         <div class="benchmark-chart" id="benchmark-lift-chart"></div>
       </section>
 
-      <section class="benchmark-section" id="trials" aria-labelledby="trials-title">
-        <header class="benchmark-section__header">
-          <div class="benchmark-section__heading">
-            <span class="benchmark-section__eyebrow">03 / inspect the variance</span>
-            <h2 class="benchmark-section__title" id="trials-title">The means are not the evidence. These trials are.</h2>
-          </div>
-          <p class="benchmark-section__summary">Every judged response is plotted. Small vertical offsets prevent overlap and carry no quantitative meaning. Focus a point for its model, condition, trial, and score.</p>
-        </header>
-        <div class="benchmark-chart" id="benchmark-trials-chart"></div>
-      </section>
-
       <section class="benchmark-section" id="answers" aria-labelledby="answers-title">
         <header class="benchmark-section__header">
           <div class="benchmark-section__heading">
-            <span class="benchmark-section__eyebrow">04 / read what was judged</span>
+            <span class="benchmark-section__eyebrow">03 / read what was judged</span>
             <h2 class="benchmark-section__title" id="answers-title">Compare any three model configurations.</h2>
           </div>
-          <p class="benchmark-section__summary">Choose any three available configurations, then switch all three between clean and treatment responses with one control.</p>
+          <p class="benchmark-section__summary">Both matched scores and the Vasir effect stay visible. Choose which complete answer, rationale, and rubric evidence to inspect below them.</p>
         </header>
-        <div class="benchmark-answer" data-condition="vasir">
+        <div class="benchmark-answer is-showing-vasir">
           <div class="benchmark-answer__toolbar">
             <fieldset class="benchmark-answer__condition">
-              <legend class="benchmark-answer__label">Run condition · applies to all three</legend>
+              <legend class="benchmark-answer__label">Full answer shown · applies to all three</legend>
               <div class="benchmark-answer__toggle">
                 <input class="benchmark-answer__toggle-input" type="radio" name="benchmark-answer-condition" id="benchmark-answer-condition-clean" value="clean">
                 <label class="benchmark-answer__toggle-label" for="benchmark-answer-condition-clean">${escapeHtml(cleanConditionLabel)}</label>
@@ -3196,7 +3625,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
               <span class="benchmark-answer__label">Trial · applies to all three</span>
               <select class="ui-select" id="benchmark-answer-trial"></select>
             </label>
-            <p class="benchmark-answer__scope" id="benchmark-answer-scope">Showing ${escapeHtml(report.treatment.label)} responses for the same trial across all three models.</p>
+            <p class="benchmark-answer__scope" id="benchmark-answer-scope">Both scores stay visible. Showing the ${escapeHtml(report.treatment.label)} full answers and evidence below.</p>
           </div>
           <div class="benchmark-answer__grid">
             ${[1, 2, 3].map((slot) => `
@@ -3205,12 +3634,35 @@ export function renderBenchmarkReportHtml(runArtifact) {
                 <span class="benchmark-answer__label">Model ${slot}</span>
                 <select class="ui-select" id="benchmark-answer-model-${slot}"></select>
               </label>
-              <div class="benchmark-answer__metrics">
-                <div>
-                  <span class="benchmark-answer__label" id="benchmark-answer-condition-${slot}">${escapeHtml(treatmentConditionLabel)}</span>
-                  <p class="benchmark-answer__score" id="benchmark-answer-score-${slot}">—</p>
+              <div class="benchmark-answer__comparison">
+                <div class="benchmark-answer__comparison-head">
+                  <span class="benchmark-answer__label">Vasir effect</span>
+                  <p class="benchmark-answer__delta benchmark-answer__delta--neutral" id="benchmark-answer-delta-${slot}">—</p>
                 </div>
-                <p class="benchmark-answer__delta" id="benchmark-answer-delta-${slot}"></p>
+                <dl class="benchmark-answer__score-pair">
+                  <div class="benchmark-answer__score-row benchmark-answer__score-row--clean">
+                    <dt class="benchmark-answer__score-name">${escapeHtml(cleanConditionLabel)}</dt>
+                    <dd class="benchmark-answer__score-data">
+                      <span class="benchmark-answer__score-value" id="benchmark-answer-clean-score-${slot}">—</span>
+                      <span class="benchmark-answer__score-rail" aria-hidden="true">
+                        <span class="benchmark-answer__score-fill benchmark-answer__score-fill--clean" id="benchmark-answer-clean-fill-${slot}"></span>
+                      </span>
+                    </dd>
+                  </div>
+                  <div class="benchmark-answer__score-row benchmark-answer__score-row--vasir">
+                    <dt class="benchmark-answer__score-name">${escapeHtml(treatmentConditionLabel)}</dt>
+                    <dd class="benchmark-answer__score-data">
+                      <span class="benchmark-answer__score-value" id="benchmark-answer-vasir-score-${slot}">—</span>
+                      <span class="benchmark-answer__score-rail" aria-hidden="true">
+                        <span class="benchmark-answer__score-fill benchmark-answer__score-fill--vasir" id="benchmark-answer-vasir-fill-${slot}"></span>
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              <div class="benchmark-answer__selection">
+                <span class="benchmark-answer__selection-label" id="benchmark-answer-condition-${slot}">${escapeHtml(treatmentConditionLabel)} answer</span>
+                <p class="benchmark-answer__score" id="benchmark-answer-score-${slot}">—</p>
               </div>
               <p class="benchmark-answer__status" id="benchmark-answer-status-${slot}">Loading score evidence…</p>
               <pre class="benchmark-answer__output" id="benchmark-answer-output-${slot}">Loading response…</pre>
@@ -3224,7 +3676,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
       <section class="benchmark-section" id="matrix" aria-labelledby="matrix-title">
         <header class="benchmark-section__header">
           <div class="benchmark-section__heading">
-            <span class="benchmark-section__eyebrow">05 / complete matrix</span>
+            <span class="benchmark-section__eyebrow">04 / complete matrix</span>
             <h2 class="benchmark-section__title" id="matrix-title">Nothing is hidden behind the charts.</h2>
           </div>
           <p class="benchmark-section__summary">This is the exact accessible lookup layer: every response, status, score, token count, answer, and recorded rationale. It remains useful if chart JavaScript is unavailable.</p>
@@ -3254,7 +3706,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
       <section class="benchmark-section" id="method" aria-labelledby="method-title">
         <header class="benchmark-section__header">
           <div class="benchmark-section__heading">
-            <span class="benchmark-section__eyebrow">06 / measurement contract</span>
+            <span class="benchmark-section__eyebrow">05 / measurement contract</span>
             <h2 class="benchmark-section__title" id="method-title">What produced these numbers?</h2>
           </div>
           <p class="benchmark-section__summary">${escapeHtml(judgeMethodSummary)}</p>
@@ -3273,8 +3725,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
               <dt class="benchmark-method__term">Calibration</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.calibrationStatus)}</dd>
               <dt class="benchmark-method__term">Judge cohort</dt><dd class="benchmark-method__definition">${report.judge.cohortSize === null ? "Not recorded" : `${escapeHtml(report.judge.cohortSize)} anonymous answers`}</dd>
               <dt class="benchmark-method__term">Cohort basis</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.cohortHash === "Not recorded" ? report.judge.cohortHash : report.judge.cohortHash.slice(0, 12))}</dd>
-              ${isPanelJudging ? `<dt class="benchmark-method__term">Panel prompt</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.panelPromptHash === "Not recorded" ? report.judging.panelPromptHash : report.judging.panelPromptHash.slice(0, 12))}</dd>` : ""}
-              <dt class="benchmark-method__term">${isPanelJudging ? "Synthesis prompt" : "Judge prompt"}</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.promptHash === "Not recorded" ? report.judge.promptHash : report.judge.promptHash.slice(0, 12))}</dd>
+              ${judgingPromptFacts}
               <dt class="benchmark-method__term">Harness</dt><dd class="benchmark-method__definition">${escapeHtml(report.source.harnessVersion)}</dd>
             </dl>
             ${report.judge.error ? `<p class="benchmark-method__copy">Judge failure: ${escapeHtml(report.judge.error)}</p>` : ""}

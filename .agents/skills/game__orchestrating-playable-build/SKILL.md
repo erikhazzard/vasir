@@ -85,9 +85,11 @@ For broad playable builds, the usual tool map is:
 | Art direction | `game__art-directing` | Visual language, readability, active-play slap review. |
 | UI shell | `ui__revamping-game-shell-ui` or the relevant UI skill | HUD/menus/results without breaking deterministic boundaries. |
 | 3D/physics interaction | `physics__creating-interaction-system` | Deterministic object interaction and simulation semantics. |
-| Observed 3D performance problem | `threejs__improve-performance` | Reproducible diagnosis and measured remediation. |
-| Planned mobile 3D architecture | `code__threejs-rapier-performance` | Pre-change render, physics, asset, tier, and threading constraints. |
+| Three.js / Rapier hot-path implementation or static review | `code__threejs-rapier-performance` | Prevent unforced per-frame/per-tick work expansion and constrain planned architecture before causal measurement. |
+| Observed 3D performance symptom or measured patch verification | `threejs__improve-performance` | Reproducible attribution, remediation, and before/after proof. |
 | First-fun judgment | `game-proof__auditing-first-playable-comprehension` | First act, response, consequence, better next try. |
+
+Route `code__threejs-rapier-performance` for every hot-path implementation or review, regardless of symptom. For an observed symptom, use `threejs__improve-performance` to attribute it, guard the bounded candidate before implementation or acceptance, then return to diagnosis for before/after verification.
 
 If one phase is irrelevant, mark it `not-needed` with one sentence. Do not load skills just to make the notes look full.
 

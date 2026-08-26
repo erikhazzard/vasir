@@ -33,7 +33,7 @@
       "min": 0,
       "max": 4
     },
-    "judgeInstructions": "Judge each anonymously labeled answer independently before comparing or ranking them. Score only the architecture's observable product completeness, authoritative versus derived state, horizontal continuity, bounded publish/read/rank work, component rent, visibility correctness, recovery, and cost. Do not reward any vendor, datastore, feed strategy, ML stack, protocol, service count, verbosity, or fashionable terminology. Compute-on-read, precomputation, and hybrid designs can each earn full credit when their bounds and tradeoffs satisfy the contract. Ten million daily users is not a throughput envelope: reward an explicit scale function and preserved unknowns, not invented capacity claims. A preferred technology earns no credit when its persistence, partitioning, recovery, or workload fit is unexplained. Use integer dimension ratings from 0 through 4, apply the lowest failed-gate cap after calculating the weighted score, and give concrete answer-specific reasons for every gate and rating.",
+    "judgeInstructions": "Judge each anonymously labeled answer independently before comparing or ranking them. Score only the architecture's observable product completeness, authoritative versus derived state, horizontal continuity, bounded publish/read/rank work, component rent, visibility correctness, recovery, and cost. Do not reward any vendor, datastore, feed strategy, ML stack, protocol, service count, verbosity, or fashionable terminology. Compute-on-read, precomputation, and hybrid designs can each earn full credit when their bounds and tradeoffs satisfy the contract. Ten million daily users is not a throughput envelope: reward an explicit scale function and preserved unknowns, not invented capacity claims. A preferred technology earns no credit when its persistence, partitioning, recovery, or workload fit is unexplained. Use integer dimension ratings from 0 through 4, apply the lowest failed-gate cap after calculating the weighted score, and give one concise answer-specific rationale citing decisive evidence, every failed gate, and ratings that materially affect the score.",
     "gates": [
       {
         "id": "complete-feed-contract",
@@ -120,7 +120,7 @@
         "anchors": {
           "0": "Retries duplicate content, acknowledged mutations disappear, or stale copies leak restricted content.",
           "2": "Mentions retries or replication but leaves partial derivation, reconnect, or rebuild gaps.",
-          "4": "Defines idempotency/versioning, fail-closed visibility enforcement, reconciliation, rebuild, and diagnosable degraded behavior."
+          "4": "Defines idempotency/versioning, exact unauthorized-visibility denial, reconciliation, rebuild, and diagnosable degraded behavior."
         }
       },
       {

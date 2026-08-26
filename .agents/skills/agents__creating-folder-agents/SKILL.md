@@ -91,7 +91,7 @@ Capture only local facts that steer behavior:
 - **Owns**: decisions, value paths, state transitions, rendering, data transforms, jobs, boundaries, or proof harnesses owned here.
 - **Read First**: files that give the fastest trustworthy orientation.
 - **Entry Points**: handlers, routes, commands, screens, jobs, exported modules, reducers, hooks, schemas, or generators.
-- **Non-Obvious Constraints**: invariants, local hard nos, counter-mean patterns, generated artifact rules, dangerous defaults, perf/order/cost constraints, and any named protected effect that must be withheld when its authority or integrity cannot be established.
+- **Non-Obvious Constraints**: invariants, local hard nos, counter-mean patterns, generated artifact rules, dangerous defaults, perf/order/cost constraints, and any exact local effect that cannot safely proceed. For failure behavior, name the affected subject and the independent behavior that continues; never turn an independently containable member, candidate, or dependency fault into collection, service, startup, health-check, or process failure.
 - **Proof Commands**: exact commands, harnesses, artifacts, screenshots, traces, snapshots, fixtures, or manual checks needed to prove changes here.
 - **Deeper Maps**: child folders whose `AGENTS.md` files take precedence.
 
@@ -195,6 +195,7 @@ If the user asked only for an audit, recommendation, or section draft, return th
 - Do not use `AGENTS__non-obvious.md` for folder steering maps.
 - Do not generate folder steering maps with `vasir agents sync --scope`.
 - Do not write generic software-engineering advice into a folder AGENTS.
+- Root §9 owns failure scope. Never author or preserve a broader local outage rule without current repository evidence that every independent result would itself perform the same named unsafe effect.
 - Do not invent commands, invariants, ownership, dependencies, or generated-file rules.
 - Do not fork root policy into a local file.
 - Do not ask the user questions unless the target path or authority boundary is genuinely blocked.

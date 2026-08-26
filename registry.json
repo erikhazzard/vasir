@@ -103,7 +103,7 @@
     },
     {
       "name": "code__auditing",
-      "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; use alone for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, while explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.",
+      "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, it owns the canonical report while invoking mandatory domain handoffs. Explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -155,13 +155,18 @@
     },
     {
       "name": "code__threejs-rapier-performance",
-      "description": "Plans deterministic mobile-web performance architecture for Three.js and Rapier rendering, physics, quality tiers, loading, memory, assets, and threading. Use for system-level design before implementation; use $threejs__improve-performance for observed performance symptoms.",
+      "description": "Guards Three.js / Rapier batching, instancing, render-loop, pass, target, UI-composition, and other per-frame/per-tick implementations and static reviews; also plans mobile performance architecture. Use $threejs__improve-performance for causal measurement.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md",
+        "evals/fixtures/fog/README.md",
+        "evals/fixtures/fog/index.html",
+        "evals/suite.json",
+        "references/render-topology-guard.md"
       ],
       "path": ".agents/skills/code__threejs-rapier-performance",
       "entry": "SKILL.md"
@@ -1058,7 +1063,7 @@
     },
     {
       "name": "threejs__improve-performance",
-      "description": "Diagnose and improve Three.js / Rapier performance through reproducible benchmark/replay proof and stack-native fixes. Use for observed low FPS, bad frame pacing, periodic stutter, rare hitches, load or first-use stalls, GPU/CPU/GC pressure, scene-graph, shader, material, animation, particle, asset, Rapier, worker-handoff, XR, memory, or lifecycle problems; for pre-change mobile performance architecture, use $code__threejs-rapier-performance.",
+      "description": "Diagnoses observed Three.js / Rapier performance failures and verifies candidate patches through reproducible proof. Before implementing or accepting any per-frame/per-tick remediation, use $code__threejs-rapier-performance.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

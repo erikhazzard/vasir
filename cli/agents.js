@@ -211,6 +211,9 @@ const ROUTING_LANE_DEFINITIONS = Object.freeze([
   }
 ]);
 
+const ALLOWED_FAIL_CLOSED_PROHIBITION = "**DO NOT DEFAULT TO FAIL CLOSED!**";
+const FAIL_CLOSED_POLICY_PATTERN = /\bfail(?:s|ed|ing)?(?:[\s_\p{Dash_Punctuation}]+)closed\b/iu;
+
 const AGENTS_VALIDATION_RULES = Object.freeze([
   {
     code: "SCAFFOLD_NOTE_LEFT_IN_FILE",
@@ -1182,6 +1185,39 @@ function createAgentsTemplateMissingError(templateFilePath) {
   });
 }
 
+function findFailurePolicyValidationIssues(agentsText) {
+  const lines = agentsText.split(/\r?\n/);
+  const prohibitionLineIndexes = lines.flatMap((lineText, lineIndex) =>
+    lineText.trim() === ALLOWED_FAIL_CLOSED_PROHIBITION ? [lineIndex] : []
+  );
+  const duplicateIssues = prohibitionLineIndexes.slice(1).map((lineIndex) => ({
+    code: "DUPLICATE_FAIL_CLOSED_PROHIBITION",
+    lineNumber: lineIndex + 1,
+    message: "Keep the root prohibition single-homed; remove this duplicate.",
+    lineText: ALLOWED_FAIL_CLOSED_PROHIBITION
+  }));
+  const textWithoutAllowedProhibition = lines
+    .map((lineText) => lineText.trim() === ALLOWED_FAIL_CLOSED_PROHIBITION ? "" : lineText)
+    .join("\n");
+  const prohibitedMatch = FAIL_CLOSED_POLICY_PATTERN.exec(textWithoutAllowedProhibition);
+
+  if (!prohibitedMatch) {
+    return duplicateIssues;
+  }
+
+  const lineNumber = textWithoutAllowedProhibition.slice(0, prohibitedMatch.index).split("\n").length;
+  return [
+    ...duplicateIssues,
+    {
+      code: "GENERIC_FAIL_CLOSED_POLICY",
+      lineNumber,
+      message:
+        `Remove generic failure-policy shorthand. The only permitted use is the exact root prohibition: ${ALLOWED_FAIL_CLOSED_PROHIBITION}`,
+      lineText: prohibitedMatch[0].replace(/\s+/g, " ")
+    }
+  ];
+}
+
 function findAgentsValidationIssues(agentsText) {
   return agentsText
     .split(/\r?\n/)
@@ -1213,9 +1249,9 @@ function createAgentsValidationError({ agentsFilePath, issues }) {
 
   return new VasirCliError({
     code: "AGENTS_VALIDATION_FAILED",
-    message: `AGENTS.md still contains scaffold or repo-truth issues. ${issueSummary}`,
+    message: `AGENTS.md contains invalid steering, scaffold, or repo-truth content. ${issueSummary}`,
     suggestion:
-      "Edit the flagged lines, create any missing required local AGENTS.md files, or rerun `vasir agents init <profile> --replace`, then rerun `vasir agents validate`.",
+      "Edit the flagged lines, create any missing required local AGENTS.md files, or rerun `vasir agents sync`, then rerun `vasir agents validate`.",
     context: {
       agentsFilePath,
       issues
@@ -1535,6 +1571,7 @@ export function validateProjectAgentsFile({ projectRootDirectory }) {
 
 function validateAgentsText({ agentsText, projectRootDirectory }) {
   return [
+    ...findFailurePolicyValidationIssues(agentsText),
     ...findAgentsValidationIssues(agentsText),
     ...findAgentsPathValidationIssues({
       agentsText,

@@ -90,3 +90,29 @@ test("fresh Claude runtime captures output, model receipt, usage, and attributab
   assert.equal(result.costUsd, 0.12);
   assert.deepEqual(result.runtimeReceipt.canonicalModels, ["claude-opus-5"]);
 });
+
+test("a wrapper that converts SIGTERM to exit 143 still reports the harness timeout", async () => {
+  const spawnStub = () => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => queueMicrotask(() => child.emit("close", 143, null));
+    return child;
+  };
+
+  await assert.rejects(
+    runBenchmarkAgent({
+      configuration: {
+        id: "claude:opus@max",
+        provider: "claude",
+        model: "opus",
+        reasoning: "max"
+      },
+      promptText: "Judge it.",
+      timeoutMs: 1,
+      spawnImplementation: spawnStub
+    }),
+    (error) => error.code === "EVAL_AGENT_RUNTIME_FAILED" && /timed out/.test(error.message)
+  );
+});

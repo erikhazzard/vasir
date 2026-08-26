@@ -1,19 +1,55 @@
 ---
 name: code__threejs-rapier-performance
-description: Plans deterministic mobile-web performance architecture for Three.js and Rapier rendering, physics, quality tiers, loading, memory, assets, and threading. Use for system-level design before implementation; use $threejs__improve-performance for observed performance symptoms.
+description: Guards Three.js / Rapier batching, instancing, render-loop, pass, target, UI-composition, and other per-frame/per-tick implementations and static reviews; also plans mobile performance architecture. Use $threejs__improve-performance for causal measurement.
 ---
 
-Use this skill before committing to system-level mobile performance architecture.
+Use this skill before committing to, while implementing, or while statically reviewing a Three.js / Rapier change that can alter per-frame or per-tick work, as well as for system-level mobile performance architecture.
 
 ## Routing boundary
 
-Use this skill for planned renderer, physics, asset-pipeline, quality-tier, loading, memory, or threading architecture. Use `$threejs__improve-performance` for observed low FPS, stutter, hitches, load stalls, or memory growth; return here only if diagnosis earns an architecture change. Do not load both skills speculatively.
+Use this skill for every concrete implementation or static acceptance touching batching or instancing, render/update loops, scene traversal, passes, render targets, cameras/views, final presentation or UI composition, shader/material variants, physics stepping/query/sync, or other per-frame/per-tick work, regardless of whether a slowdown is already observed.
+
+Also use it for planned renderer, physics, asset-pipeline, quality-tier, loading, memory, or threading architecture. When a symptom is observed, use `$threejs__improve-performance` to attribute it first, apply this skill's `local_change_guard` to the bounded remediation before implementation or static acceptance, then return to diagnosis for measured verification. A statically proven topology, ownership, scope, or work-cardinality violation may be rejected here without inventing a timing claim; hand off to diagnosis only for causal performance claims or when measurement could change the decision.
+
+## Modes
+
+### `local_change_guard`
+
+Use for one concrete hot-path implementation or static review. Apply only the rules for the touched domains; do not demand a whole-game asset, physics, tier, and threading plan for a local instancing or render-loop change. For rendering changes, always read `references/render-topology-guard.md` before accepting or writing the change.
+
+Return one domain disposition. When embedded in `$code__auditing`, this is evidence for that skill's canonical release verdict, not a competing audit verdict:
+
+- `SAFE_LOCAL_CHANGE`: the change stays inside the requested local boundary and preserves required work topology.
+- `REJECT_UNFORCED_MULTIPLIER`: leaf/content cardinality creates unrequested frame-global or tick-global work.
+- `ARCHITECTURE_PROOF_REQUIRED`: the expansion is intentional and plausibly forced, but needs explicit authorization and bounded proof before production implementation or acceptance. The smallest reversible isolated prototype may be authorized solely to obtain that proof.
+
+### `architecture_plan`
+
+Use for system-level mobile renderer, physics, asset-pipeline, quality-tier, loading, memory, or threading design. Follow the full architecture operating order and Definition of Done.
+
+## Local hot-path cardinality invariant
+
+Leaf/content axes such as entity, type, material, batch, component, or feature instance may scale their own bounded data and work items. They may not silently multiply frame-global or tick-global owners and phases such as animation loops, whole-scene traversal, physics-world steps, full-world queries or synchronization, worker round trips, render graphs, or terminal output. A new global phase is an explicit architecture change, never an incidental implementation detail of local batching or feature work.
+
+## Local render-topology invariant
+
+**Default invariant:** a local rendering optimization may change draw groups, instance buffers, and per-object data inside existing passes. It may not add or multiply frame-global render owners, scene-render invocations, full-scene or G-buffer passes, render targets, attachments, fullscreen passes, canvas/default-framebuffer writes, output transforms, or presentation roots unless the user explicitly requested an architecture change and bounded evidence supports it. Optimization-driven expansion needs measured break-even; correctness- or platform-required expansion needs demonstrated necessity plus measured target-budget headroom.
+
+Entity, type, material, and batch cardinality may affect draw count. They must never control frame-global pass, target, attachment, or presentation cardinality. Feature modules contribute renderable data; one canonical frame/output owner controls each canvas or logical view. Multiple passes can be valid when centrally owned, fixed by an explicit rendering requirement, and budgeted; do not confuse another canvas-target write with another browser presentation.
+
+A structurally observed topology expansion can be rejected without timing it. Timing is required to quantify its cost or approve an intentional architecture change, not to prove that the expansion exists.
+
+**Instancing anchor:** one compatible `InstancedMesh` group per geometry/material/render-state bucket participates in the existing world, shadow, depth, and picking topology. With `T` enemy types, draw groups may scale with `T`; G-buffer passes and targets must not. If deferred rendering already exists, all groups feed its shared topology. If it does not exist, an instancing task must not introduce it.
+
+**UI anchor:** UI may use browser composition or contribute overlay draws through the canonical frame/output owner. A deliberate fixed UI pass can be valid. A HUD subsystem must not silently start another frame loop, renderer, composer, render pipeline, world render, terminal output transform, or independently owned canvas-output path.
 
 Mobile-web performance is not “higher FPS.” It is stable frame time, low touch/input latency, bounded memory, controlled download size, thermal resilience, and deterministic simulation on real phones. The goal is not to make one device look impressive. The goal is to ship a game that feels responsive, stays correct, and degrades intentionally across mobile browsers.
 
 # 0) Operating Order
 
-Before choosing architecture:
+For `local_change_guard`, follow the routed specialist reference and inspect only the touched hot path plus its ownership and multiplicity boundaries.
+
+Before choosing architecture in `architecture_plan`:
 
 1. Name the player journey and the controls, readability, camera, hit timing, and deterministic outcomes that must survive every quality tier.
 2. Name the target device classes and only the budgets supported by repo evidence or measurements; label consequential assumptions.
@@ -440,6 +476,12 @@ No second renderer or second device scorer without a deletion plan.
 * Using expensive materials broadly when a cheaper material preserves gameplay readability.
 * Treating transparency, bloom, SSAO/SSR/SSGI, or dynamic shadows as free polish.
 * Shipping repeated props as thousands of separate draw calls when instancing or batching is available.
+* Introducing deferred rendering, a G-buffer, or a render graph to satisfy a batching-only or instancing-only request.
+* Creating a pass, target, attachment set, composer, renderer, or frame loop per entity, type, material, batch, component, or feature instance.
+* Letting world and HUD subsystems own competing frame loops, renderer/composer pipelines, terminal output transforms, or canvas-output paths.
+* Claiming a draw-call win while leaving added traversal, pixel, attachment, load/store, resolve, copy, synchronization, or lifecycle work unaccounted.
+* Requiring a benchmark before rejecting a directly observed, unrequested topology or work-cardinality expansion. Measurement quantifies runtime cost; it does not make the structural expansion exist.
+* Driving a physics-world step, full-world query/sync, whole-scene traversal, animation update, or worker round trip from an entity, type, material, batch, component, or feature-instance loop.
 * Updating huge static scene graphs every frame.
 * Using pixels as Rapier world units.
 * Enabling CCD broadly “just to be safe.”
@@ -490,7 +532,24 @@ No second renderer or second device scorer without a deletion plan.
 
 # 5) Definition of Done (PR gate)
 
-A change is not done unless all apply:
+## 5.1 `local_change_guard`
+
+A local change is not done until all materially relevant items apply:
+
+* ✅ The requested boundary and the existing frame/tick owner and entry points are named.
+* ✅ For render changes, the before/after topology delta from `references/render-topology-guard.md` is complete.
+* ✅ Multiplicity axes, work removed, and work added are explicit; code inside a loop is counted by executions, not call sites.
+* ✅ Entity, type, material, batch, or component cardinality does not create unrequested frame-global/tick-global work or a second owner.
+* ✅ The domain disposition is exactly one of `SAFE_LOCAL_CHANGE`, `REJECT_UNFORCED_MULTIPLIER`, or `ARCHITECTURE_PROOF_REQUIRED`.
+* ✅ `ARCHITECTURE_PROOF_REQUIRED` names the forcing requirement, cost both ways, and bounded proof handoff. The expansion is not merged into or accepted on the production path before proof; only the smallest reversible isolated prototype may be authorized to obtain it.
+* ✅ Touched rendering, gameplay, determinism, lifecycle/disposal, and fallback semantics are preserved and checked at the cheapest faithful seam.
+* ✅ No unrelated whole-system ceremony is demanded for a narrow local change.
+
+Static topology evidence can justify rejection, but it cannot justify a claimed timing improvement. A `SAFE_LOCAL_CHANGE` disposition confirms scope and topology safety; any claimed performance win still requires `$threejs__improve-performance` measurement.
+
+## 5.2 `architecture_plan`
+
+An architecture plan is not done until all materially relevant items apply:
 
 * ✅ Game form / camera / visibility / physics role explicitly stated
 * ✅ Determinism contract explicitly preserved
@@ -502,7 +561,7 @@ A change is not done unless all apply:
 * ✅ Low / Medium / High tiers specified or updated
 * ✅ Device auto-select and user override considered
 * ✅ At least one deterministic integration test added or updated
-* ✅ Perf proof supplied for hot-path changes
+* ✅ Perf proof supplied for hot-path claims
 * ✅ Fallback behavior stated for unsupported/slow paths
 * ✅ Cleanup/disposal ownership stated
 * ✅ No banned anti-pattern introduced
@@ -523,3 +582,7 @@ Excellent changes are boring in the best way:
 * memory stays bounded through load/unload churn
 * performance claims are measured, not narrated
 * the code path gets simpler, not more magical
+
+# 7) References
+
+- `references/render-topology-guard.md` — always read for local render implementation or static review, and for architecture changes affecting frame loops, render owners, passes, targets, views, UI composition, or final output.

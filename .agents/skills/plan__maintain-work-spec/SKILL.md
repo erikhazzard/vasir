@@ -54,7 +54,7 @@ Capture every substantial request before synthesizing it away:
 
 Always ask: **Could an agent complete this spec while visibly failing what the user actually requested?** If yes, fix the product map before implementation. Similar colors, labels, mechanisms, or vibes are not equivalent delivery.
 
-When failure behavior is material, apply root §9 once at the contract boundary: name the subject, scope, promised terminal outcome, surviving valid state/value, externally visible non-success outcome, and recovery owner. A preserved control, completed handler, empty response, hidden action, or successful no-op never satisfies the rung unless that exact denial or emptiness is the promised terminal outcome.
+When failure behavior is material, apply root §9 once at the contract boundary: begin with the exact independently meaningful subject, name what is isolated, preserve selected verified state and independent behavior, expose the scoped non-success outcome, and name the recovery owner. A broader collection, service, startup, health-check, or process boundary requires current repository evidence that every independent result would itself perform the same named unsafe effect. A preserved control, completed handler, empty response, hidden action, or successful no-op never satisfies the rung unless that exact denial or emptiness is the promised terminal outcome.
 
 ## The map is not the territory
 
@@ -184,7 +184,7 @@ Keep this section scoped to the active and next rung.
 
 - `[C-001 | Must]` If <condition>, then <observable result>, otherwise the feature is broken.
 - `[C-002 | Must Not]` <forbidden observable outcome>.
-- `[C-003 | Failure]` If <material failure condition>, then <honest degraded / pending-or-unknown / denied / unavailable / failed outcome>; preserve <valid state and independent value>; recover by <owner/action>. Omit when no material failure contract is needed.
+- `[C-003 | Failure]` If <material failure condition affects exact subject>, then <isolate/report that subject with an honest degraded / pending-or-unknown / denied / unavailable / failed outcome>; preserve <selected verified state and named independent behavior>; recover by <owner/action>. Cite the named unsafe effect and evidence only if a wider boundary is unavoidable. Omit when no material failure contract is needed.
 
 Contracts live here once. Elsewhere cite their IDs.
 
@@ -246,7 +246,7 @@ Before writing, confirm:
 
 - the request anchor, `vFinal`, North Star, non-goals, contracts, and ladder describe the same product;
 - every required item maps to an observable contract or rung, with any changed/deferred treatment explicitly awaiting a human product decision;
-- every material failure contract preserves the root §9 distinction between control containment, runtime outcome, and proof claim; no non-green path counts as completion;
+- every material failure contract preserves the root §9 distinction between control containment, runtime outcome, and proof claim, and does not amplify an independently containable fault; no non-green path counts as completion;
 - every rung is a valuable vertical slice using the lasting shape;
 - the active rung is the richest section and is buildable now;
 - implementation details remain adaptive;

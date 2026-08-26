@@ -1,6 +1,6 @@
 ---
 name: threejs__improve-performance
-description: Diagnose and improve Three.js / Rapier performance through reproducible benchmark/replay proof and stack-native fixes. Use for observed low FPS, bad frame pacing, periodic stutter, rare hitches, load or first-use stalls, GPU/CPU/GC pressure, scene-graph, shader, material, animation, particle, asset, Rapier, worker-handoff, XR, memory, or lifecycle problems; for pre-change mobile performance architecture, use $code__threejs-rapier-performance.
+description: Diagnoses observed Three.js / Rapier performance failures and verifies candidate patches through reproducible proof. Before implementing or accepting any per-frame/per-tick remediation, use $code__threejs-rapier-performance.
 ---
 # Three.js + Rapier Performance Diagnosis and Optimization
 
@@ -42,12 +42,13 @@ Do not output generic optimization folklore. Every recommendation must be tied t
 - **Output:** use separate `hotspot_fix` and `full_audit` contracts.
 - **Equivalence:** use `intended_equivalent` until tests prove equivalence; never declare a change equivalent from inspection alone.
 - **Architecture:** route into deep specialist references rather than producing one shallow all-subsystem checklist.
+- **Remediation guard:** after attribution selects per-frame/per-tick work, route the bounded candidate through `$code__threejs-rapier-performance` before implementation or static acceptance, then return here for measured verification.
 - **Adaptive quality:** diagnose with fixed settings first. Once GPU pressure is confirmed and quality trades are allowed, dynamic resolution, foveation, or tiered effects may be early `quality_trade` interventions.
 - **Warmup:** stage likely-next-use resources; do not blindly prewarm the entire application.
 
 ## Sibling routing
 
-Use this skill when a performance symptom exists and the work must establish causal attribution, implement the narrowest supported remediation, or verify an existing performance patch. Use `$code__threejs-rapier-performance` when no observed performance failure is being diagnosed and a planned mobile Three.js or Rapier architecture, asset-pipeline, quality-tier, or threading change needs constraints before implementation. If diagnosis here earns an architecture change, hand that bounded decision to `$code__threejs-rapier-performance`; do not load both skills by default.
+Use this skill when an observed performance symptom needs causal attribution or remediation, or when a candidate performance claim needs measured verification. Diagnosis owns causal attribution. Every proposed per-frame/per-tick remediation then goes through `$code__threejs-rapier-performance` before implementation or static acceptance, regardless of whether a symptom exists; afterward, return here to verify the performance claim. That guard may reject directly observed topology, ownership, scope, or work-cardinality expansion without measurement. If it returns `ARCHITECTURE_PROOF_REQUIRED`, permit only its bounded proof path. Use the skills sequentially at these boundaries, not speculatively in parallel.
 
 ## Reference routing
 
@@ -334,6 +335,8 @@ action:
 ```
 
 Do not use `small/medium/large` alone. When useful, include an ordinal estimate plus basis, for example: `medium-large, modeled from reducing 4,100 draw submissions to <150; GPU FPS gain unknown until measured`.
+
+Before Step 9, send every action that changes per-frame/per-tick work through `$code__threejs-rapier-performance` in `local_change_guard` mode and record its domain disposition. `REJECT_UNFORCED_MULTIPLIER` removes the action from the ladder. `ARCHITECTURE_PROOF_REQUIRED` permits only its authorized isolated proof prototype. Only `SAFE_LOCAL_CHANGE` permits ordinary production-path implementation; this skill still owns the before/after performance claim.
 
 Example:
 

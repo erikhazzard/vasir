@@ -68,7 +68,7 @@ Each tag names the claim/failure class that must be resolved and any contract th
 | C3 | serialized/wire/generated shape drift that breaks a supported consumer | schema + compatibility + empty/missing/error semantics |
 | C4 | duplicate, replay, ordering, partial-failure, concurrency, or recovery invariant failure | delivery semantics, ordering, idempotency, retry/timeout owners |
 | C5 | sourced budget or observed hot-path/capacity regression under representative work | perf budget / hot-path contract |
-| C6 | unauthorized allow, privileged-data leak, or fail-open trust-boundary behavior | authz invariant, data class, redaction |
+| C6 | protected effect executed without established authority, privileged-data leak, or trust-boundary bypass | authz invariant, data class, redaction |
 | C7 | old/new/coexistence, resume, rollback, or irreversible migration failure | compatibility window, removal condition |
 | C8 | dependency/build/generated output changes unexpectedly or introduces a known applicable advisory; inspect only decision-relevant release notes/advisories | — |
 
@@ -88,7 +88,7 @@ For deterministic-lane surfaces, root §2 binds on top of all of this (kernel RN
 
 Inspect the minimum relevant set: symbols/callers/generated sources · tests at the boundary · config/flags/build scripts · existing logs/metrics/traces/alerts · migration and rollback patterns · dependency files when C8 · docs/decision logs · recent *adjacent* precedent (never extrapolate from unrelated legacy code). Then state: problem check · risk boundary · existing path, contract, tests, observability, rollout · precedent with file paths · `Unknowns` · `Tentatives`.
 
-**Safe-design comparison (root §9).** First fix the explicit outcome and evidenced invariants at the named risk boundary. If repo evidence does not otherwise distinguish among safe candidates, prefer the candidate introducing fewer material commitments across this protocol's owned surfaces: contracts, authority, persisted state, topology, rollout/skew, dependencies, and operations. Each additional commitment needs an explicit requirement or forcing fact. Line count and configurability are not proxies.
+**Safe-design comparison (root §9).** First fix the explicit outcome and evidenced invariants at the named risk boundary. A broader unavailable, throw, crash, collection, service, startup, health-check, or process boundary is an additional design commitment and requires current evidence that every independent result would itself perform the same named unsafe effect. If repo evidence does not otherwise distinguish among safe candidates, prefer the candidate introducing fewer material commitments across this protocol's owned surfaces: contracts, authority, persisted state, topology, rollout/skew, dependencies, and operations. Each additional commitment needs an explicit requirement or forcing fact. Line count and configurability are not proxies.
 
 **Never write:** "the repo standard is…" without file evidence · "this is safe because it is simple" · "this should not affect performance" without naming the boundary · "add tests later" · "rollback is redeploy" when data, flags, caches, clients, queues, or generated artifacts are involved.
 

@@ -200,7 +200,8 @@ Recommended path:
 2. Run `vasir agents sync`.
 3. If Vasir inferred the wrong profile, rerun with `vasir agents sync --profile backend`, `vasir agents sync --profile frontend`, `vasir agents sync --profile ios`, or `vasir agents sync --profile generic`.
 4. Keep repo-specific landmines in `AGENTS__non-obvious.md`; `AGENTS.md` and `CLAUDE.md` are regenerated from it.
-5. Use `vasir agents init`, `draft-purpose`, `draft-routing`, and `validate` only when you intentionally need the lower-level primitives.
+5. Remove generic failure-posture shorthand from `AGENTS__non-obvious.md`; name the exact rejected effect and the independent behavior that continues.
+6. Use `vasir agents init`, `draft-purpose`, `draft-routing`, and `validate` only when you intentionally need the lower-level primitives.
 
 Verification:
 

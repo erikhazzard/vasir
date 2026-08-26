@@ -1,6 +1,6 @@
 ---
 name: code__auditing
-description: Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; use alone for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, while explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.
+description: Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, it owns the canonical report while invoking mandatory domain handoffs. Explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.
 tools: Read, Grep, Glob, Write
 ---
 
@@ -19,7 +19,9 @@ Root §6 owns first-match request classification; do not duplicate its phrase ma
 - use its `CHANGESET` mode for a scoped change, or the narrowest explicitly named journey, subsystem, or repository mode; never widen coverage merely because the request says "code audit";
 - structural findings remain simplification recommendations unless their underlying harm independently passes this skill's release-severity gate.
 
-A focused request selected by root §6 uses this skill alone. A named specialist audit routes to that specialist. Additional lenses run only when the user explicitly names them; do not load every installed audit skill merely because it exists.
+A focused request selected by root §6 uses this skill alone except for the mandatory domain handoff below. A named specialist audit routes to that specialist. Other additional lenses run only when the user explicitly names them; do not load every installed audit skill merely because it exists.
+
+One narrow domain handoff is mandatory: when the inspected diff touches Three.js / Rapier per-frame or per-tick work, invoke `$code__threejs-rapier-performance` as the static hot-path guard against the same boundary. It returns domain evidence into this audit rather than a separate report; this skill retains the canonical findings, severity, and `SHIP` / `SHIP WITH NOTES` / `NO-SHIP` recommendation.
 
 ## Operating lenses
 
@@ -122,7 +124,7 @@ Severity caps:
 
 - Three or more independent rare conditions must coincide: maximum P2 unless the plausible blast radius is catastrophic.
 - Not introduced or worsened by the change: maximum P2 unless the active unlock cannot work safely without resolving it.
-- No observed hotspot, scale evidence, or stated budget: do not invent a performance blocker.
+- No observed hotspot, scale evidence, or stated budget: do not invent timing impact or a performance blocker. Directly inspected Three.js / Rapier topology or work-cardinality facts remain admissible only as structural/change-scope evidence; calibrate their severity through the ordinary release gate, and leave runtime impact unmeasured until proven.
 - No explicit cross-process ownership, exact-once, linearizability, or split-brain requirement: do not prescribe a new service, queue, distributed lock, lease, token fence, or consensus-like mechanism.
 - A remedy whose complexity or operational cost exceeds the realistic expected harm must be downgraded, narrowed, or rejected.
 - Existing mitigations reduce severity even when they do not constitute a mathematical guarantee. State what residual risk remains.

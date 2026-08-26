@@ -152,7 +152,7 @@ def test_audio_missing_is_typed_and_audio_present_is_measured(tmp_path: Path) ->
     assert float(arrays["rms"].max()) > 0
 
 
-def test_invalid_media_fails_closed(tmp_path: Path) -> None:
+def test_invalid_media_returns_failure_without_output(tmp_path: Path) -> None:
     output = tmp_path / "must_not_exist.npz"
     proc = subprocess.run(
         [sys.executable, str(SCRIPTS / "metrics_video.py"), str(tmp_path / "missing.mp4"), str(output)],

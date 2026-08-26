@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a source manifest with exact stream metadata, optional full PTS scan, and optional fail-closed decode verification."""
+"""Create a source manifest with exact stream metadata, optional full PTS scan, and optional strict decode verification."""
 from __future__ import annotations
 
 import argparse

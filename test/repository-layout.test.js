@@ -10,6 +10,8 @@ import { buildRegistry } from "../registry/build.js";
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS_ROOT = path.join(REPO_ROOT, ".agents", "skills");
 const AGENTS_TEMPLATE_SNIPPETS_ROOT = path.join(REPO_ROOT, "templates", "agents", "snippets");
+const ALLOWED_FAIL_CLOSED_PROHIBITION = "**DO NOT DEFAULT TO FAIL CLOSED!**";
+const FAIL_CLOSED_POLICY_PATTERN = /\bfail(?:s|ed|ing)?(?:[\s_\p{Dash_Punctuation}]+)closed\b/iu;
 
 const AGENTS_SNIPPET_MARKER_PAIRS = Object.freeze([
   ["<!-- vasir:purpose:start -->", "<!-- vasir:purpose:end -->"],
@@ -273,23 +275,42 @@ test("specialist descriptions stay narrow and performance has no forced preamble
   }
 
   const performanceSkillText = skillTexts["code__threejs-rapier-performance"];
-  assert.match(performanceSkillText, /Use for system-level design before implementation/);
+  assert.match(performanceSkillText, /batching, instancing, render-loop, pass, target, UI-composition/);
+  assert.match(performanceSkillText, /every concrete implementation or static acceptance/);
+  assert.match(performanceSkillText, /regardless of whether a slowdown is already observed/);
   assert.doesNotMatch(performanceSkillText, /Mobile Perf Note|Game Form & Player Journey|Output \*\*exactly\*\*/);
 });
 
-test("root contract twins preserve scoped failure semantics without false-green outcomes", () => {
+test("root contract twins require containment and prohibit generic fail-closed policy", () => {
   const agentsTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "AGENTS.md"), "utf8");
   const claudeTemplateText = fs.readFileSync(path.join(REPO_ROOT, "templates", "agents", "CLAUDE.md"), "utf8");
   const agentsFailureBlock = extractUniqueTaggedBlock(agentsTemplateText, "failure_semantics");
   const claudeFailureBlock = extractUniqueTaggedBlock(claudeTemplateText, "failure_semantics");
 
   assert.equal(agentsFailureBlock, claudeFailureBlock, "AGENTS and CLAUDE must share one failure-semantics law");
-  assert.equal((agentsFailureBlock.match(/fail(?:s|ed|ing)?[ _-]?closed/gi) ?? []).length, 1);
-  assert.doesNotMatch(agentsTemplateText.replace(agentsFailureBlock, ""), /fail(?:s|ed|ing)?[ _-]?closed/i);
-  assert.doesNotMatch(claudeTemplateText.replace(claudeFailureBlock, ""), /fail(?:s|ed|ing)?[ _-]?closed/i);
-  assert.match(agentsFailureBlock, /specifically named protected disclosure, privilege\/value change, canonical write, destructive action/);
-  assert.match(agentsFailureBlock, /control posture, never an operation, journey, task, proof, or completion verdict/);
-  assert.match(agentsFailureBlock, /subject, scope, and promised terminal outcome/);
+  const failureBlockLines = agentsFailureBlock.split(/\r?\n/).map((lineText) => lineText.trim());
+  assert.equal(
+    failureBlockLines.filter((lineText) => lineText === ALLOWED_FAIL_CLOSED_PROHIBITION).length,
+    1,
+    "the explicit prohibition must appear exactly once"
+  );
+  assert.doesNotMatch(
+    failureBlockLines.filter((lineText) => lineText !== ALLOWED_FAIL_CLOSED_PROHIBITION).join("\n"),
+    FAIL_CLOSED_POLICY_PATTERN
+  );
+  assert.doesNotMatch(agentsTemplateText.replace(agentsFailureBlock, ""), FAIL_CLOSED_POLICY_PATTERN);
+  assert.doesNotMatch(claudeTemplateText.replace(claudeFailureBlock, ""), FAIL_CLOSED_POLICY_PATTERN);
+  assert.match(agentsFailureBlock, /DEFAULT TO LOG, ISOLATE, AND CONTINUE/);
+  assert.match(agentsFailureBlock, /A fault does not earn a larger failure boundary/);
+  assert.match(agentsFailureBlock, /batching or transport aggregation does not merge independent subjects into one obligation/);
+  assert.match(agentsFailureBlock, /Atomic publication does not imply atomic availability/);
+  assert.match(agentsFailureBlock, /refresh failure alone never invalidates selected verified state/);
+  assert.match(agentsFailureBlock, /separately authenticated revocation or integrity quarantine/);
+  assert.match(agentsFailureBlock, /lower-precedence uses of that shorthand are ambiguous, not binding failure-scope evidence/);
+  assert.match(agentsFailureBlock, /remains canonical, not a fallback/);
+  assert.match(agentsFailureBlock, /continuing any independent result would itself perform that specifically named unsafe effect/);
+  assert.match(agentsFailureBlock, /wrongly pinned asset is reported and quarantined from aggregate discovery while the rest of its kit remains usable/);
+  assert.match(agentsFailureBlock, /exact load of that asset reports that asset `UNAVAILABLE` without affecting siblings/);
   assert.match(agentsFailureBlock, /`SUCCEEDED`, `DEGRADED`, `PENDING_OR_UNKNOWN`, `DENIED`, `UNAVAILABLE`, or `FAILED`/);
   assert.match(agentsFailureBlock, /Control preservation never upgrades the runtime outcome/);
   assert.match(agentsFailureBlock, /proof claim is `GREEN`, `RED`, or `UNVERIFIED`/);
@@ -297,20 +318,24 @@ test("root contract twins preserve scoped failure semantics without false-green 
   assert.match(agentsFailureBlock, /may not promote subsystem\/task success into user-journey success/);
 
   for (const templateText of [agentsTemplateText, claudeTemplateText]) {
-    assert.match(templateText, /\| Validation \| Report `FAILED` with a typed `INVALID_INPUT` reason \|/);
+    assert.match(templateText, /\| Request validation \| Reject the exact invalid operation with typed `INVALID_INPUT`; do not mutate or silently default required input \|/);
+    assert.match(templateText, /\| Member validation \| Report and quarantine or omit only the independently invalid member; keep siblings working \|/);
     assert.match(templateText, /\| Known policy \| Report `DENIED` after an evaluated policy refusal \|/);
+    assert.match(templateText, /\| Invariant \| Log \+ alert; isolate and continue unless the Process-impossible test is met \|/);
+    assert.doesNotMatch(templateText, /\| Fatal \| Crash \/ halt process \|/);
+    assert.doesNotMatch(templateText, /Schema migration mismatch/);
     assert.doesNotMatch(templateText, /typed invalid or denied outcome/);
   }
 
   const normativeSkillFilePaths = walkFiles(SKILLS_ROOT).filter((filePath) =>
-    [".js", ".json", ".md", ".txt", ".yaml", ".yml"].includes(path.extname(filePath))
+    [".js", ".json", ".md", ".mjs", ".py", ".sh", ".ts", ".txt", ".yaml", ".yml"].includes(path.extname(filePath))
   );
   for (const skillFilePath of normativeSkillFilePaths) {
     const relativeSkillFilePath = path.relative(REPO_ROOT, skillFilePath).replace(/\\/g, "/");
     const skillFileText = fs.readFileSync(skillFilePath, "utf8");
     assert.doesNotMatch(
       skillFileText,
-      /fail(?:s|ed|ing)?[ _-]?closed/i,
+      FAIL_CLOSED_POLICY_PATTERN,
       `${relativeSkillFilePath} must use a precise failure outcome and cite root failure semantics instead of repeating the phrase`
     );
   }
@@ -354,9 +379,10 @@ test("failure-owning skills preserve runtime, proof, and completion truth", () =
   assert.match(replayText, /`EMPTY` is a data state only after a `SUCCEEDED` discovery response/);
   assert.match(replayText, /failed refresh\/load-more preserves existing rows, playback actions, and the captured cursor/);
 
-  assert.match(maintainWorkSpecText, /subject, scope, promised terminal outcome, surviving valid state\/value/);
+  assert.match(maintainWorkSpecText, /begin with the exact independently meaningful subject/);
+  assert.match(maintainWorkSpecText, /does not amplify an independently containable fault/);
   assert.match(questionWorkSpecText, /Failure-contract truth:[\s\S]*rung remains open/);
-  assert.match(implementWorkSpecText, /Failure truth is completion truth[\s\S]*keep the rung open/);
+  assert.match(implementWorkSpecText, /Failure containment is implementation truth[\s\S]*keep the rung open/);
 });
 
 test("paired code-audit skill and eval contracts agree with root routing", () => {

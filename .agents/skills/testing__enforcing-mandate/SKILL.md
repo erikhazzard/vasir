@@ -115,6 +115,7 @@ Avoid private helpers unless no real boundary exists.
 ### Step 5: If the material failure needs one, add the right special guard
 - **External API**: contract test or sandbox record/replay; no routine live external calls.
 - **Concurrency / ordering / retries / idempotency**: invariant/property tests with fixed seeds and bounded cases.
+- **Failure containment**: report the exact bad subject and, for each independently valuable scope the fault could plausibly threaten, prove it remains usable—for example siblings, selected verified state, unrelated requests, or process health. Do not invent irrelevant scopes or preserve a broader outage merely because existing code or tests currently produce one.
 - **Legacy / hard-to-test code**: characterization only when behavior uncertainty is material, then the smallest seam.
 - **Migration**: test both old and new readable states if needed, with explicit removal plan.
 - **Hot path**: add or update performance proof only for a sourced budget or observed material symptom.

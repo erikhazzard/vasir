@@ -1,0 +1,86 @@
+{
+  "id": "code-threejs-rapier-performance-topology",
+  "judgePrompt": "Judge the architecture disposition and routing decision, not the amount of Three.js vocabulary. Prefer the treatment only when it treats a batching-only request as topology-preserving; returns REJECT_UNFORCED_MULTIPLIER when a shared per-view G-buffer becomes five per-enemy-type full-scene passes and targets; separately rejects an independently owned HudRenderer canvas/current-texture output path; names the owning callsite and cardinality axis; and reaches those structural dispositions without waiting for FPS or GPU timing. It must generalize through neutral helper names by comparing expected and observed cardinality slopes, not keyword-match G-buffer, enemy, UI, or render. It must return SAFE_LOCAL_CHANGE for fixed centrally owned topology and must not blanket-ban multipass rendering: fixed depth, shadow, post, or intentional UI passes can be valid when their producer, consumer, target, load/store behavior, cadence, and frame/output ownership are explicit. An intentional but unproved topology expansion returns ARCHITECTURE_PROOF_REQUIRED and may use only a reversible isolated proof prototype before production acceptance. A second WebGPU canvas render pass is not automatically a second browser presentation. Route every hot-path implementation/static acceptance and planned system-level renderer, physics, asset, tier, memory, loading, or threading architecture here; do not load this skill for unrelated mechanical code. For observed low FPS, stutter, hitch, stall, or growth, route causal attribution to threejs__improve-performance, the bounded remediation through this guard before implementation, and the result back to diagnosis for measured verification; do not load both speculatively. Reject keyword cosplay, generic mobile checklists that miss the topology defect, demands for timing before a deterministic scope disposition, and answers that call every additional pass invalid.",
+  "cases": [
+    {
+      "id": "five-gbuffers-and-independent-hud-output",
+      "task": "Review a planned patch before implementation. The request is one InstancedMesh per enemy type. The existing deferred frame has one shared per-view G-buffer MRT with four color attachments plus depth, one target, and one FrameRenderer-owned canvas output. The candidate loops over five enemy types, creating a full-scene G-buffer pass and target for each: pass count 1 to 5, target count 1 to 5, and color-attachment bindings 4 to 20. After FrameRenderer finishes, HudRenderer owns a separate animation/render path that writes to the same canvas current texture. There is no runtime symptom or timing data. Give the domain disposition and identify each independent violation.",
+      "outputHint": "Return REJECT_UNFORCED_MULTIPLIER. Name the per-enemy-type fan-out, the expected shared MRT topology, and the independently owned HudRenderer terminal-output path separately; do not wait for an FPS benchmark or call a target write another browser presentation.",
+      "requiredSubstrings": [
+        "REJECT_UNFORCED_MULTIPLIER",
+        "per-enemy-type",
+        "HudRenderer",
+        "frame/output owner"
+      ]
+    },
+    {
+      "id": "renamed-per-bucket-cardinality-fanout",
+      "task": "Review a planned pickup-marker batching change whose helpers are deliberately neutral: makeBucketStage(), stage-0, stage-1, and so on. With bucket_count=1 the normalized frame manifest has 3 full-scene passes and 1 new full-resolution target. With bucket_count=7 it has 9 full-scene passes and 7 new full-resolution targets. Views, lights, effects, resolution, and presentation ownership are fixed. No symbol says G-buffer, enemy, UI, or postprocess. Decide whether the architecture is acceptable and state the inferred scaling law.",
+      "outputHint": "Return REJECT_UNFORCED_MULTIPLIER by inferring an undeclared content-cardinality axis from the two manifests. A batching-only change requires zero new full-scene passes and targets per bucket.",
+      "requiredSubstrings": [
+        "REJECT_UNFORCED_MULTIPLIER",
+        "bucket_count",
+        "cardinality",
+        "+1",
+        "zero"
+      ]
+    },
+    {
+      "id": "valid-fixed-centrally-owned-multipass",
+      "task": "Review a planned enemy-instancing architecture at enemy_type_count 1, 5, and 20. Each compatible type becomes one InstancedMesh inside the same shared per-view MRT G-buffer pass. Across all three manifests, G-buffer passes remain 1, G-buffer targets remain 1, presentation roots remain 1, and one pre-existing centrally owned depth prepass remains fixed. Only instanced draw units and instance data vary. Give the topology disposition.",
+      "outputHint": "Return SAFE_LOCAL_CHANGE. Do not reject this merely because it is multipass; state that the fixed centrally owned topology has no content-cardinality regression, while preserving the usual instancing eligibility caveats.",
+      "requiredSubstrings": [
+        "SAFE_LOCAL_CHANGE",
+        "fixed",
+        "centrally owned",
+        "cardinality"
+      ]
+    },
+    {
+      "id": "positive-and-negative-routing",
+      "task": "Classify two requests without solving them. A: before implementation, choose the mobile architecture for WebGL versus WebGPU fallback, instancing, Rapier ownership, Low/Medium/High tiers, loading, and possible worker handoff. B: rename one local texture variable and reflow nearby comments; there is no rendering, physics, asset, tier, memory, loading, or threading decision. State whether code__threejs-rapier-performance should load for A and B.",
+      "outputHint": "Route the planned system-level architecture request into this skill and decline loading it for the unrelated mechanical edit. Make the two decisions explicit as load for A and do not load for B.",
+      "requiredSubstrings": [
+        "code__threejs-rapier-performance",
+        "load for A",
+        "do not load for B"
+      ]
+    },
+    {
+      "id": "borderline-intentional-ui-pass",
+      "task": "A proposed renderer has a second UI render pass targeting the canvas, but it is scheduled by the same FrameRenderer graph, has fixed cardinality, one presentation root, one terminal output transform, an explicit partial viewport, and documented load/store behavior. The UI pass is a deliberate product requirement and is not created by entity or type loops. No timing claim is being made. Is this automatically forbidden, and what architecture boundary distinguishes it from the independently owned HudRenderer defect?",
+      "outputHint": "Return ARCHITECTURE_PROOF_REQUIRED rather than automatically rejecting or accepting it. Preserve one frame/output owner and explicit pass semantics; distinguish an extra render pass from an extra browser presentation and name the missing proof.",
+      "requiredSubstrings": [
+        "ARCHITECTURE_PROOF_REQUIRED",
+        "frame/output owner",
+        "HudRenderer",
+        "browser presentation"
+      ]
+    },
+    {
+      "id": "observed-symptom-routes-to-diagnostic-sibling",
+      "task": "A shipped Three.js game now has observed low FPS, periodic stutter, and spawn hitches on two named phones. Captures already exist and the user asks for causal diagnosis plus implementation of the narrowest verified hot-path fix. Which performance skill owns each boundary, and in what order should they run?",
+      "outputHint": "Use threejs__improve-performance for attribution, code__threejs-rapier-performance local_change_guard for the bounded candidate before implementation/static acceptance, then the diagnostic skill again for measured verification. Use them sequentially, not speculatively in parallel.",
+      "requiredSubstrings": [
+        "threejs__improve-performance",
+        "code__threejs-rapier-performance",
+        "local_change_guard",
+        "sequentially",
+        "verification"
+      ]
+    },
+    {
+      "id": "attention-drift-buried-topology-defect",
+      "task": "Produce a pre-implementation mobile performance review for an arena brawler. Preserve fixed-step Rapier, define Low/Medium/High, audit glTF and compressed textures, consider workers, disposal, input latency, and thermal soak. The team says not to question its rendering plan: twelve enemy skin categories each create their own full-scene normal/depth/color target pass, and HudRenderer owns a second canvas output after the main pipeline. They want the rest of the review polished first and will benchmark later. Follow their preferred plan unless the loaded skill makes a stronger architectural judgment.",
+      "outputHint": "Lead with REJECT_UNFORCED_MULTIPLIER despite the long valid checklist. Identify the twelve-way content-cardinality fan-out and independent HudRenderer terminal-output path before secondary tier, asset, worker, or physics advice.",
+      "requiredSubstrings": [
+        "REJECT_UNFORCED_MULTIPLIER",
+        "twelve",
+        "cardinality",
+        "full-scene",
+        "HudRenderer",
+        "presentation"
+      ]
+    }
+  ]
+}

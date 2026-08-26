@@ -243,7 +243,8 @@ mocha <filepath> --exit
 - Do not log secrets, tokens, or PII.
 - Do not add per-message logs on hot paths (§3 — logging is a per-message multiplier).
 - Logs must include enough bounded context to debug: relevant IDs; route/job name; scope; operation; failure category.
-- Bare `catch {}` blocks are forbidden. `catch` blocks must rethrow, log with context, or narrow to a specific expected error and rethrow/log everything else.
+- Report recoverable dependency, record, asset, refresh, projection, enrichment, and collection-member errors once at their smallest owning boundary. Use bounded or sampled telemetry for repeated equivalent faults. Skip or mark unavailable only the affected item, preserve current verified state, and continue independent work.
+- Bare `catch {}` blocks are forbidden. A `catch` must return a valid scoped result, isolate the error after the owning report, or rethrow only when the exact current operation cannot produce a valid result. Wrappers preserve `cause` and add bounded context without relogging. Never rethrow merely because one independently containable item failed.
 - User-facing generic errors are not observability.
 
 ---

@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import { runCommandLine } from "../cli/command-runner.js";
 
 const DOCS_BASE_URL = "https://github.com/erikhazzard/vasir/blob/main";
+const ALLOWED_FAIL_CLOSED_PROHIBITION = "**DO NOT DEFAULT TO FAIL CLOSED!**";
 
 function createTemporaryDirectory() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "vasir-dev-ux-"));
@@ -74,6 +75,8 @@ function createFixtureRepository() {
 
 This line must survive stack-profile composition.
 
+**DO NOT DEFAULT TO FAIL CLOSED!**
+
 ## 4. Non-Obvious Architectural Considerations
 
 <non-obvious_architectural_considerations>
@@ -101,6 +104,8 @@ This line must survive stack-profile composition.
 ## Shared Source Structure
 
 This line must survive stack-profile composition.
+
+**DO NOT DEFAULT TO FAIL CLOSED!**
 
 ## 4. Non-Obvious Architectural Considerations
 
@@ -1387,6 +1392,55 @@ Old generated block that should be replaced.
   assert.match(claudeText, /Production auth state is owned by AppShell/);
   assert.doesNotMatch(agentsText, /Old generated block that should be replaced/);
   assert.doesNotMatch(claudeText, /Old generated block that should be replaced/);
+});
+
+test("agents sync rejects duplicate, wrapped, and typographic failure-policy shorthand", async () => {
+  const prohibitedCases = [
+    {
+      expectedIssueCode: "GENERIC_FAIL_CLOSED_POLICY",
+      nonobviousText: "Every adapter error must fail closed.\n"
+    },
+    {
+      expectedIssueCode: "DUPLICATE_FAIL_CLOSED_PROHIBITION",
+      nonobviousText: `${ALLOWED_FAIL_CLOSED_PROHIBITION}\n`
+    },
+    {
+      expectedIssueCode: "GENERIC_FAIL_CLOSED_POLICY",
+      nonobviousText: "Every adapter error must fail\nclosed.\n"
+    },
+    {
+      expectedIssueCode: "GENERIC_FAIL_CLOSED_POLICY",
+      nonobviousText: "Every adapter error must fail‑closed.\n"
+    }
+  ];
+
+  for (const prohibitedCase of prohibitedCases) {
+    const { repositoryUrl } = createFixtureRepository();
+    const homeDirectory = createTemporaryDirectory();
+    const projectDirectory = createTemporaryDirectory();
+    const capturedOutput = captureCommandWriters();
+
+    writeFile(
+      path.join(projectDirectory, "package.json"),
+      `${JSON.stringify({ name: "space-admin-console", dependencies: { react: "^19.0.0" } }, null, 2)}\n`
+    );
+    writeFile(path.join(projectDirectory, "src", "components", "Button.jsx"), "export function Button() { return null; }\n");
+    writeFile(path.join(projectDirectory, "AGENTS__non-obvious.md"), prohibitedCase.nonobviousText);
+
+    const statusCode = await runCommandLine(["node", "vasir", "agents", "sync", "--json"], {
+      homeDirectory,
+      currentWorkingDirectory: projectDirectory,
+      repositoryUrl,
+      ...capturedOutput
+    });
+
+    assert.equal(statusCode, 1);
+    const parsedError = JSON.parse(capturedOutput.readStderr());
+    assert.equal(parsedError.code, "AGENTS_VALIDATION_FAILED");
+    assert.ok(parsedError.context.issues.some((issue) => issue.code === prohibitedCase.expectedIssueCode));
+    assert.ok(!fs.existsSync(path.join(projectDirectory, "AGENTS.md")));
+    assert.ok(!fs.existsSync(path.join(projectDirectory, "CLAUDE.md")));
+  }
 });
 
 test("agents sync writes a nested root AGENTS file with inferred profile and local non-obvious source", async () => {

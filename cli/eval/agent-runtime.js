@@ -44,8 +44,10 @@ function runProcess({
     let stdout = "";
     let stderr = "";
     let settled = false;
+    let timedOut = false;
     const timeoutHandle = setTimeout(() => {
       if (!settled) {
+        timedOut = true;
         child.kill("SIGTERM");
       }
     }, timeoutMs);
@@ -77,7 +79,9 @@ function runProcess({
         signal,
         stdout,
         stderr,
-        timedOut: signal === "SIGTERM"
+        // CLI wrappers can translate SIGTERM into exit code 143 and clear the signal.
+        // The harness owns the deadline, so record the timer firing directly.
+        timedOut
       });
     });
 

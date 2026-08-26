@@ -114,6 +114,7 @@ Map the system → extract the payload → build the rewrite chain → place eac
 - **Template obedience** — filling every section because the template has it. → Choose components by the cognitive failure each prevents.
 - **Context landfill** — copying README, root contract, or style guides into the manifest. → Keep only decision-changing expertise; cite the rest.
 - **Root-law cloning** — restating a root law creates a second copy that drifts. → Cite the section; one law, one home.
+- **Blast-radius escalation** — a skill invents an error posture or turns a local fault into collection, service, startup, or process unavailability. → Cite root §9; encode only the domain-specific affected subject, named unsafe effect, and independent behavior that continues.
 - **Sibling collision** — overlapping a sibling's routing cluster or restating its single-homed definition. → Merge, narrow, or write the boundary with cross-references.
 - **Foreign-system import** — shipping another system's runtime, infra, or constitution vocabulary. → Keep the expertise, drop the scaffolding, re-ground to local law.
 - **Validator cosplay** — scripts that check obvious syntax and create maintenance drag. → Automation only for repeated brittle machine-checkable errors.

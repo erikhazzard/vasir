@@ -1374,7 +1374,7 @@ Usage:
   vasir agents init <profile> [--json] [--replace] [--repo-root <path>] Write AGENTS.md from the canonical template plus a stack snippet
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
-  vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md still contains scaffold placeholders
+  vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md contains invalid steering or scaffold placeholders
   vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] Run an independent clean-vs-Vasir benchmark
   vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>] Regenerate the visual report from a recorded benchmark run
   vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run a legacy skill-owned eval suite
