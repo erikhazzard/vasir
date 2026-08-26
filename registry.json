@@ -767,6 +767,19 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "messaging-root-agents",
+      "description": "Messages and reads independent Ratatosk-managed Codex root sessions through verified identity, immediate steering, or explicitly queued delivery. Use when one root agent must communicate with another root outside its collaboration tree; not for spawned subagents.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/messaging-root-agents",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "ops__maintain-incident-postmortem",
       "description": "Authors or updates a durable incident postmortem preserving ruled-out hypotheses, misleading signals, proven mechanism, and the fast-path discriminator. Triggers when the user explicitly requests one or the diagnosis would be materially expensive or dangerous to re-derive; routine bugs return not warranted.",
       "category": "uncategorized",

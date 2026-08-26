@@ -232,7 +232,7 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /vasir agents validate \[--scope <path>\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval inspect <skill> \[run-id\] \[--json\]/);
-  assert.match(capturedOutput.readStdout(), /vasir eval rescore <skill> \[run-id\] \[--json\]/);
+  assert.match(capturedOutput.readStdout(), /vasir eval rescore <benchmark-or-skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir --version/);
   assert.match(capturedOutput.readStdout(), /vasir add all/i);
   assert.match(capturedOutput.readStdout(), /--json/);

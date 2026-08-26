@@ -9,7 +9,7 @@ import { createCommandUi } from "./ui/command-output.js";
 import { interactiveSelect } from "./ui/interactive-select.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const KNOWN_EVAL_SUBCOMMANDS = new Set(["run", "inspect", "rescore"]);
+const KNOWN_EVAL_SUBCOMMANDS = new Set(["run", "report", "inspect", "rescore"]);
 const POSITIONAL_MODEL_ALIASES = new Set([
   "anthropic",
   "claude-opus-4-6",
@@ -151,6 +151,21 @@ function parseWrapperArguments(rawArguments, { candidateNames, inferredSkillName
         passthroughArguments.push(trialCountArgument);
         argumentIndex += 1;
       }
+      continue;
+    }
+
+    if (rawArgument === "--treatment" || rawArgument === "--reasoning") {
+      const valueArgument = rawArguments[argumentIndex + 1];
+      passthroughArguments.push(rawArgument);
+      if (valueArgument) {
+        passthroughArguments.push(valueArgument);
+        argumentIndex += 1;
+      }
+      continue;
+    }
+
+    if (rawArgument === "--open") {
+      passthroughArguments.push(rawArgument);
       continue;
     }
 

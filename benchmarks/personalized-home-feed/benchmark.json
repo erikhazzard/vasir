@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "id": "personalized-home-feed",
+  "title": "Personalized home feed architecture",
+  "description": "Tests whether a model can find a complete, lasting, low-rent topology for personalized consumer discovery with high-follower skew, mutable visibility, and ranked derived state without being steered toward a preferred technology or feed strategy.",
+  "limitations": [
+    "Ten million daily users is a population target rather than a throughput envelope, so the benchmark rewards topology continuity and explicit unknowns rather than invented capacity proof.",
+    "The task does not specify a learned-recommendation quality target, so a bounded heuristic ranking can satisfy the product contract."
+  ],
+  "taskKind": "response",
+  "outputContract": "Recommend one concrete architecture in one or two paragraphs, followed by bullets naming canonical authorities, ownership keys, bounded request/background paths, and permanent components.",
+  "cases": [
+    {
+      "id": "ten-million-daily-users",
+      "task": "Architect a personalized home feed for a consumer app that can grow from launch to 10 million daily users. People follow creators and page through a ranked mix of recent followed posts and recommendations, and some creators have millions of followers. New posts should be eligible within 30 seconds; after a deletion or privacy change is acknowledged, later feed requests must not reveal affected content to an unauthorized viewer."
+    }
+  ],
+  "judging": {
+    "panel": [
+      "codex:gpt-5.6-sol@ultra",
+      "claude:opus@max"
+    ],
+    "synthesizer": "codex:gpt-5.6-sol@ultra"
+  },
+  "scoring": {
+    "version": "personalized-home-feed-rubric-v1",
+    "kind": "anchored-llm",
+    "scoreRange": {
+      "min": 0,
+      "max": 100
+    },
+    "ratingScale": {
+      "min": 0,
+      "max": 4
+    },
+    "judgeInstructions": "Judge each anonymously labeled answer independently before comparing or ranking them. Score only the architecture's observable product completeness, authoritative versus derived state, horizontal continuity, bounded publish/read/rank work, component rent, visibility correctness, recovery, and cost. Do not reward any vendor, datastore, feed strategy, ML stack, protocol, service count, verbosity, or fashionable terminology. Compute-on-read, precomputation, and hybrid designs can each earn full credit when their bounds and tradeoffs satisfy the contract. Ten million daily users is not a throughput envelope: reward an explicit scale function and preserved unknowns, not invented capacity claims. A preferred technology earns no credit when its persistence, partitioning, recovery, or workload fit is unexplained. Use integer dimension ratings from 0 through 4, apply the lowest failed-gate cap after calculating the weighted score, and give concrete answer-specific reasons for every gate and rating.",
+    "gates": [
+      {
+        "id": "complete-feed-contract",
+        "criterion": "Publishing, following, personalized followed/recommended retrieval, bounded pagination, 30-second eligibility, and deletion/privacy behavior form one complete journey.",
+        "failureCap": 49
+      },
+      {
+        "id": "canonical-state-and-derivation",
+        "criterion": "Content, follow/privacy facts, and any durable session state each have an unambiguous canonical authority and stable ownership rule; candidate lists, ranks, and copies are clearly derived or explicitly authoritative.",
+        "failureCap": 49
+      },
+      {
+        "id": "horizontal-continuity",
+        "criterion": "Launch and 10-million-daily-user operation use the same critical-path component graph, scaling by replicas or partitions; million-follower creators do not require unbounded synchronous work or a later topology replacement.",
+        "failureCap": 49
+      },
+      {
+        "id": "acknowledged-mutation-and-visibility-safety",
+        "criterion": "Confirmed writes are durable and retry-safe, and stale derived state cannot reveal deleted or unauthorized content on later requests; reconciliation or rebuild behavior is defined.",
+        "failureCap": 59
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "product-fidelity",
+        "title": "Product fidelity",
+        "criterion": "How completely the design serves publishing, following, personalized ranking, bounded pagination, 30-second eligibility, and deletion/privacy behavior without inventing irrelevant product requirements.",
+        "weight": 15,
+        "anchors": {
+          "0": "Misses personalization, pagination, freshness, or visibility behavior.",
+          "2": "Basic publish/read feed works, but session or mutation semantics are vague.",
+          "4": "Defines the complete journey, ranking/freshness boundaries, pagination behavior, and sensible degradation."
+        }
+      },
+      {
+        "id": "authority-and-partitioning",
+        "title": "Authority and partitioning",
+        "criterion": "How clearly canonical content, follow/privacy state, derived candidates and ranks, stable ownership keys, and concurrent mutation boundaries are defined.",
+        "weight": 15,
+        "anchors": {
+          "0": "Conflicting sources of truth or ambiguous ownership.",
+          "2": "Names source and feed state but leaves versioning, derivation, or mutation ownership unclear.",
+          "4": "Defines one authority per fact, stable ownership keys, derived-state lineage, and concurrency boundaries."
+        }
+      },
+      {
+        "id": "horizontal-scale-continuity",
+        "title": "Horizontal scale continuity",
+        "criterion": "Whether publish, follow, candidate-generation, ranking, and page-read paths scale by bounded work plus replicas or partitions while preserving the same day-one topology, including for million-follower creators.",
+        "weight": 20,
+        "anchors": {
+          "0": "Contains an unpartitioned bottleneck, unbounded follower work, or later rewrite.",
+          "2": "Broadly shardable but omits a major path or celebrity skew.",
+          "4": "Publish, follow, candidate generation, ranking, and page reads all scale within the day-one topology."
+        }
+      },
+      {
+        "id": "bounded-critical-path",
+        "title": "Bounded critical path",
+        "criterion": "Whether request work, fanout, candidate generation, hydration, ranking, pagination, and retry work are bounded per action and support interactive use.",
+        "weight": 15,
+        "anchors": {
+          "0": "A request scans the corpus or synchronously touches an unbounded follower set.",
+          "2": "Common paths are plausible, but candidate, hydration, pagination, retry, or overload bounds are missing.",
+          "4": "Every action has explicit bounds, including hot creators, ranking candidates, page assembly, and backpressure."
+        }
+      },
+      {
+        "id": "component-rent",
+        "title": "Component rent",
+        "criterion": "Whether each datastore, queue, cache, ranking plane, derived copy, protocol, worker, and service is forced by a stated requirement and earns its failure and operating cost.",
+        "weight": 15,
+        "anchors": {
+          "0": "A service catalog with duplicate state and unforced ranking, queue, cache, or analytics planes.",
+          "2": "Mostly coherent, with at least one permanent component whose removal is not shown to break the contract.",
+          "4": "The smallest complete topology; every retained plane survives a collapse test and serves a sourced requirement."
+        }
+      },
+      {
+        "id": "failure-and-recovery",
+        "title": "Failure and recovery",
+        "criterion": "How precisely the design handles duplicate publication, partial derivation, stale candidates, visibility changes, acknowledged mutations, reconstruction, and operational diagnosis.",
+        "weight": 10,
+        "anchors": {
+          "0": "Retries duplicate content, acknowledged mutations disappear, or stale copies leak restricted content.",
+          "2": "Mentions retries or replication but leaves partial derivation, reconnect, or rebuild gaps.",
+          "4": "Defines idempotency/versioning, fail-closed visibility enforcement, reconciliation, rebuild, and diagnosable degraded behavior."
+        }
+      },
+      {
+        "id": "cost-and-tradeoffs",
+        "title": "Cost and tradeoffs",
+        "criterion": "Whether cost follows bounded useful work and explicitly trades off read/write amplification, ranking compute, storage duplication, freshness, and high-follower skew.",
+        "weight": 10,
+        "anchors": {
+          "0": "Ignores read/write amplification, ranking cost, storage duplication, or unsupported scale claims.",
+          "2": "Names broad tradeoffs without connecting them to demand or topology.",
+          "4": "Relates cost to useful bounded work and states concrete triggers for changing freshness, ranking, or derivation strategy."
+        }
+      }
+    ]
+  }
+}

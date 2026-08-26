@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "id": "hyper-scale-chat",
+  "title": "Hyper-scale chat architecture",
+  "description": "Tests whether a model can find a complete, lasting, low-rent topology for mobile chat at extreme concurrency without being steered toward a preferred product or protocol.",
+  "limitations": [
+    "The architecture treatment contains a chat-specific worked default, so this benchmark measures retrieval and application of that guidance rather than novel-task generalization."
+  ],
+  "taskKind": "response",
+  "outputContract": "Recommend one concrete architecture in one or two paragraphs, followed by bullets naming the core technologies.",
+  "cases": [
+    {
+      "id": "ten-million-concurrent-users",
+      "task": "Architect a chat app infrastructure that supports 10 million concurrent users."
+    }
+  ],
+  "judging": {
+    "panel": [
+      "codex:gpt-5.6-sol@ultra",
+      "claude:opus@max"
+    ],
+    "synthesizer": "codex:gpt-5.6-sol@ultra"
+  },
+  "scoring": {
+    "version": "hyper-scale-chat-rubric-v1",
+    "kind": "anchored-llm",
+    "scoreRange": {
+      "min": 0,
+      "max": 100
+    },
+    "ratingScale": {
+      "min": 0,
+      "max": 4
+    },
+    "judgeInstructions": "Judge each anonymously labeled answer independently before comparing or ranking them. Score only the architecture's observable product completeness, ownership and correctness, horizontal scale function, bounded critical path, component rent, failure behavior, and cost. Do not reward verbosity, fashionable terminology, or any particular vendor, datastore, polling interval, protocol, or service count. A different technology can earn full credit when it satisfies the same outcomes with equal or lower justified rent. A preferred technology earns no credit when its persistence, partitioning, recovery, or workload fit is unexplained. Use integer dimension ratings from 0 through 4, apply the lowest failed-gate cap after calculating the weighted score, and give concrete answer-specific reasons for every gate and rating.",
+    "gates": [
+      {
+        "id": "complete-chat-contract",
+        "criterion": "The answer preserves the defining chat journey: users can send and receive messages with suitable interactive fidelity, resume after disconnects without losing their place, and use unreliable mobile networks without making connection continuity a correctness requirement.",
+        "failureCap": 49
+      },
+      {
+        "id": "canonical-ownership",
+        "criterion": "The answer identifies one canonical message authority and a stable partition or ownership rule that makes concurrent writes, ordering scope, and reads unambiguous.",
+        "failureCap": 49
+      },
+      {
+        "id": "horizontal-continuity",
+        "criterion": "The stated 10-million-concurrent-user target is reached by adding or reassigning replicas and partitions within the proposed day-one component graph, not by replacing the critical path with a new authority, transport, or service topology later.",
+        "failureCap": 49
+      },
+      {
+        "id": "acknowledged-write-safety",
+        "criterion": "The answer explains enough persistence, replication, idempotency, retry, and recovery behavior that an acknowledged message is not silently lost and reconnects or retries do not corrupt the visible conversation.",
+        "failureCap": 59
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "product-fidelity",
+        "title": "Product fidelity",
+        "criterion": "How completely the design serves sending, reading, reconnecting, multi-device use, and appropriate interactive latency without inventing irrelevant product requirements.",
+        "weight": 15,
+        "anchors": {
+          "0": "Misses core chat behavior or treats transport continuity as correctness.",
+          "2": "Covers basic send/read behavior but leaves reconnect, multi-device state, or latency materially vague.",
+          "4": "Defines a complete mobile chat journey with cursor/resume and sensible fidelity boundaries."
+        }
+      },
+      {
+        "id": "authority-and-partitioning",
+        "title": "Authority and partitioning",
+        "criterion": "How clearly canonical state, ordering scope, ownership key, hot-key behavior, and concurrent mutation boundaries are defined.",
+        "weight": 15,
+        "anchors": {
+          "0": "State ownership is ambiguous or depends on cross-system coordination for ordinary operations.",
+          "2": "Names a primary store and partition idea but leaves ordering or hot ownership unclear.",
+          "4": "Defines one authoritative path with stable owner-local partitioning and explicit ordering/concurrency scope."
+        }
+      },
+      {
+        "id": "horizontal-scale-continuity",
+        "title": "Horizontal scale continuity",
+        "criterion": "Whether every demand-bearing path scales by bounded work plus replicas or partitions while preserving the same day-one topology.",
+        "weight": 20,
+        "anchors": {
+          "0": "Relies on an unpartitioned bottleneck or requires a later critical-path rewrite.",
+          "2": "Is broadly shardable but omits routing continuity, skew, or a major scale-bearing path.",
+          "4": "Makes the scale function explicit for reads, writes, fanout, routing, and hot-entity skew without changing topology."
+        }
+      },
+      {
+        "id": "bounded-critical-path",
+        "title": "Bounded critical path",
+        "criterion": "Whether request work, fanout, catch-up, payload size, and retry work are bounded per action and support the claimed interactive latency.",
+        "weight": 15,
+        "anchors": {
+          "0": "Includes unbounded synchronous fanout, scans, or coordination on the hot path.",
+          "2": "The common path is plausible but one important bound or overload behavior is missing.",
+          "4": "All critical work is owner-local and explicitly bounded, with clear overload/backpressure behavior."
+        }
+      },
+      {
+        "id": "component-rent",
+        "title": "Component rent",
+        "criterion": "Whether each datastore, broker, cache, worker plane, protocol, and derived copy is forced by a stated requirement and earns its failure and operating cost.",
+        "weight": 15,
+        "anchors": {
+          "0": "Presents a service catalog with duplicate state or multiple unforced planes.",
+          "2": "Mostly coherent but retains one or more components whose removal is not shown to break a requirement.",
+          "4": "Uses the smallest complete topology and gives a concrete forcing requirement for every permanent plane."
+        }
+      },
+      {
+        "id": "failure-and-recovery",
+        "title": "Failure and recovery",
+        "criterion": "How precisely the design handles disconnects, duplicate requests, partial writes, unavailable partitions, acknowledged-write recovery, and operational diagnosis.",
+        "weight": 10,
+        "anchors": {
+          "0": "Material failures can lose or corrupt acknowledged user-visible state.",
+          "2": "Mentions retries or replication but leaves a key ambiguity or reconciliation gap.",
+          "4": "Defines idempotent retry, durable acknowledgement, bounded recovery, and diagnosable failure states."
+        }
+      },
+      {
+        "id": "cost-and-tradeoffs",
+        "title": "Cost and tradeoffs",
+        "criterion": "Whether cost follows bounded useful work, local and production shapes align, and assumptions plus concrete invalidation triggers are stated.",
+        "weight": 10,
+        "anchors": {
+          "0": "Ignores cost drivers and presents unsupported scale claims as facts.",
+          "2": "Names broad cost or tradeoffs but does not connect them to work and topology.",
+          "4": "Explains the cost curve, important assumptions, and measured conditions that would force a design change."
+        }
+      }
+    ]
+  }
+}

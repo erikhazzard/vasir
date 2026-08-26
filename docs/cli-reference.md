@@ -36,9 +36,11 @@ vasir --version
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
 | `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Exit nonzero and identify any root or nested root `AGENTS.md` that still contains scaffold placeholders or broken repo routes |
-| `eval run` | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment eval for a skill |
+| `eval run` | `vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] [--repo-root <path>]` | Run an independent benchmark through matched clean and skill-treated fresh agents |
+| `eval report` | `vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>]` | Regenerate a self-contained visual report from a saved benchmark run |
+| `eval run` (legacy) | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment suite owned by a skill |
 | `eval inspect` | `vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>]` | Inspect the latest or named saved eval artifact for a skill |
-| `eval rescore` | `vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>]` | Recompute a saved eval artifact with the current scorer |
+| `eval rescore` | `vasir eval rescore <benchmark-or-skill> [run-id] [--json] [--repo-root <path>]` | Recompute saved evidence with the target's current scorer or judge panel |
 | `--version` | `vasir --version [--json]` | Print the installed CLI name and version |
 
 ### `status`
@@ -406,7 +408,69 @@ vasir agents validate --json
 
 ## Eval
 
-`vasir eval run <skill>` is the one-command developer workflow for measuring whether a skill improved steering.
+Eval has two task shapes: independent benchmarks for comparing the same task against selectable treatments, and legacy suites owned by one skill.
+
+### Independent benchmarks
+
+Use an independent benchmark when the task and scoring contract must remain separate from the skill being tested:
+
+```bash
+vasir eval run hyper-scale-chat \
+  --treatment skill:plan__question-spec-architecture \
+  --open
+```
+
+The bundled `hyper-scale-chat` benchmark:
+
+- sends the exact same task and output contract through clean and skill-treated conditions;
+- runs each row in a new non-persisted Codex or Claude CLI session with project customizations disabled;
+- defaults to 27 distinct GPT-5.6 Sol/Terra/Luna and Claude Fable/Opus reasoning configurations, for 54 rows at one trial;
+- uses the logged-in `codex` and `claude` CLIs rather than provider API keys;
+- sends the same anonymous completed-answer cohort independently to fresh `codex:gpt-5.6-sol@ultra` and `claude:opus@max` judges;
+- uses a separate fresh `codex:gpt-5.6-sol@ultra` synthesizer to select the most rubric-faithful complete judgment per candidate—never a mechanical average;
+- calculates a 0–100 score from benchmark-owned gates and weighted dimensions;
+- saves the exact prompts, answers, usage, failures, every judge result, disagreement, synthesis choice, and comparison basis under `.agents/vasir-evals/<benchmark>/<run-id>/run.json`;
+- derives a self-contained `report.html` with embedded D3. `run.json` remains authoritative.
+
+The default matrix can be narrowed without collapsing model and reasoning identity:
+
+```bash
+# Every supported Sol reasoning effort
+vasir eval run hyper-scale-chat \
+  --treatment skill:plan__question-spec-architecture \
+  --model sol
+
+# One exact model/reasoning configuration
+vasir eval run hyper-scale-chat \
+  --treatment skill:plan__question-spec-architecture \
+  --model claude:opus@max
+
+# Apply the same requested efforts to the selected models
+vasir eval run hyper-scale-chat \
+  --treatment skill:plan__question-spec-architecture \
+  --model sol --model terra \
+  --reasoning xhigh --reasoning max
+```
+
+Regenerate or reopen the latest or a named saved report without rerunning models:
+
+```bash
+vasir eval report hyper-scale-chat --open
+vasir eval report hyper-scale-chat <run-id> --open
+```
+
+Apply the benchmark's current judge panel to a saved response cohort without rerunning generation. This writes a new linked run, preserves the source artifact, and safely reuses any compatible complete judge seats when retrying an incomplete panel:
+
+```bash
+vasir eval rescore hyper-scale-chat <run-id>
+vasir eval report hyper-scale-chat --open
+```
+
+Numeric scores are explicitly `author-calibration-pending` in this first benchmark. They are directional evidence, not ground truth or a universal model ranking. Its chat task also overlaps a worked default in the architecture skill, so it measures retrieval and application of that guidance rather than novel-task generalization. Inspect the complete answers and judge reasons in the report.
+
+### Legacy skill-owned evals
+
+`vasir eval run <skill>` remains the one-command developer workflow for measuring a skill with the suite stored beside that skill.
 
 ```bash
 vasir eval run testing__enforcing-mandate

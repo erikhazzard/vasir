@@ -26,6 +26,7 @@
   "files": [
     "bin/",
     "cli/",
+    "benchmarks/",
     "registry.json",
     ".vasir-catalog-manifest.json",
     ".agents/skills/",

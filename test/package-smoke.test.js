@@ -83,6 +83,9 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
     fs.existsSync(path.join(installPrefixDirectory, "node_modules", "vasir", ".vasir-catalog-manifest.json"))
   );
   const installedPackageDirectory = path.join(installPrefixDirectory, "node_modules", "vasir");
+  assert.ok(
+    fs.existsSync(path.join(installedPackageDirectory, "benchmarks", "hyper-scale-chat", "benchmark.json"))
+  );
   const installedFilePaths = listRelativeFiles(installedPackageDirectory);
   assert.ok(
     installedFilePaths.every(
@@ -118,9 +121,11 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.match(helpResult.stdout, /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
   assert.match(helpResult.stdout, /vasir agents draft-routing \[--json\] \[--write\]/);
   assert.match(helpResult.stdout, /vasir agents validate \[--scope <path>\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir eval run <benchmark> --treatment skill:<name>/);
+  assert.match(helpResult.stdout, /vasir eval report <benchmark> \[run-id\] \[--open\]/);
   assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(helpResult.stdout, /vasir eval inspect <skill> \[run-id\] \[--json\]/);
-  assert.match(helpResult.stdout, /vasir eval rescore <skill> \[run-id\] \[--json\]/);
+  assert.match(helpResult.stdout, /vasir eval rescore <benchmark-or-skill> \[run-id\] \[--json\]/);
   assert.match(helpResult.stdout, /vasir add all/i);
   const versionResult = runCommand(binaryPath, ["--version"], packDirectory);
   assert.equal(versionResult.status, 0, versionResult.stderr);

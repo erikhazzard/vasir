@@ -59,7 +59,9 @@ import { listSkillFiles } from "./skill-metadata.js";
 import { canPromptInteractively, promptForMissingProviderCredential } from "./eval/interactive.js";
 import { inspectSkillEval } from "./eval/inspect-skill-eval.js";
 import { rescoreSkillEval } from "./eval/rescore-skill-eval.js";
+import { runBenchmarkEval } from "./eval/run-benchmark-eval.js";
 import { runSkillEval } from "./eval/run-skill-eval.js";
+import { resolveBenchmarkSource } from "./eval/benchmark-source.js";
 import { createCommandUi } from "./ui/command-output.js";
 import { interactiveMultiSelect } from "./ui/interactive-select.js";
 import { isLikelyTextBuffer, renderUnifiedDiff } from "./unified-diff.js";
@@ -1373,9 +1375,11 @@ Usage:
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
   vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md still contains scaffold placeholders
-  vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run the built-in baseline vs treatment eval for a skill
+  vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] Run an independent clean-vs-Vasir benchmark
+  vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>] Regenerate the visual report from a recorded benchmark run
+  vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run a legacy skill-owned eval suite
   vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>] Inspect the latest or named eval artifact for a skill
-  vasir eval rescore <skill> [run-id] [--json] [--repo-root <path>] Rescore an existing eval artifact with the current scorer
+  vasir eval rescore <benchmark-or-skill> [run-id] [--json] [--repo-root <path>] Rejudge or rescore saved evidence with the current evaluator
   vasir --version [--json]                          Print the installed Vasir CLI version
   vasir --help
 
@@ -1474,9 +1478,12 @@ function parseCommandInvocation(argumentVector) {
   let dryRunRequested = false;
   let exitCodeRequested = false;
   let modelArguments = [];
+  let openRequested = false;
   let projectRootArgument = null;
+  let reasoningArguments = [];
   let replaceExistingSkills = false;
   let requestedTrialCount = null;
+  let treatmentArgument = null;
   let versionRequested = false;
   let writeGeneratedOutput = false;
 
@@ -1514,6 +1521,11 @@ function parseCommandInvocation(argumentVector) {
 
     if (rawArgument === "--exit-code") {
       exitCodeRequested = true;
+      continue;
+    }
+
+    if (rawArgument === "--open") {
+      openRequested = true;
       continue;
     }
 
@@ -1603,6 +1615,38 @@ function parseCommandInvocation(argumentVector) {
       continue;
     }
 
+    if (rawArgument === "--reasoning") {
+      const reasoningArgument = rawArguments[argumentIndex + 1];
+      if (!reasoningArgument || reasoningArgument.startsWith("--")) {
+        throw new VasirCliError({
+          code: "REASONING_FLAG_VALUE_REQUIRED",
+          message: "`--reasoning` requires an effort label.",
+          suggestion: "Use `--reasoning low`, `medium`, `high`, `xhigh`, `max`, or `ultra` where the selected model supports it.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+
+      reasoningArguments = [...reasoningArguments, reasoningArgument];
+      argumentIndex += 1;
+      continue;
+    }
+
+    if (rawArgument === "--treatment") {
+      const treatmentValue = rawArguments[argumentIndex + 1];
+      if (!treatmentValue || treatmentValue.startsWith("--")) {
+        throw new VasirCliError({
+          code: "TREATMENT_FLAG_VALUE_REQUIRED",
+          message: "`--treatment` requires a treatment id.",
+          suggestion: "Use `--treatment skill:plan__question-spec-architecture`.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+
+      treatmentArgument = treatmentValue;
+      argumentIndex += 1;
+      continue;
+    }
+
     if (rawArgument === "--trials") {
       const trialCountArgument = rawArguments[argumentIndex + 1];
       if (!trialCountArgument || trialCountArgument.startsWith("--")) {
@@ -1653,9 +1697,12 @@ function parseCommandInvocation(argumentVector) {
     dryRunRequested,
     exitCodeRequested,
     modelArguments,
+    openRequested,
     projectRootArgument,
+    reasoningArguments,
     requestedTrialCount,
     replaceExistingSkills,
+    treatmentArgument,
     writeGeneratedOutput,
     versionRequested,
     helpRequested: helpRequested || commandName === "help"
@@ -3835,7 +3882,10 @@ async function runRemove({
 async function runEval({
   evalArguments,
   modelArguments,
+  reasoningArguments,
   requestedTrialCount,
+  treatmentArgument,
+  openRequested,
   homeDirectory,
   currentWorkingDirectory,
   projectRootDirectory,
@@ -3854,31 +3904,43 @@ async function runEval({
     throw new VasirCliError({
       code: "EVAL_SUBCOMMAND_REQUIRED",
       message: "An eval subcommand is required.",
-      suggestion: "Use `vasir eval run <skill>`, `vasir eval inspect <skill>`, or `vasir eval rescore <skill>`.",
+      suggestion: "Use `vasir eval run <benchmark>`, `vasir eval report <benchmark>`, `vasir eval inspect <skill>`, or `vasir eval rescore <skill>`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
 
-  if (!["run", "inspect", "rescore"].includes(evalSubcommand)) {
+  if (!["run", "report", "inspect", "rescore"].includes(evalSubcommand)) {
     throw new VasirCliError({
       code: "UNKNOWN_EVAL_SUBCOMMAND",
       message: `Unknown eval subcommand: ${evalSubcommand}`,
-      suggestion: "Use `vasir eval run <skill>`, `vasir eval inspect <skill>`, or `vasir eval rescore <skill>`.",
+      suggestion: "Use `vasir eval run <benchmark>`, `vasir eval report <benchmark>`, `vasir eval inspect <skill>`, or `vasir eval rescore <skill>`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
 
-  const skillName = evalArguments[1];
-  if (!skillName) {
+  const targetName = evalArguments[1];
+  if (!targetName) {
     throw new VasirCliError({
-      code: "EVAL_SKILL_REQUIRED",
-      message: "A skill name is required for `vasir eval run`.",
-      suggestion: "Run `vasir eval run <skill>` with a skill that exists locally or in the global catalog.",
+      code: "EVAL_TARGET_REQUIRED",
+      message: `A benchmark or skill name is required for \`vasir eval ${evalSubcommand}\`.`,
+      suggestion: "Run `vasir eval run hyper-scale-chat --treatment skill:plan__question-spec-architecture`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
 
   const runId = evalArguments[2] ?? null;
+  let benchmarkSource = null;
+  try {
+    benchmarkSource = resolveBenchmarkSource({
+      benchmarkName: targetName,
+      currentWorkingDirectory,
+      projectRootDirectory
+    });
+  } catch (error) {
+    if (error?.code !== "EVAL_BENCHMARK_NOT_FOUND") {
+      throw error;
+    }
+  }
 
   const promptForMissingCredential =
     !jsonOutput && canPromptInteractively({ inputStream, outputStream })
@@ -3891,8 +3953,37 @@ async function runEval({
       : null;
 
   if (evalSubcommand === "run") {
+    if (benchmarkSource) {
+      return runBenchmarkEval({
+        benchmarkName: targetName,
+        treatmentId: treatmentArgument,
+        homeDirectory,
+        currentWorkingDirectory,
+        projectRootDirectory,
+        repositoryUrl,
+        platform,
+        spawnSyncImplementation,
+        requestedModelArguments: modelArguments,
+        requestedReasoningArguments: reasoningArguments,
+        trialCount: requestedTrialCount ?? undefined,
+        openReport: openRequested,
+        stdoutWriter,
+        jsonOutput,
+        environmentVariables
+      });
+    }
+
+    if (treatmentArgument !== null || reasoningArguments.length > 0 || openRequested) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "--treatment, --reasoning, and --open are supported by independent benchmark runs, not legacy skill-owned evals.",
+        suggestion: "Run a benchmark such as `hyper-scale-chat`, or remove the benchmark-only flags.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+
     return runSkillEval({
-      skillName,
+      skillName: targetName,
       homeDirectory,
       currentWorkingDirectory,
       projectRootDirectory,
@@ -3910,11 +4001,52 @@ async function runEval({
     });
   }
 
-  if (modelArguments.length > 0) {
+  if (evalSubcommand === "report") {
+    if (
+      modelArguments.length > 0 ||
+      reasoningArguments.length > 0 ||
+      treatmentArgument !== null ||
+      requestedTrialCount !== null
+    ) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "A saved benchmark report does not accept generation flags.",
+        suggestion: "Use only `vasir eval report <benchmark> [run-id] [--open]`.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    if (!benchmarkSource) {
+      throw new VasirCliError({
+        code: "EVAL_BENCHMARK_NOT_FOUND",
+        message: `Benchmark not found: ${targetName}`,
+        suggestion: "Choose a bundled benchmark with a recorded run.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    const { reportBenchmarkEval } = await import("./eval/report-benchmark-eval.js");
+    return reportBenchmarkEval({
+      benchmarkName: targetName,
+      runId,
+      currentWorkingDirectory,
+      projectRootDirectory,
+      platform,
+      spawnSyncImplementation,
+      openReport: openRequested,
+      stdoutWriter,
+      jsonOutput
+    });
+  }
+
+  if (
+    modelArguments.length > 0 ||
+    reasoningArguments.length > 0 ||
+    treatmentArgument !== null ||
+    openRequested
+  ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--model is only supported by `vasir eval run`.",
-      suggestion: "Use `vasir eval inspect <skill>` or `vasir eval rescore <skill>` without `--model`.",
+      message: "Generation and report flags are not supported by this eval subcommand.",
+      suggestion: "Use `vasir eval inspect <skill>` or `vasir eval rescore <skill>` without run/report flags.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -3928,9 +4060,22 @@ async function runEval({
     });
   }
 
+  if (evalSubcommand === "rescore" && benchmarkSource) {
+    const { rejudgeBenchmarkEval } = await import("./eval/rejudge-benchmark-eval.js");
+    return rejudgeBenchmarkEval({
+      benchmarkName: targetName,
+      runId,
+      currentWorkingDirectory,
+      projectRootDirectory,
+      stdoutWriter,
+      jsonOutput,
+      environmentVariables
+    });
+  }
+
   if (evalSubcommand === "inspect") {
     return inspectSkillEval({
-      skillName,
+      skillName: targetName,
       runId,
       currentWorkingDirectory,
       projectRootDirectory,
@@ -3941,7 +4086,7 @@ async function runEval({
   }
 
   return rescoreSkillEval({
-    skillName,
+    skillName: targetName,
     runId,
     currentWorkingDirectory,
     projectRootDirectory,
@@ -3965,9 +4110,12 @@ async function runSelectedCommand({
   dryRunRequested,
   exitCodeRequested,
   modelArguments,
+  openRequested,
   projectRootArgument,
+  reasoningArguments,
   requestedTrialCount,
   replaceExistingSkills,
+  treatmentArgument,
   writeGeneratedOutput,
   homeDirectory,
   currentWorkingDirectory,
@@ -4049,6 +4197,33 @@ async function runSelectedCommand({
       message: "--trials is only supported by `vasir eval`.",
       suggestion:
         "Use `vasir eval run <skill> --trials <count>` when you want repeated eval trials.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (reasoningArguments.length > 0 && commandName !== "eval") {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--reasoning is only supported by `vasir eval`.",
+      suggestion: "Use `vasir eval run <benchmark> --reasoning <effort>`.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (treatmentArgument !== null && commandName !== "eval") {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--treatment is only supported by `vasir eval`.",
+      suggestion: "Use `vasir eval run <benchmark> --treatment skill:<name>`.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (openRequested && commandName !== "eval") {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--open is only supported by `vasir eval run` and `vasir eval report`.",
+      suggestion: "Use `vasir eval report <benchmark> --open`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -4292,7 +4467,10 @@ async function runSelectedCommand({
     return runEval({
       evalArguments: commandArguments,
       modelArguments,
+      reasoningArguments,
       requestedTrialCount,
+      treatmentArgument,
+      openRequested,
       homeDirectory,
       currentWorkingDirectory,
       projectRootDirectory,
@@ -4375,9 +4553,12 @@ export async function runCommandLine(
       dryRunRequested: invocation.dryRunRequested,
       exitCodeRequested: invocation.exitCodeRequested,
       modelArguments: invocation.modelArguments,
+      openRequested: invocation.openRequested,
       projectRootArgument: invocation.projectRootArgument,
+      reasoningArguments: invocation.reasoningArguments,
       requestedTrialCount: invocation.requestedTrialCount,
       replaceExistingSkills: invocation.replaceExistingSkills,
+      treatmentArgument: invocation.treatmentArgument,
       writeGeneratedOutput: invocation.writeGeneratedOutput,
       homeDirectory,
       currentWorkingDirectory,

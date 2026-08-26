@@ -219,7 +219,7 @@ export function readEvalRunArtifacts({
     throw new VasirCliError({
       code: "EVAL_RUN_NOT_FOUND",
       message: `No eval runs were found for ${skillName}.`,
-      suggestion: "Run `vasir eval run <skill>` first, then inspect or rescore that recorded run.",
+      suggestion: "Run the target with `vasir eval run` first, then inspect, rescore, or report that recorded run.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -237,7 +237,7 @@ export function readEvalRunArtifacts({
       code: "EVAL_RUN_NOT_FOUND",
       message: `Eval run not found for ${skillName}: ${resolvedRunId}`,
       suggestion:
-        "Use a valid recorded run id under `.agents/vasir-evals/<skill>/`, or rerun the eval to create a fresh artifact.",
+        "Use a valid recorded run id under `.agents/vasir-evals/<target>/`, or rerun the eval to create a fresh artifact.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
