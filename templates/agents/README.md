@@ -62,3 +62,7 @@ If you want to edit the source templates directly, use the table below and stop 
 3. Add repo-specific landmines in `AGENTS__non-obvious.md`.
 4. Edit both [AGENTS.md](./AGENTS.md) and [CLAUDE.md](./CLAUDE.md) when shared laws change.
 5. Edit the matching snippet only when the stack-specific doctrine should change.
+
+## Behavioral Cases
+
+[Expert-counterfactual cases](./evals/expert-counterfactual.md) are non-normative manual checks for the root §9 law. Run them in fresh sessions when that law or one of its decision-skill hooks changes; the root contract remains the only policy authority.

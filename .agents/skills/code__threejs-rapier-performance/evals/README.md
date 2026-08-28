@@ -16,4 +16,11 @@ A live-model run is required for the behavioral verdict. Mock mode proves suite 
 
 Current limit: the suite supplies deterministic topology facts and evaluates the resulting architectural judgment. It does not capture a browser frame, validate renderer instrumentation, measure GPU cost, or prove visual equivalence.
 
-For a realistic defect-discovery A/B rather than an inline topology case, use [`fixtures/fog/index.html`](fixtures/fog/index.html) with the isolation and provenance rules in [`fixtures/fog/README.md`](fixtures/fog/README.md). This manual fixture tests static prioritization and falsifier quality; it still cannot establish the demo's runtime bottleneck.
+For realistic defect-discovery A/Bs rather than inline topology cases, use one of the manual static-audit fixtures:
+
+- [`fixtures/fog/index.html`](fixtures/fog/index.html), with provenance and isolation rules in [`fixtures/fog/README.md`](fixtures/fog/README.md)
+- [`fixtures/water-ripples/index.html`](fixtures/water-ripples/index.html), with provenance and isolation rules in [`fixtures/water-ripples/README.md`](fixtures/water-ripples/README.md)
+
+These fixtures test static prioritization and falsifier quality; they still cannot establish a demo's runtime bottleneck.
+
+For paired code-generation evaluation, use [`references/moonlit-flooded-observatory-generation-prompt.md`](references/moonlit-flooded-observatory-generation-prompt.md). It fixes one asset-free visual workload while leaving render topology and implementation choices undisclosed; generated artifacts require separate feature-equivalence, runtime, and crossed static-audit evaluation.

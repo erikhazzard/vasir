@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "version": "vasir-capabilities-development-v2",
+  "status": "development",
+  "categories": [
+    {
+      "id": "backend-architecture",
+      "title": "Backend Architecture",
+      "description": "Systems that reach real scale through replicas and partitions instead of a later rewrite.",
+      "benchmarkIds": [
+        "hyper-scale-chat",
+        "personalized-home-feed",
+        "device-telemetry"
+      ],
+      "modelScore": {
+        "method": "equal-benchmark-peer-index-v1",
+        "benchmarkWeighting": "equal",
+        "scaleMaximum": 100
+      },
+      "rating": {
+        "method": "matched-outcome-elo-v1",
+        "promptWeighting": "equal",
+        "cleanReference": 1500
+      }
+    }
+  ]
+}

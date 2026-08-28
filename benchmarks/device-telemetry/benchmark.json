@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "id": "device-telemetry",
+  "title": "High-volume device telemetry architecture",
+  "description": "Tests whether a model can derive a complete, lasting, low-rent topology for high-volume owner-local telemetry while preserving durable retry semantics, monotonic current state, and honest capacity bounds without being rewarded for preferred products.",
+  "limitations": [
+    "The stated workload determines steady ingest and retained-data scale, but correlated send and reconnect bursts, query volume, geography, latency targets, availability targets, and durability failure domains remain unspecified.",
+    "The task deliberately excludes fleet-wide analytics, alerting, device commands, and archival beyond the stated retention contract; infrastructure added only for those invented requirements counts against the answer.",
+    "The current architecture skill has no telemetry-specific worked example, but its general owner-sharding, expiring-history, idempotency, and vendor-neutral scale rules were refined while discussing this case. This is a development benchmark, not an uncontaminated holdout."
+  ],
+  "taskKind": "response",
+  "outputContract": "Recommend one concrete architecture in one or two paragraphs, followed by bullets naming the canonical authority, stable ownership key, bounded ingest/query/retry paths, durability boundary, and permanent components.",
+  "cases": [
+    {
+      "id": "ten-million-active-devices",
+      "task": "Architect a telemetry backend that can grow from launch to 10 million simultaneously active devices. Each device has a stable ID and a strictly increasing, never-reused local sequence number, and produces one reading of at most 1 KB every 30 seconds. After reconnecting, a device may retry or upload as many as 1,000 buffered readings in one request. Users fetch the latest accepted reading or cursor through one device's readings from the previous 24 hours. Every acknowledged reading must remain queryable for 24 hours; retries must not create duplicate logical readings; late or out-of-order readings must never move latest backward. The latest accepted reading must remain available until a newer reading replaces it, even after its history copy expires."
+    }
+  ],
+  "judging": {
+    "panel": [
+      "codex:gpt-5.6-sol@ultra",
+      "claude:opus@max"
+    ],
+    "synthesizer": "codex:gpt-5.6-sol@ultra"
+  },
+  "scoring": {
+    "version": "device-telemetry-rubric-v1",
+    "kind": "anchored-llm",
+    "scoreRange": {
+      "min": 0,
+      "max": 100
+    },
+    "ratingScale": {
+      "min": 0,
+      "max": 4
+    },
+    "judgeInstructions": "Judge each anonymously labeled answer independently before comparing or ranking them. Score only the architecture's observable read/write completeness, canonical state ownership, monotonic-latest correctness, durable acknowledgment, retry behavior, owner-local bounded work, horizontal continuity, component rent, and honest capacity reasoning. Do not reward any particular vendor, datastore, protocol, cloud service, language, service count, or fashionable terminology. A named product earns no credit unless the answer explains the storage, partitioning, expiry, conditional-update, durability, recovery, and workload properties that make it fit; a vendor-neutral design can earn full credit by specifying those properties. Ten million devices producing one reading every 30 seconds implies roughly 333,333 readings per second, up to 333 MB/s of raw payload, 28.8 billion readings per 24 hours, and 28.8 TB of raw retained payload before metadata, indexes, redundancy, and head state. Instantaneous send alignment, aggregate reconnect bursts, query volume, geography, latency, availability, compression, payload distribution, and required failure survival remain unknown. Reward answers that derive the forced properties and preserve those unknowns rather than claiming capacity by product name. Do not require first-write-wins arbitration for conflicting sequence reuse because the task states sequence numbers are never reused; deterministic same-key convergence is sufficient for history retries. Use integer dimension ratings from 0 through 4, apply the lowest failed-gate cap after calculating the weighted score, and give one concise answer-specific rationale citing decisive evidence, every failed gate, and ratings that materially affect the score.",
+    "gates": [
+      {
+        "id": "complete-telemetry-contract",
+        "criterion": "The answer supports individual and up-to-1,000-reading retryable uploads, per-device latest reads, bounded cursor history reads, 24-hour acknowledged-history retention, and latest-state retention until superseded.",
+        "failureCap": 49
+      },
+      {
+        "id": "canonical-device-ownership",
+        "criterion": "History and current latest state have unambiguous canonical ownership under a stable device key; ordinary ingest, latest, and one-device history operations do not require cross-shard fanout, a placement directory, or cross-authority coordination.",
+        "failureCap": 49
+      },
+      {
+        "id": "horizontal-continuity",
+        "criterion": "Launch and 10-million-device operation use the same critical-path component graph and ownership contract, scaling by replicas, partitions, or reassignment rather than later replacing the ingest, authority, or query path.",
+        "failureCap": 49
+      },
+      {
+        "id": "acknowledged-write-and-retry-safety",
+        "criterion": "The answer defines an acknowledgment boundary that keeps every acknowledged item recoverable for 24 hours under its stated durability assumption; deterministic identities and partial-batch behavior make retries converge without duplicate logical readings or acknowledged gaps.",
+        "failureCap": 59
+      },
+      {
+        "id": "monotonic-latest-and-expiry",
+        "criterion": "Concurrent, late, and out-of-order writes cannot replace latest with a lower sequence, and expiring history cannot erase or regress the retained latest state.",
+        "failureCap": 59
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "product-fidelity",
+        "title": "Product fidelity",
+        "criterion": "How completely the design serves bounded upload and retry, latest lookup, cursor history, 24-hour retention, and latest-until-superseded behavior without inventing unrelated product requirements.",
+        "weight": 10,
+        "anchors": {
+          "0": "Misses a defining ingest, retry, latest, history, or retention behavior.",
+          "2": "Basic ingest and reads work, but batch acknowledgment, pagination, retention, or latest persistence remains vague.",
+          "4": "Defines the complete device and reader journeys, including retries, bounded batches, cursor reads, expiry, and sensible degraded behavior."
+        }
+      },
+      {
+        "id": "authority-and-device-partitioning",
+        "title": "Authority and device partitioning",
+        "criterion": "How clearly canonical history and latest state, the stable device ownership key, mutation boundaries, and owner-local reads and writes are defined.",
+        "weight": 15,
+        "anchors": {
+          "0": "State ownership is ambiguous, ordinary operations scatter across shards, or one device is arbitrarily split across subshards.",
+          "2": "Names a store and device key but leaves latest/history authority, routing, or mutation ownership unclear.",
+          "4": "Defines unambiguous canonical state and one stable owner-local path for each device without unnecessary placement or coordination machinery."
+        }
+      },
+      {
+        "id": "durability-and-idempotency",
+        "title": "Durability and idempotency",
+        "criterion": "Whether acknowledgment, persistence, redundancy assumptions, deterministic logical identity, partial batches, timeout retries, and recovery preserve every acknowledged reading without duplicates.",
+        "weight": 15,
+        "anchors": {
+          "0": "Acknowledged data can disappear, retries duplicate logical readings, or partial batches create unrecoverable ambiguity.",
+          "2": "Mentions durable storage and idempotent keys but leaves acknowledgment, partial success, or recovery materially unclear.",
+          "4": "Defines a precise durable acknowledgment boundary and deterministic retry convergence for individual and partial batch writes."
+        }
+      },
+      {
+        "id": "monotonic-current-state",
+        "title": "Monotonic current state",
+        "criterion": "Whether latest advances only to a greater sequence under concurrent or out-of-order arrival and remains available independently of expiring history.",
+        "weight": 15,
+        "anchors": {
+          "0": "Arrival order or history expiry can regress, erase, or corrupt latest.",
+          "2": "Proposes a latest record or conditional update but leaves concurrency, ordering, or expiry interaction unclear.",
+          "4": "Defines a persistent owner-local head and an atomic monotonic update rule that remains correct across retries, late arrival, and history expiry."
+        }
+      },
+      {
+        "id": "horizontal-scale-continuity",
+        "title": "Horizontal scale continuity",
+        "criterion": "Whether regular ingest, reconnect uploads, latest reads, and history reads scale through bounded work plus replicas or device partitions while preserving the same launch topology.",
+        "weight": 15,
+        "anchors": {
+          "0": "Contains an unpartitioned bottleneck, cross-device coordination, or a required later critical-path rewrite.",
+          "2": "Is broadly shardable but leaves routing continuity, rebalancing, a major path, or reconnect pressure unclear.",
+          "4": "Makes the scale function explicit for every demand-bearing path, with launch and target scale differing only in replica and partition counts."
+        }
+      },
+      {
+        "id": "bounded-critical-path",
+        "title": "Bounded critical path",
+        "criterion": "Whether upload, retry, pagination, latest lookup, storage work, and overload behavior are bounded per device action and remain owner-local.",
+        "weight": 10,
+        "anchors": {
+          "0": "Uses unbounded scans, fanout, synchronous global coordination, or uncontrolled retry work.",
+          "2": "Common paths are plausible but batch, page, timeout, backpressure, or overload bounds are missing.",
+          "4": "Bounds each upload at 1,000 readings, each history page explicitly, every operation to one device owner, and overload through retry-safe backpressure."
+        }
+      },
+      {
+        "id": "component-rent",
+        "title": "Component rent",
+        "criterion": "Whether every datastore, broker, stream processor, cache, worker plane, directory, analytics system, derived copy, protocol, and service is forced by a stated requirement and earns its failure and operating cost.",
+        "weight": 10,
+        "anchors": {
+          "0": "Presents an unforced service catalog, duplicate authorities, or infrastructure for invented analytics, alerting, commands, or archival.",
+          "2": "Mostly coherent but retains one or more permanent planes whose removal is not shown to break the contract.",
+          "4": "Uses the smallest complete topology and ties every retained permanent plane to a sourced requirement that the collapsed shape cannot meet."
+        }
+      },
+      {
+        "id": "capacity-and-tradeoffs",
+        "title": "Capacity and tradeoffs",
+        "criterion": "Whether the answer derives the workload and retained-data envelope, selects properties rather than logos, distinguishes bounded per-request work from unknown aggregate demand, and names concrete invalidation triggers.",
+        "weight": 10,
+        "anchors": {
+          "0": "Claims scale from a vendor name, ignores the stated data volume, or silently invents missing workload and reliability assumptions.",
+          "2": "Recognizes the ingest or storage magnitude but leaves reconnect bursts, query demand, redundancy cost, or invalidation conditions vague.",
+          "4": "Correctly relates regular ingest, retained rows and bytes, redundancy, expiry, and backpressure to the topology while preserving unknown burst, read, geography, latency, availability, and failure-domain requirements."
+        }
+      }
+    ]
+  }
+}

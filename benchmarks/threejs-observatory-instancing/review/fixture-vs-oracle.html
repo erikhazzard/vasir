@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#060914">
+  <link rel="icon" href="data:,">
+  <title>Observatory Fixture Visual Gate</title>
+  <!--
+    Aesthetic direction
+    Hook: a forensic darkroom contact sheet for one exact visual decision.
+    Typography: Georgia for the verdict question; native monospace for evidence labels.
+    Color: ink-black field, moon-white text, cyan evidence accents, coral warning.
+    Motion: none; the images must stay stable while the author compares them.
+
+    Naming contract
+    visual-review: complete human-review artifact.
+    visual-pair: one orientation's accepted-oracle and candidate-fixture comparison.
+  -->
+  <style>
+    @layer settings, base, components;
+
+    @layer settings {
+      :root {
+        --color-surface: #060914;
+        --color-surface-raised: #0b1221;
+        --color-text-primary: #eef8ff;
+        --color-text-secondary: #9bb4c9;
+        --color-accent: #72e7ee;
+        --color-caution: #ff9daf;
+        --color-border: #22344a;
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.5rem;
+        --space-6: 2rem;
+        --space-7: 3rem;
+        --radius-sm: 0.25rem;
+        --font-display: Georgia, 'Times New Roman', serif;
+        --font-evidence: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+        --text-sm: 0.8125rem;
+        --text-base: 1rem;
+        --text-lg: 1.25rem;
+        --text-xl: clamp(1.75rem, 3vw, 3rem);
+        --leading-tight: 1.15;
+        --leading-normal: 1.5;
+      }
+    }
+
+    @layer base {
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html { color-scheme: dark; }
+
+      body {
+        margin: 0;
+        background: var(--color-surface);
+        color: var(--color-text-primary);
+        font-family: var(--font-evidence);
+        font-size: var(--text-base);
+        line-height: var(--leading-normal);
+      }
+
+      a { color: inherit; }
+
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    }
+
+    @layer components {
+      .visual-review {
+        display: grid;
+        gap: var(--space-7);
+        width: min(100% - var(--space-6), 112rem);
+        margin-inline: auto;
+        padding-block: var(--space-7);
+      }
+
+      .visual-review__header {
+        display: grid;
+        gap: var(--space-3);
+        max-width: 72ch;
+      }
+
+      .visual-review__eyebrow {
+        margin: 0;
+        color: var(--color-accent);
+        font-size: var(--text-sm);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .visual-review__title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: var(--text-xl);
+        font-weight: 400;
+        line-height: var(--leading-tight);
+        text-wrap: balance;
+      }
+
+      .visual-review__note {
+        margin: 0;
+        color: var(--color-text-secondary);
+      }
+
+      .visual-review__caution { color: var(--color-caution); }
+
+      .visual-pair {
+        display: grid;
+        gap: var(--space-4);
+      }
+
+      .visual-pair__title {
+        margin: 0;
+        font-size: var(--text-lg);
+        font-weight: 500;
+      }
+
+      .visual-pair__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-4);
+        align-items: start;
+      }
+
+      .visual-pair__figure {
+        display: grid;
+        gap: var(--space-2);
+        margin: 0;
+        min-width: 0;
+      }
+
+      .visual-pair__label {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-3);
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+      }
+
+      .visual-pair__image-link {
+        overflow: hidden;
+        border-radius: var(--radius-sm);
+        background: var(--color-surface-raised);
+        box-shadow: 0 0 0 1px var(--color-border);
+      }
+
+      .visual-pair__image-link:focus-visible {
+        outline: 2px solid var(--color-accent); /* visible keyboard evidence focus */
+        outline-offset: var(--space-1);
+      }
+
+      @media (max-width: 52rem) {
+        .visual-review {
+          width: min(100% - var(--space-4), 112rem);
+          padding-block: var(--space-5);
+        }
+
+        .visual-pair__grid { grid-template-columns: 1fr; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="visual-review">
+    <header class="visual-review__header">
+      <p class="visual-review__eyebrow">Required visual gate · before paired agents run</p>
+      <h1 class="visual-review__title">Accepted oracle and frozen topology-safe fixture</h1>
+      <p class="visual-review__note">The user accepted the right-hand fixture as visually equivalent enough to become both agents' identical starting point. Framing, HUD, counts, water, fog, and composition are mechanically aligned.</p>
+      <p class="visual-review__note visual-review__caution">The visible judgment is marker treatment: the fixture is slightly crisper and less diffusely glowy, with subtler family outlines inside dense clusters.</p>
+    </header>
+
+    <section class="visual-pair" aria-labelledby="landscape-title">
+      <h2 class="visual-pair__title" id="landscape-title">Landscape · tick 240</h2>
+      <div class="visual-pair__grid">
+        <figure class="visual-pair__figure">
+          <figcaption class="visual-pair__label"><span>Accepted oracle</span><span>1600 × 900</span></figcaption>
+          <a class="visual-pair__image-link" href="../oracle/captures/approved/landscape-tick-0240.png">
+            <img src="../oracle/captures/approved/landscape-tick-0240.png" alt="Accepted landscape visual oracle for the moonlit flooded observatory">
+          </a>
+        </figure>
+        <figure class="visual-pair__figure">
+          <figcaption class="visual-pair__label"><span>Topology-safe fixture</span><span>1600 × 900</span></figcaption>
+          <a class="visual-pair__image-link" href="../fixture/captures/approved/landscape-tick-0240.png">
+            <img src="../fixture/captures/approved/landscape-tick-0240.png" alt="Accepted topology-safe landscape fixture for the moonlit flooded observatory">
+          </a>
+        </figure>
+      </div>
+    </section>
+
+    <section class="visual-pair" aria-labelledby="portrait-title">
+      <h2 class="visual-pair__title" id="portrait-title">Portrait · tick 240</h2>
+      <div class="visual-pair__grid">
+        <figure class="visual-pair__figure">
+          <figcaption class="visual-pair__label"><span>Accepted oracle</span><span>900 × 1600</span></figcaption>
+          <a class="visual-pair__image-link" href="../oracle/captures/approved/portrait-tick-0240.png">
+            <img src="../oracle/captures/approved/portrait-tick-0240.png" alt="Accepted portrait visual oracle for the moonlit flooded observatory">
+          </a>
+        </figure>
+        <figure class="visual-pair__figure">
+          <figcaption class="visual-pair__label"><span>Topology-safe fixture</span><span>900 × 1600</span></figcaption>
+          <a class="visual-pair__image-link" href="../fixture/captures/approved/portrait-tick-0240.png">
+            <img src="../fixture/captures/approved/portrait-tick-0240.png" alt="Accepted topology-safe portrait fixture for the moonlit flooded observatory">
+          </a>
+        </figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

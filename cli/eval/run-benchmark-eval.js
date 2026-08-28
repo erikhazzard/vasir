@@ -456,6 +456,83 @@ export async function runBenchmarkEval({
   );
 
   const runId = createRunId(startedAt, benchmarkSource.benchmarkHash, treatment.hash);
+  const runMetadata = {
+    kind: "benchmark",
+    schemaVersion: 1,
+    runId,
+    benchmarkName,
+    skillName: benchmarkName,
+    benchmark: {
+      id: benchmarkSource.benchmarkId,
+      title: benchmarkSource.benchmarkDefinition.title,
+      description: benchmarkSource.benchmarkDefinition.description,
+      hash: benchmarkSource.benchmarkHash,
+      generationHash: benchmarkSource.benchmarkGenerationHash,
+      scoringHash: benchmarkSource.benchmarkScoringHash,
+      sourceType: benchmarkSource.sourceType,
+      definition: benchmarkSource.benchmarkDefinition
+    },
+    treatment,
+    conditions,
+    configurations,
+    generation: {
+      trialCount: resolvedTrialCount,
+      concurrency: MAX_GENERATION_CONCURRENCY,
+      neutralHarnessInstruction: NEUTRAL_HARNESS_INSTRUCTION,
+      freshAgentSessions: true
+    },
+    harnessVersion: BENCHMARK_HARNESS_VERSION,
+    scorerVersion: benchmarkSource.benchmarkDefinition.scoring.version,
+    startedAt: startedAt.toISOString()
+  };
+  const checkpointJudging = {
+    status: "pending",
+    judgeConfiguration: judgingPlan.synthesizer ?? judgingPlan.panel[0],
+    judgeConfigurations: judgingPlan.panel,
+    synthesizerConfiguration: judgingPlan.synthesizer,
+    freshContext: true,
+    blinded: true,
+    calibrationStatus: "author-calibration-pending",
+    cohortHash: null,
+    cohortSize: rows.filter((row) => row.rowStatus === "complete").length,
+    promptHash: null,
+    candidateOrder: [],
+    judges: [],
+    synthesis: null,
+    basisHash: null,
+    promptText: null,
+    ranking: [],
+    comparativeNote: "",
+    runtimeReceipt: null,
+    usage: null,
+    costUsd: null,
+    durationMs: null,
+    error: null
+  };
+  const checkpointPairs = createPairs({ rows, treatmentId: treatment.id });
+  const checkpointSummary = createSummary({
+    rows,
+    pairs: checkpointPairs,
+    configurations,
+    treatmentId: treatment.id,
+    judging: checkpointJudging
+  });
+  writeEvalRunArtifacts({
+    currentWorkingDirectory,
+    projectRootDirectory,
+    skillName: benchmarkName,
+    runId,
+    runPayload: {
+      ...runMetadata,
+      runStatus: "incomplete",
+      judging: checkpointJudging,
+      summary: checkpointSummary,
+      pairs: checkpointPairs,
+      rows,
+      completedAt: null
+    }
+  });
+
   let judging;
   try {
     const judgeResult = await judgeRowsImplementation({
@@ -542,38 +619,12 @@ export async function runBenchmarkEval({
     : "incomplete";
   const completedAt = new Date();
   const run = {
-    kind: "benchmark",
-    schemaVersion: 1,
-    runId,
+    ...runMetadata,
     runStatus,
-    benchmarkName,
-    skillName: benchmarkName,
-    benchmark: {
-      id: benchmarkSource.benchmarkId,
-      title: benchmarkSource.benchmarkDefinition.title,
-      description: benchmarkSource.benchmarkDefinition.description,
-      hash: benchmarkSource.benchmarkHash,
-      generationHash: benchmarkSource.benchmarkGenerationHash,
-      scoringHash: benchmarkSource.benchmarkScoringHash,
-      sourceType: benchmarkSource.sourceType,
-      definition: benchmarkSource.benchmarkDefinition
-    },
-    treatment,
-    conditions,
-    configurations,
-    generation: {
-      trialCount: resolvedTrialCount,
-      concurrency: MAX_GENERATION_CONCURRENCY,
-      neutralHarnessInstruction: NEUTRAL_HARNESS_INSTRUCTION,
-      freshAgentSessions: true
-    },
     judging,
     summary,
     pairs,
     rows,
-    harnessVersion: BENCHMARK_HARNESS_VERSION,
-    scorerVersion: benchmarkSource.benchmarkDefinition.scoring.version,
-    startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString()
   };
   const outputDirectory = writeEvalRunArtifacts({

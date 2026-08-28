@@ -32,7 +32,7 @@ Apply all six together:
 - **Systems correctness:** Are state ownership, concurrency, I/O, recovery, security, and bounds sound for the declared risk tier?
 - **Failure truth:** Under root §9, does each failure preserve valid state and independent value while exposing the honest unavailable, degraded, pending, denied, or failed outcome—or does empty data, hidden UI, a swallowed error, blocked work, or a successful no-op falsely look green?
 - **Proportionality and simplicity:** Is the proposed remedy cheaper and safer than the expected harm?
-- **Skeptical self-review:** What evidence, mitigation, or assumption could make the finding wrong or less severe?
+- **Expert counterfactual and skeptical review:** Apply root §9 to every implemented choice under review: name why the best expert in that field would reject it, if they would, and report the concrete gap through the ordinary evidence and severity gates. State every trade-off the implementation takes. Finding no rejection reason is valid; inventing one is not.
 
 ## Select the audit mode
 

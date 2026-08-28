@@ -90,6 +90,34 @@ test("resolves the checked-in hyper-scale-chat benchmark independently from any 
   assert.equal(Object.hasOwn(source.benchmarkDefinition, "treatments"), false);
 });
 
+test("resolves the checked-in device telemetry benchmark as a vendor-neutral 54-row experiment", () => {
+  const source = resolveBenchmarkSource({
+    benchmarkName: "device-telemetry",
+    currentWorkingDirectory: REPOSITORY_ROOT
+  });
+
+  assert.equal(source.benchmarkId, "device-telemetry");
+  assert.equal(source.sourceType, "repo-source");
+  assert.equal(source.benchmarkDefinition.cases.length, 1);
+  assert.match(source.benchmarkDefinition.cases[0].task, /10 million simultaneously active devices/);
+  assert.equal(source.benchmarkDefinition.scoring.gates.length, 5);
+  assert.equal(
+    source.benchmarkDefinition.scoring.dimensions.reduce(
+      (total, dimension) => total + dimension.weight,
+      0
+    ),
+    100
+  );
+  assert.deepEqual(source.benchmarkDefinition.judging.panel, [
+    "codex:gpt-5.6-sol@ultra",
+    "claude:opus@max"
+  ]);
+  assert.equal(source.benchmarkDefinition.judging.synthesizer, "codex:gpt-5.6-sol@ultra");
+  assert.doesNotMatch(source.benchmarkDefinition.scoring.judgeInstructions, /must use (scylla|dynamodb|redis)/i);
+  assert.equal(Object.hasOwn(source.benchmarkDefinition, "conditions"), false);
+  assert.equal(Object.hasOwn(source.benchmarkDefinition, "treatments"), false);
+});
+
 test("judge changes alter scoring identity without invalidating generation identity", () => {
   const projectRootDirectory = createTemporaryDirectory();
   const firstDefinition = createValidBenchmark("judge-hash");

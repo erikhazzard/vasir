@@ -1,0 +1,158 @@
+{
+  "reportVersion": 1,
+  "reportId": "threejs-water-ripples-static-audit-2026-08-27",
+  "status": "COMPLETE",
+  "title": "Water Ripples code-review test",
+  "reportHtml": "index.html",
+  "fixture": {
+    "path": "../index.html",
+    "sha256": "c042d4811a5a3528836f2e231f8dccd92a10a7f47cc278e53f737b044e3d42fe",
+    "provenance": "/Users/erikhazzard/code/experiments/water-ripples/index.html"
+  },
+  "claimBoundary": {
+    "canEstablish": [
+      "Whether the skill helps an agent write a better code review of Three.js performance problems"
+    ],
+    "cannotEstablish": [
+      "Whether the demo runs faster after applying the proposed fixes",
+      "Any FPS, draw-call, frame-time, GPU-time, thermal, or device-level improvement"
+    ],
+    "runtimeStatus": "NOT_MEASURED"
+  },
+  "conditions": {
+    "sharedModel": "gpt-5.6-sol",
+    "sharedReasoningEffort": "xhigh",
+    "clean": {
+      "skillAccess": false,
+      "allowedInput": "fixture and shared prompt only"
+    },
+    "skill": {
+      "skillAccess": true,
+      "allowedInput": "fixture, shared prompt, SKILL.md, and references/render-topology-guard.md"
+    }
+  },
+  "execution": {
+    "date": "2026-08-27",
+    "cleanTask": "/root/water_ripples_clean",
+    "skillTask": "/root/water_ripples_skill",
+    "judgeTask": "/root/water_ripples_judge",
+    "candidateMapping": {
+      "A": "clean",
+      "B": "skill"
+    },
+    "judgeReceivedConditionLabels": false
+  },
+  "prompt": "Review this single-file Three.js water-ripples demo for performance issues. Return a concise, prioritized audit and recommended fixes. Do not modify the file.",
+  "rubric": {
+    "precommittedBeforeResponses": true,
+    "maximumScore": 20,
+    "items": [
+      {
+        "id": "R1",
+        "name": "Ripple submission and material cardinality",
+        "maxPoints": 4,
+        "fullCredit": "Prioritizes the two meshes and two cloned materials per ripple slot; explains that pooling removes allocation churn but not per-active-ripple submissions, with up to 400 ripple meshes/draw opportunities at MAX_RIPPLES=200; proposes a bounded batching or representation change without assuming visual equivalence."
+      },
+      {
+        "id": "R2",
+        "name": "Offscreen target and pixel cost",
+        "maxPoints": 3,
+        "fullCredit": "Identifies the window-sized ripple target multiplied by capped DPR, its unused default depth attachment, and the effectively continuous offscreen pass under the demo's ongoing spawns; proposes a render-scale/depth-buffer experiment rather than asserting measured savings."
+      },
+      {
+        "id": "R3",
+        "name": "Water fragment workload",
+        "maxPoints": 2,
+        "fullCredit": "Identifies the screen-covering MeshStandardMaterial path, DoubleSide, three base normal samples plus the ripple sample, and environment lighting as a plausible GPU cost that requires measurement."
+      },
+      {
+        "id": "R4",
+        "name": "Drop-pool GPU resource duplication",
+        "maxPoints": 2,
+        "fullCredit": "Finds that each of 50 pooled drops constructs its own SphereGeometry and MeshStandardMaterial; recommends shared resources or a visually equivalent instance path."
+      },
+      {
+        "id": "R5",
+        "name": "Render topology accuracy",
+        "maxPoints": 2,
+        "fullCredit": "Correctly maps one animation/frame owner, one conditional ripple-target scene submission, and one main scene submission; avoids inventing G-buffers or adding new frame-global passes while optimizing leaf work."
+      },
+      {
+        "id": "R6",
+        "name": "Calibration and falsifier quality",
+        "maxPoints": 4,
+        "fullCredit": "States that static code cannot establish the bottleneck; proposes a fixed deterministic workload, warmup, repeated CPU/GPU frame-time distributions, draw/submission and target-size counts, and at least one DPR/render-scale or active-ripple sweep."
+      },
+      {
+        "id": "R7",
+        "name": "Visual and behavioral preservation",
+        "maxPoints": 2,
+        "fullCredit": "Calls out the subtract/add blend ordering and screen-space ripple appearance as semantics to preserve, with before/after capture or visual-diff checks plus unchanged interaction behavior."
+      },
+      {
+        "id": "R8",
+        "name": "Prioritization and precision",
+        "maxPoints": 1,
+        "fullCredit": "Ranks concrete high-impact mechanisms ahead of generic advice and does not recommend pooling as though the fixture lacks it."
+      }
+    ],
+    "pairwiseRule": "The higher total wins only if the margin is at least 2 points and the winner has no material mechanism error or unsupported runtime claim; otherwise the pair is a tie."
+  },
+  "sourceFacts": {
+    "maxRipples": 200,
+    "meshesPerRippleSlot": 2,
+    "maximumRippleMeshes": 400,
+    "maxDrops": 50,
+    "normalTargetScale": "CSS width and height multiplied by min(devicePixelRatio, 1.5)",
+    "declaredFrameOwnerCount": 1,
+    "declaredSceneSubmissionsWhenRipplesActive": 2
+  },
+  "evidence": {
+    "cleanResponse": {
+      "path": "evidence/clean-response.md",
+      "sha256": "9f81c77962a87fa7b8f6711ff61317716c09de2803dc8a554d8d324608dfd660"
+    },
+    "skillResponse": {
+      "path": "evidence/skill-response.md",
+      "sha256": "a5e9ccd52d36866cd5f90c2ae121df8968fa8a925a917256ea2a68d3980ebdd9"
+    },
+    "blindJudgment": {
+      "path": "evidence/blind-judgment.md",
+      "sha256": "3a63b91cfa1dfc79365a4688b28afc9aa577cf325c643c3c4d866da873540242"
+    }
+  },
+  "result": {
+    "pairwiseOutcome": "SKILL_WIN",
+    "headline": "No FPS or draw-call test was run. The skill-assisted written review scored 17/20. The review without the skill scored 11/20.",
+    "cleanScore": 11,
+    "skillScore": 17,
+    "scoreMaximum": 20,
+    "skillLiftPoints": 6,
+    "itemScores": {
+      "R1": { "clean": 3, "skill": 4 },
+      "R2": { "clean": 2, "skill": 3 },
+      "R3": { "clean": 1, "skill": 1 },
+      "R4": { "clean": 2, "skill": 2 },
+      "R5": { "clean": 1, "skill": 2 },
+      "R6": { "clean": 0, "skill": 3 },
+      "R7": { "clean": 1, "skill": 1 },
+      "R8": { "clean": 1, "skill": 1 }
+    },
+    "demonstratedLift": [
+      "Counted both ripple draws and cloned materials",
+      "Counted the existing animation loop and two renders correctly",
+      "Specified a fixed-workload phone benchmark for testing the proposed fixes"
+    ],
+    "sharedStrengths": [
+      "Both responses found the high ripple draw count, full-resolution ripple target, water shader cost, duplicate drop resources, refresh-rate-coupled spawning, and blend-order risk"
+    ],
+    "remainingGap": "Neither response specified a complete screenshot comparison and input-preservation test.",
+    "runtimeStatus": "NOT_MEASURED",
+    "runtimeConclusion": "Runtime performance is unknown because neither agent changed or benchmarked the demo.",
+    "ratingEligibility": {
+      "eligible": false,
+      "status": "NO_COMPARABLE_RATING",
+      "reason": "One code-review comparison cannot produce a gaming performance rating."
+    }
+  }
+}

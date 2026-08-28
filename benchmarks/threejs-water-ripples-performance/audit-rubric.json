@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "scoreRange": {
+    "min": 0,
+    "max": 20
+  },
+  "scoring": "Each criterion receives 0, 1, or 2 points. Give 2 only when the response identifies the concrete source behavior and gives a technically compatible action or measurement. Give 1 for a relevant but incomplete finding. Give 0 when absent, wrong, or unsupported.",
+  "criteria": [
+    {
+      "id": "ripple-draw-cardinality",
+      "title": "Ripple draw cardinality",
+      "weight": 2,
+      "fullCredit": "Explains that the pool can expose 200 ripple slots with two meshes each, so pooling bounds allocation but can still approach 400 ripple draws."
+    },
+    {
+      "id": "ripple-material-batching",
+      "title": "Ripple batching constraints",
+      "weight": 2,
+      "fullCredit": "Connects cloned per-mesh materials and per-ripple opacity to lost batching, then proposes a compatible shared, instanced, or shader-owned representation without adding a scene pass per ripple or type."
+    },
+    {
+      "id": "drop-resource-sharing",
+      "title": "Drop resource sharing",
+      "weight": 2,
+      "fullCredit": "Finds that 50 drops each allocate their own sphere geometry and material, and recommends sharing or instancing them while preserving logical drops."
+    },
+    {
+      "id": "ripple-target-cost",
+      "title": "Ripple target cost",
+      "weight": 2,
+      "fullCredit": "Finds the full drawing-buffer-sized ripple target, names its pixel or bandwidth cost, notices unnecessary depth when applicable, and treats lower resolution as a measured visual tradeoff rather than a free win."
+    },
+    {
+      "id": "water-fragment-cost",
+      "title": "Water fragment cost",
+      "weight": 2,
+      "fullCredit": "Identifies the screen-filling water shader and its three normal-map samples plus ripple sample as a plausible GPU or fill-rate cost that requires GPU or render-scale evidence."
+    },
+    {
+      "id": "instrumentation-overhead",
+      "title": "Instrumentation overhead",
+      "weight": 2,
+      "fullCredit": "Calls out StatsGL or GPU tracking in the production frame loop as observer work that should be disabled or measured separately during controlled benchmarks."
+    },
+    {
+      "id": "time-and-spawn-semantics",
+      "title": "Time and spawn semantics",
+      "weight": 2,
+      "fullCredit": "Finds frame-count-based spawning, initial delta-time risk, or nondeterministic random drops and explains why a fixed seed and fixed workload are needed for comparison."
+    },
+    {
+      "id": "topology-preservation",
+      "title": "Render topology preservation",
+      "weight": 2,
+      "fullCredit": "Correctly inventories one frame owner, at most one ripple-target scene submission, and one main terminal submission, then explicitly rejects new per-ripple or per-type passes, targets, renderers, or canvas outputs."
+    },
+    {
+      "id": "measurement-contract",
+      "title": "Measurement contract",
+      "weight": 2,
+      "fullCredit": "Requires repeated same-workload CPU and GPU timing, frame-time percentiles, draw counts, fixed resolution and quality, warmup, and a noise or no-signal rule. FPS alone does not receive full credit."
+    },
+    {
+      "id": "evidence-calibration",
+      "title": "Evidence calibration",
+      "weight": 2,
+      "fullCredit": "Separates source-proven work counts from unmeasured bottleneck claims, prioritizes hypotheses, and requires visual and behavioral equivalence before accepting a speedup."
+    }
+  ],
+  "failureRules": [
+    "Do not reward generic advice that is not tied to this file.",
+    "Do not reward a lower-quality rendering as a performance fix.",
+    "Do not reward any proposal that multiplies whole-scene passes, render targets, frame owners, or terminal outputs by ripple, material, batch, or type.",
+    "Do not infer implementation success from audit prose."
+  ]
+}

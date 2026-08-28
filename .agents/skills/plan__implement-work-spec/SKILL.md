@@ -28,6 +28,7 @@ If these are clear, build. Do not manufacture another gate.
 ## Execution law
 
 - **Build the slice, not the checklist.** Keep the actor, entrypoint, promised outcome, quality bar, and obvious next action in view. Backend, schema, tests, polish, and feasibility investigation are work inside the slice.
+- **Expert judgment before commitment.** Apply root §9's expert counterfactual before committing an implementation choice; follow root §3 for any human-owned fork and disclose every trade-off the choice takes.
 - **The map follows the territory.** Adapt files, symbols, internal architecture, technical schema details that preserve the external promise, sequencing, estimates, proof mechanics, and equivalent rung decomposition as evidence arrives. Do not seek reapproval or contort code to stale prose.
 - **Product forks stop; engineering discoveries do not.** Stop only when the new shape would materially change the user/consumer promise, violate an existing external contract, cross an externally owned authority or safety/data-integrity boundary, require an irreversible operation, or reverse an explicit human decision.
 - **Implementation is the default motion.** Continue through coherent in-boundary work rather than interrupting after every action for spec maintenance.
@@ -63,4 +64,4 @@ Return only:
 - the observable user/system result;
 - the exact fresh check or inspection and actual result;
 - any material thing not run or still unproven;
-- the next additive rung, real blocker, load-bearing product decision, or `vFinal` completion.
+- the next additive rung, real blocker, load-bearing product decision or trade-off taken, or `vFinal` completion.

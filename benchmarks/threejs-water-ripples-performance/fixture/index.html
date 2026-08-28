@@ -1,0 +1,804 @@
+<!-- https://discourse.threejs.org/t/screen-space-water-ripples-with-world-space-player-movement-in-three-js/87814 -->
+<!-- Builds on Mirko Kunze's CheapWater (MIT) -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cheap Interactive Water Demo with Pooling</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #container {
+        width: 100dvw;
+        height: 100dvh;
+      }
+      #controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        font-family: monospace;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 5px;
+      }
+      #performanceStats {
+        display: none;
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        bottom: 70px;
+        right: 10px;
+        gap: 10px;
+      }
+      #performanceStats.gl {
+        bottom: 120px !important;
+        right: 280px !important;
+      }
+      #performanceStats div {
+        visibility: visible !important;
+        position: relative !important;
+        top: unset !important;
+        left: unset !important;
+        cursor: pointer !important;
+        opacity: 0.9 !important;
+        z-index: 10000 !important;
+      }
+    </style>
+    <script
+      async
+      src="https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.js"
+    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+          "stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/+esm"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="controls">
+      <strong>Move:</strong> WASD / ↑↓←→<br />
+      <strong>Rotate:</strong> Mouse drag<br />
+      <strong>Zoom:</strong> Scroll<br />
+      <strong>Pan:</strong> Right-click drag / Ctrl + drag
+    </div>
+    <div id="performanceStats"></div>
+    <script type="module">
+      import * as THREE from "three";
+      import StatsGL from "stats-gl";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      const benchmarkMode =
+        new URLSearchParams(window.location.search).get("benchmark") === "1";
+      const FIXED_DELTA_SECONDS = 1 / 60;
+      const DEFAULT_BENCHMARK_SEED = 0x5eed1234;
+      const textureStatus = {
+        ripple: "loading",
+        waterNormal: "loading",
+      };
+      const textureErrors = {};
+      const texturePromises = [];
+      let externalTexturesReady = false;
+
+      function loadTrackedTexture(loader, url, key, onLoad) {
+        if (!benchmarkMode) return loader.load(url, onLoad);
+        let resolveTexture;
+        let rejectTexture;
+        const promise = new Promise((resolve, reject) => {
+          resolveTexture = resolve;
+          rejectTexture = reject;
+        });
+        const loadedTexture = loader.load(
+          url,
+          (loaded) => {
+            if (onLoad) onLoad(loaded);
+            textureStatus[key] = "ready";
+            resolveTexture(loaded);
+          },
+          undefined,
+          (error) => {
+            textureStatus[key] = "error";
+            textureErrors[key] = String(error?.message || error || "load failed");
+            rejectTexture(error);
+          }
+        );
+        texturePromises.push(promise);
+        return loadedTexture;
+      }
+
+      let renderer = new THREE.WebGLRenderer({
+        alpha: false,
+        antialias: true,
+        precision: "highp",
+        powerPreference: "high-performance",
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.physicallyCorrectLights = true;
+      renderer.toneMappingExposure = 1.0;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      if (benchmarkMode) renderer.info.autoReset = false;
+      document.getElementById("container").appendChild(renderer.domElement);
+
+      // --- Stats ---
+      let stats = null;
+      if (!benchmarkMode) {
+        stats = new StatsGL({
+          trackGPU: true,
+          trackHz: true,
+        });
+        const statsContainer = document.getElementById("performanceStats");
+        statsContainer.classList.add("gl");
+        statsContainer.appendChild(stats.dom);
+        stats.init(renderer);
+      }
+
+      // --- Cameras ---
+      let camera = new THREE.PerspectiveCamera(60, 1.0, 0.1, 1000);
+      camera.position.set(15, 0, 15);
+      camera.up.set(0, 0, 1);
+
+      // --- Controls ---
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 1;
+      controls.maxDistance = 900;
+      controls.maxPolarAngle = Math.PI / 2;
+      controls.enableKeys = false;
+
+      // --- Normal scene for ripple map ---
+      let normalScene = new THREE.Scene();
+      let gray50 = new THREE.Color(0.5, 0.5, 0.5);
+      normalScene.background = gray50;
+
+      let squareGeometry = new THREE.PlaneGeometry(10, 10);
+      let minusMaterial = new THREE.MeshBasicMaterial({
+        color: gray50,
+        blending: THREE.CustomBlending,
+        blendEquation: THREE.ReverseSubtractEquation,
+        blendSrc: THREE.SrcAlphaFactor,
+        blendDst: THREE.OneFactor,
+        blendEquationAlpha: THREE.AddEquation,
+        depthTest: false,
+        depthWrite: false,
+        transparent: true,
+        side: THREE.DoubleSide,
+      });
+      let textureLoader = new THREE.TextureLoader();
+      let texture = loadTrackedTexture(
+        textureLoader,
+        "https://raw.githubusercontent.com/mqnc/cheapwater/master/ripple.png",
+        "ripple"
+      );
+      let plusMaterial = new THREE.MeshBasicMaterial({
+        map: texture,
+        blending: THREE.CustomBlending,
+        blendEquation: THREE.AddEquation,
+        blendSrc: THREE.SrcAlphaFactor,
+        blendDst: THREE.OneFactor,
+        depthTest: false,
+        depthWrite: false,
+        transparent: true,
+        side: THREE.DoubleSide,
+      });
+
+      // --- Ripple Object Pool ---
+      const MAX_RIPPLES = 200;
+      let ripplePool = [];
+      let activeRipples = []; // will store indices
+      let freeRippleIndices = [];
+
+      for (let i = 0; i < MAX_RIPPLES; i++) {
+        const minus = new THREE.Mesh(squareGeometry, minusMaterial.clone());
+        const plus = new THREE.Mesh(squareGeometry, plusMaterial.clone());
+        minus.renderOrder = plus.renderOrder = i * 2;
+        minus.scale.set(0.1, 0.1, 1);
+        plus.scale.set(0.1, 0.1, 1);
+        minus.visible = plus.visible = false;
+        minus.frustumCulled = false;
+        plus.frustumCulled = false;
+        normalScene.add(minus);
+        normalScene.add(plus);
+        ripplePool.push({ minus, plus, active: false, index: i });
+        freeRippleIndices.push(i);
+      }
+
+      function makeRipple(x, y, strength) {
+        if (freeRippleIndices.length === 0) return;
+        const idx = freeRippleIndices.pop();
+        const slot = ripplePool[idx];
+        slot.active = true;
+        slot.minus.position.set(x, y, 0);
+        slot.plus.position.set(x, y, 0);
+        slot.minus.material.opacity = strength;
+        slot.plus.material.opacity = strength;
+        slot.minus.scale.set(0.1, 0.1, 1);
+        slot.plus.scale.set(0.1, 0.1, 1);
+        slot.minus.visible = true;
+        slot.plus.visible = true;
+        activeRipples.push(idx);
+      }
+
+      function updateRipples(dt) {
+        let count = activeRipples.length;
+        for (let i = 0; i < count; ) {
+          const idx = activeRipples[i];
+          const r = ripplePool[idx];
+          r.minus.scale.x += dt;
+          r.minus.scale.y += dt;
+          r.plus.scale.x += dt;
+          r.plus.scale.y += dt;
+          r.minus.material.opacity -= dt / 6;
+          r.plus.material.opacity -= dt / 6;
+          if (r.minus.material.opacity <= 0) {
+            r.active = false;
+            r.minus.visible = false;
+            r.plus.visible = false;
+            freeRippleIndices.push(idx);
+            // move last into current slot
+            activeRipples[i] = activeRipples[--count];
+          } else {
+            i++;
+          }
+        }
+        activeRipples.length = count;
+      }
+
+      // --- Normal target ---
+      let normalTarget = new THREE.WebGLRenderTarget(
+        window.innerWidth,
+        window.innerHeight,
+        {
+          type: THREE.UnsignedByteType,
+          format: THREE.RGBAFormat,
+        }
+      );
+      normalTarget.texture.colorSpace = THREE.NoColorSpace;
+      normalTarget.texture.minFilter = THREE.LinearFilter;
+      normalTarget.texture.magFilter = THREE.LinearFilter;
+      let normalTextureUniform = { value: normalTarget.texture };
+
+      // --- Color scene ---
+      let colorScene = new THREE.Scene();
+      THREE.ColorManagement.enabled = true;
+      colorScene.background = new THREE.Color(0x87ceeb);
+
+      // --- Simple environment ---
+      const pmremGenerator = new THREE.PMREMGenerator(renderer);
+      const tempScene = new THREE.Scene();
+      tempScene.background = new THREE.Color(0xcccccc);
+      const envRT = pmremGenerator.fromScene(tempScene);
+      colorScene.environment = envRT.texture;
+      pmremGenerator.dispose();
+
+      // --- Water ---
+      const WATER_SIZE = 5000;
+      let waterGeometry = new THREE.PlaneGeometry(WATER_SIZE, WATER_SIZE);
+      const waterNormalLoader = new THREE.TextureLoader();
+      let waterMaterial = new THREE.MeshStandardMaterial({
+        color: 0x5a75a0,
+        metalness: 1,
+        roughness: 0.27,
+        normalMap: loadTrackedTexture(
+          waterNormalLoader,
+          "https://raw.githubusercontent.com/mqnc/cheapwater/master/water_normal.png",
+          "waterNormal",
+          (loaded) => (loaded.flipY = false)
+        ),
+        normalMapType: THREE.ObjectSpaceNormalMap,
+        side: THREE.DoubleSide,
+      });
+      waterMaterial.normalMap.wrapS = THREE.RepeatWrapping;
+      waterMaterial.normalMap.wrapT = THREE.RepeatWrapping;
+      const repeatVal = WATER_SIZE / 10;
+      waterMaterial.normalMap.repeat.set(repeatVal, repeatVal);
+
+      let timeUniform = { value: 0 };
+      let resolutionUniform = {
+        value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      };
+
+      waterMaterial.onBeforeCompile = (shader) => {
+        // Same three base directions (radians)
+        const angles = [0.1, 0.1 + 2.0943951, 0.1 + 4.1887902];
+
+        // Precompute rotation matrices (3 × 2×2 matrices = 3 vec4)
+        const rotMats = new Float32Array(3 * 4);
+        for (let i = 0; i < 3; i++) {
+          const a = angles[i];
+          const c = Math.cos(a);
+          const s = Math.sin(a);
+          rotMats[i * 4 + 0] = c; // m00
+          rotMats[i * 4 + 1] = -s; // m01
+          rotMats[i * 4 + 2] = s; // m10
+          rotMats[i * 4 + 3] = c; // m11
+        }
+
+        // Upload uniforms
+        shader.uniforms.time = timeUniform;
+        shader.uniforms.resolution = resolutionUniform;
+        shader.uniforms.normalDisturbance = normalTextureUniform;
+        shader.uniforms.rotMats = { value: rotMats };
+        shader.uniforms.angleOffsets = { value: new Float32Array(angles) };
+
+        // GLSL injection
+        const chunk = `
+    // Combine 3 pre-rotated normal maps (identical math, faster)
+    for (int i = 0; i < 3; i++) {
+      mat2 r = mat2(
+        rotMats[i].x, rotMats[i].y,
+        rotMats[i].z, rotMats[i].w
+      );
+      vec2 uv = r * vNormalMapUv + vec2(time * 0.03, angleOffsets[i]);
+      vec3 subNormal = texture2D(normalMap, uv).rgb * 2.0 - 1.0;
+      subNormal.xy = r * subNormal.xy;
+      normal += subNormal;
+    }
+  `;
+
+        shader.fragmentShader =
+          "uniform float time;\n" +
+          "uniform vec2 resolution;\n" +
+          "uniform sampler2D normalDisturbance;\n" +
+          "uniform vec4 rotMats[3];\n" +
+          "uniform float angleOffsets[3];\n" +
+          shader.fragmentShader.replace(
+            "\t#include <normal_fragment_maps>",
+            chunk +
+              `
+      vec3 ripple = texture2D(normalDisturbance, gl_FragCoord.xy / resolution).rgb * 2.0 - 1.0;
+      normal += 3.0 * ripple;
+      #ifdef FLIP_SIDED
+        normal = -normal;
+      #endif
+      #ifdef DOUBLE_SIDED
+        normal = normal * faceDirection;
+      #endif
+      normal = normalize(normalMatrix * normal);
+      `
+          );
+      };
+
+      let waterPlane = new THREE.Mesh(waterGeometry, waterMaterial);
+      colorScene.add(waterPlane);
+
+      // --- Player ---
+      const player = new THREE.Mesh(
+        new THREE.SphereGeometry(0.15, 16, 16),
+        new THREE.MeshStandardMaterial({
+          color: 0xff3333,
+          roughness: 0,
+          metalness: 1,
+        })
+      );
+      player.position.set(0, 0, 0.1);
+      colorScene.add(player);
+
+      // --- WASD ---
+      const keys = {};
+      window.addEventListener("keydown", (e) => (keys[e.code] = true));
+      window.addEventListener("keyup", (e) => (keys[e.code] = false));
+
+      const moveVec = new THREE.Vector3();
+      const forwardVec = new THREE.Vector3();
+      const rightVec = new THREE.Vector3();
+      const worldUp = new THREE.Vector3(0, 0, 1);
+
+      function updatePlayer(dt) {
+        const speed = 6;
+        moveVec.set(0, 0, 0);
+        forwardVec.set(0, 0, 0);
+        rightVec.set(0, 0, 0);
+
+        camera.getWorldDirection(forwardVec);
+        forwardVec.z = 0;
+        forwardVec.normalize();
+        rightVec.crossVectors(forwardVec, worldUp).normalize();
+
+        if (keys["KeyW"] || keys["ArrowUp"]) moveVec.add(forwardVec);
+        if (keys["KeyS"] || keys["ArrowDown"]) moveVec.sub(forwardVec);
+        if (keys["KeyD"] || keys["ArrowRight"]) moveVec.add(rightVec);
+        if (keys["KeyA"] || keys["ArrowLeft"]) moveVec.sub(rightVec);
+
+        if (moveVec.lengthSq() > 0) {
+          moveVec.normalize().multiplyScalar(speed * dt);
+          player.position.add(moveVec);
+          const dx = player.position.x - (player.userData.lastRippleX || 0);
+          const dy = player.position.y - (player.userData.lastRippleY || 0);
+          if (Math.hypot(dx, dy) > 0.8) {
+            makeRipple(player.position.x, player.position.y, 0.6);
+            player.userData.lastRippleX = player.position.x;
+            player.userData.lastRippleY = player.position.y;
+          }
+        }
+      }
+
+      // --- Drop Pool ---
+      const MAX_DROPS = 50;
+      let dropPool = [];
+      let activeDrops = []; // will store indices
+      let freeDropIndices = [];
+
+      for (let i = 0; i < MAX_DROPS; i++) {
+        const drop = new THREE.Mesh(
+          new THREE.SphereGeometry(0.1, 16, 16),
+          new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1 })
+        );
+        drop.visible = false;
+        drop.userData.vz = 0;
+        colorScene.add(drop);
+        dropPool.push(drop);
+        freeDropIndices.push(i);
+      }
+
+      function makeDrop(x, y, z) {
+        if (freeDropIndices.length === 0) return;
+        const idx = freeDropIndices.pop();
+        const drop = dropPool[idx];
+        drop.visible = true;
+        drop.position.set(x, y, z);
+        drop.userData.vz = 0;
+        activeDrops.push(idx);
+      }
+
+      function updateDrops(dt) {
+        let count = activeDrops.length;
+        for (let i = 0; i < count; ) {
+          const idx = activeDrops[i];
+          const drop = dropPool[idx];
+          drop.position.z += drop.userData.vz * dt;
+          drop.userData.vz -= 9.81 * dt;
+          if (drop.position.z < 0) {
+            drop.visible = false;
+            makeRipple(drop.position.x, drop.position.y, 0.5);
+            freeDropIndices.push(idx);
+            activeDrops[i] = activeDrops[--count];
+          } else {
+            i++;
+          }
+        }
+        activeDrops.length = count;
+      }
+
+      // --- Resize ---
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio, 1.5);
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(window.innerWidth, window.innerHeight, true);
+        normalTarget.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
+        resolutionUniform.value.set(
+          window.innerWidth * dpr,
+          window.innerHeight * dpr
+        );
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // --- Animate and benchmark stepping ---
+      let lastTime = 0;
+      let ball = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 16, 16),
+        new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1 })
+      );
+      colorScene.add(ball);
+      let i = 0;
+      let hasRipples = false;
+      let benchmarkFrame = 0;
+      let benchmarkTime = 0;
+      let benchmarkSeed = DEFAULT_BENCHMARK_SEED;
+      let benchmarkRandomState = DEFAULT_BENCHMARK_SEED;
+      let scenarioName = "ordinary";
+      let lastRender = {
+        sceneSubmissions: 0,
+        normalSceneSubmissions: 0,
+        colorSceneSubmissions: 0,
+        offscreenTargetWrites: 0,
+        terminalTargetWrites: 0,
+        drawCalls: 0,
+        triangles: 0,
+        points: 0,
+        lines: 0,
+      };
+
+      function normalizeSeed(seed) {
+        const numericSeed = Number(seed);
+        return Number.isFinite(numericSeed)
+          ? numericSeed >>> 0
+          : DEFAULT_BENCHMARK_SEED;
+      }
+
+      function resetBenchmarkRandom(seed) {
+        benchmarkSeed = normalizeSeed(seed);
+        benchmarkRandomState = benchmarkSeed;
+      }
+
+      function seededRandom() {
+        benchmarkRandomState =
+          (benchmarkRandomState + 0x6d2b79f5) >>> 0;
+        let value = benchmarkRandomState;
+        value = Math.imul(value ^ (value >>> 15), value | 1);
+        value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+        return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+      }
+
+      function scenarioRandom() {
+        return benchmarkMode ? seededRandom() : Math.random();
+      }
+
+      function advanceSimulation(t, dt) {
+        timeUniform.value = t;
+
+        // Demo ball
+        const x = Math.sin(Math.sqrt(5) * t) * 5;
+        const y = Math.cos(t) * 5;
+        const vx = Math.sqrt(5) * Math.cos(Math.sqrt(5) * t) * 5;
+        const vy = Math.sin(t) * 5;
+        ball.position.set(x, y, 0);
+        if (i++ % 3 === 0)
+          makeRipple(x, y, Math.sqrt(vx ** 2 + vy ** 2) / 30);
+        if (i % 10 === 1)
+          makeDrop(
+            scenarioRandom() * 30 - 15,
+            scenarioRandom() * 30 - 15,
+            20
+          );
+
+        // Player
+        updatePlayer(dt);
+        controls.target.lerp(player.position, 0.05);
+        controls.update();
+
+        // Update ripples & drops
+        updateRipples(dt);
+        updateDrops(dt);
+      }
+
+      function renderFrame() {
+        if (benchmarkMode) renderer.info.reset();
+
+        // --- Conditional ripple rendering (with 1-frame post-ripple flush) ---
+        const hadRipples = hasRipples;
+        hasRipples = activeRipples.length > 0;
+        let normalSceneSubmissions = 0;
+        if (hasRipples || hadRipples) {
+          renderer.setRenderTarget(normalTarget);
+          renderer.render(normalScene, camera);
+          renderer.setRenderTarget(null);
+          normalSceneSubmissions = 1;
+        }
+        // --- Main scene ---
+        renderer.render(colorScene, camera);
+
+        if (benchmarkMode) {
+          lastRender.sceneSubmissions = normalSceneSubmissions + 1;
+          lastRender.normalSceneSubmissions = normalSceneSubmissions;
+          lastRender.colorSceneSubmissions = 1;
+          lastRender.offscreenTargetWrites = normalSceneSubmissions;
+          lastRender.terminalTargetWrites = 1;
+          lastRender.drawCalls = renderer.info.render.calls;
+          lastRender.triangles = renderer.info.render.triangles;
+          lastRender.points = renderer.info.render.points;
+          lastRender.lines = renderer.info.render.lines;
+        }
+
+        if (stats) stats.update();
+        return benchmarkMode ? lastRender : undefined;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = performance.now() / 1000;
+        let dt = t - lastTime;
+        lastTime = t;
+        advanceSimulation(t, dt);
+        renderFrame();
+      }
+
+      function clearScenarioState() {
+        activeRipples.length = 0;
+        freeRippleIndices.length = 0;
+        for (let index = 0; index < ripplePool.length; index++) {
+          const ripple = ripplePool[index];
+          ripple.active = false;
+          ripple.minus.visible = false;
+          ripple.plus.visible = false;
+          ripple.minus.position.set(0, 0, 0);
+          ripple.plus.position.set(0, 0, 0);
+          ripple.minus.scale.set(0.1, 0.1, 1);
+          ripple.plus.scale.set(0.1, 0.1, 1);
+          ripple.minus.material.opacity = 1;
+          ripple.plus.material.opacity = 1;
+          freeRippleIndices.push(index);
+        }
+
+        activeDrops.length = 0;
+        freeDropIndices.length = 0;
+        for (let index = 0; index < dropPool.length; index++) {
+          const drop = dropPool[index];
+          drop.visible = false;
+          drop.position.set(0, 0, 0);
+          drop.userData.vz = 0;
+          freeDropIndices.push(index);
+        }
+
+        for (const key of Object.keys(keys)) delete keys[key];
+        player.position.set(0, 0, 0.1);
+        delete player.userData.lastRippleX;
+        delete player.userData.lastRippleY;
+        ball.position.set(0, 0, 0);
+        camera.position.set(15, 0, 15);
+        controls.target.set(0, 0, 0);
+        controls.update();
+        timeUniform.value = 0;
+        lastTime = 0;
+        i = 0;
+        benchmarkFrame = 0;
+        benchmarkTime = 0;
+        // Force one normal-target refresh on the next render after reset.
+        hasRipples = true;
+        for (const key of Object.keys(lastRender)) lastRender[key] = 0;
+      }
+
+      function prepareStressState() {
+        for (let index = 0; index < MAX_RIPPLES; index++) {
+          const angle = (index / MAX_RIPPLES) * Math.PI * 12;
+          const radius = 0.75 + (index / (MAX_RIPPLES - 1)) * 13;
+          makeRipple(
+            Math.cos(angle) * radius,
+            Math.sin(angle) * radius,
+            0.55 + scenarioRandom() * 0.4
+          );
+          const ripple = ripplePool[activeRipples[activeRipples.length - 1]];
+          const scale = 0.25 + scenarioRandom() * 1.75;
+          ripple.minus.scale.set(scale, scale, 1);
+          ripple.plus.scale.set(scale, scale, 1);
+        }
+        for (let index = 0; index < MAX_DROPS; index++) {
+          makeDrop(
+            scenarioRandom() * 30 - 15,
+            scenarioRandom() * 30 - 15,
+            3 + scenarioRandom() * 17
+          );
+          dropPool[activeDrops[activeDrops.length - 1]].userData.vz =
+            -scenarioRandom() * 2;
+        }
+        hasRipples = true;
+      }
+
+      function resetScenario(options = {}) {
+        const normalizedOptions =
+          typeof options === "number" ? { seed: options } : options;
+        const requestedScenario = normalizedOptions.scenario || "ordinary";
+        if (requestedScenario !== "ordinary" && requestedScenario !== "stress") {
+          throw new Error(
+            `Unknown benchmark scenario "${requestedScenario}"; expected ordinary or stress.`
+          );
+        }
+        clearScenarioState();
+        scenarioName = requestedScenario;
+        resetBenchmarkRandom(normalizedOptions.seed);
+        if (scenarioName === "stress") prepareStressState();
+        return snapshot();
+      }
+
+      function stepFrame(count = 1) {
+        const frameCount = Number(count);
+        if (!Number.isInteger(frameCount) || frameCount < 1 || frameCount > 10000) {
+          throw new Error("stepFrame(count) requires an integer from 1 through 10000.");
+        }
+        for (let frame = 0; frame < frameCount; frame++) {
+          benchmarkTime += FIXED_DELTA_SECONDS;
+          benchmarkFrame += 1;
+          advanceSimulation(benchmarkTime, FIXED_DELTA_SECONDS);
+        }
+        return snapshot();
+      }
+
+      function snapshot() {
+        const drawingBufferSize = renderer.getDrawingBufferSize(
+          new THREE.Vector2()
+        );
+        return {
+          apiVersion: 1,
+          benchmarkMode,
+          scenario: scenarioName,
+          seed: benchmarkSeed,
+          randomState: benchmarkRandomState,
+          fixedDeltaSeconds: FIXED_DELTA_SECONDS,
+          frame: benchmarkFrame,
+          timeSeconds: benchmarkTime,
+          externalTextures: {
+            ready: externalTexturesReady,
+            status: { ...textureStatus },
+            errors: { ...textureErrors },
+          },
+          logicalCounts: {
+            activeRipples: activeRipples.length,
+            visibleRippleMeshes: activeRipples.length * 2,
+            freeRipples: freeRippleIndices.length,
+            maxRipples: MAX_RIPPLES,
+            activeDrops: activeDrops.length,
+            visibleDrops: activeDrops.length,
+            freeDrops: freeDropIndices.length,
+            maxDrops: MAX_DROPS,
+          },
+          state: {
+            ball: ball.position.toArray(),
+            player: player.position.toArray(),
+            camera: camera.position.toArray(),
+            controlsTarget: controls.target.toArray(),
+          },
+          renderSurface: {
+            cssWidth: renderer.domElement.clientWidth,
+            cssHeight: renderer.domElement.clientHeight,
+            drawingBufferWidth: drawingBufferSize.x,
+            drawingBufferHeight: drawingBufferSize.y,
+            pixelRatio: renderer.getPixelRatio(),
+            normalTargetWidth: normalTarget.width,
+            normalTargetHeight: normalTarget.height,
+          },
+          topology: {
+            frameOwners: 1,
+            offscreenTargets: 1,
+            ...lastRender,
+          },
+          rendererInfo: {
+            calls: renderer.info.render.calls,
+            triangles: renderer.info.render.triangles,
+            points: renderer.info.render.points,
+            lines: renderer.info.render.lines,
+            geometries: renderer.info.memory.geometries,
+            textures: renderer.info.memory.textures,
+            programs: renderer.info.programs?.length ?? null,
+          },
+        };
+      }
+
+      if (benchmarkMode) {
+        const benchmarkApi = {
+          version: 1,
+          fixedDeltaSeconds: FIXED_DELTA_SECONDS,
+          renderer,
+          gl: renderer.getContext(),
+          ready: null,
+          reset: resetScenario,
+          resetScenario,
+          prepareOrdinary(seed = DEFAULT_BENCHMARK_SEED) {
+            return resetScenario({ scenario: "ordinary", seed });
+          },
+          prepareStress(seed = DEFAULT_BENCHMARK_SEED) {
+            return resetScenario({ scenario: "stress", seed });
+          },
+          stepFrame,
+          renderFrame,
+          snapshot,
+        };
+        benchmarkApi.ready = Promise.all(texturePromises).then(() => {
+          externalTexturesReady = true;
+          return benchmarkApi.snapshot();
+        });
+        window.__waterRipplesBenchmark = benchmarkApi;
+      } else {
+        animate();
+      }
+
+      ["touchstart", "touchend"].forEach((ev) =>
+        renderer.domElement.addEventListener(
+          ev,
+          (event) => event.preventDefault(),
+          { passive: false }
+        )
+      ); // kill iOS double-tap zoom on canvas
+    </script>
+  </body>
+</html>

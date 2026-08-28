@@ -1,0 +1,156 @@
+{
+  "kind": "threejs-observatory-visual-oracle-pending",
+  "approval": "pending-human-review",
+  "captureTick": 240,
+  "source": {
+    "file": "index.html",
+    "sha256": "c406d5a7af3de4b1d5be5bd077bc861194cdc59207d55744c2b9b13ad5ff7a6f"
+  },
+  "browser": {
+    "product": "Chrome/151.0.7922.175",
+    "protocolVersion": "1.3",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+    "jsVersion": "15.1.206.23",
+    "webkitVersion": "537.36 (@02fcc75bd274240484d344e0ef73fd82953276bc)"
+  },
+  "profiles": [
+    {
+      "id": "portrait",
+      "file": "portrait-tick-0240.png",
+      "requested": {
+        "id": "portrait",
+        "width": 900,
+        "height": 1600,
+        "dpr": 1
+      },
+      "png": {
+        "sha256": "0426eced486ae20ddc3d50c7119dbab0731c2eea15ef6b90c405987e640d081d",
+        "bytes": 852803,
+        "width": 900,
+        "height": 1600,
+        "repeatSha256": "0426eced486ae20ddc3d50c7119dbab0731c2eea15ef6b90c405987e640d081d",
+        "byteIdenticalFreshTargetRepeat": true
+      },
+      "observation": {
+        "ready": "true",
+        "captureTick": "240",
+        "innerWidth": 900,
+        "innerHeight": 1600,
+        "devicePixelRatio": 1,
+        "canvasCount": 1,
+        "displayedCanvasCount": 1,
+        "canvasRect": {
+          "x": 0,
+          "y": 0,
+          "width": 900,
+          "height": 1600
+        },
+        "canvasBuffer": {
+          "width": 900,
+          "height": 1600
+        },
+        "datasets": {
+          "engine": "three.js r180",
+          "worldScale": "0.67",
+          "worldBuffer": "603x1072",
+          "outputBuffer": "900x1600",
+          "captureTick": "240"
+        },
+        "workload": {
+          "seed": 424242,
+          "totalMarkers": 1200,
+          "markersPerFamily": 240,
+          "familyCount": 5,
+          "rippleCount": 64,
+          "fixedHz": 60,
+          "worldRenderScale": 0.67,
+          "markerMeshCount": 5,
+          "outlinePassCount": 5
+        },
+        "renderer": {
+          "threeRevision": "180",
+          "webglVersion": 2,
+          "vendor": "WebKit",
+          "renderer": "WebKit WebGL",
+          "unmaskedVendor": "Google Inc. (Apple)",
+          "unmaskedRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        }
+      },
+      "diagnostics": {
+        "runtimeExceptions": [],
+        "consoleMessages": [],
+        "logEntries": []
+      }
+    },
+    {
+      "id": "landscape",
+      "file": "landscape-tick-0240.png",
+      "requested": {
+        "id": "landscape",
+        "width": 1600,
+        "height": 900,
+        "dpr": 1
+      },
+      "png": {
+        "sha256": "d29b968f754c4a0cdaa255edcbccadabf32580425901e679fd9e27d9c9994b69",
+        "bytes": 1029885,
+        "width": 1600,
+        "height": 900,
+        "repeatSha256": "d29b968f754c4a0cdaa255edcbccadabf32580425901e679fd9e27d9c9994b69",
+        "byteIdenticalFreshTargetRepeat": true
+      },
+      "observation": {
+        "ready": "true",
+        "captureTick": "240",
+        "innerWidth": 1600,
+        "innerHeight": 900,
+        "devicePixelRatio": 1,
+        "canvasCount": 1,
+        "displayedCanvasCount": 1,
+        "canvasRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1600,
+          "height": 900
+        },
+        "canvasBuffer": {
+          "width": 1600,
+          "height": 900
+        },
+        "datasets": {
+          "engine": "three.js r180",
+          "worldScale": "0.67",
+          "worldBuffer": "1072x603",
+          "outputBuffer": "1600x900",
+          "captureTick": "240"
+        },
+        "workload": {
+          "seed": 424242,
+          "totalMarkers": 1200,
+          "markersPerFamily": 240,
+          "familyCount": 5,
+          "rippleCount": 64,
+          "fixedHz": 60,
+          "worldRenderScale": 0.67,
+          "markerMeshCount": 5,
+          "outlinePassCount": 5
+        },
+        "renderer": {
+          "threeRevision": "180",
+          "webglVersion": 2,
+          "vendor": "WebKit",
+          "renderer": "WebKit WebGL",
+          "unmaskedVendor": "Google Inc. (Apple)",
+          "unmaskedRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        }
+      },
+      "diagnostics": {
+        "runtimeExceptions": [],
+        "consoleMessages": [],
+        "logEntries": []
+      }
+    }
+  ],
+  "objectiveVerdict": "green",
+  "objectiveClaimBoundary": "Deterministic local Chrome canvas artifact health only; visual acceptance remains human and performance is not measured."
+}

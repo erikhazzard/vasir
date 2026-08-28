@@ -160,6 +160,77 @@ Use one authority.`
   assert.deepEqual(failedRow.error.context, { exitCode: 2, stderr: "unknown model" });
 });
 
+test("persists generated responses before judging so an interrupted run can be rejudged", async (context) => {
+  const projectDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "vasir-benchmark-checkpoint-"));
+  context.after(() => fs.rmSync(projectDirectory, { recursive: true, force: true }));
+  writeFile(path.join(projectDirectory, "package.json"), "{}\n");
+  writeFile(
+    path.join(projectDirectory, ".agents", "skills", "test-architecture", "SKILL.md"),
+    `---
+name: test-architecture
+description: Test architecture guidance.
+---
+Use one authority.`
+  );
+
+  let checkpoint = null;
+  let recovered = null;
+  const result = await runBenchmarkEval({
+    benchmarkName: "hyper-scale-chat",
+    treatmentId: "skill:test-architecture",
+    currentWorkingDirectory: projectDirectory,
+    projectRootDirectory: projectDirectory,
+    requestedModelArguments: ["sol@max"],
+    jsonOutput: true,
+    spawnSyncImplementation: () => ({ status: 0 }),
+    agentRunnerImplementation: async ({ promptText }) => ({
+      text: promptText.includes("Vasir Skill Guidance") ? "Treatment answer" : "Clean answer"
+    }),
+    judgeRowsImplementation: async ({ rows }) => {
+      const benchmarkHistoryDirectory = path.join(
+        projectDirectory,
+        ".agents",
+        "vasir-evals",
+        "hyper-scale-chat"
+      );
+      const [checkpointRunId] = fs.readdirSync(benchmarkHistoryDirectory);
+      checkpoint = JSON.parse(fs.readFileSync(
+        path.join(benchmarkHistoryDirectory, checkpointRunId, "run.json"),
+        "utf8"
+      ));
+      recovered = await rejudgeBenchmarkEval({
+        benchmarkName: "hyper-scale-chat",
+        runId: checkpoint.runId,
+        currentWorkingDirectory: projectDirectory,
+        projectRootDirectory: projectDirectory,
+        jsonOutput: true,
+        judgeRowsImplementation: async ({ rows: recoveredRows }) => ({
+          scoresByRowKey: new Map(recoveredRows.map((row) => [row.rowKey, { total: 75 }])),
+          judging: { status: "complete", promptText: "recovery judge", candidateOrder: [] }
+        }),
+        reportWriterImplementation: ({ outputFilePath }) => {
+          writeFile(outputFilePath, "<!doctype html><title>Recovered</title>");
+        }
+      });
+      return {
+        scoresByRowKey: new Map(rows.map((row) => [row.rowKey, { total: 80 }])),
+        judging: { status: "complete", promptText: "original judge", candidateOrder: [] }
+      };
+    },
+    reportWriterImplementation: ({ outputFilePath }) => {
+      writeFile(outputFilePath, "<!doctype html><title>Benchmark</title>");
+    }
+  });
+
+  assert.equal(checkpoint?.runStatus, "incomplete");
+  assert.equal(checkpoint?.judging.status, "pending");
+  assert.deepEqual(checkpoint?.rows.map((row) => row.outputText), ["Clean answer", "Treatment answer"]);
+  assert.deepEqual(checkpoint?.rows.map((row) => row.score), [null, null]);
+  assert.equal(recovered?.sourceRunId, checkpoint?.runId);
+  assert.equal(recovered?.runStatus, "complete");
+  assert.equal(result.runStatus, "complete");
+});
+
 test("saved benchmark responses can be rejudged into a new immutable run with a new panel", async (context) => {
   const projectDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "vasir-benchmark-rejudge-"));
   context.after(() => fs.rmSync(projectDirectory, { recursive: true, force: true }));

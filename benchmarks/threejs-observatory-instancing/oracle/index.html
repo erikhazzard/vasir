@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050817">
+  <link rel="icon" href="data:,">
+  <title>Moonlit Flooded Observatory</title>
+  <!--
+    Aesthetic direction
+    Hook: a retro-futurist moon temple rendered as a jewel-like, low-poly nocturne.
+    Typography: a native 5x7 WebGL pixel alphabet; 7 / 11 / 17 px hierarchy.
+    Color: indigo-black stone with cyan, violet, coral, amber, and blue signal light.
+    Motion: quiet deterministic orbital drift and expanding water rings at a fixed 60 Hz.
+
+    Naming contract
+    observatory-shell: full-viewport artifact frame.
+    observatory-stage: the sole displayed WebGL surface; state is exposed through data-ready.
+  -->
+  <style>
+    @layer settings, base, components;
+
+    @layer settings {
+      :root {
+        --color-surface: #050817;
+        --color-text-primary: #eaf7ff;
+        --viewport-full: 100%;
+      }
+    }
+
+    @layer base {
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html,
+      body {
+        width: var(--viewport-full);
+        height: var(--viewport-full);
+        margin: 0;
+        overflow: hidden;
+        background: var(--color-surface);
+        color: var(--color-text-primary);
+      }
+    }
+
+    @layer components {
+      .observatory-shell {
+        width: var(--viewport-full);
+        height: var(--viewport-full);
+        isolation: isolate;
+      }
+
+      .observatory-stage {
+        display: block;
+        width: var(--viewport-full);
+        height: var(--viewport-full);
+        touch-action: none;
+      }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="observatory-shell" aria-label="Moonlit Flooded Observatory technical art demo">
+    <canvas
+      class="observatory-stage"
+      aria-label="A fixed oblique view of a moonlit flooded observatory filled with twelve hundred luminous signal markers"
+      role="img"
+    ></canvas>
+  </main>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { Reflector } from 'three/addons/objects/Reflector.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+    const SEED = 424242;
+    const MARKERS_PER_FAMILY = 240;
+    const FAMILY_COUNT = 5;
+    const TOTAL_MARKERS = MARKERS_PER_FAMILY * FAMILY_COUNT;
+    const RIPPLE_COUNT = 64;
+    const FIXED_STEP = 1 / 60;
+    const WORLD_RENDER_SCALE = 0.67;
+    const TAU = Math.PI * 2;
+    const injectedCaptureTick = globalThis.__MOONLIT_CAPTURE_TICK__;
+    const CAPTURE_TICK = injectedCaptureTick === undefined
+      ? null
+      : Number.isInteger(injectedCaptureTick) && injectedCaptureTick >= 0 && injectedCaptureTick <= 1_000_000
+        ? injectedCaptureTick
+        : (() => { throw new Error('Invalid __MOONLIT_CAPTURE_TICK__'); })();
+
+    function mulberry32(seed) {
+      let state = seed >>> 0;
+      return function random() {
+        state += 0x6d2b79f5;
+        let value = state;
+        value = Math.imul(value ^ value >>> 15, value | 1);
+        value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+        return ((value ^ value >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    const random = mulberry32(SEED);
+    const canvas = document.querySelector('.observatory-stage');
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: false,
+      alpha: false,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true,
+      stencil: false
+    });
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
+    renderer.setClearColor(0x050817, 1);
+    renderer.autoClear = false;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050817);
+    scene.fog = new THREE.FogExp2(0x9bb5cd, 0.018);
+
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 90);
+    const cameraTarget = new THREE.Vector3(0, 1.0, 0);
+    camera.position.set(17.5, 13.5, 19.5);
+    camera.lookAt(cameraTarget);
+
+    const world = new THREE.Group();
+    world.name = 'moonlit-observatory';
+    scene.add(world);
+
+    const palette = {
+      indigo: new THREE.Color(0x6269ff),
+      cyan: new THREE.Color(0x46e7f0),
+      violet: new THREE.Color(0xb986ff),
+      coral: new THREE.Color(0xff7185),
+      amber: new THREE.Color(0xffc55c),
+      moon: new THREE.Color(0xd8ecff),
+      fog: new THREE.Color(0x9bb5cd)
+    };
+
+    const familySpecs = [
+      {
+        name: 'CONE',
+        color: palette.coral,
+        outline: new THREE.Color(0xff9daf),
+        geometry: new THREE.ConeGeometry(0.24, 1.4, 5),
+        roughness: 0.3,
+        metalness: 0.05,
+        emissiveIntensity: 2.15,
+        motionRate: 0.72
+      },
+      {
+        name: 'CYL',
+        color: palette.cyan,
+        outline: new THREE.Color(0x8effff),
+        geometry: new THREE.CylinderGeometry(0.22, 0.30, 1.2, 6),
+        roughness: 0.19,
+        metalness: 0.48,
+        emissiveIntensity: 1.9,
+        motionRate: 0.58
+      },
+      {
+        name: 'ICO',
+        color: palette.violet,
+        outline: new THREE.Color(0xd7b5ff),
+        geometry: new THREE.IcosahedronGeometry(0.38, 0),
+        roughness: 0.42,
+        metalness: 0.16,
+        emissiveIntensity: 2.05,
+        motionRate: 0.66
+      },
+      {
+        name: 'TOR',
+        color: palette.amber,
+        outline: new THREE.Color(0xffdd86),
+        geometry: new THREE.TorusGeometry(0.34, 0.09, 4, 8),
+        roughness: 0.21,
+        metalness: 0.62,
+        emissiveIntensity: 2.25,
+        motionRate: 0.5
+      },
+      {
+        name: 'BOX',
+        color: palette.indigo,
+        outline: new THREE.Color(0xa6abff),
+        geometry: new THREE.BoxGeometry(0.55, 0.85, 0.18),
+        roughness: 0.34,
+        metalness: 0.28,
+        emissiveIntensity: 2.0,
+        motionRate: 0.62
+      }
+    ];
+
+    const stoneMaterial = new THREE.MeshStandardMaterial({
+      color: 0x11172d,
+      roughness: 0.84,
+      metalness: 0.08
+    });
+    const stoneEdgeMaterial = new THREE.MeshStandardMaterial({
+      color: 0x202b49,
+      roughness: 0.7,
+      metalness: 0.12
+    });
+    const basinMaterial = new THREE.MeshStandardMaterial({
+      color: 0x0b1025,
+      roughness: 0.9,
+      metalness: 0.04
+    });
+
+    const basin = new THREE.Mesh(new THREE.CylinderGeometry(14, 14.2, 0.7, 64), basinMaterial);
+    basin.position.y = -0.42;
+    world.add(basin);
+
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(13.65, 0.42, 8, 96), stoneEdgeMaterial);
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = -0.02;
+    world.add(rim);
+
+    const innerRim = new THREE.Mesh(new THREE.TorusGeometry(2.65, 0.2, 6, 64), stoneEdgeMaterial);
+    innerRim.rotation.x = Math.PI / 2;
+    innerRim.position.y = 0.11;
+    world.add(innerRim);
+
+    const columnCount = 24;
+    const columnShafts = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(0.42, 0.52, 1, 8),
+      stoneMaterial,
+      columnCount
+    );
+    const columnBases = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(0.68, 0.78, 0.28, 8),
+      stoneEdgeMaterial,
+      columnCount
+    );
+    const columnCaps = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(0.62, 0.47, 0.34, 8),
+      stoneEdgeMaterial,
+      columnCount
+    );
+    const transform = new THREE.Object3D();
+
+    for (let index = 0; index < columnCount; index += 1) {
+      const isOuter = index < 16;
+      const ringIndex = isOuter ? index : index - 16;
+      const ringCount = isOuter ? 16 : 8;
+      const radius = isOuter ? 11.15 : 7.65;
+      const angle = ringIndex / ringCount * TAU + (isOuter ? Math.PI / 16 : Math.PI / 8);
+      const mirroredVariation = ((ringIndex % Math.max(1, ringCount / 2)) * 37 + (isOuter ? 11 : 23)) % 5;
+      const height = (isOuter ? 4.4 : 3.4) - mirroredVariation * 0.17;
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+
+      transform.position.set(x, height * 0.5 + 0.1, z);
+      transform.rotation.set(0, -angle, 0);
+      transform.scale.set(1, height, 1);
+      transform.updateMatrix();
+      columnShafts.setMatrixAt(index, transform.matrix);
+
+      transform.position.set(x, 0.15, z);
+      transform.scale.set(1, 1, 1);
+      transform.updateMatrix();
+      columnBases.setMatrixAt(index, transform.matrix);
+
+      transform.position.set(x, height + 0.12, z);
+      transform.rotation.set(0.04 * Math.sin(angle * 3), -angle, 0.04 * Math.cos(angle * 2));
+      transform.updateMatrix();
+      columnCaps.setMatrixAt(index, transform.matrix);
+    }
+    columnShafts.instanceMatrix.needsUpdate = true;
+    columnBases.instanceMatrix.needsUpdate = true;
+    columnCaps.instanceMatrix.needsUpdate = true;
+    world.add(columnShafts, columnBases, columnCaps);
+
+    const platformCount = 8;
+    const platforms = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(2.8, 0.44, 1.55, 2, 1, 1),
+      stoneEdgeMaterial,
+      platformCount
+    );
+    for (let index = 0; index < platformCount; index += 1) {
+      const angle = index / platformCount * TAU + Math.PI / 8;
+      transform.position.set(Math.cos(angle) * 5.25, 0.13, Math.sin(angle) * 5.25);
+      transform.rotation.set(0, -angle + Math.PI / 2, 0);
+      transform.scale.set(1, 1, 1);
+      transform.updateMatrix();
+      platforms.setMatrixAt(index, transform.matrix);
+    }
+    platforms.instanceMatrix.needsUpdate = true;
+    world.add(platforms);
+
+    const centralDais = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.35, 2.55, 0.72, 12),
+      stoneEdgeMaterial
+    );
+    centralDais.position.y = 0.28;
+    world.add(centralDais);
+
+    const armillaryMaterial = new THREE.MeshStandardMaterial({
+      color: 0x7086b8,
+      emissive: 0x24345e,
+      emissiveIntensity: 0.7,
+      roughness: 0.28,
+      metalness: 0.76
+    });
+    const armillary = new THREE.Group();
+    armillary.position.y = 3.15;
+    for (let index = 0; index < 3; index += 1) {
+      const ringMesh = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.075, 6, 64), armillaryMaterial);
+      ringMesh.rotation.set(index === 0 ? Math.PI / 2 : Math.PI / 4, index * Math.PI / 3, index === 2 ? Math.PI / 3 : 0);
+      armillary.add(ringMesh);
+    }
+    const observatoryOrb = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(0.5, 1),
+      new THREE.MeshStandardMaterial({
+        color: 0x9eeeff,
+        emissive: 0x46e7f0,
+        emissiveIntensity: 1.7,
+        roughness: 0.24,
+        metalness: 0.18
+      })
+    );
+    armillary.add(observatoryOrb);
+    world.add(armillary);
+
+    const starPositions = new Float32Array(180 * 3);
+    for (let index = 0; index < 180; index += 1) {
+      const angle = random() * TAU;
+      const radius = 30 + random() * 22;
+      starPositions[index * 3] = Math.cos(angle) * radius;
+      starPositions[index * 3 + 1] = 8 + random() * 22;
+      starPositions[index * 3 + 2] = Math.sin(angle) * radius - 4;
+    }
+    const starsGeometry = new THREE.BufferGeometry();
+    starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const stars = new THREE.Points(
+      starsGeometry,
+      new THREE.PointsMaterial({ color: 0xc4dbff, size: 0.065, transparent: true, opacity: 0.62 })
+    );
+    scene.add(stars);
+
+    const moon = new THREE.Mesh(
+      new THREE.SphereGeometry(2.1, 24, 16),
+      new THREE.MeshBasicMaterial({ color: 0xb9d4f0, fog: false })
+    );
+    moon.position.set(-12, 15, -19);
+    scene.add(moon);
+
+    const hemisphere = new THREE.HemisphereLight(0x7895cc, 0x090c1a, 1.3);
+    scene.add(hemisphere);
+    const moonLight = new THREE.DirectionalLight(0xc4ddff, 3.0);
+    moonLight.position.set(-9, 16, -11);
+    scene.add(moonLight);
+    const basinGlow = new THREE.PointLight(0x756eff, 18, 18, 2.0);
+    basinGlow.position.set(0, 4, 0);
+    scene.add(basinGlow);
+
+    const markerMeshes = [];
+    const markerStates = [];
+    for (let familyIndex = 0; familyIndex < FAMILY_COUNT; familyIndex += 1) {
+      const spec = familySpecs[familyIndex];
+      const material = new THREE.MeshStandardMaterial({
+        color: spec.color.clone().multiplyScalar(0.78),
+        emissive: spec.color,
+        emissiveIntensity: spec.emissiveIntensity,
+        roughness: spec.roughness,
+        metalness: spec.metalness,
+        flatShading: true
+      });
+      const mesh = new THREE.InstancedMesh(spec.geometry, material, MARKERS_PER_FAMILY);
+      mesh.name = `signal-markers-${spec.name.toLowerCase()}`;
+      mesh.frustumCulled = false;
+      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      mesh.userData.familyIndex = familyIndex;
+      world.add(mesh);
+      markerMeshes.push(mesh);
+
+      const states = [];
+      for (let index = 0; index < MARKERS_PER_FAMILY; index += 1) {
+        const progress = (index + 0.5) / MARKERS_PER_FAMILY;
+        const lane = index % 8;
+        const sweep = progress * TAU * 2.0 + familyIndex * 0.41;
+        const radius = 5.65
+          + lane * 0.73
+          + 0.84 * Math.sin(sweep * 1.5 + familyIndex * 0.7)
+          + (random() - 0.5) * 0.18;
+        states.push({
+          sweep,
+          radius,
+          height: 0.73 + (lane % 3) * 0.18 + random() * 0.16,
+          phase: random() * TAU,
+          lean: (random() - 0.5) * 0.2,
+          scale: 0.72 + random() * 0.42
+        });
+      }
+      markerStates.push(states);
+    }
+
+    function updateMarkerMatrices(tick) {
+      const time = tick * FIXED_STEP;
+      for (let familyIndex = 0; familyIndex < FAMILY_COUNT; familyIndex += 1) {
+        const mesh = markerMeshes[familyIndex];
+        const spec = familySpecs[familyIndex];
+        const states = markerStates[familyIndex];
+        for (let index = 0; index < MARKERS_PER_FAMILY; index += 1) {
+          const state = states[index];
+          const flow = Math.sin(time * spec.motionRate + state.phase);
+          const crossFlow = Math.cos(time * (spec.motionRate * 0.73) + state.phase * 1.31);
+          const angle = state.sweep + flow * 0.045;
+          const radius = state.radius + crossFlow * 0.11;
+          transform.position.set(
+            Math.cos(angle) * radius,
+            state.height + Math.sin(time * (0.9 + familyIndex * 0.07) + state.phase) * 0.12,
+            Math.sin(angle) * radius
+          );
+          transform.rotation.set(
+            state.lean + crossFlow * 0.04,
+            -angle + Math.PI / 2 + time * (0.08 + familyIndex * 0.015),
+            familyIndex === 3 ? time * 0.34 + state.phase : flow * 0.08
+          );
+          transform.scale.setScalar(state.scale);
+          transform.updateMatrix();
+          mesh.setMatrixAt(index, transform.matrix);
+        }
+        mesh.instanceMatrix.needsUpdate = true;
+      }
+      armillary.rotation.y = time * 0.035;
+      armillary.children[1].rotation.z = Math.PI / 6 + time * 0.025;
+    }
+
+    updateMarkerMatrices(0);
+
+    const fogGeometry = new THREE.CircleGeometry(1, 32);
+    const fogMaterial = new THREE.MeshBasicMaterial({
+      color: palette.fog,
+      transparent: true,
+      opacity: 0.032,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    const fogPatches = new THREE.InstancedMesh(fogGeometry, fogMaterial, 32);
+    fogPatches.renderOrder = 3;
+    for (let index = 0; index < 32; index += 1) {
+      const angle = index / 32 * TAU + (random() - 0.5) * 0.16;
+      const radius = 2.6 + random() * 10.1;
+      transform.position.set(Math.cos(angle) * radius, 0.42 + random() * 0.5, Math.sin(angle) * radius);
+      transform.rotation.set(-Math.PI / 2, 0, angle);
+      transform.scale.set(1.8 + random() * 2.5, 0.7 + random() * 1.4, 1);
+      transform.updateMatrix();
+      fogPatches.setMatrixAt(index, transform.matrix);
+    }
+    fogPatches.instanceMatrix.needsUpdate = true;
+    world.add(fogPatches);
+
+    const rippleUniforms = [];
+    for (let index = 0; index < RIPPLE_COUNT; index += 1) {
+      const angle = random() * TAU;
+      const radius = Math.sqrt(random()) * 0.43;
+      rippleUniforms.push(new THREE.Vector4(
+        0.5 + Math.cos(angle) * radius,
+        0.5 + Math.sin(angle) * radius,
+        random(),
+        3.6 + random() * 3.1
+      ));
+    }
+
+    const waterShader = {
+      name: 'ObservatoryRippleReflector',
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib.fog,
+        {
+          color: { value: new THREE.Color(0x162d57) },
+          shallowColor: { value: new THREE.Color(0x1b6d78) },
+          highlightColor: { value: new THREE.Color(0xa6f4ff) },
+          tDiffuse: { value: null },
+          textureMatrix: { value: new THREE.Matrix4() },
+          uTime: { value: 0 },
+          uRipples: { value: rippleUniforms }
+        }
+      ]),
+      vertexShader: /* glsl */`
+        uniform mat4 textureMatrix;
+        varying vec4 vProjectiveUv;
+        varying vec2 vSurfaceUv;
+        #include <fog_pars_vertex>
+
+        void main() {
+          vSurfaceUv = uv;
+          vProjectiveUv = textureMatrix * vec4(position, 1.0);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mvPosition;
+          #include <fog_vertex>
+        }
+      `,
+      fragmentShader: /* glsl */`
+        uniform vec3 color;
+        uniform vec3 shallowColor;
+        uniform vec3 highlightColor;
+        uniform sampler2D tDiffuse;
+        uniform float uTime;
+        uniform vec4 uRipples[64];
+        varying vec4 vProjectiveUv;
+        varying vec2 vSurfaceUv;
+        #include <fog_pars_fragment>
+
+        void main() {
+          vec2 centered = vSurfaceUv - 0.5;
+          float radialDepth = smoothstep(0.49, 0.12, length(centered));
+          vec2 rippleVector = vec2(0.0);
+          float rippleLight = 0.0;
+
+          for (int index = 0; index < 64; index++) {
+            vec2 delta = vSurfaceUv - uRipples[index].xy;
+            float distanceToImpact = length(delta);
+            float age = fract(uTime / uRipples[index].w + uRipples[index].z);
+            float ringRadius = age * 0.205;
+            float ringDistance = abs(distanceToImpact - ringRadius);
+            float ring = exp(-ringDistance * 155.0) * (1.0 - age);
+            rippleLight += ring;
+            rippleVector += normalize(delta + vec2(0.0001)) * ring * 0.00105;
+          }
+
+          vec2 waves = vec2(
+            sin(vSurfaceUv.y * 82.0 + uTime * 0.92) + sin((vSurfaceUv.x + vSurfaceUv.y) * 51.0 - uTime * 0.51),
+            cos(vSurfaceUv.x * 76.0 - uTime * 0.78) + cos((vSurfaceUv.x - vSurfaceUv.y) * 45.0 + uTime * 0.64)
+          ) * 0.00072;
+          vec4 projection = vProjectiveUv;
+          projection.xy += (waves + rippleVector) * projection.w;
+          vec3 reflection = texture2DProj(tDiffuse, projection).rgb;
+
+          float movingHighlight = pow(
+            max(0.0, sin((vSurfaceUv.x * 1.2 + vSurfaceUv.y) * 88.0 + uTime * 1.35)),
+            18.0
+          ) * 0.13;
+          vec3 depthTint = mix(shallowColor, color, radialDepth * 0.78);
+          vec3 finalColor = mix(depthTint, reflection, 0.61 + radialDepth * 0.16);
+          finalColor += highlightColor * (min(rippleLight, 1.5) * 0.11 + movingHighlight);
+          gl_FragColor = vec4(finalColor, 1.0);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+          #include <fog_fragment>
+        }
+      `
+    };
+
+    const water = new Reflector(new THREE.CircleGeometry(13.28, 96), {
+      clipBias: 0.003,
+      textureWidth: 512,
+      textureHeight: 512,
+      color: 0x162d57,
+      shader: waterShader,
+      multisample: 0
+    });
+    water.name = 'continuous-reflective-water';
+    water.rotation.x = -Math.PI / 2;
+    water.position.y = 0.055;
+    water.renderOrder = 2;
+    world.add(water);
+
+    let reflectionFrame = -1;
+    let presentedFrame = 0;
+    const originalWaterRender = water.onBeforeRender;
+    water.onBeforeRender = function cachedReflection(...args) {
+      if (reflectionFrame === presentedFrame) return;
+      reflectionFrame = presentedFrame;
+      originalWaterRender.apply(this, args);
+    };
+
+    const composer = new EffectComposer(renderer);
+    composer.setPixelRatio(1);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.24, 0.32, 1.0);
+    composer.addPass(bloomPass);
+
+    const outlinePasses = [];
+    for (let familyIndex = 0; familyIndex < FAMILY_COUNT; familyIndex += 1) {
+      const outlinePass = new OutlinePass(new THREE.Vector2(1, 1), scene, camera, [markerMeshes[familyIndex]]);
+      outlinePass.visibleEdgeColor.copy(familySpecs[familyIndex].outline);
+      outlinePass.hiddenEdgeColor.set(0x000000);
+      outlinePass.edgeStrength = 2.3;
+      outlinePass.edgeGlow = 0.08;
+      outlinePass.edgeThickness = 1.34;
+      outlinePass.pulsePeriod = 0;
+      outlinePass.usePatternTexture = false;
+      composer.addPass(outlinePass);
+      outlinePasses.push(outlinePass);
+    }
+
+    const outputPass = new OutputPass();
+    composer.addPass(outputPass);
+
+    const hudScene = new THREE.Scene();
+    const hudCamera = new THREE.OrthographicCamera(0, 1, 1, 0, 0.1, 10);
+    hudCamera.position.z = 2;
+    const hudMaterial = new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide
+    });
+    const hudGeometry = new THREE.BufferGeometry();
+    const hudMesh = new THREE.Mesh(hudGeometry, hudMaterial);
+    hudMesh.frustumCulled = false;
+    hudMesh.renderOrder = 2;
+    hudScene.add(hudMesh);
+
+    const hudPanelMaterial = new THREE.MeshBasicMaterial({
+      color: 0x071022,
+      transparent: true,
+      opacity: 0.88,
+      depthTest: false,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide
+    });
+    const hudPanel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), hudPanelMaterial);
+    hudPanel.renderOrder = 1;
+    hudScene.add(hudPanel);
+
+    const glyphs = {
+      ' ': ['00000','00000','00000','00000','00000','00000','00000'],
+      '0': ['01110','10001','10011','10101','11001','10001','01110'],
+      '1': ['00100','01100','00100','00100','00100','00100','01110'],
+      '2': ['01110','10001','00001','00010','00100','01000','11111'],
+      '3': ['11110','00001','00001','01110','00001','00001','11110'],
+      '4': ['00010','00110','01010','10010','11111','00010','00010'],
+      '5': ['11111','10000','10000','11110','00001','00001','11110'],
+      '6': ['01110','10000','10000','11110','10001','10001','01110'],
+      '7': ['11111','00001','00010','00100','01000','01000','01000'],
+      '8': ['01110','10001','10001','01110','10001','10001','01110'],
+      '9': ['01110','10001','10001','01111','00001','00001','01110'],
+      'A': ['01110','10001','10001','11111','10001','10001','10001'],
+      'B': ['11110','10001','10001','11110','10001','10001','11110'],
+      'C': ['01111','10000','10000','10000','10000','10000','01111'],
+      'D': ['11110','10001','10001','10001','10001','10001','11110'],
+      'E': ['11111','10000','10000','11110','10000','10000','11111'],
+      'F': ['11111','10000','10000','11110','10000','10000','10000'],
+      'G': ['01111','10000','10000','10111','10001','10001','01111'],
+      'H': ['10001','10001','10001','11111','10001','10001','10001'],
+      'I': ['01110','00100','00100','00100','00100','00100','01110'],
+      'J': ['00001','00001','00001','00001','10001','10001','01110'],
+      'K': ['10001','10010','10100','11000','10100','10010','10001'],
+      'L': ['10000','10000','10000','10000','10000','10000','11111'],
+      'M': ['10001','11011','10101','10101','10001','10001','10001'],
+      'N': ['10001','11001','10101','10011','10001','10001','10001'],
+      'O': ['01110','10001','10001','10001','10001','10001','01110'],
+      'P': ['11110','10001','10001','11110','10000','10000','10000'],
+      'Q': ['01110','10001','10001','10001','10101','10010','01101'],
+      'R': ['11110','10001','10001','11110','10100','10010','10001'],
+      'S': ['01111','10000','10000','01110','00001','00001','11110'],
+      'T': ['11111','00100','00100','00100','00100','00100','00100'],
+      'U': ['10001','10001','10001','10001','10001','10001','01110'],
+      'V': ['10001','10001','10001','10001','10001','01010','00100'],
+      'W': ['10001','10001','10001','10101','10101','11011','10001'],
+      'X': ['10001','10001','01010','00100','01010','10001','10001'],
+      'Y': ['10001','10001','01010','00100','00100','00100','00100'],
+      '.': ['00000','00000','00000','00000','00000','00110','00110'],
+      ':': ['00000','00100','00100','00000','00100','00100','00000'],
+      '/': ['00001','00010','00010','00100','01000','01000','10000']
+    };
+
+    let drawingBufferWidth = 1;
+    let drawingBufferHeight = 1;
+    let viewportWidth = 1;
+    let viewportHeight = 1;
+    let hudUnit = 1;
+    let hudOriginX = 1;
+    let hudOriginY = 1;
+    const hudPositions = [];
+    const hudColors = [];
+
+    function pushHudQuad(x, y, width, height, color) {
+      const z = 0;
+      hudPositions.push(
+        x, y, z, x + width, y, z, x + width, y + height, z,
+        x, y, z, x + width, y + height, z, x, y + height, z
+      );
+      for (let vertex = 0; vertex < 6; vertex += 1) {
+        hudColors.push(color.r, color.g, color.b);
+      }
+    }
+
+    function pushHudText(text, x, y, unit, color) {
+      let cursor = x;
+      for (const character of text) {
+        const glyph = glyphs[character] || glyphs[' '];
+        for (let row = 0; row < 7; row += 1) {
+          for (let column = 0; column < 5; column += 1) {
+            if (glyph[row][column] === '1') {
+              pushHudQuad(cursor + column * unit, y + row * unit, unit, unit, color);
+            }
+          }
+        }
+        cursor += unit * 6;
+      }
+    }
+
+    function rebuildHud(tick) {
+      hudPositions.length = 0;
+      hudColors.length = 0;
+      const white = new THREE.Color(0xeaf7ff);
+      const muted = new THREE.Color(0x7192aa);
+      const unit = hudUnit;
+      const x = hudOriginX;
+      const y = hudOriginY;
+
+      pushHudText('MOONLIT OBSERVATORY', x, y, unit, white);
+      pushHudText(`MARKERS:${TOTAL_MARKERS}`, x, y + unit * 11, unit, muted);
+      pushHudText(`TICK:${String(tick).padStart(7, '0')}`, x + unit * 92, y + unit * 11, unit, muted);
+
+      let familyX = x;
+      for (let familyIndex = 0; familyIndex < FAMILY_COUNT; familyIndex += 1) {
+        const spec = familySpecs[familyIndex];
+        pushHudQuad(familyX, y + unit * 22, unit * 5, unit * 7, spec.color);
+        pushHudText(spec.name, familyX + unit * 8, y + unit * 22, unit, white);
+        familyX += unit * 34;
+      }
+      pushHudText('WORLD:0.67X', x, y + unit * 33, unit, muted);
+
+      hudGeometry.setAttribute('position', new THREE.Float32BufferAttribute(hudPositions, 3));
+      hudGeometry.setAttribute('color', new THREE.Float32BufferAttribute(hudColors, 3));
+      hudGeometry.computeBoundingSphere();
+    }
+
+    function resize() {
+      const cssWidth = Math.max(1, window.innerWidth);
+      const cssHeight = Math.max(1, window.innerHeight);
+      viewportWidth = cssWidth;
+      viewportHeight = cssHeight;
+      const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
+      renderer.setPixelRatio(pixelRatio);
+      renderer.setSize(cssWidth, cssHeight, false);
+      const bufferSize = renderer.getDrawingBufferSize(new THREE.Vector2());
+      drawingBufferWidth = bufferSize.x;
+      drawingBufferHeight = bufferSize.y;
+
+      const worldWidth = Math.max(1, Math.round(drawingBufferWidth * WORLD_RENDER_SCALE));
+      const worldHeight = Math.max(1, Math.round(drawingBufferHeight * WORLD_RENDER_SCALE));
+      composer.setSize(worldWidth, worldHeight);
+      water.getRenderTarget().setSize(worldWidth, worldHeight);
+
+      camera.aspect = cssWidth / cssHeight;
+      camera.fov = camera.aspect < 1
+        ? THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(42 * 0.5)) / camera.aspect))
+        : 42;
+      camera.updateProjectionMatrix();
+
+      hudCamera.left = 0;
+      hudCamera.right = drawingBufferWidth;
+      hudCamera.top = 0;
+      hudCamera.bottom = drawingBufferHeight;
+      hudCamera.updateProjectionMatrix();
+
+      hudOriginX = Math.round(14 * pixelRatio);
+      hudOriginY = Math.round(14 * pixelRatio);
+      const preferredHudUnit = Math.max(1, Math.round(pixelRatio * (cssWidth < 520 ? 1.0 : 1.5)));
+      const widthBoundHudUnit = Math.max(1, Math.floor((drawingBufferWidth - hudOriginX * 2) / 180));
+      hudUnit = Math.min(preferredHudUnit, widthBoundHudUnit);
+      const panelWidth = Math.min(drawingBufferWidth - hudOriginX * 2, hudUnit * 180);
+      const panelHeight = hudUnit * 44;
+      hudPanel.scale.set(panelWidth, panelHeight, 1);
+      hudPanel.position.set(hudOriginX - hudUnit * 5 + panelWidth * 0.5, hudOriginY - hudUnit * 5 + panelHeight * 0.5, 0.5);
+      rebuildHud(simulationTick);
+
+      canvas.dataset.worldScale = WORLD_RENDER_SCALE.toFixed(2);
+      canvas.dataset.worldBuffer = `${worldWidth}x${worldHeight}`;
+      canvas.dataset.outputBuffer = `${drawingBufferWidth}x${drawingBufferHeight}`;
+    }
+
+    let simulationTick = 0;
+    let accumulator = 0;
+    let previousTime = 0;
+
+    function applySimulationTick(tick) {
+      simulationTick = tick;
+      updateMarkerMatrices(simulationTick);
+      water.material.uniforms.uTime.value = simulationTick * FIXED_STEP;
+      rebuildHud(simulationTick);
+    }
+
+    function simulateFixedStep() {
+      applySimulationTick(simulationTick + 1);
+    }
+
+    function renderFrame() {
+      presentedFrame += 1;
+      renderer.setViewport(0, 0, viewportWidth, viewportHeight);
+      renderer.setScissorTest(false);
+      renderer.clear(true, true, true);
+      composer.render(0);
+
+      renderer.setRenderTarget(null);
+      renderer.setViewport(0, 0, viewportWidth, viewportHeight);
+      renderer.clearDepth();
+      renderer.render(hudScene, hudCamera);
+    }
+
+    function animationLoop(timestamp) {
+      const currentTime = timestamp * 0.001;
+      const frameDelta = previousTime === 0 ? FIXED_STEP : Math.min(0.25, currentTime - previousTime);
+      previousTime = currentTime;
+      accumulator += frameDelta;
+
+      while (accumulator >= FIXED_STEP) {
+        simulateFixedStep();
+        accumulator -= FIXED_STEP;
+      }
+
+      renderFrame();
+      requestAnimationFrame(animationLoop);
+    }
+
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+    applySimulationTick(CAPTURE_TICK ?? 0);
+    renderFrame();
+    if (CAPTURE_TICK !== null) canvas.dataset.captureTick = String(CAPTURE_TICK);
+    document.documentElement.dataset.ready = 'true';
+
+    window.__moonlitObservatory = Object.freeze({
+      seed: SEED,
+      totalMarkers: TOTAL_MARKERS,
+      markersPerFamily: MARKERS_PER_FAMILY,
+      familyCount: FAMILY_COUNT,
+      rippleCount: RIPPLE_COUNT,
+      fixedHz: 60,
+      worldRenderScale: WORLD_RENDER_SCALE,
+      captureTick: CAPTURE_TICK,
+      threeRevision: THREE.REVISION,
+      renderer,
+      scene,
+      camera,
+      markerMeshes,
+      outlinePasses,
+      water
+    });
+
+    if (CAPTURE_TICK === null) requestAnimationFrame(animationLoop);
+  </script>
+</body>
+</html>

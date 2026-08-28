@@ -54,6 +54,8 @@ Capture every substantial request before synthesizing it away:
 
 Always ask: **Could an agent complete this spec while visibly failing what the user actually requested?** If yes, fix the product map before implementation. Similar colors, labels, mechanisms, or vibes are not equivalent delivery.
 
+Before freezing a product, contract, rung, or engineering decision, apply root §9's expert counterfactual. Record only the surviving decision, any human-owned fork, and every trade-off the decision takes—never an alternatives ledger.
+
 When failure behavior is material, apply root §9 once at the contract boundary: begin with the exact independently meaningful subject, name what is isolated, preserve selected verified state and independent behavior, expose the scoped non-success outcome, and name the recovery owner. A broader collection, service, startup, health-check, or process boundary requires current repository evidence that every independent result would itself perform the same named unsafe effect. A preserved control, completed handler, empty response, hidden action, or successful no-op never satisfies the rung unless that exact denial or emptiness is the promised terminal outcome.
 
 ## The map is not the territory
@@ -264,6 +266,6 @@ Return only:
 - `vFinal`;
 - active vertical-slice unlock;
 - next implementation action or exact blocker;
-- any changed product decision, contract, human acceptance, or honest claim boundary.
+- any changed product decision, contract, trade-off taken, human acceptance, or honest claim boundary.
 
 Do not grant approval or start implementation from this skill.

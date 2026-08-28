@@ -1,0 +1,1 @@
+Work only from the task and the isolated workspace supplied for this controlled benchmark. Do not inspect parent or sibling directories, load ambient instructions or skills, use plugins, invoke subagents, or search for benchmark material. Do not use the internet except for the page's existing runtime imports. Do not claim measurements you did not run.
