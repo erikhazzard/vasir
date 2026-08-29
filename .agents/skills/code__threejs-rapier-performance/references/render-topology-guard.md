@@ -5,6 +5,7 @@ Use this reference when planning or reviewing batching, instancing, material, pa
 ## Contents
 
 - [Hard guard](#hard-guard)
+- [Execution-cardinality audit](#execution-cardinality-audit)
 - [Backend-safe vocabulary](#backend-safe-vocabulary)
 - [Ownership and topology delta](#ownership-and-topology-delta)
 - [Cardinality and cost](#cardinality-and-cost)
@@ -24,6 +25,14 @@ Reject the local patch before benchmarking when it:
 - hides topology growth behind lower draw calls, unchanged screenshots, or acceptable timing on one device
 
 Only a separately requested architecture change may expand this topology, and it must satisfy the exception and proof requirements below. A topology reduction is allowed when pass removal is itself in scope and semantics survive.
+
+## Execution-cardinality audit
+
+**Shader work.** For every in-scope fullscreen, high-coverage, or heavily overdrawn fragment shader, trace each expensive block through called functions: its guards and consumers, texture operations and static loop bounds, finest-varying input, and executions across covered fragment invocations (and sample-frequency invocations only when actually enabled). Classify that input as sample/fragment, primitive/instance, draw/pass, frame, or change/event scope; include interpolants, fragment built-ins, texture coordinates, and derivative/LOD inputs. Work whose finest dependency is coarser than the fragment is a source-level lower-cardinality result requested again by each covered fragment invocation. If the work's consumers exist only when a semantically equivalent draw-uniform feature guard passes, test that guard before the work. Report texture operations as a source-level scaling law, not physical memory transactions or measured time.
+
+A coarser dependency proves a source-level invocation-cardinality mismatch, not a safe destination or realized GPU cost. Prefer elimination, exact sample reuse, or an existing draw-uniform guard. Before moving texture work to CPU, a uniform, or another shader stage, prove producer order and freshness, data residency, stage sampler/varying support, interpolation and precision, and equivalent wrap, filter, color-space, derivative, LOD, and anisotropy semantics on every shipping backend. Never move implicit-derivative sampling into fragment-divergent control flow without equivalent explicit gradients or LOD. GPU-only data cannot become a current-frame CPU uniform without readback and synchronization; do not introduce that hot-path round trip for a hoist. A separate 1x1 render-to-texture precompute still requires an offscreen target, a target-write pass, and a later texture sample, so it follows the topology exception and measured-break-even rules. If output equivalence is unproven, label the move a candidate requiring semantic proof and targeted visual regression checks, not the smallest exact fix.
+
+**Whole-frame counters.** For a `WebGLRenderer` frame with multiple `renderer.render()` calls, set `renderer.info.autoReset = false` once. At the application-frame boundary, before any update or subsystem can render, call `renderer.info.reset()`; after all conditional offscreen, world, post, debug, and terminal renders, snapshot the scalar fields of `renderer.info.render` into application-owned values before the next reset. With default auto-reset, moving the read later alone still reports only the latest render call; disabling auto-reset without a per-frame reset accumulates frames. `renderer.info` counts Three-managed draws and primitives, not logical or backend passes, target writes, GPU time, browser composition, or application frames. `renderer.info.render.frame` is renderer-owned, not the application-frame counter; own that boundary separately.
 
 ## Backend-safe vocabulary
 
