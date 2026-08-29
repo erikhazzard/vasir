@@ -1,0 +1,164 @@
+{
+  "kind": "vasirbenchmark-site-template-lock",
+  "version": "2026-08-29",
+  "status": "accepted",
+  "canonicalPath": "site/vasirbenchmark.com",
+  "acceptance": {
+    "acceptedAt": "2026-08-29",
+    "authority": "user",
+    "verdict": "Accepted",
+    "response": "very good. let's lock this in as the template that we'll use.",
+    "criterion": "The current light-mode VasirBench site, responsive views, interactions, benchmark drilldown, and editorial Efficiency frontier are the canonical web template."
+  },
+  "deployment": {
+    "status": "deferred",
+    "targetDomain": "vasirbenchmark.com",
+    "awsAccountAlias": "fylgya",
+    "topology": null
+  },
+  "claimBoundary": "This accepts the static interface template and illustrative visual fixture only. It does not establish benchmark-score eligibility, production data integration, hosting topology, or deployment authorization.",
+  "files": [
+    {
+      "path": "index.html",
+      "role": "runtime",
+      "sha256": "889fc5ac9c49d9afcf6ccc95db38d4ec1f2d0e0e6f1fb42d72e86766a72e898e",
+      "bytes": 2178
+    },
+    {
+      "path": "style.css",
+      "role": "runtime",
+      "sha256": "a2c38c717fcfc826ca77d7a48ee40cbecb1c9960000328d086561c8efc57243b",
+      "bytes": 106209
+    },
+    {
+      "path": "app.js",
+      "role": "runtime",
+      "sha256": "938c152bc0852e1f63862f92c4ccf220aa8ee61c8cc4647783dfe0bb2360107f",
+      "bytes": 86639
+    },
+    {
+      "path": "data.js",
+      "role": "illustrative-fixture",
+      "sha256": "25a00f64b386ff2ff3268dd91943efe568542277916347b324f515d5b73928b1",
+      "bytes": 22873
+    },
+    {
+      "path": "benchmark-report.html",
+      "role": "runtime",
+      "sha256": "96b2d7408048486db979cca99a439208262e3b747f53d5eb5461ad5e1063a701",
+      "bytes": 1968
+    },
+    {
+      "path": "benchmark-report.css",
+      "role": "runtime",
+      "sha256": "fc8c0bbf7d89ae7cb6d751da7f675db69e22fe99282b98ea5e074c21a0bf8cd5",
+      "bytes": 17182
+    },
+    {
+      "path": "benchmark-report.js",
+      "role": "runtime",
+      "sha256": "9737c64ec8515d90a2e275e739e35eab274d8a06576555ffef1b861a8eea7bac",
+      "bytes": 14643
+    },
+    {
+      "path": "capture.mjs",
+      "role": "qa-harness",
+      "sha256": "b16968cd278c9f11a86cc9166d74dadf30f7ddb274d3ae7afbbe401c70257905",
+      "bytes": 147748
+    },
+    {
+      "path": "capture.sh",
+      "role": "qa-harness",
+      "sha256": "a222b1abac439d2aeedba9ad3e85dacb65f702b644f29625c66676a35fd1be55",
+      "bytes": 1820
+    },
+    {
+      "path": "assets/kanit-latin-900-normal.woff2",
+      "role": "font",
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
+      "bytes": 19216
+    }
+  ],
+  "captures": [
+    {
+      "path": "desktop.png",
+      "route": "#capabilities/overall",
+      "sha256": "609c4f4dcc2213e5911f8ef6404c4ad6a0b4456f543d7fd026f73f227ec41b4c",
+      "bytes": 219275,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "mobile.png",
+      "route": "#capabilities/overall",
+      "sha256": "ca5a7c23a394e6aacb06736320c182a10e7b4b5510a1bfd88f52d16e88af54c4",
+      "bytes": 78403,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "desktop-capabilities.png",
+      "route": "#capabilities/engineering",
+      "sha256": "63a37a9c5c4e608be695cd10010bcc01faeac56401978393e4e1ff925880f490",
+      "bytes": 144554,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "mobile-capabilities.png",
+      "route": "#capabilities/engineering",
+      "sha256": "ca53335b60c3f345fe81e7a4d2249f72e272417c64da7ff07222ad5802d05790",
+      "bytes": 71643,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "desktop-capability-benchmarks.png",
+      "route": "#capabilities/engineering/benchmarks",
+      "sha256": "cbafa547149464882ccd8b0a4c321cea4a8598aadcedbcfebebd87c6dd6d14ba",
+      "bytes": 194414,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "mobile-capability-benchmarks.png",
+      "route": "#capabilities/engineering/benchmarks",
+      "sha256": "f37affdd4db681ada399d0a2f0b0dbaa62b4d8450c9f7e838ce2d9aad9d6177f",
+      "bytes": 76979,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "desktop-efficiency.png",
+      "route": "#capabilities/overall/efficiency",
+      "sha256": "2a3ddf75034dd49151dd0575e3ae8b610ccad83de37137863ff4eb4e16d93051",
+      "bytes": 190959,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "mobile-efficiency.png",
+      "route": "#capabilities/overall/efficiency",
+      "sha256": "0c92121af5b0f76677d5581685b27423b408c01f9ec38ad592cb3c411acc6041",
+      "bytes": 73112,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "desktop-benchmark-report.png",
+      "route": "#report/hyper-scale-chat",
+      "sha256": "d25a5ea5537ea99c1b858d5f7db7a485a297c2a9c19556e79f19a0ec462e5d55",
+      "bytes": 133031,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "mobile-benchmark-report.png",
+      "route": "#report/hyper-scale-chat",
+      "sha256": "ad5330f4756afe9df0c5f8106d3bb2998d9bc9f7c2057744f838c3b83a22b784",
+      "bytes": 59481,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

@@ -1,0 +1,1699 @@
+(function () {
+  'use strict';
+
+  const data = window.VASIR_DATA;
+  if (!data) throw new Error('VasirBench fixture failed to load.');
+
+  const INITIAL_RESULT_COUNT = 10;
+  const QUALITY_DOMAIN = [55, 95];
+  const CAPABILITY_MODES = ['models', 'benchmarks', 'efficiency'];
+  const COMBINED_CAPABILITY = {
+    id: 'overall',
+    name: 'Combined',
+    short: 'ALL',
+    color: 'var(--category-combined)',
+    isCombined: true
+  };
+  const capabilityFields = [COMBINED_CAPABILITY, ...data.categories];
+  const capabilityIndexMedia = window.matchMedia('(min-width: 67.501rem)');
+
+  const metricConfig = {
+    cost: {
+      label: 'Cost',
+      axis: 'Cost per benchmark run (USD)',
+      note: 'Cost · log scale',
+      domain: [0.018, 0.52],
+      ticks: [0.02, 0.05, 0.1, 0.25, 0.5],
+      format: (value) => `$${value.toFixed(value < 0.1 ? 3 : 2)}`,
+      spoken: (value) => `${value.toFixed(3)} dollars per benchmark run`
+    },
+    latency: {
+      label: 'Latency',
+      axis: 'Latency per benchmark run (seconds)',
+      note: 'Latency · log scale',
+      domain: [5, 85],
+      ticks: [5, 10, 20, 40, 80],
+      format: (value) => `${value.toFixed(value < 10 ? 1 : 0)}s`,
+      spoken: (value) => `${value.toFixed(1)} seconds per benchmark run`
+    },
+    tokens: {
+      label: 'Tokens',
+      axis: 'Output tokens per benchmark run',
+      note: 'Tokens · log scale',
+      domain: [1700, 22000],
+      ticks: [2000, 3500, 6000, 11000, 20000],
+      format: (value) => `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}k`,
+      spoken: (value) => `${value.toLocaleString()} output tokens per benchmark run`
+    }
+  };
+
+  const conditionById = new Map(data.conditions.map((condition) => [condition.id, condition]));
+  const categoryById = new Map(capabilityFields.map((category) => [category.id, category]));
+  const benchmarkById = new Map(data.benchmarks.map((benchmark) => [benchmark.id, benchmark]));
+  const benchmarkSummaryById = new Map(data.benchmarkSummaries.map((summary) => [summary.benchmarkId, summary]));
+  const entryById = new Map(data.entries.map((entry) => [entry.id, entry]));
+  const baselineBySetting = new Map(
+    data.entries
+      .filter((entry) => entry.condition === 'baseline')
+      .map((entry) => [entry.settingId, entry])
+  );
+
+  const fieldConfig = {
+    overall: { label: 'Combined', short: 'Combined' },
+    ...Object.fromEntries(data.categories.map((category) => [
+      category.id,
+      { label: category.name, short: category.short }
+    ]))
+  };
+  const capabilityMobileLabel = {
+    overall: 'Combined',
+    engineering: 'Eng',
+    games: 'Games',
+    product: 'Design',
+    writing: 'Writing',
+    workflows: 'AI flow'
+  };
+  const suiteDescriptions = {
+    'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.',
+    'Reliability & Change': 'Safe evolution and evidence-led diagnosis under live-system pressure.',
+    'Game Feel & Onboarding': 'The first-hand quality of play: control, feedback, comprehension, and early momentum.',
+    'Systems & Integrity': 'Deterministic, coherent game systems that remain fair, inspectable, and hard to exploit.',
+    'Information & Interaction': 'Dense product surfaces that make state, evidence, and action obvious at a glance.',
+    'Product Quality': 'Judgment across learning, accessibility, failure recovery, and real user completion.',
+    'Exposition & Persuasion': 'Writing that makes a difficult idea or decision clear, credible, and memorable.',
+    'Voice & Synthesis': 'Revision and synthesis that preserve authorship while improving force and truthfulness.',
+    'Execution & Coordination': 'Agent work that selects the right tools, preserves intent, and hands off cleanly.',
+    'Skill & Evaluation Design': 'Reusable steering and proof systems that change decisions without overclaiming.'
+  };
+
+  const elements = {
+    workspace: document.querySelector('#panel-capabilities'),
+    capabilityView: document.querySelector('#capability-view')
+  };
+
+  const routeFromHash = () => {
+    const route = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+    if (route === 'leaderboard') {
+      return { category: COMBINED_CAPABILITY.id, mode: 'models', legacy: true };
+    }
+    if (route === 'efficiency') {
+      return { category: COMBINED_CAPABILITY.id, mode: 'efficiency', legacy: true };
+    }
+    if (route === 'vasir-effect') {
+      return { category: data.categories[0].id, mode: 'models', legacy: true };
+    }
+    if (route === 'capabilities') {
+      return { category: COMBINED_CAPABILITY.id, mode: 'models', canonical: false };
+    }
+    if (route.startsWith('capabilities/')) {
+      const [, category, requestedMode] = route.split('/');
+      const categoryIsValid = categoryById.has(category);
+      const mode = requestedMode === 'benchmarks' || requestedMode === 'efficiency'
+        ? requestedMode
+        : 'models';
+      return {
+        category: categoryIsValid ? category : COMBINED_CAPABILITY.id,
+        mode,
+        canonical: categoryIsValid && (!requestedMode || requestedMode === 'benchmarks' || requestedMode === 'efficiency')
+      };
+    }
+    return {
+      category: COMBINED_CAPABILITY.id,
+      mode: 'models',
+      invalid: Boolean(route)
+    };
+  };
+
+  const initialRoute = routeFromHash();
+
+  const state = {
+    selectedId: data.entries[0].id,
+    capabilityCategory: initialRoute.category || COMBINED_CAPABILITY.id,
+    capabilityMode: CAPABILITY_MODES.includes(initialRoute.mode) ? initialRoute.mode : 'models',
+    metric: 'cost',
+    showAll: false
+  };
+
+  const capabilityHash = () => (
+    `#capabilities/${state.capabilityCategory}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`
+  );
+
+  const escapeHtml = (value) => String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+
+  const formatScore = (value) => value.toFixed(1);
+
+  const signed = (value) => {
+    if (value > 0) return `+${value.toFixed(1)}`;
+    if (value < 0) return `−${Math.abs(value).toFixed(1)}`;
+    return '±0.0';
+  };
+
+  const scoreFor = (entry, field = 'overall') => {
+    if (field === 'overall') return entry.score;
+    return entry.categories.find((reading) => reading.category === field).score;
+  };
+
+  const baselineScoreFor = (entry, field = 'overall') => {
+    if (field === 'overall') return entry.baselineScore;
+    return entry.baselineCategories.find((reading) => reading.category === field).score;
+  };
+
+  const deltaFor = (entry, field = 'overall') => (
+    Math.round((scoreFor(entry, field) - baselineScoreFor(entry, field)) * 10) / 10
+  );
+
+  const rankedField = (field = 'overall') => {
+    const entries = [...data.entries].sort((left, right) => (
+      scoreFor(right, field) - scoreFor(left, field) ||
+      right.score - left.score ||
+      left.cost - right.cost ||
+      left.id.localeCompare(right.id)
+    ));
+    return {
+      entries,
+      ranks: new Map(entries.map((entry, index) => [entry.id, index + 1]))
+    };
+  };
+
+  const rankedCondition = (conditionId, field = 'overall') => {
+    const entries = data.entries
+      .filter((entry) => entry.condition === conditionId)
+      .sort((left, right) => (
+        scoreFor(right, field) - scoreFor(left, field) ||
+        right.score - left.score ||
+        left.cost - right.cost ||
+        left.id.localeCompare(right.id)
+      ));
+    return {
+      entries,
+      ranks: new Map(entries.map((entry, index) => [entry.id, index + 1]))
+    };
+  };
+
+  const selectedEntry = () => entryById.get(state.selectedId) || data.entries[0];
+
+  const matchedEntries = (entry) => data.conditions.map((condition) => (
+    entryById.get(`${entry.settingId}-${condition.id}`)
+  ));
+
+  const conditionMarkup = (conditionId, short = false) => {
+    const condition = conditionById.get(conditionId);
+    return `
+      <span class="condition-label condition-label--${escapeHtml(conditionId)}">
+        <span class="condition-mark condition-mark--${escapeHtml(conditionId)}" aria-hidden="true"></span>
+        ${escapeHtml(short ? condition.short : condition.label)}
+      </span>
+    `;
+  };
+
+  const weightedComposition = (entry) => {
+    const weighted = data.categories.map((category) => {
+      const rawScore = entry.categories.find((reading) => reading.category === category.id).score;
+      return {
+        category,
+        rawScore,
+        unscaledContribution: rawScore * category.weight
+      };
+    });
+    const weightedTotal = weighted.reduce((sum, item) => sum + item.unscaledContribution, 0);
+    const scale = weightedTotal > 0 ? entry.score / weightedTotal : 0;
+    let allocated = 0;
+
+    return weighted.map((item, index) => {
+      const contribution = index === weighted.length - 1
+        ? entry.score - allocated
+        : item.unscaledContribution * scale;
+      allocated += contribution;
+      return { ...item, contribution };
+    });
+  };
+
+  const weightedCompositionDescription = (segments) => segments.map(({ category, rawScore, contribution }) => (
+    `${category.name} score ${formatScore(rawScore)}, ${Math.round(category.weight * 100)} percent weight, ${contribution.toFixed(2)} weighted points`
+  )).join('; ');
+
+  const capabilityCompositionMarkup = (entry, conditionRank, fullEntryId) => {
+    const score = entry.score;
+    const segments = weightedComposition(entry);
+    const profileLabel = weightedCompositionDescription(segments);
+    const conditionLabel = entry.condition === 'baseline' ? 'Without Vasir' : 'With Vasir';
+
+    return `
+      <span
+        class="capability-composition capability-composition--${escapeHtml(entry.condition)}"
+        data-entry-id="${escapeHtml(entry.id)}"
+        data-condition="${escapeHtml(entry.condition)}"
+        data-composite-score="${score.toFixed(1)}"
+        data-condition-rank="${conditionRank}"
+        role="group"
+        aria-label="${escapeHtml(conditionLabel)}, composite ${formatScore(score)} of 100, ${escapeHtml(conditionLabel)} rank ${conditionRank} of 20. ${escapeHtml(profileLabel)}."
+      >
+        <span class="capability-composition__meta">
+          <span class="capability-composition__label">${escapeHtml(conditionLabel)}</span>
+          <span class="capability-composition__rank">${escapeHtml(conditionLabel)} rank #${String(conditionRank).padStart(2, '0')}</span>
+        </span>
+        <span class="capability-composition__track">
+          <span class="capability-composition__stack" role="toolbar" aria-label="Open a capability leaderboard from ${escapeHtml(conditionLabel)} scores">
+            ${segments.map(({ category, rawScore, contribution }, index) => {
+              const insight = `${category.name}: raw score ${formatScore(rawScore)}, weight ${Math.round(category.weight * 100)}%, weighted contribution ${contribution.toFixed(2)} points`;
+              return `
+                <button
+                  class="capability-composition__segment capability-composition__segment--${escapeHtml(category.id)}"
+                  type="button"
+                  data-category-id="${escapeHtml(category.id)}"
+                  data-entry-id="${escapeHtml(fullEntryId)}"
+                  data-source-condition="${escapeHtml(entry.condition)}"
+                  data-category-label="${escapeHtml(category.name)}"
+                  data-category-short="${escapeHtml(category.short)}"
+                  data-raw-score="${rawScore.toFixed(1)}"
+                  data-weight="${category.weight}"
+                  data-contribution="${contribution.toFixed(6)}"
+                  style="--segment-width:${contribution.toFixed(6)}%"
+                  tabindex="${index === 0 ? '0' : '-1'}"
+                  aria-label="Open ${escapeHtml(category.name)} capabilities for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with Full Vasir selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
+                  title="${escapeHtml(insight)}"
+                >
+                  <span class="capability-composition__abbr" aria-hidden="true">${escapeHtml(category.short)}</span>
+                  <strong class="capability-composition__score" aria-hidden="true">${formatScore(rawScore)}</strong>
+                </button>
+              `;
+            }).join('')}
+          </span>
+        </span>
+        <strong class="capability-composition__total">${formatScore(score)}</strong>
+      </span>
+    `;
+  };
+
+  const resourceComparison = (entry, key) => {
+    const baseline = baselineBySetting.get(entry.settingId)[key];
+    const difference = Math.round(((entry[key] / baseline) - 1) * 100);
+    if (difference === 0) return 'Minimal reference';
+    return `${difference > 0 ? '+' : '−'}${Math.abs(difference)}% vs Minimal`;
+  };
+
+  const normalizedQuality = (score) => {
+    const ratio = (score - QUALITY_DOMAIN[0]) / (QUALITY_DOMAIN[1] - QUALITY_DOMAIN[0]);
+    return Math.max(0, Math.min(100, ratio * 100));
+  };
+
+  const resourcePosition = (value, metric = state.metric) => {
+    const [minimum, maximum] = metricConfig[metric].domain;
+    const ratio = (Math.log(value) - Math.log(minimum)) / (Math.log(maximum) - Math.log(minimum));
+    return Math.max(0, Math.min(100, ratio * 100));
+  };
+
+  const plotCoordinates = (entry, field = state.capabilityCategory, metric = state.metric) => ({
+    x: resourcePosition(entry[metric], metric),
+    y: 100 - normalizedQuality(scoreFor(entry, field))
+  });
+
+  const tripletMarkup = (entry, field = 'overall') => {
+    const ranking = rankedField(field);
+    return matchedEntries(entry).map((candidate) => {
+      const selected = candidate.id === entry.id;
+      const condition = conditionById.get(candidate.condition);
+      return `
+        <button
+          class="matched-triplet__option matched-triplet__option--${escapeHtml(candidate.condition)}${selected ? ' is-selected' : ''}"
+          type="button"
+          data-entry-id="${escapeHtml(candidate.id)}"
+          aria-pressed="${selected}"
+          aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} score ${formatScore(scoreFor(candidate, field))}, absolute rank ${ranking.ranks.get(candidate.id)}"
+        >
+          ${conditionMarkup(candidate.condition, true)}
+          <strong>${formatScore(scoreFor(candidate, field))}</strong>
+          <span>#${String(ranking.ranks.get(candidate.id)).padStart(2, '0')} · ${signed(deltaFor(candidate, field))} vs Minimal</span>
+        </button>
+      `;
+    }).join('');
+  };
+
+  const categoryBenchmarks = (categoryId) => (
+    categoryId === COMBINED_CAPABILITY.id
+      ? data.benchmarks
+      : data.benchmarks.filter((benchmark) => benchmark.category === categoryId)
+  );
+
+  const combinedOutcomeSummary = () => {
+    const fullEntries = rankedCondition('full', COMBINED_CAPABILITY.id).entries;
+    const deltas = fullEntries
+      .map((entry) => Math.round((entry.score - baselineBySetting.get(entry.settingId).score) * 10) / 10)
+      .sort((left, right) => left - right);
+    const midpoint = Math.floor(deltas.length / 2);
+    const median = deltas.length % 2
+      ? deltas[midpoint]
+      : Math.round(((deltas[midpoint - 1] + deltas[midpoint]) / 2) * 10) / 10;
+    return {
+      median,
+      improved: deltas.filter((delta) => delta > 0).length,
+      regressed: deltas.filter((delta) => delta < 0).length,
+      unchanged: deltas.filter((delta) => delta === 0).length,
+      total: deltas.length
+    };
+  };
+
+  const capabilityHeaderMarkup = (category) => {
+    const benchmarks = categoryBenchmarks(category.id);
+    const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
+    const measuredCount = benchmarks.filter((benchmark) => benchmark.evidenceKind === 'development').length;
+    const fullWinner = rankedCondition('full', category.id).entries[0];
+    const baselineWinner = rankedCondition('baseline', category.id).entries[0];
+    const showingBenchmarks = state.capabilityMode === 'benchmarks';
+    const showingEfficiency = state.capabilityMode === 'efficiency';
+    const outcome = category.isCombined && state.capabilityMode === 'models' ? combinedOutcomeSummary() : null;
+    const modelViewLabel = category.isCombined ? 'Paired leaderboard' : 'Model leaderboard';
+    const identityLabel = `Capabilities / ${category.name} / ${showingBenchmarks ? 'Benchmark tests' : showingEfficiency ? 'Efficiency' : modelViewLabel}`;
+    const modelSummary = category.isCombined
+      ? `20 matched settings · weighted across all ${data.categories.length} categories · ranked by With Vasir score`
+      : '20 matched settings · ranked by With Vasir score';
+    return `
+      <header class="capability-canvas__header">
+        <div class="capability-canvas__identity">
+          <p class="ui-eyebrow">${escapeHtml(identityLabel)}</p>
+          <h3 id="capability-question" tabindex="-1">${escapeHtml(category.name)}</h3>
+          <p>${showingBenchmarks
+            ? `${trackCount} tracks · ${benchmarks.length} benchmark tests`
+            : showingEfficiency
+              ? `60 configurations · ${escapeHtml(category.name)} quality × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
+              : escapeHtml(modelSummary)}</p>
+        </div>
+        <dl class="capability-canvas__readings${outcome ? ' capability-canvas__readings--combined' : ''}" aria-label="${escapeHtml(category.name)} summary">
+          ${showingBenchmarks ? `
+            <div class="capability-canvas__reading capability-canvas__reading--measured" data-count="${measuredCount}">
+              <dt>Evidence</dt>
+              <dd>${measuredCount}<small> measured</small></dd>
+            </div>
+            <div class="capability-canvas__reading capability-canvas__reading--illustrative" data-count="${benchmarks.length - measuredCount}">
+              <dt>Preview</dt>
+              <dd>${benchmarks.length - measuredCount}<small> illustrative</small></dd>
+            </div>
+          ` : outcome ? `
+            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
+              <dt>Best with Vasir</dt>
+              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
+            </div>
+            <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${outcome.median.toFixed(1)}">
+              <dt>Median Full effect</dt>
+              <dd>${signed(outcome.median)}<small>Across ${outcome.total} matched settings</small></dd>
+            </div>
+            <div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}">
+              <dt>Full outcomes</dt>
+              <dd>${outcome.improved}/${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd>
+            </div>
+          ` : `
+            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
+              <dt>Leader with Vasir</dt>
+              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
+            </div>
+            <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${scoreFor(baselineWinner, category.id).toFixed(1)}">
+              <dt>Best without Vasir</dt>
+              <dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small></dd>
+            </div>
+          `}
+        </dl>
+      </header>
+    `;
+  };
+
+  const capabilityModeMarkup = (category) => {
+    const benchmarks = categoryBenchmarks(category.id);
+    const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
+    return `
+      ${capabilityHeaderMarkup(category)}
+      <nav class="capability-mode" aria-label="Choose ${escapeHtml(category.name)} view">
+          <span class="capability-mode__label" aria-hidden="true">View</span>
+          <div class="capability-mode__tabs" role="tablist" aria-label="Choose ${escapeHtml(category.name)} evidence view">
+            <button
+              class="capability-mode__tab${state.capabilityMode === 'models' ? ' is-selected' : ''}"
+              id="capability-mode-models"
+              type="button"
+              role="tab"
+              data-capability-mode="models"
+              aria-selected="${state.capabilityMode === 'models'}"
+              aria-controls="capability-ranking"
+              tabindex="${state.capabilityMode === 'models' ? '0' : '-1'}"
+            ><strong>Leaderboard</strong><span>20 ranked settings</span></button>
+            <button
+              class="capability-mode__tab${state.capabilityMode === 'benchmarks' ? ' is-selected' : ''}"
+              id="capability-mode-benchmarks"
+              type="button"
+              role="tab"
+              data-capability-mode="benchmarks"
+              aria-selected="${state.capabilityMode === 'benchmarks'}"
+              aria-controls="capability-benchmarks"
+              tabindex="${state.capabilityMode === 'benchmarks' ? '0' : '-1'}"
+            ><strong>Benchmark tests</strong><span>${trackCount} tracks · ${benchmarks.length} tests</span></button>
+            <button
+              class="capability-mode__tab${state.capabilityMode === 'efficiency' ? ' is-selected' : ''}"
+              id="capability-mode-efficiency"
+              type="button"
+              role="tab"
+              data-capability-mode="efficiency"
+              aria-selected="${state.capabilityMode === 'efficiency'}"
+              aria-controls="capability-efficiency"
+              tabindex="${state.capabilityMode === 'efficiency' ? '0' : '-1'}"
+            ><strong>Efficiency</strong><span>Quality × resource</span></button>
+          </div>
+      </nav>
+    `;
+  };
+
+  const efficiencyPanelMarkup = () => `
+    <section
+      class="capability-efficiency"
+      id="capability-efficiency"
+      role="tabpanel"
+      aria-labelledby="capability-mode-efficiency"
+      ${state.capabilityMode === 'efficiency' ? '' : 'hidden'}
+    >
+      <header class="efficiency-controls">
+        <div class="efficiency-controls__label">
+          <p class="ui-eyebrow">Efficiency explorer</p>
+          <strong>60 model × condition results</strong>
+        </div>
+        <label class="field-control field-control--wide" for="efficiency-entry">
+          <span>Selected result</span>
+          <select id="efficiency-entry" name="efficiency-entry"></select>
+        </label>
+        <label class="field-control" for="resource-axis">
+          <span>Resource axis</span>
+          <select id="resource-axis" name="resource-axis">
+            ${Object.entries(metricConfig).map(([key, metric]) => (
+              `<option value="${escapeHtml(key)}"${state.metric === key ? ' selected' : ''}>${escapeHtml(metric.label)}</option>`
+            )).join('')}
+          </select>
+        </label>
+      </header>
+      <div id="efficiency-view"></div>
+    </section>
+  `;
+
+  const benchmarkLedgerRowMarkup = (benchmark, categoryIndex, sourceCategoryId) => {
+    const summary = benchmarkSummaryById.get(benchmark.id);
+    const measured = summary.evidenceKind === 'development';
+    const regression = summary.delta < 0;
+    const action = measured ? 'Open report' : 'Preview test design';
+    const reportHref = sourceCategoryId === COMBINED_CAPABILITY.id
+      ? summary.detailHref.replace('#', '?from=overall#')
+      : summary.detailHref;
+    return `
+      <a
+        class="benchmark-ledger__row${measured ? ' benchmark-ledger__row--measured' : ' benchmark-ledger__row--illustrative'}${regression ? ' benchmark-ledger__row--regression' : ''}"
+        href="${escapeHtml(reportHref)}"
+        data-benchmark-id="${escapeHtml(benchmark.id)}"
+        data-evidence-kind="${escapeHtml(summary.evidenceKind)}"
+        data-baseline-score="${summary.baseline.toFixed(1)}"
+        data-treatment-score="${summary.treatment.toFixed(1)}"
+        data-report-href="${escapeHtml(reportHref)}"
+        aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. ${escapeHtml(summary.baselineLabel)} ${formatScore(summary.baseline)}, ${escapeHtml(summary.treatmentLabel)} ${formatScore(summary.treatment)}, change ${signed(summary.delta)} points."
+      >
+        <span class="benchmark-ledger__identity">
+          <span>${String(categoryIndex + 1).padStart(2, '0')} / ${escapeHtml(categoryById.get(benchmark.category)?.name || 'Benchmark')}</span>
+          <strong>${escapeHtml(benchmark.name)}</strong>
+          <small>${escapeHtml(benchmark.description)}</small>
+        </span>
+        <span class="benchmark-ledger__comparison">
+          <span><small>${escapeHtml(summary.baselineLabel)}</small><strong>${formatScore(summary.baseline)}</strong></span>
+          <i aria-hidden="true">→</i>
+          <span><small>${escapeHtml(summary.treatmentLabel)}</small><strong>${formatScore(summary.treatment)}</strong></span>
+          <b>${signed(summary.delta)}<small> pts</small></b>
+        </span>
+        <span class="benchmark-ledger__evidence">
+          <strong>${summary.complete}/${summary.total} ${escapeHtml(summary.completionLabel)}</strong>
+          <span>${summary.wins}W · ${summary.ties}T · ${summary.losses}L</span>
+          <span>${escapeHtml(summary.calibration)}</span>
+        </span>
+        <span class="benchmark-ledger__action">${escapeHtml(action)} <span aria-hidden="true">→</span></span>
+      </a>
+    `;
+  };
+
+  const benchmarkLedgerMarkup = (category, hidden = false) => {
+    const benchmarks = categoryBenchmarks(category.id);
+    const suiteNames = [...new Set(benchmarks.map((benchmark) => benchmark.suite))];
+    return `
+      <section
+        class="benchmark-ledger"
+        id="capability-benchmarks"
+        role="tabpanel"
+        aria-labelledby="capability-mode-benchmarks"
+        ${hidden ? 'hidden' : ''}
+        style="--category-color:${category.color}"
+      >
+        <h4 class="visually-hidden">${escapeHtml(category.name)} benchmark tests</h4>
+        <div class="benchmark-ledger__tracks">
+          ${suiteNames.map((suite, suiteIndex) => {
+            const suiteBenchmarks = benchmarks.filter((benchmark) => benchmark.suite === suite);
+            const suiteMeasured = suiteBenchmarks.filter((benchmark) => benchmark.evidenceKind === 'development').length;
+            return `
+              <section class="benchmark-ledger__track" aria-labelledby="benchmark-track-${category.id}-${suiteIndex}">
+                <header class="benchmark-ledger__track-header">
+                  <span>${String(suiteIndex + 1).padStart(2, '0')} / TRACK</span>
+                  <div>
+                    <h4 id="benchmark-track-${category.id}-${suiteIndex}">${escapeHtml(suite)}</h4>
+                    <p>${escapeHtml(suiteDescriptions[suite] || '')}</p>
+                  </div>
+                  <strong>${suiteBenchmarks.length} tests · ${suiteMeasured ? `${suiteMeasured} measured` : 'illustrative'}</strong>
+                </header>
+                <div class="benchmark-ledger__rows">
+                  ${suiteBenchmarks.map((benchmark) => benchmarkLedgerRowMarkup(benchmark, benchmarks.indexOf(benchmark), category.id)).join('')}
+                </div>
+              </section>
+            `;
+          }).join('')}
+        </div>
+      </section>
+    `;
+  };
+
+  const settingRowMarkup = (fullEntry, baselineRanks, fullRanks) => {
+    const baselineEntry = baselineBySetting.get(fullEntry.settingId);
+    const baselineRank = baselineRanks.get(baselineEntry.id);
+    const fullRank = fullRanks.get(fullEntry.id);
+    const delta = Math.round((fullEntry.score - baselineEntry.score) * 10) / 10;
+    const selected = selectedEntry().settingId === fullEntry.settingId;
+    const compositionDescriptionId = `paired-composition-description-${fullEntry.settingId}`;
+    const baselineDescription = weightedCompositionDescription(weightedComposition(baselineEntry));
+    const fullDescription = weightedCompositionDescription(weightedComposition(fullEntry));
+    const deltaClass = delta < 0 ? ' setting-row__delta--negative' : '';
+
+    return `
+      <li
+        class="setting-row${selected ? ' is-selected' : ''}"
+        id="row-${escapeHtml(fullEntry.settingId)}"
+        data-setting-id="${escapeHtml(fullEntry.settingId)}"
+        data-baseline-entry-id="${escapeHtml(baselineEntry.id)}"
+        data-full-entry-id="${escapeHtml(fullEntry.id)}"
+        data-baseline-score="${baselineEntry.score.toFixed(1)}"
+        data-full-score="${fullEntry.score.toFixed(1)}"
+        data-baseline-rank="${baselineRank}"
+        data-full-rank="${fullRank}"
+        data-delta="${delta.toFixed(1)}"
+      >
+        <div class="setting-row__layout">
+          <button
+            class="setting-row__select"
+            type="button"
+            data-entry-id="${escapeHtml(fullEntry.id)}"
+            aria-pressed="${selected}"
+            aria-describedby="${escapeHtml(compositionDescriptionId)}"
+            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning with Full Vasir. Composite ${formatScore(fullEntry.score)}, With rank ${fullRank} of 20. Without Vasir composite ${formatScore(baselineEntry.score)}, Without rank ${baselineRank} of 20. Full Vasir effect ${signed(delta)} points."
+          >
+            <span class="setting-row__identity">
+              <strong>${escapeHtml(fullEntry.family)}</strong>
+              <span>${escapeHtml(fullEntry.reasoning)}</span>
+              <small>Primary order · With rank #${String(fullRank).padStart(2, '0')}</small>
+            </span>
+            <span class="setting-row__disclosure">${selected ? 'Selected' : 'Select'} <span aria-hidden="true">${selected ? '●' : '→'}</span></span>
+          </button>
+          <span class="setting-row__pair">
+            ${capabilityCompositionMarkup(fullEntry, fullRank, fullEntry.id)}
+            ${capabilityCompositionMarkup(baselineEntry, baselineRank, fullEntry.id)}
+          </span>
+          <span class="setting-row__delta${deltaClass}"><strong>${signed(delta)}</strong><span>pts</span></span>
+        </div>
+        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">With Vasir capability profile: ${escapeHtml(fullDescription)}. Without Vasir capability profile: ${escapeHtml(baselineDescription)}. Each colored segment opens that capability leaderboard.</span>
+      </li>
+    `;
+  };
+
+  const combinedLeaderboardMarkup = () => {
+    const baselineRanking = rankedCondition('baseline');
+    const fullRanking = rankedCondition('full');
+    const visible = state.showAll
+      ? fullRanking.entries
+      : fullRanking.entries.slice(0, INITIAL_RESULT_COUNT);
+    const disclosureLabel = state.showAll
+      ? `Show top ${INITIAL_RESULT_COUNT} settings ↑`
+      : 'Show all 20 settings ↓';
+
+    return `
+      <section
+        class="capability-ranking capability-ranking--combined"
+        id="capability-ranking"
+        role="tabpanel"
+        aria-labelledby="capability-mode-models"
+        ${state.capabilityMode === 'models' ? '' : 'hidden'}
+      >
+        <section class="score-field score-field--combined" aria-labelledby="score-field-title">
+          <h3 class="visually-hidden" id="score-field-title">Combined model leaderboard</h3>
+
+          <div class="score-axis-header">
+            <span class="score-axis-header__identity">Model / reasoning / matched pair</span>
+            <div class="score-axis-header__profile">
+              <div class="score-axis-header__profile-title">
+                <strong>Weighted capability profile</strong>
+                <span>/ 100</span>
+              </div>
+              <div class="capability-legend" aria-label="Weighted capability categories">
+                <span class="capability-legend__item capability-legend__item--engineering"><i aria-hidden="true"></i><span class="capability-legend__long">Engineering</span><span class="capability-legend__short">ENG</span></span>
+                <span class="capability-legend__item capability-legend__item--games"><i aria-hidden="true"></i><span class="capability-legend__long">Games</span><span class="capability-legend__short">GAME</span></span>
+                <span class="capability-legend__item capability-legend__item--product"><i aria-hidden="true"></i><span class="capability-legend__long">Product design</span><span class="capability-legend__short">DES</span></span>
+                <span class="capability-legend__item capability-legend__item--writing"><i aria-hidden="true"></i><span class="capability-legend__long">Writing</span><span class="capability-legend__short">WRITE</span></span>
+                <span class="capability-legend__item capability-legend__item--workflows"><i aria-hidden="true"></i><span class="capability-legend__long">AI workflows</span><span class="capability-legend__short">FLOW</span></span>
+              </div>
+              <div class="score-axis-header__scale" aria-hidden="true"><span>0</span><span>Composite total</span><span>100</span></div>
+            </div>
+            <span class="score-axis-header__effect">Full effect</span>
+          </div>
+
+          <ol class="result-list" id="result-list" aria-label="Matched model and reasoning settings ordered by With Vasir rank. Each row compares Without Vasir and With Vasir.">
+            ${visible.map((entry) => settingRowMarkup(entry, baselineRanking.ranks, fullRanking.ranks)).join('')}
+          </ol>
+          <button class="show-all" id="show-all" type="button" aria-expanded="${state.showAll}">${escapeHtml(disclosureLabel)}</button>
+        </section>
+      </section>
+    `;
+  };
+
+  const capabilitySelectorMarkup = () => `
+    <nav class="capability-selector" aria-label="Choose a capability">
+      <header class="capability-selector__header">
+        <strong>Capabilities</strong>
+        <span>
+          <i class="condition-mark condition-mark--full" aria-hidden="true"></i>
+          <span class="capability-selector__instruction capability-selector__instruction--long">Best with Vasir /100</span>
+          <span class="capability-selector__instruction capability-selector__instruction--short">Best /100</span>
+        </span>
+      </header>
+      <div class="capability-selector__tabs" role="tablist" aria-label="Capability score fields" aria-orientation="${capabilityIndexMedia.matches ? 'vertical' : 'horizontal'}">
+        ${capabilityFields.map((category, categoryIndex) => {
+          const winner = rankedCondition('full', category.id).entries[0];
+          const selected = category.id === state.capabilityCategory;
+          const accessibleFieldName = category.isCombined
+            ? 'Combined score, weighted across all five capability categories.'
+            : `${category.name} capability score.`;
+          return `
+            <button
+              class="capability-selector__tab${category.isCombined ? ' capability-selector__tab--combined' : ''}${selected ? ' is-selected' : ''}"
+              id="capability-category-${escapeHtml(category.id)}"
+              type="button"
+              role="tab"
+              data-category-id="${escapeHtml(category.id)}"
+              data-winner-entry-id="${escapeHtml(winner.id)}"
+              data-winner-score="${scoreFor(winner, category.id).toFixed(1)}"
+              data-winner-condition="full"
+              aria-selected="${selected}"
+              aria-controls="capability-field-panel"
+              tabindex="${selected ? '0' : '-1'}"
+              style="--category-color:${category.color}"
+              aria-label="${escapeHtml(accessibleFieldName)} Best with Vasir: ${escapeHtml(winner.family)}, ${escapeHtml(winner.reasoning)} reasoning, score ${formatScore(scoreFor(winner, category.id))}."
+            >
+              <span class="capability-selector__index" aria-hidden="true">${category.isCombined ? '00' : String(categoryIndex).padStart(2, '0')}</span>
+              <span class="capability-selector__name">
+                <span class="capability-selector__long">${escapeHtml(category.name)}</span>
+                <span class="capability-selector__short">${escapeHtml(capabilityMobileLabel[category.id])}</span>
+              </span>
+              <span class="capability-selector__state">${selected ? 'Selected' : ''}</span>
+              <strong>${formatScore(scoreFor(winner, category.id))}<small>/100</small></strong>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    </nav>
+  `;
+
+  const capabilityRankRowMarkup = (fullEntry, baselineRanking, fullRanking, category) => {
+    const baselineEntry = baselineBySetting.get(fullEntry.settingId);
+    const baselineScore = scoreFor(baselineEntry, category.id);
+    const fullScore = scoreFor(fullEntry, category.id);
+    const baselineRank = baselineRanking.ranks.get(baselineEntry.id);
+    const fullRank = fullRanking.ranks.get(fullEntry.id);
+    const delta = Math.round((fullScore - baselineScore) * 10) / 10;
+    const start = Math.min(baselineScore, fullScore);
+    const connectorWidth = Math.max(Math.abs(fullScore - baselineScore), 0.25);
+    const selected = selectedEntry().settingId === fullEntry.settingId;
+    return `
+      <li
+        class="capability-rank-row${selected ? ' is-selected' : ''}${delta < 0 ? ' is-regression' : ''}"
+        data-setting-id="${escapeHtml(fullEntry.settingId)}"
+        data-baseline-entry-id="${escapeHtml(baselineEntry.id)}"
+        data-full-entry-id="${escapeHtml(fullEntry.id)}"
+        data-baseline-score="${baselineScore.toFixed(1)}"
+        data-full-score="${fullScore.toFixed(1)}"
+        data-baseline-rank="${baselineRank}"
+        data-full-rank="${fullRank}"
+        data-delta="${delta.toFixed(1)}"
+        style="--category-color:${category.color};--baseline-score:${baselineScore}%;--full-score:${fullScore}%;--connector-start:${start}%;--connector-width:${connectorWidth}%"
+      >
+        <button
+          class="capability-rank-row__select"
+          type="button"
+          data-entry-id="${escapeHtml(fullEntry.id)}"
+          aria-pressed="${selected}"
+          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning with Full Vasir. ${escapeHtml(category.name)}: With Vasir ${formatScore(fullScore)}, rank ${fullRank} of 20; Without Vasir ${formatScore(baselineScore)}, rank ${baselineRank} of 20; effect ${signed(delta)} points."
+        >
+          <span class="capability-rank-row__identity">
+            <span class="capability-rank-row__position">#${String(fullRank).padStart(2, '0')}</span>
+            <span class="capability-rank-row__model">
+              <strong>${escapeHtml(fullEntry.family)}</strong>
+              <small>${escapeHtml(fullEntry.reasoning)}</small>
+            </span>
+          </span>
+          <span
+            class="capability-rank-row__track"
+            role="img"
+            aria-label="Without Vasir circle at ${formatScore(baselineScore)}. With Vasir square at ${formatScore(fullScore)}."
+          >
+            <span class="capability-rank-row__axis" aria-hidden="true"></span>
+            <span class="capability-rank-row__connector" aria-hidden="true"></span>
+            <span class="capability-rank-row__marker capability-rank-row__marker--baseline" aria-hidden="true"></span>
+            <span class="capability-rank-row__marker capability-rank-row__marker--full" aria-hidden="true"></span>
+          </span>
+          <span class="capability-rank-row__reading capability-rank-row__reading--baseline">
+            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Without</span></span>
+            <strong>${formatScore(baselineScore)}</strong>
+            <small>#${baselineRank}</small>
+          </span>
+          <span class="capability-rank-row__reading capability-rank-row__reading--full">
+            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>With</span></span>
+            <strong>${formatScore(fullScore)}</strong>
+            <small>#${fullRank}</small>
+          </span>
+          <strong class="capability-rank-row__delta">${signed(delta)}<small>pts</small></strong>
+        </button>
+      </li>
+    `;
+  };
+
+  const animateCapabilityHandoff = (skipMotion = false) => {
+    if (skipMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const canvas = elements.capabilityView.querySelector('.capability-browser__canvas');
+    const activePanel = canvas?.querySelector('.capability-ranking:not([hidden]), .benchmark-ledger:not([hidden]), .capability-efficiency:not([hidden])');
+    const target = activePanel || canvas;
+    if (!target) return;
+    target.animate(
+      [
+        { opacity: 0.58, transform: 'translateY(0.25rem)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ],
+      {
+        duration: 180,
+        easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+      }
+    );
+  };
+
+  const renderCapabilities = ({ animate = false, skipMotion = false } = {}) => {
+    const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
+    state.capabilityCategory = category.id;
+    const baselineRanking = rankedCondition('baseline', category.id);
+    const fullRanking = rankedCondition('full', category.id);
+
+    const rankingContent = category.isCombined ? combinedLeaderboardMarkup() : `
+        <section
+          class="capability-ranking"
+          id="capability-ranking"
+          role="tabpanel"
+          aria-labelledby="capability-mode-models"
+          ${state.capabilityMode === 'models' ? '' : 'hidden'}
+        >
+          <h4 class="visually-hidden">${escapeHtml(category.name)} model leaderboard</h4>
+          <div class="capability-ranking__axis" aria-hidden="true">
+            <span>Rank / model</span>
+            <span class="capability-ranking__ticks">
+              <span class="capability-ranking__scale-label">Score / 100</span>
+              <span class="capability-ranking__scale-values"><i>0</i><i>25</i><i>50</i><i>75</i><i>100</i></span>
+            </span>
+            <span class="capability-ranking__condition-heading"><i class="capability-key__baseline"></i>Without Vasir</span>
+            <span class="capability-ranking__condition-heading"><i class="capability-key__full"></i>With Vasir</span>
+            <span>Change</span>
+          </div>
+          <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by With Vasir score">
+            ${fullRanking.entries.map((entry) => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, category)).join('')}
+          </ol>
+        </section>
+      `;
+    const benchmarkContent = benchmarkLedgerMarkup(category, state.capabilityMode !== 'benchmarks');
+
+    elements.capabilityView.innerHTML = `
+      <section class="capability-browser" style="--category-color:${category.color}">
+        <aside class="capability-browser__index">
+          ${capabilitySelectorMarkup()}
+        </aside>
+        <div
+          class="capability-browser__canvas"
+          id="capability-field-panel"
+          role="tabpanel"
+          aria-labelledby="capability-category-${escapeHtml(category.id)}"
+        >
+          ${capabilityModeMarkup(category)}
+          ${rankingContent}
+          ${benchmarkContent}
+          ${efficiencyPanelMarkup()}
+        </div>
+      </section>
+    `;
+
+    if (state.capabilityMode === 'efficiency') renderEfficiency();
+
+    window.requestAnimationFrame(() => {
+      if (animate) animateCapabilityHandoff(skipMotion);
+      const tabList = elements.capabilityView.querySelector('.capability-selector__tabs');
+      const selectedTab = tabList?.querySelector('.capability-selector__tab[aria-selected="true"]');
+      if (!tabList || !selectedTab || tabList.scrollWidth <= tabList.clientWidth) return;
+      const centeredLeft = selectedTab.offsetLeft - ((tabList.clientWidth - selectedTab.offsetWidth) / 2);
+      const maximumLeft = tabList.scrollWidth - tabList.clientWidth;
+      tabList.scrollTo({ left: Math.max(0, Math.min(maximumLeft, centeredLeft)), behavior: 'auto' });
+    });
+  };
+
+  const updateCapabilityMode = ({ animate = false, skipMotion = false } = {}) => {
+    const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
+    const header = elements.capabilityView.querySelector('.capability-canvas__header');
+    if (header) header.outerHTML = capabilityHeaderMarkup(category);
+
+    elements.capabilityView.querySelectorAll('.capability-mode__tab[data-capability-mode]').forEach((tab) => {
+      const selected = tab.dataset.capabilityMode === state.capabilityMode;
+      tab.classList.toggle('is-selected', selected);
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+
+    const rankingPanel = elements.capabilityView.querySelector('#capability-ranking');
+    const benchmarkPanel = elements.capabilityView.querySelector('#capability-benchmarks');
+    const efficiencyPanel = elements.capabilityView.querySelector('#capability-efficiency');
+    if (rankingPanel) rankingPanel.hidden = state.capabilityMode !== 'models';
+    if (benchmarkPanel) benchmarkPanel.hidden = state.capabilityMode !== 'benchmarks';
+    if (efficiencyPanel) efficiencyPanel.hidden = state.capabilityMode !== 'efficiency';
+    if (state.capabilityMode === 'efficiency') renderEfficiency();
+    if (animate) window.requestAnimationFrame(() => animateCapabilityHandoff(skipMotion));
+  };
+
+  const syncCapabilityIndexOrientation = () => {
+    const tabList = elements.capabilityView.querySelector('.capability-selector__tabs[role="tablist"]');
+    if (tabList) tabList.setAttribute('aria-orientation', capabilityIndexMedia.matches ? 'vertical' : 'horizontal');
+  };
+
+  const resourceDeltaPercent = (entry, metric = state.metric) => {
+    const baseline = baselineBySetting.get(entry.settingId);
+    return Math.round(((entry[metric] / baseline[metric]) - 1) * 100);
+  };
+
+  const annotationDockClass = (entry, field = state.capabilityCategory, metric = state.metric) => {
+    const { x } = plotCoordinates(entry, field, metric);
+    return x > 50 ? 'is-docked-top-left' : 'is-docked-bottom-right';
+  };
+
+  const plotInspectionMarkup = (entry, ranks, frontierIds) => {
+    const field = state.capabilityCategory;
+    const metric = metricConfig[state.metric];
+    const delta = deltaFor(entry, field);
+    const resourceDelta = resourceDeltaPercent(entry);
+    const reference = entry.condition === 'baseline'
+      ? 'Minimal reference'
+      : `${signed(delta)} quality · ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}`;
+    return `
+      <span class="efficiency-plane__annotation-meta">
+        ${conditionMarkup(entry.condition, true)}
+        <span>${frontierIds.has(entry.id) ? 'On frontier' : 'Off frontier'}</span>
+      </span>
+      <strong>${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</strong>
+      <span class="efficiency-plane__annotation-values">
+        <b>${formatScore(scoreFor(entry, field))}</b>
+        <i aria-hidden="true">×</i>
+        <b>${escapeHtml(metric.format(entry[state.metric]))}</b>
+      </span>
+      <small>#${ranks.get(entry.id)} of ${data.entries.length} · ${escapeHtml(reference)}</small>
+    `;
+  };
+
+  const efficiencyDecision = (entry, frontier, field, metricKey) => {
+    const metric = metricConfig[metricKey];
+    const frontierIds = new Set(frontier.map((candidate) => candidate.id));
+    const score = scoreFor(entry, field);
+    const baseline = baselineBySetting.get(entry.settingId);
+    const baselineScore = scoreFor(baseline, field);
+    const scoreDelta = Math.round((score - baselineScore) * 10) / 10;
+    const resourceDelta = resourceDeltaPercent(entry, metricKey);
+    const bestScore = Math.max(...data.entries.map((candidate) => scoreFor(candidate, field)));
+    const highestQuality = Math.abs(score - bestScore) < 0.05;
+    const isFrontier = frontierIds.has(entry.id);
+    const dominators = data.entries.filter((candidate) => (
+      candidate.id !== entry.id &&
+      scoreFor(candidate, field) >= score &&
+      candidate[metricKey] <= entry[metricKey] &&
+      (scoreFor(candidate, field) > score || candidate[metricKey] < entry[metricKey])
+    ));
+    const cheaperFrontier = [...frontier]
+      .filter((candidate) => candidate[metricKey] < entry[metricKey])
+      .sort((left, right) => right[metricKey] - left[metricKey])[0];
+    const betterTradeoff = [...dominators]
+      .sort((left, right) => (
+        left[metricKey] - right[metricKey] ||
+        scoreFor(right, field) - scoreFor(left, field)
+      ))[0];
+
+    let finding = 'Trade-off check';
+    if (highestQuality) finding = 'Highest quality';
+    else if (isFrontier) finding = 'On the frontier';
+
+    const treatmentSentence = entry.condition === 'baseline'
+      ? 'Minimal is the matched reference for this model setting.'
+      : `${conditionById.get(entry.condition).short} adds ${signed(scoreDelta)} quality points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus Minimal.`;
+
+    let tradeoffSentence = 'No measured configuration is both higher quality and lower resource.';
+    if (!isFrontier) {
+      tradeoffSentence = `${dominators.length} configuration${dominators.length === 1 ? '' : 's'} reach at least this quality for less ${metric.label.toLowerCase()}.`;
+    } else if (cheaperFrontier) {
+      const savings = Math.round((1 - (cheaperFrontier[metricKey] / entry[metricKey])) * 100);
+      const qualityLoss = Math.round((score - scoreFor(cheaperFrontier, field)) * 10) / 10;
+      tradeoffSentence = `${escapeHtml(cheaperFrontier.family)} · ${escapeHtml(cheaperFrontier.reasoning)} saves ${savings}% for ${qualityLoss.toFixed(1)} points less.`;
+    }
+
+    return {
+      finding,
+      highestQuality,
+      isFrontier,
+      frontierIds,
+      scoreDelta,
+      resourceDelta,
+      comparison: isFrontier ? cheaperFrontier : betterTradeoff,
+      comparisonLabel: isFrontier ? 'Next cheaper frontier' : 'Better measured trade-off',
+      treatmentSentence,
+      tradeoffSentence
+    };
+  };
+
+  const efficiencyTrajectoryMarkup = (entry, field, metricKey, ranks, frontierIds) => matchedEntries(entry).map((candidate, index) => {
+    const selected = candidate.id === entry.id;
+    const condition = conditionById.get(candidate.condition);
+    return `
+      <button
+        class="matched-triplet__option matched-triplet__option--${escapeHtml(candidate.condition)}${selected ? ' is-selected' : ''}"
+        type="button"
+        data-entry-id="${escapeHtml(candidate.id)}"
+        aria-pressed="${selected}"
+        aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} score ${formatScore(scoreFor(candidate, field))}, ${metricConfig[metricKey].spoken(candidate[metricKey])}, absolute rank ${ranks.get(candidate.id)}${frontierIds.has(candidate.id) ? ', on the efficient frontier' : ''}"
+      >
+        <span class="efficiency-summary__step">${String(index + 1).padStart(2, '0')}</span>
+        ${conditionMarkup(candidate.condition, true)}
+        <strong>${formatScore(scoreFor(candidate, field))}</strong>
+        <span class="efficiency-summary__resource">${escapeHtml(metricConfig[metricKey].format(candidate[metricKey]))}</span>
+        <small>#${String(ranks.get(candidate.id)).padStart(2, '0')}${frontierIds.has(candidate.id) ? ' · frontier' : ''}</small>
+      </button>
+    `;
+  }).join('');
+
+  const plotPointMarkup = (entry, selected, ranks, frontierIds) => {
+    const field = state.capabilityCategory;
+    const metric = metricConfig[state.metric];
+    const { x, y } = plotCoordinates(entry, field, state.metric);
+    const isSelected = entry.id === selected.id;
+    const counterpart = entry.settingId === selected.settingId && !isSelected;
+    const isFrontier = frontierIds.has(entry.id);
+    const classes = [
+      'plot-point',
+      `plot-point--${entry.condition}`,
+      isFrontier ? 'is-frontier' : '',
+      isSelected ? 'is-selected' : '',
+      counterpart ? 'is-counterpart' : '',
+      !isSelected && !counterpart && !isFrontier ? 'is-muted' : ''
+    ].filter(Boolean).join(' ');
+
+    return `
+      <button
+        class="${classes}"
+        type="button"
+        data-plot-point
+        data-entry-id="${escapeHtml(entry.id)}"
+        data-frontier="${isFrontier}"
+        data-score="${scoreFor(entry, field).toFixed(1)}"
+        data-resource="${entry[state.metric]}"
+        data-plot-x="${x.toFixed(3)}"
+        data-plot-y="${y.toFixed(3)}"
+        style="left:${x.toFixed(3)}%;top:${y.toFixed(3)}%"
+        tabindex="${isSelected ? '0' : '-1'}"
+        aria-pressed="${isSelected}"
+        aria-label="Select ${fieldConfig[field].label} rank ${ranks.get(entry.id)}, ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, ${escapeHtml(conditionById.get(entry.condition).label)}, score ${formatScore(scoreFor(entry, field))}, ${metric.spoken(entry[state.metric])}${isFrontier ? ', on the efficient frontier' : ''}"
+      ></button>
+    `;
+  };
+
+  const plotMarkup = (entry, ranks, frontier, decision) => {
+    const metric = metricConfig[state.metric];
+    const field = state.capabilityCategory;
+    const current = plotCoordinates(entry, field, state.metric);
+    const trajectory = matchedEntries(entry);
+    const trajectoryPoints = trajectory.map((candidate) => {
+      const { x, y } = plotCoordinates(candidate, field, state.metric);
+      return `${x.toFixed(3)},${y.toFixed(3)}`;
+    }).join(' ');
+    const frontierPoints = frontier.map((candidate) => {
+      const { x, y } = plotCoordinates(candidate, field, state.metric);
+      return `${x.toFixed(3)},${y.toFixed(3)}`;
+    }).join(' ');
+    const frontierAnchor = frontier[Math.min(frontier.length - 1, Math.max(0, Math.floor(frontier.length * 0.42)))];
+    const frontierAnchorPosition = plotCoordinates(frontierAnchor, field, state.metric);
+    const xTicks = metric.ticks.map((tick) => (
+      `<span style="left:${resourcePosition(tick).toFixed(3)}%">${escapeHtml(metric.format(tick))}</span>`
+    )).join('');
+    const yTickValues = [55, 65, 75, 85, 95];
+    const yTicks = yTickValues.map((tick) => (
+      `<span style="top:${(100 - normalizedQuality(tick)).toFixed(3)}%">${tick}</span>`
+    )).join('');
+    const xLines = metric.ticks.map((tick) => {
+      const position = resourcePosition(tick).toFixed(3);
+      return `<line class="efficiency-plane__grid-line efficiency-plane__grid-line--x" x1="${position}" y1="0" x2="${position}" y2="100"></line>`;
+    }).join('');
+    const yLines = yTickValues.map((tick) => {
+      const position = (100 - normalizedQuality(tick)).toFixed(3);
+      return `<line class="efficiency-plane__grid-line efficiency-plane__grid-line--y" x1="0" y1="${position}" x2="100" y2="${position}"></line>`;
+    }).join('');
+    const frontierIds = frontier.map((candidate) => candidate.id);
+
+    return `
+      <div class="efficiency-plane__plot" data-frontier-ids="${escapeHtml(frontierIds.join(','))}">
+        <span class="efficiency-plane__axis-label efficiency-plane__axis-label--y">Higher quality ↑ · ${escapeHtml(fieldConfig[field].label)} score / 100 · zoomed 55–95</span>
+        <div
+          class="efficiency-plane__canvas"
+          data-selected-id="${escapeHtml(entry.id)}"
+          aria-describedby="efficiency-plot-description"
+        >
+          <svg class="efficiency-plane__grid" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <g class="efficiency-plane__grid-lines">${yLines}${xLines}</g>
+            <line class="efficiency-plane__selection-guide efficiency-plane__selection-guide--x" x1="0" y1="${current.y.toFixed(3)}" x2="${current.x.toFixed(3)}" y2="${current.y.toFixed(3)}"></line>
+            <line class="efficiency-plane__selection-guide efficiency-plane__selection-guide--y" x1="${current.x.toFixed(3)}" y1="${current.y.toFixed(3)}" x2="${current.x.toFixed(3)}" y2="100"></line>
+            <polyline
+              class="efficiency-plane__frontier"
+              data-frontier-ids="${escapeHtml(frontierIds.join(','))}"
+              points="${frontierPoints}"
+            ></polyline>
+            <polyline
+              class="efficiency-plane__trajectory"
+              data-setting-id="${escapeHtml(entry.settingId)}"
+              data-entry-ids="${escapeHtml(trajectory.map((candidate) => candidate.id).join(','))}"
+              points="${trajectoryPoints}"
+            ></polyline>
+          </svg>
+          <span class="efficiency-plane__direction" aria-hidden="true">Better trade-offs move ↖</span>
+          <span
+            class="efficiency-plane__frontier-label"
+            style="--label-x:${frontierAnchorPosition.x.toFixed(3)}%;--label-y:${frontierAnchorPosition.y.toFixed(3)}%"
+            aria-hidden="true"
+          >Efficient frontier</span>
+          <div class="efficiency-plane__points" role="group" aria-label="60 model, reasoning, and condition results">
+            ${data.entries.map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
+          </div>
+          <div class="efficiency-plane__pointer-layer" aria-hidden="true"></div>
+          <div
+            class="efficiency-plane__annotation ${annotationDockClass(entry)}"
+            style="--inspection-x:${current.x.toFixed(3)}%;--inspection-y:${current.y.toFixed(3)}%"
+            data-entry-id="${escapeHtml(entry.id)}"
+            data-frontier="${decision.isFrontier}"
+            aria-hidden="true"
+          >${plotInspectionMarkup(entry, ranks, decision.frontierIds)}</div>
+          <div class="efficiency-plane__tooltip" id="efficiency-plot-tooltip" role="tooltip" hidden></div>
+          <div class="efficiency-plane__y-ticks" aria-hidden="true">${yTicks}</div>
+          <div class="efficiency-plane__x-ticks" aria-hidden="true">${xTicks}</div>
+        </div>
+        <span class="efficiency-plane__axis-label efficiency-plane__axis-label--x">${escapeHtml(metric.axis)}</span>
+      </div>
+      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one model, reasoning setting, and Vasir condition. The line connects every measured result that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · quality scale 55–95 / 100.</p>
+    `;
+  };
+
+  const efficientFrontier = (field, metric) => data.entries
+    .filter((entry) => !data.entries.some((other) => (
+      scoreFor(other, field) >= scoreFor(entry, field) &&
+      other[metric] <= entry[metric] &&
+      (scoreFor(other, field) > scoreFor(entry, field) || other[metric] < entry[metric])
+    )))
+    .sort((left, right) => left[metric] - right[metric]);
+
+  const sampleFrontier = (frontier, maximum = 8, selectedId = null) => {
+    if (frontier.length <= maximum) return frontier;
+    const sampled = Array.from({ length: maximum }, (_, index) => (
+      frontier[Math.round((index / (maximum - 1)) * (frontier.length - 1))]
+    ));
+    const selectedIndex = selectedId ? frontier.findIndex((entry) => entry.id === selectedId) : -1;
+    if (selectedIndex >= 0 && !sampled.some((entry) => entry.id === selectedId)) {
+      const replacementIndex = Math.max(1, Math.min(maximum - 2, Math.round((selectedIndex / (frontier.length - 1)) * (maximum - 1))));
+      sampled[replacementIndex] = frontier[selectedIndex];
+      sampled.sort((left, right) => left[state.metric] - right[state.metric]);
+    }
+    return sampled;
+  };
+
+  const renderEfficiency = () => {
+    const entrySelect = elements.capabilityView.querySelector('#efficiency-entry');
+    const resourceAxis = elements.capabilityView.querySelector('#resource-axis');
+    const efficiencyView = elements.capabilityView.querySelector('#efficiency-view');
+    if (!entrySelect || !resourceAxis || !efficiencyView) return;
+
+    const entry = selectedEntry();
+    const field = state.capabilityCategory;
+    const ranking = rankedField(field);
+    const frontier = efficientFrontier(field, state.metric);
+    const decision = efficiencyDecision(entry, frontier, field, state.metric);
+    const sampled = sampleFrontier(frontier, 8, entry.id);
+    const metric = metricConfig[state.metric];
+    const comparison = decision.comparison;
+    const comparisonSaving = comparison
+      ? Math.round((1 - (comparison[state.metric] / entry[state.metric])) * 100)
+      : 0;
+    const comparisonQualityDifference = comparison
+      ? Math.round((scoreFor(entry, field) - scoreFor(comparison, field)) * 10) / 10
+      : 0;
+
+    entrySelect.innerHTML = ranking.entries.map((candidate) => `
+      <option value="${escapeHtml(candidate.id)}">#${ranking.ranks.get(candidate.id)} · ${escapeHtml(candidate.family)} · ${escapeHtml(candidate.reasoning)} · ${escapeHtml(conditionById.get(candidate.condition).short)}</option>
+    `).join('');
+    entrySelect.value = entry.id;
+    resourceAxis.value = state.metric;
+
+    efficiencyView.innerHTML = `
+      <div class="efficiency-story">
+        <section class="efficiency-field" aria-labelledby="efficiency-field-title">
+          <header class="efficiency-field__heading">
+            <div>
+              <p class="ui-eyebrow">Quality × ${escapeHtml(metric.label)} · ${data.entries.length} configurations</p>
+              <h4 id="efficiency-field-title">${escapeHtml(fieldConfig[field].label)} score: ${escapeHtml(decision.finding)} <strong>${formatScore(scoreFor(entry, field))}</strong> at <strong>${escapeHtml(metric.format(entry[state.metric]))}</strong></h4>
+              <p>${escapeHtml(decision.treatmentSentence)} ${decision.tradeoffSentence}</p>
+            </div>
+            <div class="efficiency-legend" aria-label="Chart legend">
+              ${data.conditions.map((condition) => `
+                <span>${conditionMarkup(condition.id, true)}</span>
+              `).join('')}
+              <span class="efficiency-legend__frontier"><i aria-hidden="true"></i>Efficient frontier</span>
+            </div>
+          </header>
+          <div class="efficiency-plane">${plotMarkup(entry, ranking.ranks, frontier, decision)}</div>
+        </section>
+
+        <aside class="efficiency-summary" aria-labelledby="efficiency-selected-title">
+          <header class="selected-result-heading">
+            <div>
+              <p class="ui-eyebrow">Selected configuration</p>
+              <h4 id="efficiency-selected-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4>
+              <span class="efficiency-summary__status${decision.isFrontier ? ' is-frontier' : ''}">${decision.isFrontier ? 'On the frontier' : 'Dominated trade-off'}</span>
+            </div>
+            <span class="efficiency-summary__score">
+              <small>#${ranking.ranks.get(entry.id)}</small>
+              <strong>${formatScore(scoreFor(entry, field))}</strong>
+              <small>${escapeHtml(fieldConfig[field].short)}</small>
+            </span>
+          </header>
+          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched Minimal, Skill, and Full progression">
+            ${efficiencyTrajectoryMarkup(entry, field, state.metric, ranking.ranks, decision.frontierIds)}
+          </div>
+          <dl class="efficiency-summary__resources">
+            ${Object.entries(metricConfig).map(([key, resourceMetric]) => `
+              <div class="${state.metric === key ? 'is-axis' : ''}">
+                <dt>${escapeHtml(resourceMetric.label)}</dt>
+                <dd>${escapeHtml(resourceMetric.format(entry[key]))}</dd>
+                <span>${escapeHtml(resourceComparison(entry, key))}</span>
+              </div>
+            `).join('')}
+          </dl>
+          ${comparison ? `
+            <button
+              class="efficiency-summary__alternative"
+              type="button"
+              data-entry-id="${escapeHtml(comparison.id)}"
+              aria-label="Select ${escapeHtml(decision.comparisonLabel)}, ${escapeHtml(comparison.family)}, ${escapeHtml(comparison.reasoning)} reasoning, ${escapeHtml(conditionById.get(comparison.condition).label)}, score ${formatScore(scoreFor(comparison, field))}, ${metric.spoken(comparison[state.metric])}"
+            >
+              <span class="ui-eyebrow">${escapeHtml(decision.comparisonLabel)}</span>
+              <span class="efficiency-summary__alternative-identity">
+                <strong>${escapeHtml(comparison.family)} · ${escapeHtml(comparison.reasoning)}</strong>
+                ${conditionMarkup(comparison.condition, true)}
+              </span>
+              <span class="efficiency-summary__alternative-values">
+                <b>${formatScore(scoreFor(comparison, field))}</b><small>quality</small>
+                <b>${escapeHtml(metric.format(comparison[state.metric]))}</b><small>${escapeHtml(metric.label)}</small>
+              </span>
+              <span>${comparisonSaving > 0 ? `Save ${comparisonSaving}% for ${comparisonQualityDifference.toFixed(1)} points less` : `Gain ${Math.abs(comparisonQualityDifference).toFixed(1)} points for no more ${escapeHtml(metric.label.toLowerCase())}`}</span>
+            </button>
+          ` : ''}
+        </aside>
+
+        <section class="frontier-list" aria-labelledby="frontier-list-title">
+          <header class="frontier-list__heading">
+            <div>
+              <p class="ui-eyebrow">Trade-off anchors</p>
+              <h4 id="frontier-list-title">Frontier options</h4>
+              <p>No listed configuration is both higher quality and lower ${escapeHtml(metric.label.toLowerCase())}.</p>
+            </div>
+            <span>${sampled.length} anchors · ${frontier.length} frontier results</span>
+          </header>
+          <div class="frontier-list__columns" aria-hidden="true">
+            ${[0, 1].map(() => `
+              <span class="frontier-list__column-set"><span>Configuration</span><span>Quality</span><span>${escapeHtml(metric.label)}</span></span>
+            `).join('')}
+          </div>
+          <div class="frontier-list__rows">
+          ${sampled.map((candidate) => {
+            const selected = candidate.id === entry.id;
+            return `
+              <button
+                class="frontier-row${selected ? ' is-selected' : ''}"
+                type="button"
+                data-entry-id="${escapeHtml(candidate.id)}"
+                data-score="${scoreFor(candidate, field).toFixed(1)}"
+                data-resource="${candidate[state.metric]}"
+                aria-pressed="${selected}"
+              >
+                <span class="frontier-row__rank">#${ranking.ranks.get(candidate.id)}</span>
+                <span class="frontier-row__identity">
+                  <strong>${escapeHtml(candidate.family)}</strong>
+                  <small>${escapeHtml(candidate.reasoning)} · ${escapeHtml(conditionById.get(candidate.condition).short)}</small>
+                </span>
+                <span class="frontier-row__condition">${conditionMarkup(candidate.condition, true)}</span>
+                <strong class="frontier-row__score">${formatScore(scoreFor(candidate, field))}</strong>
+                <strong class="frontier-row__resource">${escapeHtml(metric.format(candidate[state.metric]))}</strong>
+              </button>
+            `;
+          }).join('')}
+          </div>
+        </section>
+      </div>
+    `;
+
+    bindEfficiencyPlotInteractions();
+  };
+
+  const syncCapabilityRoute = ({ writeHash = false } = {}) => {
+    const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
+    const modeLabel = state.capabilityMode === 'benchmarks'
+      ? 'benchmark tests'
+      : state.capabilityMode === 'efficiency'
+        ? 'efficiency'
+        : 'leaderboard';
+    elements.workspace.dataset.selectedEntry = state.selectedId;
+    document.body.dataset.activeCapabilityMode = state.capabilityMode;
+    document.title = `VasirBench · ${category.name} ${modeLabel}`;
+
+    const nextHash = capabilityHash();
+    if (writeHash && window.location.hash !== nextHash) {
+      window.history.pushState(null, '', nextHash);
+    }
+  };
+
+  const renderDynamic = (focusSelector) => {
+    renderCapabilities();
+    syncCapabilityRoute();
+
+    if (focusSelector) {
+      window.requestAnimationFrame(() => {
+        document.querySelector(focusSelector)?.focus({ preventScroll: true });
+      });
+    }
+  };
+
+  const selectEntry = (entryId, focusSelector) => {
+    if (!entryById.has(entryId)) return;
+    state.selectedId = entryId;
+    renderDynamic(focusSelector);
+  };
+
+  const nearestPlotEntry = (event, layer) => {
+    const canvas = layer.closest('.efficiency-plane__canvas');
+    const points = canvas.querySelector('.efficiency-plane__points');
+    const bounds = points.getBoundingClientRect();
+    return data.entries.reduce((best, entry) => {
+      const x = bounds.left + (resourcePosition(entry[state.metric]) / 100) * bounds.width;
+      const y = bounds.top + ((100 - normalizedQuality(scoreFor(entry, state.capabilityCategory))) / 100) * bounds.height;
+      const distance = Math.hypot(event.clientX - x, event.clientY - y);
+      return !best || distance < best.distance ? { entry, distance, x, y } : best;
+    }, null);
+  };
+
+  const updatePlotInspection = (canvas, entryId) => {
+    if (!canvas || !entryById.has(entryId)) return;
+    const entry = entryById.get(entryId);
+    const selectedId = canvas.dataset.selectedId;
+    const ranks = rankedField(state.capabilityCategory).ranks;
+    const frontierIds = new Set(
+      (canvas.closest('.efficiency-plane__plot')?.dataset.frontierIds || '').split(',').filter(Boolean)
+    );
+    const tooltip = canvas.querySelector('.efficiency-plane__tooltip');
+    const { x, y } = plotCoordinates(entry);
+
+    canvas.dataset.inspectedId = entry.id;
+    canvas.querySelectorAll('.plot-point[data-entry-id]').forEach((point) => {
+      const candidate = entryById.get(point.dataset.entryId);
+      const related = candidate?.settingId === entry.settingId;
+      point.classList.toggle('is-inspected', point.dataset.entryId === entry.id);
+      point.classList.toggle('is-related', Boolean(related && point.dataset.entryId !== entry.id));
+      point.classList.toggle('is-deemphasized', !related && point.dataset.entryId !== selectedId);
+    });
+
+    if (!tooltip || entry.id === selectedId) {
+      if (tooltip) tooltip.hidden = true;
+      canvas.querySelector(`.plot-point[data-entry-id="${CSS.escape(entry.id)}"]`)?.removeAttribute('aria-describedby');
+      return;
+    }
+
+    tooltip.className = `efficiency-plane__tooltip ${annotationDockClass(entry)}`;
+    tooltip.style.setProperty('--inspection-x', `${x.toFixed(3)}%`);
+    tooltip.style.setProperty('--inspection-y', `${y.toFixed(3)}%`);
+    tooltip.dataset.entryId = entry.id;
+    tooltip.innerHTML = plotInspectionMarkup(entry, ranks, frontierIds);
+    tooltip.hidden = false;
+  };
+
+  const clearPlotInspection = (canvas) => {
+    if (!canvas) return;
+    delete canvas.dataset.inspectedId;
+    canvas.querySelectorAll('.plot-point[data-entry-id]').forEach((point) => {
+      point.classList.remove('is-inspected', 'is-related', 'is-deemphasized');
+      point.removeAttribute('aria-describedby');
+    });
+    const tooltip = canvas.querySelector('.efficiency-plane__tooltip');
+    if (tooltip) tooltip.hidden = true;
+  };
+
+  const bindEfficiencyPlotInteractions = () => {
+    const view = elements.capabilityView.querySelector('#efficiency-view');
+    const canvas = view?.querySelector('.efficiency-plane__canvas');
+    const pointerLayer = canvas?.querySelector('.efficiency-plane__pointer-layer');
+    if (!view || !canvas || !pointerLayer) return;
+
+    let pointerFrame = 0;
+    let latestPointerEvent = null;
+    pointerLayer.addEventListener('pointermove', (event) => {
+      latestPointerEvent = event;
+      if (pointerFrame) return;
+      pointerFrame = window.requestAnimationFrame(() => {
+        pointerFrame = 0;
+        const nearest = nearestPlotEntry(latestPointerEvent, pointerLayer);
+        if (nearest && nearest.distance <= 34) updatePlotInspection(canvas, nearest.entry.id);
+        else clearPlotInspection(canvas);
+      });
+    });
+    pointerLayer.addEventListener('pointerleave', () => {
+      if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+      pointerFrame = 0;
+      clearPlotInspection(canvas);
+    });
+
+    canvas.addEventListener('focusin', (event) => {
+      const point = event.target.closest('.plot-point[data-entry-id]');
+      if (!point) return;
+      point.setAttribute('aria-describedby', 'efficiency-plot-tooltip');
+      updatePlotInspection(canvas, point.dataset.entryId);
+    });
+    canvas.addEventListener('focusout', (event) => {
+      if (event.relatedTarget?.closest?.('.plot-point[data-entry-id]')) return;
+      clearPlotInspection(canvas);
+    });
+
+    view.querySelectorAll('.frontier-row[data-entry-id], .efficiency-summary__alternative[data-entry-id]').forEach((row) => {
+      row.addEventListener('pointerenter', () => updatePlotInspection(canvas, row.dataset.entryId));
+      row.addEventListener('pointerleave', () => {
+        if (document.activeElement !== row) clearPlotInspection(canvas);
+      });
+      row.addEventListener('focus', () => updatePlotInspection(canvas, row.dataset.entryId));
+      row.addEventListener('blur', () => clearPlotInspection(canvas));
+    });
+  };
+
+  const plotPointSnapshot = () => new Map(
+    [...elements.capabilityView.querySelectorAll('.plot-point[data-entry-id]')].map((point) => {
+      const box = point.getBoundingClientRect();
+      return [point.dataset.entryId, { x: box.left + (box.width / 2), y: box.top + (box.height / 2) }];
+    })
+  );
+
+  const animatePlotReflow = (before) => {
+    if (!before?.size || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    elements.capabilityView.querySelectorAll('.plot-point[data-entry-id]').forEach((point) => {
+      const previous = before.get(point.dataset.entryId);
+      if (!previous || typeof point.animate !== 'function') return;
+      const box = point.getBoundingClientRect();
+      const x = box.left + (box.width / 2);
+      const y = box.top + (box.height / 2);
+      point.animate([
+        {
+          transform: `translate(calc(-50% + ${previous.x - x}px), calc(-50% + ${previous.y - y}px))`,
+          opacity: 0.58
+        },
+        { transform: 'translate(-50%, -50%)', opacity: 1 }
+      ], {
+        duration: 220,
+        easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+      });
+    });
+    const frontier = elements.capabilityView.querySelector('.efficiency-plane__frontier');
+    frontier?.animate?.([{ opacity: 0.18 }, { opacity: 1 }], {
+      duration: 220,
+      easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+    });
+  };
+
+  const focusPlotNeighbor = (point, key) => {
+    const points = [...point.closest('.efficiency-plane__points').querySelectorAll('.plot-point[data-entry-id]')];
+    const current = {
+      x: Number(point.dataset.plotX),
+      y: Number(point.dataset.plotY)
+    };
+    let target = null;
+
+    if (key === 'Home') {
+      target = [...points].sort((left, right) => Number(left.dataset.plotX) - Number(right.dataset.plotX))[0];
+    } else if (key === 'End') {
+      target = [...points].sort((left, right) => Number(left.dataset.plotY) - Number(right.dataset.plotY))[0];
+    } else {
+      const candidates = points
+        .filter((candidate) => candidate !== point)
+        .map((candidate) => ({
+          candidate,
+          dx: Number(candidate.dataset.plotX) - current.x,
+          dy: Number(candidate.dataset.plotY) - current.y
+        }))
+        .filter(({ dx, dy }) => (
+          (key === 'ArrowRight' && dx > 0.1) ||
+          (key === 'ArrowLeft' && dx < -0.1) ||
+          (key === 'ArrowDown' && dy > 0.1) ||
+          (key === 'ArrowUp' && dy < -0.1)
+        ))
+        .sort((left, right) => {
+          const horizontal = key === 'ArrowRight' || key === 'ArrowLeft';
+          const leftPrimary = Math.abs(horizontal ? left.dx : left.dy);
+          const rightPrimary = Math.abs(horizontal ? right.dx : right.dy);
+          const leftCross = Math.abs(horizontal ? left.dy : left.dx);
+          const rightCross = Math.abs(horizontal ? right.dy : right.dx);
+          return (leftPrimary + (leftCross * 0.35)) - (rightPrimary + (rightCross * 0.35));
+        });
+      target = candidates[0]?.candidate || null;
+    }
+
+    if (!target) return;
+    points.forEach((candidate) => { candidate.tabIndex = candidate === target ? 0 : -1; });
+    target.focus({ preventScroll: true });
+  };
+
+  const selectCapabilityCategory = (categoryId, { focusSelector, writeHash = true, skipMotion = false } = {}) => {
+    if (!categoryById.has(categoryId)) return;
+    state.capabilityCategory = categoryId;
+    renderCapabilities({ animate: true, skipMotion });
+    syncCapabilityRoute({ writeHash });
+    if (focusSelector) {
+      window.requestAnimationFrame(() => {
+        document.querySelector(focusSelector)?.focus({ preventScroll: true });
+      });
+    }
+  };
+
+  const selectCapabilityMode = (mode, { focusSelector, writeHash = true, skipMotion = false } = {}) => {
+    if (!CAPABILITY_MODES.includes(mode)) return;
+    state.capabilityMode = mode;
+    updateCapabilityMode({ animate: true, skipMotion });
+    syncCapabilityRoute({ writeHash });
+    if (focusSelector) {
+      window.requestAnimationFrame(() => {
+        document.querySelector(focusSelector)?.focus({ preventScroll: true });
+      });
+    }
+  };
+
+  document.addEventListener('click', (event) => {
+    const capabilitySegment = event.target.closest('.capability-composition__segment[data-category-id][data-entry-id]');
+    if (capabilitySegment) {
+      if (!entryById.has(capabilitySegment.dataset.entryId) || !categoryById.has(capabilitySegment.dataset.categoryId)) return;
+      state.selectedId = capabilitySegment.dataset.entryId;
+      state.capabilityCategory = capabilitySegment.dataset.categoryId;
+      state.capabilityMode = 'models';
+      renderDynamic();
+      syncCapabilityRoute({ writeHash: true });
+      window.requestAnimationFrame(() => {
+        document.querySelector('#capability-question')?.focus({ preventScroll: true });
+      });
+      return;
+    }
+
+    const capabilityTab = event.target.closest('.capability-selector__tab[data-category-id]');
+    if (capabilityTab) {
+      selectCapabilityCategory(capabilityTab.dataset.categoryId, {
+        focusSelector: `.capability-selector__tab[data-category-id="${CSS.escape(capabilityTab.dataset.categoryId)}"]`
+      });
+      return;
+    }
+
+    const capabilityModeTab = event.target.closest('.capability-mode__tab[data-capability-mode]');
+    if (capabilityModeTab) {
+      selectCapabilityMode(capabilityModeTab.dataset.capabilityMode, {
+        focusSelector: `.capability-mode__tab[data-capability-mode="${CSS.escape(capabilityModeTab.dataset.capabilityMode)}"]`
+      });
+      return;
+    }
+
+    const showAll = event.target.closest('#show-all');
+    if (showAll) {
+      state.showAll = !state.showAll;
+      renderCapabilities();
+      window.requestAnimationFrame(() => {
+        document.querySelector('#show-all')?.focus({ preventScroll: true });
+      });
+      return;
+    }
+
+    const pointerLayer = event.target.closest('.efficiency-plane__pointer-layer');
+    if (pointerLayer) {
+      const nearest = nearestPlotEntry(event, pointerLayer);
+      if (nearest && nearest.distance <= 28) selectEntry(nearest.entry.id);
+      return;
+    }
+
+    const selectable = event.target.closest(
+      '.setting-row__select[data-entry-id], .capability-rank-row__select[data-entry-id], .matched-triplet__option[data-entry-id], .plot-point[data-entry-id], .frontier-row[data-entry-id], .efficiency-summary__alternative[data-entry-id]'
+    );
+    if (selectable) {
+      const selector = selectable.classList.contains('plot-point')
+        ? `.plot-point[data-entry-id="${CSS.escape(selectable.dataset.entryId)}"]`
+        : selectable.classList.contains('matched-triplet__option')
+          ? `.matched-triplet__option[data-entry-id="${CSS.escape(selectable.dataset.entryId)}"]`
+          : selectable.classList.contains('efficiency-summary__alternative')
+            ? `.efficiency-summary__alternative[data-entry-id="${CSS.escape(selectable.dataset.entryId)}"]`
+          : selectable.classList.contains('setting-row__select')
+            ? `.setting-row__select[data-entry-id="${CSS.escape(selectable.dataset.entryId)}"]`
+            : selectable.classList.contains('capability-rank-row__select')
+              ? `.capability-rank-row[data-full-entry-id="${CSS.escape(selectable.dataset.entryId)}"] .capability-rank-row__select`
+            : null;
+      selectEntry(selectable.dataset.entryId, selector);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const plotPoint = event.target.closest('.plot-point[data-entry-id]');
+    if (plotPoint && ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      focusPlotNeighbor(plotPoint, event.key);
+      return;
+    }
+
+    if (plotPoint && event.key === 'Escape') {
+      clearPlotInspection(plotPoint.closest('.efficiency-plane__canvas'));
+      plotPoint.blur();
+      return;
+    }
+
+    const capabilityModeTab = event.target.closest('.capability-mode__tab[data-capability-mode]');
+    if (capabilityModeTab) {
+      const tabs = [...capabilityModeTab.closest('[role="tablist"]').querySelectorAll('.capability-mode__tab[data-capability-mode]')];
+      const index = tabs.indexOf(capabilityModeTab);
+      let nextIndex = null;
+      if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+      if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = tabs.length - 1;
+      if (nextIndex === null) return;
+      event.preventDefault();
+      const mode = tabs[nextIndex].dataset.capabilityMode;
+      selectCapabilityMode(mode, {
+        focusSelector: `.capability-mode__tab[data-capability-mode="${CSS.escape(mode)}"]`,
+        skipMotion: true
+      });
+      return;
+    }
+
+    const capabilityTab = event.target.closest('.capability-selector__tab[data-category-id]');
+    if (capabilityTab) {
+      const tabList = capabilityTab.closest('[role="tablist"]');
+      const tabs = [...tabList.querySelectorAll('.capability-selector__tab[data-category-id]')];
+      const index = tabs.indexOf(capabilityTab);
+      const orientation = tabList.getAttribute('aria-orientation') || 'horizontal';
+      let nextIndex = null;
+      if ((orientation === 'horizontal' && event.key === 'ArrowRight') || (orientation === 'vertical' && event.key === 'ArrowDown')) nextIndex = (index + 1) % tabs.length;
+      if ((orientation === 'horizontal' && event.key === 'ArrowLeft') || (orientation === 'vertical' && event.key === 'ArrowUp')) nextIndex = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = tabs.length - 1;
+      if (nextIndex === null) return;
+      event.preventDefault();
+      const categoryId = tabs[nextIndex].dataset.categoryId;
+      selectCapabilityCategory(categoryId, {
+        focusSelector: `.capability-selector__tab[data-category-id="${CSS.escape(categoryId)}"]`,
+        skipMotion: true
+      });
+      return;
+    }
+
+    const segment = event.target.closest('.capability-composition__segment[data-category-id]');
+    if (!segment) return;
+    const segments = [...segment.closest('.capability-composition__stack').querySelectorAll('.capability-composition__segment[data-category-id]')];
+    const index = segments.indexOf(segment);
+    let nextIndex = null;
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % segments.length;
+    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + segments.length) % segments.length;
+    if (event.key === 'Home') nextIndex = 0;
+    if (event.key === 'End') nextIndex = segments.length - 1;
+    if (nextIndex === null) return;
+    event.preventDefault();
+    segments.forEach((candidate, candidateIndex) => {
+      candidate.tabIndex = candidateIndex === nextIndex ? 0 : -1;
+    });
+    segments[nextIndex].focus();
+  });
+
+  document.addEventListener('change', (event) => {
+    if (event.target.matches('#efficiency-entry')) {
+      selectEntry(event.target.value, '#efficiency-entry');
+      return;
+    }
+    if (event.target.matches('#resource-axis') && metricConfig[event.target.value]) {
+      const previousPositions = plotPointSnapshot();
+      state.metric = event.target.value;
+      updateCapabilityMode({ skipMotion: true });
+      window.requestAnimationFrame(() => {
+        animatePlotReflow(previousPositions);
+        document.querySelector('#resource-axis')?.focus({ preventScroll: true });
+      });
+    }
+  });
+
+  window.addEventListener('hashchange', () => {
+    const restoreCapabilityFocus = elements.capabilityView.contains(document.activeElement);
+    const restoreModeFocus = Boolean(document.activeElement?.closest?.('.capability-mode__tab'));
+    const route = routeFromHash();
+    state.capabilityCategory = route.category;
+    state.capabilityMode = CAPABILITY_MODES.includes(route.mode) ? route.mode : 'models';
+    renderCapabilities({ animate: true });
+    syncCapabilityRoute();
+    const canonicalHash = capabilityHash();
+    if (route.legacy || route.invalid || route.canonical === false || window.location.hash !== canonicalHash) {
+      window.history.replaceState(null, '', canonicalHash);
+    }
+    if (restoreCapabilityFocus) {
+      window.requestAnimationFrame(() => {
+        const selector = restoreModeFocus
+          ? '.capability-mode__tab[aria-selected="true"]'
+          : '.capability-selector__tab[aria-selected="true"]';
+        document.querySelector(selector)?.focus({ preventScroll: true });
+      });
+    }
+  });
+
+  capabilityIndexMedia.addEventListener('change', syncCapabilityIndexOrientation);
+
+  renderDynamic();
+  const initialHash = capabilityHash();
+  if (window.location.hash !== initialHash) {
+    window.history.replaceState(null, '', initialHash);
+  }
+}());

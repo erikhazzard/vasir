@@ -1,0 +1,217 @@
+{
+  "action": {
+    "title": "Action",
+    "reference": "references/genres/action.md",
+    "global_value_axis": "Life / Death",
+    "positive_pole": "Life",
+    "negative_pole": "Death",
+    "core_event": "The Mercy Scene: the hero is at the villain’s mercy, at their weakest against the villain’s greatest power, and must turn the tables through the final tactic and expressed gift.",
+    "core_emotion": "Excitement",
+    "conscious_objects_of_desire": [
+      "Defeat the antagonist or evil force",
+      "Save an individual, group, society, or environment from harm",
+      "Secure or destroy a dangerous MacGuffin",
+      "Restore order and peace"
+    ],
+    "subgenres": [
+      "Action Adventure — Labyrinth",
+      "Action Adventure — Monster",
+      "Action Adventure — Environment",
+      "Action Adventure — Doomsday",
+      "Action Duel — Revenge",
+      "Action Duel — Hunted",
+      "Action Duel — Machiavellian",
+      "Action Duel — Collision",
+      "Action Epic — Rebellion",
+      "Action Epic — Conspiracy",
+      "Action Epic — Vigilante",
+      "Action Epic — Savior",
+      "Action Clock — Ransom",
+      "Action Clock — Countdown",
+      "Action Clock — Holdout",
+      "Action Clock — Fate"
+    ]
+  },
+  "horror": {
+    "title": "Horror",
+    "reference": "references/genres/horror.md",
+    "global_value_axis": "Life / Death, deepening to Damnation or another fate worse than death",
+    "positive_pole": "Life / Salvation",
+    "negative_pole": "Death / Damnation",
+    "core_event": "The Confrontation with Evil: the protagonist faces the fully revealed horror in a final showdown whose outcome determines survival, death, or a fate worse than death.",
+    "core_emotion": "Fear and dread",
+    "conscious_objects_of_desire": [
+      "Survive and escape",
+      "Understand the source and rules of the horror",
+      "Protect loved ones or innocents",
+      "Destroy, neutralize, contain, or outlast the horror"
+    ],
+    "subgenres": [
+      "Supernatural Horror",
+      "Psychological Horror",
+      "Body Horror",
+      "Monster Horror",
+      "Gothic Horror",
+      "Slasher Horror"
+    ]
+  },
+  "crime": {
+    "title": "Crime",
+    "reference": "references/genres/crime.md",
+    "global_value_axis": "Justice / Injustice",
+    "positive_pole": "Justice",
+    "negative_pole": "Injustice",
+    "core_event": "The Exposure of the Criminal: the criminal’s identity, method, motive, or social defection is revealed. Punishment may follow or fail; exposure itself is the indispensable audience payoff.",
+    "core_emotion": "Intrigue, curiosity, and the satisfaction of the penny dropping",
+    "conscious_objects_of_desire": [
+      "Solve the crime and identify who is responsible",
+      "Expose or bring the perpetrator to justice",
+      "Exonerate the wrongly accused or oneself",
+      "Commit the perfect crime and escape justice when told from the criminal’s perspective"
+    ],
+    "subgenres": [
+      "Murder Mystery — Master Detective",
+      "Murder Mystery — Cozy",
+      "Murder Mystery — Historical",
+      "Murder Mystery — Noir / Hardboiled",
+      "Murder Mystery — Paranormal",
+      "Murder Mystery — Police Procedural",
+      "Organized Crime",
+      "Caper",
+      "Courtroom",
+      "Newsroom",
+      "Espionage Crime",
+      "Prison"
+    ]
+  },
+  "love": {
+    "title": "Love",
+    "reference": "references/genres/love.md",
+    "global_value_axis": "Love / Hate or Intimacy / Estrangement",
+    "positive_pole": "Love / Intimacy",
+    "negative_pole": "Hate / Estrangement",
+    "core_event": "The Proof of Love Scene: one or both lovers make a sacrificial or vulnerable action that proves genuine love rather than infatuation, lust, convenience, or possession.",
+    "core_emotion": "Connection and romance",
+    "conscious_objects_of_desire": [
+      "Win the beloved’s affection",
+      "Overcome internal and external barriers to be together",
+      "Achieve mutual understanding and respect",
+      "Secure a shared future or meaningful commitment"
+    ],
+    "subgenres": [
+      "Obsession",
+      "Romantic Comedy",
+      "Tragic Romance",
+      "Historical Romance",
+      "Paranormal Romance",
+      "Erotic Romance"
+    ]
+  },
+  "performance": {
+    "title": "Performance",
+    "reference": "references/genres/performance.md",
+    "global_value_axis": "Shame / Respect",
+    "positive_pole": "Respect",
+    "negative_pole": "Shame",
+    "core_event": "The Big Performance Scene: under decisive pressure, the protagonist unconditionally expresses—or betrays, withholds, or corrupts—their unique gift.",
+    "core_emotion": "Triumph",
+    "conscious_objects_of_desire": [
+      "Win or gain access to the major performance opportunity",
+      "Master and express the gift",
+      "Earn respect from audience, peers, mentor, or self",
+      "Defeat a rival or standard without surrendering the authentic gift"
+    ],
+    "subgenres": [
+      "Sports",
+      "Business / Profession",
+      "Art",
+      "Performing Arts"
+    ]
+  },
+  "western": {
+    "title": "Western",
+    "reference": "references/genres/western.md",
+    "global_value_axis": "Subjugation / Freedom",
+    "positive_pole": "Freedom",
+    "negative_pole": "Subjugation",
+    "core_event": "The Big Showdown: hero and villain face off in a decisive test of individual sovereignty, protection of the community, and the price of chosen duty.",
+    "core_emotion": "Intrigue",
+    "conscious_objects_of_desire": [
+      "Stop the oppressor’s plan",
+      "Protect the victim or community",
+      "Preserve or redefine personal autonomy",
+      "Restore conditions in which the community can govern itself"
+    ],
+    "subgenres": [
+      "Vengeance",
+      "Transition",
+      "Professional"
+    ]
+  },
+  "society": {
+    "title": "Society",
+    "reference": "references/genres/society.md",
+    "global_value_axis": "Impotence / Power",
+    "positive_pole": "Power",
+    "negative_pole": "Impotence",
+    "core_event": "The Revolution Scene: the protagonist’s or luminaries’ gifts are expressed or refused and power visibly changes hands—or fails to change hands.",
+    "core_emotion": "Intrigue",
+    "conscious_objects_of_desire": [
+      "Expose hypocrisy and lies of the reigning power",
+      "Gain recognition and rights for the disenfranchised",
+      "Create social or political change",
+      "Overthrow, reform, capture, or redistribute institutional power"
+    ],
+    "subgenres": [
+      "Political Society"
+    ]
+  },
+  "thriller": {
+    "title": "Thriller",
+    "reference": "references/genres/thriller.md",
+    "global_value_axis": "Damnation / Life",
+    "positive_pole": "Life",
+    "negative_pole": "Damnation",
+    "core_event": "Hero at the Mercy of the Villain: the protagonist’s pursuit of safety is most threatened, a fate worse than death becomes possible, and the outcome depends on how the protagonist unleashes—or fails to unleash—the unique gift.",
+    "core_emotion": "Excitement and suspense",
+    "conscious_objects_of_desire": [
+      "Unmask and stop the master villain",
+      "Prevent further victimization",
+      "Use the unique gift to outwit or overpower the antagonist",
+      "Restore personal and societal safety"
+    ],
+    "subgenres": [
+      "Serial Killer",
+      "Medical Thriller",
+      "Legal Thriller",
+      "Psychological Thriller",
+      "Espionage Thriller",
+      "Child in Jeopardy",
+      "Military Thriller",
+      "Political Thriller",
+      "Journalism Thriller",
+      "Financial Thriller",
+      "Hitchcock / Ordinary Person"
+    ]
+  },
+  "war": {
+    "title": "War",
+    "reference": "references/genres/war.md",
+    "global_value_axis": "Honor / Dishonor",
+    "positive_pole": "Honor",
+    "negative_pole": "Dishonor",
+    "core_event": "The Big Battle: the climactic organized conflict in which courage, strategy, kinship, and willingness to sacrifice are tested and the meaning of the sacrifice is established.",
+    "core_emotion": "Intrigue: fascination with how the characters will contend with an apparently impossible situation",
+    "conscious_objects_of_desire": [
+      "Fulfill or prevent the military objective",
+      "Protect comrades, civilians, homeland, or kin",
+      "Survive or achieve victory without forfeiting honor",
+      "Expose, resist, or obey a command whose moral legitimacy is contested"
+    ],
+    "subgenres": [
+      "Pro-War",
+      "Anti-War",
+      "Kinship of War"
+    ]
+  }
+}
