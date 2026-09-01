@@ -253,3 +253,178 @@ One real task should force the isolation mechanism. A game benchmark probably ne
 4. **The benchmark measures style agreement.** Calibrate gates on known strong/overbuilt/underbuilt/counter-idiomatic answers; keep candidates anonymous; expose reasons and cohort basis; require human review for the first claim.
 5. **The report launders weak samples into confidence.** Default to raw trial spread and sample counts, make incomplete cells explicit, and let every aggregate drill into the exact rows.
 6. **“Generic” becomes an evaluator framework.** Keep the stable core to condition snapshots, rows, pairs, score records, artifacts, and rendering; add a new task-kind adapter only when a real response or workspace task cannot fit those records.
+
+## 9) Production publication
+
+Read this section for `VASIR-BENCH__M1G` only.
+
+### Declared target
+
+```text
+operator
+  -> vasir benchmark publish
+  -> exact accepted-site receipt + nine-file production allowlist
+  -> bounded deterministic artifact + source-manifest SHA-256 release id
+  -> AWS account assertion: profile faedark == 339713108333
+  -> CloudFormation stack vasirbenchmark-production (us-east-1)
+       -> private, encrypted, versioned S3 bucket
+       -> CloudFront OAC + distribution + cache/security response policies
+       -> viewer-request CloudFront Function with ActiveReleaseId parameter
+       -> ACM DNS-validated certificate for vasirbenchmark.com
+       -> Route 53 A + AAAA aliases in Z08966383N3FDP7DJ59WU
+  -> acquire and conditionally renew one S3 publisher lease
+  -> reconcile private staged/verified publication state with the stack pointer
+  -> remove every physical version of safely expired releases; enforce 1 GiB
+  -> upload and checksum releases/<release-id>/...
+  -> update ActiveReleaseId once to activate the complete prefix
+  -> exact HTTPS/body/header/origin probe + Chrome route audit
+  -> conditionally record verified state; release the lease
+```
+
+The public workload is identical cacheable reads of a bounded static artifact. S3 is the durable object authority and CloudFront is the shared public serving path. The viewer-request function rewrites only `/`, `/index.html`, and `/benchmark-report.html` to the corresponding object inside `releases/<ActiveReleaseId>/` before cache lookup. Built HTML refers to release-qualified assets, so a page and all of its dependencies always come from one release. Changing the single function parameter creates a new cache key and activates the whole site without root-key overwrites or invalidation. The function publication is request-atomic and globally convergent, not globally instantaneous: an edge may briefly use either release pointer, but either pointer yields a complete coherent release. There is no write path, per-user payload, query workload, runtime compute, queue, datastore, key-value store, or second origin to justify another plane.
+
+Day one and the foreseeable production shape use the same components; traffic growth changes only CloudFront/S3 request counts. The initial CloudFront price class is the low-cost North America/Europe class; non-NA/EU latency remains unmeasured and is the explicit revisit condition. The hosted zone remains existing account infrastructure. The stack owns the certificate, bucket, OAC, distribution, function, policies, and alias records.
+
+### Planned source map
+
+```text
+cli/benchmark.js                              benchmark command/subcommand boundary and human output
+cli/benchmark-publish.js                      config, artifact build, lease, AWS state machine, activation, proof
+cli/docs-ref.js                               stable publish docs/troubleshooting anchors
+cli/command-runner.js                         command discovery, global flags, and benchmark dispatch
+site/vasirbenchmark.com/deployment.json       checked-in target, account assertion, stack, and public allowlist
+site/vasirbenchmark.com/infra/production.yml  complete CloudFormation authority
+site/vasirbenchmark.com/data.js               public-only evidence destinations; no ignored-workspace links
+site/vasirbenchmark.com/capture.mjs            local/remote finite route and browser proof harness
+site/vasirbenchmark.com/benchmark-report.js    honest local-evidence boundary in the public report
+test/benchmark-publish.test.js                 artifact, dry-run, identity, lease, rollback, and output contracts
+docs/cli-reference.md                         command reference
+docs/troubleshooting.md                       stable stage-error recovery
+site/vasirbenchmark.com/README.md              short operator how-to and artifact boundary
+```
+
+`deployment.json` is the only target configuration. The common command accepts no account, bucket, distribution, domain, or region override; those would make production identity an easy-to-misroute call-site choice. `--repo-root` changes only which repository is inspected. The AWS CLI is retained instead of an SDK dependency because it is already the authorized credential/profile boundary and CloudFormation owns resource convergence.
+
+### Accepted source and artifact contract
+
+The production allowlist contains only `index.html`, `style.css`, `assets/d3.v7.min.js`, `app.js`, `data.js`, `benchmark-report.html`, `benchmark-report.css`, `benchmark-report.js`, and `assets/kanit-latin-900-normal.woff2`. `template-lock.json` is the acceptance receipt, not a deploy input. The user's explicit request to use D3 makes its vendored runtime part of the public artifact contract. The receipt may be renewed only after the current source, harness, and ten canonical captures pass and the user accepts them. Publication has no `--force` or acceptance bypass: any later path, byte, or capture mismatch returns `BENCHMARK_PUBLISH_ACCEPTANCE_REQUIRED` and lists only the changed paths.
+
+The builder rejects missing, symlinked, or non-regular allowlisted paths; reads no non-allowlisted content into the public artifact; canonicalizes the sorted `{path, bytes, sha256}` source manifest; and uses its SHA-256 as the release identifier. It copies into a fresh temporary directory and deterministically rewrites HTML dependency URLs and generated report/navigation URLs so asset dependencies point to `/releases/<release-id>/...` while the public homepage and report entrypoints stay `/` and `/benchmark-report.html#<report-id>`. The temporary directory is removed on every exit. It never traverses `.agents`, screenshots, captures, docs, or the repository generally.
+
+Limits are binding and locally checked before AWS mutation: exactly nine files, at most 2 MiB per file, at most 5 MiB raw total, and at most 250 KiB gzip-compressed for the landing document plus its first-load CSS/JS/data/font dependencies. The deployed manifest records each transformed public path, media type, cache class, bytes, and SHA-256. HTML uses `public, max-age=0, s-maxage=31536000, must-revalidate`: browsers revalidate the stable visible URL, while CloudFront may retain the immutable release-qualified cache key. Release-qualified CSS, JS, data, and font objects use `public, max-age=31536000, immutable`. The CloudFront cache policy has `MinTTL=0`, `DefaultTTL=0`, and `MaxTTL=31536000`, honors those origin headers, enables gzip/Brotli, and excludes cookies, headers, and query strings from the cache key.
+
+Build validation rejects any local or relative target outside the finite artifact/route graph. The report manifest consists of all 24 checked-in benchmark IDs; the capability manifest consists of Combined plus five job families across Leaderboard, Benchmark tests, and Efficiency. The three current development summaries keep their reviewed public report routes but state that raw response/judge artifacts remain local and unpublished; their ignored-workspace source links are removed rather than copied.
+
+### AWS publication state machine
+
+The command first performs read-only identity, hosted-zone, tool, receipt, artifact, and stack-state checks. It accepts an absent stack, `CREATE_COMPLETE`, `UPDATE_COMPLETE`, and `UPDATE_ROLLBACK_COMPLETE`. It waits on an in-progress state only within the stage ceiling, then re-reads truth. A first-create `ROLLBACK_COMPLETE` with no verified release is deleted and recreated by the same command; `UPDATE_ROLLBACK_FAILED`, `ROLLBACK_FAILED`, `DELETE_FAILED`, or an unknown terminal state returns `BENCHMARK_PUBLISH_INFRASTRUCTURE_FAILED` without speculative repair. Initial infrastructure convergence is bounded to 60 minutes; later convergence and activation are each bounded to 30 minutes.
+
+An absent stack is first created with `ActiveReleaseId=bootstrap`. After a usable bucket exists, `_deploy/control/publish-lock.json` is acquired with a conditional `If-None-Match: *` put. The lock carries a random owner id, acquisition time, and 120-minute expiry. A fresh foreign lock returns `BENCHMARK_PUBLISH_BUSY`; an expired lock may be replaced only with its observed ETag. Conditional renewal replaces that exact ETag and yields the next owner ETag. Conditional release deletes only the current owner ETag. The lease-held state machine has a 75-minute wall-clock ceiling and checks token, ETag, owner, and expiry immediately before every AWS mutation. It renews with CAS before cleanup, activation, and rollback. On failed renewal, expired ownership, a foreign token, or the 75-minute ceiling, the process performs no further mutation—including rollback or cleanup—and reports the observed release as `indeterminate` when activation may already have occurred.
+
+`_deploy/control/publication-state.json` is the last-verified authority. It is updated with `If-Match`/`If-None-Match` CAS and contains `status`, `candidateReleaseId`, `previousActiveReleaseId`, `lastVerifiedReleaseId`, `previousVerifiedReleaseId`, timestamps, and the current publisher owner. Before activation the command writes `status=staged` with the observed stack pointer and last verified pointer. After terminal public proof it writes `status=verified`, promotes the candidate to `lastVerifiedReleaseId`, and preserves the prior verified identifier. A rerun reconciles this record with the stack before staging new work:
+
+- verified record + matching stack pointer: continue normally;
+- staged record + stack on the candidate: verify it, then finalize it or conditionally restore `lastVerifiedReleaseId`;
+- staged record + stack on `previousActiveReleaseId`: activation never became observed, so restore the prior verified control record;
+- missing record + `bootstrap`: first publication;
+- any other mismatch: return `BENCHMARK_PUBLISH_ACTIVATION_FAILED` with `rollback.status=indeterminate` and perform no speculative mutation.
+
+The command then uploads any missing `releases/<release-id>/...` objects with conditional creates and the declared cache/content/checksum metadata, verifies S3 checksum and length for every staged object, and writes its non-public manifest under `_deploy/manifests/`. It renews and proves lease ownership, writes the staged control record, and updates the same stack once with the new `ActiveReleaseId`. Regardless of the deploy exit, it waits for a terminal CloudFormation state, rereads the stack parameter, and waits until `cloudfront describe-function --stage LIVE` exposes the expected published function. A failed update does not assume which pointer is serving.
+
+If public verification fails, rollback is allowed only after CAS lease renewal and only when the reread active pointer still equals this command's candidate. The command then performs one bounded update to `lastVerifiedReleaseId`, waits for terminal stack and `LIVE` function state, rereads the restored pointer, and verifies the restored public release. Any missing prior verified release, unexpected pointer, lease loss, timeout, or restoration failure returns an explicit `indeterminate` rollback status. A first release has no prior public value and therefore remains `indeterminate` until a rerun verifies or replaces it.
+
+Before staging, a lease-renewed cleanup may delete only release prefixes that are neither the observed stack active release, the last verified release, nor the previous verified release and whose newest physical version is older than 30 days. It deletes every object version and delete marker for eligible `releases/<id>/` keys plus the matching private manifest; an ordinary unversioned delete does not count as cleanup. It then lists all remaining bucket versions, including `_deploy`, and rejects the candidate when projected physical bytes exceed 1 GiB. The stack applies a seven-day noncurrent-version and expired-delete-marker lifecycle only to `_deploy/control/`; release retention is command-owned so a long-lived active release can never age out. This bounds physical recovery storage rather than merely hiding old versions behind delete markers.
+
+The bucket policy grants the CloudFront service principal OAC-signed `s3:GetObject` only on `arn:...:bucket/releases/*` and binds that grant to the one distribution ARN. It grants no CloudFront read on `_deploy/*`; the terminal live probe requires a known `/_deploy/control/publication-state.json` request to return access denied.
+
+### CLI surface and result contract
+
+This is `NEW_PUBLIC_SURFACE` with a `FULL` contract and source-repository operator stability. The sole mutating command is:
+
+```text
+vasir benchmark publish [--dry-run] [--json] [--repo-root <path>]
+```
+
+The common path has an explicit mutating verb and accepts no domain, profile, account, region, bucket, distribution, stack, release, or force override. `deployment.json` is the fixed production identity. `--repo-root` changes only which repository is inspected. The AWS CLI is retained instead of an SDK dependency because it is already the authorized credential/profile boundary and CloudFormation owns resource convergence.
+
+Human mode names each completed stage with concise, non-animated output and ends with the public URL, release identifier, stack, and active release. `NO_COLOR` remains honored. `--json` suppresses progress and writes exactly one JSON object. `--dry-run` performs the same local build, target-closure, tool, receipt, and read-only identity checks, but never deploys CloudFormation, writes or deletes S3 objects, activates a function, or changes DNS. Its ordered `actions` say what the real command would do.
+
+Success and dry-run use schema version 1:
+
+```json
+{
+  "command": "benchmark",
+  "subcommand": "publish",
+  "schemaVersion": 1,
+  "status": "success",
+  "dryRun": false,
+  "target": {
+    "url": "https://vasirbenchmark.com",
+    "domain": "vasirbenchmark.com",
+    "profile": "faedark",
+    "accountId": "339713108333",
+    "region": "us-east-1",
+    "stackName": "vasirbenchmark-production"
+  },
+  "artifact": {
+    "releaseId": "<64 lowercase hex>",
+    "fileCount": 9,
+    "totalBytes": 0,
+    "compressedLandingBytes": 0,
+    "files": [{ "path": "index.html", "bytes": 0, "sha256": "<hex>" }],
+    "routes": {
+      "entrypoints": ["/", "/index.html", "/benchmark-report.html"],
+      "capabilityFragments": ["/#capabilities/overall"],
+      "reportFragments": ["/benchmark-report.html#hyper-scale-chat"]
+    }
+  },
+  "deployment": {
+    "previousVerifiedReleaseId": null,
+    "activeReleaseId": "<release-id>",
+    "bucketName": "<name>",
+    "distributionId": "<id>",
+    "functionName": "<name>",
+    "rollback": { "status": "not-needed", "releaseId": null }
+  },
+  "verification": {
+    "status": "passed",
+    "verifiedFiles": 9,
+    "verifiedReportRoutes": 24,
+    "verifiedCapabilityRoutes": 18,
+    "originPrivate": true
+  },
+  "actions": [
+    { "id": "validate-acceptance", "stage": "acceptance", "status": "completed", "mutatesAws": false },
+    { "id": "build-artifact", "stage": "artifact", "status": "completed", "mutatesAws": false },
+    { "id": "assert-identity", "stage": "identity", "status": "completed", "mutatesAws": false },
+    { "id": "converge-infrastructure", "stage": "infrastructure", "status": "completed", "mutatesAws": true },
+    { "id": "acquire-lease", "stage": "lease", "status": "completed", "mutatesAws": true },
+    { "id": "cleanup-releases", "stage": "cleanup", "status": "completed", "mutatesAws": true },
+    { "id": "stage-release", "stage": "upload", "status": "completed", "mutatesAws": true },
+    { "id": "activate-release", "stage": "activation", "status": "completed", "mutatesAws": true },
+    { "id": "verify-publication", "stage": "verification", "status": "completed", "mutatesAws": false },
+    { "id": "release-lease", "stage": "lease", "status": "completed", "mutatesAws": true }
+  ]
+}
+```
+
+`artifact.routes.entrypoints` is exactly the three stable HTML resources, `capabilityFragments` is the deterministic 18-route matrix of six scopes × three views, and `reportFragments` contains all 24 report routes. `actions[]` always uses the shape `{id, stage, status, mutatesAws}`. `id` is one of the ten identifiers shown above; `stage` is `acceptance | artifact | identity | infrastructure | lease | upload | activation | verification | cleanup`; and `status` is `completed | planned | skipped`. Array and route order are deterministic.
+
+Dry-run keeps the same keys, sets `dryRun=true`, uses `null` for unknown AWS output identifiers, and sets `verification.status="planned"`. Local/read-only actions that actually ran are `completed`; every mutating action is `planned` and no mutating AWS argv is invoked. `deployment.activeReleaseId` is the currently observed stack value or `null` when no stack exists; it never reports `artifact.releaseId` as active during dry-run. Human and JSON output are projections of the same result object, and normalization tests assert that both expose the same target, artifact, action, deployment, and verification facts.
+
+Errors use the shared `{code, message, context, suggestion, docsRef}` contract and exit nonzero. Stable publication codes are `BENCHMARK_PUBLISH_SUBCOMMAND_REQUIRED`, `BENCHMARK_PUBLISH_CONFIG_INVALID`, `BENCHMARK_PUBLISH_ACCEPTANCE_REQUIRED`, `BENCHMARK_PUBLISH_TOOL_MISSING`, `BENCHMARK_PUBLISH_ACCOUNT_MISMATCH`, `BENCHMARK_PUBLISH_ARTIFACT_INVALID`, `BENCHMARK_PUBLISH_STORAGE_BUDGET_EXCEEDED`, `BENCHMARK_PUBLISH_BUSY`, `BENCHMARK_PUBLISH_INFRASTRUCTURE_FAILED`, `BENCHMARK_PUBLISH_UPLOAD_FAILED`, `BENCHMARK_PUBLISH_ACTIVATION_FAILED`, `BENCHMARK_PUBLISH_VERIFICATION_FAILED`, and `BENCHMARK_PUBLISH_ROLLBACK_FAILED`. Context always includes `stage`, `releaseId` when known, `stackName`, `safeRetry`, and `rollback.status`; identity failures include only the expected/actual account ids, never credential material.
+
+The common quickstart is deliberately two lines:
+
+```bash
+vasir benchmark publish --dry-run
+vasir benchmark publish
+```
+
+The second command succeeds only after the exact public bytes and browser journey pass, then prints `https://vasirbenchmark.com` and the active release id. Help, CLI reference, troubleshooting anchors, README operator how-to, package smoke, and focused integration tests must all expose this same spelling and contract.
+
+### Terminal verification
+
+HTTP convergence verification has a separate two-minute ceiling and at most eight bounded attempts with five-second connect and fifteen-second total request timeouts. It verifies HTTP-to-HTTPS redirect, certificate-valid HTTPS, the expected VasirBench marker, the declared security headers, and exact decompressed SHA-256 for every deployed file through its release-qualified public URL. It confirms `/` and `/benchmark-report.html` serve the active release, checks anonymous direct S3 access returns access denied, and checks `/_deploy/control/publication-state.json` is denied through CloudFront.
+
+The existing Chrome harness accepts either its local `file:` source or the production HTTPS base. The live audit has its own five-minute ceiling and opens the Combined default, all six capability scopes in each of three view modes, and all 24 `benchmark-report.html#<id>` routes; it asserts the expected selected scope/report title, navigation target closure, zero page/runtime errors, and no horizontal overflow at the canonical desktop and mobile viewports. Fragment proof is browser-owned because fragments are not sent in HTTP requests. Publication succeeds only after this browser proof and the exact-byte HTTP proof both pass.

@@ -1,0 +1,78 @@
+{
+  "kind": "vasirbenchmark-production-deployment",
+  "schemaVersion": 1,
+  "target": {
+    "profile": "faedark",
+    "accountId": "339713108333",
+    "region": "us-east-1",
+    "domain": "vasirbenchmark.com",
+    "url": "https://vasirbenchmark.com",
+    "stackName": "vasirbenchmark-production",
+    "hostedZoneId": "Z08966383N3FDP7DJ59WU",
+    "bucketName": "vasirbenchmark-production-339713108333"
+  },
+  "templatePath": "infra/production.yml",
+  "publicFiles": [
+    {
+      "path": "index.html",
+      "contentType": "text/html; charset=utf-8",
+      "cacheClass": "html"
+    },
+    {
+      "path": "style.css",
+      "contentType": "text/css; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "assets/d3.v7.min.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "app.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "data.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "benchmark-report.html",
+      "contentType": "text/html; charset=utf-8",
+      "cacheClass": "html"
+    },
+    {
+      "path": "benchmark-report.css",
+      "contentType": "text/css; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "benchmark-report.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "assets/kanit-latin-900-normal.woff2",
+      "contentType": "font/woff2",
+      "cacheClass": "immutable"
+    }
+  ],
+  "limits": {
+    "maxFileBytes": 2097152,
+    "maxArtifactBytes": 5242880,
+    "maxCompressedLandingBytes": 256000,
+    "maxPhysicalStorageBytes": 1073741824,
+    "releaseRetentionDays": 30,
+    "controlNoncurrentRetentionDays": 7,
+    "leaseDurationMinutes": 120,
+    "maxLeaseHeldMinutes": 75
+  },
+  "tags": {
+    "Application": "VasirBench",
+    "Environment": "production",
+    "ManagedBy": "CloudFormation",
+    "Repository": "vasir"
+  }
+}

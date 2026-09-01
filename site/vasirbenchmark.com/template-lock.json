@@ -1,70 +1,82 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-08-29",
+  "version": "2026-08-30-category-score-only-segments",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
-    "acceptedAt": "2026-08-29",
+    "acceptedAt": "2026-08-30",
     "authority": "user",
     "verdict": "Accepted",
-    "response": "very good. let's lock this in as the template that we'll use.",
-    "criterion": "The current light-mode VasirBench site, responsive views, interactions, benchmark drilldown, and editorial Efficiency frontier are the canonical web template."
+    "response": "we dont need the +; too redundant; always ship",
+    "criterion": "The full-bleed SDK-reference VasirBench design renders every Combined capability segment with only its category abbreviation and exact raw score, omits redundant visible per-category uplift tokens, retains the underlying category-delta evidence and dedicated row uplift, preserves the synchronized D3 7.9 shared 0–100 comparison field and all prior interaction contracts, and passes the freshly verified ten-capture suite for production publication."
   },
   "deployment": {
-    "status": "deferred",
+    "status": "active",
     "targetDomain": "vasirbenchmark.com",
-    "awsAccountAlias": "fylgya",
-    "topology": null
+    "awsAccountAlias": "faedark",
+    "topology": {
+      "owner": "CloudFormation",
+      "stack": "vasirbenchmark-production",
+      "origin": "private-s3-oac",
+      "edge": "cloudfront-release-router",
+      "dns": "route53-apex-alias"
+    }
   },
-  "claimBoundary": "This accepts the static interface template and illustrative visual fixture only. It does not establish benchmark-score eligibility, production data integration, hosting topology, or deployment authorization.",
+  "claimBoundary": "This accepts and authorizes production publication of the static interface and illustrative visual fixture. It does not establish benchmark-score eligibility, scorer calibration, or production benchmark evidence; displayed aggregate rankings remain illustrative.",
   "files": [
     {
       "path": "index.html",
       "role": "runtime",
-      "sha256": "889fc5ac9c49d9afcf6ccc95db38d4ec1f2d0e0e6f1fb42d72e86766a72e898e",
-      "bytes": 2178
+      "sha256": "45008a0704089132364f355c776708a3990d3e6f35a943d644388909d6846364",
+      "bytes": 2234
     },
     {
       "path": "style.css",
       "role": "runtime",
-      "sha256": "a2c38c717fcfc826ca77d7a48ee40cbecb1c9960000328d086561c8efc57243b",
-      "bytes": 106209
+      "sha256": "c7adea3f7ad70ae6340dd9a7891fb53fa3b974713b7bbd76d334b966168fff38",
+      "bytes": 130111
+    },
+    {
+      "path": "assets/d3.v7.min.js",
+      "role": "runtime",
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+      "bytes": 279706
     },
     {
       "path": "app.js",
       "role": "runtime",
-      "sha256": "938c152bc0852e1f63862f92c4ccf220aa8ee61c8cc4647783dfe0bb2360107f",
-      "bytes": 86639
+      "sha256": "d99dd8d999f3b5f2d623b9ae06c04be0052fdb7a27f2cd0ac7bdc26424b2c9ff",
+      "bytes": 93452
     },
     {
       "path": "data.js",
       "role": "illustrative-fixture",
-      "sha256": "25a00f64b386ff2ff3268dd91943efe568542277916347b324f515d5b73928b1",
-      "bytes": 22873
+      "sha256": "2cbeaaa912256e919bd9fb1008656209fc6c17f1404b488c8f7de32c0141c722",
+      "bytes": 22542
     },
     {
       "path": "benchmark-report.html",
       "role": "runtime",
-      "sha256": "96b2d7408048486db979cca99a439208262e3b747f53d5eb5461ad5e1063a701",
-      "bytes": 1968
+      "sha256": "1fc069c97797487690db263ebcf44bc53314df890ef722d6af33d350b56845ba",
+      "bytes": 1979
     },
     {
       "path": "benchmark-report.css",
       "role": "runtime",
-      "sha256": "fc8c0bbf7d89ae7cb6d751da7f675db69e22fe99282b98ea5e074c21a0bf8cd5",
-      "bytes": 17182
+      "sha256": "9f736b71648ae439400613eb99acddec9d03a1d967615e3f31e66828072e7cdf",
+      "bytes": 17554
     },
     {
       "path": "benchmark-report.js",
       "role": "runtime",
-      "sha256": "9737c64ec8515d90a2e275e739e35eab274d8a06576555ffef1b861a8eea7bac",
-      "bytes": 14643
+      "sha256": "0535d1f86de3d8181bd344c215d6c0a7933a2dc4351fc108537161c290ab4fe5",
+      "bytes": 15237
     },
     {
       "path": "capture.mjs",
       "role": "qa-harness",
-      "sha256": "b16968cd278c9f11a86cc9166d74dadf30f7ddb274d3ae7afbbe401c70257905",
-      "bytes": 147748
+      "sha256": "dbf7808ceab4072d5452cdb9af79ddd2938b3dc8f17745aadb3640c904e1c9e8",
+      "bytes": 183520
     },
     {
       "path": "capture.sh",
@@ -83,80 +95,80 @@
     {
       "path": "desktop.png",
       "route": "#capabilities/overall",
-      "sha256": "609c4f4dcc2213e5911f8ef6404c4ad6a0b4456f543d7fd026f73f227ec41b4c",
-      "bytes": 219275,
+      "sha256": "721bb191c9839b4c8459c17354271e9f3409ec77dd2133aaa39ffe6fcf48050e",
+      "bytes": 200938,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile.png",
       "route": "#capabilities/overall",
-      "sha256": "ca5a7c23a394e6aacb06736320c182a10e7b4b5510a1bfd88f52d16e88af54c4",
-      "bytes": 78403,
+      "sha256": "816ad53e44e03bcdce109b2dba3d002bb8c607720510294d0b5bf1c1ef1c6946",
+      "bytes": 64608,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-capabilities.png",
       "route": "#capabilities/engineering",
-      "sha256": "63a37a9c5c4e608be695cd10010bcc01faeac56401978393e4e1ff925880f490",
-      "bytes": 144554,
+      "sha256": "13948aa39489cb530bfcae48257d85b865dd67c61205be0caf965637852c3534",
+      "bytes": 136373,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-capabilities.png",
       "route": "#capabilities/engineering",
-      "sha256": "ca53335b60c3f345fe81e7a4d2249f72e272417c64da7ff07222ad5802d05790",
-      "bytes": 71643,
+      "sha256": "2ae333b22c1b51820938b9f2e624e20818a2bd90b2f4f3f9094e05c103411427",
+      "bytes": 57531,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-capability-benchmarks.png",
       "route": "#capabilities/engineering/benchmarks",
-      "sha256": "cbafa547149464882ccd8b0a4c321cea4a8598aadcedbcfebebd87c6dd6d14ba",
-      "bytes": 194414,
+      "sha256": "b09334198e961ba9c28e7667718dbf9336d8d15af11b4a0630732d84f8771335",
+      "bytes": 179417,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-capability-benchmarks.png",
       "route": "#capabilities/engineering/benchmarks",
-      "sha256": "f37affdd4db681ada399d0a2f0b0dbaa62b4d8450c9f7e838ce2d9aad9d6177f",
-      "bytes": 76979,
+      "sha256": "e3bbad0d372a75f81a78644ad3a578a985568e83dd83fc6cbef6bc94a16b5606",
+      "bytes": 60215,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-efficiency.png",
       "route": "#capabilities/overall/efficiency",
-      "sha256": "2a3ddf75034dd49151dd0575e3ae8b610ccad83de37137863ff4eb4e16d93051",
-      "bytes": 190959,
+      "sha256": "a471d67500ea62420ffaa1a627d9f8d159fcd00fe080683e396120c5bcf6b6ad",
+      "bytes": 186200,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-efficiency.png",
       "route": "#capabilities/overall/efficiency",
-      "sha256": "0c92121af5b0f76677d5581685b27423b408c01f9ec38ad592cb3c411acc6041",
-      "bytes": 73112,
+      "sha256": "be7f32f416c621bb74e89089ed68902098669ea52e066b028e7eb3ce243087a2",
+      "bytes": 53490,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-benchmark-report.png",
       "route": "#report/hyper-scale-chat",
-      "sha256": "d25a5ea5537ea99c1b858d5f7db7a485a297c2a9c19556e79f19a0ec462e5d55",
-      "bytes": 133031,
+      "sha256": "cef3d199937aaa1fcfae785057b8daee99d7d4f2045d7b75b9b77b3fa7860f14",
+      "bytes": 146759,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-benchmark-report.png",
       "route": "#report/hyper-scale-chat",
-      "sha256": "ad5330f4756afe9df0c5f8106d3bb2998d9bc9f7c2057744f838c3b83a22b784",
-      "bytes": 59481,
+      "sha256": "3a4952e83ebc29983ae05e30f3efa55e15623e47101283f02c40724fd7369cd9",
+      "bytes": 62475,
       "width": 390,
       "height": 844
     }

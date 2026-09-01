@@ -54,6 +54,21 @@ export function formatCliErrorForText(error, { outputStream = process.stderr } =
     renderedLines.push(ui.formatField("code", ui.colors.bold(error.code)));
   }
 
+  const contextFields = [
+    ["stage", error.context?.stage],
+    ["release", error.context?.releaseId],
+    ["stack", error.context?.stackName],
+    ["active release", error.context?.observedActiveReleaseId],
+    ["last verified", error.context?.lastVerifiedReleaseId],
+    ["rollback", error.context?.rollback?.status],
+    ["safe retry", typeof error.context?.safeRetry === "boolean" ? (error.context.safeRetry ? "yes" : "no") : null]
+  ];
+  for (const [label, value] of contextFields) {
+    if (value !== null && value !== undefined && value !== "") {
+      renderedLines.push(ui.formatField(label, String(value)));
+    }
+  }
+
   if (error.suggestion) {
     renderedLines.push(ui.formatField("suggestion", error.suggestion));
   }

@@ -235,6 +235,10 @@ test("help output documents json support across commands and the explicit replac
   assert.match(capturedOutput.readStdout(), /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents draft-routing \[--json\] \[--write\]/);
   assert.match(capturedOutput.readStdout(), /vasir agents validate \[--scope <path>\] \[--json\]/);
+  assert.match(
+    capturedOutput.readStdout(),
+    /vasir benchmark publish \[--dry-run\] \[--json\] \[--repo-root <path>\]/
+  );
   assert.match(capturedOutput.readStdout(), /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval rescore <benchmark-or-skill> \[run-id\] \[--json\]/);

@@ -10,6 +10,7 @@ const siteRoot = join(repoRoot, 'site', 'vasirbenchmark.com');
 const expectedFiles = [
   'index.html',
   'style.css',
+  'assets/d3.v7.min.js',
   'app.js',
   'data.js',
   'benchmark-report.html',
@@ -60,10 +61,16 @@ test('canonical VasirBench site matches its accepted template lock', async () =>
   assert.equal(manifest.status, 'accepted');
   assert.equal(manifest.canonicalPath, 'site/vasirbenchmark.com');
   assert.equal(manifest.acceptance.authority, 'user');
-  assert.equal(manifest.deployment.status, 'deferred');
+  assert.equal(manifest.deployment.status, 'active');
   assert.equal(manifest.deployment.targetDomain, 'vasirbenchmark.com');
-  assert.equal(manifest.deployment.awsAccountAlias, 'fylgya');
-  assert.equal(manifest.deployment.topology, null);
+  assert.equal(manifest.deployment.awsAccountAlias, 'faedark');
+  assert.deepEqual(manifest.deployment.topology, {
+    owner: 'CloudFormation',
+    stack: 'vasirbenchmark-production',
+    origin: 'private-s3-oac',
+    edge: 'cloudfront-release-router',
+    dns: 'route53-apex-alias'
+  });
 
   assert.deepEqual(manifest.files.map(({ path }) => path), expectedFiles);
   assert.deepEqual(manifest.captures.map(({ path }) => path), expectedCaptures);

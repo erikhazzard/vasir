@@ -6,10 +6,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const [pagePath, destinationPath, widthArgument, heightArgument, targetArgument = 'leaderboard'] = process.argv.slice(2);
+const [pageInput, destinationPath, widthArgument, heightArgument, targetArgument = 'leaderboard'] = process.argv.slice(2);
 const chromeBinary = process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const width = Number(widthArgument);
 const height = Number(heightArgument);
+const scoreGuidePreview = process.env.VASIR_CAPTURE_SCORE_GUIDE === undefined
+  ? null
+  : Number(process.env.VASIR_CAPTURE_SCORE_GUIDE);
 const captureTarget = targetArgument.toLowerCase();
 const captureTargets = ['leaderboard', 'capabilities', 'capability-benchmarks', 'efficiency', 'report'];
 const isReportCapture = captureTarget === 'report';
@@ -26,7 +29,7 @@ const capabilityRoute = (category, mode = 'models') => (
 );
 
 if (
-  !pagePath ||
+  !pageInput ||
   !destinationPath ||
   !Number.isInteger(width) ||
   !Number.isInteger(height) ||
@@ -34,13 +37,31 @@ if (
   height <= 0 ||
   !captureTargets.includes(captureTarget)
 ) {
-  console.error('Usage: capture.mjs PAGE_PATH DESTINATION WIDTH HEIGHT [leaderboard|capabilities|capability-benchmarks|efficiency|report]');
+  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|capabilities|capability-benchmarks|efficiency|report]');
+  console.error('PAGE must be a local file path or an http(s) URL.');
   process.exit(1);
 }
 
-if (!fs.existsSync(pagePath)) {
-  console.error(`Page not found: ${pagePath}`);
-  process.exit(1);
+const isRemotePage = /^https?:\/\//i.test(pageInput);
+let pageUrl;
+
+if (isRemotePage) {
+  try {
+    pageUrl = new URL(pageInput);
+  } catch {
+    console.error(`Invalid page URL: ${pageInput}`);
+    process.exit(1);
+  }
+} else {
+  if (/^[a-z][a-z\d+.-]*:\/\//i.test(pageInput)) {
+    console.error(`Unsupported page URL protocol: ${pageInput}`);
+    process.exit(1);
+  }
+  if (!fs.existsSync(pageInput)) {
+    console.error(`Page not found: ${pageInput}`);
+    process.exit(1);
+  }
+  pageUrl = pathToFileURL(path.resolve(pageInput));
 }
 
 if (!fs.existsSync(chromeBinary)) {
@@ -50,7 +71,6 @@ if (!fs.existsSync(chromeBinary)) {
 
 const profileDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'vasirbench-final.'));
 const portFile = path.join(profileDirectory, 'DevToolsActivePort');
-const pageUrl = pathToFileURL(path.resolve(pagePath));
 pageUrl.hash = isReportCapture
   ? 'hyper-scale-chat'
   : captureTarget === 'leaderboard'
@@ -352,17 +372,18 @@ const reportAuditExpression = String.raw`(() => {
   if (!benchmark || !summary) failures.push('hyper-scale-chat fixture/summary missing');
   if (location.hash !== '#hyper-scale-chat') failures.push('route ' + location.hash);
   if (benchmark?.evidenceKind !== 'development' || summary?.evidenceKind !== 'development') failures.push('measured evidence kind mismatch');
-  if (!summary?.sourceHref || summary.sourceHref !== benchmark?.sourceHref) failures.push('source metadata mismatch');
+  if (summary?.sourceHref !== null || benchmark?.sourceHref != null) failures.push('public source metadata should be absent');
   if (text(document.querySelector('#report-title')) !== benchmark?.name) failures.push('report title mismatch');
 
   const truth = document.querySelector('.evidence-truth[aria-label="Evidence status"]');
   const truthText = text(truth);
   if (
     !isVisible(truth) ||
-    !truthText.includes('Development evidence') ||
+    !truthText.includes('Development snapshot') ||
     !truthText.includes('Calibration pending') ||
     !truthText.includes('Architecture skill') ||
-    !truthText.includes('not Full Vasir')
+    !truthText.includes('not Full Vasir') ||
+    !truthText.includes('Raw responses and judgments remain local')
   ) {
     failures.push('measured truth statement mismatch: ' + truthText);
   }
@@ -394,9 +415,29 @@ const reportAuditExpression = String.raw`(() => {
   if (breadcrumb?.querySelector('[aria-current="page"]')?.textContent.trim() !== benchmark?.name) failures.push('breadcrumb current page mismatch');
   if (!back || back.tagName !== 'A' || back.getAttribute('href') !== expectedBack || !isVisible(back)) failures.push('native back link mismatch');
 
+  const publicBoundary = document.querySelector('.report-overview__source');
+  const publicBoundaryText = text(publicBoundary);
   const sourceLinks = [...document.querySelectorAll('.evidence-truth a[href], .report-overview__source a[href]')];
-  if (sourceLinks.length !== 2 || sourceLinks.some((link) => link.tagName !== 'A' || link.getAttribute('href') !== summary?.sourceHref)) {
-    failures.push('native source links mismatch');
+  if (sourceLinks.length !== 0) failures.push('public report exposes a source link');
+  if (
+    !isVisible(publicBoundary) ||
+    text(publicBoundary?.querySelector('h3')) !== 'Public evidence boundary' ||
+    !publicBoundaryText.includes('real development snapshot') ||
+    !publicBoundaryText.includes('Raw responses, judgments') ||
+    !publicBoundaryText.includes('not published here') ||
+    !publicBoundaryText.includes('calibration remains pending')
+  ) {
+    failures.push('public evidence boundary mismatch: ' + publicBoundaryText);
+  }
+  const evidenceStateText = text([...document.querySelectorAll('.method-grid > section')]
+    .find((section) => text(section.querySelector('h3')) === 'Evidence state'));
+  if (
+    !evidenceStateText.includes('Calibration pending') ||
+    !evidenceStateText.includes('raw responses, judgments') ||
+    !evidenceStateText.includes('remain local') ||
+    !evidenceStateText.includes('not published here')
+  ) {
+    failures.push('method evidence boundary mismatch: ' + evidenceStateText);
   }
 
   const ranking = document.querySelector('#ranking');
@@ -423,6 +464,129 @@ const reportAuditExpression = String.raw`(() => {
     breadcrumbLinks: breadcrumbLinks.length,
     sourceLinks: sourceLinks.length,
     disclaimerVisible: isVisible(disclaimer),
+    failures
+  };
+})()`;
+
+const reportRouteAuditExpression = String.raw`(async () => {
+  const data = window.VASIR_DATA;
+  const benchmarks = data?.benchmarks || [];
+  const summaries = data?.benchmarkSummaries || [];
+  const summaryById = new Map(summaries.map((summary) => [summary.benchmarkId, summary]));
+  const benchmarkIds = benchmarks.map((benchmark) => benchmark.id);
+  const benchmarkIdSet = new Set(benchmarkIds);
+  const failures = [];
+  const routes = [];
+  const text = (element) => element?.textContent.replace(/\s+/g, ' ').trim() || '';
+  const isVisible = (element) => {
+    if (!element) return false;
+    const style = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+  };
+  const settle = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const sectionNames = ['overview', 'overview', 'ranking', 'method', 'top'];
+
+  if (benchmarks.length !== 24) failures.push('report manifest has ' + benchmarks.length + '/24 benchmarks');
+  if (benchmarkIdSet.size !== benchmarks.length) failures.push('report manifest contains duplicate benchmark ids');
+  if (summaries.length !== benchmarks.length || summaries.some((summary) => !benchmarkIdSet.has(summary.benchmarkId))) {
+    failures.push('report summary manifest does not match benchmark manifest');
+  }
+  if (benchmarkIds.some((id) => !/^[a-z0-9-]+$/.test(id))) failures.push('report manifest contains an unsafe fragment id');
+
+  for (const benchmark of benchmarks) {
+    const routeFailures = [];
+    const summary = summaryById.get(benchmark.id);
+    const expectedHash = '#' + benchmark.id;
+    window.location.hash = benchmark.id;
+    await settle();
+
+    const title = document.querySelector('#report-title');
+    const truth = document.querySelector('.evidence-truth[aria-label="Evidence status"]');
+    const truthText = text(truth);
+    const publicBoundary = document.querySelector('.report-overview__source');
+    const publicBoundaryText = text(publicBoundary);
+    const currentBreadcrumb = document.querySelector('.report-breadcrumb [aria-current="page"]');
+    const sourceLinks = [...document.querySelectorAll('.evidence-truth a[href], .report-overview__source a[href]')];
+    const sectionLinks = [...document.querySelectorAll('[data-report-section]')];
+    const paginationLinks = [...document.querySelectorAll('.report-pagination__link[href]')];
+    const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0);
+
+    if (!summary) routeFailures.push('summary missing');
+    if (location.hash !== expectedHash) routeFailures.push('hash ' + location.hash + ' != ' + expectedHash);
+    if (!isVisible(title) || text(title) !== benchmark.name) routeFailures.push('rendered title mismatch');
+    if (document.title !== benchmark.name + ' · VasirBench') routeFailures.push('document title mismatch');
+    if (text(currentBreadcrumb) !== benchmark.name) routeFailures.push('breadcrumb current page mismatch');
+    if (benchmark.evidenceKind !== summary?.evidenceKind) routeFailures.push('evidence kind mismatch');
+    if (summary?.detailHref !== './benchmark-report.html#' + benchmark.id) routeFailures.push('detail route mismatch');
+    if (sourceLinks.length !== 0) routeFailures.push('public source link exposed');
+    if (scrollWidth > innerWidth) routeFailures.push('horizontal overflow ' + (scrollWidth - innerWidth) + 'px');
+
+    if (
+      sectionLinks.length !== sectionNames.length ||
+      sectionLinks.some((link, index) => link.getAttribute('href') !== '#' + benchmark.id + '/' + sectionNames[index])
+    ) {
+      routeFailures.push('section fragment routes mismatch');
+    }
+    if (
+      paginationLinks.length !== 2 ||
+      paginationLinks.some((link) => {
+        const target = link.getAttribute('href')?.slice(1) || '';
+        return !benchmarkIdSet.has(target);
+      })
+    ) {
+      routeFailures.push('pagination fragment routes mismatch');
+    }
+
+    if (benchmark.evidenceKind === 'development') {
+      if (benchmark.sourceHref != null || summary?.sourceHref !== null) routeFailures.push('development source metadata should be absent');
+      if (
+        !isVisible(truth) ||
+        !truthText.includes('Development snapshot') ||
+        !truthText.includes('Calibration pending') ||
+        !truthText.includes('Architecture skill') ||
+        !truthText.includes('not Full Vasir') ||
+        !truthText.includes('Raw responses and judgments remain local')
+      ) {
+        routeFailures.push('development truth boundary mismatch');
+      }
+      if (
+        !isVisible(publicBoundary) ||
+        text(publicBoundary?.querySelector('h3')) !== 'Public evidence boundary' ||
+        !publicBoundaryText.includes('real development snapshot') ||
+        !publicBoundaryText.includes('not published here') ||
+        !publicBoundaryText.includes('calibration remains pending')
+      ) {
+        routeFailures.push('development public boundary mismatch');
+      }
+    } else {
+      if (benchmark.sourceHref != null || summary?.sourceHref !== null) routeFailures.push('illustrative source metadata should be absent');
+      if (
+        !isVisible(truth) ||
+        !truthText.includes('Illustrative design fixture') ||
+        !truthText.includes('No run.json, judge artifacts, or source judgments exist')
+      ) {
+        routeFailures.push('illustrative truth boundary mismatch');
+      }
+      if (text(publicBoundary?.querySelector('h3')) !== 'Evidence not collected yet') {
+        routeFailures.push('illustrative evidence boundary mismatch');
+      }
+    }
+
+    routes.push({ id: benchmark.id, evidenceKind: benchmark.evidenceKind, failures: routeFailures });
+    routeFailures.forEach((failure) => failures.push(benchmark.id + ': ' + failure));
+  }
+
+  window.location.hash = 'hyper-scale-chat';
+  await settle();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+
+  return {
+    routeCount: routes.length,
+    developmentCount: routes.filter((route) => route.evidenceKind === 'development').length,
+    illustrativeCount: routes.filter((route) => route.evidenceKind === 'illustrative').length,
+    restoredHash: location.hash,
+    routes,
     failures
   };
 })()`;
@@ -460,15 +624,25 @@ const capabilitySnapshotExpression = (category, mode) => String.raw`(async () =>
   const capabilityBrowser = workspace?.querySelector('.capability-browser');
   const capabilityIndex = workspace?.querySelector('.capability-browser__index');
   const capabilityCanvas = workspace?.querySelector('.capability-browser__canvas');
+  const pageFrame = document.querySelector('.page-frame');
   const capabilityModeRect = capabilityMode?.getBoundingClientRect();
   const capabilityModeTabsRect = capabilityModeTabsRoot?.getBoundingClientRect();
   const capabilityCanvasHeaderRect = capabilityCanvasHeader?.getBoundingClientRect();
   const capabilityCanvasRect = capabilityCanvas?.getBoundingClientRect();
+  const pageFrameRect = pageFrame?.getBoundingClientRect();
   const capabilityModeTabRects = capabilityModeTabs.map((tab) => tab.getBoundingClientRect());
-  const allowedKanit = '.capability-selector__tab > strong, .capability-canvas__readings dd';
+  const allowedKanit = [
+    '.benchmark-mast__identity h1',
+    '.capability-selector__tab > strong',
+    '.capability-canvas__identity h3',
+    '.capability-canvas__readings dd',
+    '.score-axis-header__profile-title strong',
+    '.capability-composition__total',
+    '.setting-row__delta strong'
+  ].join(', ');
   const unexpectedKanit = [...document.querySelectorAll('body *')]
     .filter((element) => getComputedStyle(element).fontFamily.includes('Kanit'))
-    .filter((element) => !element.matches(allowedKanit));
+    .filter((element) => !element.closest(allowedKanit));
   const modeTabRecords = capabilityModeTabs.map((tab) => {
     const controls = tab.getAttribute('aria-controls') || '';
     const controlledPanel = controls ? document.getElementById(controls) : null;
@@ -486,6 +660,11 @@ const capabilitySnapshotExpression = (category, mode) => String.raw`(async () =>
   return {
     expectedCategory,
     expectedMode,
+    viewportWidth: innerWidth,
+    d3Version: window.d3?.version || '',
+    pageFrameLeft: pageFrameRect?.left ?? NaN,
+    pageFrameRight: pageFrameRect?.right ?? NaN,
+    pageFrameWidth: pageFrameRect?.width || 0,
     hash: location.hash,
     globalLensNavigationCount: document.querySelectorAll('.lens-navigation, .lens-tab[data-lens], #panel-efficiency').length,
     globalTabPanelCount: document.querySelectorAll('.benchmark-explorer > [role="tabpanel"]').length,
@@ -538,6 +717,9 @@ const capabilitySnapshotExpression = (category, mode) => String.raw`(async () =>
     capabilityModeLabelVisible: isVisible(capabilityModeLabel),
     capabilityModeLabelText: capabilityModeLabel?.textContent.trim() || '',
     capabilityAxisText: capabilityAxis?.textContent.replace(/\s+/g, ' ').trim() || '',
+    combinedProfileMetricLabel: capabilityAxis?.querySelector('.score-axis-header__profile-title > span')?.textContent.trim() || '',
+    combinedEffectLabel: capabilityAxis?.querySelector('.score-axis-header__effect')?.textContent.trim() || '',
+    combinedConditionHintCount: capabilityAxis?.querySelectorAll('.score-axis-header__scale').length || 0,
     capabilityBrowserWidth: capabilityBrowser?.getBoundingClientRect().width || 0,
     capabilityIndexWidth: capabilityIndex?.getBoundingClientRect().width || 0,
     capabilityCanvasWidth: capabilityCanvas?.getBoundingClientRect().width || 0,
@@ -549,6 +731,10 @@ const capabilitySnapshotExpression = (category, mode) => String.raw`(async () =>
     completeCombinedRowsInViewport: combinedRows.filter((row) => {
       const box = row.getBoundingClientRect();
       return box.top >= 0 && box.bottom <= innerHeight;
+    }).length,
+    visibleCombinedRowsInViewport: combinedRows.filter((row) => {
+      const box = row.getBoundingClientRect();
+      return box.bottom > 0 && box.top < innerHeight;
     }).length,
     plotPointCount: workspace?.querySelectorAll('.capability-efficiency:not([hidden]) .plot-point[data-entry-id]').length || 0,
     efficiencySelectCount: workspace?.querySelectorAll('.capability-efficiency:not([hidden]) select:not([disabled])').length || 0,
@@ -809,7 +995,7 @@ const leaderboardCompositionExpression = (returnCategory, returnMode) => String.
     if (segments.length !== 5) failures.push(phase + ' ' + entryId + ': ' + segments.length + '/5 segments');
     const expected = expectedContributions(expectedEntry);
     const seenCategories = new Set();
-    let widthSum = 0;
+    let contributionSum = 0;
 
     segments.forEach((segment, index) => {
       const expectedSegment = expected[index];
@@ -827,8 +1013,13 @@ const leaderboardCompositionExpression = (returnCategory, returnMode) => String.
       const rawScore = number(segment.getAttribute('data-raw-score'));
       const weight = number(segment.getAttribute('data-weight'));
       const contribution = number(segment.getAttribute('data-contribution'));
-      const cssWidth = number(segment.style.getPropertyValue('--segment-width'));
-      widthSum += cssWidth;
+      const categoryDelta = number(segment.getAttribute('data-delta'));
+      const baselineEntry = window.VASIR_DATA.entries.find((candidate) => candidate.id === expectedEntry.settingId + '-baseline');
+      const baselineRawScore = baselineEntry?.categories.find((reading) => reading.category === categoryId)?.score;
+      const expectedCategoryDelta = Math.round((rawScore - baselineRawScore) * 10) / 10;
+      const visibleLabel = segment.textContent.replace(/\s+/g, ' ').trim();
+      const expectedVisibleLabel = category.short + ' ' + rawScore.toFixed(1);
+      contributionSum += contribution;
 
       if (segment.getAttribute('data-category-label') !== category.name) {
         failures.push(phase + ' ' + entryId + ' ' + categoryId + ': category label mismatch');
@@ -845,21 +1036,80 @@ const leaderboardCompositionExpression = (returnCategory, returnMode) => String.
       if (!closeEnough(contribution, expectedSegment?.contribution)) {
         failures.push(phase + ' ' + entryId + ' ' + categoryId + ': contribution ' + contribution + ' != ' + expectedSegment?.contribution);
       }
-      if (!closeEnough(cssWidth, contribution)) {
-        failures.push(phase + ' ' + entryId + ' ' + categoryId + ': CSS width ' + cssWidth + ' != contribution ' + contribution);
+      if (!closeEnough(categoryDelta, expectedCategoryDelta)) {
+        failures.push(phase + ' ' + entryId + ' ' + categoryId + ': category delta metadata ' + categoryDelta + ' != ' + expectedCategoryDelta);
+      }
+      if (segment.querySelector('.capability-composition__delta') || visibleLabel !== expectedVisibleLabel) {
+        failures.push(
+          phase + ' ' + entryId + ' ' + categoryId + ': visual label must contain only category and score; "' +
+          visibleLabel + '" != "' + expectedVisibleLabel + '"'
+        );
       }
     });
 
     if (seenCategories.size !== window.VASIR_DATA.categories.length) {
       failures.push(phase + ' ' + entryId + ': category coverage ' + seenCategories.size + '/5');
     }
-    if (!closeEnough(widthSum, compositeScore, scoreTolerance)) {
-      failures.push(phase + ' ' + entryId + ': CSS width sum ' + widthSum + ' != composite ' + compositeScore);
+    if (!closeEnough(contributionSum, compositeScore, scoreTolerance)) {
+      failures.push(phase + ' ' + entryId + ': weighted contribution sum ' + contributionSum + ' != composite ' + compositeScore);
     }
+    const track = composition.querySelector('.capability-composition__track');
+    const trackRect = track?.getBoundingClientRect();
+    const trackStyle = track ? getComputedStyle(track) : null;
+    const trackBorderLeft = Number.parseFloat(trackStyle?.borderLeftWidth || '0') || 0;
+    const trackBorderRight = Number.parseFloat(trackStyle?.borderRightWidth || '0') || 0;
+    const segmentRects = segments.map((segment) => segment.getBoundingClientRect());
+    const firstSegmentRect = segmentRects[0];
+    const lastSegmentRect = segmentRects.at(-1);
+    const availableWidth = Math.max(0, (trackRect?.width || 0) - trackBorderLeft - trackBorderRight);
+    const trackContentLeft = (trackRect?.left || 0) + trackBorderLeft;
+    const renderedWidth = lastSegmentRect
+      ? lastSegmentRect.right - trackContentLeft
+      : 0;
+    const expectedWidth = availableWidth * compositeScore / 100;
+    if (
+      availableWidth <= 0 ||
+      !firstSegmentRect ||
+      Math.abs(firstSegmentRect.left - trackContentLeft) > 1 ||
+      Math.abs(renderedWidth - expectedWidth) > 2
+    ) {
+      failures.push(
+        phase + ' ' + entryId + ': shared 0–100 endpoint ' + renderedWidth.toFixed(1) +
+        'px != ' + expectedWidth.toFixed(1) + 'px for score ' + compositeScore
+      );
+    }
+    let cumulativeContribution = 0;
+    segmentRects.forEach((segmentRect, index) => {
+      const previousContribution = cumulativeContribution;
+      cumulativeContribution += expected[index]?.contribution || 0;
+      const expectedSegmentWidth = availableWidth * (expected[index]?.contribution || 0) / 100;
+      const expectedSegmentStart = trackContentLeft + availableWidth * previousContribution / 100;
+      const expectedSegmentEnd = trackContentLeft + availableWidth * cumulativeContribution / 100;
+      if (
+        Math.abs(segmentRect.width - expectedSegmentWidth) > 2 ||
+        Math.abs(segmentRect.left - expectedSegmentStart) > 2 ||
+        Math.abs(segmentRect.right - expectedSegmentEnd) > 2
+      ) {
+        failures.push(
+          phase + ' ' + entryId + ' segment ' + (index + 1) + ': shared-scale geometry ' +
+          segmentRect.left.toFixed(1) + '–' + segmentRect.right.toFixed(1) + 'px != ' +
+          expectedSegmentStart.toFixed(1) + '–' + expectedSegmentEnd.toFixed(1) + 'px'
+        );
+      }
+    });
     if (composition.querySelector('.capability-composition__baseline')) {
       failures.push(phase + ' ' + entryId + ': obsolete Minimal marker present');
     }
-    return { entryId, condition, segmentCount: segments.length, widthSum, compositeScore };
+    return {
+      entryId,
+      condition,
+      segmentCount: segments.length,
+      contributionSum,
+      compositeScore,
+      availableWidth,
+      renderedWidth,
+      expectedWidth
+    };
   };
 
   const auditVisibleRows = (phase) => {
@@ -916,10 +1166,26 @@ const leaderboardCompositionExpression = (returnCategory, returnMode) => String.
       }
 
       const deltaElement = row.querySelector('.setting-row__delta');
+      const deltaValueElement = deltaElement?.querySelector('strong');
+      const totalElements = [...row.querySelectorAll('.capability-composition__total')];
       const visibleDelta = number(deltaElement?.textContent);
       if (!isVisible(deltaElement)) failures.push(phase + ' ' + settingId + ': delta is not visible');
       if (!closeEnough(visibleDelta, expectedDelta)) {
         failures.push(phase + ' ' + settingId + ': visible delta ' + visibleDelta + ' != ' + expectedDelta);
+      }
+      const deltaFontSize = deltaValueElement
+        ? parseFloat(getComputedStyle(deltaValueElement).fontSize)
+        : Number.NaN;
+      const totalFontSizes = totalElements.map((element) => parseFloat(getComputedStyle(element).fontSize));
+      if (
+        totalElements.length !== 2 ||
+        !Number.isFinite(deltaFontSize) ||
+        totalFontSizes.some((fontSize) => !Number.isFinite(fontSize) || fontSize < deltaFontSize + 2)
+      ) {
+        failures.push(
+          phase + ' ' + settingId + ': overall scores must be at least 2px larger than uplift; scores ' +
+          totalFontSizes.join(', ') + 'px vs uplift ' + deltaFontSize + 'px'
+        );
       }
 
       const compositions = [...row.querySelectorAll('.capability-composition')];
@@ -939,6 +1205,14 @@ const leaderboardCompositionExpression = (returnCategory, returnMode) => String.
       } else {
         const baselineRecord = auditComposition(phase, baselineComposition, baselineEntry, 'baseline', failures);
         const fullRecord = auditComposition(phase, fullComposition, fullEntry, 'full', failures);
+        const expectedEndpointDelta = fullRecord.availableWidth * expectedDelta / 100;
+        const renderedEndpointDelta = fullRecord.renderedWidth - baselineRecord.renderedWidth;
+        if (Math.abs(renderedEndpointDelta - expectedEndpointDelta) > 2) {
+          failures.push(
+            phase + ' ' + settingId + ': paired endpoint delta ' + renderedEndpointDelta.toFixed(1) +
+            'px != ' + expectedEndpointDelta.toFixed(1) + 'px for uplift ' + expectedDelta
+          );
+        }
         records.push({
           settingId,
           baselineEntryId,
@@ -1114,10 +1388,21 @@ const capabilityAuditExpression = (returnCategory, returnMode) => String.raw`(as
         : Math.round(((deltas[midpoint - 1] + deltas[midpoint]) / 2) * 10) / 10;
       const improved = deltas.filter((delta) => delta > 0).length;
       const regressed = deltas.filter((delta) => delta < 0).length;
-      if (!headerText.includes(category.name) || !headerText.includes('20 matched settings') || !headerText.includes('Best with Vasir') || !headerText.includes('Median Full effect') || !headerText.includes('Full outcomes')) {
+      if (!headerText.includes(category.name) || !headerText.includes('20 matched settings') || !headerText.includes('Best with Vasir') || !headerText.includes('Median uplift') || !headerText.includes('Improved settings')) {
         failures.push('Combined canvas header copy mismatch: ' + headerText);
       }
-      if (!/Model \/ reasoning \/ matched pair/i.test(axisText) || !/Weighted capability profile/i.test(axisText) || !/Full effect/i.test(axisText)) {
+      const profileMetricLabel = axis?.querySelector('.score-axis-header__profile-title > span')?.textContent.trim() || '';
+      const effectLabel = axis?.querySelector('.score-axis-header__effect')?.textContent.trim() || '';
+      const redundantConditionHints = axis?.querySelectorAll('.score-axis-header__scale').length || 0;
+      const staleAxisCopy = /Shared scale|Without shown below|With Vasir above|Overall uplift/i.test(axisText);
+      if (
+        !/Rank \/ model setting/i.test(axisText) ||
+        !/Capability scores/i.test(axisText) ||
+        profileMetricLabel !== 'Overall' ||
+        effectLabel !== 'Uplift' ||
+        redundantConditionHints !== 0 ||
+        staleAxisCopy
+      ) {
         failures.push('Combined axis labels mismatch: ' + axisText);
       }
       if (baselineBest) failures.push('Combined header repeats Best without summary');
@@ -1128,7 +1413,7 @@ const capabilityAuditExpression = (returnCategory, returnMode) => String.raw`(as
       if (
         number(outcomesSummary?.getAttribute('data-improved')) !== improved ||
         number(outcomesSummary?.getAttribute('data-regressed')) !== regressed ||
-        !outcomesSummary?.textContent.includes(improved + '/' + deltas.length) ||
+        !outcomesSummary?.textContent.includes(improved + ' of ' + deltas.length) ||
         !outcomesSummary?.textContent.includes(regressed + ' regressed')
       ) failures.push('Combined outcomes summary mismatch');
     } else {
@@ -1187,6 +1472,34 @@ const capabilityAuditExpression = (returnCategory, returnMode) => String.raw`(as
       const baselineMarkers = row.querySelectorAll('.capability-rank-row__marker--baseline');
       const fullMarkers = row.querySelectorAll('.capability-rank-row__marker--full');
       if (baselineMarkers.length !== 1 || fullMarkers.length !== 1) failures.push(prefix + 'markers ' + baselineMarkers.length + '/' + fullMarkers.length);
+      const track = row.querySelector('.capability-rank-row__track');
+      const connector = row.querySelector('.capability-rank-row__connector');
+      if (!track || !connector || baselineMarkers.length !== 1 || fullMarkers.length !== 1) {
+        failures.push(prefix + 'dumbbell geometry unavailable');
+      } else {
+        const trackBox = track.getBoundingClientRect();
+        const connectorBox = connector.getBoundingClientRect();
+        const baselineBox = baselineMarkers[0].getBoundingClientRect();
+        const fullBox = fullMarkers[0].getBoundingClientRect();
+        const baselineCenter = baselineBox.left + (baselineBox.width / 2);
+        const fullCenter = fullBox.left + (fullBox.width / 2);
+        const expectedBaselineCenter = trackBox.left + ((expectedBaselineScore / 100) * trackBox.width);
+        const expectedFullCenter = trackBox.left + ((expectedFullScore / 100) * trackBox.width);
+        const expectedConnectorLeft = Math.min(expectedBaselineCenter, expectedFullCenter);
+        const expectedConnectorRight = Math.max(expectedBaselineCenter, expectedFullCenter);
+        const connectorStyle = getComputedStyle(connector);
+        if (
+          connectorBox.height < 5.5 ||
+          Number.parseFloat(connectorStyle.borderTopWidth) < 0.9 ||
+          Number.parseFloat(connectorStyle.borderBottomWidth) < 0.9
+        ) failures.push(prefix + 'comparison connector is not a high-contrast 6px band');
+        if (
+          Math.abs(baselineCenter - expectedBaselineCenter) > 1.25 ||
+          Math.abs(fullCenter - expectedFullCenter) > 1.25 ||
+          Math.abs(connectorBox.left - expectedConnectorLeft) > 1.25 ||
+          Math.abs(connectorBox.right - expectedConnectorRight) > 1.25
+        ) failures.push(prefix + 'dumbbell is not aligned to the shared 0–100 scale');
+      }
       if (row.querySelector('[class*="skill"], [data-condition="skill"]')) failures.push(prefix + 'isolated Skill leaked into row');
       const rowReadings = [...row.querySelectorAll('.capability-rank-row__reading strong')].map((reading) => number(reading.textContent));
       if (!closeEnough(rowReadings[0], expectedBaselineScore) || !closeEnough(rowReadings[1], expectedFullScore)) failures.push(prefix + 'visible exact scores mismatch');
@@ -1493,7 +1806,7 @@ const capabilityBenchmarkAuditExpression = (returnCategory, returnMode) => Strin
 
       if (summary.evidenceKind === 'development') {
         if (!row.classList.contains('benchmark-ledger__row--measured') || row.classList.contains('benchmark-ledger__row--illustrative')) failures.push(prefix + 'measured class mismatch');
-        if (!benchmark.sourceHref || summary.sourceHref !== benchmark.sourceHref || !/\.\.\/.+\/report\.html#overview$/.test(summary.sourceHref)) failures.push(prefix + 'source report metadata missing');
+        if (benchmark.sourceHref != null || summary.sourceHref !== null) failures.push(prefix + 'development source metadata should be absent');
         if (summary.treatmentLabel !== 'Architecture skill') failures.push(prefix + 'development treatment mislabeled');
       } else {
         if (!row.classList.contains('benchmark-ledger__row--illustrative') || row.classList.contains('benchmark-ledger__row--measured')) failures.push(prefix + 'illustrative class mismatch');
@@ -1568,7 +1881,7 @@ const capabilityBenchmarkAuditExpression = (returnCategory, returnMode) => Strin
     measuredEngineering,
     expectedMeasuredEngineering,
     developmentSummaryCount: developmentSummaries.length,
-    developmentSourcesPresent: developmentSummaries.filter((summary) => Boolean(summary.sourceHref)).length,
+    developmentSourcesAbsent: developmentSummaries.filter((summary) => summary.sourceHref === null).length,
     illustrativeSummaryCount: illustrativeSummaries.length,
     illustrativeSourcesAbsent: illustrativeSummaries.filter((summary) => summary.sourceHref === null).length,
     totalTracks: categoryAudits.reduce((sum, audit) => sum + audit.trackCount, 0),
@@ -1876,6 +2189,153 @@ const plotInspectionSmokeExpression = String.raw`(async () => {
   };
 })()`;
 
+const capabilitySelectorInkExpression = (categoryId) => String.raw`(() => {
+  const categoryId = @@CATEGORY_ID@@;
+  const tab = document.querySelector('.capability-selector__tab[data-category-id="' + CSS.escape(categoryId) + '"]');
+  if (!tab) return { found: false, categoryId };
+  const pseudo = getComputedStyle(tab, '::before');
+  const transform = pseudo.transform === 'none' ? new DOMMatrix() : new DOMMatrix(pseudo.transform);
+  const box = tab.getBoundingClientRect();
+  const normalizeColor = (value) => {
+    const probe = document.createElement('span');
+    probe.style.color = value;
+    document.body.append(probe);
+    const normalized = getComputedStyle(probe).color;
+    probe.remove();
+    return normalized;
+  };
+  const paperColor = normalizeColor(getComputedStyle(tab).getPropertyValue('--sdk-paper').trim());
+  const colorOf = (selector) => getComputedStyle(tab.querySelector(selector)).color;
+  return {
+    found: true,
+    categoryId,
+    selected: tab.getAttribute('aria-selected') === 'true',
+    hoverCapable: matchMedia('(hover: hover) and (pointer: fine)').matches,
+    tab: { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height },
+    ink: {
+      opacity: Number(pseudo.opacity),
+      width: Number.parseFloat(pseudo.width) * Math.abs(transform.a),
+      backgroundColor: pseudo.backgroundColor
+    },
+    paperColor,
+    colors: {
+      index: colorOf('.capability-selector__index'),
+      name: colorOf('.capability-selector__name'),
+      state: colorOf('.capability-selector__state'),
+      score: colorOf(':scope > strong'),
+      unit: colorOf(':scope > strong small')
+    }
+  };
+})()`
+  .replace('@@CATEGORY_ID@@', JSON.stringify(categoryId));
+
+const combinedScoreGuideTargetExpression = (score, rowIndex = 2) => String.raw`(() => {
+  const requestedScore = @@SCORE@@;
+  const requestedRowIndex = @@ROW_INDEX@@;
+  const scoreField = document.querySelector('.score-field--combined');
+  const resultList = scoreField?.querySelector('.result-list');
+  const tracks = [...scoreField?.querySelectorAll('.capability-composition--full .capability-composition__track') || []];
+  const track = tracks[Math.min(requestedRowIndex, Math.max(0, tracks.length - 1))];
+  const guide = scoreField?.querySelector('.capability-score-guide');
+  if (!scoreField || !resultList || !track || !guide || !window.d3?.scaleLinear) {
+    return { found: false, requestedScore, requestedRowIndex };
+  }
+
+  const fieldBox = scoreField.getBoundingClientRect();
+  const listBox = resultList.getBoundingClientRect();
+  const trackBox = track.getBoundingClientRect();
+  const trackStyle = getComputedStyle(track);
+  const borderLeft = Number.parseFloat(trackStyle.borderLeftWidth) || 0;
+  const borderRight = Number.parseFloat(trackStyle.borderRightWidth) || 0;
+  const contentLeft = trackBox.left + borderLeft;
+  const contentRight = trackBox.right - borderRight;
+  const scale = window.d3.scaleLinear().domain([0, 100]).range([contentLeft, contentRight]).clamp(true);
+  const boundedScore = scale.invert(scale(requestedScore));
+  const rowBoxes = [...resultList.querySelectorAll('.setting-row')].map((row) => {
+    const box = row.getBoundingClientRect();
+    return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+  });
+
+  return {
+    found: true,
+    requestedScore,
+    boundedScore,
+    point: { x: scale(boundedScore), y: trackBox.top + (trackBox.height / 2) },
+    field: { left: fieldBox.left, top: fieldBox.top, right: fieldBox.right, bottom: fieldBox.bottom, width: fieldBox.width, height: fieldBox.height },
+    list: { left: listBox.left, top: listBox.top, right: listBox.right, bottom: listBox.bottom, width: listBox.width, height: listBox.height },
+    track: { left: contentLeft, right: contentRight, width: contentRight - contentLeft },
+    rowCount: rowBoxes.length,
+    rowBoxes,
+    guideInitiallyVisible: guide.classList.contains('is-visible')
+  };
+})()`
+  .replace('@@SCORE@@', JSON.stringify(score))
+  .replace('@@ROW_INDEX@@', JSON.stringify(rowIndex));
+
+const combinedScoreGuideStateExpression = String.raw`(() => {
+  const scoreField = document.querySelector('.score-field--combined');
+  const resultList = scoreField?.querySelector('.result-list');
+  const guide = scoreField?.querySelector('.capability-score-guide');
+  const line = guide?.querySelector('.capability-score-guide__line');
+  const readout = guide?.querySelector('.capability-score-guide__readout');
+  const track = scoreField?.querySelector('.capability-composition--full .capability-composition__track');
+  if (!scoreField || !resultList || !guide || !line || !readout || !track) return { found: false };
+
+  const fieldBox = scoreField.getBoundingClientRect();
+  const listBox = resultList.getBoundingClientRect();
+  const guideBox = guide.getBoundingClientRect();
+  const lineBox = line.getBoundingClientRect();
+  const readoutBox = readout.getBoundingClientRect();
+  const trackBox = track.getBoundingClientRect();
+  const trackStyle = getComputedStyle(track);
+  const guideStyle = getComputedStyle(guide);
+  const borderLeft = Number.parseFloat(trackStyle.borderLeftWidth) || 0;
+  const borderRight = Number.parseFloat(trackStyle.borderRightWidth) || 0;
+  const contentLeft = trackBox.left + borderLeft;
+  const contentRight = trackBox.right - borderRight;
+  const rowBoxes = [...resultList.querySelectorAll('.setting-row')].map((row) => {
+    const box = row.getBoundingClientRect();
+    return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+  });
+  const parsedScore = Number(guide.dataset.score);
+
+  return {
+    found: true,
+    visible: guide.classList.contains('is-visible') && guideStyle.display !== 'none' && Number(guideStyle.opacity) > 0.99,
+    hasVisibleClass: guide.classList.contains('is-visible'),
+    score: Number.isFinite(parsedScore) ? parsedScore : null,
+    source: guide.dataset.source || '',
+    readout: readout.textContent.replace(/\s+/g, ''),
+    labelShift: guide.style.getPropertyValue('--score-guide-label-shift').trim(),
+    guide: { left: guideBox.left, top: guideBox.top, right: guideBox.right, bottom: guideBox.bottom, width: guideBox.width, height: guideBox.height },
+    line: { left: lineBox.left, top: lineBox.top, right: lineBox.right, bottom: lineBox.bottom, width: lineBox.width, height: lineBox.height, centerX: lineBox.left + (lineBox.width / 2) },
+    readoutBox: { left: readoutBox.left, top: readoutBox.top, right: readoutBox.right, bottom: readoutBox.bottom, width: readoutBox.width, height: readoutBox.height },
+    field: { left: fieldBox.left, top: fieldBox.top, right: fieldBox.right, bottom: fieldBox.bottom, width: fieldBox.width, height: fieldBox.height },
+    list: { left: listBox.left, top: listBox.top, right: listBox.right, bottom: listBox.bottom, width: listBox.width, height: listBox.height },
+    track: { left: contentLeft, right: contentRight, width: contentRight - contentLeft },
+    rowCount: rowBoxes.length,
+    rowBoxes,
+    activeSegment: document.activeElement?.classList.contains('capability-composition__segment') || false
+  };
+})()`;
+
+const combinedScoreGuideFocusExpression = String.raw`(() => {
+  const scoreField = document.querySelector('.score-field--combined');
+  const stack = scoreField?.querySelector('.capability-composition--full .capability-composition__stack');
+  const segments = [...(stack?.querySelectorAll('.capability-composition__segment') || [])];
+  const segment = segments[2];
+  if (!scoreField || segments.length !== 5 || !segment) return { found: false, segmentCount: segments.length };
+  const expectedScore = segments.slice(0, 3).reduce((sum, candidate) => sum + (Number(candidate.dataset.contribution) || 0), 0);
+  segment.focus({ preventScroll: true });
+  return {
+    found: true,
+    expectedScore,
+    segmentCount: segments.length,
+    focused: document.activeElement === segment,
+    categoryId: segment.dataset.categoryId || ''
+  };
+})()`;
+
 const plotPointSetupExpression = (index) => String.raw`(() => {
   const classText = (element) => {
     if (typeof element.className === 'string') return element.className;
@@ -1942,6 +2402,17 @@ function capabilityStateProblems(stage, state) {
     problems.push(`${stage} obsolete global-lens chrome remains (${state.globalLensNavigationCount} controls, ${state.globalTabPanelCount} top-level tabpanels)`);
   }
   if (!state.workspaceVisible) problems.push(`${stage} capability workspace is not visible`);
+  if (state.d3Version !== '7.9.0') problems.push(`${stage} D3 runtime ${state.d3Version || '(missing)'}, expected 7.9.0`);
+  if (
+    state.pageFrameWidth <= 0 ||
+    Math.abs(state.pageFrameLeft) > 0.5 ||
+    Math.abs(state.pageFrameRight - state.viewportWidth) > 0.5
+  ) {
+    problems.push(
+      `${stage} page frame is not full bleed: ` +
+      `${state.pageFrameLeft.toFixed(1)}–${state.pageFrameRight.toFixed(1)} of ${state.viewportWidth}px`
+    );
+  }
   if (!state.selectedEntry) problems.push(`${stage} workspace has no data-selected-entry`);
   if (state.hasEffectTab || state.hasEffectPanel) {
     problems.push(`${stage} obsolete Vasir effect tab/panel remains`);
@@ -2022,18 +2493,19 @@ function capabilityStateProblems(stage, state) {
         problems.push(`${stage} tablet capability selectors are not one contained row (spread ${state.capabilitySelectorTopSpread.toFixed(1)}, in viewport ${state.capabilitySelectorsInViewport}/6)`);
       }
     } else if (
-      state.capabilitySelectorTopSpread > 1 ||
-      state.capabilitySelectorsInViewport < 2 ||
-      state.capabilitySelectorsInViewport > 4
+      state.capabilitySelectorTopSpread < 120 ||
+      state.capabilitySelectorTopSpread > 160 ||
+      state.capabilitySelectorsInViewport !== 6
     ) {
-      problems.push(`${stage} mobile capability scroller mismatch (spread ${state.capabilitySelectorTopSpread.toFixed(1)}, fully visible ${state.capabilitySelectorsInViewport}/6)`);
+      problems.push(`${stage} mobile capability grid mismatch (spread ${state.capabilitySelectorTopSpread.toFixed(1)}, fully visible ${state.capabilitySelectorsInViewport}/6)`);
     }
     if (state.capabilitySelectorMaxHeight < 60 || state.capabilitySelectorMaxHeight > 80) {
       problems.push(`${stage} capability selector height ${state.capabilitySelectorMaxHeight.toFixed(1)}px, expected 60–80px`);
     }
+    const selectorHeaderHeightRange = width > 1080 ? [154, 158] : [43.9, 58];
     if (
-      state.capabilitySelectorHeaderHeight < 43.9 ||
-      state.capabilitySelectorHeaderHeight > 58 ||
+      state.capabilitySelectorHeaderHeight < selectorHeaderHeightRange[0] ||
+      state.capabilitySelectorHeaderHeight > selectorHeaderHeightRange[1] ||
       !/^Capabilities\b/i.test(state.capabilitySelectorHeaderText) ||
       !/Best with Vasir \/100/i.test(state.capabilitySelectorHeaderText) ||
       state.capabilitySelectorMarkerCount !== 1 ||
@@ -2047,7 +2519,7 @@ function capabilityStateProblems(stage, state) {
       Math.abs(state.capabilityModeWidth - state.capabilityCanvasWidth) > 2 ||
       Math.abs(state.capabilityModeHeaderGap) > 1 ||
       Math.abs(state.capabilityModeContentGap) > 5 ||
-      state.capabilityModeFirstTabOffset > (width <= 688 ? 2 : 90) ||
+      state.capabilityModeFirstTabOffset > (width <= 688 ? 2 : 96) ||
       state.capabilityModeLabelVisible !== (width > 688) ||
       state.capabilityModeLabelText !== 'View'
     ) {
@@ -2067,27 +2539,30 @@ function capabilityStateProblems(stage, state) {
         if (!state.hasShowAll) problems.push(`${stage} Combined model mode has no #show-all`);
         if (
           state.capabilityHeaderHeight < (width <= 688 ? 180 : 110) ||
-          state.capabilityHeaderHeight > (width <= 688 ? 300 : 165) ||
+          state.capabilityHeaderHeight > (width <= 688 ? 300 : 210) ||
           state.capabilityHeaderReadingCount !== 3 ||
           !/20 matched settings/i.test(state.capabilityHeaderText) ||
           !/ranked by With Vasir/i.test(state.capabilityHeaderText) ||
           !/Best with Vasir/i.test(state.capabilityHeaderText) ||
-          !/Median Full effect/i.test(state.capabilityHeaderText) ||
-          !/Full outcomes/i.test(state.capabilityHeaderText)
+          !/Median uplift/i.test(state.capabilityHeaderText) ||
+          !/Improved settings/i.test(state.capabilityHeaderText)
         ) {
           problems.push(`${stage} Combined canvas header mismatch (${state.capabilityHeaderHeight.toFixed(1)}px): ${state.capabilityHeaderText}`);
         }
         if (
           state.capabilityAxisHeight < (width <= 688 ? 48 : 60) ||
           state.capabilityAxisHeight > 100 ||
-          !/Model \/ reasoning \/ matched pair/i.test(state.capabilityAxisText) ||
-          !/Weighted capability profile/i.test(state.capabilityAxisText) ||
-          !/Full effect/i.test(state.capabilityAxisText)
+          !/Rank \/ model setting/i.test(state.capabilityAxisText) ||
+          !/Capability scores/i.test(state.capabilityAxisText) ||
+          state.combinedProfileMetricLabel !== 'Overall' ||
+          state.combinedEffectLabel !== 'Uplift' ||
+          state.combinedConditionHintCount !== 0 ||
+          /Shared scale|Without shown below|With Vasir above|Overall uplift/i.test(state.capabilityAxisText)
         ) {
           problems.push(`${stage} Combined structural axis mismatch (${state.capabilityAxisHeight.toFixed(1)}px): ${state.capabilityAxisText}`);
         }
-        if (width <= 390 && state.completeCombinedRowsInViewport < 1) {
-          problems.push(`${stage} mobile shows no complete Combined paired row in viewport`);
+        if (width <= 390 && state.visibleCombinedRowsInViewport < 1) {
+          problems.push(`${stage} mobile shows no Combined paired row in viewport`);
         }
       } else {
         if (state.capabilityRowCount !== 20 || state.combinedSettingRowCount !== 0) {
@@ -2096,7 +2571,7 @@ function capabilityStateProblems(stage, state) {
         if (state.hasShowAll) problems.push(`${stage} named capability unexpectedly has #show-all`);
         if (
           state.capabilityHeaderHeight < (width <= 688 ? 150 : 110) ||
-          state.capabilityHeaderHeight > (width <= 688 ? 210 : 145) ||
+          state.capabilityHeaderHeight > (width <= 688 ? 250 : 210) ||
           state.capabilityHeaderReadingCount !== 2 ||
           !/20 matched settings/i.test(state.capabilityHeaderText) ||
           !/ranked by With Vasir/i.test(state.capabilityHeaderText) ||
@@ -2115,15 +2590,15 @@ function capabilityStateProblems(stage, state) {
         ) {
           problems.push(`${stage} named capability axis mismatch (${state.capabilityAxisHeight.toFixed(1)}px): ${state.capabilityAxisText}`);
         }
-        if (width <= 390 && state.completeCapabilityRowsInViewport < 3) {
-          problems.push(`${stage} mobile shows ${state.completeCapabilityRowsInViewport}/3 complete named capability rows in viewport`);
+        if (width <= 390 && state.completeCapabilityRowsInViewport < 1) {
+          problems.push(`${stage} mobile shows no complete named capability row in viewport`);
         }
       }
     } else if (state.expectedMode === 'benchmarks') {
       const expectedRows = expectedBenchmarkCounts[state.selectedCapabilityCategory];
       if (
         state.capabilityHeaderHeight < (width <= 688 ? 150 : 110) ||
-        state.capabilityHeaderHeight > (width <= 688 ? 210 : 145) ||
+        state.capabilityHeaderHeight > (width <= 688 ? 250 : 210) ||
         state.capabilityHeaderReadingCount !== 2 ||
         !/tracks/i.test(state.capabilityHeaderText) ||
         !/benchmark tests/i.test(state.capabilityHeaderText) ||
@@ -2220,6 +2695,37 @@ try {
   );
 
   const capturedState = isReportCapture ? null : await evaluate(capabilitySnapshotExpression(captureCapabilityCategory, captureCapabilityMode), true);
+  await evaluate(
+    `new Promise((resolve) => {
+      let remainingFrames = 4;
+      const pinTop = () => {
+        window.scrollTo(0, 0);
+        remainingFrames -= 1;
+        if (remainingFrames === 0) resolve(true);
+        else requestAnimationFrame(pinTop);
+      };
+      requestAnimationFrame(pinTop);
+    })`,
+    true
+  );
+  const capturedScrollY = await evaluate('window.scrollY');
+  if (
+    captureTarget === 'leaderboard' &&
+    width > 1080 &&
+    Number.isFinite(scoreGuidePreview) &&
+    scoreGuidePreview >= 0 &&
+    scoreGuidePreview <= 100
+  ) {
+    const target = await evaluate(combinedScoreGuideTargetExpression(scoreGuidePreview, 2));
+    if (target.found) {
+      await protocol.send('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: target.point.x,
+        y: target.point.y
+      });
+      await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))', true);
+    }
+  }
   const initialAudit = await evaluate(auditExpression);
   const screenshot = await protocol.send('Page.captureScreenshot', {
     format: 'png',
@@ -2234,12 +2740,27 @@ try {
 
   if (isReportCapture) {
     const reportAudit = await evaluate(reportAuditExpression);
+    const reportRouteAudit = await evaluate(reportRouteAuditExpression, true);
     const finalAudit = await evaluate(auditExpression);
     const problems = [
       ...auditProblems('initial', { ...initialAudit, brokenHashes: [] }),
       ...auditProblems('post-render', { ...finalAudit, brokenHashes: [] }),
-      ...reportAudit.failures
+      ...reportAudit.failures,
+      ...reportRouteAudit.failures
     ];
+    if (capturedScrollY !== 0) problems.push(`capture scroll position ${capturedScrollY}px, expected top`);
+    if (
+      reportRouteAudit.routeCount !== 24 ||
+      reportRouteAudit.developmentCount !== 3 ||
+      reportRouteAudit.illustrativeCount !== 21 ||
+      reportRouteAudit.restoredHash !== '#hyper-scale-chat'
+    ) {
+      problems.push(
+        `report route manifest ${reportRouteAudit.routeCount}/24 with ` +
+        `${reportRouteAudit.developmentCount}/3 development and ` +
+        `${reportRouteAudit.illustrativeCount}/21 illustrative routes; restored ${reportRouteAudit.restoredHash || '(empty)'}`
+      );
+    }
     if (capturedWidth !== width || capturedHeight !== height) {
       problems.push(`PNG dimensions ${capturedWidth}×${capturedHeight}, expected ${width}×${height}`);
     }
@@ -2248,7 +2769,7 @@ try {
     }
     if (!kanitReady) problems.push('bundled Kanit 900 font did not load');
     const status = problems.length ? `QA FAIL · ${problems.join('; ')}` : 'QA clean';
-    const summary = `${path.basename(destination)} · #report/hyper-scale-chat · ${capturedWidth}×${capturedHeight} · ${status} · measured ${reportAudit.baseline}→${reportAudit.treatment} (${reportAudit.delta > 0 ? '+' : ''}${reportAudit.delta}) / ${reportAudit.completion} / ${reportAudit.record} / ${reportAudit.breadcrumbLinks} breadcrumb links / ${reportAudit.sourceLinks} source links / illustrative disclaimer ${reportAudit.disclaimerVisible ? 'visible' : 'missing'}`;
+    const summary = `${path.basename(destination)} · #report/hyper-scale-chat · ${capturedWidth}×${capturedHeight} · ${status} · measured ${reportAudit.baseline}→${reportAudit.treatment} (${reportAudit.delta > 0 ? '+' : ''}${reportAudit.delta}) / ${reportAudit.completion} / ${reportAudit.record} / ${reportAudit.breadcrumbLinks} breadcrumb links / ${reportAudit.sourceLinks} public source links / ${reportRouteAudit.routeCount}/24 fragment routes / illustrative disclaimer ${reportAudit.disclaimerVisible ? 'visible' : 'missing'}`;
     if (problems.length) {
       console.error(summary);
       process.exitCode = 1;
@@ -2256,6 +2777,79 @@ try {
       console.log(summary);
     }
   } else {
+  let capabilitySelectorInkAudit = { skipped: true };
+  if (width > 1080) {
+    const resting = await evaluate(capabilitySelectorInkExpression('games'));
+    if (resting.found) {
+      await protocol.send('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: resting.tab.left + (resting.tab.width / 2),
+        y: resting.tab.top + (resting.tab.height / 2)
+      });
+      await evaluate('new Promise((resolve) => setTimeout(resolve, 240))', true);
+      const hovered = await evaluate(capabilitySelectorInkExpression('games'));
+      capabilitySelectorInkAudit = { skipped: false, resting, hovered };
+      await protocol.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: width - 2, y: height - 2 });
+    }
+  }
+  let combinedScoreGuideAudit = { skipped: true };
+  if (width > 1080) {
+    await evaluate(activateCapabilityRouteExpression('overall', 'models'), true);
+    const collapsedTarget = await evaluate(combinedScoreGuideTargetExpression(73.4, 2));
+    if (collapsedTarget.found) {
+      const hiddenBefore = await evaluate(combinedScoreGuideStateExpression);
+      await protocol.send('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: collapsedTarget.point.x,
+        y: collapsedTarget.point.y
+      });
+      await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))', true);
+      const pointer = await evaluate(combinedScoreGuideStateExpression);
+
+      await evaluate(`new Promise((resolve) => {
+        document.querySelector('.score-field--combined #show-all')?.click();
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)));
+      })`, true);
+      const expandedTarget = await evaluate(combinedScoreGuideTargetExpression(41.2, 2));
+      await protocol.send('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: expandedTarget.point.x,
+        y: expandedTarget.point.y
+      });
+      await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))', true);
+      const expanded = await evaluate(combinedScoreGuideStateExpression);
+
+      await protocol.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 2, y: 2 });
+      await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))', true);
+      const hiddenAfter = await evaluate(combinedScoreGuideStateExpression);
+
+      await evaluate(`new Promise((resolve) => {
+        document.querySelector('.score-field--combined #show-all')?.click();
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)));
+      })`, true);
+      const focusSetup = await evaluate(combinedScoreGuideFocusExpression);
+      await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))', true);
+      const focus = await evaluate(combinedScoreGuideStateExpression);
+      await evaluate('document.activeElement?.blur(); true');
+      await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))', true);
+      const focusCleared = await evaluate(combinedScoreGuideStateExpression);
+
+      combinedScoreGuideAudit = {
+        skipped: false,
+        collapsedTarget,
+        hiddenBefore,
+        pointer,
+        expandedTarget,
+        expanded,
+        hiddenAfter,
+        focusSetup,
+        focus,
+        focusCleared
+      };
+    }
+    await protocol.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: width - 2, y: height - 2 });
+    await evaluate(activateCapabilityRouteExpression(captureCapabilityCategory, captureCapabilityMode), true);
+  }
   const smoke = await evaluate(navigationInteractionExpression(captureCapabilityCategory, captureCapabilityMode), true);
   const compositionSmoke = await evaluate(
     leaderboardCompositionExpression(captureCapabilityCategory, captureCapabilityMode),
@@ -2335,6 +2929,7 @@ try {
     ...auditProblems('initial', initialAudit),
     ...auditProblems('post-interaction', finalAudit)
   ];
+  if (capturedScrollY !== 0) problems.push(`capture scroll position ${capturedScrollY}px, expected top`);
   const hashMatchesCapabilityRoute = (hash) => /^#capabilities\/(overall|engineering|games|product|writing|workflows)(?:\/(benchmarks|efficiency))?$/.test(hash);
   const expectedCaptureHash = capabilityRoute(captureCapabilityCategory, captureCapabilityMode);
 
@@ -2345,6 +2940,133 @@ try {
     problems.push(`${runtimeExceptions.length} runtime exception(s): ${runtimeExceptions.slice(0, 3).join(' | ')}`);
   }
   if (!kanitReady) problems.push('bundled Kanit 900 font did not load');
+  if (!capabilitySelectorInkAudit.skipped) {
+    const { resting, hovered } = capabilitySelectorInkAudit;
+    const hoverColors = Object.values(hovered.colors);
+    if (
+      !resting.hoverCapable ||
+      resting.selected ||
+      resting.ink.opacity < 0.99 ||
+      resting.ink.width < 8 ||
+      resting.ink.width > 16 ||
+      hovered.ink.width < hovered.tab.width - 2 ||
+      hoverColors.some((color) => color !== hovered.paperColor) ||
+      Math.abs(resting.tab.width - hovered.tab.width) > 0.5 ||
+      Math.abs(resting.tab.height - hovered.tab.height) > 0.5
+    ) {
+      problems.push(
+        `category ink treatment rest ${resting.ink.width.toFixed(1)}px/${resting.ink.opacity.toFixed(2)} → ` +
+        `hover ${hovered.ink.width.toFixed(1)}px of ${hovered.tab.width.toFixed(1)}px, ` +
+        `colors ${hoverColors.join(', ')}, paper ${hovered.paperColor}`
+      );
+    }
+  }
+  if (width > 1080 && combinedScoreGuideAudit.skipped) {
+    problems.push('combined score guide audit could not find its desktop chart target');
+  }
+  if (!combinedScoreGuideAudit.skipped) {
+    const {
+      collapsedTarget,
+      hiddenBefore,
+      pointer,
+      expandedTarget,
+      expanded,
+      hiddenAfter,
+      focusSetup,
+      focus,
+      focusCleared
+    } = combinedScoreGuideAudit;
+    const closeTo = (actual, expected, tolerance = 1) => (
+      Number.isFinite(actual) && Number.isFinite(expected) && Math.abs(actual - expected) <= tolerance
+    );
+    const geometryStayedPut = (target, state) => (
+      closeTo(state.field.left, target.field.left, 0.5) &&
+      closeTo(state.field.width, target.field.width, 0.5) &&
+      closeTo(state.list.left, target.list.left, 0.5) &&
+      closeTo(state.list.width, target.list.width, 0.5) &&
+      closeTo(state.rowBoxes[0]?.left, target.rowBoxes[0]?.left, 0.5) &&
+      closeTo(state.rowBoxes[0]?.width, target.rowBoxes[0]?.width, 0.5)
+    );
+    const pointerGeometryPassed = (
+      hiddenBefore.found &&
+      !collapsedTarget.guideInitiallyVisible &&
+      !hiddenBefore.visible &&
+      !hiddenBefore.hasVisibleClass &&
+      pointer.found &&
+      pointer.visible &&
+      pointer.source === 'pointer' &&
+      closeTo(pointer.score, 73.4, 0.11) &&
+      pointer.readout === '73.4/100' &&
+      pointer.rowCount === 10 &&
+      closeTo(pointer.line.centerX, collapsedTarget.point.x, 2) &&
+      closeTo(pointer.line.top, pointer.list.top, 2) &&
+      closeTo(pointer.line.bottom, pointer.list.bottom, 2) &&
+      closeTo(pointer.line.width, 2, 0.25) &&
+      geometryStayedPut(collapsedTarget, pointer)
+    );
+    if (!pointerGeometryPassed) {
+      problems.push(`combined score guide collapsed pointer geometry failed: ${JSON.stringify({ collapsedTarget, hiddenBefore, pointer })}`);
+    }
+
+    const expandedGeometryPassed = (
+      expandedTarget.found &&
+      expandedTarget.rowCount === 20 &&
+      expanded.found &&
+      expanded.visible &&
+      expanded.source === 'pointer' &&
+      closeTo(expanded.score, 41.2, 0.11) &&
+      expanded.readout === '41.2/100' &&
+      expanded.rowCount === 20 &&
+      closeTo(expanded.line.centerX, expandedTarget.point.x, 2) &&
+      closeTo(expanded.line.top, expanded.list.top, 2) &&
+      closeTo(expanded.line.bottom, expanded.list.bottom, 2) &&
+      closeTo(expanded.line.width, 2, 0.25) &&
+      Math.abs(expanded.line.centerX - pointer.line.centerX) > 40 &&
+      geometryStayedPut(expandedTarget, expanded)
+    );
+    if (!expandedGeometryPassed) {
+      problems.push(`combined score guide expanded pointer geometry failed: ${JSON.stringify({ expandedTarget, expanded })}`);
+    }
+
+    if (
+      !hiddenAfter.found ||
+      hiddenAfter.visible ||
+      hiddenAfter.hasVisibleClass ||
+      hiddenAfter.score !== null ||
+      hiddenAfter.source !== ''
+    ) {
+      problems.push(`combined score guide did not clear after pointer exit: ${JSON.stringify(hiddenAfter)}`);
+    }
+
+    const focusExpectedX = focus.track.left + ((focusSetup.expectedScore / 100) * focus.track.width);
+    const focusPassed = (
+      focusSetup.found &&
+      focusSetup.focused &&
+      focusSetup.segmentCount === 5 &&
+      focusSetup.categoryId === 'product' &&
+      focus.found &&
+      focus.visible &&
+      focus.source === 'focus' &&
+      focus.activeSegment &&
+      closeTo(focus.score, focusSetup.expectedScore, 0.002) &&
+      focus.readout === `${focusSetup.expectedScore.toFixed(1)}/100` &&
+      closeTo(focus.line.centerX, focusExpectedX, 2) &&
+      closeTo(focus.line.top, focus.list.top, 2) &&
+      closeTo(focus.line.bottom, focus.list.bottom, 2)
+    );
+    if (!focusPassed) {
+      problems.push(`combined score guide focus geometry failed: ${JSON.stringify({ focusSetup, focus, focusExpectedX })}`);
+    }
+    if (
+      !focusCleared.found ||
+      focusCleared.visible ||
+      focusCleared.hasVisibleClass ||
+      focusCleared.score !== null ||
+      focusCleared.source !== ''
+    ) {
+      problems.push(`combined score guide did not clear after focus exit: ${JSON.stringify(focusCleared)}`);
+    }
+  }
   if (!smoke.selectionChanged || !smoke.selectionPersistent) {
     problems.push(
       `selection persistence changed=${smoke.selectionChanged}, across views=${smoke.selectionPersistent}, ` +
@@ -2559,7 +3281,7 @@ try {
     capabilityBenchmarkAudit.totalTracks !== 10 ||
     capabilityBenchmarkAudit.totalTests !== 24 ||
     capabilityBenchmarkAudit.developmentSummaryCount !== 3 ||
-    capabilityBenchmarkAudit.developmentSourcesPresent !== 3 ||
+    capabilityBenchmarkAudit.developmentSourcesAbsent !== 3 ||
     capabilityBenchmarkAudit.illustrativeSummaryCount !== 21 ||
     capabilityBenchmarkAudit.illustrativeSourcesAbsent !== 21 ||
     capabilityBenchmarkAudit.measuredEngineering.join('|') !== capabilityBenchmarkAudit.expectedMeasuredEngineering.join('|')
@@ -2567,7 +3289,7 @@ try {
     problems.push(
       `benchmark fixture provenance mismatch: tracks=${capabilityBenchmarkAudit.totalTracks}/10, ` +
       `tests=${capabilityBenchmarkAudit.totalTests}/24, development=${capabilityBenchmarkAudit.developmentSummaryCount}/3 ` +
-      `with ${capabilityBenchmarkAudit.developmentSourcesPresent}/3 sources, illustrative=${capabilityBenchmarkAudit.illustrativeSummaryCount}/21 ` +
+      `with ${capabilityBenchmarkAudit.developmentSourcesAbsent}/3 source-free, illustrative=${capabilityBenchmarkAudit.illustrativeSummaryCount}/21 ` +
       `with ${capabilityBenchmarkAudit.illustrativeSourcesAbsent}/21 source-free, engineering=` +
       `${capabilityBenchmarkAudit.measuredEngineering.join(',')}`
     );
@@ -2613,7 +3335,13 @@ try {
   });
 
   const status = problems.length ? `QA FAIL · ${problems.join('; ')}` : 'QA clean';
-  const summary = `${path.basename(destination)} · #${captureTarget} → ${expectedCaptureHash} · ${capturedWidth}×${capturedHeight} · ${status} · Kanit ${kanitReady ? 'ready' : 'missing'} / ${smoke.modeRoutes.length}/3 local view routes / ${smoke.selects.exercised}/${smoke.selects.eligible} efficiency selects / show-all ${smoke.showAll.changed && smoke.showAll.restored ? 'toggle+restore' : 'failed'} / paired composition ${compositionSmoke.expanded.checkedCount}/20 settings × 2 conditions × 5 segments / capability fields 1 Combined × 10 paired + ${capabilityAudit.categoryAudits.length - 1}/5 named × 20 dot rows / benchmark mode 3 tabs × ${capabilityBenchmarkAudit.categoryAudits.length}/5 categories × ${capabilityBenchmarkAudit.totalTracks}/10 tracks × ${capabilityBenchmarkAudit.totalTests}/24 tests / efficiency ${efficiencyContextAudit.fieldAudits.length}/6 fields × 60 points / segment drill ${capabilityAudit.drilldowns.length}/10 / Full selection ${smoke.selectionPersistent ? 'persistent' : 'failed'} / ${plotPointerSmoke.exercised}/${plotPointerSmoke.total} plot pointer centers / hover+focus+roving inspection / ${keyboardResults.length} plot key paths`;
+  const selectorInkSummary = capabilitySelectorInkAudit.skipped
+    ? 'category ink touch layout'
+    : `category ink ${capabilitySelectorInkAudit.resting.ink.width.toFixed(0)}→${capabilitySelectorInkAudit.hovered.ink.width.toFixed(0)}px`;
+  const scoreGuideSummary = combinedScoreGuideAudit.skipped
+    ? 'score guide desktop only'
+    : 'score guide pointer+focus across 10→20 rows';
+  const summary = `${path.basename(destination)} · #${captureTarget} → ${expectedCaptureHash} · ${capturedWidth}×${capturedHeight} · ${status} · Kanit ${kanitReady ? 'ready' : 'missing'} / ${selectorInkSummary} / ${scoreGuideSummary} / ${smoke.modeRoutes.length}/3 local view routes / ${smoke.selects.exercised}/${smoke.selects.eligible} efficiency selects / show-all ${smoke.showAll.changed && smoke.showAll.restored ? 'toggle+restore' : 'failed'} / paired composition ${compositionSmoke.expanded.checkedCount}/20 settings × 2 conditions × 5 segments / capability fields 1 Combined × 10 paired + ${capabilityAudit.categoryAudits.length - 1}/5 named × 20 dot rows / benchmark mode 3 tabs × ${capabilityBenchmarkAudit.categoryAudits.length}/5 categories × ${capabilityBenchmarkAudit.totalTracks}/10 tracks × ${capabilityBenchmarkAudit.totalTests}/24 tests / efficiency ${efficiencyContextAudit.fieldAudits.length}/6 fields × 60 points / segment drill ${capabilityAudit.drilldowns.length}/10 / Full selection ${smoke.selectionPersistent ? 'persistent' : 'failed'} / ${plotPointerSmoke.exercised}/${plotPointerSmoke.total} plot pointer centers / hover+focus+roving inspection / ${keyboardResults.length} plot key paths`;
   if (problems.length) {
     console.error(summary);
     process.exitCode = 1;

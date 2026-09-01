@@ -36,6 +36,7 @@ vasir --version
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
 | `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Exit nonzero and identify any root or nested root `AGENTS.md` that still contains scaffold placeholders or broken repo routes |
+| `benchmark publish` | `vasir benchmark publish [--dry-run] [--json] [--repo-root <path>]` | Validate and publish the accepted VasirBench static site to `https://vasirbenchmark.com` through the fixed production target |
 | `eval run` | `vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] [--repo-root <path>]` | Run an independent benchmark through matched clean and skill-treated fresh agents |
 | `eval report` | `vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>]` | Regenerate a self-contained visual report from a saved benchmark run |
 | `eval run` (legacy) | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment suite owned by a skill |
@@ -575,6 +576,121 @@ Notes:
 - Eval artifacts are tool-owned local files and are ignored by this repo via `.agents/vasir-evals/`.
 - Every saved run is stored as a single `run.json` artifact.
 
+## Benchmark Publication
+
+### `benchmark publish`
+
+`vasir benchmark publish` is the only supported production publication path for the accepted static VasirBench site.
+
+```text
+vasir benchmark publish [--dry-run] [--json] [--repo-root <path>]
+```
+
+The target is fixed in the repository deployment configuration:
+
+- public URL: `https://vasirbenchmark.com`
+- AWS CLI profile: `faedark`
+- required AWS account: `339713108333`
+- region: `us-east-1`
+- CloudFormation stack: `vasirbenchmark-production`
+
+The command accepts no domain, profile, account, region, bucket, distribution, stack, release, or force override. It checks that `faedark` resolves to account `339713108333` before any AWS mutation.
+
+Prerequisites:
+
+- Run from the Vasir source repository, or pass its root with `--repo-root <path>`.
+- Install the AWS CLI and configure an authenticated profile named `faedark`.
+- Make Chrome or Chromium available to the repository's site capture harness for the terminal browser proof.
+- Keep `site/vasirbenchmark.com/template-lock.json` matched to the accepted source, capture harness, and ten canonical captures. There is no acceptance bypass.
+
+Confirm the AWS identity without changing cloud state:
+
+```bash
+aws sts get-caller-identity --profile faedark --region us-east-1
+```
+
+The `Account` value must be `339713108333`.
+
+The common publication flow is exactly:
+
+```bash
+vasir benchmark publish --dry-run
+vasir benchmark publish
+```
+
+The dry run performs the same local build, target closure, tool, acceptance-receipt, and read-only identity checks as publication. It does not deploy CloudFormation, write or delete S3 objects, acquire or release the publisher lease, activate a release, or change DNS. Its ordered action list identifies every AWS mutation the real command would perform.
+
+The publishing command:
+
+1. Builds the bounded artifact and deterministic release identifier.
+2. Verifies the fixed AWS account and converges the `vasirbenchmark-production` stack.
+3. Acquires the conditional publisher lease so only one activation can run at a time.
+4. Uploads and verifies the complete immutable release under `releases/<release-id>/`.
+5. Atomically activates that release through the stack-owned CloudFront Function pointer.
+6. Verifies the exact public bytes, HTTPS redirect, certificate, security headers, private origin, and complete Chrome route journey.
+7. Retains the active release, the immediately previous verified release, and releases younger than 30 days, then releases the publisher lease.
+
+Publication is idempotent for identical source bytes. A rerun uses the same release identifier and does not create a second stack or duplicate release.
+
+Flags:
+
+| Flag | Behavior |
+| --- | --- |
+| `--dry-run` | Runs local and read-only preflight checks, emits the resolved plan, and performs no AWS mutation |
+| `--json` | Suppresses progress and writes exactly one schema-versioned JSON object; errors remain nonzero structured errors |
+| `--repo-root <path>` | Changes only which source repository is inspected; it does not override any production target field |
+
+#### Public artifact boundary
+
+Exactly these nine checked-in source files may enter the public artifact:
+
+- `index.html`
+- `style.css`
+- `assets/d3.v7.min.js`
+- `app.js`
+- `data.js`
+- `benchmark-report.html`
+- `benchmark-report.css`
+- `benchmark-report.js`
+- `assets/kanit-latin-900-normal.woff2`
+
+The publisher does not upload capture scripts, screenshots, documentation, infrastructure sources, deployment manifests, `template-lock.json`, or ignored `.agents/vasir-evals` evidence. Missing, symlinked, non-regular, oversized, or unexpectedly linked artifact files fail validation before AWS mutation.
+
+Limits:
+
+- at most 2 MiB per file
+- at most 5 MiB for the complete raw artifact
+- at most 250 KiB gzip-compressed for the landing page and its first-load CSS, JavaScript, data, and font dependencies
+- at most 1 GiB for retained releases plus the candidate before upload
+
+#### JSON result
+
+Success and dry-run results use schema version 1 and include:
+
+- `command: "benchmark"`, `subcommand: "publish"`, `status`, `schemaVersion`, and `dryRun`
+- `target`: URL, domain, profile, account, region, and stack name
+- `artifact`: release identifier, file count, byte totals, per-file hashes, and the complete entrypoint, capability-fragment, and report-fragment route arrays
+- `deployment`: previous and active release identifiers, AWS output identifiers, and rollback outcome
+- `verification`: status, verified file and route counts, and origin-privacy result
+- `actions[]`: the deterministic production plan
+
+Each action has `{id, stage, status, mutatesAws}`. Action status is `completed`, `planned`, or `skipped`. The stable action identifiers, in order, are:
+
+1. `validate-acceptance`
+2. `build-artifact`
+3. `assert-identity`
+4. `converge-infrastructure`
+5. `acquire-lease`
+6. `cleanup-releases`
+7. `stage-release`
+8. `activate-release`
+9. `verify-publication`
+10. `release-lease`
+
+Dry-run preserves the same result keys. Unknown AWS output identifiers are `null`, `verification.status` is `planned`, local and read-only actions that ran are `completed`, and mutating actions are `planned`. `deployment.activeReleaseId` is the currently observed stack value or `null`; the candidate remains `artifact.releaseId` and is never reported as active during dry-run. Human and JSON modes expose the same target, artifact, action, deployment, and verification facts.
+
+The normal command succeeds only after the exact public bytes and browser journey pass. Its final output includes `https://vasirbenchmark.com` and the active release identifier. See [Benchmark Publication Errors](./troubleshooting.md#benchmark-publication-errors) for stable error codes and recovery.
+
 ## Version
 
 Use this when you need to confirm the installed CLI version before troubleshooting or reporting a bug.
@@ -606,7 +722,7 @@ Facts:
 
 ## JSON Output
 
-`--json` is supported by `status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `list`, `add`, `adopt`, `remove`, `agents sync`, `agents init`, `agents draft-purpose`, `agents draft-routing`, `agents validate`, and `eval run`.
+`--json` is supported by `status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `list`, `add`, `adopt`, `remove`, `agents sync`, `agents init`, `agents draft-purpose`, `agents draft-routing`, `agents validate`, `benchmark publish`, and `eval run`.
 
 Success envelope:
 
@@ -627,6 +743,7 @@ Success envelope:
 - `subcommand`, `agentsFilePath`, `claudeFilePath`, `profile`, `profileSource`, `purposeSource`, `nonobviousFilePath`, `wroteAgentsFile`, `wroteClaudeFile`, `wroteNonobviousFile`, `routingLines[]`, and `issues[]` for `agents sync`
 - `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `adoptedSkills`, and `skippedSkills` for `adopt`
 - `projectRootDirectory`, `projectConfigFilePath`, `projectSkillsDirectory`, `removedSkills`, and `missingSkills` for `remove`
+- `subcommand`, `schemaVersion`, `dryRun`, `target`, `artifact`, `deployment`, `verification`, and `actions[]` for `benchmark publish`
 
 `list --json` returns `skills[]` entries with:
 

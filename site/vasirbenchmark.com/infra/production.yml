@@ -1,0 +1,294 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Production static hosting for vasirbenchmark.com.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: vasirbenchmark.com
+    AllowedPattern: '^[a-z0-9.-]+$'
+    Description: Apex domain served by the distribution.
+  HostedZoneId:
+    Type: String
+    Default: Z08966383N3FDP7DJ59WU
+    AllowedPattern: '^Z[A-Z0-9]+$'
+    Description: Existing public Route 53 hosted zone for the apex domain.
+  BucketName:
+    Type: String
+    Default: vasirbenchmark-production-339713108333
+    AllowedPattern: '^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$'
+    Description: Fixed private origin bucket name.
+  ActiveReleaseId:
+    Type: String
+    Default: bootstrap
+    AllowedPattern: '^(bootstrap|[a-f0-9]{64})$'
+    Description: Immutable release prefix selected by the viewer-request function.
+
+Resources:
+  OriginBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: RetainExceptOnCreate
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireNoncurrentDeploymentControl
+            Status: Enabled
+            Prefix: _deploy/control/
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 7
+            ExpiredObjectDeleteMarker: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Application
+          Value: VasirBench
+        - Key: Environment
+          Value: production
+        - Key: ManagedBy
+          Value: CloudFormation
+        - Key: Repository
+          Value: vasir
+
+  SiteCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS
+      CertificateTransparencyLoggingPreference: ENABLED
+      Tags:
+        - Key: Application
+          Value: VasirBench
+        - Key: Environment
+          Value: production
+        - Key: ManagedBy
+          Value: CloudFormation
+        - Key: Repository
+          Value: vasir
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: Signed access to the private VasirBench release prefix.
+        Name: vasirbenchmark-production-s3-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  SiteCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: Honor immutable release cache headers without varying on viewer state.
+        DefaultTTL: 0
+        MaxTTL: 31536000
+        MinTTL: 0
+        Name: vasirbenchmark-production-cache-v1
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
+  SecurityHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Comment: Browser security boundary for the static VasirBench application.
+        CustomHeadersConfig:
+          Items:
+            - Header: Permissions-Policy
+              Override: true
+              Value: >-
+                accelerometer=(), autoplay=(), camera=(), display-capture=(),
+                encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(),
+                magnetometer=(), microphone=(), midi=(), payment=(),
+                publickey-credentials-get=(), screen-wake-lock=(), usb=()
+        Name: vasirbenchmark-production-security-v1
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: >-
+              default-src 'none'; base-uri 'none'; connect-src 'none';
+              font-src 'self'; form-action 'none'; frame-ancestors 'none';
+              img-src 'self' data:; object-src 'none'; script-src 'self';
+              style-src 'self' 'unsafe-inline'; upgrade-insecure-requests
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: no-referrer
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            IncludeSubdomains: false
+            Override: true
+            Preload: false
+
+  ReleaseRouterFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      FunctionCode: !Sub |
+        function handler(event) {
+          var request = event.request;
+
+          if (request.uri === '/' || request.uri === '/index.html') {
+            request.uri = '/releases/${ActiveReleaseId}/index.html';
+          } else if (request.uri === '/benchmark-report.html') {
+            request.uri = '/releases/${ActiveReleaseId}/benchmark-report.html';
+          }
+
+          return request;
+        }
+      FunctionConfig:
+        Comment: !Sub Route stable HTML paths to release ${ActiveReleaseId}.
+        Runtime: cloudfront-js-2.0
+      Name: vasirbenchmark-production-release-router
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref DomainName
+        Comment: Production VasirBench static site.
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachePolicyId: !Ref SiteCachePolicy
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt ReleaseRouterFunction.FunctionMetadata.FunctionARN
+          ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
+          TargetOriginId: private-s3-origin
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Origins:
+          - DomainName: !GetAtt OriginBucket.RegionalDomainName
+            Id: private-s3-origin
+            OriginAccessControlId: !Ref OriginAccessControl
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        PriceClass: PriceClass_100
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: none
+        ViewerCertificate:
+          AcmCertificateArn: !Ref SiteCertificate
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+      Tags:
+        - Key: Application
+          Value: VasirBench
+        - Key: Environment
+          Value: production
+        - Key: ManagedBy
+          Value: CloudFormation
+        - Key: Repository
+          Value: vasir
+
+  OriginBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref OriginBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontReadOnlyReleases
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${OriginBucket.Arn}/releases/*'
+            Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref AWS::AccountId
+                AWS:SourceArn: !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}'
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt OriginBucket.Arn
+              - !Sub '${OriginBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  ApexAliasA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt SiteDistribution.DomainName
+        EvaluateTargetHealth: false
+        HostedZoneId: Z2FDTNDATAQYW2
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+
+  ApexAliasAAAA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt SiteDistribution.DomainName
+        EvaluateTargetHealth: false
+        HostedZoneId: Z2FDTNDATAQYW2
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: AAAA
+
+Outputs:
+  ActiveReleaseId:
+    Description: Release identifier compiled into the LIVE viewer-request function.
+    Value: !Ref ActiveReleaseId
+  CertificateArn:
+    Description: ACM certificate used by CloudFront.
+    Value: !Ref SiteCertificate
+  DistributionDomainName:
+    Description: CloudFront distribution hostname.
+    Value: !GetAtt SiteDistribution.DomainName
+  DistributionId:
+    Description: CloudFront distribution identifier.
+    Value: !Ref SiteDistribution
+  BucketName:
+    Description: Private S3 origin bucket.
+    Value: !Ref OriginBucket
+  ReleaseRouterFunctionArn:
+    Description: LIVE release-routing CloudFront Function ARN.
+    Value: !GetAtt ReleaseRouterFunction.FunctionMetadata.FunctionARN
+  ReleaseRouterFunctionName:
+    Description: Release-routing CloudFront Function name.
+    Value: vasirbenchmark-production-release-router
+  SiteUrl:
+    Description: Public VasirBench URL.
+    Value: !Sub 'https://${DomainName}'

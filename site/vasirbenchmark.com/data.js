@@ -8,11 +8,11 @@
   ];
 
   const CATEGORIES = [
-    { id: 'engineering', name: 'Engineering', short: 'ENG', weight: 0.24, color: '#008094' },
-    { id: 'games', name: 'Games', short: 'GAME', weight: 0.20, color: '#00873a' },
-    { id: 'product', name: 'Product Design', short: 'DES', weight: 0.20, color: '#ac6400' },
-    { id: 'writing', name: 'Writing', short: 'WRITE', weight: 0.16, color: '#d63a30' },
-    { id: 'workflows', name: 'AI Workflows', short: 'FLOW', weight: 0.20, color: '#844cff' }
+    { id: 'engineering', name: 'Engineering', short: 'ENG', weight: 0.24, color: '#007f99' },
+    { id: 'games', name: 'Games', short: 'GAME', weight: 0.20, color: '#007c3a' },
+    { id: 'product', name: 'Product Design', short: 'DES', weight: 0.20, color: '#b45f00' },
+    { id: 'writing', name: 'Writing', short: 'WRITE', weight: 0.16, color: '#d6322a' },
+    { id: 'workflows', name: 'AI Workflows', short: 'FLOW', weight: 0.20, color: '#7445ff' }
   ];
 
   const BENCHMARKS = [
@@ -21,7 +21,6 @@
       name: 'Hyper-scale chat architecture', variance: 1.2, evidenceKind: 'development',
       description: 'Tests whether a model can find a complete, lasting, low-rent topology for mobile chat at extreme concurrency.',
       prompt: 'Architect a chat app infrastructure that supports 10 million concurrent users.',
-      sourceHref: '../hyper-scale-chat/2026-08-27T02-56-43Z__rejudge__a53c9da44229/report.html#overview',
       measured: { baseline: 47.5, treatment: 73.2, delta: 25.7, wins: 24, ties: 1, losses: 2, complete: 54, total: 54, treatmentLabel: 'Architecture skill', calibration: 'Calibration pending' }
     },
     {
@@ -29,7 +28,6 @@
       name: 'Personalized home feed architecture', variance: -1.3, evidenceKind: 'development',
       description: 'Tests lasting feed ownership, hot-creator fanout, pagination, mutable visibility, deletion, and privacy safety.',
       prompt: 'Design the backend for a personalized home feed with followed and recommended content at large scale.',
-      sourceHref: '../personalized-home-feed/2026-08-27T06-19-29Z__rejudge__dfe5ad38d285/report.html#overview',
       measured: { baseline: 68.2, treatment: 74.1, delta: 5.9, wins: 17, ties: 5, losses: 5, complete: 54, total: 54, treatmentLabel: 'Architecture skill', calibration: 'Calibration pending' }
     },
     {
@@ -37,7 +35,6 @@
       name: 'High-volume device telemetry architecture', variance: 0.6, evidenceKind: 'development',
       description: 'Tests durable retry semantics, idempotent acceptance, monotonic latest state, and expiring device history.',
       prompt: 'Architect a telemetry backend that can grow from launch to 10 million simultaneously active devices.',
-      sourceHref: '../device-telemetry/2026-08-27T00-39-11Z__1f48cd046cb7/report.html#overview',
       measured: { baseline: 67.0, treatment: 85.0, delta: 17.9, wins: 23, ties: 1, losses: 3, complete: 54, total: 54, treatmentLabel: 'Architecture skill', calibration: 'Calibration pending' }
     },
     { id: 'api-contract-migration', category: 'engineering', suite: 'Reliability & Change', name: 'Live API contract migration', variance: -2.1, evidenceKind: 'illustrative', description: 'Tests whether a model can evolve a live contract without breaking old clients, state, or rollback safety.', prompt: 'Plan and implement a zero-downtime API contract migration across mixed-version clients.' },
@@ -189,7 +186,7 @@
         completionLabel: 'responses',
         calibration: measured.calibration,
         detailHref: `./benchmark-report.html#${benchmark.id}`,
-        sourceHref: benchmark.sourceHref
+        sourceHref: null
       };
     }
 

@@ -121,6 +121,10 @@ test("npm pack produces a runnable vasir binary with help and add support", () =
   assert.match(helpResult.stdout, /vasir agents draft-purpose \[--json\] \[--write\] \[--model <name>\]/);
   assert.match(helpResult.stdout, /vasir agents draft-routing \[--json\] \[--write\]/);
   assert.match(helpResult.stdout, /vasir agents validate \[--scope <path>\] \[--json\]/);
+  assert.match(
+    helpResult.stdout,
+    /vasir benchmark publish \[--dry-run\] \[--json\] \[--repo-root <path>\]/
+  );
   assert.match(helpResult.stdout, /vasir eval run <benchmark> --treatment skill:<name>/);
   assert.match(helpResult.stdout, /vasir eval report <benchmark> \[run-id\] \[--open\]/);
   assert.match(helpResult.stdout, /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);

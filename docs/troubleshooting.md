@@ -258,6 +258,122 @@ Verification:
 - The command prints a results path under `.agents/vasir-evals/<skill>/...`.
 - That directory contains `run.json`.
 
+## Benchmark Publication Errors
+
+Use this section for:
+
+- `BENCHMARK_PUBLISH_SUBCOMMAND_REQUIRED`
+- `BENCHMARK_PUBLISH_CONFIG_INVALID`
+- `BENCHMARK_PUBLISH_ACCEPTANCE_REQUIRED`
+- `BENCHMARK_PUBLISH_TOOL_MISSING`
+- `BENCHMARK_PUBLISH_ACCOUNT_MISMATCH`
+- `BENCHMARK_PUBLISH_ARTIFACT_INVALID`
+- `BENCHMARK_PUBLISH_STORAGE_BUDGET_EXCEEDED`
+- `BENCHMARK_PUBLISH_BUSY`
+- `BENCHMARK_PUBLISH_INFRASTRUCTURE_FAILED`
+- `BENCHMARK_PUBLISH_UPLOAD_FAILED`
+- `BENCHMARK_PUBLISH_ACTIVATION_FAILED`
+- `BENCHMARK_PUBLISH_VERIFICATION_FAILED`
+- `BENCHMARK_PUBLISH_ROLLBACK_FAILED`
+
+Every publication error includes a stage, the release identifier when known, the fixed stack name, a safe retry action, and the rollback outcome. With `--json`, read those values from `context`. Never paste AWS credentials, session tokens, or signed request material into an issue or diagnostic log.
+
+Start with the non-mutating path:
+
+```bash
+vasir benchmark publish --dry-run
+```
+
+Then follow the recovery for the reported code.
+
+### Configuration, acceptance, and tool failures
+
+For `BENCHMARK_PUBLISH_SUBCOMMAND_REQUIRED` or `BENCHMARK_PUBLISH_CONFIG_INVALID`:
+
+1. Use the exact command `vasir benchmark publish`.
+2. Run it from the Vasir source repository or pass `--repo-root <path>` for that repository.
+3. Do not pass production target overrides; the domain, profile, account, region, and stack are fixed in `site/vasirbenchmark.com/deployment.json`.
+
+For `BENCHMARK_PUBLISH_ACCEPTANCE_REQUIRED`:
+
+1. Read the changed paths reported by the error.
+2. From `site/vasirbenchmark.com/`, run `./capture.sh` and resolve any source, harness, capture, or route failure.
+3. Obtain human acceptance for the current source and ten canonical captures.
+4. Renew `template-lock.json` with those exact accepted hashes, then rerun the dry run. There is no `--force` or acceptance bypass.
+
+For `BENCHMARK_PUBLISH_TOOL_MISSING`:
+
+1. Confirm `aws --version` succeeds.
+2. Confirm Chrome or Chromium is available to `site/vasirbenchmark.com/capture.mjs`.
+3. Rerun the dry run.
+
+Verification:
+
+- `vasir benchmark publish --dry-run` completes the acceptance, artifact, tool, and read-only identity actions.
+
+### Account mismatch
+
+`BENCHMARK_PUBLISH_ACCOUNT_MISMATCH` stops before any AWS mutation. Do not bypass it or change the fixed target to match an unintended caller.
+
+```bash
+aws sts get-caller-identity --profile faedark --region us-east-1
+```
+
+The returned `Account` must be `339713108333`. Repair the local `faedark` authentication or profile selection, then rerun the dry run.
+
+### Artifact and storage failures
+
+For `BENCHMARK_PUBLISH_ARTIFACT_INVALID`:
+
+1. Fix only the paths identified by the error.
+2. Confirm all eight allowlisted files exist, are regular files rather than symlinks, and remain within the documented byte limits.
+3. Remove or replace any local or relative public link that falls outside the finite deployed route graph.
+4. Rerun the dry run before publishing.
+
+For `BENCHMARK_PUBLISH_STORAGE_BUDGET_EXCEEDED`, publication has stopped before upload. Follow the returned `safeRetry` guidance and do not delete the active or immediately previous verified release. The command will not proceed while retained releases plus the candidate exceed 1 GiB.
+
+### Active publisher lease
+
+`BENCHMARK_PUBLISH_BUSY` means another publisher owns the conditional S3 lease.
+
+- Do not delete a fresh lease or attempt a second activation path.
+- Wait for the active publisher to finish and release it, then rerun the same command.
+- A lease expires after 120 minutes, while one process may hold it for at most 75 minutes. On a later rerun, Vasir may replace an expired lease only if its observed ETag still matches, preventing one publisher from stealing or deleting another publisher's lease.
+
+If a process was interrupted while holding the lease, rerunning after the lease is released or expires is the supported recovery path.
+
+### Infrastructure failure
+
+For `BENCHMARK_PUBLISH_INFRASTRUCTURE_FAILED`, inspect the `vasirbenchmark-production` stack event that corresponds to the returned stage and stack context:
+
+```bash
+aws cloudformation describe-stack-events \
+  --stack-name vasirbenchmark-production \
+  --profile faedark \
+  --region us-east-1
+```
+
+Repair the reported AWS boundary, then rerun `vasir benchmark publish`. The command converges the same stack; do not create a replacement stack manually. Failed or unknown terminal stack states are reported without speculative repair.
+
+### Upload or activation failure
+
+For `BENCHMARK_PUBLISH_UPLOAD_FAILED` or `BENCHMARK_PUBLISH_ACTIVATION_FAILED`, the previously active release remains the serving pointer. The candidate upload is immutable and safe to reuse. Repair the reported boundary and rerun the same command; identical source bytes use the same release identifier.
+
+### Verification, rollback, and an indeterminate first release
+
+For `BENCHMARK_PUBLISH_VERIFICATION_FAILED`, inspect `context.rollback` before retrying:
+
+- If a previous verified release existed, Vasir attempts to restore and publicly verify that pointer before returning the error. Use the reported rollback outcome rather than assuming the candidate or prior release is live.
+- If this was the first release, there is no prior public value to restore. A post-activation failure reports `rollback.status: "indeterminate"`. Treat the public state as unverified and rerun `vasir benchmark publish`; the same command is responsible for verifying or replacing it.
+
+`BENCHMARK_PUBLISH_ROLLBACK_FAILED` means the attempt to restore the previous pointer did not complete or could not be publicly verified. Do not edit the CloudFront Function or S3 origin manually. Inspect the stack events, repair the reported AWS failure, and rerun the same command. Until it succeeds, treat the live URL as unverified.
+
+Verification:
+
+- `vasir benchmark publish` exits successfully only after `https://vasirbenchmark.com` serves the exact active release over valid HTTPS.
+- `https://vasirbenchmark.com/benchmark-report.html#hyper-scale-chat` opens the expected report in a real browser.
+- The command reports eight verified files, 24 report routes, 18 capability routes, required security headers, and a private S3 origin.
+
 ## Unexpected Errors
 
 Use this section for:

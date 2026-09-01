@@ -3,9 +3,15 @@
 
   const data = window.VASIR_DATA;
   if (!data) throw new Error('VasirBench fixture failed to load.');
+  const d3 = window.d3;
+  if (!d3?.scaleLinear) throw new Error('VasirBench D3 runtime failed to load.');
 
   const INITIAL_RESULT_COUNT = 10;
   const QUALITY_DOMAIN = [55, 95];
+  const COMPOSITE_SCORE_SCALE = d3.scaleLinear()
+    .domain([0, 100])
+    .range([0, 100])
+    .clamp(true);
   const CAPABILITY_MODES = ['models', 'benchmarks', 'efficiency'];
   const COMBINED_CAPABILITY = {
     id: 'overall',
@@ -16,6 +22,7 @@
   };
   const capabilityFields = [COMBINED_CAPABILITY, ...data.categories];
   const capabilityIndexMedia = window.matchMedia('(min-width: 67.501rem)');
+  const combinedScoreGuideMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 67.501rem)');
 
   const metricConfig = {
     cost: {
@@ -242,6 +249,7 @@
     const segments = weightedComposition(entry);
     const profileLabel = weightedCompositionDescription(segments);
     const conditionLabel = entry.condition === 'baseline' ? 'Without Vasir' : 'With Vasir';
+    const baselineEntry = baselineBySetting.get(entry.settingId);
 
     return `
       <span
@@ -255,11 +263,13 @@
       >
         <span class="capability-composition__meta">
           <span class="capability-composition__label">${escapeHtml(conditionLabel)}</span>
-          <span class="capability-composition__rank">${escapeHtml(conditionLabel)} rank #${String(conditionRank).padStart(2, '0')}</span>
+          <span class="capability-composition__rank">Rank #${String(conditionRank).padStart(2, '0')}</span>
         </span>
         <span class="capability-composition__track">
           <span class="capability-composition__stack" role="toolbar" aria-label="Open a capability leaderboard from ${escapeHtml(conditionLabel)} scores">
             ${segments.map(({ category, rawScore, contribution }, index) => {
+              const baselineScore = baselineEntry.categories.find((reading) => reading.category === category.id).score;
+              const categoryDelta = Math.round((rawScore - baselineScore) * 10) / 10;
               const insight = `${category.name}: raw score ${formatScore(rawScore)}, weight ${Math.round(category.weight * 100)}%, weighted contribution ${contribution.toFixed(2)} points`;
               return `
                 <button
@@ -273,7 +283,8 @@
                   data-raw-score="${rawScore.toFixed(1)}"
                   data-weight="${category.weight}"
                   data-contribution="${contribution.toFixed(6)}"
-                  style="--segment-width:${contribution.toFixed(6)}%"
+                  data-delta="${categoryDelta.toFixed(1)}"
+                  style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%"
                   tabindex="${index === 0 ? '0' : '-1'}"
                   aria-label="Open ${escapeHtml(category.name)} capabilities for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with Full Vasir selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
                   title="${escapeHtml(insight)}"
@@ -399,12 +410,12 @@
               <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${outcome.median.toFixed(1)}">
-              <dt>Median Full effect</dt>
+              <dt>Median uplift</dt>
               <dd>${signed(outcome.median)}<small>Across ${outcome.total} matched settings</small></dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}">
-              <dt>Full outcomes</dt>
-              <dd>${outcome.improved}/${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd>
+              <dt>Improved settings</dt>
+              <dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd>
             </div>
           ` : `
             <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
@@ -606,9 +617,12 @@
             aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning with Full Vasir. Composite ${formatScore(fullEntry.score)}, With rank ${fullRank} of 20. Without Vasir composite ${formatScore(baselineEntry.score)}, Without rank ${baselineRank} of 20. Full Vasir effect ${signed(delta)} points."
           >
             <span class="setting-row__identity">
-              <strong>${escapeHtml(fullEntry.family)}</strong>
-              <span>${escapeHtml(fullEntry.reasoning)}</span>
-              <small>Primary order · With rank #${String(fullRank).padStart(2, '0')}</small>
+              <span class="setting-row__rank" aria-hidden="true">${String(fullRank).padStart(2, '0')}</span>
+              <span class="setting-row__model">
+                <strong>${escapeHtml(fullEntry.family)}</strong>
+                <span>${escapeHtml(fullEntry.reasoning)}</span>
+                <small>Without rank #${String(baselineRank).padStart(2, '0')}</small>
+              </span>
             </span>
             <span class="setting-row__disclosure">${selected ? 'Selected' : 'Select'} <span aria-hidden="true">${selected ? '●' : '→'}</span></span>
           </button>
@@ -618,7 +632,7 @@
           </span>
           <span class="setting-row__delta${deltaClass}"><strong>${signed(delta)}</strong><span>pts</span></span>
         </div>
-        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">With Vasir capability profile: ${escapeHtml(fullDescription)}. Without Vasir capability profile: ${escapeHtml(baselineDescription)}. Each colored segment opens that capability leaderboard.</span>
+        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both capability profiles use one shared 0 to 100 scale and end at their composite score. With Vasir capability profile: ${escapeHtml(fullDescription)}. Without Vasir capability profile: ${escapeHtml(baselineDescription)}. Each colored segment opens that capability leaderboard.</span>
       </li>
     `;
   };
@@ -645,11 +659,11 @@
           <h3 class="visually-hidden" id="score-field-title">Combined model leaderboard</h3>
 
           <div class="score-axis-header">
-            <span class="score-axis-header__identity">Model / reasoning / matched pair</span>
+            <span class="score-axis-header__identity">Rank / model setting</span>
             <div class="score-axis-header__profile">
               <div class="score-axis-header__profile-title">
-                <strong>Weighted capability profile</strong>
-                <span>/ 100</span>
+                <strong>Weighted capability scores <span>with uplift vs baseline</span></strong>
+                <span>Overall</span>
               </div>
               <div class="capability-legend" aria-label="Weighted capability categories">
                 <span class="capability-legend__item capability-legend__item--engineering"><i aria-hidden="true"></i><span class="capability-legend__long">Engineering</span><span class="capability-legend__short">ENG</span></span>
@@ -658,14 +672,17 @@
                 <span class="capability-legend__item capability-legend__item--writing"><i aria-hidden="true"></i><span class="capability-legend__long">Writing</span><span class="capability-legend__short">WRITE</span></span>
                 <span class="capability-legend__item capability-legend__item--workflows"><i aria-hidden="true"></i><span class="capability-legend__long">AI workflows</span><span class="capability-legend__short">FLOW</span></span>
               </div>
-              <div class="score-axis-header__scale" aria-hidden="true"><span>0</span><span>Composite total</span><span>100</span></div>
             </div>
-            <span class="score-axis-header__effect">Full effect</span>
+            <span class="score-axis-header__effect">Uplift</span>
           </div>
 
           <ol class="result-list" id="result-list" aria-label="Matched model and reasoning settings ordered by With Vasir rank. Each row compares Without Vasir and With Vasir.">
             ${visible.map((entry) => settingRowMarkup(entry, baselineRanking.ranks, fullRanking.ranks)).join('')}
           </ol>
+          <div class="capability-score-guide" aria-hidden="true">
+            <span class="capability-score-guide__line"></span>
+            <span class="capability-score-guide__readout"><strong>0.0</strong><small>/100</small></span>
+          </div>
           <button class="show-all" id="show-all" type="button" aria-expanded="${state.showAll}">${escapeHtml(disclosureLabel)}</button>
         </section>
       </section>
@@ -800,6 +817,138 @@
     );
   };
 
+  const combinedScoreGuideGeometry = (scoreField) => {
+    const track = scoreField?.querySelector('.capability-composition__track');
+    const resultList = scoreField?.querySelector('.result-list');
+    if (!track || !resultList) return null;
+
+    const scoreFieldBox = scoreField.getBoundingClientRect();
+    const trackBox = track.getBoundingClientRect();
+    const resultListBox = resultList.getBoundingClientRect();
+    const scoreFieldStyle = getComputedStyle(scoreField);
+    const trackStyle = getComputedStyle(track);
+    const borderTop = Number.parseFloat(scoreFieldStyle.borderTopWidth) || 0;
+    const borderLeft = Number.parseFloat(trackStyle.borderLeftWidth) || 0;
+    const borderRight = Number.parseFloat(trackStyle.borderRightWidth) || 0;
+    const contentLeft = trackBox.left + borderLeft;
+    const contentRight = trackBox.right - borderRight;
+    const contentWidth = contentRight - contentLeft;
+
+    if (contentWidth <= 0 || resultListBox.height <= 0) return null;
+    return {
+      scoreFieldBox,
+      contentLeft,
+      contentRight,
+      contentWidth,
+      resultListTop: resultListBox.top,
+      resultListBottom: resultListBox.bottom,
+      guideTop: resultListBox.top - scoreFieldBox.top - borderTop,
+      guideHeight: resultListBox.height
+    };
+  };
+
+  const clearCombinedScoreGuide = (scoreField) => {
+    const guide = scoreField?.querySelector('.capability-score-guide');
+    if (!guide) return;
+    guide.classList.remove('is-visible');
+    delete guide.dataset.score;
+    delete guide.dataset.source;
+  };
+
+  const positionCombinedScoreGuide = (scoreField, score, source, geometry = combinedScoreGuideGeometry(scoreField)) => {
+    const guide = scoreField?.querySelector('.capability-score-guide');
+    const readout = guide?.querySelector('.capability-score-guide__readout strong');
+    if (!guide || !readout || !geometry || !combinedScoreGuideMedia.matches) {
+      clearCombinedScoreGuide(scoreField);
+      return;
+    }
+
+    const pixelScale = COMPOSITE_SCORE_SCALE.copy().range([
+      geometry.contentLeft - geometry.scoreFieldBox.left,
+      geometry.contentRight - geometry.scoreFieldBox.left
+    ]);
+    const boundedScore = COMPOSITE_SCORE_SCALE.invert(COMPOSITE_SCORE_SCALE(score));
+    const scoreRatio = COMPOSITE_SCORE_SCALE(boundedScore) / 100;
+    const labelShift = scoreRatio < 0.075 ? '0%' : scoreRatio > 0.925 ? '-100%' : '-50%';
+
+    guide.style.setProperty('--score-guide-x', `${pixelScale(boundedScore).toFixed(3)}px`);
+    guide.style.setProperty('--score-guide-y', `${geometry.guideTop.toFixed(3)}px`);
+    guide.style.setProperty('--score-guide-height', `${geometry.guideHeight.toFixed(3)}px`);
+    guide.style.setProperty('--score-guide-label-shift', labelShift);
+    guide.dataset.score = boundedScore.toFixed(3);
+    guide.dataset.source = source;
+    readout.textContent = formatScore(boundedScore);
+    guide.classList.add('is-visible');
+  };
+
+  const focusedCompositionScore = (scoreField) => {
+    const segment = scoreField?.querySelector('.capability-composition__segment:focus');
+    if (!segment) return null;
+    const segments = [...segment.closest('.capability-composition__stack').querySelectorAll('.capability-composition__segment')];
+    const focusedIndex = segments.indexOf(segment);
+    if (focusedIndex < 0) return null;
+    return segments.slice(0, focusedIndex + 1).reduce((sum, candidate) => (
+      sum + (Number(candidate.dataset.contribution) || 0)
+    ), 0);
+  };
+
+  const bindCombinedScoreGuide = () => {
+    const scoreField = elements.capabilityView.querySelector('.score-field--combined');
+    if (!scoreField) return;
+
+    let pointerFrame = 0;
+    let latestPointer = null;
+    const restoreFocusOrClear = () => {
+      const focusScore = focusedCompositionScore(scoreField);
+      if (focusScore === null) clearCombinedScoreGuide(scoreField);
+      else positionCombinedScoreGuide(scoreField, focusScore, 'focus');
+    };
+
+    scoreField.addEventListener('pointermove', (event) => {
+      if (!combinedScoreGuideMedia.matches || !['mouse', 'pen'].includes(event.pointerType)) {
+        restoreFocusOrClear();
+        return;
+      }
+      latestPointer = { clientX: event.clientX, clientY: event.clientY };
+      if (pointerFrame) return;
+      pointerFrame = window.requestAnimationFrame(() => {
+        pointerFrame = 0;
+        const geometry = combinedScoreGuideGeometry(scoreField);
+        if (
+          !geometry ||
+          latestPointer.clientX < geometry.contentLeft ||
+          latestPointer.clientX > geometry.contentRight ||
+          latestPointer.clientY < geometry.scoreFieldBox.top ||
+          latestPointer.clientY > geometry.resultListBottom
+        ) {
+          restoreFocusOrClear();
+          return;
+        }
+        const pixelScale = COMPOSITE_SCORE_SCALE.copy().range([geometry.contentLeft, geometry.contentRight]);
+        positionCombinedScoreGuide(scoreField, pixelScale.invert(latestPointer.clientX), 'pointer', geometry);
+      });
+    });
+
+    scoreField.addEventListener('pointerleave', () => {
+      if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+      pointerFrame = 0;
+      latestPointer = null;
+      restoreFocusOrClear();
+    });
+
+    scoreField.addEventListener('focusin', (event) => {
+      const segment = event.target.closest('.capability-composition__segment');
+      if (!segment) return;
+      const focusScore = focusedCompositionScore(scoreField);
+      if (focusScore !== null) positionCombinedScoreGuide(scoreField, focusScore, 'focus');
+    });
+
+    scoreField.addEventListener('focusout', (event) => {
+      if (event.relatedTarget?.closest?.('.capability-composition__segment')) return;
+      clearCombinedScoreGuide(scoreField);
+    });
+  };
+
   const renderCapabilities = ({ animate = false, skipMotion = false } = {}) => {
     const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
     state.capabilityCategory = category.id;
@@ -851,6 +1000,7 @@
       </section>
     `;
 
+    bindCombinedScoreGuide();
     if (state.capabilityMode === 'efficiency') renderEfficiency();
 
     window.requestAnimationFrame(() => {

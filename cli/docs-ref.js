@@ -11,6 +11,8 @@ export const REMOVE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-r
 export const REPLACE_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#replace`;
 export const AGENTS_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#agents`;
 export const EVAL_REFERENCE_DOCS_REF = `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#eval`;
+export const BENCHMARK_PUBLISH_REFERENCE_DOCS_REF =
+  `${REPOSITORY_DOCS_BASE_URL}/docs/cli-reference.md#benchmark-publication`;
 
 export const GIT_TROUBLESHOOTING_DOCS_REF =
   `${REPOSITORY_DOCS_BASE_URL}/docs/troubleshooting.md#git-and-node-prerequisites`;
@@ -26,5 +28,7 @@ export const ALIAS_TROUBLESHOOTING_DOCS_REF =
   `${REPOSITORY_DOCS_BASE_URL}/docs/troubleshooting.md#alias-problems`;
 export const EVAL_TROUBLESHOOTING_DOCS_REF =
   `${REPOSITORY_DOCS_BASE_URL}/docs/troubleshooting.md#eval-errors`;
+export const BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF =
+  `${REPOSITORY_DOCS_BASE_URL}/docs/troubleshooting.md#benchmark-publication-errors`;
 export const UNEXPECTED_ERROR_TROUBLESHOOTING_DOCS_REF =
   `${REPOSITORY_DOCS_BASE_URL}/docs/troubleshooting.md#unexpected-errors`;

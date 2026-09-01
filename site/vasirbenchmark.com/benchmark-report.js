@@ -34,9 +34,15 @@
   };
   const categoryBenchmarks = (categoryId) => data.benchmarks.filter((benchmark) => benchmark.category === categoryId);
 
-  const hydrateSectionLinks = (benchmarkId) => {
+  const hydrateSectionLinks = (benchmarkId, requestedSection = 'overview') => {
+    const currentSection = ['ranking', 'method'].includes(requestedSection)
+      ? requestedSection
+      : 'overview';
     document.querySelectorAll('[data-report-section]').forEach((link) => {
       link.href = `#${benchmarkId}/${link.dataset.reportSection}`;
+      if (!link.closest('.report-mast__nav')) return;
+      if (link.dataset.reportSection === currentSection) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
     });
   };
 
@@ -74,9 +80,9 @@
     if (benchmark.evidenceKind === 'development') {
       return `
         <aside class="evidence-truth" aria-label="Evidence status">
-          <strong class="evidence-truth__kind">Development evidence</strong>
-          <p>Calibration pending · treatment is the <strong>Architecture skill</strong>, not Full Vasir.</p>
-          <a href="${escapeHTML(summary.sourceHref)}">Open source report →</a>
+          <strong class="evidence-truth__kind">Development snapshot</strong>
+          <p>Observed local result · <strong>${escapeHTML(summary.calibration)}</strong> · treatment is the <strong>Architecture skill</strong>, not Full Vasir. Raw responses and judgments remain local.</p>
+          <span aria-hidden="true"></span>
         </aside>
       `;
     }
@@ -131,9 +137,8 @@
   const overviewMarkup = (benchmark, summary) => {
     const sourceMarkup = benchmark.evidenceKind === 'development'
       ? `
-        <h3>Inspect every answer and judgment</h3>
-        <p>The source artifact contains the real prompt, response matrix, judge decisions, and method behind the summary above.</p>
-        <a href="${escapeHTML(summary.sourceHref)}">Open full evidence report →</a>
+        <h3>Public evidence boundary</h3>
+        <p>This page preserves the real development snapshot and its prompt-local summary. Raw responses, judgments, and the full local evidence report are not published here; calibration remains pending.</p>
       `
       : `
         <h3>Evidence not collected yet</h3>
@@ -226,7 +231,7 @@
           </section>
           <section>
             <h3>Evidence state</h3>
-            <p>${measured ? `${escapeHTML(summary.calibration)}. Use the source report for answers, judgments, response matrix, and method.` : 'No run artifact or judgment record exists. Do not cite these values as observed model performance.'}</p>
+            <p>${measured ? `${escapeHTML(summary.calibration)}. This public snapshot preserves the observed prompt-local result; raw responses, judgments, and the full evidence report remain local and are not published here.` : 'No run artifact or judgment record exists. Do not cite these values as observed model performance.'}</p>
           </section>
         </div>
       </section>
@@ -288,13 +293,14 @@
     if (!benchmarkById.has(benchmarkId)) {
       window.history.replaceState(null, '', `#${benchmark.id}`);
     }
-    hydrateSectionLinks(benchmark.id);
+    hydrateSectionLinks(benchmark.id, options.section || 'overview');
     if (options.scroll) scrollToSection(options.section || 'top');
   };
 
   window.addEventListener('hashchange', () => {
     const route = parseRoute();
     if (route.benchmarkId === activeBenchmarkId && benchmarkById.has(route.benchmarkId)) {
+      hydrateSectionLinks(route.benchmarkId, route.section || 'overview');
       scrollToSection(route.section || 'top');
       return;
     }

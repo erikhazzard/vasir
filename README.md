@@ -226,6 +226,17 @@ npm run eval rescore testing__enforcing-mandate
 
 Provider credentials can live in repo-root `keys.json`. Start from [keys.json.example](./keys.json.example).
 
+## Publish VasirBench
+
+From the Vasir source repository, preview and publish the accepted static site:
+
+```bash
+vasir benchmark publish --dry-run
+vasir benchmark publish
+```
+
+The production target is fixed at [https://vasirbenchmark.com](https://vasirbenchmark.com). Publication requires the AWS CLI profile `faedark` to resolve to account `339713108333`, a current accepted site receipt, and Chrome or Chromium for the live route proof. See the [`benchmark publish` reference](./docs/cli-reference.md#benchmark-publication) and [publication troubleshooting](./docs/troubleshooting.md#benchmark-publication-errors).
+
 ## Developing Vasir
 
 Regenerate registry artifacts after changing skills, templates, docs included in the packaged catalog, or package metadata.

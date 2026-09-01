@@ -9,6 +9,7 @@ import {
   resolveRecommendedAgentsProfile,
   runAgents
 } from "./agents.js";
+import { runBenchmark } from "./benchmark.js";
 import {
   formatCliErrorForJson,
   formatCliErrorForText,
@@ -1375,6 +1376,7 @@ Usage:
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
   vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md contains invalid steering or scaffold placeholders
+  vasir benchmark publish [--dry-run] [--json] [--repo-root <path>] Build, publish, and verify the accepted VasirBench site at vasirbenchmark.com
   vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] Run an independent clean-vs-Vasir benchmark
   vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>] Regenerate the visual report from a recorded benchmark run
   vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run a legacy skill-owned eval suite
@@ -1409,6 +1411,7 @@ Notes:
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
   agents validate exits nonzero and reports details when AGENTS.md still contains known scaffold placeholders or broken repo routes.
+  benchmark publish is the fixed production path for vasirbenchmark.com; start with --dry-run, then rerun without it to stage, activate, and verify one immutable release through the faedark account.
   Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md + CLAUDE.md during vasir agents init.
   remove mutates only the current repo root and also updates .agents/vasir.json and .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
@@ -4243,12 +4246,12 @@ async function runSelectedCommand({
 
   if (
     dryRunRequested &&
-    !(commandName === "update" || (commandName === "agents" && commandArguments[0] === "sync"))
+    !(commandName === "update" || commandName === "benchmark" || (commandName === "agents" && commandArguments[0] === "sync"))
   ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--dry-run is only supported by `vasir update` and `vasir agents sync`.",
-      suggestion: "Use `vasir update --dry-run` for skill refresh previews, or `vasir agents sync --dry-run` for AGENTS.md previews.",
+      message: "--dry-run is only supported by `vasir update`, `vasir benchmark publish`, and `vasir agents sync`.",
+      suggestion: "Use `vasir update --dry-run` for skill refresh previews, `vasir benchmark publish --dry-run` for the production site plan, or `vasir agents sync --dry-run` for AGENTS.md previews.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }
@@ -4273,12 +4276,12 @@ async function runSelectedCommand({
 
   if (
     projectRootArgument !== null &&
-    !["status", "context", "doctor", "repair", "diff", "init", "update", "add", "adopt", "remove", "agents", "work", "eval"].includes(commandName)
+    !["status", "context", "doctor", "repair", "diff", "init", "update", "add", "adopt", "remove", "agents", "benchmark", "work", "eval"].includes(commandName)
   ) {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
       message: "--repo-root is only supported by repo-bound commands.",
-      suggestion: "Use `--repo-root <path>` with `vasir status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `add`, `adopt`, `remove`, `agents`, `work`, or `eval`.",
+      suggestion: "Use `--repo-root <path>` with `vasir status`, `context`, `doctor`, `repair`, `diff`, `init`, `update`, `add`, `adopt`, `remove`, `agents`, `benchmark`, `work`, or `eval`.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }
@@ -4459,6 +4462,22 @@ async function runSelectedCommand({
       stdoutWriter,
       jsonOutput,
       environmentVariables,
+      fetchImplementation
+    });
+  }
+
+  if (commandName === "benchmark") {
+    return runBenchmark({
+      benchmarkArguments: commandArguments,
+      dryRunRequested,
+      currentWorkingDirectory,
+      projectRootDirectory,
+      spawnSyncImplementation,
+      stdoutWriter,
+      jsonOutput,
+      outputStream,
+      environmentVariables,
+      platform,
       fetchImplementation
     });
   }

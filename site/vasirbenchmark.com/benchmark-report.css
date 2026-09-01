@@ -3,18 +3,20 @@
 }
 
 .report-mast {
-  min-height: 6.6rem;
+  min-height: 5.5rem;
   grid-template-columns: minmax(13rem, 0.75fr) minmax(20rem, 1.25fr);
 }
 
 .report-mast__brand {
-  margin-top: 0.3rem;
+  margin-top: var(--space-1);
   display: inline-block;
-  font-size: 2rem;
+  color: var(--sdk-ink);
+  font-family: var(--font-display);
+  font-size: 3rem;
   font-style: italic;
-  font-weight: 700;
-  letter-spacing: -0.05em;
-  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.004em;
+  line-height: 0.82;
   text-decoration: none;
 }
 
@@ -31,10 +33,16 @@
   display: inline-flex;
   align-items: center;
   border-bottom: 2px solid transparent;
-  color: var(--ink-muted);
+  color: var(--sdk-ink-soft);
+  font-family: var(--font-data);
   font-size: var(--type-small);
   font-weight: 700;
   text-decoration: none;
+}
+
+.report-mast__nav a[aria-current="location"] {
+  border-bottom-color: var(--sdk-blue);
+  color: var(--sdk-ink);
 }
 
 .report-shell {
@@ -175,12 +183,15 @@
 }
 
 .evidence-hero h1 {
-  max-width: 13ch;
+  max-width: 11ch;
   margin: 0;
-  font-size: clamp(2.35rem, 4vw, 4.2rem);
-  font-weight: 700;
-  letter-spacing: -0.055em;
-  line-height: 0.98;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5.6vw, 6rem);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.004em;
+  line-height: 0.82;
+  text-transform: uppercase;
 }
 
 .evidence-hero__description {
@@ -250,6 +261,7 @@
   display: block;
   font-family: var(--font-callout);
   font-size: clamp(2.5rem, 5vw, 4.35rem);
+  font-style: italic;
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 0.9;
@@ -294,6 +306,7 @@
   color: var(--sdk-lime);
   font-family: var(--font-callout);
   font-size: clamp(1.8rem, 3vw, 2.65rem);
+  font-style: italic;
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -655,7 +668,7 @@
 @media (hover: hover) and (pointer: fine) {
   .report-mast__nav a:hover {
     border-bottom-color: var(--sdk-blue);
-    color: var(--ink);
+    color: var(--sdk-blue-deep);
   }
 
   .report-context__back:hover,
@@ -704,7 +717,7 @@
   }
 
   .report-mast__brand {
-    font-size: 1.75rem;
+    font-size: 2.25rem;
   }
 
   .report-mast__nav {
@@ -714,7 +727,7 @@
   }
 
   .report-mast__nav a {
-    min-height: 2.35rem;
+    min-height: var(--touch);
   }
 
   .report-mast .benchmark-mast__issue {
@@ -732,7 +745,7 @@
   }
 
   .report-context__back {
-    min-height: 2.35rem;
+    min-height: var(--touch);
     width: max-content;
     padding-inline: 0;
     border: 0;
