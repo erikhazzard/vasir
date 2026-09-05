@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "version": "vasir-capabilities-development-v2",
+  "schemaVersion": 3,
+  "version": "vasir-capabilities-development-v5",
   "status": "development",
   "categories": [
     {
@@ -13,14 +13,30 @@
         "device-telemetry"
       ],
       "modelScore": {
-        "method": "equal-benchmark-peer-index-v1",
+        "label": "Engineering v2",
+        "edition": "backend-architecture-panel-consensus-v2",
+        "method": "equal-benchmark-absolute-mean-v1",
         "benchmarkWeighting": "equal",
-        "scaleMaximum": 100
+        "scaleMaximum": 100,
+        "judging": {
+          "panel": [
+            "codex:gpt-6-astra@xhigh",
+            "claude:claude-fable-5-1@max"
+          ],
+          "judgeCount": 2,
+          "batchUnit": "matched-pair",
+          "aggregation": "unanimity-gates-mean-dimensions-v1",
+          "synthesizer": null
+        }
       },
-      "rating": {
-        "method": "matched-outcome-elo-v1",
-        "promptWeighting": "equal",
-        "cleanReference": 1500
+      "effect": {
+        "method": "paired-absolute-delta-v1",
+        "benchmarkWeighting": "equal",
+        "unit": "rubric-points"
+      },
+      "uncertainty": {
+        "status": "not-estimated",
+        "reason": "Only one trial per task and condition is published; per-response judge spread is retained."
       }
     }
   ]

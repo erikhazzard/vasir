@@ -1,0 +1,114 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "judge_version",
+    "mode",
+    "candidate_id",
+    "evidence_status",
+    "evidence_reason",
+    "first_read",
+    "dimensions",
+    "strongest_quality",
+    "visible_failures",
+    "primary_gap",
+    "next_improvement",
+    "confidence"
+  ],
+  "properties": {
+    "judge_version": {
+      "enum": ["cloudscape-still-judge-v1"]
+    },
+    "mode": {
+      "enum": ["still-image-calibration"]
+    },
+    "candidate_id": {
+      "type": "string"
+    },
+    "evidence_status": {
+      "enum": ["gradable", "blocked"]
+    },
+    "evidence_reason": {
+      "type": "string"
+    },
+    "first_read": {
+      "type": ["string", "null"]
+    },
+    "dimensions": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "macro-meso-form",
+        "illumination-material",
+        "spatial-depth-integration",
+        "fine-structure-finish",
+        "cloud-led-art-direction"
+      ],
+      "properties": {
+        "macro-meso-form": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rating", "reason"],
+          "properties": {
+            "rating": { "type": "integer" },
+            "reason": { "type": "string" }
+          }
+        },
+        "illumination-material": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rating", "reason"],
+          "properties": {
+            "rating": { "type": "integer" },
+            "reason": { "type": "string" }
+          }
+        },
+        "spatial-depth-integration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rating", "reason"],
+          "properties": {
+            "rating": { "type": "integer" },
+            "reason": { "type": "string" }
+          }
+        },
+        "fine-structure-finish": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rating", "reason"],
+          "properties": {
+            "rating": { "type": "integer" },
+            "reason": { "type": "string" }
+          }
+        },
+        "cloud-led-art-direction": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rating", "reason"],
+          "properties": {
+            "rating": { "type": "integer" },
+            "reason": { "type": "string" }
+          }
+        }
+      }
+    },
+    "strongest_quality": {
+      "type": ["string", "null"]
+    },
+    "visible_failures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "primary_gap": {
+      "type": ["string", "null"]
+    },
+    "next_improvement": {
+      "type": ["string", "null"]
+    },
+    "confidence": {
+      "enum": ["high", "medium", "low"]
+    }
+  }
+}

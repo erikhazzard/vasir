@@ -16,6 +16,8 @@ Read the relevant internal reference before producing detailed art direction:
 
 If neither reference fits, use this root skill only as a routing and quality bar: preserve gameplay read, name the player-facing visual job, separate inspiration from copying, and keep implementation specs tied to the target runtime and asset pipeline.
 
+For choosing or refining a whole-game visual target before asset production, use the **Visual target** step in `$game__art-directing`. That skill owns comparable concept frames and the transition from the selected image to active play; `$game-assets__generating-images` owns generation, persistence, and runtime asset promotion.
+
 ## Rules
 
 - Do not present subfolder references as separately invocable skills.

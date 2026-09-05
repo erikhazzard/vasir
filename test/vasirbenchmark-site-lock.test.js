@@ -7,18 +7,10 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const siteRoot = join(repoRoot, 'site', 'vasirbenchmark.com');
-const expectedFiles = [
-  'index.html',
-  'style.css',
-  'assets/d3.v7.min.js',
-  'app.js',
-  'data.js',
-  'benchmark-report.html',
-  'benchmark-report.css',
-  'benchmark-report.js',
+const generatedPublicFiles = new Set(['data.js', 'responses.js']);
+const acceptanceOnlyFiles = [
   'capture.mjs',
-  'capture.sh',
-  'assets/kanit-latin-900-normal.woff2'
+  'capture.sh'
 ];
 const expectedCaptures = [
   'desktop.png',
@@ -56,6 +48,11 @@ async function assertLockedFile(record) {
 
 test('canonical VasirBench site matches its accepted template lock', async () => {
   const manifest = JSON.parse(await readFile(join(siteRoot, 'template-lock.json'), 'utf8'));
+  const deployment = JSON.parse(await readFile(join(siteRoot, 'deployment.json'), 'utf8'));
+  const expectedFiles = [...new Set([
+    ...deployment.publicFiles.map(({ path }) => path).filter((path) => !generatedPublicFiles.has(path)),
+    ...acceptanceOnlyFiles
+  ])].sort();
 
   assert.equal(manifest.kind, 'vasirbenchmark-site-template-lock');
   assert.equal(manifest.status, 'accepted');
@@ -72,7 +69,7 @@ test('canonical VasirBench site matches its accepted template lock', async () =>
     dns: 'route53-apex-alias'
   });
 
-  assert.deepEqual(manifest.files.map(({ path }) => path), expectedFiles);
+  assert.deepEqual(manifest.files.map(({ path }) => path).sort(), expectedFiles);
   assert.deepEqual(manifest.captures.map(({ path }) => path), expectedCaptures);
 
   for (const record of manifest.files) await assertLockedFile(record);

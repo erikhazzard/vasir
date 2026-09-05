@@ -60,6 +60,7 @@ import { listSkillFiles } from "./skill-metadata.js";
 import { canPromptInteractively, promptForMissingProviderCredential } from "./eval/interactive.js";
 import { inspectSkillEval } from "./eval/inspect-skill-eval.js";
 import { rescoreSkillEval } from "./eval/rescore-skill-eval.js";
+import { extendBenchmarkEval } from "./eval/extend-benchmark-eval.js";
 import { runBenchmarkEval } from "./eval/run-benchmark-eval.js";
 import { runSkillEval } from "./eval/run-skill-eval.js";
 import { resolveBenchmarkSource } from "./eval/benchmark-source.js";
@@ -1378,6 +1379,7 @@ Usage:
   vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md contains invalid steering or scaffold placeholders
   vasir benchmark publish [--dry-run] [--json] [--repo-root <path>] Build, publish, and verify the accepted VasirBench site at vasirbenchmark.com
   vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] Run an independent clean-vs-Vasir benchmark
+  vasir eval extend <benchmark> <source-run-id> --model <provider:model@effort>... [--resume <extension-run-id>] [--open] Add or resume exact configurations without regenerating completed responses
   vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>] Regenerate the visual report from a recorded benchmark run
   vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>] Run a legacy skill-owned eval suite
   vasir eval inspect <skill> [run-id] [--json] [--repo-root <path>] Inspect the latest or named eval artifact for a skill
@@ -1485,6 +1487,7 @@ function parseCommandInvocation(argumentVector) {
   let projectRootArgument = null;
   let reasoningArguments = [];
   let replaceExistingSkills = false;
+  let resumeRunArgument = null;
   let requestedTrialCount = null;
   let treatmentArgument = null;
   let versionRequested = false;
@@ -1529,6 +1532,29 @@ function parseCommandInvocation(argumentVector) {
 
     if (rawArgument === "--open") {
       openRequested = true;
+      continue;
+    }
+
+    if (rawArgument === "--resume") {
+      const resumeValue = rawArguments[argumentIndex + 1];
+      if (!resumeValue || resumeValue.startsWith("--")) {
+        throw new VasirCliError({
+          code: "EVAL_BENCHMARK_EXTENSION_RESUME_REQUIRED",
+          message: "`--resume` requires an incomplete extension run id.",
+          suggestion: "Use `--resume <extension-run-id>` with the id printed before generation starts.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+      if (resumeRunArgument !== null) {
+        throw new VasirCliError({
+          code: "EVAL_BENCHMARK_EXTENSION_RESUME_DUPLICATE",
+          message: "`--resume` may be passed only once.",
+          suggestion: "Choose one incomplete extension run id to resume.",
+          docsRef: EVAL_REFERENCE_DOCS_REF
+        });
+      }
+      resumeRunArgument = resumeValue;
+      argumentIndex += 1;
       continue;
     }
 
@@ -1703,6 +1729,7 @@ function parseCommandInvocation(argumentVector) {
     openRequested,
     projectRootArgument,
     reasoningArguments,
+    resumeRunArgument,
     requestedTrialCount,
     replaceExistingSkills,
     treatmentArgument,
@@ -3886,6 +3913,7 @@ async function runEval({
   evalArguments,
   modelArguments,
   reasoningArguments,
+  resumeRunArgument,
   requestedTrialCount,
   treatmentArgument,
   openRequested,
@@ -3912,7 +3940,7 @@ async function runEval({
     });
   }
 
-  if (!["run", "report", "inspect", "rescore"].includes(evalSubcommand)) {
+  if (!["run", "extend", "report", "inspect", "rescore"].includes(evalSubcommand)) {
     throw new VasirCliError({
       code: "UNKNOWN_EVAL_SUBCOMMAND",
       message: `Unknown eval subcommand: ${evalSubcommand}`,
@@ -3954,6 +3982,69 @@ async function runEval({
             outputStream
           })
       : null;
+
+  if (evalSubcommand === "extend") {
+    if (!runId) {
+      throw new VasirCliError({
+        code: "EVAL_BENCHMARK_EXTENSION_SOURCE_REQUIRED",
+        message: "Benchmark extension requires one explicit source run id.",
+        suggestion: "Use `vasir eval extend <benchmark> <source-run-id> --model <provider:model@effort>`.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    if (evalArguments.length > 3) {
+      throw new VasirCliError({
+        code: "EVAL_BENCHMARK_EXTENSION_ARGUMENT_INVALID",
+        message: "Benchmark extension accepts exactly one source run id.",
+        suggestion: "Pass added configurations with repeated exact `--model <provider:model@effort>` flags.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    if (!benchmarkSource) {
+      throw new VasirCliError({
+        code: "EVAL_BENCHMARK_NOT_FOUND",
+        message: `Benchmark not found: ${targetName}`,
+        suggestion: "Choose a bundled benchmark with an immutable source run.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    if (modelArguments.length === 0) {
+      throw new VasirCliError({
+        code: "EVAL_BENCHMARK_EXTENSION_MODEL_REQUIRED",
+        message: "Benchmark extension requires at least one exact model selector.",
+        suggestion: "Use `--model <provider:model@effort>` once for every configuration to add.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    if (
+      reasoningArguments.length > 0 ||
+      treatmentArgument !== null ||
+      requestedTrialCount !== null
+    ) {
+      throw new VasirCliError({
+        code: "INVALID_COMMAND_FLAG",
+        message: "Benchmark extension infers treatment and trials from its source and requires effort in each exact --model selector.",
+        suggestion: "Use only repeated `--model <provider:model@effort>` flags, plus optional `--open`.",
+        docsRef: EVAL_REFERENCE_DOCS_REF
+      });
+    }
+    return extendBenchmarkEval({
+      benchmarkName: targetName,
+      sourceRunId: runId,
+      homeDirectory,
+      currentWorkingDirectory,
+      projectRootDirectory,
+      repositoryUrl,
+      platform,
+      spawnSyncImplementation,
+      requestedModelArguments: modelArguments,
+      resumeRunId: resumeRunArgument,
+      openReport: openRequested,
+      stdoutWriter,
+      jsonOutput,
+      environmentVariables
+    });
+  }
 
   if (evalSubcommand === "run") {
     if (benchmarkSource) {
@@ -4116,6 +4207,7 @@ async function runSelectedCommand({
   openRequested,
   projectRootArgument,
   reasoningArguments,
+  resumeRunArgument,
   requestedTrialCount,
   replaceExistingSkills,
   treatmentArgument,
@@ -4142,6 +4234,18 @@ async function runSelectedCommand({
       suggestion:
         "Use `vasir add --replace <skill>` to refresh a project-local skill copy, or `vasir agents init <profile> --replace` to overwrite AGENTS.md intentionally.",
       docsRef: REPLACE_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (
+    resumeRunArgument !== null &&
+    !(commandName === "eval" && commandArguments[0] === "extend")
+  ) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--resume is only supported by `vasir eval extend`.",
+      suggestion: "Use `vasir eval extend <benchmark> <source-run-id> --model <provider:model@effort> --resume <extension-run-id>`.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
 
@@ -4225,7 +4329,7 @@ async function runSelectedCommand({
   if (openRequested && commandName !== "eval") {
     throw new VasirCliError({
       code: "INVALID_COMMAND_FLAG",
-      message: "--open is only supported by `vasir eval run` and `vasir eval report`.",
+      message: "--open is only supported by `vasir eval run`, `vasir eval extend`, and `vasir eval report`.",
       suggestion: "Use `vasir eval report <benchmark> --open`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
@@ -4487,6 +4591,7 @@ async function runSelectedCommand({
       evalArguments: commandArguments,
       modelArguments,
       reasoningArguments,
+      resumeRunArgument,
       requestedTrialCount,
       treatmentArgument,
       openRequested,
@@ -4575,6 +4680,7 @@ export async function runCommandLine(
       openRequested: invocation.openRequested,
       projectRootArgument: invocation.projectRootArgument,
       reasoningArguments: invocation.reasoningArguments,
+      resumeRunArgument: invocation.resumeRunArgument,
       requestedTrialCount: invocation.requestedTrialCount,
       replaceExistingSkills: invocation.replaceExistingSkills,
       treatmentArgument: invocation.treatmentArgument,

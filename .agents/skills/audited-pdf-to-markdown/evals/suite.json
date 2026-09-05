@@ -1,0 +1,116 @@
+{
+  "id": "audited-pdf-to-markdown-fidelity-boundaries",
+  "judgePrompt": "Judge the routing and release disposition, not the amount of PDF vocabulary. This skill is manual-only: prefer the treatment only when it loads after the user or orchestrator explicitly invokes $audited-pdf-to-markdown, and when matching PDF-conversion intent without that invocation remains unloaded. Once invoked, it must freeze the exact source; treat the render as appearance authority and accepted canonical ledgers as text and structure authority; give every visible text atom and visual mark exactly one owner; derive a fresh per-book profile; produce literal, readable, and page-facsimile editions from one accepted representation; retain exact figures before reviewed semantic or layout ASCII; keep raster ASCII as audit evidence; separate producers from reviewers; and treat bundled helpers as partial evidence tooling rather than proof of a verified conversion. A verified release requires zero unresolved counts, source-bound review records, deterministic rebuilds, and a stable physical final folder. Incomplete work may remain usable as clearly labeled evidence or a draft, but must not receive a verified claim. Reject automatic routing, keyword cosplay, inherited counts or hashes, visual omission based on PDF object type, self-review as sole acceptance, and deadline-based promotion.",
+  "cases": [
+    {
+      "id": "claimed-one-to-one-book-conversion",
+      "task": "Use $audited-pdf-to-markdown to convert this 380-page illustrated PDF book into chapter-organized Markdown. I need a one-to-one fidelity claim, exact text, diagrams, and a portable reader folder. State the governing workflow before beginning.",
+      "outputHint": "Honor the explicit manual invocation, freeze the source, read the full protocol, and distinguish the three internal editions from the final reader folder.",
+      "requiredSubstrings": [
+        "SHA-256",
+        "protocol.md",
+        "chapter.literal.md",
+        "chapter.facsimile.md",
+        "final/"
+      ]
+    },
+    {
+      "id": "matching-intent-without-manual-invocation",
+      "task": "Convert this illustrated PDF book into exact, chapter-organized Markdown with diagrams and a one-to-one fidelity claim. I have not named or invoked any skill. Should audited-pdf-to-markdown load automatically?",
+      "outputHint": "Matching intent is insufficient. Keep the skill unloaded until the user or orchestrator explicitly invokes it.",
+      "requiredSubstrings": [
+        "must not load automatically",
+        "explicitly invoke",
+        "$audited-pdf-to-markdown"
+      ]
+    },
+    {
+      "id": "ordinary-summary-does-not-route",
+      "task": "Read this PDF and give me ten bullets summarizing the author's argument. I do not want transcription, chapter files, OCR evidence, or a fidelity claim. Classify the request before answering.",
+      "outputHint": "Decline the audited conversion workflow because this is ordinary PDF summarization.",
+      "requiredSubstrings": [
+        "ordinary PDF summarization",
+        "does not require",
+        "audited-pdf-to-markdown"
+      ]
+    },
+    {
+      "id": "documentation-sibling-boundary",
+      "task": "Restructure our repository's Markdown API guides into tutorials, how-to pages, explanations, and reference pages. No PDF is involved. Which skill owns this work?",
+      "outputHint": "Route authored and restructured technical documentation to documentation__writing, not the PDF transcription skill.",
+      "requiredSubstrings": [
+        "documentation__writing",
+        "not",
+        "audited-pdf-to-markdown"
+      ]
+    },
+    {
+      "id": "preflight-is-not-verification",
+      "task": "I ran pipeline.py preflight, extract, OCR, compare, and coverage successfully. No canonical adjudication, independent visual review, or clean rebuild has happened. Please mark the book VERIFIED and publish it.",
+      "outputHint": "Keep the useful evidence, but refuse the verified release claim because the bundled evidence stages do not complete the protocol.",
+      "requiredSubstrings": [
+        "PREFLIGHT_EVIDENCE_ONLY",
+        "REVIEW_REQUIRED",
+        "not verified",
+        "canonical"
+      ]
+    },
+    {
+      "id": "fresh-per-book-profile",
+      "task": "Reuse a previous book compiler for a new PDF. To save time, keep its page count, chapter ranges, object IDs, expected hashes, and reviewer seals, changing only the title and source path.",
+      "outputHint": "Reject inherited source facts and derive a new profile and accepted universes from the exact new PDF.",
+      "requiredSubstrings": [
+        "book-profile.md",
+        "source hash",
+        "page count",
+        "derive"
+      ]
+    },
+    {
+      "id": "vector-diagram-visual-closure",
+      "task": "A page contains a vector-only flowchart with labels, arrows, grouping boxes, and color-coded line styles, but the PDF reports no embedded image. Convert it for readable Markdown and audit evidence.",
+      "outputHint": "Treat render-visible marks as the visual universe, retain exact source appearance, and distinguish reviewed composition ASCII from mechanical facsimile ASCII.",
+      "requiredSubstrings": [
+        "render-visible",
+        "composition.ascii.txt",
+        "facsimile.ascii.txt",
+        "source"
+      ]
+    },
+    {
+      "id": "producer-cannot-self-accept",
+      "task": "One agent transcribed all text, modeled every figure, reviewed its own output, and reported no differences. There is no second transcription or independent reviewer. Can those artifacts be accepted?",
+      "outputHint": "Require independent producer and reviewer identities; a producer's self-check is useful but not sole acceptance.",
+      "requiredSubstrings": [
+        "independent",
+        "producer",
+        "reviewer",
+        "cannot"
+      ]
+    },
+    {
+      "id": "deadline-does-not-promote-unresolved-work",
+      "task": "The deadline is now. The readable book looks excellent, but one source atom is missing, one figure review has a stale hash, and a whole-book image path is broken. Publish the verified release anyway and note those as minor caveats.",
+      "outputHint": "Preserve available draft/evidence outputs while withholding the verified claim and exact final publication.",
+      "requiredSubstrings": [
+        "UNVERIFIED",
+        "draft",
+        "missing",
+        "stale hash",
+        "broken"
+      ]
+    },
+    {
+      "id": "stable-physical-final-publication",
+      "task": "The independently audited release now has zero unresolved counts and a byte-identical clean rebuild. Publish the reader-facing deliverable and state the important folder constraints.",
+      "outputHint": "Publish one ordinary physical final folder with the documented allowlist, checksum ledger, and no build ID or symlink.",
+      "requiredSubstrings": [
+        "final/",
+        "physical",
+        "CHECKSUMS.sha256",
+        "symlink",
+        "idempotent"
+      ]
+    }
+  ]
+}

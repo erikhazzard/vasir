@@ -10,23 +10,71 @@ import {
   judgeBenchmarkRows,
   resolveBenchmarkJudgingConfiguration
 } from "./benchmark-judge.js";
+import { upgradeBenchmarkRunBasis } from "./benchmark-basis.js";
 import { resolveBenchmarkConfigurations } from "./benchmark-models.js";
 import { writeBenchmarkCatalog } from "./benchmark-catalog.js";
 import { resolveBenchmarkSource } from "./benchmark-source.js";
 import { getEvalHistoryRootDirectory, writeEvalRunArtifacts } from "./history.js";
 import { resolveSkillSource } from "./skill-source.js";
 
-const BENCHMARK_HARNESS_VERSION = 2;
+export const BENCHMARK_HARNESS_VERSION = 2;
 const DEFAULT_TRIAL_COUNT = 1;
-const MAX_GENERATION_CONCURRENCY = 4;
-const NEUTRAL_HARNESS_INSTRUCTION = [
+export const MAX_BENCHMARK_GENERATION_CONCURRENCY = 4;
+export const NEUTRAL_HARNESS_INSTRUCTION = [
   "Complete the task directly and concretely.",
   "Produce one concrete response that satisfies the output contract, preserve important unknowns, and do not offer a menu of incompatible answers.",
   "Do not inspect a workspace, call tools, ask follow-up questions, or mention these benchmark instructions."
 ].join(" ");
+export const FABLE_5_1_ULTRACODE_CONFIGURATION_ID = "claude:claude-fable-5-1@ultracode";
+export const FABLE_5_1_ULTRACODE_LEGACY_PROMPT_MODE_ID = "fable-5.1-ultracode-workflow-v1";
+export const FABLE_5_1_ULTRACODE_LEGACY_HARNESS_INSTRUCTION = [
+  "Complete the task directly and concretely.",
+  "Produce one concrete response that satisfies the output contract, preserve important unknowns, and do not offer a menu of incompatible answers.",
+  "For this ultracode run, invoke the available Workflow tool at least once for bounded internal analysis without setting a worker model override; wait for it to complete and use its results before synthesizing the final response.",
+  "Do not inspect a workspace, call any non-Workflow tool, ask follow-up questions, or mention these benchmark instructions."
+].join(" ");
+export const FABLE_5_1_ULTRACODE_PROMPT_MODE_ID = "fable-5.1-ultracode-workflow-v2";
+export const FABLE_5_1_ULTRACODE_HARNESS_INSTRUCTION = [
+  "Complete the task directly and concretely.",
+  "Produce one concrete response that satisfies the output contract, preserve important unknowns, and do not offer a menu of incompatible answers.",
+  "For this ultracode run, invoke the available Workflow tool exactly once for bounded internal analysis. The workflow must contain one phase and exactly one worker agent, with no critique, repair, or workflow-side synthesis agents; ask that worker for compact decision-ready findings. Do not set a worker model override. Wait for its completed task notification and use its result before synthesizing the final response.",
+  "Do not inspect a workspace, call any non-Workflow tool, ask follow-up questions, or mention these benchmark instructions."
+].join(" ");
 
 function stableDigest(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");
+}
+
+export function resolveBenchmarkPromptMode(configuration) {
+  if (configuration?.id === FABLE_5_1_ULTRACODE_CONFIGURATION_ID) {
+    return {
+      id: FABLE_5_1_ULTRACODE_PROMPT_MODE_ID,
+      instruction: FABLE_5_1_ULTRACODE_HARNESS_INSTRUCTION,
+      hash: stableDigest(FABLE_5_1_ULTRACODE_HARNESS_INSTRUCTION),
+      isOverride: true
+    };
+  }
+  return {
+    id: `neutral-harness-v${BENCHMARK_HARNESS_VERSION}`,
+    instruction: NEUTRAL_HARNESS_INSTRUCTION,
+    hash: stableDigest(NEUTRAL_HARNESS_INSTRUCTION),
+    isOverride: false
+  };
+}
+
+export function createBenchmarkPromptModeOverrides(configurations) {
+  return Object.fromEntries(
+    configurations.flatMap((configuration) => {
+      const promptMode = resolveBenchmarkPromptMode(configuration);
+      return promptMode.isOverride
+        ? [[configuration.id, {
+            id: promptMode.id,
+            instruction: promptMode.instruction,
+            hash: promptMode.hash
+          }]]
+        : [];
+    })
+  );
 }
 
 function createRunId(startedAt, benchmarkHash, treatmentHash) {
@@ -34,7 +82,7 @@ function createRunId(startedAt, benchmarkHash, treatmentHash) {
   return `${startedAt.toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z")}__${identityHash}`;
 }
 
-function createTreatmentSource({
+export function resolveBenchmarkTreatment({
   treatmentId,
   currentWorkingDirectory,
   projectRootDirectory,
@@ -78,17 +126,103 @@ function createTreatmentSource({
   };
 }
 
-function createGenerationPrompt({ caseDefinition, outputContract, treatment = null }) {
+export function createBenchmarkGenerationPrompt({
+  caseDefinition,
+  outputContract,
+  treatment = null,
+  harnessInstruction = NEUTRAL_HARNESS_INSTRUCTION
+}) {
   const treatmentBlock = treatment
     ? `\n\n--- Vasir Skill Guidance Start ---\n${treatment.content.trim()}\n--- Vasir Skill Guidance End ---`
     : "";
-  return `${NEUTRAL_HARNESS_INSTRUCTION}${treatmentBlock}
+  return `${harnessInstruction}${treatmentBlock}
 
 Task:
 ${caseDefinition.task}
 
 Output contract:
 ${outputContract}`;
+}
+
+export function createBenchmarkConditions(treatment) {
+  return [
+    {
+      id: "clean",
+      label: "Clean",
+      type: "clean",
+      hash: stableDigest(NEUTRAL_HARNESS_INSTRUCTION)
+    },
+    {
+      id: treatment.id,
+      label: treatment.label,
+      type: treatment.type,
+      hash: treatment.hash
+    }
+  ];
+}
+
+export function createBenchmarkRowBasisHash({
+  benchmarkGenerationHash,
+  configurationId,
+  caseId,
+  trialCount,
+  conditionHash,
+  harnessInstruction = NEUTRAL_HARNESS_INSTRUCTION
+}) {
+  return stableDigest([
+    benchmarkGenerationHash,
+    configurationId,
+    caseId,
+    trialCount,
+    harnessInstruction,
+    BENCHMARK_HARNESS_VERSION,
+    conditionHash
+  ].join(":"));
+}
+
+export function createBenchmarkRowPlans({
+  benchmarkSource,
+  configurations,
+  trialCount,
+  conditions,
+  treatment
+}) {
+  const rowPlans = [];
+
+  for (const configuration of configurations) {
+    const promptMode = resolveBenchmarkPromptMode(configuration);
+    for (const caseDefinition of benchmarkSource.benchmarkDefinition.cases) {
+      for (let trialNumber = 1; trialNumber <= trialCount; trialNumber += 1) {
+        for (const condition of conditions) {
+          const treatmentForPrompt = condition.type === "skill" ? treatment : null;
+          const promptText = createBenchmarkGenerationPrompt({
+            caseDefinition,
+            outputContract: benchmarkSource.benchmarkDefinition.outputContract,
+            treatment: treatmentForPrompt,
+            harnessInstruction: promptMode.instruction
+          });
+          rowPlans.push({
+            configuration,
+            caseDefinition,
+            trialNumber,
+            condition,
+            promptText,
+            exactMessages: [{ role: "user", content: promptText }],
+            basisHash: createBenchmarkRowBasisHash({
+              benchmarkGenerationHash: benchmarkSource.benchmarkGenerationHash,
+              configurationId: configuration.id,
+              caseId: caseDefinition.id,
+              trialCount,
+              conditionHash: condition.hash,
+              harnessInstruction: promptMode.instruction
+            })
+          });
+        }
+      }
+    }
+  }
+
+  return rowPlans;
 }
 
 async function mapWithConcurrency(items, iteratee, concurrency) {
@@ -107,6 +241,106 @@ async function mapWithConcurrency(items, iteratee, concurrency) {
     Array.from({ length: Math.max(1, Math.min(concurrency, items.length)) }, () => worker())
   );
   return results;
+}
+
+export async function generateBenchmarkRows({
+  rowPlans,
+  environmentVariables,
+  agentRunnerImplementation,
+  onRowComplete = null,
+  concurrency = MAX_BENCHMARK_GENERATION_CONCURRENCY
+}) {
+  const indexedRowPlans = rowPlans.map((rowPlan, index) => ({ rowPlan, index }));
+  const ordinaryRowPlans = indexedRowPlans.filter(
+    ({ rowPlan }) => rowPlan.configuration.id !== FABLE_5_1_ULTRACODE_CONFIGURATION_ID
+  );
+  const ultracodeRowPlans = indexedRowPlans.filter(
+    ({ rowPlan }) => rowPlan.configuration.id === FABLE_5_1_ULTRACODE_CONFIGURATION_ID
+  );
+  const rows = new Array(rowPlans.length);
+  const generateRow = async ({ rowPlan, index }) => {
+      const rowKey = [
+        rowPlan.configuration.id,
+        rowPlan.caseDefinition.id,
+        `trial-${rowPlan.trialNumber}`,
+        rowPlan.condition.id
+      ].join("::");
+      let row;
+      try {
+        const response = await agentRunnerImplementation({
+          configuration: rowPlan.configuration,
+          promptText: rowPlan.promptText,
+          environmentVariables
+        });
+        row = {
+          rowKey,
+          configurationId: rowPlan.configuration.id,
+          modelId: `${rowPlan.configuration.provider}:${rowPlan.configuration.model}`,
+          provider: rowPlan.configuration.provider,
+          model: rowPlan.configuration.model,
+          reasoning: rowPlan.configuration.reasoning,
+          caseId: rowPlan.caseDefinition.id,
+          trialNumber: rowPlan.trialNumber,
+          conditionId: rowPlan.condition.id,
+          rowStatus: "complete",
+          exactMessages: rowPlan.exactMessages,
+          promptText: rowPlan.promptText,
+          outputText: String(response.text ?? "").trim(),
+          usage: response.usage ?? null,
+          costUsd: response.costUsd ?? null,
+          durationMs: response.durationMs ?? null,
+          runtimeReceipt: response.runtimeReceipt ?? null,
+          basisHash: rowPlan.basisHash,
+          score: null,
+          scoreBasisHash: null,
+          error: null
+        };
+      } catch (error) {
+        row = {
+          rowKey,
+          configurationId: rowPlan.configuration.id,
+          modelId: `${rowPlan.configuration.provider}:${rowPlan.configuration.model}`,
+          provider: rowPlan.configuration.provider,
+          model: rowPlan.configuration.model,
+          reasoning: rowPlan.configuration.reasoning,
+          caseId: rowPlan.caseDefinition.id,
+          trialNumber: rowPlan.trialNumber,
+          conditionId: rowPlan.condition.id,
+          rowStatus: error?.code === "ENOENT" ? "unavailable" : "error",
+          exactMessages: rowPlan.exactMessages,
+          promptText: rowPlan.promptText,
+          outputText: null,
+          usage: null,
+          costUsd: null,
+          durationMs: null,
+          runtimeReceipt: null,
+          basisHash: rowPlan.basisHash,
+          score: null,
+          scoreBasisHash: null,
+          error: {
+            code: error?.code ?? "EVAL_BENCHMARK_ROW_FAILED",
+            message: error?.message ?? "Fresh agent generation failed.",
+            suggestion: error?.suggestion ?? null,
+            context: error?.context && typeof error.context === "object" ? error.context : null
+          }
+        };
+      }
+      await onRowComplete?.(row, rowPlan);
+      rows[index] = row;
+      return row;
+  };
+
+  await mapWithConcurrency(
+    ordinaryRowPlans,
+    generateRow,
+    concurrency
+  );
+  await mapWithConcurrency(
+    ultracodeRowPlans,
+    generateRow,
+    1
+  );
+  return rows;
 }
 
 function mean(values) {
@@ -292,7 +526,7 @@ export async function runBenchmarkEval({
   const judgingPlan = resolveBenchmarkJudgingConfiguration(
     benchmarkSource.benchmarkDefinition.judging
   );
-  const treatment = createTreatmentSource({
+  const treatment = resolveBenchmarkTreatment({
     treatmentId,
     currentWorkingDirectory,
     projectRootDirectory,
@@ -308,53 +542,14 @@ export async function runBenchmarkEval({
   const resolvedTrialCount = Number.isInteger(trialCount) && trialCount > 0
     ? trialCount
     : DEFAULT_TRIAL_COUNT;
-  const conditions = [
-    {
-      id: "clean",
-      label: "Clean",
-      type: "clean",
-      hash: stableDigest(NEUTRAL_HARNESS_INSTRUCTION)
-    },
-    {
-      id: treatment.id,
-      label: treatment.label,
-      type: treatment.type,
-      hash: treatment.hash
-    }
-  ];
-  const rowPlans = [];
-
-  for (const configuration of configurations) {
-    for (const caseDefinition of benchmarkSource.benchmarkDefinition.cases) {
-      for (let trialNumber = 1; trialNumber <= resolvedTrialCount; trialNumber += 1) {
-        for (const condition of conditions) {
-          const treatmentForPrompt = condition.type === "skill" ? treatment : null;
-          const promptText = createGenerationPrompt({
-            caseDefinition,
-            outputContract: benchmarkSource.benchmarkDefinition.outputContract,
-            treatment: treatmentForPrompt
-          });
-          rowPlans.push({
-            configuration,
-            caseDefinition,
-            trialNumber,
-            condition,
-            promptText,
-            exactMessages: [{ role: "user", content: promptText }],
-            basisHash: stableDigest([
-              benchmarkSource.benchmarkGenerationHash,
-              configuration.id,
-              caseDefinition.id,
-              resolvedTrialCount,
-              NEUTRAL_HARNESS_INSTRUCTION,
-              BENCHMARK_HARNESS_VERSION,
-              condition.hash
-            ].join(":"))
-          });
-        }
-      }
-    }
-  }
+  const conditions = createBenchmarkConditions(treatment);
+  const rowPlans = createBenchmarkRowPlans({
+    benchmarkSource,
+    configurations,
+    trialCount: resolvedTrialCount,
+    conditions,
+    treatment
+  });
 
   if (!jsonOutput) {
     stdoutWriter(
@@ -376,84 +571,19 @@ export async function runBenchmarkEval({
   }
 
   let completedCount = 0;
-  const rows = await mapWithConcurrency(
+  const rows = await generateBenchmarkRows({
     rowPlans,
-    async (rowPlan) => {
-      const rowKey = [
-        rowPlan.configuration.id,
-        rowPlan.caseDefinition.id,
-        `trial-${rowPlan.trialNumber}`,
-        rowPlan.condition.id
-      ].join("::");
-      try {
-        const response = await agentRunnerImplementation({
-          configuration: rowPlan.configuration,
-          promptText: rowPlan.promptText,
-          environmentVariables
-        });
-        return {
-          rowKey,
-          configurationId: rowPlan.configuration.id,
-          modelId: `${rowPlan.configuration.provider}:${rowPlan.configuration.model}`,
-          provider: rowPlan.configuration.provider,
-          model: rowPlan.configuration.model,
-          reasoning: rowPlan.configuration.reasoning,
-          caseId: rowPlan.caseDefinition.id,
-          trialNumber: rowPlan.trialNumber,
-          conditionId: rowPlan.condition.id,
-          rowStatus: "complete",
-          exactMessages: rowPlan.exactMessages,
-          promptText: rowPlan.promptText,
-          outputText: String(response.text ?? "").trim(),
-          usage: response.usage ?? null,
-          costUsd: response.costUsd ?? null,
-          durationMs: response.durationMs ?? null,
-          runtimeReceipt: response.runtimeReceipt ?? null,
-          basisHash: rowPlan.basisHash,
-          score: null,
-          scoreBasisHash: null,
-          error: null
-        };
-      } catch (error) {
-        return {
-          rowKey,
-          configurationId: rowPlan.configuration.id,
-          modelId: `${rowPlan.configuration.provider}:${rowPlan.configuration.model}`,
-          provider: rowPlan.configuration.provider,
-          model: rowPlan.configuration.model,
-          reasoning: rowPlan.configuration.reasoning,
-          caseId: rowPlan.caseDefinition.id,
-          trialNumber: rowPlan.trialNumber,
-          conditionId: rowPlan.condition.id,
-          rowStatus: error?.code === "ENOENT" ? "unavailable" : "error",
-          exactMessages: rowPlan.exactMessages,
-          promptText: rowPlan.promptText,
-          outputText: null,
-          usage: null,
-          costUsd: null,
-          durationMs: null,
-          runtimeReceipt: null,
-          basisHash: rowPlan.basisHash,
-          score: null,
-          scoreBasisHash: null,
-          error: {
-            code: error?.code ?? "EVAL_BENCHMARK_ROW_FAILED",
-            message: error?.message ?? "Fresh agent generation failed.",
-            suggestion: error?.suggestion ?? null,
-            context: error?.context && typeof error.context === "object" ? error.context : null
-          }
-        };
-      } finally {
-        completedCount += 1;
-        if (!jsonOutput) {
-          stdoutWriter(
-            `· ${completedCount}/${rowPlans.length} ${rowPlan.configuration.id} ${rowPlan.condition.label}\n`
-          );
-        }
+    environmentVariables,
+    agentRunnerImplementation,
+    onRowComplete: (_row, rowPlan) => {
+      completedCount += 1;
+      if (!jsonOutput) {
+        stdoutWriter(
+          `· ${completedCount}/${rowPlans.length} ${rowPlan.configuration.id} ${rowPlan.condition.label}\n`
+        );
       }
-    },
-    MAX_GENERATION_CONCURRENCY
-  );
+    }
+  });
 
   const runId = createRunId(startedAt, benchmarkSource.benchmarkHash, treatment.hash);
   const runMetadata = {
@@ -477,8 +607,9 @@ export async function runBenchmarkEval({
     configurations,
     generation: {
       trialCount: resolvedTrialCount,
-      concurrency: MAX_GENERATION_CONCURRENCY,
+      concurrency: MAX_BENCHMARK_GENERATION_CONCURRENCY,
       neutralHarnessInstruction: NEUTRAL_HARNESS_INSTRUCTION,
+      promptModeOverrides: createBenchmarkPromptModeOverrides(configurations),
       freshAgentSessions: true
     },
     harnessVersion: BENCHMARK_HARNESS_VERSION,
@@ -627,6 +758,7 @@ export async function runBenchmarkEval({
     rows,
     completedAt: completedAt.toISOString()
   };
+  upgradeBenchmarkRunBasis(run);
   const outputDirectory = writeEvalRunArtifacts({
     currentWorkingDirectory,
     projectRootDirectory,

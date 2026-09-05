@@ -7,10 +7,21 @@ import zlib from "node:zlib";
 
 import { VasirCliError } from "./cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
+import {
+  buildBenchmarkPublicationProjection,
+  buildBenchmarkPublicationRoutes,
+  validateBenchmarkPublicationProjection,
+  validateBenchmarkPublicationResponses
+} from "./eval/benchmark-publication-projection.js";
 
 const DEPLOYMENT_CONFIG_PATH = path.join("site", "vasirbenchmark.com", "deployment.json");
 const TEMPLATE_LOCK_FILE_NAME = "template-lock.json";
+const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js"]);
 const RELEASE_ID_PATTERN = /^[a-f0-9]{64}$/;
+const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|\/Users\/|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
+const PRIVATE_PARENT_PATH_PATTERN = /(?:^|[^.])\.\.[/\\]/i;
+const ACCEPTANCE_QA_FILE_PATHS = Object.freeze(["capture.mjs", "capture.sh"]);
+const FIXTURE_TOKEN_PATTERN = /\b(?:fake|illustrative|synthetic|simulated|fixture|mock)\b/i;
 const CACHE_CONTROL_BY_CLASS = Object.freeze({
   html: "public, max-age=0, s-maxage=31536000, must-revalidate",
   immutable: "public, max-age=31536000, immutable"
@@ -29,12 +40,12 @@ const CANONICAL_PUBLIC_FILES = Object.freeze([
   { path: "assets/d3.v7.min.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "app.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "data.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
+  { path: "responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "benchmark-report.html", contentType: "text/html; charset=utf-8", cacheClass: "html" },
   { path: "benchmark-report.css", contentType: "text/css; charset=utf-8", cacheClass: "immutable" },
   { path: "benchmark-report.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "assets/kanit-latin-900-normal.woff2", contentType: "font/woff2", cacheClass: "immutable" }
 ]);
-
 function sha256(contents) {
   return crypto.createHash("sha256").update(contents).digest("hex");
 }
@@ -107,6 +118,48 @@ function assertPositiveInteger(value, fieldName) {
   }
 }
 
+function isNormalizedRelativePublicPath(filePath) {
+  return typeof filePath === "string" &&
+    filePath !== "" &&
+    filePath === path.posix.normalize(filePath) &&
+    !path.posix.isAbsolute(filePath) &&
+    !filePath.includes("\\") &&
+    !filePath.includes("%") &&
+    !filePath.includes("?") &&
+    !filePath.includes("#") &&
+    !filePath.split("/").some((segment) => segment === "" || segment === "." || segment === "..");
+}
+
+function assertPublicFileConfig({ fileConfig, fieldName, configuredPaths }) {
+  assertString(fileConfig?.path, `${fieldName}.path`);
+  assertString(fileConfig?.contentType, `${fieldName}.contentType`);
+  if (!(fileConfig.cacheClass in CACHE_CONTROL_BY_CLASS)) {
+    throw artifactError({
+      code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
+      message: `Unsupported cache class for ${fileConfig.path}: ${fileConfig.cacheClass}`,
+      suggestion: "Use only `html` or `immutable` cache classes.",
+      stage: "acceptance"
+    });
+  }
+  if (!isNormalizedRelativePublicPath(fileConfig.path)) {
+    throw artifactError({
+      code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
+      message: `Public file path must be a normalized path inside the site root: ${fileConfig.path}`,
+      suggestion: "Use a normalized relative POSIX allowlist path without escapes, URL encoding, query strings, or fragments.",
+      stage: "acceptance"
+    });
+  }
+  if (configuredPaths.has(fileConfig.path)) {
+    throw artifactError({
+      code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
+      message: `Duplicate production allowlist path: ${fileConfig.path}`,
+      suggestion: "Keep each public file exactly once in deployment.json.",
+      stage: "acceptance"
+    });
+  }
+  configuredPaths.add(fileConfig.path);
+}
+
 export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   const configPath = path.join(repoRootDirectory, DEPLOYMENT_CONFIG_PATH);
   const config = readJsonFile(configPath, "VasirBench deployment config");
@@ -132,12 +185,36 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   ]) {
     assertString(config.target?.[fieldName], `target.${fieldName}`);
   }
+  let siteUrl;
+  try {
+    siteUrl = new URL(config.target.url);
+  } catch (error) {
+    throw artifactError({
+      code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
+      message: `Production site URL must be a valid absolute URL: ${error.message}`,
+      suggestion: "Restore the reviewed HTTPS site URL in deployment.json.",
+      stage: "acceptance"
+    });
+  }
+  if (
+    siteUrl.protocol !== "https:" ||
+    siteUrl.pathname !== "/" ||
+    siteUrl.search || siteUrl.hash ||
+    siteUrl.hostname !== config.target.domain
+  ) {
+    throw artifactError({
+      code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
+      message: "The production site must use the configured domain as its root HTTPS URL.",
+      suggestion: "Keep target.url on the reviewed apex HTTPS site without a path, query, or fragment.",
+      stage: "acceptance"
+    });
+  }
   assertString(config.templatePath, "templatePath");
   if (!Array.isArray(config.publicFiles) || config.publicFiles.length !== CANONICAL_PUBLIC_FILES.length) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist must contain exactly nine files.",
-      suggestion: "Restore the reviewed nine-file allowlist in deployment.json.",
+      message: "The production allowlist must contain exactly ten files.",
+      suggestion: "Restore the reviewed ten-file allowlist in deployment.json.",
       stage: "acceptance"
     });
   }
@@ -155,7 +232,7 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (publicContractDrift.length > 0) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist drifted from the canonical nine-file publication contract.",
+      message: "The production allowlist drifted from the canonical ten-file publication contract.",
       suggestion: "Restore the reviewed paths, content types, cache classes, and ordering in deployment.json.",
       stage: "acceptance",
       context: { expectedPaths: CANONICAL_PUBLIC_FILES.map(({ path: filePath }) => filePath) }
@@ -164,33 +241,7 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
 
   const configuredPaths = new Set();
   for (const [fileIndex, fileConfig] of config.publicFiles.entries()) {
-    assertString(fileConfig?.path, `publicFiles[${fileIndex}].path`);
-    assertString(fileConfig?.contentType, `publicFiles[${fileIndex}].contentType`);
-    if (!(fileConfig.cacheClass in CACHE_CONTROL_BY_CLASS)) {
-      throw artifactError({
-        code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-        message: `Unsupported cache class for ${fileConfig.path}: ${fileConfig.cacheClass}`,
-        suggestion: "Use only `html` or `immutable` cache classes.",
-        stage: "acceptance"
-      });
-    }
-    if (path.isAbsolute(fileConfig.path) || fileConfig.path.split("/").includes("..")) {
-      throw artifactError({
-        code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-        message: `Public file path must stay inside the site root: ${fileConfig.path}`,
-        suggestion: "Use a normalized relative allowlist path.",
-        stage: "acceptance"
-      });
-    }
-    if (configuredPaths.has(fileConfig.path)) {
-      throw artifactError({
-        code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-        message: `Duplicate production allowlist path: ${fileConfig.path}`,
-        suggestion: "Keep each public file exactly once in deployment.json.",
-        stage: "acceptance"
-      });
-    }
-    configuredPaths.add(fileConfig.path);
+    assertPublicFileConfig({ fileConfig, fieldName: `publicFiles[${fileIndex}]`, configuredPaths });
   }
 
   for (const [limitName, limitValue] of Object.entries(config.limits ?? {})) {
@@ -254,7 +305,12 @@ export function validateBenchmarkAcceptance({ config, siteRootDirectory }) {
     lock.acceptance?.authority !== "user" ||
     lock.deployment?.targetDomain !== config.target.domain ||
     lock.deployment?.awsAccountAlias !== config.target.profile;
-  if (invalidReceipt || !Array.isArray(lock.files) || !Array.isArray(lock.captures)) {
+  if (
+    invalidReceipt ||
+    !Array.isArray(lock.files) ||
+    !Array.isArray(lock.captures) ||
+    lock.captures.length === 0
+  ) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_ACCEPTANCE_REQUIRED",
       message: "The VasirBench production acceptance receipt is missing, stale, or targets a different deployment.",
@@ -270,14 +326,22 @@ export function validateBenchmarkAcceptance({ config, siteRootDirectory }) {
       driftedPaths.push(TEMPLATE_LOCK_FILE_NAME);
       break;
     }
+    if (GENERATED_PUBLIC_FILE_PATHS.has(record.path)) continue;
     inspectLockedPath({ siteRootDirectory, record, driftedPaths });
   }
 
-  const lockedFilePaths = new Set(lock.files.map((record) => record.path));
-  for (const fileConfig of config.publicFiles) {
-    if (!lockedFilePaths.has(fileConfig.path)) driftedPaths.push(fileConfig.path);
+  const lockedFilePaths = new Set([...lock.files, ...lock.captures]
+    .filter((record) => !GENERATED_PUBLIC_FILE_PATHS.has(record.path))
+    .map((record) => record.path));
+  const requiredAcceptedPaths = [
+    ...config.publicFiles
+      .map((fileConfig) => fileConfig.path)
+      .filter((filePath) => !GENERATED_PUBLIC_FILE_PATHS.has(filePath)),
+    ...ACCEPTANCE_QA_FILE_PATHS
+  ];
+  for (const requiredPath of requiredAcceptedPaths) {
+    if (!lockedFilePaths.has(requiredPath)) driftedPaths.push(requiredPath);
   }
-
   const changedPaths = [...new Set(driftedPaths)].sort();
   if (changedPaths.length > 0) {
     throw artifactError({
@@ -292,83 +356,29 @@ export function validateBenchmarkAcceptance({ config, siteRootDirectory }) {
   return lock;
 }
 
-function evaluateSiteData(dataSource, filePath) {
+function evaluateSiteModule({ source, filePath, globalName, publicPath }) {
   const sandbox = { window: {} };
   try {
-    vm.runInNewContext(dataSource, sandbox, {
+    vm.runInNewContext(source, sandbox, {
       filename: filePath,
       timeout: 1000
     });
   } catch (error) {
     throw artifactError({
-      message: `Cannot evaluate the accepted public data fixture: ${error.message}`,
-      suggestion: "Repair data.js so it produces window.VASIR_DATA without external dependencies.",
-      context: { path: "data.js" }
+      message: `Cannot evaluate the generated public module ${publicPath}: ${error.message}`,
+      suggestion: `Repair ${publicPath} so it produces window.${globalName} without external dependencies.`,
+      context: { path: publicPath }
     });
   }
-  const data = sandbox.window.VASIR_DATA;
-  if (!data || !Array.isArray(data.categories) || !Array.isArray(data.benchmarks) || !Array.isArray(data.benchmarkSummaries)) {
+  const value = sandbox.window[globalName];
+  if (!value) {
     throw artifactError({
-      message: "data.js did not produce the required VasirBench route data.",
-      suggestion: "Restore window.VASIR_DATA with categories, benchmarks, and benchmark summaries.",
-      context: { path: "data.js" }
+      message: `${publicPath} did not produce the required window.${globalName} data.`,
+      suggestion: `Repair the public projector so ${publicPath} assigns window.${globalName}.`,
+      context: { path: publicPath }
     });
   }
-  return data;
-}
-
-function buildRouteManifest(data) {
-  const categoryIds = Array.from(data.categories, (category) => category.id);
-  const benchmarkIds = Array.from(data.benchmarks, (benchmark) => benchmark.id);
-  if (categoryIds.length !== 5 || new Set(categoryIds).size !== 5) {
-    throw artifactError({
-      message: `Expected five unique job-family route ids; found ${categoryIds.length}.`,
-      suggestion: "Restore the accepted Combined plus five-job-family navigation contract."
-    });
-  }
-  if (benchmarkIds.length !== 24 || new Set(benchmarkIds).size !== 24) {
-    throw artifactError({
-      message: `Expected 24 unique benchmark report ids; found ${benchmarkIds.length}.`,
-      suggestion: "Restore the accepted 24-report route manifest."
-    });
-  }
-
-  const capabilityFragments = [];
-  for (const categoryId of ["overall", ...categoryIds]) {
-    capabilityFragments.push(`/#capabilities/${categoryId}`);
-    capabilityFragments.push(`/#capabilities/${categoryId}/benchmarks`);
-    capabilityFragments.push(`/#capabilities/${categoryId}/efficiency`);
-  }
-  return {
-    entrypoints: ["/", "/index.html", "/benchmark-report.html"],
-    capabilityFragments,
-    reportFragments: benchmarkIds.map((benchmarkId) => `/benchmark-report.html#${benchmarkId}`)
-  };
-}
-
-function validatePublicEvidenceBoundary(data) {
-  const leakingBenchmarks = data.benchmarks
-    .filter((benchmark) => typeof benchmark.sourceHref === "string" && benchmark.sourceHref.trim() !== "")
-    .map((benchmark) => benchmark.id);
-  const leakingSummaries = data.benchmarkSummaries
-    .filter((summary) => typeof summary.sourceHref === "string" && summary.sourceHref.trim() !== "")
-    .map((summary) => summary.benchmarkId);
-  if (leakingBenchmarks.length > 0 || leakingSummaries.length > 0) {
-    throw artifactError({
-      message: "The public data fixture still links to local-only benchmark evidence.",
-      suggestion: "Remove local sourceHref values and keep the public report's evidence boundary explicit.",
-      context: { benchmarkIds: [...new Set([...leakingBenchmarks, ...leakingSummaries])].sort() }
-    });
-  }
-  for (const summary of data.benchmarkSummaries) {
-    if (summary.detailHref !== `./benchmark-report.html#${summary.benchmarkId}`) {
-      throw artifactError({
-        message: `Benchmark report route is outside the public route manifest: ${summary.benchmarkId}`,
-        suggestion: "Use the stable benchmark-report.html fragment route for every summary.",
-        context: { benchmarkId: summary.benchmarkId, detailHref: summary.detailHref }
-      });
-    }
-  }
+  return value;
 }
 
 function transformHtmlDependencies({ contents, releaseId, publicFiles }) {
@@ -382,17 +392,40 @@ function transformHtmlDependencies({ contents, releaseId, publicFiles }) {
   return Buffer.from(transformed, "utf8");
 }
 
-function validateHtmlTargets({ filesByPath, releaseId }) {
+
+function validateHtmlTargets({ filesByPath, releaseId, routes }) {
   const allowedStableTargets = new Set(["/", "/index.html", "/benchmark-report.html"]);
+  const allowedDocumentFragments = new Map([
+    ["index.html", new Set(["#top", "#benchmark-results"])],
+    ["benchmark-report.html", new Set(["#top", "#overview", "#ranking", "#method", "#limitations"])]
+  ]);
+  const allowedFragmentTargets = new Set([
+    ...routes.familyFragments,
+    ...routes.viewFragments,
+    ...routes.reportFragments
+  ]);
   const failures = [];
   for (const htmlPath of ["index.html", "benchmark-report.html"]) {
     const contents = filesByPath.get(htmlPath)?.body.toString("utf8") ?? "";
     const attributePattern = /\b(?:href|src)="([^"]+)"/g;
     for (const match of contents.matchAll(attributePattern)) {
       const target = match[1];
-      if (target.startsWith("#")) continue;
+      if (target.startsWith("#")) {
+        const normalizedRoute = htmlPath === "index.html"
+          ? `/${target}`
+          : `/benchmark-report.html${target}`;
+        if (
+          allowedDocumentFragments.get(htmlPath)?.has(target) ||
+          allowedFragmentTargets.has(normalizedRoute)
+        ) continue;
+        failures.push(`${htmlPath}:${target}`);
+        continue;
+      }
       if (target.startsWith(`/releases/${releaseId}/`)) continue;
-      if (target === "./index.html" || allowedStableTargets.has(target)) continue;
+      if (target === "data:,") continue;
+      if (allowedStableTargets.has(target) || (target.startsWith("./") && allowedStableTargets.has(`/${target.slice(2)}`))) continue;
+      if (target.startsWith("./index.html#") && allowedFragmentTargets.has(`/${target.slice("./index.html".length)}`)) continue;
+      if (target.startsWith("./benchmark-report.html#") && allowedFragmentTargets.has(`/${target.slice(2)}`)) continue;
       if (/^https:\/\//.test(target)) continue;
       failures.push(`${htmlPath}:${target}`);
     }
@@ -436,7 +469,31 @@ export function buildBenchmarkPublicationArtifact({
     });
   }
 
+  const publicationProjection = buildBenchmarkPublicationProjection({ repoRootDirectory });
+  const generatedFiles = new Map([
+    ["data.js", Buffer.from(publicationProjection.dataSource, "utf8")],
+    ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")]
+  ]);
   const sourceFiles = config.publicFiles.map((fileConfig) => {
+    const generatedContents = generatedFiles.get(fileConfig.path);
+    if (generatedContents) {
+      if (generatedContents.length > config.limits.maxFileBytes) {
+        throw artifactError({
+          message: `Generated production file exceeds the ${config.limits.maxFileBytes}-byte limit: ${fileConfig.path}`,
+          suggestion: "Reduce the public projection or explicitly revise and re-audit the publication budget.",
+          context: { path: fileConfig.path, bytes: generatedContents.length }
+        });
+      }
+      return {
+        ...fileConfig,
+        filePath: null,
+        contents: generatedContents,
+        bytes: generatedContents.length,
+        sha256: sha256(generatedContents),
+        generated: true
+      };
+    }
+
     const filePath = path.join(siteRootDirectory, fileConfig.path);
     let stats;
     try {
@@ -469,16 +526,22 @@ export function buildBenchmarkPublicationArtifact({
       filePath,
       contents,
       bytes: contents.length,
-      sha256: sha256(contents)
+      sha256: sha256(contents),
+      generated: false
     };
   }).sort((leftFile, rightFile) => leftFile.path.localeCompare(rightFile.path));
 
-  const sourceManifest = sourceFiles.map(({ path: relativePath, bytes, sha256: fileSha256 }) => ({
+  const sourceManifest = sourceFiles.map(({ path: relativePath, bytes, sha256: fileSha256, contentType, cacheClass }) => ({
     path: relativePath,
     bytes,
-    sha256: fileSha256
+    sha256: fileSha256,
+    contentType,
+    cacheClass
   }));
-  const releaseId = sha256(Buffer.from(`${JSON.stringify(sourceManifest)}\n`, "utf8"));
+  const releaseId = sha256(Buffer.from(`${JSON.stringify({
+    sourceManifest,
+    projectionBasisSha256: publicationProjection.basisSha256
+  })}\n`, "utf8"));
   if (!RELEASE_ID_PATTERN.test(releaseId)) {
     throw artifactError({ message: "Could not derive a valid deterministic release identifier." });
   }
@@ -494,6 +557,13 @@ export function buildBenchmarkPublicationArtifact({
             publicFiles: config.publicFiles
           })
         : sourceFile.contents;
+      if (body.length > config.limits.maxFileBytes) {
+        throw artifactError({
+          message: `Release-qualified production file exceeds the ${config.limits.maxFileBytes}-byte limit: ${sourceFile.path}`,
+          suggestion: "Reduce the file size or explicitly revise and re-audit the publication budget.",
+          context: { path: sourceFile.path, bytes: body.length, releaseId }
+        });
+      }
       const outputPath = path.join(temporaryDirectory, sourceFile.path);
       fs.mkdirSync(path.dirname(outputPath), { recursive: true });
       fs.writeFileSync(outputPath, body);
@@ -540,14 +610,38 @@ export function buildBenchmarkPublicationArtifact({
   let routes;
   try {
     const dataFile = filesByPath.get("data.js");
-    const data = evaluateSiteData(dataFile.body.toString("utf8"), dataFile.outputPath);
-    validatePublicEvidenceBoundary(data);
-    routes = buildRouteManifest(data);
-    validateHtmlTargets({ filesByPath, releaseId });
+    const data = evaluateSiteModule({
+      source: dataFile.body.toString("utf8"),
+      filePath: dataFile.outputPath,
+      globalName: "VASIR_DATA",
+      publicPath: "data.js"
+    });
+    validateBenchmarkPublicationProjection(data);
+    const responsesFile = filesByPath.get("responses.js");
+    const responseBundle = evaluateSiteModule({
+      source: responsesFile.body.toString("utf8"),
+      filePath: responsesFile.outputPath,
+      globalName: "VASIR_RESPONSES",
+      publicPath: "responses.js"
+    });
+    validateBenchmarkPublicationResponses(responseBundle, data);
+    const benchmarkRoutes = buildBenchmarkPublicationRoutes(data);
+    if (JSON.stringify(benchmarkRoutes) !== JSON.stringify(publicationProjection.routes)) {
+      throw artifactError({
+        message: "The generated data and publication route manifest disagree.",
+        suggestion: "Repair the deterministic public projector before publishing.",
+        context: { releaseId }
+      });
+    }
+    routes = benchmarkRoutes;
+    validateHtmlTargets({ filesByPath, releaseId, routes });
 
     const textualLeakPaths = files
       .filter((file) => /^(?:text\/|application\/(?:javascript|json))/.test(file.contentType))
-      .filter((file) => /\.agents\/vasir-evals|\.\.\/(?:hyper-scale-chat|personalized-home-feed|device-telemetry)\//.test(file.body.toString("utf8")))
+      .filter((file) => {
+        const source = file.body.toString("utf8");
+        return PRIVATE_LOCAL_PATH_PATTERN.test(source) || PRIVATE_PARENT_PATH_PATTERN.test(source);
+      })
       .map((file) => file.path);
     if (textualLeakPaths.length > 0) {
       throw artifactError({
@@ -556,6 +650,21 @@ export function buildBenchmarkPublicationArtifact({
         context: { paths: textualLeakPaths, releaseId }
       });
     }
+
+    const fixtureTokenPaths = files
+      .filter((file) => config.publicFiles.some((fileConfig) => fileConfig.path === file.path))
+      .filter((file) => /^(?:text\/|application\/(?:javascript|json))/.test(file.contentType))
+      .filter((file) => file.path !== "responses.js")
+      .filter((file) => FIXTURE_TOKEN_PATTERN.test(file.body.toString("utf8")))
+      .map((file) => file.path);
+    if (fixtureTokenPaths.length > 0) {
+      throw artifactError({
+        message: "The production artifact contains retired fixture language.",
+        suggestion: "Remove fake, illustrative, synthetic, simulated, fixture, and mock copy from public release files.",
+        context: { paths: fixtureTokenPaths, releaseId }
+      });
+    }
+
   } catch (error) {
     fs.rmSync(temporaryDirectory, { recursive: true, force: true });
     throw error;
@@ -565,6 +674,20 @@ export function buildBenchmarkPublicationArtifact({
     kind: "vasirbenchmark-release-manifest",
     schemaVersion: 1,
     releaseId,
+    projection: {
+      basisSha256: publicationProjection.basisSha256,
+      developmentResultSetCount: publicationProjection.counts.developmentResultSets,
+      eligibleResultSetCount: publicationProjection.counts.eligibleResultSets,
+      withheldResultSetCount: publicationProjection.counts.withheldResultSets,
+      familyCount: publicationProjection.counts.families,
+      trackCount: publicationProjection.counts.tracks,
+      benchmarkDefinitionCount: publicationProjection.counts.benchmarks,
+      categoryCount: publicationProjection.counts.categories,
+      conditionCount: publicationProjection.counts.conditions,
+      settingCount: publicationProjection.counts.settings,
+      resultEntryCount: publicationProjection.counts.resultEntries,
+      responseCount: publicationProjection.counts.responses
+    },
     files: files.map(({ path: relativePath, bytes, sha256: fileSha256, contentType, cacheClass, cacheControl }) => ({
       path: relativePath,
       bytes,
@@ -582,6 +705,7 @@ export function buildBenchmarkPublicationArtifact({
     siteRootDirectory,
     templatePath,
     acceptance,
+    projection: publicManifest.projection,
     releaseId,
     sourceManifest,
     publicManifest,

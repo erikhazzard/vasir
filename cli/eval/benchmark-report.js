@@ -32,6 +32,12 @@ const REPORT_FONT_FILES = [
   }
 ];
 
+const VERSIONED_CLAUDE_MODEL_NAMES = Object.freeze({
+  "claude:fable": "Claude Fable 5",
+  "claude:claude-fable-5-1": "Claude Fable 5.1",
+  "claude:opus": "Claude Opus 5"
+});
+
 function renderEmbeddedFontStyles() {
   return REPORT_FONT_FILES.map((font) => {
     const encodedFont = fs.readFileSync(
@@ -158,12 +164,17 @@ function normalizeModelId(row, modelDefinition = {}) {
 }
 
 function formatModelName(modelId) {
+  const normalizedModelId = String(modelId).toLowerCase().replace(/@[^@]+$/, "");
+  const versionedClaudeName = VERSIONED_CLAUDE_MODEL_NAMES[normalizedModelId];
+  if (versionedClaudeName) return versionedClaudeName;
+
   return modelId
     .replace(/^[^:]+:/, "")
     .replace(/[-_]+/g, " ")
     .replace(/\b\w/g, (character) => character.toUpperCase())
     .replace(/^Gpt (\d+(?:\.\d+)*)\b/, "GPT-$1")
-    .replace(/\bGpt\b/g, "GPT");
+    .replace(/\bGpt\b/g, "GPT")
+    .replace(/\bFable 5 1\b/g, "Fable 5.1");
 }
 
 function normalizeCriteria(criteriaValue) {
@@ -345,7 +356,10 @@ function normalizeRow(row, index, modelDefinitions, conditionDefinitions, treatm
   const modelId = normalizeModelId(row, modelDefinition);
   const provider = normalizeProvider(row, modelDefinition);
   const reasoningEffort = normalizeReasoningEffort(row, modelDefinition);
-  const modelLabel = readText(
+  const canonicalModelLabel = VERSIONED_CLAUDE_MODEL_NAMES[
+    String(modelId).toLowerCase().replace(/@[^@]+$/, "")
+  ];
+  const modelLabel = canonicalModelLabel || readText(
     row.modelLabel,
     row.modelConfig?.label,
     modelDefinition.label,
@@ -791,10 +805,18 @@ function normalizeJudging(run) {
     : [];
   const synthesisSource = run.judging?.synthesis ?? run.judging?.synthesizer ?? null;
   const judgingStrategy = readText(run.judging?.strategy);
+  const aggregationMethod = readText(
+    run.judging?.aggregation?.method,
+    run.benchmark?.definition?.scoring?.aggregation?.method
+  );
+  const isAggregate = !synthesisSource && [
+    "majority-gates-median-dimensions-v1",
+    "unanimity-gates-mean-dimensions-v1"
+  ].includes(aggregationMethod);
   const batchPlan = normalizeJudgeBatchPlan(run.judging?.batchPlan);
   const expectedBatchCount = batchPlan?.batches.length ?? null;
   const isBatched = judgingStrategy.includes("batched") || judgingStrategy === "panel-synthesis-v2" || Boolean(batchPlan);
-  const hasPanelShape = judgingStrategy.startsWith("panel-synthesis-") || memberSources.length > 1 || Boolean(synthesisSource);
+  const hasPanelShape = isAggregate || judgingStrategy.startsWith("panel-synthesis-") || memberSources.length > 1 || Boolean(synthesisSource);
 
   if (hasPanelShape) {
     const members = memberSources.map((record, index) => normalizeJudgeRecord({
@@ -820,7 +842,11 @@ function normalizeJudging(run) {
         expectedBatchCount
       })
       : null;
-    const effective = synthesis ?? members[0] ?? normalizeJudgeRecord({
+    const effective = isAggregate ? {
+      ...normalizeJudgeRecord({ record: run.judging ?? {}, run, candidateOrder: topLevelCandidateOrder }),
+      model: "Deterministic rubric aggregation",
+      reasoningEffort: "Not applicable"
+    } : synthesis ?? members[0] ?? normalizeJudgeRecord({
       record: run.judging ?? {},
       configuration: run.judging?.judgeConfiguration ?? {},
       run,
@@ -836,7 +862,7 @@ function normalizeJudging(run) {
       (total, member) => total + member.completedBatchCount,
       0
     );
-    const synthesisBatchRequestedCount = isBatched
+    const synthesisBatchRequestedCount = isBatched && !isAggregate
       ? expectedBatchCount ?? synthesis?.requestedBatchCount ?? 0
       : 0;
     const synthesisBatchCompletedCount = isBatched
@@ -851,6 +877,8 @@ function normalizeJudging(run) {
     );
     return {
       mode: "panel",
+      isAggregate,
+      aggregationMethod,
       strategy: judgingStrategy || "Not recorded",
       isBatched,
       batchPlan,
@@ -864,7 +892,9 @@ function normalizeJudging(run) {
       synthesisBatchCompletedCount,
       synthesisBatchReusedCount: synthesis?.reusedBatchCount ?? 0,
       synthesis,
-      scoreAuthority: isBatched
+      scoreAuthority: isAggregate
+        ? judgingComplete && panelComplete ? "panel-aggregate" : "none"
+        : isBatched
         ? judgingComplete && panelComplete && synthesisComplete
           ? "synthesizer"
           : "none"
@@ -1151,6 +1181,8 @@ export function normalizeBenchmarkReportData(runArtifact) {
     judging,
     scoreLabel: judging.scoreAuthority === "synthesizer"
       ? "synthesized score"
+      : judging.scoreAuthority === "panel-aggregate"
+        ? "panel rubric score"
       : judging.scoreAuthority === "single-judge"
         ? "judge score"
         : "score",
@@ -3422,7 +3454,13 @@ const REPORT_SCRIPT = String.raw`
 export function renderBenchmarkReportHtml(runArtifact) {
   const report = normalizeBenchmarkReportData(runArtifact);
   const isPanelJudging = report.judging.mode === "panel";
+  const isAggregateJudging = report.judging.isAggregate === true;
+  const hasAggregateScores = report.judging.scoreAuthority === "panel-aggregate";
   const hasSynthesizedScores = report.judging.scoreAuthority === "synthesizer";
+  const scoreSourceLabel = isAggregateJudging ? "panel rubric" : hasSynthesizedScores ? "synthesized" : "judge";
+  const aggregateMethodSummary = report.judging.aggregationMethod === "unanimity-gates-mean-dimensions-v1"
+    ? "Both judges must pass each gate; either failure applies its cap. Dimension ratings use the arithmetic mean, including half points. The task rubric recomputes the score before applying the lowest failed-gate cap. There is no synthesizer."
+    : "Gates use majority vote and dimension ratings use the median integer rating. The task rubric recomputes the score before applying the lowest majority-failed gate cap. There is no synthesizer.";
   const d3Source = fs.readFileSync(D3_SOURCE_FILE_PATH, "utf8");
   const fontStyles = renderEmbeddedFontStyles();
   const heroTreatmentLabel = report.treatment.label === "Vasir architecture skill"
@@ -3437,9 +3475,9 @@ export function renderBenchmarkReportHtml(runArtifact) {
     : !report.source.matrixComplete
       ? `Partial run: completed pairs moved ${formatLift(report.observedLift)}; the declared matrix did not finish.`
     : report.observedLift > 0
-      ? `${report.treatment.label} received higher ${hasSynthesizedScores ? "synthesized" : "judge"} scores across ${report.matchedCount || "the available"} matched generation${report.matchedCount === 1 ? "" : "s"}.`
+      ? `${report.treatment.label} received higher ${scoreSourceLabel} scores across ${report.matchedCount || "the available"} matched generation${report.matchedCount === 1 ? "" : "s"}.`
       : report.observedLift < 0
-        ? `${report.treatment.label} received lower ${hasSynthesizedScores ? "synthesized" : "judge"} scores across ${report.matchedCount || "the available"} matched generation${report.matchedCount === 1 ? "" : "s"}.`
+        ? `${report.treatment.label} received lower ${scoreSourceLabel} scores across ${report.matchedCount || "the available"} matched generation${report.matchedCount === 1 ? "" : "s"}.`
         : `${report.treatment.label} produced no observed score change in this run.`;
   const heroDisplayHeadline = report.observedLift === null
     ? "No matched score signal."
@@ -3459,7 +3497,11 @@ export function renderBenchmarkReportHtml(runArtifact) {
   const batchPlanCount = report.judging.batchPlan?.batches.length ?? 0;
   const panelBatchCoverage = `${report.judging.panelBatchCompletedCount}/${report.judging.panelBatchRequestedCount}`;
   const synthesisBatchCoverage = `${report.judging.synthesisBatchCompletedCount}/${report.judging.synthesisBatchRequestedCount}`;
-  const judgeContextTitle = isBatchedJudging
+  const judgeContextTitle = isAggregateJudging
+    ? hasAggregateScores
+      ? `${report.judging.requestedCount} independent judges → deterministic rubric aggregate`
+      : `${report.judging.completedCount}/${report.judging.requestedCount} judges complete · no final aggregate`
+    : isBatchedJudging
     ? hasSynthesizedScores
       ? `${report.judging.requestedCount} independent judges × ${batchPlanCount} bounded batches → batched synthesis`
       : `${panelBatchCoverage} panel executions · ${synthesisBatchCoverage} synthesis batches · no final score`
@@ -3475,21 +3517,29 @@ export function renderBenchmarkReportHtml(runArtifact) {
   const calibrationNote = report.judge.calibrationStatus === "author-calibration-pending"
     ? "Judge calibration is pending; numeric scores are directional evidence, not ground truth."
     : `Judge calibration: ${report.judge.calibrationStatus}.`;
-  const judgeAsideNote = isBatchedJudging
+  const judgeAsideNote = isAggregateJudging
+    ? `${report.judging.requestedCount} fixed judges · ${panelBatchCoverage} pair executions`
+    : isBatchedJudging
     ? `${panelBatchCoverage} panel executions · ${synthesisBatchCoverage} synthesis batches`
     : isPanelJudging
     ? hasSynthesizedScores
       ? `${report.judging.requestedCount}-judge panel · ${report.judge.model} synthesis`
       : `${report.judging.completedCount}/${report.judging.requestedCount} judges · no final score`
     : `${report.judge.model} judge`;
-  const judgeContractNote = isBatchedJudging
+  const judgeContractNote = isAggregateJudging
+    ? `${report.judging.completedCount}/${report.judging.requestedCount} independent judges · ${panelBatchCoverage} pair executions · ${hasAggregateScores ? "rubric aggregate complete" : "no final aggregate"}.`
+    : isBatchedJudging
     ? `${panelBatchCoverage} panel batch executions · ${synthesisBatchCoverage} synthesis batches · ${hasSynthesizedScores ? "final synthesis complete" : "no final score"}.`
     : isPanelJudging
     ? `${report.judging.completedCount}/${report.judging.requestedCount} independent judgments · ${
       report.judging.synthesis?.status === "complete" ? "fresh synthesis complete" : "no final synthesis"
     }.`
     : `${report.judge.freshContext === true ? "Fresh context" : "Freshness not proven"} · ${report.judge.blinded === true ? "blinded identities" : "blinding not proven"} · ${report.judge.reasoningEffort} effort.`;
-  const judgeMethodSummary = isBatchedJudging
+  const judgeMethodSummary = isAggregateJudging
+    ? hasAggregateScores
+      ? aggregateMethodSummary
+      : "The fixed judge panel did not complete, so no final aggregate is available. Completed judge evidence remains inspectable for a retry."
+    : isBatchedJudging
     ? hasSynthesizedScores
       ? "The page reports scores synthesized from bounded, fresh judge batches. Every exact batch prompt, output, status, and retry result remains inspectable below."
       : "At least one required judge or synthesis batch did not complete, so this page publishes no final score. Successful batch evidence remains inspectable for a bounded retry."
@@ -3502,12 +3552,12 @@ export function renderBenchmarkReportHtml(runArtifact) {
     ? `
               <dt class="benchmark-method__term">Batch plan</dt><dd class="benchmark-method__definition">${escapeHtml(`${batchPlanCount} matched batches · ${report.judging.batchPlan?.version ?? "Not recorded"}`)}</dd>
               <dt class="benchmark-method__term">Panel executions</dt><dd class="benchmark-method__definition">${escapeHtml(`${panelBatchCoverage} complete`)}</dd>
-              ${isPanelJudging ? `<dt class="benchmark-method__term">Synthesis batches</dt><dd class="benchmark-method__definition">${escapeHtml(`${synthesisBatchCoverage} complete`)}</dd>` : ""}
+              ${isPanelJudging && !isAggregateJudging ? `<dt class="benchmark-method__term">Synthesis batches</dt><dd class="benchmark-method__definition">${escapeHtml(`${synthesisBatchCoverage} complete`)}</dd>` : ""}
               <dt class="benchmark-method__term">Batch bound</dt><dd class="benchmark-method__definition">${escapeHtml(`≤${report.judging.batchPlan?.maxGroups ?? "?"} groups · ≤${report.judging.batchPlan?.maxCandidates ?? "?"} candidates · ≤${formatByteCount(report.judging.batchPlan?.maxPromptBytes)}`)}</dd>
               <dt class="benchmark-method__term">Plan basis</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.batchPlan?.hash && report.judging.batchPlan.hash !== "Not recorded" ? report.judging.batchPlan.hash.slice(0, 12) : "Not recorded")}</dd>`
     : `
               ${isPanelJudging ? `<dt class="benchmark-method__term">Panel prompt</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.panelPromptHash === "Not recorded" ? report.judging.panelPromptHash : report.judging.panelPromptHash.slice(0, 12))}</dd>` : ""}
-              <dt class="benchmark-method__term">${isPanelJudging ? "Synthesis prompt" : "Judge prompt"}</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.promptHash === "Not recorded" ? report.judge.promptHash : report.judge.promptHash.slice(0, 12))}</dd>`;
+              <dt class="benchmark-method__term">${isPanelJudging && !isAggregateJudging ? "Synthesis prompt" : "Judge prompt"}</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.promptHash === "Not recorded" ? report.judge.promptHash : report.judge.promptHash.slice(0, 12))}</dd>`;
   const judgePanelEvidence = renderJudgePanelEvidence(report.judging);
   const tableRows = renderTableRows(report.rows);
 
@@ -3549,7 +3599,7 @@ export function renderBenchmarkReportHtml(runArtifact) {
           <span class="benchmark-hero__eyebrow">${report.source.matrixComplete ? "The Vasir benchmark standard" : `Partial observed ${escapeHtml(report.treatment.label)} lift`} · ${escapeHtml(report.benchmarkTitle)}</span>
           <h1 class="benchmark-hero__headline" id="benchmark-hero-title">${escapeHtml(heroDisplayHeadline)}</h1>
           <p class="benchmark-hero__copy benchmark-hero__copy--strong">${escapeHtml(liftHeadline)}</p>
-          <p class="benchmark-hero__copy">Score lift is the mean matched score difference: ${escapeHtml(report.treatment.label)} minus clean, on the ${isPanelJudging ? "synthesized" : "judge’s"} 0–100 scale. ${escapeHtml(calibrationNote)} Every complete answer, rubric result, and caveat remains visible below.</p>
+          <p class="benchmark-hero__copy">Score lift is the mean matched score difference: ${escapeHtml(report.treatment.label)} minus clean, on the ${isAggregateJudging ? "fixed rubric" : isPanelJudging ? "synthesized" : "judge’s"} 0–100 scale. ${escapeHtml(calibrationNote)} Every complete answer, rubric result, and caveat remains visible below.</p>
           <nav class="benchmark-hero__actions" aria-label="Explore benchmark evidence">
             <a class="ui-action ui-action--primary" href="#ranking"><span>See model ranking</span><span aria-hidden="true">→</span></a>
             <a class="ui-action ui-action--secondary" href="#answers"><span>Compare full answers</span><span aria-hidden="true">→</span></a>
@@ -3717,8 +3767,11 @@ export function renderBenchmarkReportHtml(runArtifact) {
             <h3 class="benchmark-method__title">${escapeHtml(judgeContextTitle)}</h3>
             <dl class="benchmark-method__facts">
               ${isPanelJudging ? `<dt class="benchmark-method__term">Panel</dt><dd class="benchmark-method__definition">${escapeHtml(`${report.judging.completedCount}/${report.judging.requestedCount} complete`)}</dd>` : ""}
-              <dt class="benchmark-method__term">${isPanelJudging ? "Synthesizer" : "Model"}</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.model)}</dd>
-              <dt class="benchmark-method__term">Effort</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.reasoningEffort)}</dd>
+              ${isAggregateJudging
+    ? `<dt class="benchmark-method__term">Judges</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.members.map((member) => `${member.model} · ${member.reasoningEffort}`).join(" + "))}</dd>
+              <dt class="benchmark-method__term">Aggregation</dt><dd class="benchmark-method__definition">${escapeHtml(report.judging.aggregationMethod)}</dd>`
+    : `<dt class="benchmark-method__term">${isPanelJudging ? "Synthesizer" : "Model"}</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.model)}</dd>
+              <dt class="benchmark-method__term">Effort</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.reasoningEffort)}</dd>`}
               <dt class="benchmark-method__term">Status</dt><dd class="benchmark-method__definition">${escapeHtml(report.judge.status)}</dd>
               <dt class="benchmark-method__term">Fresh</dt><dd class="benchmark-method__definition">${report.judge.freshContext === null ? "Not recorded" : report.judge.freshContext ? "Yes" : "No"}</dd>
               <dt class="benchmark-method__term">Blinded</dt><dd class="benchmark-method__definition">${report.judge.blinded === null ? "Not recorded" : report.judge.blinded ? "Yes" : "No"}</dd>

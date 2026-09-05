@@ -18,14 +18,19 @@
   ],
   "judging": {
     "panel": [
-      "codex:gpt-5.6-sol@ultra",
-      "claude:opus@max"
+      "codex:gpt-6-astra@xhigh",
+      "claude:claude-fable-5-1@max"
     ],
-    "synthesizer": "codex:gpt-5.6-sol@ultra"
+    "synthesizer": null
   },
   "scoring": {
-    "version": "device-telemetry-rubric-v1",
+    "version": "device-telemetry-rubric-v3",
     "kind": "anchored-llm",
+    "aggregation": {
+      "method": "unanimity-gates-mean-dimensions-v1",
+      "judgeCount": 2,
+      "batchUnit": "matched-pair"
+    },
     "scoreRange": {
       "min": 0,
       "max": 100

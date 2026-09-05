@@ -82,15 +82,20 @@ test("resolves the checked-in hyper-scale-chat benchmark independently from any 
   assert.ok(/^[a-f0-9]{64}$/.test(source.benchmarkGenerationHash));
   assert.ok(/^[a-f0-9]{64}$/.test(source.benchmarkScoringHash));
   assert.deepEqual(source.benchmarkDefinition.judging.panel, [
-    "codex:gpt-5.6-sol@ultra",
-    "claude:opus@max"
+    "codex:gpt-6-astra@xhigh",
+    "claude:claude-fable-5-1@max"
   ]);
-  assert.equal(source.benchmarkDefinition.judging.synthesizer, "codex:gpt-5.6-sol@ultra");
+  assert.equal(source.benchmarkDefinition.judging.synthesizer, null);
+  assert.deepEqual(source.benchmarkDefinition.scoring.aggregation, {
+    method: "unanimity-gates-mean-dimensions-v1",
+    judgeCount: 2,
+    batchUnit: "matched-pair"
+  });
   assert.equal(Object.hasOwn(source.benchmarkDefinition, "conditions"), false);
   assert.equal(Object.hasOwn(source.benchmarkDefinition, "treatments"), false);
 });
 
-test("resolves the checked-in device telemetry benchmark as a vendor-neutral 54-row experiment", () => {
+test("resolves the checked-in device telemetry benchmark as a vendor-neutral benchmark definition", () => {
   const source = resolveBenchmarkSource({
     benchmarkName: "device-telemetry",
     currentWorkingDirectory: REPOSITORY_ROOT
@@ -109,10 +114,10 @@ test("resolves the checked-in device telemetry benchmark as a vendor-neutral 54-
     100
   );
   assert.deepEqual(source.benchmarkDefinition.judging.panel, [
-    "codex:gpt-5.6-sol@ultra",
-    "claude:opus@max"
+    "codex:gpt-6-astra@xhigh",
+    "claude:claude-fable-5-1@max"
   ]);
-  assert.equal(source.benchmarkDefinition.judging.synthesizer, "codex:gpt-5.6-sol@ultra");
+  assert.equal(source.benchmarkDefinition.judging.synthesizer, null);
   assert.doesNotMatch(source.benchmarkDefinition.scoring.judgeInstructions, /must use (scylla|dynamodb|redis)/i);
   assert.equal(Object.hasOwn(source.benchmarkDefinition, "conditions"), false);
   assert.equal(Object.hasOwn(source.benchmarkDefinition, "treatments"), false);
@@ -181,6 +186,94 @@ test("rejects duplicate judges before launching a benchmark", () => {
       return true;
     }
   );
+});
+
+test("accepts an odd synthesis-free panel only with its exact deterministic aggregation contract", () => {
+  const projectRootDirectory = createTemporaryDirectory();
+  const benchmarkDefinition = createValidBenchmark("panel-median");
+  benchmarkDefinition.scoring.aggregation = {
+    method: "majority-gates-median-dimensions-v1",
+    judgeCount: 3,
+    batchUnit: "matched-pair"
+  };
+  benchmarkDefinition.judging = {
+    panel: [
+      "codex:gpt-5.6-sol@ultra",
+      "codex:gpt-5.6-terra@ultra",
+      "claude:opus@max"
+    ],
+    synthesizer: null
+  };
+  const benchmarkFilePath = path.join(
+    projectRootDirectory,
+    "benchmarks",
+    "panel-median",
+    "benchmark.json"
+  );
+  writeJson(benchmarkFilePath, benchmarkDefinition);
+
+  const source = resolveBenchmarkSource({
+    benchmarkName: "panel-median",
+    currentWorkingDirectory: projectRootDirectory,
+    projectRootDirectory
+  });
+  assert.equal(source.benchmarkDefinition.judging.panel.length, 3);
+  assert.equal(source.benchmarkDefinition.judging.synthesizer, null);
+
+  const evenPanel = structuredClone(benchmarkDefinition);
+  evenPanel.scoring.aggregation.judgeCount = 2;
+  evenPanel.judging.panel.pop();
+  writeJson(benchmarkFilePath, evenPanel);
+  assert.throws(
+    () => resolveBenchmarkSource({
+      benchmarkName: "panel-median",
+      currentWorkingDirectory: projectRootDirectory,
+      projectRootDirectory
+    }),
+    (error) => error?.code === "EVAL_BENCHMARK_INVALID" && /aggregation|majority/i.test(error.message)
+  );
+
+  const mismatchedPanel = structuredClone(benchmarkDefinition);
+  mismatchedPanel.scoring.aggregation.judgeCount = 5;
+  writeJson(benchmarkFilePath, mismatchedPanel);
+  assert.throws(
+    () => resolveBenchmarkSource({
+      benchmarkName: "panel-median",
+      currentWorkingDirectory: projectRootDirectory,
+      projectRootDirectory
+    }),
+    (error) => error?.code === "EVAL_BENCHMARK_INVALID" && /disagree/i.test(error.message)
+  );
+});
+
+test("two synthesis-free judges require explicit unanimity aggregation and exact count", () => {
+  const projectRootDirectory = createTemporaryDirectory();
+  const definition = createValidBenchmark("panel-consensus");
+  definition.judging = {
+    panel: ["codex:gpt-6-astra@xhigh", "claude:claude-fable-5-1@max"],
+    synthesizer: null
+  };
+  definition.scoring.aggregation = {
+    method: "unanimity-gates-mean-dimensions-v1", judgeCount: 2, batchUnit: "matched-pair"
+  };
+  const filePath = path.join(projectRootDirectory, "benchmarks", "panel-consensus", "benchmark.json");
+  const resolve = () => resolveBenchmarkSource({
+    benchmarkName: "panel-consensus", currentWorkingDirectory: projectRootDirectory, projectRootDirectory
+  });
+  writeJson(filePath, definition);
+  const source = resolve();
+  assert.deepEqual(source.benchmarkDefinition.judging, definition.judging);
+  for (const mutation of [
+    (candidate) => { delete candidate.scoring.aggregation; },
+    (candidate) => { candidate.scoring.aggregation.judgeCount = 3; },
+    (candidate) => { candidate.judging.panel.pop(); },
+    (candidate) => { candidate.judging.synthesizer = "codex:gpt-6-astra@xhigh"; }
+  ]) {
+    const candidate = structuredClone(definition);
+    mutation(candidate);
+    writeJson(filePath, candidate);
+    assert.throws(resolve, (error) => error.code === "EVAL_BENCHMARK_INVALID");
+  }
 });
 
 test("prefers a project-local independent benchmark over the bundled catalog", () => {

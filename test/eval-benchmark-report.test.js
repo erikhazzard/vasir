@@ -290,6 +290,62 @@ function createBatchedPanelRunFixture({ maliciousBatchEvidence = false } = {}) {
   return run;
 }
 
+function createAggregatePanelRunFixture({ historical = false } = {}) {
+  const run = createRunFixture();
+  const configurations = historical ? [
+    { id: "codex:gpt-5.6-sol@ultra", provider: "codex", model: "gpt-5.6-sol", reasoning: "ultra" },
+    { id: "codex:gpt-5.6-terra@ultra", provider: "codex", model: "gpt-5.6-terra", reasoning: "ultra" },
+    { id: "claude:opus@max", provider: "claude", model: "opus", reasoning: "max" }
+  ] : [
+    { id: "codex:gpt-6-astra@xhigh", provider: "codex", model: "gpt-6-astra", reasoning: "xhigh" },
+    { id: "claude:claude-fable-5-1@max", provider: "claude", model: "claude-fable-5-1", reasoning: "max" }
+  ];
+  const aggregation = {
+    method: historical ? "majority-gates-median-dimensions-v1" : "unanimity-gates-mean-dimensions-v1",
+    judgeCount: configurations.length,
+    batchUnit: "matched-pair"
+  };
+  const batch = {
+    batchId: "pair-001",
+    groupHashes: ["matched-pair-a"],
+    candidateIds: run.judging.candidateOrder.map(({ candidateId }) => candidateId),
+    candidateOrder: run.judging.candidateOrder,
+    promptHash: "1".repeat(64),
+    promptBytes: 1_024
+  };
+  run.benchmark.definition.scoring.aggregation = aggregation;
+  run.judging = {
+    ...run.judging,
+    strategy: historical ? "matched-pair-panel-median-v1" : "matched-pair-panel-consensus-v1",
+    aggregation,
+    judgeConfiguration: configurations[0],
+    judgeConfigurations: configurations,
+    synthesizerConfiguration: null,
+    synthesis: null,
+    batchPlan: {
+      version: "matched-pairs-v2",
+      maxGroups: 1,
+      maxCandidates: 2,
+      maxPromptBytes: 64 * 1_024,
+      batches: [batch]
+    },
+    judges: configurations.map((configuration, index) => ({
+      reviewerId: `reviewer-${index + 1}`,
+      configuration,
+      status: "complete",
+      batches: [{
+        ...batch,
+        configuration,
+        status: "complete",
+        promptText: `Judge both matched answers with the fixed rubric: ${configuration.id}.`,
+        outputText: `Exact paired judgment from ${configuration.id}.`
+      }]
+    }))
+  };
+  run.rows.forEach((row) => { row.score.aggregation = aggregation; });
+  return run;
+}
+
 test("normalizes the benchmark runner contract into matched report evidence", () => {
   const report = normalizeBenchmarkReportData(createRunFixture());
 
@@ -314,6 +370,60 @@ test("normalizes the benchmark runner contract into matched report evidence", ()
   assert.equal(report.rubric.summary, "Reward a small, horizontally scalable shape and penalize unforced topology.");
   assert.equal(report.rubric.criteria[0].label, "Required gate: lasting shape");
   assert.match(report.rubric.criteria[0].rationale, /Failure caps the total score at 49\./);
+});
+
+test("preserves explicit release numbers for every Claude report model", () => {
+  const cases = [
+    {
+      configurationId: "claude:fable@max",
+      modelId: "claude:fable",
+      model: "fable",
+      reasoning: "max",
+      expectedLabel: "Claude Fable 5"
+    },
+    {
+      configurationId: "claude:claude-fable-5-1@ultracode",
+      modelId: "claude:claude-fable-5-1",
+      model: "claude-fable-5-1",
+      reasoning: "ultracode",
+      expectedLabel: "Claude Fable 5.1"
+    },
+    {
+      configurationId: "claude:opus@xhigh",
+      modelId: "claude:opus",
+      model: "opus",
+      reasoning: "xhigh",
+      expectedLabel: "Claude Opus 5"
+    }
+  ];
+
+  for (const candidate of cases) {
+    const run = createRunFixture();
+    run.configurations[0] = {
+      id: candidate.configurationId,
+      provider: "claude",
+      model: candidate.model,
+      reasoning: candidate.reasoning
+    };
+    for (const row of run.rows) {
+      row.configurationId = candidate.configurationId;
+      row.modelId = candidate.modelId;
+      row.modelLabel = candidate.model === "opus" ? "Opus" : "Fable";
+      row.provider = "claude";
+      row.model = candidate.model;
+      row.reasoning = candidate.reasoning;
+    }
+    run.pairs[0].configurationId = candidate.configurationId;
+    run.summary.bestConfigurationId = candidate.configurationId;
+
+    const report = normalizeBenchmarkReportData(run);
+
+    assert.equal(report.rows[0].modelLabel, candidate.expectedLabel);
+    assert.equal(
+      report.rows[0].configurationLabel,
+      `${candidate.expectedLabel} · ${candidate.reasoning}`
+    );
+  }
 });
 
 test("renders a self-contained accessible D3 report without executable response injection", () => {
@@ -436,6 +546,94 @@ test("normalizes and renders panel judgments with one explicit synthesis authori
   assert.match(html, /widest score spread 18\.0/);
   assert.match(html, /&lt;\/script&gt;&lt;script&gt;globalThis\.__JUDGE_XSS__/);
   assert.doesNotMatch(html, /<script>globalThis\.__JUDGE_XSS__/);
+});
+
+test("a complete Astra and Fable panel renders consensus scoring with deterministic authority", () => {
+  const run = createAggregatePanelRunFixture();
+  const report = normalizeBenchmarkReportData(run);
+
+  assert.equal(report.judging.isAggregate, true);
+  assert.equal(report.judging.aggregationMethod, "unanimity-gates-mean-dimensions-v1");
+  assert.equal(report.judging.scoreAuthority, "panel-aggregate");
+  assert.equal(report.judging.requestedCount, 2);
+  assert.equal(report.judging.completedCount, 2);
+  assert.equal(report.judging.panelBatchCompletedCount, 2);
+  assert.equal(report.judging.panelBatchRequestedCount, 2);
+  assert.deepEqual(report.judging.members.map(({ configurationId }) => configurationId), [
+    "codex:gpt-6-astra@xhigh",
+    "claude:claude-fable-5-1@max"
+  ]);
+  assert.equal(report.judge.model, "Deterministic rubric aggregation");
+  assert.equal(report.scoreLabel, "panel rubric score");
+  assert.equal(report.judging.synthesis, null);
+  assert.equal(report.judging.synthesisBatchRequestedCount, 0);
+
+  const html = renderBenchmarkReportHtml(run);
+  assert.match(html, /2 independent judges → deterministic rubric aggregate/);
+  assert.match(html, /Both judges must pass each gate; either failure applies its cap/);
+  assert.match(html, /Dimension ratings use the arithmetic mean, including half points/);
+  assert.match(html, /There is no synthesizer/);
+  assert.match(html, /Panel evidence · 2\/2 batch executions complete/);
+  assert.match(html, /Exact paired judgment from codex:gpt-6-astra@xhigh/);
+  assert.match(html, /Exact paired judgment from claude:claude-fable-5-1@max/);
+  assert.doesNotMatch(html, /synthesized score|→ one synthesis|→ batched synthesis/);
+});
+
+test("a historical three-judge panel retains majority gates and median dimensions in its report", () => {
+  const run = createAggregatePanelRunFixture({ historical: true });
+  // Historical artifacts can carry the aggregation contract only in their rubric.
+  delete run.judging.aggregation;
+  const report = normalizeBenchmarkReportData(run);
+
+  assert.equal(report.judging.isAggregate, true);
+  assert.equal(report.judging.aggregationMethod, "majority-gates-median-dimensions-v1");
+  assert.equal(report.judging.scoreAuthority, "panel-aggregate");
+  assert.equal(report.judging.requestedCount, 3);
+  assert.equal(report.judging.completedCount, 3);
+  assert.equal(report.judging.panelBatchCompletedCount, 3);
+  assert.equal(report.scoreLabel, "panel rubric score");
+
+  const html = renderBenchmarkReportHtml(run);
+  assert.match(html, /3 independent judges → deterministic rubric aggregate/);
+  assert.match(html, /Gates use majority vote and dimension ratings use the median integer rating/);
+  assert.match(html, /There is no synthesizer/);
+  assert.match(html, /Panel evidence · 3\/3 batch executions complete/);
+  assert.doesNotMatch(html, /Both judges must pass|synthesized score|→ one synthesis|→ batched synthesis/);
+});
+
+test("an incomplete consensus panel preserves completed evidence without a final score authority", () => {
+  const run = createAggregatePanelRunFixture();
+  run.runStatus = "incomplete";
+  run.rows.forEach((row) => {
+    row.rowStatus = "complete";
+    row.score = null;
+  });
+  run.pairs = [];
+  run.judging.status = "error";
+  run.judging.judges[1].status = "error";
+  run.judging.judges[1].batches[0].status = "error";
+  run.judging.judges[1].batches[0].error = { message: "Fable's paired judgment timed out." };
+  run.judging.judges[1].batches[0].outputText = null;
+  const report = normalizeBenchmarkReportData(run);
+
+  assert.equal(report.judging.isAggregate, true);
+  assert.equal(report.judging.aggregationMethod, "unanimity-gates-mean-dimensions-v1");
+  assert.equal(report.judging.scoreAuthority, "none");
+  assert.equal(report.judging.completedCount, 1);
+  assert.equal(report.judging.panelBatchCompletedCount, 1);
+  assert.equal(report.judging.panelBatchRequestedCount, 2);
+  assert.equal(report.observedLift, null);
+  assert.equal(report.bestConfiguration, null);
+  assert.equal(report.scoreLabel, "score");
+
+  const html = renderBenchmarkReportHtml(run);
+  assert.match(html, /1\/2 judges complete · no final aggregate/);
+  assert.match(html, /The fixed judge panel did not complete, so no final aggregate is available/);
+  assert.match(html, /Panel evidence · 1\/2 batch executions complete/);
+  assert.match(html, /Exact paired judgment from codex:gpt-6-astra@xhigh/);
+  assert.match(html, /paired judgment timed out/);
+  assert.match(html, /No matched score signal/);
+  assert.doesNotMatch(html, /rubric aggregate complete|synthesized score|→ one synthesis|→ batched synthesis/);
 });
 
 test("renders complete v2 judging as bounded panel and synthesis batch evidence", () => {

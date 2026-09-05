@@ -201,8 +201,8 @@ test("catalog renders a stable, self-contained capability index and escapes arti
 
 function createCategoryTaxonomy(benchmarkIds) {
   return {
-    schemaVersion: 2,
-    version: "test-capabilities-v2",
+    schemaVersion: 3,
+    version: "test-capabilities-v3",
     status: "development",
     categories: [{
       id: "backend-architecture",
@@ -210,14 +210,19 @@ function createCategoryTaxonomy(benchmarkIds) {
       description: "Tests lasting backend architecture.",
       benchmarkIds,
       modelScore: {
-        method: "equal-benchmark-peer-index-v1",
+        edition: "backend-architecture-absolute-v1",
+        method: "equal-benchmark-absolute-mean-v1",
         benchmarkWeighting: "equal",
         scaleMaximum: 100
       },
-      rating: {
-        method: "matched-outcome-elo-v1",
-        promptWeighting: "equal",
-        cleanReference: 1500
+      effect: {
+        method: "paired-absolute-delta-v1",
+        benchmarkWeighting: "equal",
+        unit: "rubric-points"
+      },
+      uncertainty: {
+        status: "not-estimated",
+        reason: "two-tasks-one-trial-per-condition"
       }
     }]
   };
@@ -282,20 +287,20 @@ function createCategoryEntry({
   };
 }
 
-function outcomes({ wins, ties, losses }) {
-  return [
-    ...Array.from({ length: wins }, () => 1),
-    ...Array.from({ length: ties }, () => 0),
-    ...Array.from({ length: losses }, () => -1)
-  ];
-}
+const MODEL_CONFIGURATIONS = Object.freeze([
+  { id: "model:a@max", modelId: "model:a", modelLabel: "Model A", configurationLabel: "Model A · max" },
+  { id: "model:b@max", modelId: "model:b", modelLabel: "Model B", configurationLabel: "Model B · max" },
+  { id: "model:c@max", modelId: "model:c", modelLabel: "Model C", configurationLabel: "Model C · max" }
+]);
 
-function createModelScoreEntry({ benchmarkId, cleanScores, treatmentScores }) {
-  const configurations = [
-    { id: "model:a@max", modelId: "model:a", modelLabel: "Model A", configurationLabel: "Model A · max" },
-    { id: "model:b@max", modelId: "model:b", modelLabel: "Model B", configurationLabel: "Model B · max" },
-    { id: "model:c@max", modelId: "model:c", modelLabel: "Model C", configurationLabel: "Model C · max" }
-  ];
+function createModelScoreEntry({
+  benchmarkId,
+  cleanScores,
+  treatmentScores,
+  configurations = MODEL_CONFIGURATIONS
+}) {
+  assert.equal(cleanScores.length, configurations.length);
+  assert.equal(treatmentScores.length, configurations.length);
   const entry = createCategoryEntry({
     benchmarkId,
     deltas: cleanScores.map((score, index) => treatmentScores[index] - score)
@@ -331,55 +336,97 @@ function createModelScoreEntry({ benchmarkId, cleanScores, treatmentScores }) {
   };
 }
 
-test("category rating uses equal-prompt matched outcomes and produces the architecture golden result", () => {
+test("category aggregation retains matched outcomes without turning them into a relative rating", () => {
   const benchmarkIds = ["chat", "feed", "telemetry"];
   const categories = buildBenchmarkCatalogCategories([
-    createCategoryEntry({ benchmarkId: "chat", deltas: outcomes({ wins: 24, ties: 1, losses: 2 }) }),
-    createCategoryEntry({ benchmarkId: "feed", deltas: outcomes({ wins: 17, ties: 5, losses: 5 }) }),
-    createCategoryEntry({ benchmarkId: "telemetry", deltas: outcomes({ wins: 23, ties: 1, losses: 3 }) })
+    createCategoryEntry({ benchmarkId: "chat", deltas: [1, 1, 0, -1] }),
+    createCategoryEntry({ benchmarkId: "feed", deltas: [1, 0, -1] }),
+    createCategoryEntry({ benchmarkId: "telemetry", deltas: [1, 1, -1] })
   ], createCategoryTaxonomy(benchmarkIds));
 
   assert.equal(categories.length, 1);
-  assert.deepEqual(categories[0].record, { wins: 64, ties: 7, losses: 10 });
-  assert.equal(categories[0].matchedPairCount, 81);
-  assert.equal(categories[0].rating.matchScore, 5 / 6);
-  assert.equal(categories[0].rating.clean, 1500);
-  assert.equal(categories[0].rating.treatment, 1780);
-  assert.equal(categories[0].rating.delta, 280);
+  assert.deepEqual(categories[0].record, { wins: 5, ties: 2, losses: 3 });
+  assert.equal(categories[0].matchedPairCount, 10);
+  assert.equal(categories[0].modelScoreMethod, "equal-benchmark-absolute-mean-v1");
+  assert.equal(categories[0].scoreEdition, "backend-architecture-absolute-v1");
+  assert.equal(categories[0].effectMethod, "paired-absolute-delta-v1");
+  assert.deepEqual(categories[0].uncertainty, {
+    status: "not-estimated",
+    reason: "two-tasks-one-trial-per-condition"
+  });
+  assert.equal("rating" in categories[0], false);
   assert.equal(categories[0].calibrationStatus, "Provisional");
 });
 
-test("category rating weights prompts equally and withholds incompatible or missing evidence", () => {
+test("absolute scoring withholds incompatible or missing evidence", () => {
   const taxonomy = createCategoryTaxonomy(["one", "two"]);
-  const equallyWeighted = buildBenchmarkCatalogCategories([
-    createCategoryEntry({ benchmarkId: "one", deltas: [1] }),
-    createCategoryEntry({ benchmarkId: "two", deltas: Array.from({ length: 9 }, () => -1) })
-  ], taxonomy)[0];
-  assert.equal(equallyWeighted.rating.matchScore, 0.5);
-  assert.equal(equallyWeighted.rating.treatment, 1500);
-
   const missing = buildBenchmarkCatalogCategories([
     createCategoryEntry({ benchmarkId: "one", deltas: [1] })
   ], taxonomy)[0];
-  assert.equal(missing.rating, null);
+  assert.deepEqual(missing.modelScores, []);
   assert.match(missing.problems.join(" "), /Missing mapped benchmarks/);
 
   const incompatible = buildBenchmarkCatalogCategories([
     createCategoryEntry({ benchmarkId: "one", deltas: [1] }),
     createCategoryEntry({ benchmarkId: "two", deltas: [1], treatmentHash: "different" })
   ], taxonomy)[0];
-  assert.equal(incompatible.rating, null);
+  assert.deepEqual(incompatible.modelScores, []);
   assert.match(incompatible.problems.join(" "), /treatment id and snapshot/);
 
   const incomplete = buildBenchmarkCatalogCategories([
     createCategoryEntry({ benchmarkId: "one", deltas: [1] }),
     createCategoryEntry({ benchmarkId: "two", deltas: [1], featuredStatus: "incomplete" })
   ], taxonomy)[0];
-  assert.equal(incomplete.rating, null);
+  assert.deepEqual(incomplete.modelScores, []);
   assert.match(incomplete.problems.join(" "), /Incomplete featured evidence/);
 });
 
-test("category model index ranks each condition independently with equal benchmark weight", () => {
+test("synthesis-free three-judge scoring is a complete comparison basis", () => {
+  const entries = ["one", "two"].map((benchmarkId) => {
+    const entry = createCategoryEntry({ benchmarkId, deltas: [5] });
+    return {
+      ...entry,
+      compatibility: {
+        ...entry.compatibility,
+        judgingStrategy: "matched-pair-panel-median-v1",
+        panelConfigurationIds: [
+          "codex:gpt-5.6-sol@ultra",
+          "codex:gpt-5.6-terra@ultra",
+          "claude:opus@max"
+        ],
+        synthesizerConfigurationId: ""
+      }
+    };
+  });
+  const category = buildBenchmarkCatalogCategories(entries, createCategoryTaxonomy(["one", "two"]))[0];
+
+  assert.deepEqual(category.modelScoreProblems, []);
+  assert.equal(category.modelScores.length, 1);
+  assert.equal(category.modelScores[0].baselineScore, 50);
+  assert.equal(category.modelScores[0].skillScore, 55);
+});
+
+test("synthesis-free two-judge consensus is a complete comparison basis", () => {
+  const entries = ["one", "two"].map((benchmarkId) => {
+    const entry = createCategoryEntry({ benchmarkId, deltas: [5] });
+    return {
+      ...entry,
+      compatibility: {
+        ...entry.compatibility,
+        judgingStrategy: "matched-pair-panel-consensus-v1",
+        panelConfigurationIds: ["codex:gpt-6-astra@xhigh", "claude:claude-fable-5-1@max"],
+        synthesizerConfigurationId: ""
+      }
+    };
+  });
+  const category = buildBenchmarkCatalogCategories(entries, createCategoryTaxonomy(["one", "two"]))[0];
+  assert.deepEqual(category.modelScoreProblems, []);
+  assert.equal(category.modelScores.length, 1);
+  assert.equal(category.modelScores[0].baselineScore, 50);
+  assert.equal(category.modelScores[0].skillScore, 55);
+});
+
+test("category model scores are equal-benchmark absolute means with paired uplift and secondary ranks", () => {
   const entries = [
     createModelScoreEntry({ benchmarkId: "one", cleanScores: [90, 80, 70], treatmentScores: [95, 85, 75] }),
     createModelScoreEntry({ benchmarkId: "two", cleanScores: [60, 80, 70], treatmentScores: [95, 85, 75] })
@@ -390,20 +437,47 @@ test("category model index ranks each condition independently with equal benchma
   assert.deepEqual(category.modelScoreProblems, []);
   const modelA = category.modelScores.find((score) => score.configurationId === "model:a@max");
   const modelB = category.modelScores.find((score) => score.configurationId === "model:b@max");
-  assert.equal(modelB.cleanRank, 1);
-  assert.equal(modelB.cleanIndex, 75);
-  assert.equal(modelA.cleanRank, 2);
-  assert.equal(modelA.cleanIndex, 50);
-  assert.equal(modelA.treatmentRank, 1);
-  assert.equal(modelA.treatmentIndex, 100);
-  assert.equal(modelA.indexChange, 50);
+  assert.deepEqual({
+    baseline: modelA.baselineScore,
+    skill: modelA.skillScore,
+    uplift: modelA.upliftPoints,
+    baselineRank: modelA.baselineRank,
+    skillRank: modelA.skillRank
+  }, {
+    baseline: 75,
+    skill: 95,
+    uplift: 20,
+    baselineRank: 2,
+    skillRank: 1
+  });
+  assert.deepEqual({
+    baseline: modelB.baselineScore,
+    skill: modelB.skillScore,
+    uplift: modelB.upliftPoints,
+    baselineRank: modelB.baselineRank,
+    skillRank: modelB.skillRank
+  }, {
+    baseline: 80,
+    skill: 85,
+    uplift: 5,
+    baselineRank: 1,
+    skillRank: 2
+  });
   assert.equal(category.modelScoreScaleMaximum, 100);
   assert.deepEqual(modelA.record, { wins: 2, ties: 0, losses: 0 });
-  assert.equal("cleanIndexRaw" in modelA, false);
-  assert.equal(category.modelRunScoreMethod, "equal-benchmark-combined-peer-index-v1");
+  assert.equal(category.modelScoreMethod, "equal-benchmark-absolute-mean-v1");
+  assert.equal(category.scoreEdition, "backend-architecture-absolute-v1");
+  assert.equal(category.effectMethod, "paired-absolute-delta-v1");
+  assert.equal("baselineScoreRaw" in modelA, false);
+  assert.equal("skillScoreRaw" in modelA, false);
+  assert.equal("upliftPointsRaw" in modelA, false);
   assert.equal(category.modelRuns.length, 6);
   assert.equal(category.modelRuns[0].rank, 1);
   assert.equal(category.modelRuns[0].conditionId, "treatment");
+  assert.equal(category.modelRuns[0].score, 95);
+  assert.equal(category.modelRuns[0].baselineScore, 75);
+  assert.equal(category.modelRuns[0].skillScore, 95);
+  assert.equal(category.modelRuns[0].upliftPoints, 20);
 
   const html = renderBenchmarkCatalogHtml(entries, { taxonomy });
   assert.match(html, /Backend Architecture leaderboard/);
@@ -426,8 +500,8 @@ test("category model index ranks each condition independently with equal benchma
   assert.match(html, /Without Vasir/);
   assert.match(html, /Best observed score/);
   assert.match(html, /Winner’s Vasir change/);
-  assert.match(html, /Overall Vasir advantage/);
-  assert.match(html, /100\.0/);
+  assert.match(html, /Evidence depth/);
+  assert.match(html, /95\.0/);
   assert.doesNotMatch(html, /\bSort\b/);
   assert.doesNotMatch(html, /catalog-rank-with/);
   assert.doesNotMatch(html, /catalog-rank-line/);
@@ -438,11 +512,53 @@ test("category model index ranks each condition independently with equal benchma
   assert.doesNotMatch(html, /benchmark index/i);
   assert.doesNotMatch(html, /catalog-score-track/);
   assert.doesNotMatch(html, /Overall Vasir index/);
+  assert.doesNotMatch(html, /peer index/i);
+});
+
+test("appending a candidate cannot rewrite incumbent absolute scores or uplift", () => {
+  const benchmarkInputs = [
+    { benchmarkId: "one", cleanScores: [90, 80, 70], treatmentScores: [95, 85, 75] },
+    { benchmarkId: "two", cleanScores: [60, 80, 70], treatmentScores: [95, 85, 75] }
+  ];
+  const taxonomy = createCategoryTaxonomy(["one", "two"]);
+  const incumbentCategory = buildBenchmarkCatalogCategories(
+    benchmarkInputs.map((input) => createModelScoreEntry(input)),
+    taxonomy
+  )[0];
+  const appendedConfigurations = [
+    ...MODEL_CONFIGURATIONS,
+    { id: "model:d@max", modelId: "model:d", modelLabel: "Model D", configurationLabel: "Model D · max" }
+  ];
+  const appendedCategory = buildBenchmarkCatalogCategories(
+    benchmarkInputs.map((input) => createModelScoreEntry({
+      ...input,
+      cleanScores: [...input.cleanScores, 100],
+      treatmentScores: [...input.treatmentScores, 100],
+      configurations: appendedConfigurations
+    })),
+    taxonomy
+  )[0];
+  const absoluteSnapshot = (category) => Object.fromEntries(category.modelScores
+    .filter(({ configurationId }) => configurationId !== "model:d@max")
+    .map(({ configurationId, baselineScore, skillScore, upliftPoints }) => [
+      configurationId,
+      { baselineScore, skillScore, upliftPoints }
+    ]));
+
+  assert.deepEqual(absoluteSnapshot(appendedCategory), absoluteSnapshot(incumbentCategory));
+  assert.equal(
+    incumbentCategory.modelScores.find(({ configurationId }) => configurationId === "model:a@max").skillRank,
+    1
+  );
+  assert.equal(
+    appendedCategory.modelScores.find(({ configurationId }) => configurationId === "model:a@max").skillRank,
+    2
+  );
 });
 
 test("checked-in capability taxonomy maps the development backend architecture category", () => {
   const taxonomy = readBenchmarkCapabilityTaxonomy();
-  assert.equal(taxonomy.schemaVersion, 2);
+  assert.equal(taxonomy.schemaVersion, 3);
   assert.equal(taxonomy.status, "development");
   assert.deepEqual(taxonomy.categories.map((category) => category.id), ["backend-architecture"]);
   assert.deepEqual(taxonomy.categories[0].benchmarkIds, [
@@ -450,6 +566,32 @@ test("checked-in capability taxonomy maps the development backend architecture c
     "personalized-home-feed",
     "device-telemetry"
   ]);
+  assert.deepEqual(taxonomy.categories[0].modelScore, {
+    label: "Engineering v2",
+    edition: "backend-architecture-panel-consensus-v2",
+    method: "equal-benchmark-absolute-mean-v1",
+    benchmarkWeighting: "equal",
+    scaleMaximum: 100,
+    judging: {
+      panel: [
+        "codex:gpt-6-astra@xhigh",
+        "claude:claude-fable-5-1@max"
+      ],
+      judgeCount: 2,
+      batchUnit: "matched-pair",
+      aggregation: "unanimity-gates-mean-dimensions-v1",
+      synthesizer: null
+    }
+  });
+  assert.deepEqual(taxonomy.categories[0].effect, {
+    method: "paired-absolute-delta-v1",
+    benchmarkWeighting: "equal",
+    unit: "rubric-points"
+  });
+  assert.deepEqual(taxonomy.categories[0].uncertainty, {
+    status: "not-estimated",
+    reason: "Only one trial per task and condition is published; per-response judge spread is retained."
+  });
 });
 
 test("catalog writer derives index.html from run artifacts", (context) => {

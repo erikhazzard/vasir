@@ -37,6 +37,10 @@ function renderHumanResult({ result, outputStream }) {
     }),
     ui.formatField("release", result.artifact.releaseId),
     ui.formatField("artifact", `${ui.formatCount(result.artifact.fileCount)} files · ${ui.formatCount(result.artifact.totalBytes)} bytes`),
+    ui.formatField(
+      "projection",
+      `${ui.formatCount(result.artifact.projection.benchmarkDefinitionCount)} benchmarks · ${ui.formatCount(result.artifact.projection.settingCount)} settings · ${ui.formatCount(result.artifact.projection.developmentResultSetCount)} development · ${ui.formatCount(result.artifact.projection.eligibleResultSetCount)} verified`
+    ),
     ui.formatField("account", `${result.target.profile} · ${result.target.accountId} · ${result.target.region}`),
     ui.formatField("stack", result.target.stackName)
   ];
@@ -55,7 +59,7 @@ function renderHumanResult({ result, outputStream }) {
       ui.formatField("origin", result.verification.originPrivate ? "Private · CloudFront OAC only" : "Unverified"),
       ui.formatField(
         "proof",
-        `${result.verification.verifiedFiles}/${result.artifact.fileCount} files · ${result.verification.verifiedCapabilityRoutes}/18 capability routes · ${result.verification.verifiedReportRoutes}/24 reports`
+        `${result.verification.verifiedFiles}/${result.artifact.fileCount} files · ${result.verification.verifiedCapabilityRoutes}/${result.artifact.routes.familyFragments.length + result.artifact.routes.viewFragments.length} benchmark routes · ${result.verification.verifiedReportRoutes}/${result.artifact.routes.reportFragments.length} reports`
       )
     );
   }

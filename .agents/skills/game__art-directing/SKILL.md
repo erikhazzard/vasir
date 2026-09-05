@@ -108,6 +108,17 @@ Before any visual specification, establish:
 
 State these explicitly. If the user hasn't specified, make a reasoned default and flag it. The **core loop type** and **viewport spec** are the two most consequential diagnoses — together they determine what the player looks at, how fast they need to read it, and how much screen real estate each system gets.
 
+### Visual target — resolve consequential uncertainty before producing assets
+
+When a new or revised art direction could lead to materially different assets, establish a gameplay-scale target image. A mood board can settle palette while leaving character scale, traversable space, depth, and movement identity unresolved.
+
+- Reuse a user-selected reference and record what they selected. Generate variants only when a remaining visual choice would change production; an accepted image does not require another selection round.
+- If alternatives are useful, make two or three purposefully different concept frames through `$game-assets__generating-images`, which owns image capability/model choice, persistence, and runtime promotion. Hold viewport, gameplay moment, character scale, and course composition comparable so the changed art choice is visible. State the question each variant resolves; extra random seeds do not establish a direction.
+- Compose the target as active gameplay at the intended screen size: player, next action, contact surfaces, depth layers, and one characteristic motion accent. Label generated frames as concepts. They do not establish playable geometry, correct controls, performance, or animation quality.
+- Preserve the selected image at a durable reference path with a short account of its value hierarchy, silhouette, materials, depth, and motion language. User selection accepts that visual direction only; otherwise carry the choice as an agent proposal while progressing within the authorized scope.
+- Translate the target into independently composited scenery, traversable art, character poses, and effects. Use the reference to direct those assets rather than shipping the complete concept image behind unrelated gameplay. Decorative creatures or props do not silently introduce new mechanics.
+- Move from the selected frame to one short playable action sequence. Verify that silhouette, foreground/background separation, contact edges, and effects survive motion at the target size. The existing active-play review owns the resulting quality judgment.
+
 ### Pass 1 — Apply the core loop visual profile (the branching point)
 
 The core loop type diagnosed in Pass 0 is NOT just metadata — it is the PRIMARY driver that configures every visual subsystem. Different loops demand fundamentally different visual priorities. An action combat game and a deckbuilder with identical art styles, palettes, and sprite quality will STILL look wrong if their animation grammar, juice profile, and readability priorities don't match their core loop.

@@ -1,14 +1,14 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-08-30-category-score-only-segments",
+  "version": "2026-09-04-engineering-v2-astra-fable-judges",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
-    "acceptedAt": "2026-08-30",
+    "acceptedAt": "2026-09-04",
     "authority": "user",
-    "verdict": "Accepted",
-    "response": "we dont need the +; too redundant; always ship",
-    "criterion": "The full-bleed SDK-reference VasirBench design renders every Combined capability segment with only its category abbreviation and exact raw score, omits redundant visible per-category uplift tokens, retains the underlying category-delta evidence and dedicated row uplift, preserves the synchronized D3 7.9 shared 0–100 comparison field and all prior interaction contracts, and passes the freshly verified ten-capture suite for production publication."
+    "verdict": "Authorized Engineering judge and results update",
+    "response": "amazing. I think we need to swap the judge to astra xhigh or max now instead of 5.6. and probably remove luna as a judge to be honest. so just astra judge and fable 5.1 judge",
+    "criterion": "Preserve the established Engineering interface and all 216 saved answers; rescore every answer using only Astra xhigh and Fable 5.1 max. Publish Engineering v2 with unanimous gate passes, mean dimension ratings, and both saved judge rationales."
   },
   "deployment": {
     "status": "active",
@@ -22,153 +22,147 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "This accepts and authorizes production publication of the static interface and illustrative visual fixture. It does not establish benchmark-score eligibility, scorer calibration, or production benchmark evidence; displayed aggregate rankings remain illustrative.",
+  "claimBoundary": "Engineering v2 contains one development category, three Backend Architecture tasks, 36 matched model and reasoning settings, two conditions, one trial per task and condition, and two fixed judges with 432 individual response evaluations. Scores are fixed-rubric absolute task scores; Architecture-skill uplift is a paired rubric-point difference. The release makes no Games, Cloudbreak, visual-rendering, or broad-model-capability claim.",
   "files": [
-    {
-      "path": "index.html",
-      "role": "runtime",
-      "sha256": "45008a0704089132364f355c776708a3990d3e6f35a943d644388909d6846364",
-      "bytes": 2234
-    },
-    {
-      "path": "style.css",
-      "role": "runtime",
-      "sha256": "c7adea3f7ad70ae6340dd9a7891fb53fa3b974713b7bbd76d334b966168fff38",
-      "bytes": 130111
-    },
-    {
-      "path": "assets/d3.v7.min.js",
-      "role": "runtime",
-      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
-      "bytes": 279706
-    },
     {
       "path": "app.js",
       "role": "runtime",
-      "sha256": "d99dd8d999f3b5f2d623b9ae06c04be0052fdb7a27f2cd0ac7bdc26424b2c9ff",
-      "bytes": 93452
+      "sha256": "cd02db336fcae75da79dc73856b42a838dde7d55caa70322deb9d06120a4af23",
+      "bytes": 98503
     },
     {
-      "path": "data.js",
-      "role": "illustrative-fixture",
-      "sha256": "2cbeaaa912256e919bd9fb1008656209fc6c17f1404b488c8f7de32c0141c722",
-      "bytes": 22542
-    },
-    {
-      "path": "benchmark-report.html",
-      "role": "runtime",
-      "sha256": "1fc069c97797487690db263ebcf44bc53314df890ef722d6af33d350b56845ba",
-      "bytes": 1979
-    },
-    {
-      "path": "benchmark-report.css",
-      "role": "runtime",
-      "sha256": "9f736b71648ae439400613eb99acddec9d03a1d967615e3f31e66828072e7cdf",
-      "bytes": 17554
-    },
-    {
-      "path": "benchmark-report.js",
-      "role": "runtime",
-      "sha256": "0535d1f86de3d8181bd344c215d6c0a7933a2dc4351fc108537161c290ab4fe5",
-      "bytes": 15237
-    },
-    {
-      "path": "capture.mjs",
-      "role": "qa-harness",
-      "sha256": "dbf7808ceab4072d5452cdb9af79ddd2938b3dc8f17745aadb3640c904e1c9e8",
-      "bytes": 183520
-    },
-    {
-      "path": "capture.sh",
-      "role": "qa-harness",
-      "sha256": "a222b1abac439d2aeedba9ad3e85dacb65f702b644f29625c66676a35fd1be55",
-      "bytes": 1820
+      "path": "assets/d3.v7.min.js",
+      "role": "visualization-runtime",
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+      "bytes": 279706
     },
     {
       "path": "assets/kanit-latin-900-normal.woff2",
       "role": "font",
       "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
       "bytes": 19216
+    },
+    {
+      "path": "benchmark-report.css",
+      "role": "runtime",
+      "sha256": "1f7ae5291a1f6561050aec649518fef2cdf41f1fca6cc3a725192e1998a7e7c4",
+      "bytes": 27466
+    },
+    {
+      "path": "benchmark-report.html",
+      "role": "runtime",
+      "sha256": "0764bcb807d87e81ea0ccf860b134c03889b626ea775796ab36bbbe28dced4ea",
+      "bytes": 2131
+    },
+    {
+      "path": "benchmark-report.js",
+      "role": "runtime",
+      "sha256": "35591a587ad196a66685b61e64dd4352fb017883834509bc8e7fab0dccc6243f",
+      "bytes": 34183
+    },
+    {
+      "path": "capture.mjs",
+      "role": "qa-harness",
+      "sha256": "b3f9c592fb2b27f6a04e44fe8f6073de8e7841d52bb00bbb308cab338fc5c288",
+      "bytes": 91835
+    },
+    {
+      "path": "capture.sh",
+      "role": "qa-harness",
+      "sha256": "0da2ffd08c2c05e3ae8f4afa304ce29a5597eb4deb3bfdf0b30c8069099df3a9",
+      "bytes": 2250
+    },
+    {
+      "path": "index.html",
+      "role": "runtime",
+      "sha256": "a5231da124a40bd053f6a27a8c5558f81f49baee75903435a0a878115b37cb5c",
+      "bytes": 2260
+    },
+    {
+      "path": "style.css",
+      "role": "runtime",
+      "sha256": "20e30cee7a52acadfc0e6db52fb586a3eeb93b533a6617675433ecad237470f3",
+      "bytes": 132814
     }
   ],
   "captures": [
     {
       "path": "desktop.png",
       "route": "#capabilities/overall",
-      "sha256": "721bb191c9839b4c8459c17354271e9f3409ec77dd2133aaa39ffe6fcf48050e",
-      "bytes": 200938,
+      "sha256": "b30f3bcd993171f088c1a324225b8fa0a3c2c9277d45bfb39b8b8c474bb10a61",
+      "bytes": 160601,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile.png",
       "route": "#capabilities/overall",
-      "sha256": "816ad53e44e03bcdce109b2dba3d002bb8c607720510294d0b5bf1c1ef1c6946",
-      "bytes": 64608,
+      "sha256": "089cd5c599daf926ab4fbbe9a2f2465703fb7109839c43ae6c364fe526aa431f",
+      "bytes": 68283,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-capabilities.png",
       "route": "#capabilities/engineering",
-      "sha256": "13948aa39489cb530bfcae48257d85b865dd67c61205be0caf965637852c3534",
-      "bytes": 136373,
+      "sha256": "8d05db028b9e0be8171c3ae20ffae07b5f22ef760203553824032f607a32c6ab",
+      "bytes": 139783,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-capabilities.png",
       "route": "#capabilities/engineering",
-      "sha256": "2ae333b22c1b51820938b9f2e624e20818a2bd90b2f4f3f9094e05c103411427",
-      "bytes": 57531,
+      "sha256": "cb0d10f61e4376b12f59e85def9643bed274dd12e4abd698a0bf904596004c50",
+      "bytes": 66988,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-capability-benchmarks.png",
       "route": "#capabilities/engineering/benchmarks",
-      "sha256": "b09334198e961ba9c28e7667718dbf9336d8d15af11b4a0630732d84f8771335",
-      "bytes": 179417,
+      "sha256": "68c781e1c8daaf8d74ea51f4bc61e064435acec6ebf2d217c67990e666d4ed6a",
+      "bytes": 188041,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-capability-benchmarks.png",
       "route": "#capabilities/engineering/benchmarks",
-      "sha256": "e3bbad0d372a75f81a78644ad3a578a985568e83dd83fc6cbef6bc94a16b5606",
-      "bytes": 60215,
+      "sha256": "abf82db7463fe5b8b6f9357234467978127ac2557f3c410388b5ebd14f94ff1b",
+      "bytes": 70390,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-efficiency.png",
       "route": "#capabilities/overall/efficiency",
-      "sha256": "a471d67500ea62420ffaa1a627d9f8d159fcd00fe080683e396120c5bcf6b6ad",
-      "bytes": 186200,
+      "sha256": "1531d0f9cdee75a10b63faaac19d1224428e0af23fea0c169ee0a61fc010eca8",
+      "bytes": 196766,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-efficiency.png",
       "route": "#capabilities/overall/efficiency",
-      "sha256": "be7f32f416c621bb74e89089ed68902098669ea52e066b028e7eb3ce243087a2",
-      "bytes": 53490,
+      "sha256": "1f7f8d531b67f86f69034418f194710187ffe57decd8b459dbba3866f325e734",
+      "bytes": 65985,
       "width": 390,
       "height": 844
     },
     {
       "path": "desktop-benchmark-report.png",
-      "route": "#report/hyper-scale-chat",
-      "sha256": "cef3d199937aaa1fcfae785057b8daee99d7d4f2045d7b75b9b77b3fa7860f14",
-      "bytes": 146759,
+      "route": "#hyper-scale-chat",
+      "sha256": "19ea1c3d24f6fde831635b67336adc0375189e0338020a61151fa1bb6b5fb616",
+      "bytes": 157056,
       "width": 1440,
       "height": 1000
     },
     {
       "path": "mobile-benchmark-report.png",
-      "route": "#report/hyper-scale-chat",
-      "sha256": "3a4952e83ebc29983ae05e30f3efa55e15623e47101283f02c40724fd7369cd9",
-      "bytes": 62475,
+      "route": "#hyper-scale-chat",
+      "sha256": "b6ac310949a41fa188762f971101a2f1ca8b46b1f9848e819538da7419f8d45d",
+      "bytes": 61998,
       "width": 390,
       "height": 844
     }

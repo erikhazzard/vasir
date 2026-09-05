@@ -204,6 +204,30 @@ function validateScoring(scoring, benchmarkFilePath) {
       suggestion: "Adjust dimension weights so the numeric score has an explicit 100-point basis."
     });
   }
+
+  if (scoring.aggregation !== undefined) {
+    const aggregation = scoring.aggregation;
+    const validMethodAndCount = aggregation && (
+      (aggregation.method === "majority-gates-median-dimensions-v1" &&
+        Number.isInteger(aggregation.judgeCount) && aggregation.judgeCount >= 3 &&
+        aggregation.judgeCount % 2 === 1) ||
+      (aggregation.method === "unanimity-gates-mean-dimensions-v1" &&
+        aggregation.judgeCount === 2)
+    );
+    if (
+      !aggregation ||
+      typeof aggregation !== "object" ||
+      !validMethodAndCount ||
+      aggregation.batchUnit !== "matched-pair"
+    ) {
+      failInvalidBenchmark({
+        benchmarkFilePath,
+        message: "Benchmark scoring aggregation contract is invalid",
+        suggestion:
+          "Use unanimity-gates-mean-dimensions-v1 with exactly 2 judges, or majority-gates-median-dimensions-v1 with an odd judgeCount of at least 3; batchUnit must be `matched-pair`."
+      });
+    }
+  }
 }
 
 function validateJudging(judging, benchmarkFilePath) {
@@ -244,11 +268,13 @@ function validateJudging(judging, benchmarkFilePath) {
 
   if (judging.synthesizer === null || judging.synthesizer === undefined) {
     if (judging.panel.length > 1) {
-      failInvalidBenchmark({
-        benchmarkFilePath,
-        message: "A multi-judge benchmark has no synthesis authority",
-        suggestion: "Set `judging.synthesizer` to one exact model selector."
-      });
+      if (judging.panel.length !== 2 && (judging.panel.length < 3 || judging.panel.length % 2 === 0)) {
+        failInvalidBenchmark({
+          benchmarkFilePath,
+          message: "A synthesis-free judge panel requires two judges for unanimity or an odd majority",
+          suggestion: "Use two distinct exact model selectors with unanimity aggregation, or an odd panel of at least three."
+        });
+      }
     }
     return;
   }
@@ -260,6 +286,29 @@ function validateJudging(judging, benchmarkFilePath) {
       benchmarkFilePath,
       message: `Benchmark synthesizer selector is invalid: ${String(judging.synthesizer)}`,
       suggestion: error?.suggestion ?? "Use an exact supported model selector with a reasoning effort."
+    });
+  }
+}
+
+function validateScoringJudgingAgreement({ scoring, judging, benchmarkFilePath }) {
+  const aggregation = scoring?.aggregation;
+  if (!aggregation) {
+    if (judging?.panel?.length > 1 && judging?.synthesizer == null) {
+      failInvalidBenchmark({
+        benchmarkFilePath,
+        message: "A synthesis-free judge panel has no deterministic aggregation contract",
+        suggestion: "Define `scoring.aggregation` with the panel's exact method, judge count, and matched-pair batches."
+      });
+    }
+    return;
+  }
+
+  if (!judging || judging.synthesizer != null || judging.panel.length !== aggregation.judgeCount) {
+    failInvalidBenchmark({
+      benchmarkFilePath,
+      message: "Benchmark scoring aggregation and judge panel disagree",
+      suggestion:
+        "Use a synthesis-free judging panel whose length exactly matches `scoring.aggregation.judgeCount`."
     });
   }
 }
@@ -330,6 +379,11 @@ function validateBenchmarkDefinition({ benchmarkDefinition, benchmarkFilePath, b
 
   validateScoring(benchmarkDefinition.scoring, benchmarkFilePath);
   validateJudging(benchmarkDefinition.judging, benchmarkFilePath);
+  validateScoringJudgingAgreement({
+    scoring: benchmarkDefinition.scoring,
+    judging: benchmarkDefinition.judging,
+    benchmarkFilePath
+  });
 }
 
 function isCatalogSourceRepository(directoryPath) {

@@ -14,9 +14,11 @@ const FONT_FILES = [
   ["Plus Jakarta Sans", "plus-jakarta-700.woff2.b64", 700, "normal"],
   ["JetBrains Mono", "jetbrains-mono-600.woff2.b64", 600, "normal"]
 ];
-const ELO_DISPLAY_LIMIT = 0.99;
-const ELO_ROUNDING = 10;
-const COMBINED_RUN_SCORE_METHOD = "equal-benchmark-combined-peer-index-v1";
+const ABSOLUTE_SCORE_METHOD = "equal-benchmark-absolute-mean-v1";
+const SYNTHESIS_FREE_JUDGING_STRATEGIES = new Set([
+  "matched-pair-panel-median-v1",
+  "matched-pair-panel-consensus-v1"
+]);
 
 function stableSerialize(value) {
   if (Array.isArray(value)) {
@@ -72,7 +74,7 @@ function isKebabIdentifier(value) {
 
 function validateCapabilityTaxonomy(taxonomy, taxonomyFilePath) {
   if (
-    taxonomy?.schemaVersion !== 2 ||
+    taxonomy?.schemaVersion !== 3 ||
     typeof taxonomy.version !== "string" ||
     !taxonomy.version.trim() ||
     !Array.isArray(taxonomy.categories)
@@ -92,12 +94,16 @@ function validateCapabilityTaxonomy(taxonomy, taxonomyFilePath) {
       !category.description.trim() ||
       !Array.isArray(category.benchmarkIds) ||
       category.benchmarkIds.length === 0 ||
-      category.modelScore?.method !== "equal-benchmark-peer-index-v1" ||
+      !isKebabIdentifier(category.modelScore?.edition) ||
+      category.modelScore?.method !== ABSOLUTE_SCORE_METHOD ||
       category.modelScore?.benchmarkWeighting !== "equal" ||
       category.modelScore?.scaleMaximum !== 100 ||
-      category.rating?.method !== "matched-outcome-elo-v1" ||
-      category.rating?.promptWeighting !== "equal" ||
-      !Number.isFinite(category.rating?.cleanReference)
+      category.effect?.method !== "paired-absolute-delta-v1" ||
+      category.effect?.benchmarkWeighting !== "equal" ||
+      category.effect?.unit !== "rubric-points" ||
+      category.uncertainty?.status !== "not-estimated" ||
+      typeof category.uncertainty?.reason !== "string" ||
+      !category.uncertainty.reason.trim()
     ) {
       throw new Error(`Capability category is invalid at ${taxonomyFilePath}.`);
     }
@@ -347,30 +353,13 @@ function formatCompatibilityProblem(benchmarkIds, label) {
   return `${label}: ${benchmarkIds.join(", ")}`;
 }
 
-function calculateCategoryRating(categoryDefinition, entries) {
-  const promptMatchScores = entries.map((entry) => (
-    entry.record.wins + (0.5 * entry.record.ties)
-  ) / entry.matchedPairCount);
-  const matchScore = mean(promptMatchScores);
-  const boundedMatchScore = Math.min(ELO_DISPLAY_LIMIT, Math.max(1 - ELO_DISPLAY_LIMIT, matchScore));
-  const rawDelta = 400 * Math.log10(boundedMatchScore / (1 - boundedMatchScore));
-  const delta = Math.round(rawDelta / ELO_ROUNDING) * ELO_ROUNDING;
-  const clean = categoryDefinition.rating.cleanReference;
-  return {
-    method: categoryDefinition.rating.method,
-    matchScore,
-    clean,
-    treatment: clean + delta,
-    delta,
-    displayCap: matchScore >= 1 ? "upper" : matchScore <= 0 ? "lower" : null
-  };
-}
-
 function buildCategoryBasisHash(taxonomy, categoryDefinition, entries) {
   return hashValue({
     taxonomyVersion: taxonomy.version,
     categoryId: categoryDefinition.id,
-    rating: categoryDefinition.rating,
+    modelScore: categoryDefinition.modelScore,
+    effect: categoryDefinition.effect,
+    uncertainty: categoryDefinition.uncertainty,
     sources: entries.map((entry) => ({
       benchmarkId: entry.benchmarkId,
       runId: entry.featuredRunId,
@@ -402,51 +391,17 @@ function rankModelScores(scores, scoreKey, rankKey) {
   }
 }
 
-function peerOutrankPercentage(target, cohort, scoreKey) {
-  const peers = cohort.filter((candidate) => candidate.configurationId !== target.configurationId);
-  if (peers.length === 0) {
-    return null;
-  }
-  const credit = peers.reduce((total, peer) => {
-    if (target[scoreKey] > peer[scoreKey]) return total + 1;
-    if (target[scoreKey] === peer[scoreKey]) return total + 0.5;
-    return total;
-  }, 0);
-  return (credit / peers.length) * 100;
-}
-
 function calculateCombinedLeaderboardRuns(scores) {
-  const benchmarkCohorts = new Map();
-  for (const score of scores) {
-    for (const benchmark of score.benchmarks) {
-      if (!benchmarkCohorts.has(benchmark.benchmarkId)) {
-        benchmarkCohorts.set(benchmark.benchmarkId, []);
-      }
-      const cohort = benchmarkCohorts.get(benchmark.benchmarkId);
-      cohort.push({ configurationId: `${score.configurationId}:clean`, value: benchmark.cleanScore });
-      cohort.push({ configurationId: `${score.configurationId}:treatment`, value: benchmark.treatmentScore });
-    }
-  }
-
   const runs = scores.flatMap((score) => [
-    { conditionId: "clean", conditionLabel: "Without Vasir", scoreKey: "cleanScore" },
-    { conditionId: "treatment", conditionLabel: "With Vasir", scoreKey: "treatmentScore" }
+    { conditionId: "clean", conditionLabel: "Without Vasir", scoreKey: "baselineScoreRaw" },
+    { conditionId: "treatment", conditionLabel: "With Vasir", scoreKey: "skillScoreRaw" }
   ].map((condition) => {
-    const runId = `${score.configurationId}:${condition.conditionId}`;
-    const benchmarkScores = score.benchmarks.map((benchmark) => {
-      const value = benchmark[condition.scoreKey];
-      return {
-        benchmarkId: benchmark.benchmarkId,
-        value,
-        peerIndex: peerOutrankPercentage(
-          { configurationId: runId, value },
-          benchmarkCohorts.get(benchmark.benchmarkId),
-          "value"
-        )
-      };
-    });
+    const taskScores = score.benchmarks.map((benchmark) => ({
+      benchmarkId: benchmark.benchmarkId,
+      value: condition.conditionId === "clean" ? benchmark.baselineScore : benchmark.skillScore
+    }));
     return {
-      runId,
+      runId: `${score.configurationId}:${condition.conditionId}`,
       configurationId: score.configurationId,
       configurationLabel: score.configurationLabel,
       modelId: score.modelId,
@@ -455,59 +410,25 @@ function calculateCombinedLeaderboardRuns(scores) {
       reasoningEffort: score.reasoningEffort,
       conditionId: condition.conditionId,
       conditionLabel: condition.conditionLabel,
-      peerIndexRaw: mean(benchmarkScores.map((benchmark) => benchmark.peerIndex)),
-      judgedScoreMean: roundScore(mean(benchmarkScores.map((benchmark) => benchmark.value))),
-      benchmarkScores
+      scoreRaw: score[condition.scoreKey],
+      baselineScore: roundScore(score.baselineScoreRaw),
+      skillScore: roundScore(score.skillScoreRaw),
+      upliftPoints: roundScore(score.upliftPointsRaw),
+      taskScores
     };
   }));
 
-  rankModelScores(runs, "peerIndexRaw", "rank");
-  const byConfiguration = new Map();
-  for (const run of runs) {
-    if (!byConfiguration.has(run.configurationId)) {
-      byConfiguration.set(run.configurationId, {});
-    }
-    byConfiguration.get(run.configurationId)[run.conditionId] = run;
-  }
-  return runs.map(({ peerIndexRaw, benchmarkScores, ...run }) => {
-    const pair = byConfiguration.get(run.configurationId);
-    return {
-      ...run,
-      peerIndex: roundScore(peerIndexRaw),
-      cleanPeerIndex: roundScore(pair.clean.peerIndexRaw),
-      treatmentPeerIndex: roundScore(pair.treatment.peerIndexRaw),
-      vasirChange: roundScore(pair.treatment.peerIndexRaw - pair.clean.peerIndexRaw),
-      benchmarkScores: benchmarkScores.map((benchmark) => ({
-        ...benchmark,
-        peerIndex: roundScore(benchmark.peerIndex)
-      }))
-    };
-  }).sort((left, right) => left.rank - right.rank || left.configurationLabel.localeCompare(right.configurationLabel) || left.conditionId.localeCompare(right.conditionId));
+  rankModelScores(runs, "scoreRaw", "rank");
+  return runs.map(({ scoreRaw, ...run }) => ({
+    ...run,
+    score: roundScore(scoreRaw)
+  })).sort((left, right) => left.rank - right.rank || left.configurationLabel.localeCompare(right.configurationLabel) || left.conditionId.localeCompare(right.conditionId));
 }
 
 function calculateCategoryModelScores(entries, definition) {
   const expectedConfigurationIds = entries[0]?.compatibility.configurationIds ?? [];
-  const benchmarkCohorts = new Map(entries.map((entry) => [
-    entry.benchmarkId,
-    entry.configurationScores.filter((score) => (
-      Number.isFinite(score.cleanScore) && Number.isFinite(score.treatmentScore)
-    ))
-  ]));
   const scores = [];
   const problems = [];
-  const undersizedBenchmarkIds = entries
-    .filter((entry) => benchmarkCohorts.get(entry.benchmarkId).length < 2)
-    .map((entry) => entry.benchmarkId);
-  if (undersizedBenchmarkIds.length > 0) {
-    return {
-      method: definition.modelScore.method,
-      runMethod: COMBINED_RUN_SCORE_METHOD,
-      scaleMaximum: definition.modelScore.scaleMaximum,
-      scores,
-      runs: [],
-      problems: [formatCompatibilityProblem(undersizedBenchmarkIds, "At least two scored configurations are required for a peer index")]
-    };
-  }
   for (const configurationId of expectedConfigurationIds) {
     const contributions = entries.map((entry) => ({
       entry,
@@ -525,27 +446,23 @@ function calculateCategoryModelScores(entries, definition) {
       continue;
     }
     const first = contributions[0].score;
-    const benchmarkScores = contributions.map(({ entry, score }) => {
-      const cohort = benchmarkCohorts.get(entry.benchmarkId);
-      return {
-        benchmarkId: entry.benchmarkId,
-        title: entry.title,
-        href: entry.featuredHref,
-        cleanScore: score.cleanScore,
-        treatmentScore: score.treatmentScore,
-        lift: roundScore(score.treatmentScore - score.cleanScore),
-        cleanPeerIndex: peerOutrankPercentage(score, cohort, "cleanScore"),
-        treatmentPeerIndex: peerOutrankPercentage(score, cohort, "treatmentScore")
-      };
-    });
+    const benchmarkScores = contributions.map(({ entry, score }) => ({
+      benchmarkId: entry.benchmarkId,
+      title: entry.title,
+      href: entry.featuredHref,
+      baselineScore: score.cleanScore,
+      skillScore: score.treatmentScore,
+      upliftPoints: score.treatmentScore - score.cleanScore
+    }));
     const record = benchmarkScores.reduce((total, benchmark) => {
-      if (benchmark.lift > 0) total.wins += 1;
-      else if (benchmark.lift < 0) total.losses += 1;
+      if (benchmark.upliftPoints > 0) total.wins += 1;
+      else if (benchmark.upliftPoints < 0) total.losses += 1;
       else total.ties += 1;
       return total;
     }, { wins: 0, ties: 0, losses: 0 });
-    const cleanIndexRaw = mean(benchmarkScores.map((benchmark) => benchmark.cleanPeerIndex));
-    const treatmentIndexRaw = mean(benchmarkScores.map((benchmark) => benchmark.treatmentPeerIndex));
+    const baselineScoreRaw = mean(benchmarkScores.map((benchmark) => benchmark.baselineScore));
+    const skillScoreRaw = mean(benchmarkScores.map((benchmark) => benchmark.skillScore));
+    const upliftPointsRaw = mean(benchmarkScores.map((benchmark) => benchmark.upliftPoints));
     scores.push({
       configurationId,
       modelId: first.modelId,
@@ -553,38 +470,42 @@ function calculateCategoryModelScores(entries, definition) {
       configurationLabel: first.configurationLabel,
       provider: first.provider,
       reasoningEffort: first.reasoningEffort,
-      cleanIndexRaw,
-      treatmentIndexRaw,
-      indexChangeRaw: treatmentIndexRaw - cleanIndexRaw,
+      baselineScoreRaw,
+      skillScoreRaw,
+      upliftPointsRaw,
       record,
       benchmarkCount: contributions.length,
       requiredBenchmarkCount: definition.benchmarkIds.length,
       benchmarks: benchmarkScores.map((benchmark) => ({
         ...benchmark,
-        cleanPeerIndex: roundScore(benchmark.cleanPeerIndex),
-        treatmentPeerIndex: roundScore(benchmark.treatmentPeerIndex)
+        baselineScore: roundScore(benchmark.baselineScore),
+        skillScore: roundScore(benchmark.skillScore),
+        upliftPoints: roundScore(benchmark.upliftPoints)
       }))
     });
   }
-  rankModelScores(scores, "cleanIndexRaw", "cleanRank");
-  rankModelScores(scores, "treatmentIndexRaw", "treatmentRank");
+  rankModelScores(scores, "baselineScoreRaw", "baselineRank");
+  rankModelScores(scores, "skillScoreRaw", "skillRank");
+  const runs = calculateCombinedLeaderboardRuns(scores);
   const normalizedScores = scores.map(({
-    cleanIndexRaw,
-    treatmentIndexRaw,
-    indexChangeRaw,
+    baselineScoreRaw,
+    skillScoreRaw,
+    upliftPointsRaw,
     ...score
   }) => ({
     ...score,
-    cleanIndex: roundScore(cleanIndexRaw),
-    treatmentIndex: roundScore(treatmentIndexRaw),
-    indexChange: roundScore(indexChangeRaw)
+    baselineScore: roundScore(baselineScoreRaw),
+    skillScore: roundScore(skillScoreRaw),
+    upliftPoints: roundScore(upliftPointsRaw)
   }));
   return {
     method: definition.modelScore.method,
-    runMethod: COMBINED_RUN_SCORE_METHOD,
+    edition: definition.modelScore.edition,
+    effectMethod: definition.effect.method,
+    uncertainty: definition.uncertainty,
     scaleMaximum: definition.modelScore.scaleMaximum,
-    scores: normalizedScores.sort((left, right) => left.cleanRank - right.cleanRank || left.configurationLabel.localeCompare(right.configurationLabel)),
-    runs: calculateCombinedLeaderboardRuns(normalizedScores),
+    scores: normalizedScores.sort((left, right) => left.baselineRank - right.baselineRank || left.configurationLabel.localeCompare(right.configurationLabel)),
+    runs,
     problems
   };
 }
@@ -637,7 +558,10 @@ function normalizeCatalogCategory({ taxonomy, definition, entriesByBenchmarkId }
       entry.compatibility.configurationIds.length === 0 ||
       !entry.compatibility.judgingStrategy ||
       entry.compatibility.panelConfigurationIds.length === 0 ||
-      !entry.compatibility.synthesizerConfigurationId ||
+      (
+        !SYNTHESIS_FREE_JUDGING_STRATEGIES.has(entry.compatibility.judgingStrategy) &&
+        !entry.compatibility.synthesizerConfigurationId
+      ) ||
       !entry.compatibility.batchPlanVersion ||
       !entry.compatibility.judgingBasisHash ||
       !entry.compatibility.generationHash ||
@@ -652,13 +576,13 @@ function normalizeCatalogCategory({ taxonomy, definition, entriesByBenchmarkId }
     .filter((entry) => !["Calibrated", "Pending", "Uncalibrated"].includes(entry.calibrationStatus))
     .map((entry) => entry.benchmarkId);
   if (unsupportedCalibrationIds.length > 0) {
-    problems.push(formatCompatibilityProblem(unsupportedCalibrationIds, "Calibration state cannot support a rating"));
+    problems.push(formatCompatibilityProblem(unsupportedCalibrationIds, "Calibration state cannot support this score edition"));
   }
 
   const complete = problems.length === 0;
   const modelScoreResult = complete
     ? calculateCategoryModelScores(entries, definition)
-    : { method: definition.modelScore.method, runMethod: COMBINED_RUN_SCORE_METHOD, scaleMaximum: definition.modelScore.scaleMaximum, scores: [], runs: [], problems: ["Category evidence is incomplete or incompatible."] };
+    : { method: definition.modelScore.method, edition: definition.modelScore.edition, effectMethod: definition.effect.method, uncertainty: definition.uncertainty, scaleMaximum: definition.modelScore.scaleMaximum, scores: [], runs: [], problems: ["Category evidence is incomplete or incompatible."] };
   const record = entries.reduce((total, entry) => ({
     wins: total.wins + entry.record.wins,
     ties: total.ties + entry.record.ties,
@@ -679,12 +603,13 @@ function normalizeCatalogCategory({ taxonomy, definition, entriesByBenchmarkId }
     entries,
     problems,
     modelScoreMethod: modelScoreResult.method,
-    modelRunScoreMethod: modelScoreResult.runMethod,
+    scoreEdition: modelScoreResult.edition,
+    effectMethod: modelScoreResult.effectMethod,
+    uncertainty: modelScoreResult.uncertainty,
     modelScoreScaleMaximum: modelScoreResult.scaleMaximum,
     modelScores: modelScoreResult.scores,
     modelRuns: modelScoreResult.runs,
     modelScoreProblems: modelScoreResult.problems,
-    rating: complete ? calculateCategoryRating(definition, entries) : null,
     record,
     matchedPairCount: entries.reduce((total, entry) => total + entry.matchedPairCount, 0),
     treatment: treatmentIds.size === 1 ? entries[0].treatment : null,
@@ -710,23 +635,24 @@ export function buildBenchmarkCatalogCategories(entries, taxonomy) {
     categories.push({
       id: "unmapped-benchmarks",
       title: "Unmapped benchmarks",
-      description: "These prompts remain visible but are not assigned to a capability rating in the current taxonomy.",
+      description: "These prompts remain visible but are not assigned to a score edition in the current taxonomy.",
       taxonomyVersion: taxonomy.version,
       taxonomyStatus: taxonomy.status,
       requiredPromptCount: unmappedEntries.length,
       measuredPromptCount: unmappedEntries.length,
       completePromptCount: unmappedEntries.filter((entry) => entry.featuredStatus === "complete").length,
       calibratedPromptCount: 0,
-      calibrationStatus: "No category rating",
+      calibrationStatus: "No score edition",
       entries: unmappedEntries,
       problems: ["Add an explicit taxonomy mapping before aggregating these prompts."],
       modelScoreMethod: null,
-      modelRunScoreMethod: null,
+      scoreEdition: null,
+      effectMethod: null,
+      uncertainty: null,
       modelScoreScaleMaximum: null,
       modelScores: [],
       modelRuns: [],
       modelScoreProblems: ["No category model score is available until these benchmarks are mapped."],
-      rating: null,
       record: unmappedEntries.reduce((total, entry) => ({
         wins: total.wins + entry.record.wins,
         ties: total.ties + entry.record.ties,
@@ -749,19 +675,6 @@ function formatLift(value) {
 
 function formatScore(value) {
   return Number.isFinite(value) ? value.toFixed(1) : "n/a";
-}
-
-function formatRating(value) {
-  return Number.isFinite(value) ? Math.round(value).toLocaleString("en-US") : "n/a";
-}
-
-function formatRatingDelta(rating) {
-  if (!rating) {
-    return "No signal";
-  }
-  const prefix = rating.displayCap === "upper" ? "≥" : rating.displayCap === "lower" ? "≤" : "";
-  const sign = rating.delta >= 0 ? "+" : "";
-  return `${prefix}${sign}${formatRating(rating.delta)}`;
 }
 
 function renderBenchmarkEntry(entry, index) {
@@ -831,16 +744,16 @@ function renderScoreAxis(scaleMaximum) {
 }
 
 function renderScoreLine(run, scaleMaximum, runCount) {
-  const position = scorePosition(run.peerIndex, scaleMaximum);
-  const comparisonScore = run.conditionId === "treatment" ? run.cleanPeerIndex : run.treatmentPeerIndex;
+  const position = scorePosition(run.score, scaleMaximum);
+  const comparisonScore = run.conditionId === "treatment" ? run.baselineScore : run.skillScore;
   const comparisonPosition = scorePosition(comparisonScore, scaleMaximum);
   const deltaStart = Math.min(position, comparisonPosition);
   const deltaWidth = Math.max(0.35, Math.abs(position - comparisonPosition));
-  const deltaModifier = run.vasirChange > 0 ? "positive" : run.vasirChange < 0 ? "negative" : "tied";
+  const deltaModifier = run.upliftPoints > 0 ? "positive" : run.upliftPoints < 0 ? "negative" : "tied";
   const conditionModifier = run.conditionId === "treatment" ? "skill" : "clean";
   const comparisonModifier = run.conditionId === "treatment" ? "clean" : "skill";
   const comparisonLabel = run.conditionId === "treatment" ? "without Vasir" : "with Vasir";
-  return `<div class="catalog-score-line catalog-score-line--${conditionModifier}" role="img" aria-label="${escapeHtml(run.configurationLabel)}, ${escapeHtml(run.conditionLabel)}, scores ${escapeHtml(formatScore(run.peerIndex))} and ranks number ${escapeHtml(run.rank)} of ${escapeHtml(runCount)}; matched ${escapeHtml(comparisonLabel)} score ${escapeHtml(formatScore(comparisonScore))}">
+  return `<div class="catalog-score-line catalog-score-line--${conditionModifier}" role="img" aria-label="${escapeHtml(run.configurationLabel)}, ${escapeHtml(run.conditionLabel)}, absolute rubric score ${escapeHtml(formatScore(run.score))} and rank number ${escapeHtml(run.rank)} of ${escapeHtml(runCount)}; matched ${escapeHtml(comparisonLabel)} score ${escapeHtml(formatScore(comparisonScore))}">
     <span class="catalog-score-line__axis" aria-hidden="true"></span>
     ${renderScoreTicks(scaleMaximum)}
     <span class="catalog-score-line__locator" style="--score-position:${position}%" aria-hidden="true"></span>
@@ -859,17 +772,17 @@ function renderModelRunRow(run, scaleMaximum, runCount) {
       <span class="catalog-run-condition catalog-run-condition--${conditionModifier}">${run.conditionId === "treatment" ? "◆" : "○"} ${escapeHtml(run.conditionLabel)}</span>
     </th>
     <td class="catalog-score-line-cell">${renderScoreLine(run, scaleMaximum, runCount)}</td>
-    <td class="catalog-run-score catalog-run-score--${conditionModifier}">${escapeHtml(formatScore(run.peerIndex))}</td>
+    <td class="catalog-run-score catalog-run-score--${conditionModifier}">${escapeHtml(formatScore(run.score))}</td>
     <td class="catalog-run-rank">#${escapeHtml(run.rank)}</td>
   </tr>`;
 }
 
 function renderBenchmarkScoreCell(benchmark) {
-  const liftClass = benchmark.lift < 0 ? "catalog-matrix-score__lift catalog-matrix-score__lift--negative" : "catalog-matrix-score__lift";
+  const liftClass = benchmark.upliftPoints < 0 ? "catalog-matrix-score__lift catalog-matrix-score__lift--negative" : "catalog-matrix-score__lift";
   return `<td>
-    <a class="catalog-matrix-score" href="${escapeHtml(benchmark.href)}" aria-label="${escapeHtml(benchmark.title)}: without Vasir ${escapeHtml(formatScore(benchmark.cleanScore))}, with Vasir ${escapeHtml(formatScore(benchmark.treatmentScore))}, difference ${escapeHtml(formatLift(benchmark.lift))}">
-      <span class="catalog-matrix-score__pair"><span>${escapeHtml(formatScore(benchmark.cleanScore))}</span><span aria-hidden="true">→</span><strong>${escapeHtml(formatScore(benchmark.treatmentScore))}</strong></span>
-      <span class="${liftClass}">${escapeHtml(formatLift(benchmark.lift))}</span>
+    <a class="catalog-matrix-score" href="${escapeHtml(benchmark.href)}" aria-label="${escapeHtml(benchmark.title)}: without Vasir ${escapeHtml(formatScore(benchmark.baselineScore))}, with Vasir ${escapeHtml(formatScore(benchmark.skillScore))}, difference ${escapeHtml(formatLift(benchmark.upliftPoints))}">
+      <span class="catalog-matrix-score__pair"><span>${escapeHtml(formatScore(benchmark.baselineScore))}</span><span aria-hidden="true">→</span><strong>${escapeHtml(formatScore(benchmark.skillScore))}</strong></span>
+      <span class="${liftClass}">${escapeHtml(formatLift(benchmark.upliftPoints))}</span>
     </a>
   </td>`;
 }
@@ -884,7 +797,7 @@ function renderModelMatrixRow(score) {
 function renderModelRunTable(runs, ariaLabel, scaleMaximum) {
   return `<div class="catalog-table-wrap" tabindex="0" role="region" aria-label="${escapeHtml(ariaLabel)}">
     <table class="catalog-model-table">
-      <caption class="visually-hidden">Every model, reasoning, and condition run ranked together on one shared zero to ${escapeHtml(scaleMaximum)} peer-score scale.</caption>
+      <caption class="visually-hidden">Every model, reasoning, and condition run ranked together on one shared zero to ${escapeHtml(scaleMaximum)} absolute rubric-score scale.</caption>
       <thead><tr>
         <th scope="col">Model / reasoning / condition</th>
         <th scope="col">${renderScoreAxis(scaleMaximum)}</th>
@@ -898,30 +811,21 @@ function renderModelRunTable(runs, ariaLabel, scaleMaximum) {
 
 function renderModelHeadliners(run, category) {
   const scaleMaximum = category.modelScoreScaleMaximum ?? 100;
-  const improvementClass = run.vasirChange >= 0
+  const improvementClass = run.upliftPoints >= 0
     ? "catalog-headliners__value catalog-headliners__value--positive"
     : "catalog-headliners__value catalog-headliners__value--negative";
-  const ratingValue = category.rating
-    ? `${category.rating.delta >= 0 ? "+" : ""}${formatRating(category.rating.delta)}`
-    : "n/a";
-  const ratingClass = category.rating?.delta >= 0
-    ? "catalog-headliners__value catalog-headliners__value--positive"
-    : "catalog-headliners__value catalog-headliners__value--negative";
-  const ratingContext = category.rating
-    ? `${formatRating(category.rating.treatment)} with Vasir vs ${formatRating(category.rating.clean)} without · ${category.record.wins}W ${category.record.ties}T ${category.record.losses}L`
-    : "No compatible matched outcome rating";
   return `<dl class="catalog-headliners" aria-label="Leaderboard headline metrics">
     <div class="catalog-headliners__item">
       <dt class="catalog-headliners__label">Best observed score</dt>
-      <dd class="catalog-headliners__reading"><strong class="catalog-headliners__value">${escapeHtml(formatScore(run.peerIndex))}</strong><span class="catalog-headliners__unit">/ ${escapeHtml(scaleMaximum)}</span><small class="catalog-headliners__context">${escapeHtml(run.configurationLabel)} · ${escapeHtml(run.conditionLabel)}</small></dd>
+      <dd class="catalog-headliners__reading"><strong class="catalog-headliners__value">${escapeHtml(formatScore(run.score))}</strong><span class="catalog-headliners__unit">/ ${escapeHtml(scaleMaximum)}</span><small class="catalog-headliners__context">${escapeHtml(run.configurationLabel)} · ${escapeHtml(run.conditionLabel)}</small></dd>
     </div>
     <div class="catalog-headliners__item">
       <dt class="catalog-headliners__label">Winner’s Vasir change</dt>
-      <dd class="catalog-headliners__reading"><strong class="${improvementClass}">${escapeHtml(formatLift(run.vasirChange))}</strong><small class="catalog-headliners__context">${escapeHtml(formatScore(run.cleanPeerIndex))} → ${escapeHtml(formatScore(run.treatmentPeerIndex))} benchmark score</small></dd>
+      <dd class="catalog-headliners__reading"><strong class="${improvementClass}">${escapeHtml(formatLift(run.upliftPoints))}</strong><small class="catalog-headliners__context">${escapeHtml(formatScore(run.baselineScore))} → ${escapeHtml(formatScore(run.skillScore))} rubric score</small></dd>
     </div>
     <div class="catalog-headliners__item">
-      <dt class="catalog-headliners__label">Overall Vasir advantage</dt>
-      <dd class="catalog-headliners__reading"><strong class="${ratingClass}">${escapeHtml(ratingValue)} Elo</strong><small class="catalog-headliners__context">${escapeHtml(ratingContext)}</small></dd>
+      <dt class="catalog-headliners__label">Evidence depth</dt>
+      <dd class="catalog-headliners__reading"><strong class="catalog-headliners__value">${escapeHtml(category.requiredPromptCount)} tasks</strong><small class="catalog-headliners__context">1 trial per condition · uncertainty not estimated</small></dd>
     </div>
   </dl>`;
 }
@@ -945,7 +849,7 @@ function renderModelLeaderboard(category) {
     </header>
     ${renderModelHeadliners(leader, category)}
     <div class="catalog-ranking">
-      ${renderModelRunTable(category.modelRuns, "all model runs ranked by combined peer score", category.modelScoreScaleMaximum)}
+      ${renderModelRunTable(category.modelRuns, "all model runs ranked by absolute rubric score", category.modelScoreScaleMaximum)}
     </div>
     <details class="catalog-matrix">
       <summary>Inspect all ${escapeHtml(category.matchedPairCount * 2)} task scores</summary>
@@ -963,7 +867,7 @@ function renderModelLeaderboard(category) {
 function renderTreatmentEffect(category) {
   const total = category.record.wins + category.record.ties + category.record.losses;
   const width = (value) => total > 0 ? (value / total) * 100 : 0;
-  const ratingLabel = category.rating ? `${formatRatingDelta(category.rating)} provisional outcome Elo` : "Outcome Elo unavailable";
+  const evidenceLabel = `${category.requiredPromptCount} tasks · 1 trial per condition · uncertainty not estimated`;
   return `<section class="catalog-section catalog-effect" id="effect" aria-labelledby="effect-title">
     <header class="catalog-section__header">
       <div><span class="catalog-overline">02 / Vasir effect</span><h2 id="effect-title">Vasir improved ${escapeHtml(category.record.wins)} of ${escapeHtml(total)} results.</h2></div>
@@ -979,7 +883,7 @@ function renderTreatmentEffect(category) {
         <strong><span class="catalog-key catalog-key--wins"></span>${escapeHtml(category.record.wins)} improved</strong>
         <strong><span class="catalog-key catalog-key--ties"></span>${escapeHtml(category.record.ties)} tied</strong>
         <strong><span class="catalog-key catalog-key--losses"></span>${escapeHtml(category.record.losses)} worse</strong>
-        <span>${escapeHtml(ratingLabel)}</span>
+        <span>${escapeHtml(evidenceLabel)}</span>
       </div>
     </div>
     <div class="catalog-effect__benchmarks">
@@ -1008,9 +912,9 @@ function renderMethod(category) {
       <div><span class="catalog-overline">04 / scoring</span><h2 id="method-title">Scoring and limits</h2></div>
     </header>
     <div class="catalog-method__columns">
-      <div><h3>Run leaderboard</h3><p>Every model, reasoning setting, and condition is ranked in one shared cohort. Each benchmark contributes equal weight through the percentage of the other runs outscored. The result is cohort-relative, not calibrated absolute model quality.</p></div>
-      <div><h3>Matched Vasir effect</h3><p>For each model and task, we compare its with-Vasir score to its without-Vasir score. The secondary ${escapeHtml(formatRatingDelta(category.rating))} Elo-equivalent uses those same wins, ties, and losses.</p></div>
-      <div><h3>Evidence</h3><p>This release covers ${escapeHtml(category.requiredPromptCount)} ${escapeHtml(category.title)} benchmarks, ${escapeHtml(category.modelScores.length)} model settings, one trial per condition, and ${escapeHtml(category.calibratedPromptCount)}/${escapeHtml(category.requiredPromptCount)} calibrated benchmarks. Treat the rankings as provisional.</p></div>
+      <div><h3>Run leaderboard</h3><p>Each score is the equal-weight mean of the task-local 0–100 rubric scores in the frozen ${escapeHtml(category.scoreEdition)} edition. Adding another model can change rank, but cannot change an incumbent score.</p></div>
+      <div><h3>Matched Vasir effect</h3><p>Uplift is the equal-weight mean of each task’s with-Vasir score minus its matched without-Vasir score, reported in percentage points.</p></div>
+      <div><h3>Evidence</h3><p>This release covers ${escapeHtml(category.requiredPromptCount)} ${escapeHtml(category.title)} benchmarks, ${escapeHtml(category.modelScores.length)} model settings, and one trial per condition. Uncertainty is not estimated; treat these development rubric scores as provisional.</p></div>
     </div>
     <details><summary>Run evidence</summary><p>${escapeHtml(category.taxonomyVersion)} · basis ${escapeHtml(category.basisHash ?? "unavailable")} · treatment ${escapeHtml(category.treatment?.hash ?? "unavailable")} · source runs ${category.entries.map((entry) => escapeHtml(entry.featuredRunId)).join(" · ")}</p></details>
   </section>`;

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "id": "cloudscape-private-reference-board-v1",
+  "purpose": "Calibrate perceived cloud quality across cinematic and stylized real-time rendering without prescribing an implementation technique.",
+  "visibility": {
+    "judge": "allowed",
+    "candidateGenerator": "forbidden",
+    "publicSite": "forbidden-pending-rights-clearance"
+  },
+  "referenceRules": [
+    "Use the set collectively; no single image is the target.",
+    "Judge cloud qualities, not resemblance, palette, composition, characters, terrain, logos, or text.",
+    "Photorealistic and stylized cloud rendering can both earn full credit.",
+    "Do not infer that a candidate must use true volumetrics, ray marching, simulation, or any other implementation technique."
+  ],
+  "images": [
+    {
+      "id": "reference-01",
+      "file": "reference-images/ref-01-cloud-sea-wide.png",
+      "mimeType": "image/png",
+      "width": 1157,
+      "height": 630,
+      "sha256": "6c8f9598ef1dd3e86107f7e37490763d787ab0fcc8764de3ced618cae6d56c6c",
+      "source": "User-supplied cloud-render reference",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "broad cloud-field depth",
+        "near-to-far density",
+        "soft atmospheric cohesion"
+      ],
+      "ignore": [
+        "purple palette as a requirement",
+        "exact framing"
+      ]
+    },
+    {
+      "id": "reference-02",
+      "file": "reference-images/ref-02-cloud-sea-close.png",
+      "mimeType": "image/png",
+      "width": 1156,
+      "height": 636,
+      "sha256": "9b4aecd6f8ba40314583e3482e0a553de4b938f7b728ed6ed57068d6903992d7",
+      "source": "User-supplied cloud-render reference",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "close-range cloud presence",
+        "foreground occlusion",
+        "large and small form layering"
+      ],
+      "ignore": [
+        "pink-purple palette as a requirement",
+        "exact framing"
+      ]
+    },
+    {
+      "id": "reference-03",
+      "file": "reference-images/ref-03-flight-cloud-bank.png",
+      "mimeType": "image/png",
+      "width": 895,
+      "height": 509,
+      "sha256": "518a5c3562e776a86e2e9021bb857df6eac35ae34c86f758e735be10bc10b398",
+      "source": "User-supplied commercial-game screenshot",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "flight-scale cloud masses",
+        "layer separation",
+        "depth around a flight-scale subject"
+      ],
+      "ignore": [
+        "branding and text",
+        "character and machine",
+        "exact palette and composition"
+      ]
+    },
+    {
+      "id": "reference-04",
+      "file": "reference-images/ref-04-sunset-cloudscape.png",
+      "mimeType": "image/png",
+      "width": 1573,
+      "height": 761,
+      "sha256": "84871ee2d0753ecae5df150d61aa71fce99aecdcfee49e09f6452d4b6b7abcf3",
+      "source": "User-supplied commercial-game screenshot",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "backlit cloud silhouettes",
+        "atmospheric depth",
+        "monumental scale",
+        "warm light transmission"
+      ],
+      "ignore": [
+        "branding and text",
+        "terrain and props",
+        "sunset palette as a requirement"
+      ]
+    },
+    {
+      "id": "reference-05",
+      "file": "reference-images/ref-05-storm-cloudscape.png",
+      "mimeType": "image/png",
+      "width": 1550,
+      "height": 693,
+      "sha256": "f1393e11308a37f8cb67ea72743b07ee4a8ea64e132f5afafbd78d95fadf5b3d",
+      "source": "User-supplied commercial-game screenshot",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "storm-front anatomy",
+        "strong internal value structure",
+        "dramatic directional illumination"
+      ],
+      "ignore": [
+        "branding and text",
+        "terrain and vegetation",
+        "lightning as a requirement",
+        "orange palette as a requirement"
+      ]
+    },
+    {
+      "id": "reference-06",
+      "file": "reference-images/ref-06-stylized-layered-sky.png",
+      "mimeType": "image/png",
+      "width": 1892,
+      "height": 830,
+      "sha256": "71103d1fce955513a17663d9a9d8af72ff7509dfc7b95acbfa825094a35de3dc",
+      "source": "User-supplied stylized commercial-game screenshot",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "stylized cloud layering",
+        "horizon integration",
+        "convincing distance through stylized layering"
+      ],
+      "ignore": [
+        "terrain, trees, and props",
+        "blue palette as a requirement",
+        "exact composition"
+      ]
+    },
+    {
+      "id": "reference-07",
+      "file": "reference-images/ref-07-stylized-storm-sky.jpg",
+      "mimeType": "image/jpeg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "8484fa8705931dc9b1dc42fcb0e7673b121ed73efcb60dfa81fb8285be9b2038",
+      "source": "User-supplied stylized commercial-game screenshot",
+      "rights": "Unverified; private evaluation only",
+      "calibrates": [
+        "sculptural stylized masses",
+        "readable dark-to-light hierarchy",
+        "dramatic sky coverage",
+        "cloud and environment integration"
+      ],
+      "ignore": [
+        "branding, credits, and text",
+        "foreground environment",
+        "realism as a requirement"
+      ]
+    }
+  ]
+}

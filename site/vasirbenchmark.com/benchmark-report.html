@@ -5,18 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
       name="description"
-      content="VasirBench benchmark evidence — test intent, matched condition result, model preview, and public evidence boundary."
+      content="VasirBench benchmark results — Architecture skill and Minimal baseline task scores for every matched model setting."
     >
     <meta name="color-scheme" content="light">
     <title>Benchmark report · VasirBench</title>
+    <link rel="icon" href="data:,">
     <link rel="preload" href="./assets/kanit-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./benchmark-report.css">
     <script src="./data.js" defer></script>
+    <script src="./responses.js" defer></script>
     <script src="./benchmark-report.js" defer></script>
   </head>
   <body id="top">
-    <a class="skip-link" href="#overview" data-report-section="overview">Skip to benchmark evidence</a>
+    <a class="skip-link" href="#overview" data-report-section="overview">Skip to benchmark results</a>
 
     <main class="page-frame report-page" id="report-page">
       <article class="benchmark report" aria-labelledby="report-title">
@@ -27,16 +29,17 @@
           </div>
           <nav class="report-mast__nav" aria-label="Report sections">
             <a href="#overview" data-report-section="overview">Overview</a>
-            <a href="#ranking" data-report-section="ranking">Model preview</a>
+            <a href="#ranking" data-report-section="ranking">All settings</a>
             <a href="#method" data-report-section="method">Method</a>
+            <a href="#limitations" data-report-section="limitations">Limitations</a>
           </nav>
-          <span class="benchmark-mast__issue">Evidence report · Aug 2026</span>
+          <span class="benchmark-mast__issue">Benchmark report</span>
         </header>
 
         <div id="report-view" aria-live="polite"></div>
 
         <footer class="benchmark-footer report-footer">
-          <span>VasirBench · evidence remains prompt-local</span>
+          <span>VasirBench · task-local rubric scores</span>
           <a href="#top" data-report-section="top">Back to top ↑</a>
         </footer>
       </article>

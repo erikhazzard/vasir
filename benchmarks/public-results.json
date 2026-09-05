@@ -1,0 +1,21 @@
+{
+  "kind": "vasirbenchmark-public-results",
+  "schemaVersion": 1,
+  "selectedRuns": [
+    {
+      "benchmarkId": "hyper-scale-chat",
+      "runPath": ".agents/vasir-evals/hyper-scale-chat/2026-09-04T22-09-30Z__rejudge__d7490f32658c/run.json",
+      "sha256": "1867869ffc922579c57cf984c768260b87b71b5f62d9be37c960bb1df9cd9b3b"
+    },
+    {
+      "benchmarkId": "personalized-home-feed",
+      "runPath": ".agents/vasir-evals/personalized-home-feed/2026-09-04T22-33-49Z__rejudge__1d7e5cf5fcdf/run.json",
+      "sha256": "4d082a7c67f2459a707744740edbd750c43ce4f4f5932aa6c5f836608bba68eb"
+    },
+    {
+      "benchmarkId": "device-telemetry",
+      "runPath": ".agents/vasir-evals/device-telemetry/2026-09-04T22-33-50Z__rejudge__0995e097a929/run.json",
+      "sha256": "0bb297700ae9f06bf6f93388ae5f0d816b79b36429105c3fffcc66bf521dca4a"
+    }
+  ]
+}

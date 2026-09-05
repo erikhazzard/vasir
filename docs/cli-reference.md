@@ -425,12 +425,12 @@ The bundled `hyper-scale-chat` benchmark:
 
 - sends the exact same task and output contract through clean and skill-treated conditions;
 - runs each row in a new non-persisted Codex or Claude CLI session with project customizations disabled;
-- defaults to 27 distinct GPT-5.6 Sol/Terra/Luna and Claude Fable/Opus reasoning configurations, for 54 rows at one trial;
+- defaults to 36 distinct GPT-6 Astra, GPT-5.6 Sol/Terra/Luna, historical Claude Fable/Opus, and versioned Claude Fable 5.1 reasoning configurations, for 72 rows at one trial; Astra contributes low, medium, high, xhigh, max, and ultra, while Fable 5.1 contributes xhigh, max, and ultracode;
 - uses the logged-in `codex` and `claude` CLIs rather than provider API keys;
-- sends the same anonymous completed-answer cohort independently to fresh `codex:gpt-5.6-sol@ultra` and `claude:opus@max` judges;
-- uses a separate fresh `codex:gpt-5.6-sol@ultra` synthesizer to select the most rubric-faithful complete judgment per candidate—never a mechanical average;
-- calculates a 0–100 score from benchmark-owned gates and weighted dimensions;
-- saves the exact prompts, answers, usage, failures, every judge result, disagreement, synthesis choice, and comparison basis under `.agents/vasir-evals/<benchmark>/<run-id>/run.json`;
+- sends each anonymous matched Minimal-baseline/Architecture-skill pair independently to fresh `codex:gpt-6-astra@xhigh` and `claude:claude-fable-5-1@max` judges;
+- requires both judges to pass each gate and averages their integer ratings for each weighted dimension, including half points, then recomputes the task's 0–100 rubric score and applies the lowest failed-gate cap;
+- uses no synthesizer, peer transform, or cohort-relative score;
+- saves the exact prompts, answers, usage, failures, every judge result, panel spread, deterministic aggregate, and row-local score basis under `.agents/vasir-evals/<benchmark>/<run-id>/run.json`;
 - derives a self-contained `report.html` with embedded D3. `run.json` remains authoritative.
 
 The default matrix can be narrowed without collapsing model and reasoning identity:
@@ -453,6 +453,23 @@ vasir eval run hyper-scale-chat \
   --reasoning xhigh --reasoning max
 ```
 
+Extend one immutable completed benchmark with new exact configurations without regenerating its existing responses:
+
+```bash
+vasir eval extend hyper-scale-chat <source-run-id> \
+  --model claude:claude-fable-5-1@xhigh \
+  --model claude:claude-fable-5-1@max \
+  --model claude:claude-fable-5-1@ultracode
+```
+
+`eval extend` infers the benchmark treatment and trial count from the named source, rejects any incompatible or duplicate row basis, and generates only the added cells. Under the same score edition, it preserves every source row and its row-local score basis, then judges only the added matched pairs with the fixed two-judge panel. Completion still requires every row in the combined artifact to be generated and scored. It never mutates the source. Each `--model` must include its exact effort or mode.
+
+When the source belongs to a frozen score edition, extending it with a model runs and scores only that model's six new responses across the three tasks and two conditions. The three matched pairs require six judge calls. Existing task scores, aggregate scores, and paired uplift remain unchanged; only derived ranks may move. If the task, rubric, generation contract, judge panel, aggregation method, task weights, or trial policy changes, publish those results under a new score edition rather than mixing them into the existing board.
+
+Fable 5.1 Ultracode is the versioned v2 execution mode: xhigh plus exactly one single-phase Workflow containing exactly one worker, not a native Claude effort tier. Ordinary rows finish first; Ultracode rows then run serially. The Claude invocation sets `workflowSizeGuideline` to `small` and gives the background Workflow 15 minutes inside the benchmark harness's 20-minute process deadline. Claude Code 2.1.257 or newer and environment pins force the worker to `claude-fable-5-1`. The sanitized runtime receipt must prove one correlated completed Workflow and one local, uncached, completed Fable 5.1 worker, with no fallback, remote, cached, errored, missing-model, or extra worker evidence. Missing or contradictory evidence fails the row closed.
+
+All Fable 5.1 receipts require target-model attribution and allow only Fable 5.1 plus optional ancillary Haiku 4.5 query-pipeline usage. Haiku traffic is not Workflow-worker evidence.
+
 Regenerate or reopen the latest or a named saved report without rerunning models:
 
 ```bash
@@ -460,14 +477,14 @@ vasir eval report hyper-scale-chat --open
 vasir eval report hyper-scale-chat <run-id> --open
 ```
 
-Apply the benchmark's current judge panel to a saved response cohort without rerunning generation. This writes a new linked run, preserves the source artifact, and safely reuses any compatible complete judge seats when retrying an incomplete panel:
+Apply the benchmark's current judge panel to saved responses without rerunning generation. This writes a new linked run and preserves the source artifact. Scoring runs one matched pair per prompt, checkpoints every judge/pair batch, and safely reuses compatible completed batches when retrying an interrupted rescore:
 
 ```bash
 vasir eval rescore hyper-scale-chat <run-id>
 vasir eval report hyper-scale-chat --open
 ```
 
-Numeric scores are explicitly `author-calibration-pending` in this first benchmark. They are directional evidence, not ground truth or a universal model ranking. Its chat task also overlaps a worked default in the architecture skill, so it measures retrieval and application of that guidance rather than novel-task generalization. Inspect the complete answers and judge reasons in the report.
+Engineering v2 is a development, uncalibrated score over three related Backend Architecture tasks with one trial per task and condition. It is useful for this model field, not a universal ranking or broad Engineering measure. Its chat task overlaps a worked default in the architecture skill, so it measures retrieval and application of that guidance rather than novel-task generalization. Inspect the complete answers, per-judge ratings, and panel spread in the report.
 
 ### Legacy skill-owned evals
 
@@ -601,7 +618,7 @@ Prerequisites:
 - Run from the Vasir source repository, or pass its root with `--repo-root <path>`.
 - Install the AWS CLI and configure an authenticated profile named `faedark`.
 - Make Chrome or Chromium available to the repository's site capture harness for the terminal browser proof.
-- Keep `site/vasirbenchmark.com/template-lock.json` matched to the accepted source, capture harness, and ten canonical captures. There is no acceptance bypass.
+- Keep `site/vasirbenchmark.com/template-lock.json` matched to the accepted presentation source, capture harness, and canonical captures. Generated public data is verified separately from source truth. There is no acceptance bypass.
 
 Confirm the AWS identity without changing cloud state:
 
@@ -611,14 +628,13 @@ aws sts get-caller-identity --profile faedark --region us-east-1
 
 The `Account` value must be `339713108333`.
 
-The common publication flow is exactly:
+The normal publication flow is one command:
 
 ```bash
-vasir benchmark publish --dry-run
 vasir benchmark publish
 ```
 
-The dry run performs the same local build, target closure, tool, acceptance-receipt, and read-only identity checks as publication. It does not deploy CloudFormation, write or delete S3 objects, acquire or release the publisher lease, activate a release, or change DNS. Its ordered action list identifies every AWS mutation the real command would perform.
+Use `vasir benchmark publish --dry-run` when you want the same local projection, artifact, route, acceptance-receipt, tool, and read-only identity checks without publishing. It does not deploy CloudFormation, write or delete S3 objects, acquire or release the publisher lease, activate a release, or change DNS. Its ordered action list identifies every AWS mutation the normal command would perform.
 
 The publishing command:
 
@@ -626,11 +642,31 @@ The publishing command:
 2. Verifies the fixed AWS account and converges the `vasirbenchmark-production` stack.
 3. Acquires the conditional publisher lease so only one activation can run at a time.
 4. Uploads and verifies the complete immutable release under `releases/<release-id>/`.
-5. Atomically activates that release through the stack-owned CloudFront Function pointer.
+5. Activates that release through the stack-owned CloudFront Function pointer, then invalidates and awaits the three stable HTML entrypoints.
 6. Verifies the exact public bytes, HTTPS redirect, certificate, security headers, private origin, and complete Chrome route journey.
 7. Retains the active release, the immediately previous verified release, and releases younger than 30 days, then releases the publisher lease.
 
 Publication is idempotent for identical source bytes. A rerun uses the same release identifier and does not create a second stack or duplicate release.
+
+#### Public score edition
+
+The active public score edition is `backend-architecture-panel-consensus-v2`, displayed as **Engineering v2**. The edition freezes three task-owned 0–100 rubrics, this exact judge panel, and equal task weights:
+
+- `codex:gpt-6-astra@xhigh`
+- `claude:claude-fable-5-1@max`
+
+Each judge sees one stable matched Minimal-baseline/Architecture-skill pair. The aggregation method is `unanimity-gates-mean-dimensions-v1`: both judges must pass each gate, either failure applies its cap, and each dimension uses the arithmetic mean of the two integer ratings, including half points. The benchmark recomputes the weighted task score and applies the lowest failed-gate cap. There is no synthesizer. For each exact model/reasoning configuration and condition:
+
+```text
+absolute score = mean(chat task score, feed task score, telemetry task score)
+paired uplift = Architecture skill absolute score - Minimal baseline absolute score
+```
+
+The primary `/100` value is therefore a fixed rubric score, not a percentile, peer index, Elo rating, win rate, or transform of the currently published model field. Paired uplift is expressed in rubric points. Rank is derived from the unrounded Architecture skill score and is secondary; adding a model can move rank but cannot change an incumbent score or uplift.
+
+This edition has three tasks and one trial per task and condition. Its uncertainty status is `not-estimated`; the publisher does not infer a confidence interval from those observations. Per-response judge spread and calibration status remain score metadata. The UI summarizes the method as `Engineering v2 · 3 tasks × 1 trial · 2 judges`.
+
+Adding a compatible model requires only the new model's six responses and six judge calls across the three frozen tasks. Incumbent rows are not rescored. Changing the tasks, rubrics, task weights, judge panel, aggregation method, generation contract, or trial policy requires a new score edition. A scoring-edition change may rescore saved generations into a new linked artifact; it never overwrites the historical edition.
 
 Flags:
 
@@ -642,19 +678,26 @@ Flags:
 
 #### Public artifact boundary
 
-Exactly these nine checked-in source files may enter the public artifact:
+The public artifact contains eight checked-in presentation files plus two generated data modules:
 
 - `index.html`
 - `style.css`
 - `assets/d3.v7.min.js`
 - `app.js`
-- `data.js`
 - `benchmark-report.html`
 - `benchmark-report.css`
 - `benchmark-report.js`
 - `assets/kanit-latin-900-normal.woff2`
 
-The publisher does not upload capture scripts, screenshots, documentation, infrastructure sources, deployment manifests, `template-lock.json`, or ignored `.agents/vasir-evals` evidence. Missing, symlinked, non-regular, oversized, or unexpectedly linked artifact files fail validation before AWS mutation.
+The ninth member, `data.js`, is regenerated deterministically from the canonical benchmark taxonomy, checked-in benchmark definitions, and `benchmarks/public-results.json`. The tenth, `responses.js`, is generated from the same selected rows and is loaded only by benchmark reports. The publisher does not trust or copy either checked-in inspection snapshot.
+
+`benchmarks/public-results.json` selects immutable local `run.json` artifacts by benchmark id, path, and SHA-256. The selected private artifacts are build inputs, not public files: the projector emits allowlisted score and presentation fields into `data.js`, plus explicit row identity, content-addressed exact generation messages, verbatim model output, and two allowlisted judge scores, gate mechanics, and bounded answer-specific rationales into `responses.js`. It never publishes local paths, raw judge prompts or completions, treatment content, receipts, or holdouts.
+
+The September 2026 public projection contains three digest-pinned development result sets in one Engineering category and one Backend Architecture track: three benchmarks, 36 matched model/reasoning settings, Minimal baseline plus Architecture skill, 72 condition entries, 216 benchmark response cells, and 432 individual judge evaluations. Every saved response is rescored under Engineering v2 without regenerating its answer. The exact roster preserves the 30 published settings, including Claude Fable 5.1 at xhigh, max, and ultracode, and adds GPT-6 Astra at low, medium, high, xhigh, max, and ultra. It publishes the Engineering v2 score for each condition, paired rubric-point uplift, all three task-local scores, derived ranks, observed outcomes, latency, token usage, and the fixed two-judge scoring method. Cost is omitted because attribution is incomplete. The result surface is labeled `Engineering v2 · 3 tasks × 1 trial · 2 judges`.
+
+The generated data drives the accepted full interface rather than replacing it. Combined and Engineering Leaderboard, Benchmark tests, and Efficiency routes retain the paired D3 comparisons, shared scale, synchronized guide, and three benchmark reports. Unsupported future families and resource axes are omitted; removing those analytical views is not a valid way to remove unsupported data.
+
+The publisher does not upload capture scripts, screenshots, documentation, infrastructure sources, deployment manifests, `template-lock.json`, or private run evidence. Missing, symlinked, non-regular, oversized, or unexpectedly linked artifact files fail validation before AWS mutation.
 
 Limits:
 
@@ -669,7 +712,7 @@ Success and dry-run results use schema version 1 and include:
 
 - `command: "benchmark"`, `subcommand: "publish"`, `status`, `schemaVersion`, and `dryRun`
 - `target`: URL, domain, profile, account, region, and stack name
-- `artifact`: release identifier, file count, byte totals, per-file hashes, and the complete entrypoint, capability-fragment, and report-fragment route arrays
+- `artifact`: release identifier, file count, byte totals, per-file hashes, the complete entrypoint/family/view/report route arrays, and the generated projection summary, including development, verified/eligible, setting, entry, and response counts
 - `deployment`: previous and active release identifiers, AWS output identifiers, and rollback outcome
 - `verification`: status, verified file and route counts, and origin-privacy result
 - `actions[]`: the deterministic production plan

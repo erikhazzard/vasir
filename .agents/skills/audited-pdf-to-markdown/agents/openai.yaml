@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audited PDF to Markdown"
+  short_description: "Manual-only audited PDF-to-Markdown conversion"
+  default_prompt: "Use $audited-pdf-to-markdown to convert this PDF into a checked, chapter-organized Markdown folder."

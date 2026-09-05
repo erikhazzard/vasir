@@ -240,6 +240,10 @@ test("help output documents json support across commands and the explicit replac
     /vasir benchmark publish \[--dry-run\] \[--json\] \[--repo-root <path>\]/
   );
   assert.match(capturedOutput.readStdout(), /vasir eval run <skill> \[--json\] \[--model <name>\] \[--trials <count>\]/);
+  assert.match(
+    capturedOutput.readStdout(),
+    /vasir eval extend <benchmark> <source-run-id> --model <provider:model@effort>\.\.\. \[--resume <extension-run-id>\] \[--open\]/
+  );
   assert.match(capturedOutput.readStdout(), /vasir eval inspect <skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir eval rescore <benchmark-or-skill> \[run-id\] \[--json\]/);
   assert.match(capturedOutput.readStdout(), /vasir --version/);
@@ -445,6 +449,72 @@ test("--model requires a value", async () => {
   assert.equal(parsedError.command, "eval");
   assert.equal(parsedError.status, "error");
   assert.equal(parsedError.code, "MODEL_FLAG_VALUE_REQUIRED");
+});
+
+test("benchmark extension requires an explicit exact model selector", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine([
+    "node",
+    "vasir",
+    "eval",
+    "extend",
+    "hyper-scale-chat",
+    "source-run-id",
+    "--json"
+  ], {
+    currentWorkingDirectory: process.cwd(),
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.command, "eval");
+  assert.equal(parsedError.status, "error");
+  assert.equal(parsedError.code, "EVAL_BENCHMARK_EXTENSION_MODEL_REQUIRED");
+  assert.match(parsedError.suggestion, /provider:model@effort/);
+});
+
+test("benchmark extension resume requires an explicit checkpoint id", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine([
+    "node",
+    "vasir",
+    "eval",
+    "extend",
+    "hyper-scale-chat",
+    "source-run-id",
+    "--model",
+    "terra@max",
+    "--resume",
+    "--json"
+  ], {
+    currentWorkingDirectory: process.cwd(),
+    ...capturedOutput
+  });
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.code, "EVAL_BENCHMARK_EXTENSION_RESUME_REQUIRED");
+  assert.match(parsedError.suggestion, /extension-run-id/);
+});
+
+test("--resume is rejected outside benchmark extension", async () => {
+  const capturedOutput = captureCommandWriters();
+
+  const statusCode = await runCommandLine([
+    "node",
+    "vasir",
+    "status",
+    "--resume",
+    "extension-run-id",
+    "--json"
+  ], capturedOutput);
+
+  assert.equal(statusCode, 1);
+  const parsedError = JSON.parse(capturedOutput.readStderr());
+  assert.equal(parsedError.code, "INVALID_COMMAND_FLAG");
 });
 
 test("plain vasir defaults to read-only status output", async () => {

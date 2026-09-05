@@ -2,14 +2,73 @@
   'use strict';
 
   const data = window.VASIR_DATA;
-  if (!data) throw new Error('VasirBench fixture failed to load.');
   const d3 = window.d3;
-  if (!d3?.scaleLinear) throw new Error('VasirBench D3 runtime failed to load.');
+  const capabilityView = document.querySelector('#capability-view');
+  const REQUIRED_CONDITION_IDS = ['baseline', 'skill'];
+  const requiredCollections = ['conditions', 'categories', 'benchmarks', 'benchmarkSummaries', 'settings', 'entries', 'benchmarkResults'];
+  const hasRequiredCollections = Boolean(data) && requiredCollections.every((key) => Array.isArray(data[key]));
+  const expectedEntryCount = hasRequiredCollections
+    ? data.settings.length * data.conditions.length
+    : 0;
+  const expectedResponseCount = hasRequiredCollections
+    ? expectedEntryCount * data.benchmarks.length
+    : 0;
+  if (
+    !data
+    || !d3?.scaleLinear
+    || !hasRequiredCollections
+    || data.conditions.length !== REQUIRED_CONDITION_IDS.length
+    || !REQUIRED_CONDITION_IDS.every((conditionId) => data.conditions.some((condition) => condition.id === conditionId))
+    || data.categories.length === 0
+    || data.benchmarks.length === 0
+    || data.settings.length === 0
+    || data.benchmarkSummaries.length !== data.benchmarks.length
+    || data.entries.length !== expectedEntryCount
+    || data.benchmarkResults.length !== expectedResponseCount
+  ) {
+    if (capabilityView) {
+      capabilityView.innerHTML = `
+        <section class="development-unavailable" role="alert">
+          <p class="ui-eyebrow">Benchmark data unavailable</p>
+          <h2>RESULTS COULD NOT BE VERIFIED</h2>
+          <p>The public dataset must provide one complete Minimal baseline and Architecture skill result for every matched setting and frozen task. No partial comparison is shown.</p>
+        </section>
+      `;
+    }
+    return;
+  }
 
   const INITIAL_RESULT_COUNT = 10;
-  const QUALITY_DOMAIN = [55, 95];
+  const BASELINE_CONDITION_ID = 'baseline';
+  const TREATMENT_CONDITION_ID = 'skill';
+  const SETTING_COUNT = data.settings.length;
+  const ENTRY_COUNT = data.entries.length;
+  const BENCHMARK_COUNT = data.benchmarks.length;
+  const scoreBasis = data.scoreBasis && typeof data.scoreBasis === 'object' ? data.scoreBasis : {};
+  const TASK_COUNT = Number.isFinite(Number(scoreBasis.taskCount)) && Number(scoreBasis.taskCount) > 0
+    ? Number(scoreBasis.taskCount)
+    : BENCHMARK_COUNT;
+  const SCORE_MINIMUM = Number.isFinite(Number(scoreBasis.range?.minimum)) ? Number(scoreBasis.range.minimum) : 0;
+  const SCORE_MAXIMUM = Number.isFinite(Number(scoreBasis.range?.maximum)) ? Number(scoreBasis.range.maximum) : 100;
+  const TRIALS_PER_TASK = Number.isFinite(Number(scoreBasis.trialsPerTask)) && Number(scoreBasis.trialsPerTask) > 0
+    ? Number(scoreBasis.trialsPerTask)
+    : Number.isFinite(Number(data.meta?.trials)) && Number(data.meta.trials) > 0
+      ? Number(data.meta.trials)
+      : 1;
+  const JUDGE_COUNT = Number.isInteger(Number(scoreBasis.judgeCount)) && Number(scoreBasis.judgeCount) > 0
+    ? Number(scoreBasis.judgeCount)
+    : 2;
+  const SCORE_EDITION_LABEL = typeof scoreBasis.label === 'string' && scoreBasis.label.trim()
+    ? scoreBasis.label.trim()
+    : 'Engineering v2';
+  const SCORE_METHOD_LABEL = scoreBasis.benchmarkWeighting === 'equal'
+    ? 'Equal-weight mean of frozen task rubric scores'
+    : `${SCORE_EDITION_LABEL} score`;
+  const QUALITY_DOMAIN = [SCORE_MINIMUM, SCORE_MAXIMUM];
+  const taskCoverageLabel = `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
+  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges`;
   const COMPOSITE_SCORE_SCALE = d3.scaleLinear()
-    .domain([0, 100])
+    .domain(QUALITY_DOMAIN)
     .range([0, 100])
     .clamp(true);
   const CAPABILITY_MODES = ['models', 'benchmarks', 'efficiency'];
@@ -24,44 +83,57 @@
   const capabilityIndexMedia = window.matchMedia('(min-width: 67.501rem)');
   const combinedScoreGuideMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 67.501rem)');
 
+  const resourceDomain = (key) => {
+    const values = data.entries
+      .map((entry) => Number(entry[key]))
+      .filter((value) => Number.isFinite(value) && value > 0);
+    const [observedMinimum = 1, observedMaximum = 1] = d3.extent(values);
+    const minimum = Math.max(Number.MIN_VALUE, observedMinimum * 0.9);
+    const maximum = observedMaximum === observedMinimum
+      ? observedMaximum * 1.1
+      : observedMaximum * 1.1;
+    return [minimum, maximum];
+  };
+
+  const resourceTicks = (domain) => {
+    const scale = d3.scaleLog().domain(domain);
+    const label = scale.tickFormat(6);
+    return scale.ticks(6).filter((value) => (
+      value >= domain[0] && value <= domain[1] && label(value) !== ''
+    ));
+  };
+
   const metricConfig = {
-    cost: {
-      label: 'Cost',
-      axis: 'Cost per benchmark run (USD)',
-      note: 'Cost · log scale',
-      domain: [0.018, 0.52],
-      ticks: [0.02, 0.05, 0.1, 0.25, 0.5],
-      format: (value) => `$${value.toFixed(value < 0.1 ? 3 : 2)}`,
-      spoken: (value) => `${value.toFixed(3)} dollars per benchmark run`
-    },
     latency: {
       label: 'Latency',
-      axis: 'Latency per benchmark run (seconds)',
+      axis: 'Latency per response (seconds)',
       note: 'Latency · log scale',
-      domain: [5, 85],
-      ticks: [5, 10, 20, 40, 80],
+      domain: resourceDomain('latency'),
       format: (value) => `${value.toFixed(value < 10 ? 1 : 0)}s`,
-      spoken: (value) => `${value.toFixed(1)} seconds per benchmark run`
+      spoken: (value) => `${value.toFixed(1)} seconds per response`
     },
     tokens: {
       label: 'Tokens',
-      axis: 'Output tokens per benchmark run',
+      axis: 'Output tokens per response',
       note: 'Tokens · log scale',
-      domain: [1700, 22000],
-      ticks: [2000, 3500, 6000, 11000, 20000],
+      domain: resourceDomain('tokens'),
       format: (value) => `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}k`,
-      spoken: (value) => `${value.toLocaleString()} output tokens per benchmark run`
+      spoken: (value) => `${value.toLocaleString()} output tokens per response`
     }
   };
+  Object.values(metricConfig).forEach((metric) => { metric.ticks = resourceTicks(metric.domain); });
 
   const conditionById = new Map(data.conditions.map((condition) => [condition.id, condition]));
+  const conditionVisualClass = (conditionId) => (
+    conditionId === BASELINE_CONDITION_ID ? 'baseline' : 'full'
+  );
   const categoryById = new Map(capabilityFields.map((category) => [category.id, category]));
   const benchmarkById = new Map(data.benchmarks.map((benchmark) => [benchmark.id, benchmark]));
   const benchmarkSummaryById = new Map(data.benchmarkSummaries.map((summary) => [summary.benchmarkId, summary]));
   const entryById = new Map(data.entries.map((entry) => [entry.id, entry]));
   const baselineBySetting = new Map(
     data.entries
-      .filter((entry) => entry.condition === 'baseline')
+      .filter((entry) => entry.condition === BASELINE_CONDITION_ID)
       .map((entry) => [entry.settingId, entry])
   );
 
@@ -74,23 +146,10 @@
   };
   const capabilityMobileLabel = {
     overall: 'Combined',
-    engineering: 'Eng',
-    games: 'Games',
-    product: 'Design',
-    writing: 'Writing',
-    workflows: 'AI flow'
+    engineering: 'Eng'
   };
   const suiteDescriptions = {
-    'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.',
-    'Reliability & Change': 'Safe evolution and evidence-led diagnosis under live-system pressure.',
-    'Game Feel & Onboarding': 'The first-hand quality of play: control, feedback, comprehension, and early momentum.',
-    'Systems & Integrity': 'Deterministic, coherent game systems that remain fair, inspectable, and hard to exploit.',
-    'Information & Interaction': 'Dense product surfaces that make state, evidence, and action obvious at a glance.',
-    'Product Quality': 'Judgment across learning, accessibility, failure recovery, and real user completion.',
-    'Exposition & Persuasion': 'Writing that makes a difficult idea or decision clear, credible, and memorable.',
-    'Voice & Synthesis': 'Revision and synthesis that preserve authorship while improving force and truthfulness.',
-    'Execution & Coordination': 'Agent work that selects the right tools, preserves intent, and hands off cleanly.',
-    'Skill & Evaluation Design': 'Reusable steering and proof systems that change decisions without overclaiming.'
+    'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.'
   };
 
   const elements = {
@@ -134,10 +193,10 @@
   const initialRoute = routeFromHash();
 
   const state = {
-    selectedId: data.entries[0].id,
+    selectedId: data.entries.find((entry) => entry.condition === TREATMENT_CONDITION_ID)?.id || data.entries[0].id,
     capabilityCategory: initialRoute.category || COMBINED_CAPABILITY.id,
     capabilityMode: CAPABILITY_MODES.includes(initialRoute.mode) ? initialRoute.mode : 'models',
-    metric: 'cost',
+    metric: 'latency',
     showAll: false
   };
 
@@ -145,7 +204,7 @@
     `#capabilities/${state.capabilityCategory}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`
   );
 
-  const escapeHtml = (value) => String(value)
+  const escapeHtml = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
@@ -178,12 +237,18 @@
     const entries = [...data.entries].sort((left, right) => (
       scoreFor(right, field) - scoreFor(left, field) ||
       right.score - left.score ||
-      left.cost - right.cost ||
+      left.latency - right.latency ||
       left.id.localeCompare(right.id)
     ));
+    const ranks = new Map();
+    data.conditions.forEach((condition) => {
+      entries
+        .filter((entry) => entry.condition === condition.id)
+        .forEach((entry, index) => ranks.set(entry.id, index + 1));
+    });
     return {
       entries,
-      ranks: new Map(entries.map((entry, index) => [entry.id, index + 1]))
+      ranks
     };
   };
 
@@ -193,7 +258,7 @@
       .sort((left, right) => (
         scoreFor(right, field) - scoreFor(left, field) ||
         right.score - left.score ||
-        left.cost - right.cost ||
+        left.latency - right.latency ||
         left.id.localeCompare(right.id)
       ));
     return {
@@ -206,13 +271,14 @@
 
   const matchedEntries = (entry) => data.conditions.map((condition) => (
     entryById.get(`${entry.settingId}-${condition.id}`)
-  ));
+      || data.entries.find((candidate) => candidate.settingId === entry.settingId && candidate.condition === condition.id)
+  )).filter(Boolean);
 
   const conditionMarkup = (conditionId, short = false) => {
     const condition = conditionById.get(conditionId);
     return `
-      <span class="condition-label condition-label--${escapeHtml(conditionId)}">
-        <span class="condition-mark condition-mark--${escapeHtml(conditionId)}" aria-hidden="true"></span>
+      <span class="condition-label condition-label--${escapeHtml(conditionVisualClass(conditionId))}">
+        <span class="condition-mark condition-mark--${escapeHtml(conditionVisualClass(conditionId))}" aria-hidden="true"></span>
         ${escapeHtml(short ? condition.short : condition.label)}
       </span>
     `;
@@ -221,10 +287,12 @@
   const weightedComposition = (entry) => {
     const weighted = data.categories.map((category) => {
       const rawScore = entry.categories.find((reading) => reading.category === category.id).score;
+      const weight = Number.isFinite(category.weight) ? category.weight : 1;
       return {
         category,
         rawScore,
-        unscaledContribution: rawScore * category.weight
+        weight,
+        unscaledContribution: rawScore * weight
       };
     });
     const weightedTotal = weighted.reduce((sum, item) => sum + item.unscaledContribution, 0);
@@ -240,26 +308,26 @@
     });
   };
 
-  const weightedCompositionDescription = (segments) => segments.map(({ category, rawScore, contribution }) => (
-    `${category.name} score ${formatScore(rawScore)}, ${Math.round(category.weight * 100)} percent weight, ${contribution.toFixed(2)} weighted points`
+  const weightedCompositionDescription = (segments) => segments.map(({ category, rawScore, contribution, weight }) => (
+    `${category.name} ${SCORE_EDITION_LABEL} score ${formatScore(rawScore)} of ${SCORE_MAXIMUM}, ${Math.round(weight * 100)} percent weight, ${contribution.toFixed(2)} weighted points`
   )).join('; ');
 
   const capabilityCompositionMarkup = (entry, conditionRank, fullEntryId) => {
     const score = entry.score;
     const segments = weightedComposition(entry);
     const profileLabel = weightedCompositionDescription(segments);
-    const conditionLabel = entry.condition === 'baseline' ? 'Without Vasir' : 'With Vasir';
+    const conditionLabel = conditionById.get(entry.condition).label;
     const baselineEntry = baselineBySetting.get(entry.settingId);
 
     return `
       <span
-        class="capability-composition capability-composition--${escapeHtml(entry.condition)}"
+        class="capability-composition capability-composition--${escapeHtml(conditionVisualClass(entry.condition))}"
         data-entry-id="${escapeHtml(entry.id)}"
         data-condition="${escapeHtml(entry.condition)}"
         data-composite-score="${score.toFixed(1)}"
         data-condition-rank="${conditionRank}"
         role="group"
-        aria-label="${escapeHtml(conditionLabel)}, composite ${formatScore(score)} of 100, ${escapeHtml(conditionLabel)} rank ${conditionRank} of 20. ${escapeHtml(profileLabel)}."
+        aria-label="${escapeHtml(conditionLabel)}, ${SCORE_EDITION_LABEL} score ${formatScore(score)} of ${SCORE_MAXIMUM}. ${escapeHtml(conditionLabel)} rank ${conditionRank} of ${SETTING_COUNT}, shown as secondary context. ${escapeHtml(profileLabel)}."
       >
         <span class="capability-composition__meta">
           <span class="capability-composition__label">${escapeHtml(conditionLabel)}</span>
@@ -267,10 +335,10 @@
         </span>
         <span class="capability-composition__track">
           <span class="capability-composition__stack" role="toolbar" aria-label="Open a capability leaderboard from ${escapeHtml(conditionLabel)} scores">
-            ${segments.map(({ category, rawScore, contribution }, index) => {
+            ${segments.map(({ category, rawScore, contribution, weight }, index) => {
               const baselineScore = baselineEntry.categories.find((reading) => reading.category === category.id).score;
               const categoryDelta = Math.round((rawScore - baselineScore) * 10) / 10;
-              const insight = `${category.name}: raw score ${formatScore(rawScore)}, weight ${Math.round(category.weight * 100)}%, weighted contribution ${contribution.toFixed(2)} points`;
+              const insight = `${category.name}: ${SCORE_EDITION_LABEL} score ${formatScore(rawScore)} of ${SCORE_MAXIMUM}, weight ${Math.round(weight * 100)}%, weighted contribution ${contribution.toFixed(2)} points`;
               return `
                 <button
                   class="capability-composition__segment capability-composition__segment--${escapeHtml(category.id)}"
@@ -281,12 +349,12 @@
                   data-category-label="${escapeHtml(category.name)}"
                   data-category-short="${escapeHtml(category.short)}"
                   data-raw-score="${rawScore.toFixed(1)}"
-                  data-weight="${category.weight}"
+                  data-weight="${weight}"
                   data-contribution="${contribution.toFixed(6)}"
                   data-delta="${categoryDelta.toFixed(1)}"
                   style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%"
                   tabindex="${index === 0 ? '0' : '-1'}"
-                  aria-label="Open ${escapeHtml(category.name)} capabilities for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with Full Vasir selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
+                  aria-label="Open ${escapeHtml(category.name)} results for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with Architecture skill selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
                   title="${escapeHtml(insight)}"
                 >
                   <span class="capability-composition__abbr" aria-hidden="true">${escapeHtml(category.short)}</span>
@@ -302,8 +370,10 @@
   };
 
   const resourceComparison = (entry, key) => {
-    const baseline = baselineBySetting.get(entry.settingId)[key];
-    const difference = Math.round(((entry[key] / baseline) - 1) * 100);
+    const baseline = Number(baselineBySetting.get(entry.settingId)?.[key]);
+    const value = Number(entry[key]);
+    if (!Number.isFinite(baseline) || baseline <= 0 || !Number.isFinite(value) || value <= 0) return 'Not available';
+    const difference = Math.round(((value / baseline) - 1) * 100);
     if (difference === 0) return 'Minimal reference';
     return `${difference > 0 ? '+' : '−'}${Math.abs(difference)}% vs Minimal`;
   };
@@ -331,11 +401,11 @@
       const condition = conditionById.get(candidate.condition);
       return `
         <button
-          class="matched-triplet__option matched-triplet__option--${escapeHtml(candidate.condition)}${selected ? ' is-selected' : ''}"
+          class="matched-triplet__option matched-triplet__option--${escapeHtml(conditionVisualClass(candidate.condition))}${selected ? ' is-selected' : ''}"
           type="button"
           data-entry-id="${escapeHtml(candidate.id)}"
           aria-pressed="${selected}"
-          aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} score ${formatScore(scoreFor(candidate, field))}, absolute rank ${ranking.ranks.get(candidate.id)}"
+          aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(candidate, field))} of ${SCORE_MAXIMUM}, ${escapeHtml(condition.label)} rank ${ranking.ranks.get(candidate.id)} of ${SETTING_COUNT}"
         >
           ${conditionMarkup(candidate.condition, true)}
           <strong>${formatScore(scoreFor(candidate, field))}</strong>
@@ -352,7 +422,7 @@
   );
 
   const combinedOutcomeSummary = () => {
-    const fullEntries = rankedCondition('full', COMBINED_CAPABILITY.id).entries;
+    const fullEntries = rankedCondition(TREATMENT_CONDITION_ID, COMBINED_CAPABILITY.id).entries;
     const deltas = fullEntries
       .map((entry) => Math.round((entry.score - baselineBySetting.get(entry.settingId).score) * 10) / 10)
       .sort((left, right) => left - right);
@@ -373,45 +443,46 @@
     const benchmarks = categoryBenchmarks(category.id);
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
     const measuredCount = benchmarks.filter((benchmark) => benchmark.evidenceKind === 'development').length;
-    const fullWinner = rankedCondition('full', category.id).entries[0];
-    const baselineWinner = rankedCondition('baseline', category.id).entries[0];
+    const fullWinner = rankedCondition(TREATMENT_CONDITION_ID, category.id).entries[0];
+    const baselineWinner = rankedCondition(BASELINE_CONDITION_ID, category.id).entries[0];
     const showingBenchmarks = state.capabilityMode === 'benchmarks';
     const showingEfficiency = state.capabilityMode === 'efficiency';
     const outcome = category.isCombined && state.capabilityMode === 'models' ? combinedOutcomeSummary() : null;
     const modelViewLabel = category.isCombined ? 'Paired leaderboard' : 'Model leaderboard';
     const identityLabel = `Capabilities / ${category.name} / ${showingBenchmarks ? 'Benchmark tests' : showingEfficiency ? 'Efficiency' : modelViewLabel}`;
     const modelSummary = category.isCombined
-      ? `20 matched settings · weighted across all ${data.categories.length} categories · ranked by With Vasir score`
-      : '20 matched settings · ranked by With Vasir score';
+      ? `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
+      : `${SETTING_COUNT} matched settings · ${SCORE_EDITION_LABEL} rubric score /${SCORE_MAXIMUM}`;
     return `
       <header class="capability-canvas__header">
         <div class="capability-canvas__identity">
           <p class="ui-eyebrow">${escapeHtml(identityLabel)}</p>
+          <p class="capability-canvas__status"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
           <h3 id="capability-question" tabindex="-1">${escapeHtml(category.name)}</h3>
           <p>${showingBenchmarks
-            ? `${trackCount} tracks · ${benchmarks.length} benchmark tests`
+            ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests`
             : showingEfficiency
-              ? `60 configurations · ${escapeHtml(category.name)} quality × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
+              ? `${ENTRY_COUNT} setting × condition results · fixed ${escapeHtml(category.name)} rubric score × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
               : escapeHtml(modelSummary)}</p>
         </div>
         <dl class="capability-canvas__readings${outcome ? ' capability-canvas__readings--combined' : ''}" aria-label="${escapeHtml(category.name)} summary">
           ${showingBenchmarks ? `
             <div class="capability-canvas__reading capability-canvas__reading--measured" data-count="${measuredCount}">
-              <dt>Evidence</dt>
-              <dd>${measuredCount}<small> measured</small></dd>
+              <dt>Tests</dt>
+              <dd>${measuredCount}<small> scored tasks</small></dd>
             </div>
-            <div class="capability-canvas__reading capability-canvas__reading--illustrative" data-count="${benchmarks.length - measuredCount}">
-              <dt>Preview</dt>
-              <dd>${benchmarks.length - measuredCount}<small> illustrative</small></dd>
+            <div class="capability-canvas__reading capability-canvas__reading--audit">
+              <dt>Field</dt>
+              <dd>${SETTING_COUNT}<small> matched settings</small></dd>
             </div>
           ` : outcome ? `
             <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
-              <dt>Best with Vasir</dt>
+              <dt>Best Architecture skill /${SCORE_MAXIMUM}</dt>
               <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${outcome.median.toFixed(1)}">
-              <dt>Median uplift</dt>
-              <dd>${signed(outcome.median)}<small>Across ${outcome.total} matched settings</small></dd>
+              <dt>Median paired uplift</dt>
+              <dd>${signed(outcome.median)}<small>points across ${outcome.total} matched settings</small></dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}">
               <dt>Improved settings</dt>
@@ -419,11 +490,11 @@
             </div>
           ` : `
             <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
-              <dt>Leader with Vasir</dt>
+              <dt>Architecture skill leader /${SCORE_MAXIMUM}</dt>
               <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${scoreFor(baselineWinner, category.id).toFixed(1)}">
-              <dt>Best without Vasir</dt>
+              <dt>Minimal baseline leader /${SCORE_MAXIMUM}</dt>
               <dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small></dd>
             </div>
           `}
@@ -449,7 +520,7 @@
               aria-selected="${state.capabilityMode === 'models'}"
               aria-controls="capability-ranking"
               tabindex="${state.capabilityMode === 'models' ? '0' : '-1'}"
-            ><strong>Leaderboard</strong><span>20 ranked settings</span></button>
+            ><strong>Leaderboard</strong><span>${SETTING_COUNT} ranked settings</span></button>
             <button
               class="capability-mode__tab${state.capabilityMode === 'benchmarks' ? ' is-selected' : ''}"
               id="capability-mode-benchmarks"
@@ -459,7 +530,7 @@
               aria-selected="${state.capabilityMode === 'benchmarks'}"
               aria-controls="capability-benchmarks"
               tabindex="${state.capabilityMode === 'benchmarks' ? '0' : '-1'}"
-            ><strong>Benchmark tests</strong><span>${trackCount} tracks · ${benchmarks.length} tests</span></button>
+            ><strong>Benchmark tests</strong><span>${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} tests</span></button>
             <button
               class="capability-mode__tab${state.capabilityMode === 'efficiency' ? ' is-selected' : ''}"
               id="capability-mode-efficiency"
@@ -469,7 +540,7 @@
               aria-selected="${state.capabilityMode === 'efficiency'}"
               aria-controls="capability-efficiency"
               tabindex="${state.capabilityMode === 'efficiency' ? '0' : '-1'}"
-            ><strong>Efficiency</strong><span>Quality × resource</span></button>
+            ><strong>Efficiency</strong><span>Rubric score × resource</span></button>
           </div>
       </nav>
     `;
@@ -486,7 +557,7 @@
       <header class="efficiency-controls">
         <div class="efficiency-controls__label">
           <p class="ui-eyebrow">Efficiency explorer</p>
-          <strong>60 model × condition results</strong>
+          <strong>${ENTRY_COUNT} setting × condition results</strong>
         </div>
         <label class="field-control field-control--wide" for="efficiency-entry">
           <span>Selected result</span>
@@ -507,22 +578,21 @@
 
   const benchmarkLedgerRowMarkup = (benchmark, categoryIndex, sourceCategoryId) => {
     const summary = benchmarkSummaryById.get(benchmark.id);
-    const measured = summary.evidenceKind === 'development';
     const regression = summary.delta < 0;
-    const action = measured ? 'Open report' : 'Preview test design';
+    const action = 'Open benchmark report';
     const reportHref = sourceCategoryId === COMBINED_CAPABILITY.id
       ? summary.detailHref.replace('#', '?from=overall#')
       : summary.detailHref;
     return `
       <a
-        class="benchmark-ledger__row${measured ? ' benchmark-ledger__row--measured' : ' benchmark-ledger__row--illustrative'}${regression ? ' benchmark-ledger__row--regression' : ''}"
+        class="benchmark-ledger__row benchmark-ledger__row--measured${regression ? ' benchmark-ledger__row--regression' : ''}"
         href="${escapeHtml(reportHref)}"
         data-benchmark-id="${escapeHtml(benchmark.id)}"
-        data-evidence-kind="${escapeHtml(summary.evidenceKind)}"
+        data-evidence-kind="development"
         data-baseline-score="${summary.baseline.toFixed(1)}"
         data-treatment-score="${summary.treatment.toFixed(1)}"
         data-report-href="${escapeHtml(reportHref)}"
-        aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. ${escapeHtml(summary.baselineLabel)} ${formatScore(summary.baseline)}, ${escapeHtml(summary.treatmentLabel)} ${formatScore(summary.treatment)}, change ${signed(summary.delta)} points."
+        aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. Across ${SETTING_COUNT} matched settings, ${escapeHtml(summary.baselineLabel)} field mean ${formatScore(summary.baseline)} of ${SCORE_MAXIMUM}, ${escapeHtml(summary.treatmentLabel)} field mean ${formatScore(summary.treatment)} of ${SCORE_MAXIMUM}, paired uplift ${signed(summary.delta)} points."
       >
         <span class="benchmark-ledger__identity">
           <span>${String(categoryIndex + 1).padStart(2, '0')} / ${escapeHtml(categoryById.get(benchmark.category)?.name || 'Benchmark')}</span>
@@ -530,15 +600,15 @@
           <small>${escapeHtml(benchmark.description)}</small>
         </span>
         <span class="benchmark-ledger__comparison">
-          <span><small>${escapeHtml(summary.baselineLabel)}</small><strong>${formatScore(summary.baseline)}</strong></span>
+          <span><small>Minimal field mean</small><strong>${formatScore(summary.baseline)}</strong></span>
           <i aria-hidden="true">→</i>
-          <span><small>${escapeHtml(summary.treatmentLabel)}</small><strong>${formatScore(summary.treatment)}</strong></span>
+          <span><small title="${escapeHtml(summary.treatmentLabel)}">Skill field mean</small><strong>${formatScore(summary.treatment)}</strong></span>
           <b>${signed(summary.delta)}<small> pts</small></b>
         </span>
         <span class="benchmark-ledger__evidence">
           <strong>${summary.complete}/${summary.total} ${escapeHtml(summary.completionLabel)}</strong>
           <span>${summary.wins}W · ${summary.ties}T · ${summary.losses}L</span>
-          <span>${escapeHtml(summary.calibration)}</span>
+          <span title="${escapeHtml(summary.runId || '')}">Run ${escapeHtml((summary.runId || 'not published').split('__')[0])}</span>
         </span>
         <span class="benchmark-ledger__action">${escapeHtml(action)} <span aria-hidden="true">→</span></span>
       </a>
@@ -570,7 +640,7 @@
                     <h4 id="benchmark-track-${category.id}-${suiteIndex}">${escapeHtml(suite)}</h4>
                     <p>${escapeHtml(suiteDescriptions[suite] || '')}</p>
                   </div>
-                  <strong>${suiteBenchmarks.length} tests · ${suiteMeasured ? `${suiteMeasured} measured` : 'illustrative'}</strong>
+                  <strong>${suiteBenchmarks.length} tests · ${suiteMeasured} scored</strong>
                 </header>
                 <div class="benchmark-ledger__rows">
                   ${suiteBenchmarks.map((benchmark) => benchmarkLedgerRowMarkup(benchmark, benchmarks.indexOf(benchmark), category.id)).join('')}
@@ -614,14 +684,14 @@
             data-entry-id="${escapeHtml(fullEntry.id)}"
             aria-pressed="${selected}"
             aria-describedby="${escapeHtml(compositionDescriptionId)}"
-            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning with Full Vasir. Composite ${formatScore(fullEntry.score)}, With rank ${fullRank} of 20. Without Vasir composite ${formatScore(baselineEntry.score)}, Without rank ${baselineRank} of 20. Full Vasir effect ${signed(delta)} points."
+            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. Architecture skill ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${SETTING_COUNT}. Minimal baseline score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
           >
             <span class="setting-row__identity">
               <span class="setting-row__rank" aria-hidden="true">${String(fullRank).padStart(2, '0')}</span>
               <span class="setting-row__model">
                 <strong>${escapeHtml(fullEntry.family)}</strong>
                 <span>${escapeHtml(fullEntry.reasoning)}</span>
-                <small>Without rank #${String(baselineRank).padStart(2, '0')}</small>
+                <small>Skill rank #${String(fullRank).padStart(2, '0')} · baseline rank #${String(baselineRank).padStart(2, '0')}</small>
               </span>
             </span>
             <span class="setting-row__disclosure">${selected ? 'Selected' : 'Select'} <span aria-hidden="true">${selected ? '●' : '→'}</span></span>
@@ -632,20 +702,20 @@
           </span>
           <span class="setting-row__delta${deltaClass}"><strong>${signed(delta)}</strong><span>pts</span></span>
         </div>
-        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both capability profiles use one shared 0 to 100 scale and end at their composite score. With Vasir capability profile: ${escapeHtml(fullDescription)}. Without Vasir capability profile: ${escapeHtml(baselineDescription)}. Each colored segment opens that capability leaderboard.</span>
+        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both profiles use the ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM} to ${SCORE_MAXIMUM} scale. Architecture skill profile: ${escapeHtml(fullDescription)}. Minimal baseline profile: ${escapeHtml(baselineDescription)}. Rank is secondary and condition-specific. Each colored segment opens the Engineering leaderboard.</span>
       </li>
     `;
   };
 
   const combinedLeaderboardMarkup = () => {
-    const baselineRanking = rankedCondition('baseline');
-    const fullRanking = rankedCondition('full');
+    const baselineRanking = rankedCondition(BASELINE_CONDITION_ID);
+    const fullRanking = rankedCondition(TREATMENT_CONDITION_ID);
     const visible = state.showAll
       ? fullRanking.entries
       : fullRanking.entries.slice(0, INITIAL_RESULT_COUNT);
     const disclosureLabel = state.showAll
       ? `Show top ${INITIAL_RESULT_COUNT} settings ↑`
-      : 'Show all 20 settings ↓';
+      : `Show all ${SETTING_COUNT} settings ↓`;
 
     return `
       <section
@@ -659,29 +729,27 @@
           <h3 class="visually-hidden" id="score-field-title">Combined model leaderboard</h3>
 
           <div class="score-axis-header">
-            <span class="score-axis-header__identity">Rank / model setting</span>
+            <span class="score-axis-header__identity">Model setting / skill rank</span>
             <div class="score-axis-header__profile">
               <div class="score-axis-header__profile-title">
-                <strong>Weighted capability scores <span>with uplift vs baseline</span></strong>
-                <span>Overall</span>
+                <strong>${escapeHtml(SCORE_EDITION_LABEL)} score <span>Architecture skill vs Minimal baseline · ${escapeHtml(taskCoverageLabel)}</span></strong>
+                <span>Overall /${SCORE_MAXIMUM}</span>
               </div>
               <div class="capability-legend" aria-label="Weighted capability categories">
-                <span class="capability-legend__item capability-legend__item--engineering"><i aria-hidden="true"></i><span class="capability-legend__long">Engineering</span><span class="capability-legend__short">ENG</span></span>
-                <span class="capability-legend__item capability-legend__item--games"><i aria-hidden="true"></i><span class="capability-legend__long">Games</span><span class="capability-legend__short">GAME</span></span>
-                <span class="capability-legend__item capability-legend__item--product"><i aria-hidden="true"></i><span class="capability-legend__long">Product design</span><span class="capability-legend__short">DES</span></span>
-                <span class="capability-legend__item capability-legend__item--writing"><i aria-hidden="true"></i><span class="capability-legend__long">Writing</span><span class="capability-legend__short">WRITE</span></span>
-                <span class="capability-legend__item capability-legend__item--workflows"><i aria-hidden="true"></i><span class="capability-legend__long">AI workflows</span><span class="capability-legend__short">FLOW</span></span>
+                ${data.categories.map((category) => `
+                  <span class="capability-legend__item capability-legend__item--${escapeHtml(category.id)}"><i aria-hidden="true"></i><span class="capability-legend__long">${escapeHtml(category.name)}</span><span class="capability-legend__short">${escapeHtml(category.short)}</span></span>
+                `).join('')}
               </div>
             </div>
             <span class="score-axis-header__effect">Uplift</span>
           </div>
 
-          <ol class="result-list" id="result-list" aria-label="Matched model and reasoning settings ordered by With Vasir rank. Each row compares Without Vasir and With Vasir.">
+          <ol class="result-list" id="result-list" aria-label="Matched model and reasoning settings ordered by Architecture skill ${SCORE_EDITION_LABEL} score. Each row compares Minimal baseline and Architecture skill on one shared ${SCORE_MINIMUM}-to-${SCORE_MAXIMUM} scale; condition-specific ranks are secondary.">
             ${visible.map((entry) => settingRowMarkup(entry, baselineRanking.ranks, fullRanking.ranks)).join('')}
           </ol>
           <div class="capability-score-guide" aria-hidden="true">
             <span class="capability-score-guide__line"></span>
-            <span class="capability-score-guide__readout"><strong>0.0</strong><small>/100</small></span>
+            <span class="capability-score-guide__readout"><strong>0.0</strong><small>/${SCORE_MAXIMUM}</small></span>
           </div>
           <button class="show-all" id="show-all" type="button" aria-expanded="${state.showAll}">${escapeHtml(disclosureLabel)}</button>
         </section>
@@ -695,17 +763,17 @@
         <strong>Capabilities</strong>
         <span>
           <i class="condition-mark condition-mark--full" aria-hidden="true"></i>
-          <span class="capability-selector__instruction capability-selector__instruction--long">Best with Vasir /100</span>
-          <span class="capability-selector__instruction capability-selector__instruction--short">Best /100</span>
+          <span class="capability-selector__instruction capability-selector__instruction--long">Best Architecture skill /${SCORE_MAXIMUM}</span>
+          <span class="capability-selector__instruction capability-selector__instruction--short">Best /${SCORE_MAXIMUM}</span>
         </span>
       </header>
       <div class="capability-selector__tabs" role="tablist" aria-label="Capability score fields" aria-orientation="${capabilityIndexMedia.matches ? 'vertical' : 'horizontal'}">
         ${capabilityFields.map((category, categoryIndex) => {
-          const winner = rankedCondition('full', category.id).entries[0];
+          const winner = rankedCondition(TREATMENT_CONDITION_ID, category.id).entries[0];
           const selected = category.id === state.capabilityCategory;
           const accessibleFieldName = category.isCombined
-            ? 'Combined score, weighted across all five capability categories.'
-            : `${category.name} capability score.`;
+            ? `Combined ${SCORE_EDITION_LABEL} score, equal-weighted across ${TASK_COUNT} fixed tasks.`
+            : `${category.name} ${SCORE_EDITION_LABEL} score across ${TASK_COUNT} fixed tasks.`;
           return `
             <button
               class="capability-selector__tab${category.isCombined ? ' capability-selector__tab--combined' : ''}${selected ? ' is-selected' : ''}"
@@ -715,12 +783,12 @@
               data-category-id="${escapeHtml(category.id)}"
               data-winner-entry-id="${escapeHtml(winner.id)}"
               data-winner-score="${scoreFor(winner, category.id).toFixed(1)}"
-              data-winner-condition="full"
+              data-winner-condition="skill"
               aria-selected="${selected}"
               aria-controls="capability-field-panel"
               tabindex="${selected ? '0' : '-1'}"
               style="--category-color:${category.color}"
-              aria-label="${escapeHtml(accessibleFieldName)} Best with Vasir: ${escapeHtml(winner.family)}, ${escapeHtml(winner.reasoning)} reasoning, score ${formatScore(scoreFor(winner, category.id))}."
+              aria-label="${escapeHtml(accessibleFieldName)} Best Architecture skill result: ${escapeHtml(winner.family)}, ${escapeHtml(winner.reasoning)} reasoning, ${formatScore(scoreFor(winner, category.id))} of ${SCORE_MAXIMUM}."
             >
               <span class="capability-selector__index" aria-hidden="true">${category.isCombined ? '00' : String(categoryIndex).padStart(2, '0')}</span>
               <span class="capability-selector__name">
@@ -728,7 +796,7 @@
                 <span class="capability-selector__short">${escapeHtml(capabilityMobileLabel[category.id])}</span>
               </span>
               <span class="capability-selector__state">${selected ? 'Selected' : ''}</span>
-              <strong>${formatScore(scoreFor(winner, category.id))}<small>/100</small></strong>
+              <strong>${formatScore(scoreFor(winner, category.id))}<small>/${SCORE_MAXIMUM}</small></strong>
             </button>
           `;
         }).join('')}
@@ -764,7 +832,7 @@
           type="button"
           data-entry-id="${escapeHtml(fullEntry.id)}"
           aria-pressed="${selected}"
-          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning with Full Vasir. ${escapeHtml(category.name)}: With Vasir ${formatScore(fullScore)}, rank ${fullRank} of 20; Without Vasir ${formatScore(baselineScore)}, rank ${baselineRank} of 20; effect ${signed(delta)} points."
+          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} Architecture skill ${SCORE_EDITION_LABEL} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank} of ${SETTING_COUNT}; Minimal baseline score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank} of ${SETTING_COUNT}; paired uplift ${signed(delta)} points. Rank is secondary and condition-specific."
         >
           <span class="capability-rank-row__identity">
             <span class="capability-rank-row__position">#${String(fullRank).padStart(2, '0')}</span>
@@ -776,7 +844,7 @@
           <span
             class="capability-rank-row__track"
             role="img"
-            aria-label="Without Vasir circle at ${formatScore(baselineScore)}. With Vasir square at ${formatScore(fullScore)}."
+            aria-label="Minimal baseline circle at ${formatScore(baselineScore)}. Architecture skill square at ${formatScore(fullScore)}."
           >
             <span class="capability-rank-row__axis" aria-hidden="true"></span>
             <span class="capability-rank-row__connector" aria-hidden="true"></span>
@@ -784,12 +852,12 @@
             <span class="capability-rank-row__marker capability-rank-row__marker--full" aria-hidden="true"></span>
           </span>
           <span class="capability-rank-row__reading capability-rank-row__reading--baseline">
-            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Without</span></span>
+            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Baseline</span></span>
             <strong>${formatScore(baselineScore)}</strong>
             <small>#${baselineRank}</small>
           </span>
           <span class="capability-rank-row__reading capability-rank-row__reading--full">
-            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>With</span></span>
+            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Skill</span></span>
             <strong>${formatScore(fullScore)}</strong>
             <small>#${fullRank}</small>
           </span>
@@ -952,8 +1020,8 @@
   const renderCapabilities = ({ animate = false, skipMotion = false } = {}) => {
     const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
     state.capabilityCategory = category.id;
-    const baselineRanking = rankedCondition('baseline', category.id);
-    const fullRanking = rankedCondition('full', category.id);
+    const baselineRanking = rankedCondition(BASELINE_CONDITION_ID, category.id);
+    const fullRanking = rankedCondition(TREATMENT_CONDITION_ID, category.id);
 
     const rankingContent = category.isCombined ? combinedLeaderboardMarkup() : `
         <section
@@ -965,16 +1033,16 @@
         >
           <h4 class="visually-hidden">${escapeHtml(category.name)} model leaderboard</h4>
           <div class="capability-ranking__axis" aria-hidden="true">
-            <span>Rank / model</span>
+            <span>Model / skill rank</span>
             <span class="capability-ranking__ticks">
-              <span class="capability-ranking__scale-label">Score / 100</span>
+              <span class="capability-ranking__scale-label">Rubric / ${SCORE_MAXIMUM}</span>
               <span class="capability-ranking__scale-values"><i>0</i><i>25</i><i>50</i><i>75</i><i>100</i></span>
             </span>
-            <span class="capability-ranking__condition-heading"><i class="capability-key__baseline"></i>Without Vasir</span>
-            <span class="capability-ranking__condition-heading"><i class="capability-key__full"></i>With Vasir</span>
-            <span>Change</span>
+            <span class="capability-ranking__condition-heading"><i class="capability-key__baseline"></i>Minimal baseline</span>
+            <span class="capability-ranking__condition-heading"><i class="capability-key__full"></i>Architecture skill</span>
+            <span>Uplift</span>
           </div>
-          <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by With Vasir score">
+          <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by Architecture skill ${SCORE_EDITION_LABEL} score. Ranks are secondary and condition-specific.">
             ${fullRanking.entries.map((entry) => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, category)).join('')}
           </ol>
         </section>
@@ -1043,7 +1111,10 @@
 
   const resourceDeltaPercent = (entry, metric = state.metric) => {
     const baseline = baselineBySetting.get(entry.settingId);
-    return Math.round(((entry[metric] / baseline[metric]) - 1) * 100);
+    const baselineValue = Number(baseline?.[metric]);
+    const value = Number(entry[metric]);
+    if (!Number.isFinite(baselineValue) || baselineValue <= 0 || !Number.isFinite(value) || value <= 0) return 0;
+    return Math.round(((value / baselineValue) - 1) * 100);
   };
 
   const annotationDockClass = (entry, field = state.capabilityCategory, metric = state.metric) => {
@@ -1056,9 +1127,10 @@
     const metric = metricConfig[state.metric];
     const delta = deltaFor(entry, field);
     const resourceDelta = resourceDeltaPercent(entry);
-    const reference = entry.condition === 'baseline'
+    const reference = entry.condition === BASELINE_CONDITION_ID
       ? 'Minimal reference'
-      : `${signed(delta)} quality · ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}`;
+      : `${signed(delta)} rubric points · ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}`;
+    const rankLabel = `${conditionById.get(entry.condition).short} rank #${ranks.get(entry.id)} of ${SETTING_COUNT}`;
     return `
       <span class="efficiency-plane__annotation-meta">
         ${conditionMarkup(entry.condition, true)}
@@ -1070,7 +1142,7 @@
         <i aria-hidden="true">×</i>
         <b>${escapeHtml(metric.format(entry[state.metric]))}</b>
       </span>
-      <small>#${ranks.get(entry.id)} of ${data.entries.length} · ${escapeHtml(reference)}</small>
+      <small>${escapeHtml(rankLabel)} · ${escapeHtml(reference)}</small>
     `;
   };
 
@@ -1083,7 +1155,7 @@
     const scoreDelta = Math.round((score - baselineScore) * 10) / 10;
     const resourceDelta = resourceDeltaPercent(entry, metricKey);
     const bestScore = Math.max(...data.entries.map((candidate) => scoreFor(candidate, field)));
-    const highestQuality = Math.abs(score - bestScore) < 0.05;
+    const highestScore = Math.abs(score - bestScore) < 0.05;
     const isFrontier = frontierIds.has(entry.id);
     const dominators = data.entries.filter((candidate) => (
       candidate.id !== entry.id &&
@@ -1101,25 +1173,25 @@
       ))[0];
 
     let finding = 'Trade-off check';
-    if (highestQuality) finding = 'Highest quality';
+    if (highestScore) finding = 'Highest rubric score';
     else if (isFrontier) finding = 'On the frontier';
 
-    const treatmentSentence = entry.condition === 'baseline'
-      ? 'Minimal is the matched reference for this model setting.'
-      : `${conditionById.get(entry.condition).short} adds ${signed(scoreDelta)} quality points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus Minimal.`;
+    const treatmentSentence = entry.condition === BASELINE_CONDITION_ID
+      ? 'Minimal baseline is the matched reference for this model setting.'
+      : `Architecture skill changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus Minimal baseline.`;
 
-    let tradeoffSentence = 'No measured configuration is both higher quality and lower resource.';
+    let tradeoffSentence = `No result has both a higher ${SCORE_EDITION_LABEL} score and lower resource use.`;
     if (!isFrontier) {
-      tradeoffSentence = `${dominators.length} configuration${dominators.length === 1 ? '' : 's'} reach at least this quality for less ${metric.label.toLowerCase()}.`;
+      tradeoffSentence = `${dominators.length} result${dominators.length === 1 ? '' : 's'} reach at least this rubric score for less ${metric.label.toLowerCase()}.`;
     } else if (cheaperFrontier) {
       const savings = Math.round((1 - (cheaperFrontier[metricKey] / entry[metricKey])) * 100);
-      const qualityLoss = Math.round((score - scoreFor(cheaperFrontier, field)) * 10) / 10;
-      tradeoffSentence = `${escapeHtml(cheaperFrontier.family)} · ${escapeHtml(cheaperFrontier.reasoning)} saves ${savings}% for ${qualityLoss.toFixed(1)} points less.`;
+      const scoreLoss = Math.round((score - scoreFor(cheaperFrontier, field)) * 10) / 10;
+      tradeoffSentence = `${escapeHtml(cheaperFrontier.family)} · ${escapeHtml(cheaperFrontier.reasoning)} saves ${savings}% for ${scoreLoss.toFixed(1)} rubric points less.`;
     }
 
     return {
       finding,
-      highestQuality,
+      highestScore,
       isFrontier,
       frontierIds,
       scoreDelta,
@@ -1136,11 +1208,11 @@
     const condition = conditionById.get(candidate.condition);
     return `
       <button
-        class="matched-triplet__option matched-triplet__option--${escapeHtml(candidate.condition)}${selected ? ' is-selected' : ''}"
+        class="matched-triplet__option matched-triplet__option--${escapeHtml(conditionVisualClass(candidate.condition))}${selected ? ' is-selected' : ''}"
         type="button"
         data-entry-id="${escapeHtml(candidate.id)}"
         aria-pressed="${selected}"
-        aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} score ${formatScore(scoreFor(candidate, field))}, ${metricConfig[metricKey].spoken(candidate[metricKey])}, absolute rank ${ranks.get(candidate.id)}${frontierIds.has(candidate.id) ? ', on the efficient frontier' : ''}"
+        aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(candidate, field))} of ${SCORE_MAXIMUM}, ${metricConfig[metricKey].spoken(candidate[metricKey])}, ${escapeHtml(condition.label)} rank ${ranks.get(candidate.id)} of ${SETTING_COUNT}${frontierIds.has(candidate.id) ? ', on the efficient frontier' : ''}"
       >
         <span class="efficiency-summary__step">${String(index + 1).padStart(2, '0')}</span>
         ${conditionMarkup(candidate.condition, true)}
@@ -1160,7 +1232,7 @@
     const isFrontier = frontierIds.has(entry.id);
     const classes = [
       'plot-point',
-      `plot-point--${entry.condition}`,
+      `plot-point--${conditionVisualClass(entry.condition)}`,
       isFrontier ? 'is-frontier' : '',
       isSelected ? 'is-selected' : '',
       counterpart ? 'is-counterpart' : '',
@@ -1181,7 +1253,7 @@
         style="left:${x.toFixed(3)}%;top:${y.toFixed(3)}%"
         tabindex="${isSelected ? '0' : '-1'}"
         aria-pressed="${isSelected}"
-        aria-label="Select ${fieldConfig[field].label} rank ${ranks.get(entry.id)}, ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, ${escapeHtml(conditionById.get(entry.condition).label)}, score ${formatScore(scoreFor(entry, field))}, ${metric.spoken(entry[state.metric])}${isFrontier ? ', on the efficient frontier' : ''}"
+        aria-label="Select ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, ${escapeHtml(conditionById.get(entry.condition).label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(entry, field))} of ${SCORE_MAXIMUM}, condition rank ${ranks.get(entry.id)} of ${SETTING_COUNT}, ${metric.spoken(entry[state.metric])}${isFrontier ? ', on the efficient frontier' : ''}"
       ></button>
     `;
   };
@@ -1199,12 +1271,12 @@
       const { x, y } = plotCoordinates(candidate, field, state.metric);
       return `${x.toFixed(3)},${y.toFixed(3)}`;
     }).join(' ');
-    const frontierAnchor = frontier[Math.min(frontier.length - 1, Math.max(0, Math.floor(frontier.length * 0.42)))];
+    const frontierAnchor = frontier[Math.min(frontier.length - 1, Math.max(0, Math.floor(frontier.length * 0.42)))] || entry;
     const frontierAnchorPosition = plotCoordinates(frontierAnchor, field, state.metric);
     const xTicks = metric.ticks.map((tick) => (
       `<span style="left:${resourcePosition(tick).toFixed(3)}%">${escapeHtml(metric.format(tick))}</span>`
     )).join('');
-    const yTickValues = [55, 65, 75, 85, 95];
+    const yTickValues = [0, 25, 50, 75, 100];
     const yTicks = yTickValues.map((tick) => (
       `<span style="top:${(100 - normalizedQuality(tick)).toFixed(3)}%">${tick}</span>`
     )).join('');
@@ -1220,7 +1292,7 @@
 
     return `
       <div class="efficiency-plane__plot" data-frontier-ids="${escapeHtml(frontierIds.join(','))}">
-        <span class="efficiency-plane__axis-label efficiency-plane__axis-label--y">Higher quality ↑ · ${escapeHtml(fieldConfig[field].label)} score / 100 · zoomed 55–95</span>
+        <span class="efficiency-plane__axis-label efficiency-plane__axis-label--y">Higher rubric score ↑ · ${escapeHtml(fieldConfig[field].label)} / ${SCORE_MAXIMUM} · fixed ${SCORE_MINIMUM}–${SCORE_MAXIMUM}</span>
         <div
           class="efficiency-plane__canvas"
           data-selected-id="${escapeHtml(entry.id)}"
@@ -1248,7 +1320,7 @@
             style="--label-x:${frontierAnchorPosition.x.toFixed(3)}%;--label-y:${frontierAnchorPosition.y.toFixed(3)}%"
             aria-hidden="true"
           >Efficient frontier</span>
-          <div class="efficiency-plane__points" role="group" aria-label="60 model, reasoning, and condition results">
+          <div class="efficiency-plane__points" role="group" aria-label="${ENTRY_COUNT} model, reasoning, and condition results">
             ${data.entries.map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
           </div>
           <div class="efficiency-plane__pointer-layer" aria-hidden="true"></div>
@@ -1265,11 +1337,12 @@
         </div>
         <span class="efficiency-plane__axis-label efficiency-plane__axis-label--x">${escapeHtml(metric.axis)}</span>
       </div>
-      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one model, reasoning setting, and Vasir condition. The line connects every measured result that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · quality scale 55–95 / 100.</p>
+      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one matched result under Minimal baseline or Architecture skill. The line connects results that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} ${SCORE_EDITION_LABEL} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM}–${SCORE_MAXIMUM} scale · ${escapeHtml(taskCoverageLabel)}.</p>
     `;
   };
 
   const efficientFrontier = (field, metric) => data.entries
+    .filter((entry) => Number.isFinite(Number(entry[metric])) && Number(entry[metric]) > 0)
     .filter((entry) => !data.entries.some((other) => (
       scoreFor(other, field) >= scoreFor(entry, field) &&
       other[metric] <= entry[metric] &&
@@ -1323,8 +1396,8 @@
         <section class="efficiency-field" aria-labelledby="efficiency-field-title">
           <header class="efficiency-field__heading">
             <div>
-              <p class="ui-eyebrow">Quality × ${escapeHtml(metric.label)} · ${data.entries.length} configurations</p>
-              <h4 id="efficiency-field-title">${escapeHtml(fieldConfig[field].label)} score: ${escapeHtml(decision.finding)} <strong>${formatScore(scoreFor(entry, field))}</strong> at <strong>${escapeHtml(metric.format(entry[state.metric]))}</strong></h4>
+              <p class="ui-eyebrow">${SCORE_EDITION_LABEL} score × ${escapeHtml(metric.label)} · ${ENTRY_COUNT} matched results</p>
+              <h4 id="efficiency-field-title">${escapeHtml(fieldConfig[field].label)}: ${escapeHtml(decision.finding)} <strong>${formatScore(scoreFor(entry, field))}</strong> at <strong>${escapeHtml(metric.format(entry[state.metric]))}</strong></h4>
               <p>${escapeHtml(decision.treatmentSentence)} ${decision.tradeoffSentence}</p>
             </div>
             <div class="efficiency-legend" aria-label="Chart legend">
@@ -1345,12 +1418,12 @@
               <span class="efficiency-summary__status${decision.isFrontier ? ' is-frontier' : ''}">${decision.isFrontier ? 'On the frontier' : 'Dominated trade-off'}</span>
             </div>
             <span class="efficiency-summary__score">
-              <small>#${ranking.ranks.get(entry.id)}</small>
+              <small>${escapeHtml(conditionById.get(entry.condition).short)} rank #${ranking.ranks.get(entry.id)}</small>
               <strong>${formatScore(scoreFor(entry, field))}</strong>
               <small>${escapeHtml(fieldConfig[field].short)}</small>
             </span>
           </header>
-          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched Minimal, Skill, and Full progression">
+          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched Minimal baseline and Architecture skill results">
             ${efficiencyTrajectoryMarkup(entry, field, state.metric, ranking.ranks, decision.frontierIds)}
           </div>
           <dl class="efficiency-summary__resources">
@@ -1375,7 +1448,7 @@
                 ${conditionMarkup(comparison.condition, true)}
               </span>
               <span class="efficiency-summary__alternative-values">
-                <b>${formatScore(scoreFor(comparison, field))}</b><small>quality</small>
+                <b>${formatScore(scoreFor(comparison, field))}</b><small>rubric /${SCORE_MAXIMUM}</small>
                 <b>${escapeHtml(metric.format(comparison[state.metric]))}</b><small>${escapeHtml(metric.label)}</small>
               </span>
               <span>${comparisonSaving > 0 ? `Save ${comparisonSaving}% for ${comparisonQualityDifference.toFixed(1)} points less` : `Gain ${Math.abs(comparisonQualityDifference).toFixed(1)} points for no more ${escapeHtml(metric.label.toLowerCase())}`}</span>
@@ -1388,13 +1461,13 @@
             <div>
               <p class="ui-eyebrow">Trade-off anchors</p>
               <h4 id="frontier-list-title">Frontier options</h4>
-              <p>No listed configuration is both higher quality and lower ${escapeHtml(metric.label.toLowerCase())}.</p>
+              <p>No listed result has both a higher fixed rubric score and lower ${escapeHtml(metric.label.toLowerCase())}.</p>
             </div>
             <span>${sampled.length} anchors · ${frontier.length} frontier results</span>
           </header>
           <div class="frontier-list__columns" aria-hidden="true">
             ${[0, 1].map(() => `
-              <span class="frontier-list__column-set"><span>Configuration</span><span>Quality</span><span>${escapeHtml(metric.label)}</span></span>
+              <span class="frontier-list__column-set"><span>Configuration</span><span>Rubric /${SCORE_MAXIMUM}</span><span>${escapeHtml(metric.label)}</span></span>
             `).join('')}
           </div>
           <div class="frontier-list__rows">

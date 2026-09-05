@@ -39,6 +39,11 @@
       "cacheClass": "immutable"
     },
     {
+      "path": "responses.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
       "path": "benchmark-report.html",
       "contentType": "text/html; charset=utf-8",
       "cacheClass": "html"

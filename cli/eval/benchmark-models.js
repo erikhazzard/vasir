@@ -2,18 +2,25 @@ import { VasirCliError } from "../cli-error.js";
 import { EVAL_REFERENCE_DOCS_REF } from "../docs-ref.js";
 
 const MODEL_REASONING_LEVELS = Object.freeze({
+  "codex:gpt-6-astra": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-5.6-sol": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-5.6-terra": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-5.6-luna": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
   "claude:fable": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
+  // Ultracode is a distinct visible execution mode. The Claude runtime maps it
+  // to xhigh effort plus bounded Workflow orchestration.
+  "claude:claude-fable-5-1": Object.freeze(["xhigh", "max", "ultracode"]),
   "claude:opus": Object.freeze(["low", "medium", "high", "xhigh", "max"])
 });
 
 const MODEL_ALIASES = Object.freeze({
+  astra: "codex:gpt-6-astra",
+  "gpt-6-astra": "codex:gpt-6-astra",
   sol: "codex:gpt-5.6-sol",
   terra: "codex:gpt-5.6-terra",
   luna: "codex:gpt-5.6-luna",
   fable: "claude:fable",
+  "fable-5.1": "claude:claude-fable-5-1",
   opus: "claude:opus",
   "gpt-5.6-sol": "codex:gpt-5.6-sol",
   "gpt-5.6-terra": "codex:gpt-5.6-terra",
@@ -53,7 +60,7 @@ function parseModelSelector(rawSelector) {
       code: "EVAL_BENCHMARK_MODEL_UNSUPPORTED",
       message: `Benchmark fresh-agent model is unsupported: ${provider}:${model}`,
       suggestion:
-        "Use GPT-5.6 Sol, Terra, or Luna through `codex:`, or Claude Fable or Opus through `claude:`.",
+        "Use GPT-6 Astra or GPT-5.6 Sol, Terra, or Luna through `codex:`, or Claude Fable or Opus through `claude:`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }

@@ -17,6 +17,7 @@ const DEFAULT_COMMAND_BUFFER_BYTES = 64 * 1024 * 1024;
 const INITIAL_STACK_TIMEOUT_MS = 60 * 60 * 1000;
 const UPDATE_STACK_TIMEOUT_MS = 30 * 60 * 1000;
 const FUNCTION_LIVE_TIMEOUT_MS = 5 * 60 * 1000;
+const INVALIDATION_TIMEOUT_MS = 15 * 60 * 1000;
 const HTTP_VERIFICATION_TIMEOUT_MS = 2 * 60 * 1000;
 const BROWSER_VERIFICATION_TIMEOUT_MS = 5 * 60 * 1000;
 const HTTP_ATTEMPTS = 8;
@@ -161,6 +162,7 @@ function createResult({ artifact, stack, dryRun, actions, previousVerifiedReleas
       fileCount: artifact.fileCount,
       totalBytes: artifact.totalBytes,
       compressedLandingBytes: artifact.compressedLandingBytes,
+      projection: artifact.projection,
       files: artifact.files.map(serializeFileForResult),
       routes: artifact.routes
     },
@@ -1049,6 +1051,63 @@ async function waitForLiveFunction({ artifact, aws, functionName, expectedReleas
   });
 }
 
+function invalidateStableEntrypoints({ artifact, aws, stack, targetReleaseId }) {
+  const distributionId = outputMap(stack).DistributionId;
+  let invalidation;
+  try {
+    invalidation = aws.runJson([
+      "cloudfront", "create-invalidation",
+      "--distribution-id", distributionId,
+      "--paths", "/", "/index.html", "/benchmark-report.html"
+    ]);
+  } catch (error) {
+    throw publishError({
+      code: "BENCHMARK_PUBLISH_ACTIVATION_FAILED",
+      message: `Could not invalidate stable HTML after activating release ${targetReleaseId}.`,
+      suggestion: "Keep the immutable release staged, inspect CloudFront invalidation access, and rerun the same command.",
+      config: artifact.config,
+      releaseId: artifact.releaseId,
+      stage: "activation",
+      rollback: { status: "indeterminate", releaseId: null },
+      context: { distributionId },
+      cause: error
+    });
+  }
+  const invalidationId = invalidation.Invalidation?.Id;
+  if (!invalidationId) {
+    throw publishError({
+      code: "BENCHMARK_PUBLISH_ACTIVATION_FAILED",
+      message: `CloudFront did not return an invalidation identifier for release ${targetReleaseId}.`,
+      suggestion: "Inspect the distribution and rerun so activation can be reconciled before verification.",
+      config: artifact.config,
+      releaseId: artifact.releaseId,
+      stage: "activation",
+      rollback: { status: "indeterminate", releaseId: null },
+      context: { distributionId }
+    });
+  }
+  try {
+    aws.runRaw([
+      "cloudfront", "wait", "invalidation-completed",
+      "--distribution-id", distributionId,
+      "--id", invalidationId
+    ], { timeout: INVALIDATION_TIMEOUT_MS });
+  } catch (error) {
+    throw publishError({
+      code: "BENCHMARK_PUBLISH_ACTIVATION_FAILED",
+      message: `Stable HTML invalidation did not complete for release ${targetReleaseId}.`,
+      suggestion: "Inspect the named invalidation and rerun after it reaches a terminal state.",
+      config: artifact.config,
+      releaseId: artifact.releaseId,
+      stage: "activation",
+      rollback: { status: "indeterminate", releaseId: null },
+      context: { distributionId, invalidationId },
+      cause: error
+    });
+  }
+  return invalidationId;
+}
+
 async function activateRelease({ artifact, aws, targetReleaseId, delayImplementation }) {
   const deployment = deployStack({
     artifact,
@@ -1083,6 +1142,9 @@ async function activateRelease({ artifact, aws, targetReleaseId, delayImplementa
     expectedReleaseId: targetReleaseId,
     delayImplementation
   });
+  // A viewer-request URI rewrite does not evict stable viewer cache keys. Purge
+  // only the three HTML entrypoints so every edge resolves one coherent release.
+  invalidateStableEntrypoints({ artifact, aws, stack, targetReleaseId });
   return stack;
 }
 
@@ -1143,6 +1205,18 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
         "permissions-policy"
       ]) {
         if (!responseHeader(response, headerName)) throw new Error(`security header missing: ${headerName}`);
+      }
+      const contentSecurityPolicy = String(responseHeader(response, "content-security-policy") ?? "");
+      for (const directive of ["default-src 'none'", "connect-src 'none'", "frame-ancestors 'none'"]) {
+        if (!contentSecurityPolicy.includes(directive)) {
+          throw new Error(`main site security policy is missing ${directive}`);
+        }
+      }
+      if (/script-src[^;]*'unsafe-inline'/.test(contentSecurityPolicy)) {
+        throw new Error("main site security policy must not permit inline scripts");
+      }
+      if (responseHeader(response, "x-frame-options")?.toUpperCase() !== "DENY") {
+        throw new Error("x-frame-options must be DENY");
       }
     }
   }
@@ -1225,7 +1299,8 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
   }
   return {
     verifiedReportRoutes: artifact.routes.reportFragments.length,
-    verifiedCapabilityRoutes: artifact.routes.capabilityFragments.length
+    verifiedCapabilityRoutes:
+      artifact.routes.familyFragments.length + artifact.routes.viewFragments.length
   };
 }
 
@@ -1260,12 +1335,16 @@ async function verifyPublication({ artifact, manifest, stack, chromeBinary, spaw
     fetchImplementation,
     delayImplementation
   });
-  const browser = runBrowserProof({
-    artifact,
-    chromeBinary,
-    spawnSyncImplementation,
-    environmentVariables
-  });
+  // A prior verified release can predate the candidate's projection schema.
+  // Exact stable bytes prove restoration; only the candidate uses its browser oracle.
+  const browser = manifest.releaseId === artifact.releaseId
+    ? runBrowserProof({
+        artifact,
+        chromeBinary,
+        spawnSyncImplementation,
+        environmentVariables
+      })
+    : { verifiedReportRoutes: 0, verifiedCapabilityRoutes: 0 };
   return {
     status: "passed",
     verifiedFiles: http.verifiedFiles,

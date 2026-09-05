@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import test from "node:test";
@@ -18,6 +20,73 @@ const FUNCTION_ARN = `arn:aws:cloudfront::${ACCOUNT_ID}:function/${FUNCTION_NAME
 const LOCK_KEY = "_deploy/control/publish-lock.json";
 const PUBLICATION_STATE_KEY = "_deploy/control/publication-state.json";
 const FIXED_NOW = Date.parse("2026-08-29T16:00:00.000Z");
+const CANONICAL_CAPTURE_PATHS = [
+  "desktop.png",
+  "mobile.png",
+  "desktop-capabilities.png",
+  "mobile-capabilities.png",
+  "desktop-capability-benchmarks.png",
+  "mobile-capability-benchmarks.png",
+  "desktop-efficiency.png",
+  "mobile-efficiency.png",
+  "desktop-benchmark-report.png",
+  "mobile-benchmark-report.png"
+];
+
+function createBenchmarkFixtureRoot(temporaryRoot) {
+  const fixtureRoot = path.join(temporaryRoot, "benchmarks");
+  fs.mkdirSync(fixtureRoot, { recursive: true });
+  for (const entry of [
+    "capability-taxonomy.json",
+    "public-results.json",
+    "hyper-scale-chat",
+    "personalized-home-feed",
+    "device-telemetry"
+  ]) {
+    const source = path.join(REPO_ROOT, "benchmarks", entry);
+    fs.symlinkSync(source, path.join(fixtureRoot, entry), fs.statSync(source).isDirectory() ? "dir" : "file");
+  }
+}
+
+function createPublicationRepoFixture() {
+  const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "vasirbenchmark-state-machine-"));
+  const sourceSiteRoot = path.join(REPO_ROOT, "site", "vasirbenchmark.com");
+  const siteRoot = path.join(temporaryRoot, "site", "vasirbenchmark.com");
+  fs.mkdirSync(path.dirname(siteRoot), { recursive: true });
+  fs.cpSync(sourceSiteRoot, siteRoot, { recursive: true });
+  createBenchmarkFixtureRoot(temporaryRoot);
+  fs.mkdirSync(path.join(temporaryRoot, ".agents"), { recursive: true });
+  fs.symlinkSync(path.join(REPO_ROOT, ".agents", "vasir-evals"), path.join(temporaryRoot, ".agents", "vasir-evals"), "dir");
+
+  const config = JSON.parse(fs.readFileSync(path.join(siteRoot, "deployment.json"), "utf8"));
+
+  const lockPath = path.join(siteRoot, "template-lock.json");
+  const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+  const acceptedPaths = [
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js"].includes(filePath)),
+    "capture.mjs",
+    "capture.sh"
+  ];
+  lock.files = acceptedPaths.map((relativePath) => {
+    const contents = fs.readFileSync(path.join(siteRoot, relativePath));
+    return {
+      path: relativePath,
+      role: "test-fixture",
+      sha256: crypto.createHash("sha256").update(contents).digest("hex"),
+      bytes: contents.length
+    };
+  });
+  lock.captures = CANONICAL_CAPTURE_PATHS.map((relativePath) => {
+    const contents = fs.readFileSync(path.join(siteRoot, relativePath));
+    return {
+      path: relativePath,
+      sha256: crypto.createHash("sha256").update(contents).digest("hex"),
+      bytes: contents.length
+    };
+  });
+  fs.writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`, "utf8");
+  return temporaryRoot;
+}
 
 function optionValue(args, optionName) {
   const optionIndex = args.indexOf(optionName);
@@ -48,6 +117,7 @@ function createAwsPublicationFake() {
   const conditionalWrites = [];
   const conditionalDeletes = [];
   const browserCalls = [];
+  const invalidationCalls = [];
 
   function stackDocument(activeReleaseId, status) {
     return {
@@ -181,15 +251,32 @@ function createAwsPublicationFake() {
     }
     if (service === "cloudformation") return handleCloudFormation(args);
     if (service === "s3api") return handleS3(args);
-    if (service === "cloudfront" && args[1] === "describe-function") {
-      assert.equal(optionValue(args, "--name"), FUNCTION_NAME);
-      return success({
-        FunctionSummary: {
-          Name: FUNCTION_NAME,
-          Status: "DEPLOYED",
-          FunctionMetadata: { Stage: "LIVE" }
-        }
-      });
+    if (service === "cloudfront") {
+      if (args[1] === "describe-function") {
+        assert.equal(optionValue(args, "--name"), FUNCTION_NAME);
+        return success({
+          FunctionSummary: {
+            Name: FUNCTION_NAME,
+            Status: "DEPLOYED",
+            FunctionMetadata: { Stage: "LIVE" }
+          }
+        });
+      }
+      if (args[1] === "create-invalidation") {
+        assert.equal(optionValue(args, "--distribution-id"), "E2VASIRBENCH");
+        const pathsIndex = args.indexOf("--paths");
+        const paths = args.slice(pathsIndex + 1, pathsIndex + 4);
+        invalidationCalls.push({ operation: "create", paths });
+        return success({ Invalidation: { Id: `I${invalidationCalls.length}`, Status: "InProgress" } });
+      }
+      if (args[1] === "wait" && args[2] === "invalidation-completed") {
+        invalidationCalls.push({
+          operation: "wait",
+          id: optionValue(args, "--id"),
+          distributionId: optionValue(args, "--distribution-id")
+        });
+        return success("");
+      }
     }
     return failure(`Unexpected AWS operation: ${service}:${args[1]}`, 2);
   }
@@ -220,7 +307,7 @@ function createAwsPublicationFake() {
     const object = currentObjects.get(key);
     if (!object) return response("Not found", 404);
     return response(object.body, 200, {
-      "content-security-policy": "default-src 'none'",
+      "content-security-policy": "default-src 'none'; connect-src 'none'; frame-ancestors 'none'; script-src 'self'",
       "strict-transport-security": "max-age=31536000",
       "x-content-type-options": "nosniff",
       "x-frame-options": "DENY",
@@ -233,6 +320,7 @@ function createAwsPublicationFake() {
     spawnSyncImplementation,
     fetchImplementation,
     browserCalls,
+    invalidationCalls,
     conditionalWrites,
     conditionalDeletes,
     putCountByKey,
@@ -243,10 +331,12 @@ function createAwsPublicationFake() {
   };
 }
 
-test("first publication and an identical repeat reuse one immutable release through lease and state CAS", async () => {
+test("first publication and an identical repeat reuse one immutable release through lease and state CAS", async (context) => {
+  const publicationRepoRoot = createPublicationRepoFixture();
+  context.after(() => fs.rmSync(publicationRepoRoot, { recursive: true, force: true }));
   const aws = createAwsPublicationFake();
   const publish = () => publishBenchmarkSite({
-    repoRootDirectory: REPO_ROOT,
+    repoRootDirectory: publicationRepoRoot,
     spawnSyncImplementation: aws.spawnSyncImplementation,
     environmentVariables: { ...process.env, CHROME_BIN: process.execPath },
     platform: process.platform,
@@ -307,4 +397,10 @@ test("first publication and an identical repeat reuse one immutable release thro
   assert.equal(aws.conditionalDeletes.length, 2);
   assert.ok(aws.conditionalDeletes.every(({ key, ifMatch }) => key === LOCK_KEY && /^\"etag-\d+\"$/.test(ifMatch)));
   assert.equal(aws.browserCalls.length, 8);
+  assert.deepEqual(aws.invalidationCalls, [
+    { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html"] },
+    { operation: "wait", id: "I1", distributionId: "E2VASIRBENCH" },
+    { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html"] },
+    { operation: "wait", id: "I3", distributionId: "E2VASIRBENCH" }
+  ]);
 });

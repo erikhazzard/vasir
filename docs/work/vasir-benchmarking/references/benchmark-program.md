@@ -1,6 +1,6 @@
 # VasirBench Benchmark Program
 
-This reference explains the benchmark portfolio, measurement axes, evidence standards, and defensible positioning. Product commitments and current lane state remain authoritative in [the work spec](../work-spec.md). The checked-in taxonomy becomes machine-authoritative only for categories and task mappings it actually declares.
+This reference explains the benchmark portfolio, measurement axes, scoring rules, and practical limits. Product commitments and current lane state remain authoritative in [the work spec](../work-spec.md). The checked-in taxonomy becomes machine-authoritative only for categories and task mappings it actually declares.
 
 ## 1. Decision VasirBench serves
 
@@ -63,9 +63,9 @@ These five programs describe the outcomes the author repeatedly hires AI to prod
 
 ### AI Workflows
 
-- **Terminal outcome:** a reusable steering or workflow artifact that improves fresh agents.
-- **Representative tracks:** Skill Design, Prompt Design, Agent Steering, Routing and Orchestration, Evaluation and Compounding.
-- **Native evidence:** downstream performance on sealed tasks, invocation accuracy, negative transfer, tokens, latency, and cost. The steering artifact's prose receives no direct quality score.
+- **Terminal outcome:** a useful work-spec artifact or a steering/workflow artifact whose effect improves fresh agents, according to the declared track.
+- **Representative tracks:** Work-Spec Generation, Skill Design, Prompt Design, Agent Steering, Routing and Orchestration, Evaluation and Compounding.
+- **Native evidence:** work-spec quality uses source-grounded judgment of the artifact's value, commitments, and decision usefulness. Steering effectiveness uses downstream performance on sealed tasks, invocation accuracy, negative transfer, tokens, latency, and cost. Artifact quality and downstream effect are separate measurements.
 
 ## 4. Classification and promotion rules
 
@@ -77,6 +77,7 @@ Examples:
 - A game-design brief belongs to Games.
 - A written product strategy belongs to Product Design.
 - A skill intended to improve game creation belongs to AI Workflows, with `games` as a downstream-domain tag.
+- A benchmark of work-spec generation belongs to AI Workflows, with the specified product or engineering domain recorded as a tag; it judges the quality of the planning artifact.
 
 Do not count one benchmark in multiple category scores. Do not create a new top-level family merely because a model ranking changed on the current sample.
 
@@ -92,7 +93,23 @@ Promote or split a family because it represents a distinct recurring author deci
 
 ## 5. AI Workflow evaluation
 
-AI Workflow benchmarks are nested causal evaluations:
+### Work-spec artifact quality
+
+The work-spec track evaluates the planning artifact against the original request and the relevant evidence available at that decision point. Its central question is whether exact implementation would give the intended beneficiary the requested value. Engineering unlocks must have a supported connection to the experience they enable or protect. The judge does not invent business impact or require implementing the feature to evaluate the spec.
+
+The [work-spec quality judge](work-spec-quality-judge.md) defines the six weighted dimensions, anchors, evidence requirements, readiness verdicts, intended Astra/Fable panel, and calibration probes. It evaluates recoverable meaning rather than template compliance. Real historical specs are mixed source material, not automatically gold examples; generation and maintenance cases retain their distinct inputs.
+
+The initial experiment compares fresh work-spec generation under Minimal baseline and the frozen `plan__maintain-work-spec` skill. Hold the assigned brief, evidence, configuration, tools, budgets, and neutral output requirements fixed within each pair; hide model and treatment identity from Astra xhigh and Fable 5.1 max. Report which configuration is strongest in each condition and the matched skill-minus-baseline difference for each configuration. The best skill-assisted result need not have the largest uplift. Keep exact skill and Full Vasir condition labels distinct.
+
+Controlled generation packets provide the assigned request and relevant evidence so source-grounded scores are comparable. Historical artifact diagnostics instead preserve conditional dimension ratings and claim-level verification notes without an aggregate benchmark score. Missing independent history must not erase assessable document qualities or be treated as proof that the candidate invented a claim. Conditional diagnostic ratings cannot establish request fidelity or enter generation rankings.
+
+Begin with [one concrete chat task](../../../../benchmarks/work-spec-chat/task.md) and its first exploratory matched generation pair. This greenfield brief supplies the assigned product request and scenario facts; independent historical intake is unnecessary. Then expand coverage across user experience, engineering unlock serving an experience, and revision preserving existing commitments. Before a scored model matrix, a bounded sanity check uses one development case, its harmless restyling, and a known material omission: three variants judged independently by both panel members. Passing those six assessments is not a broad calibration claim or a prerequisite for drafting and trying the first case. Repeats and further checks follow observed disagreement or close finalists rather than a mandatory tournament. Preserve per-case scores, readiness, coverage, actual resources, and negative skill effects; never rank an incomplete configuration on only its surviving cases.
+
+These results support a spec-quality claim. A separate downstream experiment is needed to establish execution usefulness. Task and family rollups must preserve that distinction and cannot silently pool scores from the two evidence regimes as interchangeable measurements.
+
+### Downstream steering effectiveness
+
+Steering-effectiveness benchmarks are nested causal evaluations:
 
 1. A creator configuration produces a skill, prompt, router, evaluator, or orchestration artifact.
 2. Freeze that artifact and its dependencies.
@@ -101,7 +118,7 @@ AI Workflow benchmarks are nested causal evaluations:
 5. Compare against the same executors without the artifact.
 6. Score downstream quality, false and missed invocation, regressions, tokens, latency, and cost.
 
-The creator never receives the sealed executor tasks. A fluent-looking skill that does not improve downstream work has failed.
+The creator never receives the sealed executor tasks. A fluent-looking skill that does not improve downstream work has failed this downstream-effectiveness evaluation, regardless of its artifact-quality judgment.
 
 ## 6. Scoring and aggregation
 
@@ -115,44 +132,41 @@ The creator never receives the sealed executor tasks. A fluent-looking skill tha
 ### Job-family level
 
 - Rank provider/model/reasoning configurations separately for each condition.
-- Show matched change for the same configuration on the same task.
+- Show matched change for the same configuration on the same task in rubric points.
 - Declare task weights, coverage, calibration, trial count, and missingness.
-- Treat the current peer-outrank index as cohort-relative. Adding weak or strong peers changes it, so it is not a stable cardinal capability score or Elo rating.
+- Publish the fixed-edition equal-weight mean of task-local rubric scores as the primary `/100` value. Adding a model may change rank but must not change an incumbent score.
+- Keep percentile, peer-outrank, Elo, Bradley–Terry, and win-rate signals in separate named units if a future preference view needs them; none may masquerade as the primary task score.
 - Keep quality beside tokens, cost, and latency. The default view should expose the quality-cost frontier rather than silently pricing all quality gains at zero.
 
 ### Cross-family level
 
 Category profiles and per-job routing remain primary. Publish one overall default-model score only after the author declares workload-frequency and regret weights, all included families have compatible calibrated contracts, and missing evidence stays visible. Never infer equal importance from the existence of five headings.
 
-## 7. Judge and evidence validity
+## 7. Judge aggregation
 
-A scored panel is complete only when every configured judge produced a substantive schema-valid evaluation for every assigned candidate and every required synthesis record is present. Empty records, placeholder text, all-zero stubs without rubric-grounded reasoning, omitted candidates, and partially parsed outputs are failures.
+Engineering v1 scores one matched Minimal-baseline/Architecture-skill pair per prompt. Each prompt goes independently to this fixed panel:
 
-The scoring basis must also:
+- `codex:gpt-5.6-sol@ultra`
+- `codex:gpt-5.6-terra@ultra`
+- `claude:opus@max`
 
-- blind model and condition identity;
-- counterbalance candidate order across judges or runs;
-- calibrate each scoring version on fixed human-labeled strong, overbuilt, incomplete, counter-idiomatic-good, and boundary examples;
-- expose panel spread as uncertainty rather than hiding it through synthesis;
-- avoid constructing one numeric axis by opportunistically selecting differently calibrated raw judge totals candidate by candidate;
-- audit family self-preference, verbosity preference, and order effects;
-- retain negative transfer and failed treatments;
-- rerun close finalists and report a meaningful tie band.
+There is no synthesizer. For each answer, gate decisions use the three-judge majority and each 0–4 dimension uses the median rating. The benchmark then recomputes the weighted 0–100 task score and applies any majority-failed gate cap. Every judge must return one substantive schema-valid record for both answers; an empty, placeholder, omitted, or partially parsed record leaves that pair incomplete.
 
-A synthesizer may adjudicate reasons, but its final score must use one declared anchored scale shared across candidates. The implementation may satisfy this through a calibrated final rubric record, a justified panel statistic, or another proven method. Selection convenience alone does not establish comparability.
+One pair per prompt keeps scoring local to the compared model setting. Candidate order is blinded and counterbalanced, and each row's score identity contains only its own rubric, response, judges, and aggregate. Adding another model creates another pair; it never changes an incumbent prompt, score, or uplift. Per-judge totals and spread are retained for inspection, while close finalists need repeated trials before a meaningful tie claim.
 
-## 8. Current evidence boundary
+## 8. Engineering v1 baseline
 
-The current Backend Architecture artifacts are development evidence:
+The first baseline uses three fixed Backend Architecture tasks:
 
-- They compare a minimal baseline with the isolated `plan__question-spec-architecture` skill. They do not exercise full Vasir.
-- Chat, personalized feed, and device telemetry are useful variants of one closely related architecture doctrine, not broad independent coverage of Engineering.
-- Each configuration has one trial per prompt.
-- Author calibration is pending.
-- The three latest featured artifacts contain 35 exact `Evaluation in progress.` judge placeholders across their panel records while the runs are marked complete: 10 chat, 10 feed, and 15 telemetry. Synthesis selected other records, effectively reducing those candidates to one substantive judge.
-- The generated catalog currently hardcodes isolated-skill results as "With Vasir."
+- Hyper-scale chat architecture
+- Personalized home-feed architecture
+- High-volume device telemetry architecture
 
-These failures block a completed two-judge-panel claim and any calibrated category rating. The saved generations remain useful. Scores become eligible only after incomplete evaluations fail closed, the cohorts are rescored under a comparable calibrated basis, and projections use the exact treatment label.
+Each configuration has one Minimal-baseline response and one Architecture-skill response per task. Saved generations can be rescored without rerunning models. Engineering v1 applies the same three-judge panel and deterministic aggregation to every selected response, then computes each condition's score as the equal mean of the three task scores. Uplift is `Architecture skill - Minimal baseline` in rubric points. Rank is secondary.
+
+These tasks are closely related architecture variants, so the current board is a useful development baseline rather than broad Engineering coverage. It uses one trial per task and does not estimate a confidence interval. A new model needs only its six generations and nine judge calls; incumbent rows remain untouched. A task, rubric, generation contract, judge panel, aggregation rule, or trial-policy change creates a new edition instead of rewriting Engineering v1.
+
+Historical two-judge-plus-synthesizer runs remain immutable diagnostics. They are not mixed with Engineering v1 scores.
 
 ## 9. Positioning
 

@@ -43,6 +43,63 @@ function createRejudgeRunId(startedAt, sourceRunId, judgingPlan) {
   return `${startedAt.toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z")}__rejudge__${basis}`;
 }
 
+function failGenerationDrift({ sourceRunId, expectedHash, actualHash, detail }) {
+  throw new VasirCliError({
+    code: "EVAL_BENCHMARK_REJUDGE_GENERATION_DRIFT",
+    message: `Saved responses no longer match the current benchmark generation contract: ${sourceRunId}`,
+    suggestion: "Run the benchmark again when cases or output requirements change; rescore only reuses responses from the exact same generation contract.",
+    docsRef: EVAL_REFERENCE_DOCS_REF,
+    context: {
+      expectedGenerationHash: expectedHash,
+      recordedGenerationHash: actualHash,
+      detail
+    }
+  });
+}
+
+function createRescoreScope({ sourceRunId, rowCount }) {
+  return {
+    strategy: "saved-responses-full-rescore-v1",
+    sourceRunId,
+    rowCount,
+    generationReused: true,
+    sourceScoresPreserved: false
+  };
+}
+
+function createPendingJudging({ judgingPlan, rows, rescoreScope, priorJudging = null }) {
+  return {
+    strategy: priorJudging?.strategy ?? null,
+    status: "pending",
+    judgeConfiguration: judgingPlan.synthesizer ?? judgingPlan.panel[0],
+    judgeConfigurations: judgingPlan.panel,
+    synthesizerConfiguration: judgingPlan.synthesizer,
+    freshContext: true,
+    blinded: true,
+    calibrationStatus: "development-uncalibrated",
+    rescoreScope,
+    cohortHash: null,
+    cohortSize: rows.filter((row) => row.rowStatus === "complete").length,
+    candidateOrder: [],
+    batchPlan: null,
+    panelPromptHash: null,
+    panelPromptText: null,
+    judges: [],
+    disagreement: null,
+    synthesis: null,
+    basisHash: null,
+    promptHash: null,
+    promptText: null,
+    ranking: [],
+    comparativeNote: "",
+    runtimeReceipt: null,
+    usage: null,
+    costUsd: null,
+    durationMs: null,
+    error: null
+  };
+}
+
 export async function rejudgeBenchmarkEval({
   benchmarkName,
   runId = null,
@@ -54,6 +111,7 @@ export async function rejudgeBenchmarkEval({
   agentRunnerImplementation = runBenchmarkAgent,
   judgeRowsImplementation = judgeBenchmarkRows,
   reportWriterImplementation = writeBenchmarkReport,
+  judgingCheckpointImplementation = null,
   nowImplementation = () => new Date()
 }) {
   const source = resolveBenchmarkSource({
@@ -76,6 +134,29 @@ export async function rejudgeBenchmarkEval({
     });
   }
 
+
+  const recordedDefinitionGenerationHash = createBenchmarkGenerationHash(
+    recorded.run.benchmark.definition
+  );
+  const recordedGenerationHash = recorded.run.benchmark.generationHash ??
+    recordedDefinitionGenerationHash;
+  if (recordedGenerationHash !== recordedDefinitionGenerationHash) {
+    failGenerationDrift({
+      sourceRunId: recorded.run.runId,
+      expectedHash: recordedDefinitionGenerationHash,
+      actualHash: recordedGenerationHash,
+      detail: "The saved artifact's generation hash disagrees with its recorded benchmark definition."
+    });
+  }
+  if (source.benchmarkGenerationHash !== recordedGenerationHash) {
+    failGenerationDrift({
+      sourceRunId: recorded.run.runId,
+      expectedHash: source.benchmarkGenerationHash,
+      actualHash: recordedGenerationHash,
+      detail: "The current benchmark cases or output contract differ from the contract that produced these responses."
+    });
+  }
+
   const judgingPlan = resolveBenchmarkJudgingConfiguration(
     source.benchmarkDefinition.judging
   );
@@ -85,17 +166,95 @@ export async function rejudgeBenchmarkEval({
   };
   const benchmarkDefinition = {
     ...structuredClone(recorded.run.benchmark.definition),
+    scoring: structuredClone(source.benchmarkDefinition.scoring),
     judging: structuredClone(judgingDefinition)
   };
   const rows = structuredClone(recorded.run.rows);
+  for (const row of rows) {
+    row.score = null;
+    row.scoreBasisHash = null;
+  }
   const startedAt = nowImplementation();
   const rejudgeRunId = createRejudgeRunId(startedAt, recorded.run.runId, judgingPlan);
+  const rescoreScope = createRescoreScope({
+    sourceRunId: recorded.run.runId,
+    rowCount: rows.length
+  });
+  const pendingJudging = createPendingJudging({
+    judgingPlan,
+    rows,
+    rescoreScope,
+    priorJudging: recorded.run.judging
+  });
+  const treatmentId = recorded.run.treatment?.id;
+  const checkpointPairs = createBenchmarkPairs({ rows, treatmentId });
+  const checkpointSummary = createBenchmarkSummary({
+    rows,
+    pairs: checkpointPairs,
+    configurations: recorded.run.configurations ?? [],
+    treatmentId,
+    judging: pendingJudging
+  });
+  const benchmarkScoringHash = createBenchmarkScoringHash(benchmarkDefinition);
+  const createCheckpointRun = (judging) => ({
+    ...structuredClone(recorded.run),
+    runId: rejudgeRunId,
+    runStatus: "incomplete",
+    benchmark: {
+      ...structuredClone(recorded.run.benchmark),
+      hash: createBenchmarkHash(benchmarkDefinition),
+      generationHash: source.benchmarkGenerationHash,
+      scoringHash: benchmarkScoringHash,
+      definition: benchmarkDefinition
+    },
+    generation: {
+      ...structuredClone(recorded.run.generation ?? {}),
+      sourceRunId: recorded.run.runId
+    },
+    scorerVersion: benchmarkDefinition.scoring.version,
+    judging: {
+      ...structuredClone(judging),
+      rescoreScope
+    },
+    rescoreScope,
+    summary: checkpointSummary,
+    pairs: checkpointPairs,
+    rows,
+    startedAt: startedAt.toISOString(),
+    completedAt: null,
+    rescoredFromRunId: recorded.run.runId
+  });
+  let outputDirectory = writeEvalRunArtifacts({
+    currentWorkingDirectory,
+    projectRootDirectory,
+    skillName: benchmarkName,
+    runId: rejudgeRunId,
+    runPayload: createCheckpointRun(pendingJudging)
+  });
+  const persistJudgingCheckpoint = async (progress) => {
+    const progressJudging = progress?.judging ?? progress;
+    if (!progressJudging || typeof progressJudging !== "object") {
+      return;
+    }
+    const checkpointRun = createCheckpointRun(progressJudging);
+    outputDirectory = writeEvalRunArtifacts({
+      currentWorkingDirectory,
+      projectRootDirectory,
+      skillName: benchmarkName,
+      runId: rejudgeRunId,
+      runPayload: checkpointRun
+    });
+    if (typeof judgingCheckpointImplementation === "function") {
+      await judgingCheckpointImplementation({ run: checkpointRun, outputDirectory });
+    }
+  };
   const judgeResult = await judgeRowsImplementation({
     benchmarkDefinition,
     rows,
     runSeed: rejudgeRunId,
     judgingConfiguration: judgingPlan,
     priorJudging: recorded.run.judging,
+    progressImplementation: persistJudgingCheckpoint,
     environmentVariables,
     agentRunnerImplementation
   });
@@ -107,9 +266,11 @@ export async function rejudgeBenchmarkEval({
     row.scoreBasisHash = null;
   }
 
-  const treatmentId = recorded.run.treatment?.id;
   const pairs = createBenchmarkPairs({ rows, treatmentId });
-  const judging = judgeResult.judging;
+  const judging = {
+    ...judgeResult.judging,
+    rescoreScope
+  };
   const summary = createBenchmarkSummary({
     rows,
     pairs,
@@ -120,9 +281,6 @@ export async function rejudgeBenchmarkEval({
   const runStatus = summary.rowCounts.complete === summary.rowCounts.expected && judging.status === "complete"
     ? "complete"
     : "incomplete";
-  const benchmarkGenerationHash = recorded.run.benchmark.generationHash ??
-    createBenchmarkGenerationHash(benchmarkDefinition);
-  const benchmarkScoringHash = createBenchmarkScoringHash(benchmarkDefinition);
   const completedAt = nowImplementation();
   const run = {
     ...structuredClone(recorded.run),
@@ -131,7 +289,7 @@ export async function rejudgeBenchmarkEval({
     benchmark: {
       ...structuredClone(recorded.run.benchmark),
       hash: createBenchmarkHash(benchmarkDefinition),
-      generationHash: benchmarkGenerationHash,
+      generationHash: source.benchmarkGenerationHash,
       scoringHash: benchmarkScoringHash,
       definition: benchmarkDefinition
     },
@@ -139,7 +297,9 @@ export async function rejudgeBenchmarkEval({
       ...structuredClone(recorded.run.generation ?? {}),
       sourceRunId: recorded.run.runId
     },
+    scorerVersion: benchmarkDefinition.scoring.version,
     judging,
+    rescoreScope,
     summary,
     pairs,
     rows,
@@ -149,7 +309,7 @@ export async function rejudgeBenchmarkEval({
   };
   upgradeBenchmarkRunBasis(run);
 
-  const outputDirectory = writeEvalRunArtifacts({
+  outputDirectory = writeEvalRunArtifacts({
     currentWorkingDirectory,
     projectRootDirectory,
     skillName: benchmarkName,

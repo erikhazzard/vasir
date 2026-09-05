@@ -27,6 +27,7 @@
     "bin/",
     "cli/",
     "benchmarks/",
+    "!benchmarks/visual-judges/**",
     "registry.json",
     ".vasir-catalog-manifest.json",
     ".agents/skills/",

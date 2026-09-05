@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
+import zlib from "node:zlib";
 
 import {
   buildBenchmarkPublicationArtifact,
@@ -12,9 +15,31 @@ import {
 } from "../cli/benchmark-publication-artifact.js";
 import { calculateProjectedPublicationBytes, publishBenchmarkSite } from "../cli/benchmark-publish.js";
 import { runCommandLine } from "../cli/command-runner.js";
+import { resolveBenchmarkConfigurations } from "../cli/eval/benchmark-models.js";
+import {
+  buildBenchmarkPublicationProjection,
+  validateBenchmarkPublicationResponses
+} from "../cli/eval/benchmark-publication-projection.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_ROOT = path.join(REPO_ROOT, "site", "vasirbenchmark.com");
+const EXPECTED_BENCHMARK_COUNT = 3;
+const EXPECTED_CONDITION_COUNT = 2;
+const EXPECTED_SETTING_COUNT = 36;
+const EXPECTED_RESULT_ENTRY_COUNT = EXPECTED_SETTING_COUNT * EXPECTED_CONDITION_COUNT;
+const EXPECTED_RESPONSE_COUNT = EXPECTED_RESULT_ENTRY_COUNT * EXPECTED_BENCHMARK_COUNT;
+const CANONICAL_CAPTURE_RECORDS = [
+  { path: "desktop.png", route: "#capabilities/overall", width: 1440, height: 1000 },
+  { path: "mobile.png", route: "#capabilities/overall", width: 390, height: 844 },
+  { path: "desktop-capabilities.png", route: "#capabilities/engineering", width: 1440, height: 1000 },
+  { path: "mobile-capabilities.png", route: "#capabilities/engineering", width: 390, height: 844 },
+  { path: "desktop-capability-benchmarks.png", route: "#capabilities/engineering/benchmarks", width: 1440, height: 1000 },
+  { path: "mobile-capability-benchmarks.png", route: "#capabilities/engineering/benchmarks", width: 390, height: 844 },
+  { path: "desktop-efficiency.png", route: "#capabilities/overall/efficiency", width: 1440, height: 1000 },
+  { path: "mobile-efficiency.png", route: "#capabilities/overall/efficiency", width: 390, height: 844 },
+  { path: "desktop-benchmark-report.png", route: "#hyper-scale-chat", width: 1440, height: 1000 },
+  { path: "mobile-benchmark-report.png", route: "#hyper-scale-chat", width: 390, height: 844 }
+];
 const EXPECTED_ACTION_IDS = [
   "validate-acceptance",
   "build-artifact",
@@ -35,6 +60,7 @@ const MUTATING_AWS_OPERATIONS = new Set([
   "s3api:delete-object",
   "s3api:delete-objects",
   "cloudfront:create-function",
+  "cloudfront:create-invalidation",
   "cloudfront:update-function",
   "cloudfront:publish-function"
 ]);
@@ -79,40 +105,187 @@ function publicationEnvironment() {
   return { ...process.env, CHROME_BIN: process.execPath };
 }
 
+function createBenchmarkFixtureRoot(temporaryRoot) {
+  const fixtureRoot = path.join(temporaryRoot, "benchmarks");
+  fs.mkdirSync(fixtureRoot, { recursive: true });
+  for (const entry of [
+    "capability-taxonomy.json",
+    "public-results.json",
+    "hyper-scale-chat",
+    "personalized-home-feed",
+    "device-telemetry"
+  ]) {
+    const source = path.join(REPO_ROOT, "benchmarks", entry);
+    fs.symlinkSync(source, path.join(fixtureRoot, entry), fs.statSync(source).isDirectory() ? "dir" : "file");
+  }
+}
+
+function createPublicationRepoCopy(prefix) {
+  const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const copiedSiteRoot = path.join(temporaryRoot, "site", "vasirbenchmark.com");
+  fs.mkdirSync(path.dirname(copiedSiteRoot), { recursive: true });
+  fs.cpSync(SITE_ROOT, copiedSiteRoot, { recursive: true });
+  createBenchmarkFixtureRoot(temporaryRoot);
+  fs.mkdirSync(path.join(temporaryRoot, ".agents"), { recursive: true });
+  fs.symlinkSync(path.join(REPO_ROOT, ".agents", "vasir-evals"), path.join(temporaryRoot, ".agents", "vasir-evals"), "dir");
+  const configPath = path.join(copiedSiteRoot, "deployment.json");
+  const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+
+  const lockPath = path.join(copiedSiteRoot, "template-lock.json");
+  const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+  const acceptedPaths = [
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js"].includes(filePath)),
+    "capture.mjs",
+    "capture.sh"
+  ];
+  lock.files = acceptedPaths.map((relativePath) => {
+    const contents = fs.readFileSync(path.join(copiedSiteRoot, relativePath));
+    return {
+      path: relativePath,
+      role: "test-fixture",
+      sha256: crypto.createHash("sha256").update(contents).digest("hex"),
+      bytes: contents.length
+    };
+  });
+  lock.captures = CANONICAL_CAPTURE_RECORDS.map((record) => {
+    const contents = fs.readFileSync(path.join(copiedSiteRoot, record.path));
+    return {
+      ...record,
+      sha256: crypto.createHash("sha256").update(contents).digest("hex"),
+      bytes: contents.length
+    };
+  });
+  fs.writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`, "utf8");
+  return { temporaryRoot, copiedSiteRoot };
+}
+
+test("public benchmark cohort is derived from selected evidence and matches registered configurations", () => {
+  const registeredConfigurationIds = resolveBenchmarkConfigurations().map(({ id }) => id);
+  const { projection } = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
+  const publicConfigurationIds = projection.settings.map(({ configurationId }) => configurationId);
+  assert.equal(publicConfigurationIds.length, EXPECTED_SETTING_COUNT);
+  assert.equal(new Set(publicConfigurationIds).size, EXPECTED_SETTING_COUNT);
+  assert.deepEqual(
+    [...publicConfigurationIds].sort(),
+    registeredConfigurationIds.sort()
+  );
+  assert.deepEqual(
+    publicConfigurationIds.filter((configurationId) => (
+      configurationId.startsWith("claude:claude-fable-5-1@")
+    )).sort(),
+    [
+      "claude:claude-fable-5-1@xhigh",
+      "claude:claude-fable-5-1@max",
+      "claude:claude-fable-5-1@ultracode"
+    ].sort()
+  );
+});
+
 test("benchmark artifact is deterministic, finite, release-qualified, and inside every budget", () => {
-  const first = buildBenchmarkPublicationArtifact({ repoRootDirectory: REPO_ROOT, validateAcceptance: false });
-  const second = buildBenchmarkPublicationArtifact({ repoRootDirectory: REPO_ROOT, validateAcceptance: false });
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-artifact-");
+  const first = buildBenchmarkPublicationArtifact({ repoRootDirectory: temporaryRoot, validateAcceptance: false });
+  const second = buildBenchmarkPublicationArtifact({ repoRootDirectory: temporaryRoot, validateAcceptance: false });
   try {
     assert.match(first.releaseId, /^[a-f0-9]{64}$/);
     assert.equal(first.releaseId, second.releaseId);
-    assert.equal(first.fileCount, 9);
+    assert.equal(first.fileCount, 10);
     assert.deepEqual(first.sourceManifest, second.sourceManifest);
     assert.deepEqual(first.publicManifest, second.publicManifest);
     assert.deepEqual(first.routes.entrypoints, ["/", "/index.html", "/benchmark-report.html"]);
-    assert.equal(first.routes.capabilityFragments.length, 18);
-    assert.equal(new Set(first.routes.capabilityFragments).size, 18);
-    assert.equal(first.routes.reportFragments.length, 24);
-    assert.equal(new Set(first.routes.reportFragments).size, 24);
+    assert.deepEqual(first.routes.familyFragments, [
+      "/#capabilities/overall",
+      "/#capabilities/engineering"
+    ]);
+    assert.deepEqual(first.routes.viewFragments, [
+      "/#capabilities/overall/benchmarks",
+      "/#capabilities/overall/efficiency",
+      "/#capabilities/engineering/benchmarks",
+      "/#capabilities/engineering/efficiency"
+    ]);
+    assert.equal(first.routes.reportFragments.length, 3);
+    assert.equal(new Set(first.routes.reportFragments).size, 3);
+    assert.deepEqual(first.projection, {
+      basisSha256: first.projection.basisSha256,
+      developmentResultSetCount: 3,
+      eligibleResultSetCount: 0,
+      withheldResultSetCount: 0,
+      familyCount: 1,
+      trackCount: 1,
+      benchmarkDefinitionCount: EXPECTED_BENCHMARK_COUNT,
+      categoryCount: 1,
+      conditionCount: EXPECTED_CONDITION_COUNT,
+      settingCount: EXPECTED_SETTING_COUNT,
+      resultEntryCount: EXPECTED_RESULT_ENTRY_COUNT,
+      responseCount: EXPECTED_RESPONSE_COUNT
+    });
+    assert.match(first.projection.basisSha256, /^[a-f0-9]{64}$/);
     assert.ok(first.files.every((file) => file.bytes <= first.config.limits.maxFileBytes));
     assert.ok(first.totalBytes <= first.config.limits.maxArtifactBytes);
     assert.ok(first.compressedLandingBytes <= first.config.limits.maxCompressedLandingBytes);
+    assert.equal(first.config.limits.maxFileBytes, 2 * 1024 * 1024);
+    assert.equal(first.config.limits.maxArtifactBytes, 5 * 1024 * 1024);
+    const landingDependencyPaths = new Set([
+      "index.html",
+      "style.css",
+      "assets/d3.v7.min.js",
+      "app.js",
+      "data.js",
+      "assets/kanit-latin-900-normal.woff2"
+    ]);
+    const recomputedLandingBytes = first.files
+      .filter((file) => landingDependencyPaths.has(file.path))
+      .reduce((total, file) => total + zlib.gzipSync(file.body, { level: 9 }).length, 0);
+    assert.equal(first.compressedLandingBytes, recomputedLandingBytes);
+
+    const responseFile = first.files.find((file) => file.path === "responses.js");
+    assert.ok(responseFile);
+    assert.equal(responseFile.contentType, "text/javascript; charset=utf-8");
+    assert.equal(responseFile.cacheClass, "immutable");
+    assert.equal(responseFile.cacheControl, "public, max-age=31536000, immutable");
+    const responseSandbox = { window: {} };
+    vm.runInNewContext(responseFile.body.toString("utf8"), responseSandbox);
+    const publicResponses = JSON.parse(JSON.stringify(responseSandbox.window.VASIR_RESPONSES));
+    const dataFile = first.files.find((file) => file.path === "data.js");
+    const dataSandbox = { window: {} };
+    vm.runInNewContext(dataFile.body.toString("utf8"), dataSandbox);
+    const publicData = JSON.parse(JSON.stringify(dataSandbox.window.VASIR_DATA));
+    validateBenchmarkPublicationResponses(publicResponses, publicData);
+    assert.equal(publicResponses.schemaVersion, 2);
+    assert.deepEqual(publicResponses.counts, {
+      benchmarks: 3,
+      settings: 36,
+      conditions: 2,
+      responses: 216,
+      messageSets: 12,
+      judgments: 432
+    });
+    assert.equal(publicResponses.responses.length, EXPECTED_RESPONSE_COUNT);
+    assert.equal(
+      publicResponses.responses.reduce((total, response) => total + response.judgments.length, 0),
+      432
+    );
+    assert.ok(publicResponses.messageSets.length < publicResponses.responses.length);
+    assert.doesNotMatch(dataFile.body.toString("utf8"), /VASIR_RESPONSES|"outputText"|"exactMessages"/);
+    assert.doesNotMatch(responseFile.body.toString("utf8"), /"(?:reviewerId|evaluationHash|promptText|runtimeReceipt|costUsd|usage)"\s*:/);
 
     const landing = first.files.find((file) => file.path === "index.html").body.toString("utf8");
+    const report = first.files.find((file) => file.path === "benchmark-report.html").body.toString("utf8");
     assert.match(landing, new RegExp(`/releases/${first.releaseId}/style\\.css`));
-    assert.match(landing, new RegExp(`/releases/${first.releaseId}/assets/d3\\.v7\\.min\\.js`));
     assert.match(landing, new RegExp(`/releases/${first.releaseId}/app\\.js`));
+    assert.match(landing, /<link rel="icon" href="data:,">/);
+    assert.match(report, /<link rel="icon" href="data:,">/);
+    assert.match(report, new RegExp(`/releases/${first.releaseId}/responses\\.js`));
+    assert.doesNotMatch(landing, /responses\.js/);
     assert.doesNotMatch(landing, /(?:href|src)="\.\/(?:style\.css|assets\/d3\.v7\.min\.js|app\.js|data\.js)"/);
   } finally {
     first.dispose();
     second.dispose();
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
   }
 });
 
 test("accepted benchmark receipt fails closed with only drifted path names", () => {
-  const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "vasirbenchmark-acceptance-"));
-  const copiedSiteRoot = path.join(temporaryRoot, "site", "vasirbenchmark.com");
-  fs.mkdirSync(path.dirname(copiedSiteRoot), { recursive: true });
-  fs.cpSync(SITE_ROOT, copiedSiteRoot, { recursive: true });
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-acceptance-");
   try {
     const { config, siteRootDirectory } = readBenchmarkDeploymentConfig({ repoRootDirectory: temporaryRoot });
     validateBenchmarkAcceptance({ config, siteRootDirectory });
@@ -149,7 +322,7 @@ test("benchmark deployment config cannot substitute accepted QA files into the p
       () => readBenchmarkDeploymentConfig({ repoRootDirectory: temporaryRoot }),
       (error) => {
         assert.equal(error.code, "BENCHMARK_PUBLISH_CONFIG_INVALID");
-        assert.match(error.message, /canonical nine-file publication contract/);
+        assert.match(error.message, /canonical ten-file publication contract/);
         return true;
       }
     );
@@ -159,7 +332,8 @@ test("benchmark deployment config cannot substitute accepted QA files into the p
 });
 
 test("storage projection charges only release objects that are not already current", () => {
-  const artifact = buildBenchmarkPublicationArtifact({ repoRootDirectory: REPO_ROOT, validateAcceptance: false });
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-storage-");
+  const artifact = buildBenchmarkPublicationArtifact({ repoRootDirectory: temporaryRoot, validateAcceptance: false });
   try {
     const manifestBytes = Buffer.byteLength(`${JSON.stringify(artifact.publicManifest, null, 2)}\n`);
     const releaseVersions = artifact.files.map((file) => ({
@@ -188,18 +362,25 @@ test("storage projection charges only release objects that are not already curre
     assert.equal(hiddenObjectProjection.candidateBytes, artifact.files[0].bytes);
   } finally {
     artifact.dispose();
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
   }
 });
 
 test("benchmark publish dry-run performs read-only AWS calls and returns the exact production plan", async () => {
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-dry-run-");
   const aws = createReadOnlyAwsStub();
-  const result = await publishBenchmarkSite({
-    repoRootDirectory: REPO_ROOT,
-    dryRun: true,
-    spawnSyncImplementation: aws.spawnSyncImplementation,
-    environmentVariables: publicationEnvironment(),
-    platform: process.platform
-  });
+  let result;
+  try {
+    result = await publishBenchmarkSite({
+      repoRootDirectory: temporaryRoot,
+      dryRun: true,
+      spawnSyncImplementation: aws.spawnSyncImplementation,
+      environmentVariables: publicationEnvironment(),
+      platform: process.platform
+    });
+  } finally {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+  }
 
   assert.equal(result.schemaVersion, 1);
   assert.equal(result.subcommand, "publish");
@@ -226,40 +407,51 @@ test("benchmark publish dry-run performs read-only AWS calls and returns the exa
 });
 
 test("benchmark publish rejects the wrong AWS account before any production mutation", async () => {
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-account-");
   const aws = createReadOnlyAwsStub({ accountId: "111111111111" });
-  await assert.rejects(
-    publishBenchmarkSite({
-      repoRootDirectory: REPO_ROOT,
-      dryRun: false,
-      spawnSyncImplementation: aws.spawnSyncImplementation,
-      environmentVariables: publicationEnvironment(),
-      platform: process.platform
-    }),
-    (error) => {
-      assert.equal(error.code, "BENCHMARK_PUBLISH_ACCOUNT_MISMATCH");
-      assert.equal(error.context.expectedAccountId, "339713108333");
-      assert.equal(error.context.actualAccountId, "111111111111");
-      assert.equal(error.context.safeRetry, false);
-      return true;
-    }
-  );
+  try {
+    await assert.rejects(
+      publishBenchmarkSite({
+        repoRootDirectory: temporaryRoot,
+        dryRun: false,
+        spawnSyncImplementation: aws.spawnSyncImplementation,
+        environmentVariables: publicationEnvironment(),
+        platform: process.platform
+      }),
+      (error) => {
+        assert.equal(error.code, "BENCHMARK_PUBLISH_ACCOUNT_MISMATCH");
+        assert.equal(error.context.expectedAccountId, "339713108333");
+        assert.equal(error.context.actualAccountId, "111111111111");
+        assert.equal(error.context.safeRetry, false);
+        return true;
+      }
+    );
+  } finally {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+  }
   assert.deepEqual(aws.calls.map((args) => `${args[0]}:${args[1]}`), ["sts:get-caller-identity"]);
 });
 
 test("benchmark publish JSON mode emits one stable success envelope and no progress chatter", async () => {
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-json-");
   const aws = createReadOnlyAwsStub();
   const stdout = [];
   const stderr = [];
-  const exitCode = await runCommandLine(
-    ["node", "vasir", "benchmark", "publish", "--dry-run", "--json", "--repo-root", REPO_ROOT],
-    {
-      currentWorkingDirectory: REPO_ROOT,
-      spawnSyncImplementation: aws.spawnSyncImplementation,
-      environmentVariables: publicationEnvironment(),
-      stdoutWriter: (message) => stdout.push(message),
-      stderrWriter: (message) => stderr.push(message)
-    }
-  );
+  let exitCode;
+  try {
+    exitCode = await runCommandLine(
+      ["node", "vasir", "benchmark", "publish", "--dry-run", "--json", "--repo-root", temporaryRoot],
+      {
+        currentWorkingDirectory: REPO_ROOT,
+        spawnSyncImplementation: aws.spawnSyncImplementation,
+        environmentVariables: publicationEnvironment(),
+        stdoutWriter: (message) => stdout.push(message),
+        stderrWriter: (message) => stderr.push(message)
+      }
+    );
+  } finally {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+  }
   assert.equal(exitCode, 0);
   assert.equal(stderr.join(""), "");
   assert.equal(stdout.length, 1);

@@ -5,6 +5,13 @@ design_dir="$(cd "$(dirname "$0")" && pwd)"
 page="$design_dir/index.html"
 report_page="$design_dir/benchmark-report.html"
 status=0
+midwidth_audit_dir="$(mktemp -d "${TMPDIR:-/tmp}/vasirbenchmark-midwidth.XXXXXX")"
+
+cleanup() {
+  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/report.png"
+  rmdir "$midwidth_audit_dir" 2>/dev/null || true
+}
+trap cleanup EXIT
 
 if [[ ! -f "$page" ]]; then
   echo "Missing canonical site template: $page" >&2
@@ -26,10 +33,12 @@ node "$design_dir/capture.mjs" "$page" "$design_dir/desktop-efficiency.png" 1440
 node "$design_dir/capture.mjs" "$page" "$design_dir/mobile-efficiency.png" 390 844 efficiency || status=1
 node "$design_dir/capture.mjs" "$report_page" "$design_dir/desktop-benchmark-report.png" 1440 1000 report || status=1
 node "$design_dir/capture.mjs" "$report_page" "$design_dir/mobile-benchmark-report.png" 390 844 report || status=1
+node "$design_dir/capture.mjs" "$page" "$midwidth_audit_dir/main.png" 820 1000 leaderboard || status=1
+node "$design_dir/capture.mjs" "$report_page" "$midwidth_audit_dir/report.png" 820 1000 report || status=1
 
 if [[ $status -ne 0 ]]; then
-  echo "Final homepage capture completed with QA failures." >&2
+  echo "Canonical real-data capture completed with QA failures." >&2
   exit "$status"
 fi
 
-echo "Canonical VasirBench site template capture and QA passed for all three local views, including Combined paired compositions, named capability rankings, benchmark-test drilldown, and category-scoped Efficiency."
+echo "Canonical VasirBench capture and QA passed at desktop, mobile, and the 820px identity-fit width for Combined, Engineering, benchmark ledger, Efficiency, and the hyper-scale chat report."

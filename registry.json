@@ -102,6 +102,32 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "audited-pdf-to-markdown",
+      "description": "Manually invoked only for audited PDF-to-Markdown conversion.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "evals/README.md",
+        "evals/suite.json",
+        "references/book-profile.md",
+        "references/forward-test.md",
+        "references/protocol.md",
+        "references/tooling.md",
+        "scripts/pdfkit_extract.swift",
+        "scripts/pipeline.py",
+        "scripts/publish_final_folder.py",
+        "scripts/record_stage.py",
+        "scripts/render_ascii_facsimile.py",
+        "scripts/requirements.txt"
+      ],
+      "path": ".agents/skills/audited-pdf-to-markdown",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "code__auditing",
       "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, it owns the canonical report while invoking mandatory domain handoffs. Explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.",
       "category": "uncategorized",
@@ -692,6 +718,19 @@
       "entry": "SKILL.md"
     },
     {
+      "name": "game-narrative__everlasting-architecture",
+      "description": "Narrative design for long-running narrative arches for long running sotry IP, live-service, seasonal, persistent-world, MMO, procedural, social, or community-shaped games. Use when the task concerns canon, world evolution, overlapping arcs, narrative mechanics, player agency, onboarding and re-entry, live production, content retirement, community co-authorship, or AI-driven narrative.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/game-narrative__everlasting-architecture",
+      "entry": "SKILL.md"
+    },
+    {
       "name": "game-onboarding__designing-game-onboarding",
       "description": "Designs and audits platformer onboarding by turning player learning into playable first-level situations. Use when creating or critiquing first levels, tutorial-free introductions, movement/combat teaching, boss-select setup, or player-learning beat maps.",
       "category": "uncategorized",
@@ -781,13 +820,15 @@
     },
     {
       "name": "messaging-root-agents",
-      "description": "Messages and reads independent Ratatosk-managed Codex root sessions through verified identity, immediate steering, or explicitly queued delivery. Use when one root agent must communicate with another root outside its collaboration tree; not for spawned subagents.",
+      "description": "Sends and reads bounded peer messages between independent Ratatosk-managed Codex roots while rejecting peer-authority escalation, active-turn interruption, and relay loops. Use for any cross-root message, reply, stop, redirect, or relay request; not for spawned subagents.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md",
+        "evals/suite.json"
       ],
       "path": ".agents/skills/messaging-root-agents",
       "entry": "SKILL.md"
@@ -1115,6 +1156,36 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/writing__response-quality-style-guide",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "writing__story-controlling-idea",
+      "description": "Use when writing or designing stories or narratives",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/controlling-idea-method.md",
+        "references/genre-index.md",
+        "references/genre-map.json",
+        "references/genre-reference-template.md",
+        "references/genres/action.md",
+        "references/genres/crime.md",
+        "references/genres/horror.md",
+        "references/genres/love.md",
+        "references/genres/performance.md",
+        "references/genres/society.md",
+        "references/genres/thriller.md",
+        "references/genres/war.md",
+        "references/genres/western.md",
+        "references/philosophy-source-protocol.md",
+        "references/quality-rubric.md",
+        "scripts/validate_skill.py",
+        "tests/acceptance-tests.md"
+      ],
+      "path": ".agents/skills/writing__story-controlling-idea",
       "entry": "SKILL.md"
     }
   ]

@@ -1,21 +1,77 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import test from "node:test";
 
-import { judgeBenchmarkRows } from "../cli/eval/benchmark-judge.js";
+import {
+  DEFAULT_BENCHMARK_JUDGING,
+  judgeBenchmarkRows
+} from "../cli/eval/benchmark-judge.js";
 import { resolveBenchmarkSource } from "../cli/eval/benchmark-source.js";
 
 function createBenchmarkDefinition(benchmarkName = "hyper-scale-chat") {
-  return resolveBenchmarkSource({
+  const benchmarkDefinition = resolveBenchmarkSource({
     benchmarkName,
     currentWorkingDirectory: process.cwd(),
     projectRootDirectory: process.cwd()
   }).benchmarkDefinition;
+  return {
+    ...benchmarkDefinition,
+    judging: {
+      panel: ["codex:gpt-5.6-sol@ultra", "claude:opus@max"],
+      synthesizer: "codex:gpt-5.6-sol@ultra"
+    }
+  };
+}
+
+function createStablePanelBenchmarkDefinition(benchmarkName = "hyper-scale-chat") {
+  const benchmarkDefinition = createBenchmarkDefinition(benchmarkName);
+  return {
+    ...benchmarkDefinition,
+    judging: {
+      panel: [
+        "codex:gpt-5.6-sol@ultra",
+        "codex:gpt-5.6-terra@ultra",
+        "claude:opus@max"
+      ],
+      synthesizer: null
+    }
+  };
+}
+
+function createConsensusPanelBenchmarkDefinition() {
+  return {
+    ...createBenchmarkDefinition(),
+    judging: DEFAULT_BENCHMARK_JUDGING
+  };
+}
+
+function createFixtureRuntimeReceipt({ configuration }) {
+  if (configuration.provider !== "claude") {
+    return { cli: "codex", freshSession: true };
+  }
+  const targetCanonicalModel = {
+    fable: "claude-fable-5",
+    "claude-fable-5-1": "claude-fable-5-1",
+    opus: "claude-opus-5"
+  }[configuration.model];
+  return {
+    cli: "claude",
+    canonicalModels: ["claude-haiku-4-5", targetCanonicalModel],
+    targetCanonicalModel,
+    targetCanonicalModelOutputTokens: 8,
+    freshSession: true
+  };
 }
 
 function createPanelRunner({
   benchmarkDefinition,
   onCall = null,
-  overallReason = "Fixture overall reason."
+  overallReason = "Fixture overall reason.",
+  synthesisReason = "This review applies the rubric most consistently.",
+  dimensionRating = null,
+  failFirstGate = true,
+  gateStatus = null,
+  runtimeReceipt = createFixtureRuntimeReceipt
 } = {}) {
   const calls = [];
   const runner = async ({ configuration, promptText, outputSchema, timeoutMs }) => {
@@ -29,17 +85,25 @@ function createPanelRunner({
             candidateId,
             gates: benchmarkDefinition.scoring.gates.map((gate, gateIndex) => ({
               id: gate.id,
-              status: candidateIndex === 0 && gateIndex === 0 ? "fail" : "pass"
+              status: typeof gateStatus === "function"
+                ? gateStatus({ configuration, candidateId, candidateIndex, gate, gateIndex })
+                : failFirstGate && candidateIndex === 0 && gateIndex === 0 ? "fail" : "pass"
             })),
             dimensions: benchmarkDefinition.scoring.dimensions.map((dimension) => ({
               id: dimension.id,
-              rating: candidateIndex === 0 ? 4 : 2
+              rating: typeof dimensionRating === "function"
+                ? dimensionRating({ configuration, candidateId, candidateIndex, dimension })
+                : dimensionRating ?? (candidateIndex === 0 ? 4 : 2)
             })),
-            reason: overallReason
+            reason: typeof overallReason === "function"
+              ? overallReason({ configuration, candidateId, candidateIndex })
+              : overallReason
           }))
         }),
         usage: { totalTokens: 100 },
-        runtimeReceipt: { freshSession: true }
+        runtimeReceipt: typeof runtimeReceipt === "function"
+          ? runtimeReceipt({ configuration })
+          : runtimeReceipt
       };
     }
 
@@ -50,14 +114,22 @@ function createPanelRunner({
         selections: candidateIds.map((candidateId, index) => ({
           candidateId,
           reviewerId: reviewerIds[index % reviewerIds.length],
-          reason: "This review applies the rubric most consistently."
+          reason: typeof synthesisReason === "function"
+            ? synthesisReason({ configuration, candidateId, candidateIndex: index })
+            : synthesisReason
         }))
       }),
       usage: { totalTokens: 50 },
-      runtimeReceipt: { freshSession: true }
+      runtimeReceipt: typeof runtimeReceipt === "function"
+        ? runtimeReceipt({ configuration })
+        : runtimeReceipt
     };
   };
   return { runner, calls };
+}
+
+function stableDigest(value) {
+  return crypto.createHash("sha256").update(String(value)).digest("hex");
 }
 
 function createMatchedRows(groupCount, { outputFactory = null, caseId = "ten-million-concurrent-users" } = {}) {
@@ -216,6 +288,452 @@ test("one configured judge needs no synthesis budget or synthesis call", async (
   assert.equal(result.judging.batchPlan.batches[0].worstCaseSynthesisPromptBytes, 0);
 });
 
+test("stable Engineering v1 scoring uses one pair, three judges, majority gates, and median ratings", async () => {
+  const benchmarkDefinition = createStablePanelBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const ratingsByJudge = new Map([
+    ["codex:gpt-5.6-sol@ultra", 0],
+    ["claude:opus@max", 4],
+    ["codex:gpt-5.6-terra@ultra", 2]
+  ]);
+  const { runner, calls } = createPanelRunner({
+    benchmarkDefinition,
+    dimensionRating: ({ configuration }) => ratingsByJudge.get(configuration.id),
+    gateStatus: ({ configuration, candidateIndex, gateIndex }) =>
+      candidateIndex === 0 &&
+      gateIndex === 0 &&
+      configuration.id !== "codex:gpt-5.6-terra@ultra"
+        ? "fail"
+        : "pass"
+  });
+
+  const result = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: runner
+  });
+
+  assert.equal(result.judging.status, "complete");
+  assert.equal(result.judging.strategy, "matched-pair-panel-median-v1");
+  assert.deepEqual(result.judging.aggregation, {
+    method: "majority-gates-median-dimensions-v1",
+    judgeCount: 3
+  });
+  assert.equal(result.judging.synthesis, null);
+  assert.equal(result.judging.judges.length, 3);
+  assert.equal(result.judging.batchPlan.version, "matched-pairs-v2");
+  assert.equal(result.judging.batchPlan.batches.length, 1);
+  assert.equal(result.judging.batchPlan.batches[0].candidateIds.length, 2);
+  assert.equal(calls.length, 3);
+  assert.equal(calls.every((call) => call.outputSchema.properties.evaluations), true);
+  assert.equal(calls.every((call) => call.promptText.includes("Do not call tools")), true);
+
+  const finalScores = [...result.scoresByRowKey.values()];
+  assert.equal(finalScores.length, 2);
+  assert.equal(finalScores.every((score) =>
+    score.dimensions.every((dimension) => dimension.rating === 2)
+  ), true);
+  assert.deepEqual(
+    finalScores.map((score) => score.total).sort((left, right) => left - right),
+    [benchmarkDefinition.scoring.gates[0].failureCap, 50]
+  );
+  const majorityFailed = finalScores.find((score) => score.gates[0].status === "fail");
+  assert.ok(majorityFailed);
+  assert.deepEqual(Object.keys(majorityFailed.aggregation), [
+    "method",
+    "judgeCount",
+    "evaluations",
+    "minScore",
+    "maxScore",
+    "spread"
+  ]);
+  assert.equal(majorityFailed.aggregation.judgeCount, 3);
+  assert.deepEqual(
+    majorityFailed.aggregation.evaluations.map((evaluation) => evaluation.reviewerId),
+    majorityFailed.aggregation.evaluations
+      .map((evaluation) => evaluation.reviewerId)
+      .sort()
+  );
+  assert.equal(majorityFailed.aggregation.evaluations.every((evaluation) =>
+    /^[a-f0-9]{64}$/u.test(evaluation.evaluationHash)
+  ), true);
+  assert.equal(majorityFailed.aggregation.minScore, 0);
+  assert.equal(majorityFailed.aggregation.maxScore, 50);
+  assert.equal(majorityFailed.aggregation.spread, 50);
+  assert.equal(result.judging.judges.every((judge) =>
+    judge.evaluations.every((evaluation) => evaluation.reason === "Fixture overall reason.")
+  ), true);
+});
+
+test("Engineering v2 averages two integer reviews and caps any gate disagreement", async (t) => {
+  const scenarios = [
+    { name: "both pass", failedBy: [], expectedCap: 100 },
+    { name: "Astra fails", failedBy: ["codex"], expectedCap: 49 },
+    { name: "Fable fails", failedBy: ["claude"], expectedCap: 59 },
+    { name: "both fail different gates", failedBy: ["codex", "claude"], expectedCap: 49 }
+  ];
+  for (const { name, failedBy, expectedCap } of scenarios) {
+    await t.test(name, async () => {
+      const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+      const { runner, calls } = createPanelRunner({
+        benchmarkDefinition,
+        dimensionRating: ({ configuration }) => configuration.provider === "codex" ? 4 : 3,
+        gateStatus: ({ configuration, gateIndex }) =>
+          failedBy.includes(configuration.provider) &&
+          gateIndex === (configuration.provider === "codex" ? 0 : 3)
+            ? "fail"
+            : "pass"
+      });
+      const result = await judgeBenchmarkRows({
+        benchmarkDefinition,
+        rows: createMatchedRows(1),
+        agentRunnerImplementation: runner
+      });
+
+      assert.equal(result.judging.status, "complete");
+      assert.equal(result.judging.strategy, "matched-pair-panel-consensus-v1");
+      assert.deepEqual(result.judging.aggregation, {
+        method: "unanimity-gates-mean-dimensions-v1",
+        judgeCount: 2
+      });
+      assert.deepEqual(calls.map((call) => call.configuration.id), [
+        "codex:gpt-6-astra@xhigh",
+        "claude:claude-fable-5-1@max"
+      ]);
+      assert.equal(calls.every((call) => call.outputSchema.properties.evaluations), true);
+      assert.equal(calls.every((call) =>
+        call.promptText.includes("at most 600 characters; aim for 450 characters or fewer")
+      ), true);
+      assert.equal(result.judging.batchPlan.batches.length, 1);
+      assert.equal(result.scoresByRowKey.size, 2);
+      for (const score of result.scoresByRowKey.values()) {
+        assert.equal(score.dimensions.every((dimension) => dimension.rating === 3.5), true);
+        assert.equal(score.uncapped, 87.5);
+        assert.equal(score.gateCap, expectedCap);
+        assert.equal(score.total, Math.min(87.5, expectedCap));
+        assert.equal(score.aggregation.judgeCount, 2);
+        assert.equal(score.aggregation.evaluations.length, 2);
+      }
+    });
+  }
+});
+
+test("two-judge scores and recovered evidence are invariant to panel and candidate order", async () => {
+  const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+  const rows = createMatchedRows(2);
+  const firstRunner = createPanelRunner({
+    benchmarkDefinition,
+    dimensionRating: ({ configuration }) => configuration.provider === "codex" ? 4 : 3
+  });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: firstRunner.runner
+  });
+  const retryRunner = createPanelRunner({ benchmarkDefinition });
+  const retry = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    judgingConfiguration: {
+      panel: [...benchmarkDefinition.judging.panel].reverse(),
+      synthesizer: null
+    },
+    rows: [...rows].reverse(),
+    priorJudging: first.judging,
+    agentRunnerImplementation: retryRunner.runner
+  });
+
+  assert.equal(first.judging.status, "complete");
+  assert.equal(retry.judging.status, "complete");
+  assert.equal(retryRunner.calls.length, 0);
+  assert.equal(retry.judging.judges.every((judge) => judge.reused), true);
+  assert.equal(retry.judging.basisHash, first.judging.basisHash);
+  assert.deepEqual(retry.scoresByRowKey, first.scoresByRowKey);
+});
+
+test("new pair prompts invalidate old-panel evidence and effort changes rerun only the changed judge", async () => {
+  const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const priorRunner = createPanelRunner({ benchmarkDefinition });
+  const prior = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    judgingConfiguration: {
+      panel: [...benchmarkDefinition.judging.panel, "codex:gpt-5.6-terra@ultra"],
+      synthesizer: null
+    },
+    rows,
+    agentRunnerImplementation: priorRunner.runner
+  });
+  const currentRunner = createPanelRunner({ benchmarkDefinition });
+  const current = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: prior.judging,
+    agentRunnerImplementation: currentRunner.runner
+  });
+
+  assert.equal(prior.judging.status, "complete");
+  assert.equal(prior.judging.aggregation.method, "majority-gates-median-dimensions-v1");
+  assert.equal(current.judging.status, "complete");
+  assert.equal(currentRunner.calls.length, 2);
+  assert.notEqual(current.judging.basisHash, prior.judging.basisHash);
+  assert.notEqual(current.judging.panelPromptHash, prior.judging.panelPromptHash);
+
+  const nextRunner = createPanelRunner({ benchmarkDefinition });
+  const next = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    judgingConfiguration: {
+      panel: ["codex:gpt-6-astra@max", "claude:claude-fable-5-1@max"],
+      synthesizer: null
+    },
+    rows,
+    priorJudging: current.judging,
+    agentRunnerImplementation: nextRunner.runner
+  });
+  assert.equal(next.judging.status, "complete");
+  assert.deepEqual(nextRunner.calls.map((call) => call.configuration.id), ["codex:gpt-6-astra@max"]);
+  assert.equal(next.judging.judges.find((judge) => judge.configuration.provider === "claude").reused, true);
+  assert.notEqual(next.judging.basisHash, current.judging.basisHash);
+});
+
+test("a missing pair judge or fractional individual rating cannot produce final scores", async (t) => {
+  for (const failure of ["unavailable", "fractional rating"]) {
+    await t.test(failure, async () => {
+      const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+      const { runner } = createPanelRunner({
+        benchmarkDefinition,
+        onCall: ({ configuration }) => {
+          if (failure === "unavailable" && configuration.provider === "claude") {
+            throw new Error("Judge unavailable.");
+          }
+        },
+        dimensionRating: ({ configuration }) =>
+          failure === "fractional rating" && configuration.provider === "claude" ? 3.5 : 4
+      });
+      const result = await judgeBenchmarkRows({
+        benchmarkDefinition,
+        rows: createMatchedRows(1),
+        agentRunnerImplementation: runner
+      });
+
+      assert.equal(result.judging.status, "error");
+      assert.equal(result.judging.error.code, "EVAL_BENCHMARK_PANEL_INCOMPLETE");
+      assert.deepEqual(result.judging.error.context.failedJudgeIds, ["claude:claude-fable-5-1@max"]);
+      assert.equal(result.scoresByRowKey.size, 0);
+      assert.equal(result.judging.judges.find((judge) => judge.configuration.provider === "codex").status, "complete");
+    });
+  }
+});
+
+test("adding a model leaves incumbent pair prompts, candidate ids, and scores unchanged", async () => {
+  const benchmarkDefinition = createStablePanelBenchmarkDefinition();
+  const originalRows = createMatchedRows(2);
+  const firstRunner = createPanelRunner({ benchmarkDefinition, failFirstGate: false });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows: originalRows,
+    agentRunnerImplementation: firstRunner.runner
+  });
+  const extendedRows = [...originalRows, ...createMatchedRows(1).map((row) => ({
+    ...row,
+    rowKey: row.rowKey.replace("model-0", "model-new"),
+    configurationId: "model-new",
+    outputText: `${row.outputText} New model.`
+  }))];
+  const secondRunner = createPanelRunner({ benchmarkDefinition, failFirstGate: false });
+  const second = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows: extendedRows,
+    priorJudging: first.judging,
+    agentRunnerImplementation: secondRunner.runner
+  });
+
+  assert.equal(first.judging.status, "complete");
+  assert.equal(second.judging.status, "complete");
+  assert.equal(first.judging.batchPlan.batches.length, 2);
+  assert.equal(second.judging.batchPlan.batches.length, 3);
+  assert.equal(secondRunner.calls.length, 3);
+  assert.equal(
+    second.judging.judges.flatMap((judge) => judge.batches).filter((batch) => batch.reused).length,
+    6
+  );
+
+  const originalCandidateIds = new Map(first.judging.candidateOrder.map((candidate) => [
+    candidate.rowKey,
+    candidate.candidateId
+  ]));
+  const extendedCandidateIds = new Map(second.judging.candidateOrder.map((candidate) => [
+    candidate.rowKey,
+    candidate.candidateId
+  ]));
+  for (const row of originalRows) {
+    assert.equal(extendedCandidateIds.get(row.rowKey), originalCandidateIds.get(row.rowKey));
+    assert.deepEqual(second.scoresByRowKey.get(row.rowKey), first.scoresByRowKey.get(row.rowKey));
+  }
+  const originalPromptHashes = new Set(first.judging.batchPlan.batches.map((batch) => batch.promptHash));
+  assert.equal(
+    second.judging.batchPlan.batches.filter((batch) => originalPromptHashes.has(batch.promptHash)).length,
+    2
+  );
+});
+
+test("stable panel checkpoints can resume at individual judge-batch granularity", async () => {
+  const benchmarkDefinition = createStablePanelBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const firstRunner = createPanelRunner({ benchmarkDefinition });
+  const checkpoints = [];
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    judgingCheckpointImplementation: async (checkpoint) => {
+      checkpoints.push(structuredClone(checkpoint));
+    },
+    agentRunnerImplementation: firstRunner.runner
+  });
+
+  assert.equal(first.judging.status, "complete");
+  assert.equal(checkpoints.length, 3);
+  assert.deepEqual(checkpoints.map((checkpoint) => checkpoint.completedBatchCount), [1, 2, 3]);
+  assert.equal(checkpoints[0].totalBatchCount, 3);
+  assert.equal(checkpoints[0].judging.judges.flatMap((judge) => judge.batches).length, 1);
+
+  const retryRunner = createPanelRunner({ benchmarkDefinition });
+  const retry = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: checkpoints[0].judging,
+    agentRunnerImplementation: retryRunner.runner
+  });
+  assert.equal(retry.judging.status, "complete");
+  assert.equal(retryRunner.calls.length, 2);
+  assert.equal(
+    retry.judging.judges.flatMap((judge) => judge.batches).filter((batch) => batch.reused).length,
+    1
+  );
+});
+
+test("stable panel recovery reruns a Claude batch whose receipt contradicts its target model", async () => {
+  const benchmarkDefinition = createStablePanelBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const firstRunner = createPanelRunner({
+    benchmarkDefinition,
+    runtimeReceipt: ({ configuration }) => configuration.id === "claude:opus@max"
+      ? {
+          cli: "claude",
+          canonicalModels: ["claude-haiku-4-5", "claude-opus-5"],
+          canonicalModelPolicy: null,
+          allowedCanonicalModels: null,
+          targetCanonicalModelOutputTokens: null,
+          freshSession: true
+        }
+      : createFixtureRuntimeReceipt({ configuration })
+  });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: firstRunner.runner
+  });
+  const currentReceiptRetry = createPanelRunner({ benchmarkDefinition });
+  const currentReceiptResult = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: first.judging,
+    agentRunnerImplementation: currentReceiptRetry.runner
+  });
+
+  assert.equal(currentReceiptResult.judging.status, "complete");
+  assert.equal(currentReceiptRetry.calls.length, 0);
+
+  const contradictoryPriorJudging = structuredClone(first.judging);
+  const opusBatch = contradictoryPriorJudging.judges
+    .find((judge) => judge.configuration.id === "claude:opus@max")
+    .batches[0];
+  opusBatch.runtimeReceipt = {
+    ...opusBatch.runtimeReceipt,
+    canonicalModels: ["claude-haiku-4-5", "claude-fable-5-1"],
+    targetCanonicalModel: "claude-fable-5-1"
+  };
+  const contradictoryReceiptRetry = createPanelRunner({ benchmarkDefinition });
+  const contradictoryReceiptResult = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: contradictoryPriorJudging,
+    agentRunnerImplementation: contradictoryReceiptRetry.runner
+  });
+
+  assert.equal(contradictoryReceiptResult.judging.status, "complete");
+  assert.equal(contradictoryReceiptRetry.calls.length, 1);
+  assert.equal(contradictoryReceiptRetry.calls[0].configuration.id, "claude:opus@max");
+  assert.equal(
+    contradictoryReceiptResult.judging.judges
+      .find((judge) => judge.configuration.id === "claude:opus@max")
+      .batches[0].reused,
+    false
+  );
+});
+
+test("legacy synthesis recovery reruns a Claude batch whose receipt contradicts its target model", async () => {
+  const source = createBenchmarkDefinition();
+  const benchmarkDefinition = {
+    ...source,
+    judging: {
+      panel: ["codex:gpt-5.6-sol@ultra", "claude:fable@max"],
+      synthesizer: "claude:opus@max"
+    }
+  };
+  const rows = createMatchedRows(1);
+  const firstRunner = createPanelRunner({ benchmarkDefinition });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: firstRunner.runner
+  });
+  const contradictoryPriorJudging = structuredClone(first.judging);
+  contradictoryPriorJudging.synthesis.batches[0].runtimeReceipt = {
+    cli: "claude",
+    canonicalModels: ["claude-haiku-4-5", "claude-fable-5-1"],
+    targetCanonicalModel: "claude-fable-5-1",
+    targetCanonicalModelOutputTokens: 8,
+    freshSession: true
+  };
+  const retryRunner = createPanelRunner({ benchmarkDefinition });
+  const retry = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: contradictoryPriorJudging,
+    agentRunnerImplementation: retryRunner.runner
+  });
+
+  assert.equal(retry.judging.status, "complete");
+  assert.equal(retryRunner.calls.length, 1);
+  assert.equal(retryRunner.calls[0].configuration.id, "claude:opus@max");
+  assert.ok(retryRunner.calls[0].outputSchema.properties.selections);
+  assert.equal(retry.judging.synthesis.batches[0].reused, false);
+});
+
+test("stable panel fails closed if a configured judge uses tools", async () => {
+  const benchmarkDefinition = createStablePanelBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const { runner } = createPanelRunner({
+    benchmarkDefinition,
+    runtimeReceipt: ({ configuration }) => configuration.id === "codex:gpt-5.6-sol@ultra"
+      ? { cli: "codex", nonMessageItemCount: 1, freshSession: true }
+      : { cli: "claude", allowedTools: [], freshSession: true }
+  });
+  const result = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: runner
+  });
+
+  assert.equal(result.judging.status, "error");
+  assert.equal(result.judging.error.code, "EVAL_BENCHMARK_PANEL_INCOMPLETE");
+  assert.equal(result.scoresByRowKey.size, 0);
+  const failedBatch = result.judging.judges
+    .find((judge) => judge.configuration.id === "codex:gpt-5.6-sol@ultra")
+    .batches[0];
+  assert.equal(failedBatch.error.code, "EVAL_BENCHMARK_JUDGE_TOOL_USE");
+});
+
 test("one failed required judge prevents synthesis and leaves no final scores", async () => {
   const benchmarkDefinition = createBenchmarkDefinition();
   const rows = [{
@@ -245,6 +763,198 @@ test("one failed required judge prevents synthesis and leaves no final scores", 
   assert.equal(result.judging.status, "error");
   assert.equal(result.judging.error.code, "EVAL_BENCHMARK_PANEL_INCOMPLETE");
   assert.equal(result.judging.synthesis.status, "skipped");
+});
+
+test("empty, status, and default judge reasons are not substantive evaluations", async (t) => {
+  const rejectedReasons = [
+    "",
+    "   ",
+    "...",
+    "0",
+    "Evaluation in progress.",
+    "Evaluation is currently in progress.",
+    "Pending.",
+    "Default reason.",
+    "No reason provided.",
+    "TBD",
+    "N/A",
+    "Placeholder text.",
+    "Lorem ipsum."
+  ];
+
+  for (const overallReason of rejectedReasons) {
+    await t.test(JSON.stringify(overallReason), async () => {
+      const benchmarkDefinition = createBenchmarkDefinition();
+      const rows = createMatchedRows(1);
+      const { runner, calls } = createPanelRunner({ benchmarkDefinition, overallReason });
+
+      const result = await judgeBenchmarkRows({
+        benchmarkDefinition,
+        rows,
+        judgingConfiguration: {
+          panel: ["codex:gpt-5.6-sol@ultra"],
+          synthesizer: null
+        },
+        agentRunnerImplementation: runner
+      });
+
+      assert.equal(calls.length, 1);
+      assert.equal(result.judging.status, "error");
+      assert.equal(result.scoresByRowKey.size, 0);
+      assert.equal(
+        result.judging.judges[0].batches[0].error.code,
+        "EVAL_BENCHMARK_JUDGE_NON_SUBSTANTIVE_REASON"
+      );
+    });
+  }
+});
+
+test("one non-substantive panel seat blocks synthesis and the final score", async () => {
+  const benchmarkDefinition = createBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const { runner, calls } = createPanelRunner({
+    benchmarkDefinition,
+    overallReason: ({ configuration }) => configuration.id === "claude:opus@max"
+      ? "Evaluation in progress."
+      : "The answer names concrete overload, durability, and recovery mechanisms required by the rubric."
+  });
+
+  const result = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: runner
+  });
+
+  assert.equal(calls.length, 2);
+  assert.equal(result.judging.status, "error");
+  assert.equal(result.judging.error.code, "EVAL_BENCHMARK_PANEL_INCOMPLETE");
+  assert.equal(result.judging.judges.filter((judge) => judge.status === "complete").length, 1);
+  assert.equal(result.judging.synthesis.status, "skipped");
+  assert.equal(result.scoresByRowKey.size, 0);
+  const failedBatch = result.judging.judges
+    .find((judge) => judge.configuration.id === "claude:opus@max")
+    .batches[0];
+  assert.equal(failedBatch.error.code, "EVAL_BENCHMARK_JUDGE_NON_SUBSTANTIVE_REASON");
+});
+
+test("non-substantive synthesis reasons cannot finalize a substantive 2/2 panel", async () => {
+  const benchmarkDefinition = createBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const { runner, calls } = createPanelRunner({
+    benchmarkDefinition,
+    synthesisReason: "Default reason."
+  });
+
+  const result = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: runner
+  });
+
+  assert.equal(calls.length, 3);
+  assert.equal(result.judging.judges.every((judge) => judge.status === "complete"), true);
+  assert.equal(result.judging.status, "error");
+  assert.equal(result.judging.error.code, "EVAL_BENCHMARK_SYNTHESIS_FAILED");
+  assert.equal(result.judging.synthesis.status, "error");
+  assert.equal(
+    result.judging.synthesis.batches[0].error.code,
+    "EVAL_BENCHMARK_SYNTHESIS_NON_SUBSTANTIVE_REASON"
+  );
+  assert.equal(result.scoresByRowKey.size, 0);
+});
+
+test("rubric-grounded zero ratings remain valid evidence", async () => {
+  const benchmarkDefinition = createBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const { runner } = createPanelRunner({
+    benchmarkDefinition,
+    dimensionRating: 0,
+    failFirstGate: false,
+    overallReason: "The answer omits explicit overload, durability, recovery, and observability mechanisms required by the rubric."
+  });
+
+  const result = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: runner
+  });
+
+  assert.equal(result.judging.status, "complete");
+  assert.equal(result.scoresByRowKey.size, 2);
+  assert.deepEqual([...result.scoresByRowKey.values()].map((score) => score.total), [0, 0]);
+  assert.equal(result.judging.judges.every((judge) =>
+    judge.evaluations.every((evaluation) =>
+      evaluation.dimensions.every((dimension) => dimension.rating === 0)
+    )
+  ), true);
+});
+
+test("retry regenerates a legacy placeholder batch while preserving valid recovered evidence", async () => {
+  const benchmarkDefinition = createBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const firstRunner = createPanelRunner({ benchmarkDefinition });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: firstRunner.runner
+  });
+  const priorJudging = structuredClone(first.judging);
+  const invalidJudge = priorJudging.judges[0];
+  const invalidBatch = invalidJudge.batches[0];
+  invalidBatch.evaluations[0].reason = "Evaluation in progress.";
+  invalidBatch.evaluationHash = stableDigest(JSON.stringify(invalidBatch.evaluations));
+  const retryRunner = createPanelRunner({ benchmarkDefinition });
+
+  const retry = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging,
+    agentRunnerImplementation: retryRunner.runner
+  });
+
+  assert.equal(retry.judging.status, "complete");
+  assert.deepEqual(retryRunner.calls.map((call) => call.configuration.id), [invalidJudge.configuration.id]);
+  assert.equal(
+    retry.judging.judges.find((judge) => judge.configuration.id === invalidJudge.configuration.id).reused,
+    false
+  );
+  assert.equal(
+    retry.judging.judges.find((judge) => judge.configuration.id !== invalidJudge.configuration.id).reused,
+    true
+  );
+  assert.equal(retry.judging.synthesis.reused, true);
+  assert.equal(retry.scoresByRowKey.size, 2);
+});
+
+test("retry regenerates a legacy placeholder synthesis while preserving both valid panel seats", async () => {
+  const benchmarkDefinition = createBenchmarkDefinition();
+  const rows = createMatchedRows(1);
+  const firstRunner = createPanelRunner({ benchmarkDefinition });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: firstRunner.runner
+  });
+  const priorJudging = structuredClone(first.judging);
+  const invalidBatch = priorJudging.synthesis.batches[0];
+  invalidBatch.selections[0].reason = "Evaluation in progress.";
+  invalidBatch.selectionHash = stableDigest(JSON.stringify(invalidBatch.selections));
+  const retryRunner = createPanelRunner({ benchmarkDefinition });
+
+  const retry = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging,
+    agentRunnerImplementation: retryRunner.runner
+  });
+
+  assert.equal(retry.judging.status, "complete");
+  assert.deepEqual(retryRunner.calls.map((call) => call.configuration.id), [
+    priorJudging.synthesis.configuration.id
+  ]);
+  assert.equal(retry.judging.judges.every((judge) => judge.reused), true);
+  assert.equal(retry.judging.synthesis.reused, false);
+  assert.equal(retry.scoresByRowKey.size, 2);
 });
 
 test("retry reuses compatible completed panel seats and runs only the failed judge plus synthesis", async () => {
@@ -323,7 +1033,7 @@ test("matched candidates are judged and synthesized in deterministic bounded bat
     "codex:gpt-5.6-sol@ultra",
     "claude:opus@max"
   ]);
-  assert.equal(firstRunner.calls.every((call) => call.timeoutMs === 10 * 60 * 1000), true);
+  assert.equal(firstRunner.calls.every((call) => call.timeoutMs === 20 * 60 * 1000), true);
   assert.equal(panelCalls.every((call) =>
     call.outputSchema.properties.evaluations.items.properties.candidateId.enum.length <= 6 &&
     Buffer.byteLength(call.promptText, "utf8") <= 64 * 1024
@@ -402,7 +1112,7 @@ test("feed synthesis remains under the byte cap with maximum escaped, multibyte,
     outputFactory: ({ groupIndex, conditionIndex }) =>
       `${groupIndex}:${conditionIndex}: ${"a".repeat(5_200)}`
   });
-  const maximumOverallReason = '"\\\n\u0000🧠\ud800'.repeat(100);
+  const maximumOverallReason = `Rubric evidence identifies concrete constraints. ${'"\\\n\u0000🧠\ud800'.repeat(100)}`;
   const { runner, calls } = createPanelRunner({
     benchmarkDefinition,
     overallReason: maximumOverallReason
