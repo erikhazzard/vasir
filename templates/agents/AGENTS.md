@@ -209,9 +209,9 @@
   Default: keep coherent lane ownership and final synthesis in the current agent. Delegate separable work when a compact result protects parent context or repays spawn overhead. Never spawn for one trivial read, search, or command, or for context the current agent must continuously interleave with its lane.
 
   Routing order (first match wins):
-    1. **gpt-5.6-sol xhigh:** product code, architecture, consequential judgment, synthesis, reviews, gate verdicts, and final decisions.
+    1. **gpt-6-astra xhigh:** product code, architecture, consequential judgment, synthesis, reviews, gate verdicts, and final decisions.
     2. **gpt-5.6-luna max:** bounded file/repo reading, reconnaissance, failure investigation, log/diff interpretation, evidence extraction, and exact safe command batteries such as tests, builds, and benchmarks. Command-only tasks return raw or capped output and make no diagnosis or verdict.
-    3. **gpt-5.6-sol high:** bounded advisory specialist work and routine tasks that need neither repo investigation, product-code authorship, architecture selection, nor a gate verdict.
+    3. **gpt-6-astra high:** bounded advisory specialist work and routine tasks that need neither repo investigation, product-code authorship, architecture selection, nor a gate verdict.
     A coding or judgment agent may read files and run commands needed for its own lane. The routing table governs delegation; it does not require fragmenting one coherent task across agents.
 
   <skill_activation_routing>
@@ -223,8 +223,8 @@
     - Use `codex exec` for model-routed delegation. If explicit routing is unavailable, work locally; if §6 requires an independent reviewer, report the missing reviewer surface as a blocker.
 
   Authority and topology:
-    - The orchestrator owns final acceptance, synthesis, and every gate verdict. Product-code authorship stays single-writer and may be assigned only to an explicitly scoped Sol xhigh lane.
-    - Luna max and Sol high delegates never author product code or render gate verdicts. Luna max returns evidence for consequential decisions to Sol xhigh.
+    - The orchestrator owns final acceptance, synthesis, and every gate verdict. Product-code authorship stays single-writer and may be assigned only to an explicitly scoped Astra xhigh lane.
+    - Luna max and Astra high delegates never author product code or render gate verdicts. Luna max returns evidence for consequential decisions to Astra xhigh.
     - Model routing never grants production write authority. Read-only production inspection remains pre-authorized; production writes remain governed by §3.
     - **Use the existing repo folder.** All agents work in that same folder. Stay in your assigned lane and preserve everyone else's changes. Never create another worktree, clone, copied repo, temporary checkout, or second dependency installation. A fresh or independent reviewer means a new conversation reading the same folder. If working there is unsafe because lanes conflict, stop and report the conflict. §8 governs custody.
 
@@ -237,8 +237,8 @@
     - A zsh function wraps `codex`, injecting `-C "$PWD" -s danger-full-access -a never` — the wrapped form is already YOLO. Do NOT pass `-C` through the wrapper (errors: "--cd cannot be used multiple times").
     - Command runner: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="max"' "<exact safe commands; return raw or capped output; make no verdict>"`
     - Read/recon: `codex exec -m gpt-5.6-luna -c 'model_reasoning_effort="max"' "<bounded evidence task; demand file:line evidence; cap answer length>"`
-    - Routine work: `codex exec -m gpt-5.6-sol -c 'model_reasoning_effort="high"' "<bounded task; cap answer length>"`
-    - Coding/judgment: `codex exec -m gpt-5.6-sol -c 'model_reasoning_effort="xhigh"' "<coding or judgment task; define authority and deliverable>"`
+    - Routine work: `codex exec -m gpt-6-astra -c 'model_reasoning_effort="high"' "<bounded task; cap answer length>"`
+    - Coding/judgment: `codex exec -m gpt-6-astra -c 'model_reasoning_effort="xhigh"' "<coding or judgment task; define authority and deliverable>"`
     - Bypass form (`command codex`, scripts, non-zsh contexts): add `-C "$PWD" --dangerously-bypass-approvals-and-sandbox` to the corresponding invocation.
     - Codex MCP calls carry the same settings: `sandbox=danger-full-access`, `approval-policy=never`, and `cwd` set to the current repo root.
     - Every delegated invocation explicitly selects its model and `model_reasoning_effort`; local defaults do not determine routing.
