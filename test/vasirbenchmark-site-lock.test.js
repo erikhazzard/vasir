@@ -22,7 +22,15 @@ const expectedCaptures = [
   'desktop-efficiency.png',
   'mobile-efficiency.png',
   'desktop-benchmark-report.png',
-  'mobile-benchmark-report.png'
+  'mobile-benchmark-report.png',
+  'desktop-workflows.png',
+  'mobile-workflows.png',
+  'desktop-workflow-benchmarks.png',
+  'mobile-workflow-benchmarks.png',
+  'desktop-workflow-efficiency.png',
+  'mobile-workflow-efficiency.png',
+  'desktop-workflow-report.png',
+  'mobile-workflow-report.png'
 ];
 
 function sha256(contents) {

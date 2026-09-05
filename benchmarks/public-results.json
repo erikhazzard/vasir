@@ -1,6 +1,6 @@
 {
   "kind": "vasirbenchmark-public-results",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "selectedRuns": [
     {
       "benchmarkId": "hyper-scale-chat",
@@ -17,5 +17,10 @@
       "runPath": ".agents/vasir-evals/device-telemetry/2026-09-04T22-33-50Z__rejudge__0995e097a929/run.json",
       "sha256": "0bb297700ae9f06bf6f93388ae5f0d816b79b36429105c3fffcc66bf521dca4a"
     }
-  ]
+  ],
+  "workSpecRun": {
+    "benchmarkId": "work-spec-chat",
+    "runPath": ".agents/vasir-evals/work-spec-chat/2026-09-05T05-06-00Z__chat__expanded-26/run.json",
+    "sha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2"
+  }
 }

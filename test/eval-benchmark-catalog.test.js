@@ -556,11 +556,11 @@ test("appending a candidate cannot rewrite incumbent absolute scores or uplift",
   );
 });
 
-test("checked-in capability taxonomy maps the development backend architecture category", () => {
+test("checked-in capability taxonomy keeps Engineering and Work Specification as separate score editions", () => {
   const taxonomy = readBenchmarkCapabilityTaxonomy();
   assert.equal(taxonomy.schemaVersion, 3);
   assert.equal(taxonomy.status, "development");
-  assert.deepEqual(taxonomy.categories.map((category) => category.id), ["backend-architecture"]);
+  assert.deepEqual(taxonomy.categories.map((category) => category.id), ["backend-architecture", "work-specification"]);
   assert.deepEqual(taxonomy.categories[0].benchmarkIds, [
     "hyper-scale-chat",
     "personalized-home-feed",
@@ -592,6 +592,10 @@ test("checked-in capability taxonomy maps the development backend architecture c
     status: "not-estimated",
     reason: "Only one trial per task and condition is published; per-response judge spread is retained."
   });
+  assert.deepEqual(taxonomy.categories[1].benchmarkIds, ["work-spec-chat"]);
+  assert.equal(taxonomy.categories[1].modelScore.edition, "work-spec-generation-v1");
+  assert.equal(taxonomy.categories[1].modelScore.judging.aggregation, "mean-weighted-dimensions-no-gates-v1");
+  assert.equal(taxonomy.categories[1].modelScore.judging.batchUnit, "individual-response");
 });
 
 test("catalog writer derives index.html from run artifacts", (context) => {

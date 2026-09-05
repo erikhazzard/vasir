@@ -1,0 +1,11 @@
+{
+  "elapsed": 41.583333333331616,
+  "deaths": 1,
+  "landed": 28,
+  "total": 28,
+  "missing": [],
+  "errors": [],
+  "checkpoint": true,
+  "restarted": true,
+  "mode": "Actual browser keyboard down/up calls, read-only snapshots; no debug movement, state arrangement, or teleport"
+}

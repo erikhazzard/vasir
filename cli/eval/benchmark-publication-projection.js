@@ -9,6 +9,7 @@ import {
 import { normalizeBenchmarkReportData } from "./benchmark-report.js";
 import { VasirCliError } from "../cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
+import { buildWorkSpecPublication, validateWorkSpecPublication, validateWorkSpecTrack, WORK_SPEC_TRACK_ID } from "./work-spec-publication.js";
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -86,7 +87,9 @@ const RESULT_AVAILABILITY = Object.freeze({
     "Three complete matched runs are shown for development inspection; author calibration and shared public eligibility remain pending.",
   blockers: RESULT_BLOCKERS
 });
-const PRIVATE_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|(?:^|[^.])\.\.[/\\]|file:\/\/|\/Users\/|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
+const PRIVATE_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|(?:^|[^.])\.\.[/\\]|file:\/\/|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
+// Keep the Mac home prefix case-sensitive so ordinary /users/ API routes remain publishable.
+const containsPrivatePath = value => PRIVATE_PATH_PATTERN.test(value) || value.includes("/Users/");
 const NONSEMANTIC_JUDGE_NOTE_PATTERN = /[\u0000\u200B\u200C\u2063]/g;
 const FIXTURE_TOKEN_PATTERN = /\b(?:fake|illustrative|synthetic|simulated|fixture|mock)\b/i;
 const FORBIDDEN_PUBLIC_KEYS = new Set([
@@ -269,7 +272,7 @@ function validatePublicResultsManifest(manifest) {
   if (
     !manifest ||
     manifest.kind !== "vasirbenchmark-public-results" ||
-    manifest.schemaVersion !== 1 ||
+    ![1, 2].includes(manifest.schemaVersion) ||
     !Array.isArray(manifest.selectedRuns)
   ) {
     throw projectionError({
@@ -277,7 +280,8 @@ function validatePublicResultsManifest(manifest) {
       suggestion: "Restore benchmarks/public-results.json schema version 1."
     });
   }
-  assertExactObjectKeys(manifest, ["kind", "schemaVersion", "selectedRuns"], "selection manifest");
+  assertExactObjectKeys(manifest, ["kind", "schemaVersion", "selectedRuns", ...(manifest.schemaVersion === 2 ? ["workSpecRun"] : [])], "selection manifest");
+  if (manifest.schemaVersion === 2) assertExactObjectKeys(manifest.workSpecRun, ["benchmarkId", "runPath", "sha256"], "workSpecRun");
 
   const selectedBenchmarkIds = new Set();
   for (const [index, selection] of manifest.selectedRuns.entries()) {
@@ -330,6 +334,17 @@ function validatePublicResultsManifest(manifest) {
 }
 
 function validateTaxonomy(taxonomy) {
+  const workflowTracks = taxonomy?.categories?.filter(track => track.id === WORK_SPEC_TRACK_ID) ?? [];
+  if (workflowTracks.length > 0) {
+    if (workflowTracks.length !== 1) throw projectionError({ message: "The work-spec taxonomy track is duplicated.", suggestion: "Declare one primary work-spec track." });
+    validateWorkSpecTrack(workflowTracks[0]);
+    validateEngineeringTaxonomy({ ...taxonomy, categories: taxonomy.categories.filter(track => track.id !== WORK_SPEC_TRACK_ID) });
+    return taxonomy;
+  }
+  return validateEngineeringTaxonomy(taxonomy);
+}
+
+function validateEngineeringTaxonomy(taxonomy) {
   if (
     !taxonomy ||
     taxonomy.schemaVersion !== 3 ||
@@ -1454,7 +1469,7 @@ function validateExactMessages(messages, label) {
     assertResponseObjectKeys(message, ["role", "content"], `${label}[${index}]`);
     assertNonEmptyString(message.role, `${label}[${index}].role`);
     assertNonEmptyString(message.content, `${label}[${index}].content`);
-    if (PRIVATE_PATH_PATTERN.test(message.content)) {
+    if (containsPrivatePath(message.content)) {
       throw projectionError({
         message: `Public responses ${label}[${index}].content contains a private local path.`,
         suggestion: "Do not publish response evidence that exposes a local benchmark or filesystem path."
@@ -1532,7 +1547,7 @@ function createPublicJudgmentsByRowKey({ run, sourceRows, benchmarkId, judgeConf
         ? evaluation.reason.replace(NONSEMANTIC_JUDGE_NOTE_PATTERN, "")
         : evaluation.reason;
       assertNonEmptyString(rationale, `${benchmarkId}.${evaluation.rowKey}.${judgeConfigurationId}.rationale`);
-      if (PRIVATE_PATH_PATTERN.test(evaluation.reason)) {
+      if (containsPrivatePath(evaluation.reason)) {
         throw projectionError({
           code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
           message: `Selected judge rationale contains a private local path for ${benchmarkId}.`,
@@ -1618,7 +1633,7 @@ function createBenchmarkPublicationResponses({ projection, runRecords }) {
       }
       validateExactMessages(row.exactMessages, `${benchmarkId}.${setting.id}.${condition.id}.messages`);
       assertNonEmptyString(row.outputText, `${benchmarkId}.${setting.id}.${condition.id}.outputText`);
-      if (PRIVATE_PATH_PATTERN.test(row.outputText)) {
+      if (containsPrivatePath(row.outputText)) {
         throw projectionError({
           code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
           message: `Selected response output contains a private local path for ${benchmarkId}.`,
@@ -1695,7 +1710,7 @@ function validatePublicValue(value, pathParts = []) {
     });
   }
   if (typeof value === "string") {
-    if (PRIVATE_PATH_PATTERN.test(value)) {
+    if (containsPrivatePath(value)) {
       throw projectionError({
         message: `Public projection contains a private local path at ${pathParts.join(".")}.`,
         suggestion: "Keep ignored evidence paths and local filesystem locations outside public data."
@@ -1818,6 +1833,12 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 }
 
 export function validateBenchmarkPublicationProjection(projection) {
+  if (projection?.schemaVersion === 3 && projection.aiWorkflows) {
+    const { aiWorkflows, ...engineering } = projection;
+    validateBenchmarkPublicationProjection({ ...engineering, schemaVersion: 2 });
+    validateWorkSpecPublication(aiWorkflows);
+    return projection;
+  }
   assertExactObjectKeys(projection, [
     "kind", "schemaVersion", "program", "meta", "scoreBasis", "conditions", "categories", "families", "tracks",
     "benchmarks", "results", "settings", "entries", "benchmarkResults", "benchmarkSummaries",
@@ -2182,6 +2203,15 @@ export function validateBenchmarkPublicationProjection(projection) {
 }
 
 export function validateBenchmarkPublicationResponses(responseBundle, projection) {
+  if (projection?.schemaVersion === 3 && projection.aiWorkflows) {
+    validateBenchmarkPublicationProjection(projection);
+    const { aiWorkflows, ...engineeringProjection } = projection;
+    const { aiWorkflows: workflowResponses, ...engineeringResponses } = responseBundle;
+    if (responseBundle.schemaVersion !== 3 || !workflowResponses) throw projectionError({ message: "The workflow projection is missing its response evidence.", suggestion: "Regenerate both public modules from the same selected evidence." });
+    validateBenchmarkPublicationResponses({ ...engineeringResponses, schemaVersion: 2 }, { ...engineeringProjection, schemaVersion: 2 });
+    validateWorkSpecPublication(aiWorkflows, workflowResponses);
+    return responseBundle;
+  }
   validateBenchmarkPublicationProjection(projection);
   assertResponseObjectKeys(responseBundle, [
     "kind", "schemaVersion", "counts", "messageSets", "responses"
@@ -2259,7 +2289,7 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
       });
     }
     assertNonEmptyString(response.outputText, `responses[${index}].outputText`);
-    if (PRIVATE_PATH_PATTERN.test(response.outputText)) {
+    if (containsPrivatePath(response.outputText)) {
       throw projectionError({
         message: `Public responses responses[${index}].outputText contains a private local path.`,
         suggestion: "Do not publish response evidence that exposes a local benchmark or filesystem path."
@@ -2286,7 +2316,7 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
       assertScore(judgment.rawScore, `${judgmentLabel}.rawScore`);
       assertScore(judgment.gateCap, `${judgmentLabel}.gateCap`);
       assertNonEmptyString(judgment.rationale, `${judgmentLabel}.rationale`);
-      if (PRIVATE_PATH_PATTERN.test(judgment.rationale)) {
+      if (containsPrivatePath(judgment.rationale)) {
         throw projectionError({
           message: `Public response ${judgmentLabel}.rationale contains a private local path.`,
           suggestion: "Do not publish judge evidence that exposes local provenance."
@@ -2386,15 +2416,16 @@ export function buildBenchmarkPublicationRoutes(projection) {
   validateBenchmarkPublicationProjection(projection);
   return {
     entrypoints: ["/", "/index.html", "/benchmark-report.html"],
-    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering"],
+    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : [])],
     viewFragments: [
       "/#capabilities/overall/benchmarks",
       "/#capabilities/overall/efficiency",
       "/#capabilities/engineering/benchmarks",
-      "/#capabilities/engineering/efficiency"
+      "/#capabilities/engineering/efficiency",
+      ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : [])
     ],
     reportFragments: Array.from(
-      projection.benchmarks,
+      [...projection.benchmarks, ...(projection.aiWorkflows?.benchmarks ?? [])],
       (benchmark) => `/benchmark-report.html#${benchmark.reportFragment}`
     )
   };
@@ -2415,9 +2446,10 @@ export function buildBenchmarkPublicationProjection({
     label: "VasirBench capability taxonomy",
     readFileSyncImplementation
   }));
+  const engineeringTaxonomy = { ...taxonomy, categories: taxonomy.categories.filter(track => track.id !== WORK_SPEC_TRACK_ID) };
 
   const definitions = new Map();
-  for (const benchmarkId of taxonomy.categories[0].benchmarkIds) {
+  for (const benchmarkId of engineeringTaxonomy.categories[0].benchmarkIds) {
     const definition = validateBenchmarkDefinition(readJson({
       filePath: path.join(repoRootDirectory, "benchmarks", benchmarkId, "benchmark.json"),
       label: `VasirBench benchmark definition ${benchmarkId}`,
@@ -2437,19 +2469,27 @@ export function buildBenchmarkPublicationProjection({
   });
   const { runRecords, category } = createProjectionSources({
     selections,
-    taxonomy,
+    taxonomy: engineeringTaxonomy,
     definitions,
     repoRootDirectory,
     readFileSyncImplementation
   });
-  const projection = createPresentationProjection({ taxonomy, definitions, runRecords, category });
+  const projection = createPresentationProjection({ taxonomy: engineeringTaxonomy, definitions, runRecords, category });
   validateBenchmarkPublicationProjection(projection);
   const responseBundle = createBenchmarkPublicationResponses({ projection, runRecords });
+  const workflows = publicResults.workSpecRun ? buildWorkSpecPublication({ repoRootDirectory, selection: publicResults.workSpecRun, track: taxonomy.categories.find(track => track.id === WORK_SPEC_TRACK_ID), readFileSyncImplementation }) : null;
+  if (workflows) {
+    projection.schemaVersion = 3;
+    projection.aiWorkflows = workflows.projection;
+    responseBundle.schemaVersion = 3;
+    responseBundle.aiWorkflows = workflows.responseBundle;
+  }
 
   const basisSha256 = sha256(stableSerialize({
     taxonomy,
     definitions: EXPECTED_BENCHMARK_IDS.map((benchmarkId) => definitions.get(benchmarkId)),
-    selectedRuns: selections.map(({ benchmarkId, observedSha256 }) => ({ benchmarkId, sha256: observedSha256 }))
+    selectedRuns: selections.map(({ benchmarkId, observedSha256 }) => ({ benchmarkId, sha256: observedSha256 })),
+    ...(workflows ? { aiWorkflows: workflows.basisSha256 } : {})
   }));
   return {
     projection,
@@ -2458,6 +2498,16 @@ export function buildBenchmarkPublicationProjection({
     responsesSource: serializeBenchmarkPublicationResponses(responseBundle, projection),
     basisSha256,
     routes: buildBenchmarkPublicationRoutes(projection),
-    counts: { ...projection.counts }
+    counts: workflows ? {
+      ...projection.counts,
+      families: projection.counts.families + workflows.projection.counts.families,
+      tracks: projection.counts.tracks + workflows.projection.counts.tracks,
+      benchmarks: projection.counts.benchmarks + workflows.projection.counts.benchmarks,
+      categories: projection.counts.categories + workflows.projection.counts.categories,
+      settings: new Set([...projection.settings, ...workflows.projection.settings].map(setting => setting.configurationId)).size,
+      resultEntries: projection.counts.resultEntries + workflows.projection.counts.resultEntries,
+      responses: projection.counts.responses + workflows.projection.counts.responses,
+      developmentResultSets: projection.counts.developmentResultSets + workflows.projection.counts.developmentResultSets
+    } : { ...projection.counts }
   };
 }

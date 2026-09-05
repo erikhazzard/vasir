@@ -41,7 +41,8 @@ function createBenchmarkFixtureRoot(temporaryRoot) {
     "public-results.json",
     "hyper-scale-chat",
     "personalized-home-feed",
-    "device-telemetry"
+    "device-telemetry",
+    "work-spec-chat"
   ]) {
     const source = path.join(REPO_ROOT, "benchmarks", entry);
     fs.symlinkSync(source, path.join(fixtureRoot, entry), fs.statSync(source).isDirectory() ? "dir" : "file");
@@ -57,6 +58,7 @@ function createPublicationRepoFixture() {
   createBenchmarkFixtureRoot(temporaryRoot);
   fs.mkdirSync(path.join(temporaryRoot, ".agents"), { recursive: true });
   fs.symlinkSync(path.join(REPO_ROOT, ".agents", "vasir-evals"), path.join(temporaryRoot, ".agents", "vasir-evals"), "dir");
+  fs.symlinkSync(path.join(REPO_ROOT, "tmp"), path.join(temporaryRoot, "tmp"), "dir");
 
   const config = JSON.parse(fs.readFileSync(path.join(siteRoot, "deployment.json"), "utf8"));
 
@@ -396,7 +398,13 @@ test("first publication and an identical repeat reuse one immutable release thro
   assert.ok(leaseWrites.filter(({ ifMatch }) => ifMatch !== null).every(({ ifMatch }) => /^\"etag-\d+\"$/.test(ifMatch)));
   assert.equal(aws.conditionalDeletes.length, 2);
   assert.ok(aws.conditionalDeletes.every(({ key, ifMatch }) => key === LOCK_KEY && /^\"etag-\d+\"$/.test(ifMatch)));
-  assert.equal(aws.browserCalls.length, 8);
+  const workflowPublished = first.artifact.routes.familyFragments.includes("/#capabilities/ai-workflows");
+  assert.equal(aws.browserCalls.length, workflowPublished ? 24 : 8);
+  if (workflowPublished) {
+    for (const target of ["workflows", "workflow-benchmarks", "workflow-efficiency", "workflow-report"]) {
+      assert.equal(aws.browserCalls.filter(args => args.at(-1) === target).length, 4, `${target} receives desktop and mobile proof on both publications`);
+    }
+  }
   assert.deepEqual(aws.invalidationCalls, [
     { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html"] },
     { operation: "wait", id: "I1", distributionId: "E2VASIRBENCH" },

@@ -1,14 +1,20 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-09-04-engineering-v2-astra-fable-judges",
+  "version": "2026-09-05-work-specs-v1-ai-workflows",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
-    "acceptedAt": "2026-09-04",
+    "acceptedAt": "2026-09-05T09:43:54.239Z",
     "authority": "user",
-    "verdict": "Authorized Engineering judge and results update",
-    "response": "amazing. I think we need to swap the judge to astra xhigh or max now instead of 5.6. and probably remove luna as a judge to be honest. so just astra judge and fable 5.1 judge",
-    "criterion": "Preserve the established Engineering interface and all 216 saved answers; rescore every answer using only Astra xhigh and Fable 5.1 max. Publish Engineering v2 with unanimous gate passes, mean dimension ratings, and both saved judge rationales."
+    "verdict": "Authorized AI Workflows benchmark and results publication",
+    "response": "you cna acutally go ahead and run the other sol / terra / luna benchmarks with this too, as well as claude (just fable 5.1 and opus 5). make sure to keep all the data and then update vasirbenchmarks.com with the benchamrks and ai workflow section etc. come back whe it's all done. thank you",
+    "criterion": "Publish the authorized 26-configuration, 52-spec, 104-judgment work-spec comparison in AI Workflows on the established VasirBench site. Preserve Engineering v2 measurements and raw work-spec evidence. Expose matched skill gains, exact-score ties, readiness, complete prompts/specs/judge assessments, and the single-case uncalibrated development boundary.",
+    "basis": "The user explicitly authorized this results and AI Workflows site update. This records that authorization and passing agent verification; it does not claim a separate human visual review of the new captures.",
+    "verification": {
+      "captureLogSha256": "f1fc5ad30448a5a40ffb67592c51f09d799ae02b3e353dcd38b82bf7a022aef1",
+      "projectionBasisSha256": "64dcbdd355ea1b489c9ab8cf8d1fcc9cc40568c11c06a153c2108c332ddef1f7",
+      "engineeringMeasurementsAndResponsesPreserved": true
+    }
   },
   "deployment": {
     "status": "active",
@@ -22,149 +28,213 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "Engineering v2 contains one development category, three Backend Architecture tasks, 36 matched model and reasoning settings, two conditions, one trial per task and condition, and two fixed judges with 432 individual response evaluations. Scores are fixed-rubric absolute task scores; Architecture-skill uplift is a paired rubric-point difference. The release makes no Games, Cloudbreak, visual-rendering, or broad-model-capability claim.",
+  "claimBoundary": "Engineering v2 preserves 216 saved responses and 432 judgments over three architecture tasks and 36 settings. Work Specs v1 adds one authored chat-spec task, 26 settings, 52 responses and 104 independent Astra-xhigh/Fable-max judgments. The isolated work-spec skill gain is a paired rubric-point difference. The AI Workflows case is uncalibrated, single-trial development evidence; readiness remains separate and disputes unresolved. No downstream-effectiveness, cross-family aggregate, or universal model-ranking claim is made.",
   "files": [
     {
-      "path": "app.js",
       "role": "runtime",
-      "sha256": "cd02db336fcae75da79dc73856b42a838dde7d55caa70322deb9d06120a4af23",
-      "bytes": 98503
+      "sha256": "b3efd0bb6dee3b964947ee70e416101908fd07034d4803c0fd2194a16fa6e4b6",
+      "bytes": 107194,
+      "path": "app.js"
     },
     {
-      "path": "assets/d3.v7.min.js",
       "role": "visualization-runtime",
       "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
-      "bytes": 279706
+      "bytes": 279706,
+      "path": "assets/d3.v7.min.js"
     },
     {
-      "path": "assets/kanit-latin-900-normal.woff2",
       "role": "font",
       "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
-      "bytes": 19216
+      "bytes": 19216,
+      "path": "assets/kanit-latin-900-normal.woff2"
     },
     {
-      "path": "benchmark-report.css",
       "role": "runtime",
-      "sha256": "1f7ae5291a1f6561050aec649518fef2cdf41f1fca6cc3a725192e1998a7e7c4",
-      "bytes": 27466
+      "sha256": "57b3274f8d02c532354a0b8ae9f7a0e93043bac43824a942592defcaf220efd0",
+      "bytes": 29324,
+      "path": "benchmark-report.css"
     },
     {
-      "path": "benchmark-report.html",
       "role": "runtime",
-      "sha256": "0764bcb807d87e81ea0ccf860b134c03889b626ea775796ab36bbbe28dced4ea",
-      "bytes": 2131
+      "sha256": "66053ba89fa047992018bb4f5a1b9ef49ed85c3ec510183b9485c0a2d1af22f8",
+      "bytes": 2164,
+      "path": "benchmark-report.html"
     },
     {
-      "path": "benchmark-report.js",
       "role": "runtime",
-      "sha256": "35591a587ad196a66685b61e64dd4352fb017883834509bc8e7fab0dccc6243f",
-      "bytes": 34183
+      "sha256": "e6b3211d881d1a4cbca989a94ff1ec3e1eee3281043107e2a7b742a3d0d13c98",
+      "bytes": 40975,
+      "path": "benchmark-report.js"
     },
     {
-      "path": "capture.mjs",
       "role": "qa-harness",
-      "sha256": "b3f9c592fb2b27f6a04e44fe8f6073de8e7841d52bb00bbb308cab338fc5c288",
-      "bytes": 91835
+      "sha256": "d850faa074aeefab4389e6fdde7d44014dbacae3b9c05db69dbd6081a431d7fe",
+      "bytes": 106545,
+      "path": "capture.mjs"
     },
     {
-      "path": "capture.sh",
       "role": "qa-harness",
-      "sha256": "0da2ffd08c2c05e3ae8f4afa304ce29a5597eb4deb3bfdf0b30c8069099df3a9",
-      "bytes": 2250
+      "sha256": "d3306cd5b92d8edbf06e9a6763f10fbcde6d20d1d8dbc3541534efa48d59e985",
+      "bytes": 3843,
+      "path": "capture.sh"
     },
     {
-      "path": "index.html",
       "role": "runtime",
-      "sha256": "a5231da124a40bd053f6a27a8c5558f81f49baee75903435a0a878115b37cb5c",
-      "bytes": 2260
+      "sha256": "01fa8ddce4b646c37afc04207490d7c69cf60c3df09a9ccc676c35916b254ad3",
+      "bytes": 2279,
+      "path": "index.html"
     },
     {
-      "path": "style.css",
       "role": "runtime",
-      "sha256": "20e30cee7a52acadfc0e6db52fb586a3eeb93b533a6617675433ecad237470f3",
-      "bytes": 132814
+      "sha256": "f8a0e4ae306d213d7b45f92f0cc6e5b4588a5223ae3b66f7cbc76149c23bf713",
+      "bytes": 134035,
+      "path": "style.css"
     }
   ],
   "captures": [
     {
-      "path": "desktop.png",
       "route": "#capabilities/overall",
-      "sha256": "b30f3bcd993171f088c1a324225b8fa0a3c2c9277d45bfb39b8b8c474bb10a61",
-      "bytes": 160601,
+      "sha256": "bdc7dc03be293e4f129426769e211221d1bd947f20e8ef80a8a8310d923f523c",
+      "bytes": 164880,
       "width": 1440,
-      "height": 1000
+      "height": 1000,
+      "path": "desktop.png"
     },
     {
-      "path": "mobile.png",
       "route": "#capabilities/overall",
-      "sha256": "089cd5c599daf926ab4fbbe9a2f2465703fb7109839c43ae6c364fe526aa431f",
-      "bytes": 68283,
+      "sha256": "d036a98a5d9902eacc987b60dc767569780399f892e3f59a6f02d6fecf4729a7",
+      "bytes": 67170,
       "width": 390,
-      "height": 844
+      "height": 844,
+      "path": "mobile.png"
     },
     {
-      "path": "desktop-capabilities.png",
       "route": "#capabilities/engineering",
-      "sha256": "8d05db028b9e0be8171c3ae20ffae07b5f22ef760203553824032f607a32c6ab",
-      "bytes": 139783,
+      "sha256": "02deff010c53f5376b5d4d6a46d687179b1e2679056cfe9ee2ba0dae4f71fb4e",
+      "bytes": 142599,
       "width": 1440,
-      "height": 1000
+      "height": 1000,
+      "path": "desktop-capabilities.png"
     },
     {
-      "path": "mobile-capabilities.png",
       "route": "#capabilities/engineering",
-      "sha256": "cb0d10f61e4376b12f59e85def9643bed274dd12e4abd698a0bf904596004c50",
-      "bytes": 66988,
+      "sha256": "ef9d6b1632faeaa351eb9cb28b0889129b0467441023e47d5d5e42c2dbe1822a",
+      "bytes": 64479,
       "width": 390,
-      "height": 844
+      "height": 844,
+      "path": "mobile-capabilities.png"
     },
     {
-      "path": "desktop-capability-benchmarks.png",
       "route": "#capabilities/engineering/benchmarks",
-      "sha256": "68c781e1c8daaf8d74ea51f4bc61e064435acec6ebf2d217c67990e666d4ed6a",
-      "bytes": 188041,
+      "sha256": "b8f9fa39044820f73457da2f32dc78f2b1d7213145a46c7193b8ee7f26dd70a1",
+      "bytes": 191662,
       "width": 1440,
-      "height": 1000
+      "height": 1000,
+      "path": "desktop-capability-benchmarks.png"
     },
     {
-      "path": "mobile-capability-benchmarks.png",
       "route": "#capabilities/engineering/benchmarks",
-      "sha256": "abf82db7463fe5b8b6f9357234467978127ac2557f3c410388b5ebd14f94ff1b",
-      "bytes": 70390,
+      "sha256": "741e65ce6807eb2887e731ef1beaff1c8b583901b2d05d0776459ed63d989c90",
+      "bytes": 64442,
       "width": 390,
-      "height": 844
+      "height": 844,
+      "path": "mobile-capability-benchmarks.png"
     },
     {
-      "path": "desktop-efficiency.png",
       "route": "#capabilities/overall/efficiency",
-      "sha256": "1531d0f9cdee75a10b63faaac19d1224428e0af23fea0c169ee0a61fc010eca8",
-      "bytes": 196766,
+      "sha256": "2b489860af4632a31ef9c116a38939098a83f38583181c848e554375cdb3206c",
+      "bytes": 205737,
       "width": 1440,
-      "height": 1000
+      "height": 1000,
+      "path": "desktop-efficiency.png"
     },
     {
-      "path": "mobile-efficiency.png",
       "route": "#capabilities/overall/efficiency",
-      "sha256": "1f7f8d531b67f86f69034418f194710187ffe57decd8b459dbba3866f325e734",
-      "bytes": 65985,
+      "sha256": "5266c3a3de7eae631a026f97d5b9fb4ea3cfaca9397d09e6bb3c169c188ef5c1",
+      "bytes": 58160,
       "width": 390,
-      "height": 844
+      "height": 844,
+      "path": "mobile-efficiency.png"
     },
     {
-      "path": "desktop-benchmark-report.png",
       "route": "#hyper-scale-chat",
       "sha256": "19ea1c3d24f6fde831635b67336adc0375189e0338020a61151fa1bb6b5fb616",
       "bytes": 157056,
       "width": 1440,
-      "height": 1000
+      "height": 1000,
+      "path": "desktop-benchmark-report.png"
     },
     {
-      "path": "mobile-benchmark-report.png",
       "route": "#hyper-scale-chat",
       "sha256": "b6ac310949a41fa188762f971101a2f1ca8b46b1f9848e819538da7419f8d45d",
       "bytes": 61998,
       "width": 390,
-      "height": 844
+      "height": 844,
+      "path": "mobile-benchmark-report.png"
+    },
+    {
+      "route": "#capabilities/ai-workflows",
+      "width": 1440,
+      "height": 1000,
+      "path": "desktop-workflows.png",
+      "sha256": "6627f058953db46c31688949e030c30641632896bfba7710c9c5de9795b7b4cf",
+      "bytes": 176968
+    },
+    {
+      "route": "#capabilities/ai-workflows",
+      "width": 390,
+      "height": 844,
+      "path": "mobile-workflows.png",
+      "sha256": "68fb21a7c45093e0f72f645030d44e208a63faf6df005d1d075e699d6043e9fa",
+      "bytes": 59437
+    },
+    {
+      "route": "#capabilities/ai-workflows/benchmarks",
+      "width": 1440,
+      "height": 1000,
+      "path": "desktop-workflow-benchmarks.png",
+      "sha256": "f165d737f6c735aba5d78a9ca123a670b3931b9495a957ddd84076aa878b6748",
+      "bytes": 116038
+    },
+    {
+      "route": "#capabilities/ai-workflows/benchmarks",
+      "width": 390,
+      "height": 844,
+      "path": "mobile-workflow-benchmarks.png",
+      "sha256": "c571abc04591e2dc22efe3402b147d6fdd1135ac6d5a3a225e7b8cfd7145fd51",
+      "bytes": 61264
+    },
+    {
+      "route": "#capabilities/ai-workflows/efficiency",
+      "width": 1440,
+      "height": 1000,
+      "path": "desktop-workflow-efficiency.png",
+      "sha256": "a03afd9669d9a1d618a5d8ce6c157b3bbe39e1f3d962422ae7f9b25ae123291d",
+      "bytes": 193914
+    },
+    {
+      "route": "#capabilities/ai-workflows/efficiency",
+      "width": 390,
+      "height": 844,
+      "path": "mobile-workflow-efficiency.png",
+      "sha256": "a024e534de0b212cdb75dc542591710dadac9d1e357346a484ae7e3d86413c22",
+      "bytes": 58316
+    },
+    {
+      "route": "#work-spec-chat",
+      "width": 1440,
+      "height": 1000,
+      "path": "desktop-workflow-report.png",
+      "sha256": "3fcb485331e7c32c00d2534d47fe2a474db6fcb1a4e49ecc3c610795cb0ea8df",
+      "bytes": 200324
+    },
+    {
+      "route": "#work-spec-chat",
+      "width": 390,
+      "height": 844,
+      "path": "mobile-workflow-report.png",
+      "sha256": "76253333ef3a621ca4b071e878cba07d03f15d4a952dcaf6af42db380164d9ce",
+      "bytes": 74637
     }
   ]
 }

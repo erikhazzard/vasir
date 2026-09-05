@@ -10,19 +10,31 @@ const [pageInput, destinationInput, widthInput, heightInput, requestedTarget = '
 const width = Number(widthInput);
 const height = Number(heightInput);
 const captureTarget = requestedTarget.toLowerCase();
+const isWorkflowCapture = captureTarget.startsWith('workflow');
+const isReportCapture = captureTarget === 'report' || captureTarget === 'workflow-report' || captureTarget === 'workflow-inspector';
 const captureTargets = new Set([
   'leaderboard',
   'capabilities',
   'capability-benchmarks',
   'efficiency',
-  'report'
+  'report',
+  'workflows',
+  'workflow-benchmarks',
+  'workflow-efficiency',
+  'workflow-report',
+  'workflow-inspector'
 ]);
 const targetRoutes = {
   leaderboard: 'capabilities/overall',
   capabilities: 'capabilities/engineering',
   'capability-benchmarks': 'capabilities/engineering/benchmarks',
   efficiency: 'capabilities/overall/efficiency',
-  report: 'hyper-scale-chat'
+  report: 'hyper-scale-chat',
+  workflows: 'capabilities/ai-workflows',
+  'workflow-benchmarks': 'capabilities/ai-workflows/benchmarks',
+  'workflow-efficiency': 'capabilities/ai-workflows/efficiency',
+  'workflow-report': 'work-spec-chat',
+  'workflow-inspector': 'work-spec-chat'
 };
 const EXPECTED_SETTING_COUNT = 36;
 const EXPECTED_CONDITION_COUNT = 2;
@@ -63,7 +75,7 @@ if (
   || height <= 0
   || !captureTargets.has(captureTarget)
 ) {
-  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|capabilities|capability-benchmarks|efficiency|report]');
+  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|capabilities|capability-benchmarks|efficiency|report|workflows|workflow-benchmarks|workflow-efficiency|workflow-report|workflow-inspector]');
   console.error('PAGE must be a local file path or an HTTPS URL.');
   process.exit(1);
 }
@@ -377,7 +389,7 @@ async function auditSite(
       !responseBundle
       || typeof responseBundle !== 'object'
       || responseBundle.kind !== 'vasirbenchmark-public-responses'
-      || responseBundle.schemaVersion !== 2
+      || ![2, 3].includes(responseBundle.schemaVersion)
       || !Array.isArray(responseBundle.messageSets)
       || !Array.isArray(responseBundle.responses)
     ) {
@@ -581,7 +593,7 @@ async function auditSite(
     // Keep the Engineering-v1 publication guard scoped to its own result surface.
     // Standalone pilots may be linked elsewhere on the page without becoming
     // published categories in this report.
-    const futureCategory = primaryText.match(/\b(?:AI Workflows|Product Design|Games)\b/);
+    const futureCategory = primaryText.match(data.aiWorkflows ? /\b(?:Product Design|Games)\b/ : /\b(?:AI Workflows|Product Design|Games)\b/);
     if (futureCategory) failures.push(context + ': unpublished category "' + futureCategory[0] + '"');
   };
 
@@ -650,7 +662,7 @@ async function auditSite(
     ['benchmarkSummaries', expectedCounts.benchmarks]
   ];
   if (data.kind !== 'vasirbenchmark-public-projection') failures.push('projection kind mismatch');
-  if (data.schemaVersion !== 2) failures.push('projection schema mismatch');
+  if (![2, 3].includes(data.schemaVersion)) failures.push('projection schema mismatch');
   if (
     data.scoreBasis?.label !== 'Engineering v2'
     || data.scoreBasis?.edition !== 'backend-architecture-panel-consensus-v2'
@@ -726,9 +738,10 @@ async function auditSite(
     );
   }
 
-  const privatePattern = /(?:\/Users\/|\/home\/|file:\/\/|artifacts\/evaluations|evaluations\/runs\/)/i;
-  const serializedData = JSON.stringify(data);
-  if (privatePattern.test(serializedData)) failures.push('public projection leaks a private filesystem or artifact path');
+  const privatePattern = /(?:\/home\/|file:\/\/|artifacts\/evaluations|evaluations\/runs\/)/i;
+  const { aiWorkflows: separateWorkflowProjection, ...engineeringProjection } = data;
+  const serializedData = JSON.stringify(engineeringProjection);
+  if (privatePattern.test(serializedData) || serializedData.includes('/Users/')) failures.push('public projection leaks a private filesystem or artifact path');
   if (/\b(?:illustrative|mock|fixture)\b/i.test(serializedData)) failures.push('public projection contains fake-data language');
   if (/\b(?:with vasir|without vasir|full vasir)\b/i.test(serializedData)) failures.push('public projection contains retired condition labels');
   if (/\b(?:peer index|peer score|outcome elo)\b/i.test(serializedData)) failures.push('public projection contains retired score language');
@@ -859,8 +872,9 @@ async function auditSite(
     requireTruth(context, '.capability-canvas__status');
     const selectors = [...document.querySelectorAll('.capability-selector__tab[data-category-id]')];
     const modes = [...document.querySelectorAll('.capability-mode__tab[data-capability-mode]')];
-    if (selectors.length !== 2) failures.push(context + ': category selector count ' + selectors.length + '/2');
-    if (selectors.map((tab) => tab.dataset.categoryId).join('|') !== 'overall|engineering') {
+    const expectedSelectorIds = ['overall', 'engineering', ...(data.aiWorkflows?.categories || []).map(category => category.id)];
+    if (selectors.length !== expectedSelectorIds.length) failures.push(context + ': category selector count mismatch');
+    if (selectors.map((tab) => tab.dataset.categoryId).join('|') !== expectedSelectorIds.join('|')) {
       failures.push(context + ': category selector ids mismatch');
     }
     const selectedCategories = selectors.filter((tab) => tab.getAttribute('aria-selected') === 'true');
@@ -1828,6 +1842,138 @@ async function auditSite(
   };
 }
 
+async function auditWorkflows(target) {
+  const data = window.VASIR_DATA?.aiWorkflows;
+  const responses = window.VASIR_RESPONSES?.aiWorkflows;
+  const failures = [];
+  const text = element => element?.textContent?.replace(/\s+/g, ' ').trim() || '';
+  const scoreText = value => Number.isFinite(value) ? value.toFixed(1) : 'Not assessable';
+  const visible = element => Boolean(element?.getClientRects().length);
+  const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (!data || data.benchmarks?.length !== 1 || data.benchmarks[0].id !== 'work-spec-chat') {
+    return { failures: ['AI Workflows requires its real one-task projection.'] };
+  }
+  const weights = { V: 25, G: 15, A: 20, D: 15, S: 15, C: 10 };
+  if (JSON.stringify(data.scoreBasis.weights) !== JSON.stringify(weights)
+    || data.scoreBasis.taskCount !== 1 || data.scoreBasis.trialsPerTask !== 1
+    || data.scoreBasis.judges.join('|') !== 'codex:gpt-6-astra@xhigh|claude:claude-fable-5-1@max'
+    || data.scoreBasis.gates !== null || data.scoreBasis.caps !== null) failures.push('Work-spec rubric/panel contract mismatch.');
+  if (data.entries.length !== data.settings.length * 2 || data.benchmarkResults.length !== data.entries.length) failures.push('Incomplete paired work-spec matrix.');
+  const expectedRank = (settingId, condition) => {
+    const cell = data.benchmarkResults.find(result => result.settingId === settingId && result.condition === condition);
+    return Number.isFinite(cell?.exactScore)
+      ? 1 + data.benchmarkResults.filter(result => result.condition === condition && result.exactScore > cell.exactScore).length
+      : null;
+  };
+  const disclosure = text(document.querySelector('.capability-canvas__status, .evidence-truth'));
+  if (!disclosure.includes('1 task × 1 trial · 2 judges') || !disclosure.includes('Uncalibrated development')) failures.push('Single-case uncalibrated disclosure missing.');
+  if (document.querySelector('.development-unavailable')) failures.push('Workflow renderer rejected the real data.');
+  if (Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1) failures.push('Workflow page overflows horizontally.');
+  if (text(document.querySelector('.capability-browser__canvas, .report-shell')).includes('Architecture skill')) failures.push('Engineering condition leaked into work-spec results.');
+
+  if (target === 'workflow-report' || target === 'workflow-inspector') {
+    if (!responses || responses.responses.length !== data.entries.length || responses.counts.judgments !== data.entries.length * 2) failures.push('Work-spec transcript matrix incomplete.');
+    const rows = [...document.querySelectorAll('.model-preview__item')];
+    if (rows.length !== data.settings.length) failures.push('Report omitted model settings.');
+    const sorted = data.benchmarkResults.filter(result => result.condition === 'skill').sort((a, b) => (b.exactScore ?? -1) - (a.exactScore ?? -1)
+      || (data.benchmarkResults.find(value => value.settingId === b.settingId && value.condition === 'baseline').exactScore ?? -1)
+        - (data.benchmarkResults.find(value => value.settingId === a.settingId && value.condition === 'baseline').exactScore ?? -1)
+      || data.settings.find(value => value.id === a.settingId).label.localeCompare(data.settings.find(value => value.id === b.settingId).label));
+    rows.forEach((row, index) => {
+      const expected = sorted[index];
+      if (!expected) return;
+      const setting = data.settings.find(value => value.id === expected.settingId);
+      if (text(row.querySelector('.model-preview__identity strong')) !== setting.label) failures.push('Report ordering/identity mismatch.');
+      const rank = expectedRank(setting.id, 'skill');
+      const rankLabel = text(row.querySelector('.model-preview__identity small'));
+      if (rank ? !rankLabel.includes('rank #' + rank + ' of ') : rankLabel !== 'Panel total not assessable') failures.push('Report does not preserve exact-score competition ranks.');
+      if (row.querySelector('.model-run').open) failures.push('Full runs must start collapsed.');
+      for (const condition of ['baseline', 'skill']) {
+        const panel = row.querySelector('[data-condition="' + condition + '"]');
+        const response = responses.responses.find(value => value.settingId === setting.id && value.condition === condition);
+        const messages = responses.messageSets.find(value => value.id === response.messageSetId).messages;
+        if (response.outputText.length ? panel.querySelector('[data-output-text] code')?.textContent !== response.outputText : !panel.querySelector('[data-output-absence]')) failures.push('Generated work spec or its explicit absence was changed.');
+        const inputs = [...panel.querySelectorAll('[data-message-content] code')].map(node => node.textContent);
+        if (JSON.stringify(inputs) !== JSON.stringify(messages.map(message => message.content))) failures.push('Effective prompt was changed, reordered, or truncated.');
+        if (panel.querySelector('.model-run__prompt').open || panel.querySelector('.model-run__judging').open) failures.push('Prompt/judge disclosure must start collapsed.');
+        if (text(panel.querySelector('[data-condition-readiness]')) !== response.readinessLabel) failures.push('Condition readiness mismatch.');
+        if (text(row.querySelector('[data-summary-readiness="' + condition + '"]')) !== response.readinessLabel) failures.push('Collapsed row omits readiness.');
+        const judges = [...panel.querySelectorAll('[data-judge-review]')];
+        if (judges.length !== 2) failures.push('Independent judge missing.');
+        judges.forEach((judgeNode, judgeIndex) => {
+          const judge = response.judgments[judgeIndex];
+          const score = judge.assessmentStatus !== 'assessable' || Object.values(judge.dimensions).some(dimension => dimension.rating === null) ? null
+            : Object.entries(weights).reduce((sum, [id, weight]) => sum + weight * judge.dimensions[id].rating, 0) / 4;
+          if (score !== judge.score || text(judgeNode.querySelector('[data-judge-score]')) !== scoreText(score)) failures.push('Judge weighted score mismatch.');
+          if (text(judgeNode.querySelector('[data-judge-readiness]')) !== judge.readiness) failures.push('Judge verdict mismatch.');
+          const dimensionRows = [...judgeNode.querySelectorAll('[data-dimension-id]')];
+          if (dimensionRows.map(value => value.dataset.dimensionId).join('|') !== 'V|G|A|D|S|C') failures.push('Six-dimension profile missing.');
+          if (judgeNode.querySelector('[data-full-assessment] code')?.textContent !== JSON.stringify(judge.assessment, null, 2)) failures.push('Full judge assessment or citations changed.');
+          if (judgeNode.querySelector('[data-judge-gate-cap], [data-judge-failed-gates]')) failures.push('Invented Engineering gates in work-spec review.');
+        });
+      }
+    });
+    const first = rows[0]?.querySelector('.model-run');
+    if (first) {
+      first.querySelector('summary').click();
+      await settle();
+      const prompt = first.querySelector('.model-run__prompt');
+      const judging = first.querySelector('.model-run__judging');
+      prompt.querySelector('summary').click();
+      await settle();
+      if (!first.open || !prompt.open || judging.open) failures.push('Input disclosure does not operate independently.');
+      judging.querySelector('summary').click();
+      await settle();
+      if (!prompt.open || !judging.open || !visible(judging.querySelector('.work-spec-dimensions__table'))) failures.push('Judge inspector does not open independently.');
+      const assessment = judging.querySelector('.work-spec-assessment');
+      assessment.querySelector('summary').click();
+      await settle();
+      if (!assessment.open || !visible(assessment.querySelector('[data-full-assessment]'))) failures.push('Full judge evidence unavailable.');
+      if (Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1) failures.push('Expanded work-spec inspector overflows.');
+      first.querySelector('summary').click();
+      await settle();
+    }
+  } else {
+    const categoryIds = [...document.querySelectorAll('.capability-selector__tab')].map(node => node.dataset.categoryId);
+    if (categoryIds.join('|') !== 'overall|engineering|ai-workflows') failures.push('Family navigation is incomplete.');
+    if (!text(document.querySelector('#capability-category-overall')).includes(innerWidth > 1080 ? 'Engineering overall' : 'Eng overall')) failures.push('Engineering-only overall ranking is not named.');
+    const rows = [...document.querySelectorAll('.capability-rank-row')];
+    if (rows.length !== data.settings.length) failures.push('Work-spec leaderboard omits settings.');
+    rows.forEach(row => {
+      for (const condition of ['baseline', 'skill']) {
+        const entry = data.entries.find(value => value.settingId === row.dataset.settingId && value.condition === condition);
+        const numeric = condition === 'skill' ? row.dataset.fullScore : row.dataset.baselineScore;
+        if (Number.isFinite(entry.score) && Number(numeric) !== entry.score) failures.push('Leaderboard condition score mismatch.');
+        const rank = expectedRank(entry.settingId, condition);
+        if ((condition === 'skill' ? row.dataset.fullRank : row.dataset.baselineRank) !== String(rank)) failures.push('Leaderboard does not preserve exact-score competition ranks.');
+        if (text(row.querySelector('[data-condition-readiness="' + condition + '"]')) !== entry.readinessLabel) failures.push('Leaderboard readiness missing or changed.');
+        if (condition === 'skill' && Number.isFinite(entry.delta) && Number(row.dataset.delta) !== entry.delta) failures.push('Paired uplift changed through display rounding.');
+      }
+    });
+    const mode = target === 'workflow-benchmarks' ? 'benchmarks' : target === 'workflow-efficiency' ? 'efficiency' : 'models';
+    if (mode !== 'benchmarks') {
+      for (const condition of ['baseline', 'skill']) {
+        const leaders = data.entries.filter(entry => entry.condition === condition && expectedRank(entry.settingId, condition) === 1);
+        const hero = document.querySelector('[data-leader-condition="' + condition + '"]');
+        if (Number(hero?.dataset.leaderCount) !== leaders.length) failures.push('Hero omits co-leader count.');
+        if (leaders.length > 1 && !text(hero?.querySelector('dt')).includes(leaders.length + ' co-leaders')) failures.push('Tied hero claims a singular leader.');
+        const identities = [...(hero?.querySelectorAll('[data-leader-entry-id]') || [])];
+        if (identities.length !== leaders.length || leaders.some(entry => !identities.some(node => node.dataset.leaderEntryId === entry.id && text(node).includes(entry.readinessLabel)))) failures.push('Hero omits a tied setting or its readiness.');
+      }
+    }
+    if (document.querySelector('.capability-mode__tab[aria-selected="true"]')?.dataset.capabilityMode !== mode) failures.push('Workflow view route mismatch.');
+    if (mode === 'benchmarks' && !document.querySelector('a[href="./benchmark-report.html#work-spec-chat"]')) failures.push('Work-spec report link missing.');
+    if (mode === 'efficiency') {
+      const scoredEntries = data.entries.filter(entry => Number.isFinite(entry.score));
+      if (document.querySelectorAll('[data-plot-point]').length !== scoredEntries.length) failures.push('Efficiency points do not match assessable results.');
+    }
+  }
+  [...document.querySelectorAll('button, a[href], summary, select')].filter(visible).forEach(element => {
+    if (!element.getAttribute('aria-label') && !element.getAttribute('aria-labelledby') && !element.labels?.length && !text(element)) failures.push('Unnamed workflow control.');
+  });
+  return { failures, benchmarkCount: data.benchmarks.length, settingCount: data.settings.length, entryCount: data.entries.length, resultCount: data.benchmarkResults.length, d3Version: window.d3?.version || '' };
+}
+
 function guideTarget(score) {
   const field = document.querySelector('.score-field--combined');
   const track = field?.querySelector('.capability-composition__track');
@@ -1950,7 +2096,7 @@ try {
   const readinessExpression = [
     "document.readyState === 'complete'",
     'Boolean(window.VASIR_DATA)',
-    captureTarget === 'report' ? 'Boolean(window.VASIR_RESPONSES)' : 'true',
+    isReportCapture ? 'Boolean(window.VASIR_RESPONSES)' : 'true',
     "document.fonts.status === 'loaded'"
   ].join(' && ');
   await waitFor(async () => {
@@ -1963,7 +2109,7 @@ try {
   if (
     !manifest
     || manifest.kind !== 'vasirbenchmark-public-projection'
-    || manifest.schemaVersion !== 2
+    || ![2, 3].includes(manifest.schemaVersion)
     || manifest.scoreEdition !== 'backend-architecture-panel-consensus-v2'
     || manifest.scoreMethod !== 'equal-benchmark-absolute-mean-v1'
     || manifest.conditions.join('|') !== 'baseline|skill'
@@ -1975,24 +2121,24 @@ try {
     || manifest.entryCount !== EXPECTED_PUBLIC_COUNTS.entries
     || manifest.resultCount !== EXPECTED_PUBLIC_COUNTS.responses
     || (
-      captureTarget === 'report'
+      isReportCapture
       && (
         manifest.responseKind !== 'vasirbenchmark-public-responses'
-        || manifest.responseSchemaVersion !== 2
+        || ![2, 3].includes(manifest.responseSchemaVersion)
         || manifest.responseCount !== EXPECTED_PUBLIC_COUNTS.responses
         || manifest.judgmentCount !== EXPECTED_PUBLIC_COUNTS.responses * 2
       )
     )
   ) throw new Error('Invalid real-data projection manifest: ' + JSON.stringify(manifest));
 
-  if (captureTarget === 'report' && !pageUrl.pathname.endsWith('benchmark-report.html')) {
+  if (isReportCapture && !pageUrl.pathname.endsWith('benchmark-report.html')) {
     throw new Error('The report target requires benchmark-report.html.');
   }
-  if (captureTarget !== 'report' && pageUrl.pathname.endsWith('benchmark-report.html')) {
+  if (!isReportCapture && pageUrl.pathname.endsWith('benchmark-report.html')) {
     throw new Error(captureTarget + ' requires the main benchmark page.');
   }
 
-  const audit = await evaluate(
+  const audit = isWorkflowCapture ? await evaluate('(' + auditWorkflows.toString() + ')(' + JSON.stringify(captureTarget) + ')') : await evaluate(
     '(' + auditSite.toString() + ')('
       + JSON.stringify(captureTarget)
       + ',' + width
@@ -2004,6 +2150,21 @@ try {
       + ')'
   );
   if (audit.failures.length) throw new Error('QA failed: ' + audit.failures.join('; '));
+
+  if (isWorkflowCapture && !isReportCapture) {
+    await evaluate("document.querySelector('#capability-category-engineering').click()");
+    await waitFor(async () => {
+      try {
+        return await evaluate("document.readyState === 'complete' && document.querySelector('#capability-category-engineering')?.getAttribute('aria-selected') === 'true' && document.querySelector('.capability-canvas__status')?.textContent.includes('Engineering v2') && document.activeElement?.id === 'capability-category-engineering'");
+      } catch { return false; }
+    });
+    await evaluate("document.querySelector('#capability-category-ai-workflows').click()");
+    await waitFor(async () => {
+      try {
+        return await evaluate("document.readyState === 'complete' && document.querySelector('#capability-category-ai-workflows')?.getAttribute('aria-selected') === 'true' && document.querySelector('.capability-canvas__status')?.textContent.includes('Work Specs v1') && document.activeElement?.id === 'capability-category-ai-workflows'");
+      } catch { return false; }
+    });
+  }
 
   let guideAudit = 'mobile-not-applicable';
   if (captureTarget === 'leaderboard' && width > 1080) {
@@ -2039,6 +2200,19 @@ try {
   await evaluate(
     "window.scrollTo({ top: 0, behavior: 'instant' }); new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
   );
+  if (captureTarget === 'workflow-inspector') {
+    await evaluate(`(() => {
+      const run = document.querySelector('.model-run');
+      run.open = true;
+      run.querySelectorAll('.model-run__prompt').forEach(prompt => { prompt.open = false; });
+      const judging = run.querySelector('.model-run__judging');
+      judging.open = true;
+      return new Promise(resolve => requestAnimationFrame(() => {
+        judging.scrollIntoView({ block: 'start', behavior: 'instant' });
+        requestAnimationFrame(resolve);
+      }));
+    })()`);
+  }
   const screenshot = await protocol.send('Page.captureScreenshot', {
     format: 'png',
     fromSurface: true,
@@ -2058,11 +2232,11 @@ try {
     + ' · #' + targetRoutes[captureTarget]
     + ' · ' + width + '×' + height
     + ' · 1 category / '
-    + EXPECTED_PUBLIC_COUNTS.benchmarks + ' benchmarks / '
-    + EXPECTED_PUBLIC_COUNTS.settings + ' settings / '
-    + EXPECTED_PUBLIC_COUNTS.entries + ' condition entries / '
-    + EXPECTED_PUBLIC_COUNTS.responses + ' result cells'
-    + (captureTarget === 'report' ? ' · report routes 3/3' : ' · D3 ' + audit.d3Version)
+    + audit.benchmarkCount + ' benchmarks / '
+    + audit.settingCount + ' settings / '
+    + audit.entryCount + ' condition entries / '
+    + audit.resultCount + ' result cells'
+    + (isReportCapture ? ' · report evidence checked' : ' · D3 ' + audit.d3Version)
     + ' · Claude release identities fit'
     + ' · guide ' + guideAudit
     + ' · QA clean'

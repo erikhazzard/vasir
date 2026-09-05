@@ -43,6 +43,7 @@
   --category-product: #b45f00;
   --category-writing: #d6322a;
   --category-workflows: #7445ff;
+  --category-ai-workflows: var(--category-workflows);
   --category-on-color: var(--sdk-paper);
   --category-rail-rest-scale: 0.04;
   --category-combined-rail: var(--category-combined);
@@ -6302,5 +6303,60 @@ body {
   .capability-canvas__header {
     height: 11rem;
     min-height: 11rem;
+  }
+}
+
+/* Work-spec verdicts remain adjacent to their own condition score. */
+.capability-canvas__header--work-spec {
+  height: auto;
+}
+
+.work-spec-leader__readiness {
+  display: block;
+  font-weight: 400;
+  white-space: normal;
+}
+
+.capability-rank-row__reading--work-spec {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+  white-space: normal;
+  overflow: visible;
+}
+
+.work-spec-readiness {
+  grid-column: 1 / -1;
+  display: block;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: var(--type-micro);
+  font-weight: 600;
+  line-height: var(--type-small-leading);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.work-spec-unassessable {
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: var(--type-small);
+  line-height: var(--type-body-leading);
+}
+
+.capability-selector__long--wrapped {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: var(--type-label-leading);
+}
+
+@media (max-width: 43rem) {
+  .capability-selector__tab--workflow {
+    grid-column: 1 / -1;
+  }
+
+  .capability-canvas__status--work-spec {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

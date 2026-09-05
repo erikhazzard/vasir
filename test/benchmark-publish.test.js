@@ -23,6 +23,7 @@ import {
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_ROOT = path.join(REPO_ROOT, "site", "vasirbenchmark.com");
+const WORKFLOW_SELECTED = Boolean(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "benchmarks/public-results.json"))).workSpecRun);
 const EXPECTED_BENCHMARK_COUNT = 3;
 const EXPECTED_CONDITION_COUNT = 2;
 const EXPECTED_SETTING_COUNT = 36;
@@ -113,7 +114,8 @@ function createBenchmarkFixtureRoot(temporaryRoot) {
     "public-results.json",
     "hyper-scale-chat",
     "personalized-home-feed",
-    "device-telemetry"
+    "device-telemetry",
+    "work-spec-chat"
   ]) {
     const source = path.join(REPO_ROOT, "benchmarks", entry);
     fs.symlinkSync(source, path.join(fixtureRoot, entry), fs.statSync(source).isDirectory() ? "dir" : "file");
@@ -128,6 +130,7 @@ function createPublicationRepoCopy(prefix) {
   createBenchmarkFixtureRoot(temporaryRoot);
   fs.mkdirSync(path.join(temporaryRoot, ".agents"), { recursive: true });
   fs.symlinkSync(path.join(REPO_ROOT, ".agents", "vasir-evals"), path.join(temporaryRoot, ".agents", "vasir-evals"), "dir");
+  fs.symlinkSync(path.join(REPO_ROOT, "tmp"), path.join(temporaryRoot, "tmp"), "dir");
   const configPath = path.join(copiedSiteRoot, "deployment.json");
   const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
@@ -194,36 +197,39 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     assert.deepEqual(first.routes.entrypoints, ["/", "/index.html", "/benchmark-report.html"]);
     assert.deepEqual(first.routes.familyFragments, [
       "/#capabilities/overall",
-      "/#capabilities/engineering"
+      "/#capabilities/engineering",
+      ...(WORKFLOW_SELECTED ? ["/#capabilities/ai-workflows"] : [])
     ]);
     assert.deepEqual(first.routes.viewFragments, [
       "/#capabilities/overall/benchmarks",
       "/#capabilities/overall/efficiency",
       "/#capabilities/engineering/benchmarks",
-      "/#capabilities/engineering/efficiency"
+      "/#capabilities/engineering/efficiency",
+      ...(WORKFLOW_SELECTED ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : [])
     ]);
-    assert.equal(first.routes.reportFragments.length, 3);
-    assert.equal(new Set(first.routes.reportFragments).size, 3);
+    assert.equal(first.routes.reportFragments.length, WORKFLOW_SELECTED ? 4 : 3);
+    assert.equal(new Set(first.routes.reportFragments).size, WORKFLOW_SELECTED ? 4 : 3);
     assert.deepEqual(first.projection, {
       basisSha256: first.projection.basisSha256,
-      developmentResultSetCount: 3,
+      developmentResultSetCount: WORKFLOW_SELECTED ? 4 : 3,
       eligibleResultSetCount: 0,
       withheldResultSetCount: 0,
-      familyCount: 1,
-      trackCount: 1,
-      benchmarkDefinitionCount: EXPECTED_BENCHMARK_COUNT,
-      categoryCount: 1,
+      familyCount: WORKFLOW_SELECTED ? 2 : 1,
+      trackCount: WORKFLOW_SELECTED ? 2 : 1,
+      benchmarkDefinitionCount: EXPECTED_BENCHMARK_COUNT + (WORKFLOW_SELECTED ? 1 : 0),
+      categoryCount: WORKFLOW_SELECTED ? 2 : 1,
       conditionCount: EXPECTED_CONDITION_COUNT,
       settingCount: EXPECTED_SETTING_COUNT,
-      resultEntryCount: EXPECTED_RESULT_ENTRY_COUNT,
-      responseCount: EXPECTED_RESPONSE_COUNT
+      resultEntryCount: EXPECTED_RESULT_ENTRY_COUNT + (WORKFLOW_SELECTED ? 52 : 0),
+      responseCount: EXPECTED_RESPONSE_COUNT + (WORKFLOW_SELECTED ? 52 : 0)
     });
     assert.match(first.projection.basisSha256, /^[a-f0-9]{64}$/);
-    assert.ok(first.files.every((file) => file.bytes <= first.config.limits.maxFileBytes));
+    assert.ok(first.files.every((file) => file.bytes <= (file.path === "responses.js" ? first.config.limits.maxResponseFileBytes : first.config.limits.maxFileBytes)));
     assert.ok(first.totalBytes <= first.config.limits.maxArtifactBytes);
     assert.ok(first.compressedLandingBytes <= first.config.limits.maxCompressedLandingBytes);
     assert.equal(first.config.limits.maxFileBytes, 2 * 1024 * 1024);
-    assert.equal(first.config.limits.maxArtifactBytes, 5 * 1024 * 1024);
+    assert.equal(first.config.limits.maxResponseFileBytes, 8 * 1024 * 1024);
+    assert.equal(first.config.limits.maxArtifactBytes, 10 * 1024 * 1024);
     const landingDependencyPaths = new Set([
       "index.html",
       "style.css",
@@ -250,7 +256,11 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     vm.runInNewContext(dataFile.body.toString("utf8"), dataSandbox);
     const publicData = JSON.parse(JSON.stringify(dataSandbox.window.VASIR_DATA));
     validateBenchmarkPublicationResponses(publicResponses, publicData);
-    assert.equal(publicResponses.schemaVersion, 2);
+    assert.equal(publicResponses.schemaVersion, WORKFLOW_SELECTED ? 3 : 2);
+    if (WORKFLOW_SELECTED) {
+      assert.equal(publicResponses.aiWorkflows.counts.responses, 52);
+      assert.equal(publicResponses.aiWorkflows.counts.judgments, 104);
+    }
     assert.deepEqual(publicResponses.counts, {
       benchmarks: 3,
       settings: 36,
@@ -280,6 +290,23 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
   } finally {
     first.dispose();
     second.dispose();
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test("artifact inspection accepts lowercase users API routes while retaining private Mac home rejection", () => {
+  const { temporaryRoot, copiedSiteRoot } = createPublicationRepoCopy("vasirbenchmark-api-path-");
+  let artifact;
+  try {
+    const appPath = path.join(copiedSiteRoot, "app.js");
+    const source = fs.readFileSync(appPath, "utf8");
+    fs.writeFileSync(appPath, `${source}\n// Example API routes: /users/me and /users/lookup?handle=friend\n`);
+    artifact = buildBenchmarkPublicationArtifact({ repoRootDirectory: temporaryRoot, validateAcceptance: false });
+    assert.ok(artifact.files.some(file => file.path === "app.js"));
+    fs.writeFileSync(appPath, `${source}\n// Private source: /Users/private-user/code/work-spec.md\n`);
+    assert.throws(() => buildBenchmarkPublicationArtifact({ repoRootDirectory: temporaryRoot, validateAcceptance: false }), /local benchmark-evidence path/);
+  } finally {
+    if (artifact) fs.rmSync(artifact.temporaryDirectory, { recursive: true, force: true });
     fs.rmSync(temporaryRoot, { recursive: true, force: true });
   }
 });

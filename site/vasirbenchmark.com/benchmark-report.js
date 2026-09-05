@@ -1,8 +1,13 @@
 (function () {
   'use strict';
 
-  const data = window.VASIR_DATA;
-  const responseData = window.VASIR_RESPONSES;
+  const rootData = window.VASIR_DATA;
+  const initialBenchmarkId = decodeURIComponent(window.location.hash.slice(1)).split('/')[0];
+  const isWorkflowBenchmark = (benchmarkId) => Boolean(rootData?.aiWorkflows?.benchmarks?.some((benchmark) => benchmark.id === benchmarkId));
+  const isWorkSpec = isWorkflowBenchmark(initialBenchmarkId);
+  const data = isWorkSpec ? rootData.aiWorkflows : rootData;
+  const responseData = isWorkSpec ? window.VASIR_RESPONSES?.aiWorkflows : window.VASIR_RESPONSES;
+  const TREATMENT_LABEL = data?.conditions?.find((condition) => condition.id === 'skill')?.label || 'Architecture skill';
   const reportView = document.getElementById('report-view');
   const reportPage = document.getElementById('report-page');
   const routeSections = new Set(['overview', 'ranking', 'method', 'limitations', 'top']);
@@ -17,7 +22,7 @@
     : null;
   const hasResponseCollections = Boolean(responseData)
     && responseData.kind === 'vasirbenchmark-public-responses'
-    && responseData.schemaVersion === 2
+    && [2, 3].includes(responseData.schemaVersion)
     && Array.isArray(responseData.messageSets)
     && Array.isArray(responseData.responses);
   let activeBenchmarkId = null;
@@ -40,7 +45,7 @@
       <section class="development-unavailable" role="alert">
         <p class="ui-eyebrow">Benchmark data unavailable</p>
         <h1>REPORT COULD NOT BE VERIFIED</h1>
-        <p>The public dataset must provide one complete Minimal baseline and Architecture skill result for every matched setting and frozen task. No partial report is shown.</p>
+        <p>The public dataset must provide one complete Minimal baseline and skill result for every matched setting and frozen task. No partial report is shown.</p>
       </section>
     `;
     return;
@@ -50,7 +55,7 @@
   const summaryById = new Map(data.benchmarkSummaries.map((summary) => [summary.benchmarkId, summary]));
   const categoryById = new Map(data.categories.map((category) => [category.id, category]));
   const settingById = new Map(data.settings.map((setting) => [setting.id, setting]));
-  const settingByConfigurationId = new Map(data.settings.map((setting) => [setting.configurationId, setting]));
+  const settingByConfigurationId = new Map([...rootData.settings, ...data.settings].map((setting) => [setting.configurationId, setting]));
   const expectedJudgeConfigurationIds = Array.isArray(data.scoreBasis?.judges) ? data.scoreBasis.judges : [];
   const messageSetById = new Map((hasResponseCollections ? responseData.messageSets : []).map((messageSet) => [messageSet.id, messageSet]));
   const responseKey = (benchmarkId, settingId, condition) => `${benchmarkId}\u0000${settingId}\u0000${condition}`;
@@ -95,23 +100,31 @@
         && response.trialNumber === result.trials
         && messageSetById.has(response.messageSetId)
         && typeof response.outputText === 'string'
-        && response.outputText.length > 0
+        && (response.outputText.length > 0 || (isWorkSpec && response.judgments?.every(judgment => judgment.assessmentStatus === 'invalid candidate')))
         && Array.isArray(response.judgments)
         && response.judgments.length === expectedJudgeConfigurationIds.length
         && response.judgments.every((judgment, judgmentIndex) => (
           judgment?.judgeConfigurationId === expectedJudgeConfigurationIds[judgmentIndex]
-          && settingByConfigurationId.has(judgment.judgeConfigurationId)
-          && Number.isFinite(judgment.score)
-          && judgment.score >= 0
-          && judgment.score <= 100
-          && Number.isFinite(judgment.rawScore)
-          && judgment.rawScore >= 0
-          && judgment.rawScore <= 100
-          && Number.isFinite(judgment.gateCap)
-          && judgment.gateCap >= 0
-          && judgment.gateCap <= 100
-          && Array.isArray(judgment.failedGates)
-          && judgment.failedGates.every((gateId) => typeof gateId === 'string' && gateId.length > 0)
+          && (isWorkSpec ? (
+            (judgment.score === null || (Number.isFinite(judgment.score) && judgment.score >= 0 && judgment.score <= 100))
+            && typeof judgment.readiness === 'string'
+            && typeof judgment.assessmentStatus === 'string'
+            && judgment.dimensions && typeof judgment.dimensions === 'object'
+            && ['V', 'G', 'A', 'D', 'S', 'C'].every((id) => Object.hasOwn(judgment.dimensions, id))
+          ) : (
+            settingByConfigurationId.has(judgment.judgeConfigurationId)
+            && Number.isFinite(judgment.score)
+            && judgment.score >= 0
+            && judgment.score <= 100
+            && Number.isFinite(judgment.rawScore)
+            && judgment.rawScore >= 0
+            && judgment.rawScore <= 100
+            && Number.isFinite(judgment.gateCap)
+            && judgment.gateCap >= 0
+            && judgment.gateCap <= 100
+            && Array.isArray(judgment.failedGates)
+            && judgment.failedGates.every((gateId) => typeof gateId === 'string' && gateId.length > 0)
+          ))
           && typeof judgment.rationale === 'string'
           && judgment.rationale.trim().length > 0
         ))
@@ -128,7 +141,7 @@
       <section class="development-unavailable" role="alert">
         <p class="ui-eyebrow">Response evidence unavailable</p>
         <h1>EXACT RUN MATRIX IS INCOMPLETE</h1>
-        <p>This report requires one complete Minimal baseline and Architecture skill transcript for every published model setting and benchmark. No partial response evidence is shown.</p>
+        <p>This report requires one complete Minimal baseline and skill transcript for every published model setting and benchmark. No partial response evidence is shown.</p>
       </section>
     `;
     return;
@@ -156,9 +169,11 @@
     ? scoreBasis.uncertainty.reason.trim()
     : 'Only one trial per task and condition is published.';
   const taskCoverageLabel = `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
-  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges`;
+  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec ? ' · Uncalibrated development' : ''}`;
   const usesConsensusScoring = scoreBasis.aggregation === 'unanimity-gates-mean-dimensions-v1';
-  const panelMethod = usesConsensusScoring
+  const panelMethod = isWorkSpec
+    ? 'Each judge rates value (25%), grounding (15%), acceptance (20%), delivery (15%), scope (15%), and coherence (10%) from 0 to 4. Their weighted totals are averaged only when both assessments and all dimensions are assessable. Readiness is a separate verdict; judge disagreement remains unresolved.'
+    : usesConsensusScoring
     ? 'Both judges must pass each gate; either failure applies its gate ceiling. Dimension ratings use the arithmetic mean, including half points. The task rubric recomputes the score before applying the lowest failed-gate ceiling.'
     : 'Gates use majority vote and dimension ratings use the median. The task rubric recomputes the score before applying the lowest majority-failed gate ceiling.';
   const panelLabel = expectedJudgeConfigurationIds
@@ -171,6 +186,9 @@
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+
+  const formatScore = (value) => Number.isFinite(value) ? value.toFixed(1) : 'Not assessable';
+  const dimensionLabels = { V: 'Value', G: 'Grounding', A: 'Acceptance', D: 'Delivery', S: 'Scope', C: 'Coherence' };
 
   const copyButtonMarkup = (value, accessibleLabel) => {
     if (typeof value !== 'string') return '';
@@ -217,7 +235,7 @@
     copyFeedbackTimers.set(control, timer);
   };
 
-  const signed = (value) => `${value > 0 ? '+' : ''}${Number(value).toFixed(1)}`;
+  const signed = (value) => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(1)}` : 'Not assessable';
   const parseRoute = () => {
     const [benchmarkId, candidateSection] = decodeURIComponent(window.location.hash.slice(1)).split('/');
     return {
@@ -267,19 +285,28 @@
         treatmentResponse: responseByKey.get(responseKey(benchmark.id, setting.id, 'skill')) || null,
         baseline: baseline.score,
         treatment: treatment.score,
-        delta: Math.round((treatment.score - baseline.score) * 10) / 10
+        baselineRankingScore: isWorkSpec ? baseline.exactScore : baseline.score,
+        treatmentRankingScore: isWorkSpec ? treatment.exactScore : treatment.score,
+        delta: Number.isFinite(treatment.score) && Number.isFinite(baseline.score)
+          ? isWorkSpec ? setting.deltas.skill : Math.round((treatment.score - baseline.score) * 10) / 10
+          : null
       };
     }).filter(Boolean).sort((a, b) => (
-      b.treatment - a.treatment
-      || b.baseline - a.baseline
+      (b.treatmentRankingScore ?? -1) - (a.treatmentRankingScore ?? -1)
+      || (b.baselineRankingScore ?? -1) - (a.baselineRankingScore ?? -1)
       || a.setting.label.localeCompare(b.setting.label)
-    ));
+    )).map((row, index, rows) => ({
+      ...row,
+      rank: Number.isFinite(row.treatmentRankingScore)
+        ? isWorkSpec ? rows.findIndex(candidate => candidate.treatmentRankingScore === row.treatmentRankingScore) + 1 : index + 1
+        : null
+    }));
   };
 
   const truthMarkup = () => `
     <aside class="evidence-truth" aria-label="${escapeHTML(developmentDisclosure)}">
       <strong class="evidence-truth__kind">${escapeHTML(developmentDisclosure)}</strong>
-      <p>Architecture skill vs Minimal baseline · fixed rubric /${SCORE_MAXIMUM}</p>
+      <p>${escapeHTML(TREATMENT_LABEL)} vs Minimal baseline · fixed rubric /${SCORE_MAXIMUM}</p>
       <span aria-hidden="true"></span>
     </aside>
   `;
@@ -300,12 +327,12 @@
           <div class="matched-result">
             <dl class="matched-result__condition matched-result__condition--baseline">
               <dt>${escapeHTML(summary.baselineLabel)}</dt>
-              <dd><strong>${summary.baseline.toFixed(1)}</strong><small>field mean /${SCORE_MAXIMUM} · n=${SETTING_COUNT}</small></dd>
+              <dd><strong>${formatScore(summary.baseline)}</strong><small>field mean /${SCORE_MAXIMUM} · n=${SETTING_COUNT}</small></dd>
             </dl>
             <span class="matched-result__arrow" aria-hidden="true">→</span>
             <dl class="matched-result__condition matched-result__condition--treatment">
               <dt>${escapeHTML(summary.treatmentLabel)}</dt>
-              <dd><strong>${summary.treatment.toFixed(1)}</strong><small>field mean /${SCORE_MAXIMUM} · n=${SETTING_COUNT}</small></dd>
+              <dd><strong>${formatScore(summary.treatment)}</strong><small>field mean /${SCORE_MAXIMUM} · n=${SETTING_COUNT}</small></dd>
             </dl>
           </div>
           <dl class="matched-result__delta${regressionClass}">
@@ -366,7 +393,48 @@
 
   const judgeReviewMarkup = ({ judgment, judgmentIndex }) => {
     const judgeSetting = settingByConfigurationId.get(judgment.judgeConfigurationId);
-    const judgeLabel = judgeSetting?.label || judgment.judgeConfigurationId;
+    const judgeLabel = judgment.judgeLabel || judgeSetting?.label || judgment.judgeConfigurationId;
+    if (isWorkSpec) {
+      const fullAssessment = typeof judgment.fullAssessment === 'string'
+        ? judgment.fullAssessment
+        : JSON.stringify(judgment.assessment || judgment, null, 2);
+      return `
+        <li class="model-run__judge" data-judge-review>
+          <header class="model-run__judge-header">
+            <span class="model-run__judge-identity">
+              <strong class="model-run__judge-index">Judge ${String(judgmentIndex + 1).padStart(2, '0')}</strong>
+              <span class="model-run__judge-configuration" data-judge-configuration>${escapeHTML(judgeLabel)}</span>
+            </span>
+            <span class="model-run__judge-score"><strong class="model-run__judge-score-value" data-judge-score>${formatScore(judgment.score)}</strong>${Number.isFinite(judgment.score) ? `<small class="model-run__judge-score-unit">/${SCORE_MAXIMUM}</small>` : ''}</span>
+          </header>
+          <p class="work-spec-verdict" data-judge-readiness>${escapeHTML(judgment.readiness)}</p>
+          <p class="model-run__aggregation-note" data-judge-assessment-status>${escapeHTML(judgment.assessmentStatus)}</p>
+          <div class="work-spec-dimensions">
+            <table class="work-spec-dimensions__table">
+              <caption class="visually-hidden">Six weighted rubric dimensions and this judge's reasons</caption>
+              <thead><tr><th scope="col">Dimension</th><th scope="col">Rating /4</th><th scope="col">Reason</th></tr></thead>
+              <tbody>${Object.entries(dimensionLabels).map(([id, label]) => {
+                const dimension = judgment.dimensions[id];
+                return `<tr data-dimension-id="${escapeHTML(id)}">
+                  <th scope="row">${escapeHTML(id)} · ${escapeHTML(label)}<small class="work-spec-dimensions__weight">${escapeHTML(scoreBasis.weights[id])}% weight</small></th>
+                  <td>${Number.isInteger(dimension.rating) ? dimension.rating : 'Not assessable'}</td>
+                  <td>${escapeHTML(dimension.reason)}</td>
+                </tr>`;
+              }).join('')}
+              </tbody>
+            </table>
+          </div>
+          <p class="model-run__judge-rationale" data-judge-rationale>${escapeHTML(judgment.rationale)}</p>
+          <details class="work-spec-assessment">
+            <summary class="work-spec-assessment__summary">Full judge assessment and cited evidence</summary>
+            <div class="work-spec-assessment__body">
+              ${copyButtonMarkup(fullAssessment, `Copy full assessment from ${judgeLabel}`)}
+              <pre class="model-run__text" data-full-assessment><code>${escapeHTML(fullAssessment)}</code></pre>
+            </div>
+          </details>
+        </li>
+      `;
+    }
     const failedGateText = judgment.failedGates.length > 0
       ? judgment.failedGates.map(gateLabel).join(' · ')
       : 'None';
@@ -390,8 +458,10 @@
   };
 
   const judgingMarkup = ({ judgments }) => {
-    const scores = judgments.map((judgment) => judgment.score);
-    const scoreRange = `${Math.min(...scores).toFixed(1)}–${Math.max(...scores).toFixed(1)}`;
+    const scores = judgments.map((judgment) => judgment.score).filter(Number.isFinite);
+    const scoreRange = scores.length === judgments.length
+      ? `${Math.min(...scores).toFixed(1)}–${Math.max(...scores).toFixed(1)}`
+      : 'Assessment incomplete';
     return `
       <details class="model-run__judging">
         <summary class="model-run__judging-summary">
@@ -400,7 +470,7 @@
           <i class="model-run__judging-mark" aria-hidden="true">↓</i>
         </summary>
         <div class="model-run__judging-body">
-          <p class="model-run__aggregation-note">${escapeHTML(panelMethod)} There is no synthesizer. Each note is the saved answer-specific rationale from one independent review, bounded to 600 characters.</p>
+          <p class="model-run__aggregation-note">${escapeHTML(panelMethod)} There is no synthesizer. ${isWorkSpec ? 'The complete independent assessments and cited reasons remain available below. Findings are each judge’s conclusions. Judge spread is disagreement, not a confidence interval.' : 'Each note is the saved answer-specific rationale from one independent review, bounded to 600 characters.'}</p>
           <ol class="model-run__judges">
             ${judgments.map((judgment, judgmentIndex) => judgeReviewMarkup({ judgment, judgmentIndex })).join('')}
           </ol>
@@ -411,7 +481,7 @@
 
   const conditionTranscriptMarkup = ({ condition, response, score, rowIndex, settingLabel }) => {
     const isBaseline = condition === 'baseline';
-    const conditionLabel = isBaseline ? 'Minimal baseline' : 'Architecture skill';
+    const conditionLabel = isBaseline ? 'Minimal baseline' : TREATMENT_LABEL;
     const messageSet = messageSetById.get(response.messageSetId);
     const messages = messageSet.messages;
     const outputText = response.outputText;
@@ -426,8 +496,9 @@
             <span class="model-run__condition-meta">${escapeHTML(settingLabel)} · ${escapeHTML(trialLabel)} · exact saved exchange</span>
             <h3 class="model-run__condition-name" id="${headingId}">${conditionLabel}</h3>
           </div>
-          <strong class="model-run__condition-score">${score.toFixed(1)}<small class="model-run__condition-unit">/${SCORE_MAXIMUM}</small></strong>
+          <strong class="model-run__condition-score">${formatScore(score)}${Number.isFinite(score) ? `<small class="model-run__condition-unit">/${SCORE_MAXIMUM}</small>` : ''}</strong>
         </header>
+        ${isWorkSpec ? `<p class="work-spec-verdict" data-condition-readiness>${escapeHTML(response.readinessLabel || 'Readiness not reported')}</p>` : ''}
         <details class="model-run__prompt">
           <summary class="model-run__prompt-summary">
             <strong class="model-run__prompt-title">Input prompt</strong>
@@ -444,15 +515,16 @@
         <section class="model-run__section" aria-label="Full model output">
           <header class="model-run__section-header">
             <h4 class="model-run__section-title">Full output</h4>
-            ${copyButtonMarkup(outputText, `Copy full output for ${settingLabel}, ${conditionLabel}`)}
+            ${outputText.length ? copyButtonMarkup(outputText, `Copy full output for ${settingLabel}, ${conditionLabel}`) : ''}
           </header>
-          <pre class="model-run__text model-run__text--output" data-output-text><code>${escapeHTML(outputText)}</code></pre>
+          ${outputText.length ? `<pre class="model-run__text model-run__text--output" data-output-text><code>${escapeHTML(outputText)}</code></pre>` : '<p class="model-run__judge-rationale" data-output-absence>No work spec was returned for this run. Both independent judgments recorded an invalid candidate.</p>'}
         </section>
       </section>
     `;
   };
 
   const modelRowMarkup = (row, index) => {
+    const comparable = Number.isFinite(row.baseline) && Number.isFinite(row.treatment);
     const start = Math.min(row.baseline, row.treatment);
     const width = Math.abs(row.treatment - row.baseline);
     const regressionClass = row.delta < 0 ? ' is-regression' : '';
@@ -461,19 +533,19 @@
       <li class="model-preview__item">
         <details class="model-run">
           <summary class="model-preview__row${regressionClass}">
-            <span class="model-preview__identity"><strong>${escapeHTML(settingLabel)}</strong><small>Architecture skill rank #${index + 1} of ${SETTING_COUNT}</small></span>
-            <span
+            <span class="model-preview__identity"><strong>${escapeHTML(settingLabel)}</strong><small>${row.rank ? `${escapeHTML(TREATMENT_LABEL)} rank #${row.rank} of ${SETTING_COUNT}` : 'Panel total not assessable'}</small></span>
+            ${comparable ? `<span
               class="model-preview__plot"
               style="--preview-start:${start}%;--preview-width:${width}%;--preview-baseline:${row.baseline}%;--preview-treatment:${row.treatment}%"
-              aria-label="Minimal baseline ${row.baseline.toFixed(1)}, Architecture skill ${row.treatment.toFixed(1)}"
+              aria-label="Minimal baseline ${formatScore(row.baseline)}, ${escapeHTML(TREATMENT_LABEL)} ${formatScore(row.treatment)}"
             >
               <i class="model-preview__axis" aria-hidden="true"></i>
               <i class="model-preview__connector" aria-hidden="true"></i>
               <i class="model-preview__mark model-preview__mark--baseline" aria-hidden="true"></i>
               <i class="model-preview__mark model-preview__mark--treatment" aria-hidden="true"></i>
-            </span>
-            <span class="model-preview__score"><span>Minimal</span>${row.baseline.toFixed(1)}</span>
-            <span class="model-preview__score model-preview__score--treatment"><span>Skill</span>${row.treatment.toFixed(1)}</span>
+            </span>` : '<span class="work-spec-unassessable">Panel total not assessable</span>'}
+            <span class="model-preview__score"><span>Minimal</span>${formatScore(row.baseline)}${isWorkSpec ? `<small class="work-spec-summary-readiness" data-summary-readiness="baseline">${escapeHTML(row.baselineResponse.readinessLabel)}</small>` : ''}</span>
+            <span class="model-preview__score model-preview__score--treatment"><span>Skill</span>${formatScore(row.treatment)}${isWorkSpec ? `<small class="work-spec-summary-readiness" data-summary-readiness="skill">${escapeHTML(row.treatmentResponse.readinessLabel)}</small>` : ''}</span>
             <span class="model-preview__delta">${signed(row.delta)} pts</span>
             <span class="model-preview__action">Inspect run <i class="model-preview__action-mark" aria-hidden="true">↓</i></span>
           </summary>
@@ -503,13 +575,13 @@
       <header class="report-section__heading">
         <div>
           <p class="ui-eyebrow">${escapeHTML(SCORE_EDITION_LABEL)} field · all ${SETTING_COUNT} matched settings</p>
-          <h2 id="ranking-title">Architecture skill task scores</h2>
+          <h2 id="ranking-title">${escapeHTML(TREATMENT_LABEL)} task scores</h2>
         </div>
-        <p>All ${SETTING_COUNT} settings, ordered by Architecture skill task score. Rank is secondary and can change as the field grows.</p>
+        <p>All ${SETTING_COUNT} settings, ordered by ${escapeHTML(TREATMENT_LABEL)} task score. Rank is secondary and can change as the field grows.</p>
       </header>
       <details class="preview-disclosure" open>
         <summary class="preview-disclosure__summary">All ${SETTING_COUNT} matched settings · task score /${SCORE_MAXIMUM}</summary>
-        <ol class="model-preview" aria-label="All ${SETTING_COUNT} matched results for Architecture skill and Minimal baseline, ordered by Architecture skill task score">
+        <ol class="model-preview" aria-label="All ${SETTING_COUNT} matched results for ${escapeHTML(TREATMENT_LABEL)} and Minimal baseline, ordered by ${escapeHTML(TREATMENT_LABEL)} task score">
           ${modelPreviewRows(benchmark).map(modelRowMarkup).join('')}
         </ol>
       </details>
@@ -540,7 +612,7 @@
           </section>
           <section>
             <h3>Score /${SCORE_MAXIMUM}</h3>
-            <p>Each value is the fixed ${JUDGE_COUNT}-judge panel result for this benchmark's rubric and does not depend on which other models are displayed. The hero shows field means across ${SETTING_COUNT} settings; each row shows one model setting.</p>
+            <p>Each value is the fixed ${JUDGE_COUNT}-judge panel result for this benchmark's rubric and does not depend on which other models are displayed. The hero shows field means across ${SETTING_COUNT} settings; each row shows one model setting.${isWorkSpec ? ' Scores and paired uplifts are rounded separately from the underlying totals.' : ''}</p>
           </section>
           <section>
             <h3>Run details</h3>
@@ -560,6 +632,7 @@
 
   const paginationMarkup = (benchmark) => {
     const siblings = categoryBenchmarks(benchmark.category);
+    if (siblings.length < 2) return '';
     const index = siblings.findIndex((candidate) => candidate.id === benchmark.id);
     const previous = siblings[(index - 1 + siblings.length) % siblings.length];
     const next = siblings[(index + 1) % siblings.length];
@@ -576,7 +649,7 @@
     const summary = summaryById.get(benchmark.id);
     const category = categoryById.get(benchmark.category);
     const returnContext = returnFieldId === 'overall'
-      ? { id: 'overall', name: 'Combined' }
+      ? { id: 'overall', name: rootData.aiWorkflows ? 'Engineering overall' : 'Combined' }
       : category;
     const returnHref = `./index.html#capabilities/${returnContext.id}/benchmarks`;
     activeBenchmarkId = benchmark.id;
@@ -627,6 +700,10 @@
 
   window.addEventListener('hashchange', () => {
     const route = parseRoute();
+    if (isWorkflowBenchmark(route.benchmarkId) !== isWorkSpec) {
+      window.location.reload();
+      return;
+    }
     if (route.benchmarkId === activeBenchmarkId && benchmarkById.has(route.benchmarkId)) {
       hydrateSectionLinks(route.benchmarkId, route.section || 'overview');
       scrollToSection(route.section || 'top');

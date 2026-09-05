@@ -2,6 +2,8 @@
 // The shell supplies fixed steps; larger steps are fully subdivided, never dropped.
 const WIDTH = 420;
 const HEIGHT = 4600;
+const LEFT_EDGE = 60;
+const RIGHT_EDGE = WIDTH - 60;
 const FIXED_STEP = 1 / 120;
 const TUNING = Object.freeze({
   speed: 258,
@@ -52,18 +54,18 @@ function createPlatforms() {
     // Side masonry grows into its wall while its inner landing edge stays put.
     // In particular, the third ledge gives a safe run-up to a right-wall kick
     // toward the fourth; the direct air-jump crossing remains equally viable.
-    if (x < 80) { w += x - 18; x = 18; }
-    else if (x > 220) w = 402 - x;
+    if (x < 80) { w += x - LEFT_EDGE; x = LEFT_EDGE; }
+    else if (x > 220) w = RIGHT_EDGE - x;
     return {
       id: `ledge-${index + 1}`, x, y, w, h: index === 13 ? 30 : 20,
       kind: index === 13 ? 'checkpoint' : index === 27 ? 'summit' : 'ledge',
     };
   });
   return [
-    { id: 'floor', x: 18, y: 4480, w: 384, h: 120, kind: 'floor' },
+    { id: 'floor', x: LEFT_EDGE, y: 4480, w: RIGHT_EDGE - LEFT_EDGE, h: 120, kind: 'floor' },
     ...ledges,
-    { id: 'left-wall', x: 0, y: -400, w: 18, h: 5000, kind: 'wall' },
-    { id: 'right-wall', x: 402, y: -400, w: 18, h: 5000, kind: 'wall' },
+    { id: 'left-wall', x: 0, y: -400, w: LEFT_EDGE, h: 5000, kind: 'wall' },
+    { id: 'right-wall', x: RIGHT_EDGE, y: -400, w: WIDTH - RIGHT_EDGE, h: 5000, kind: 'wall' },
   ];
 }
 
@@ -77,12 +79,12 @@ export function createGame() {
     player, platforms: createPlatforms(),
     // Thorn silhouettes live on the outer walls, clear of the generous main path.
     hazards: [
-      { x: 18, y: 3600, w: 15, h: 96, orientation: 'right' },
-      { x: 387, y: 3074, w: 15, h: 100, orientation: 'left' },
-      { x: 18, y: 2080, w: 15, h: 108, orientation: 'right' },
-      { x: 387, y: 1370, w: 15, h: 112, orientation: 'left' },
-      { x: 18, y: 654, w: 15, h: 100, orientation: 'right' },
-      { x: 356, y: 4461, w: 40, h: 19, orientation: 'up' },
+      { x: LEFT_EDGE, y: 3600, w: 15, h: 96, orientation: 'right' },
+      { x: RIGHT_EDGE - 15, y: 3074, w: 15, h: 100, orientation: 'left' },
+      { x: LEFT_EDGE, y: 2080, w: 15, h: 108, orientation: 'right' },
+      { x: RIGHT_EDGE - 15, y: 1370, w: 15, h: 112, orientation: 'left' },
+      { x: LEFT_EDGE, y: 654, w: 15, h: 100, orientation: 'right' },
+      { x: RIGHT_EDGE - 46, y: 4461, w: 40, h: 19, orientation: 'up' },
     ],
     checkpoint: { x: 190, y: 2382, w: 40, h: 66, active: false },
     goal: { x: 174, y: 146, w: 72, h: 94 },
@@ -202,7 +204,7 @@ export function createGame() {
   }
 
   function canOccupy(x, y) {
-    if (x < 18 || x + player.w > WIDTH - 18) return false;
+    if (x < LEFT_EDGE || x + player.w > RIGHT_EDGE) return false;
     const box = { x, y, w: player.w, h: player.h };
     return !game.platforms.some(platform => solid(platform) && overlaps(box, platform));
   }
@@ -281,11 +283,17 @@ export function createGame() {
     game.time += dt;
     if (game.state !== 'playing') return;
     game.elapsed += dt;
+    jumpBuffer = input.jumpPressed ? TUNING.jumpBuffer : Math.max(0, jumpBuffer - dt);
     if (game.respawnTimer > 0) {
       game.respawnTimer = Math.max(0, game.respawnTimer - dt);
       if (game.respawnTimer === 0) {
+        // The shell consumes press edges during death too. Keep only the still-live
+        // retry buffer across reset, then announce the return before its jump.
+        const bufferedRetry = jumpBuffer;
         resetPlayer();
+        jumpBuffer = bufferedRetry;
         emit('respawn', 0.7);
+        resolveJump();
       }
       return;
     }
@@ -294,7 +302,6 @@ export function createGame() {
     const held = !!input.jumpHeld || !!input.jumpPressed;
     const wasGrounded = player.grounded;
     coyote = wasGrounded ? TUNING.coyoteTime : Math.max(0, coyote - dt);
-    jumpBuffer = input.jumpPressed ? TUNING.jumpBuffer : Math.max(0, jumpBuffer - dt);
     wallCoyote = Math.max(0, wallCoyote - dt);
     wallLock = Math.max(0, wallLock - dt);
     player.wallDir = touchingWall();

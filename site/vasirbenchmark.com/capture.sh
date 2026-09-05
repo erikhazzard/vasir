@@ -8,7 +8,7 @@ status=0
 midwidth_audit_dir="$(mktemp -d "${TMPDIR:-/tmp}/vasirbenchmark-midwidth.XXXXXX")"
 
 cleanup() {
-  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/report.png"
+  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/report.png" "$midwidth_audit_dir/workflows.png" "$midwidth_audit_dir/workflow-report.png"
   rmdir "$midwidth_audit_dir" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -36,9 +36,31 @@ node "$design_dir/capture.mjs" "$report_page" "$design_dir/mobile-benchmark-repo
 node "$design_dir/capture.mjs" "$page" "$midwidth_audit_dir/main.png" 820 1000 leaderboard || status=1
 node "$design_dir/capture.mjs" "$report_page" "$midwidth_audit_dir/report.png" 820 1000 report || status=1
 
+has_workflows="$(node --input-type=module - "$design_dir/data.js" <<'NODE'
+import fs from 'node:fs';
+import vm from 'node:vm';
+const context = { window: {} };
+vm.runInNewContext(fs.readFileSync(process.argv[2], 'utf8'), context);
+process.stdout.write(context.window.VASIR_DATA?.aiWorkflows ? 'yes' : 'no');
+NODE
+)"
+
+if [[ "$has_workflows" == "yes" ]]; then
+  node "$design_dir/capture.mjs" "$page" "$design_dir/desktop-workflows.png" 1440 1000 workflows || status=1
+  node "$design_dir/capture.mjs" "$page" "$design_dir/mobile-workflows.png" 390 844 workflows || status=1
+  node "$design_dir/capture.mjs" "$page" "$design_dir/desktop-workflow-benchmarks.png" 1440 1000 workflow-benchmarks || status=1
+  node "$design_dir/capture.mjs" "$page" "$design_dir/mobile-workflow-benchmarks.png" 390 844 workflow-benchmarks || status=1
+  node "$design_dir/capture.mjs" "$page" "$design_dir/desktop-workflow-efficiency.png" 1440 1000 workflow-efficiency || status=1
+  node "$design_dir/capture.mjs" "$page" "$design_dir/mobile-workflow-efficiency.png" 390 844 workflow-efficiency || status=1
+  node "$design_dir/capture.mjs" "$report_page" "$design_dir/desktop-workflow-report.png" 1440 1000 workflow-report || status=1
+  node "$design_dir/capture.mjs" "$report_page" "$design_dir/mobile-workflow-report.png" 390 844 workflow-report || status=1
+  node "$design_dir/capture.mjs" "$page" "$midwidth_audit_dir/workflows.png" 820 1000 workflows || status=1
+  node "$design_dir/capture.mjs" "$report_page" "$midwidth_audit_dir/workflow-report.png" 820 1000 workflow-report || status=1
+fi
+
 if [[ $status -ne 0 ]]; then
   echo "Canonical real-data capture completed with QA failures." >&2
   exit "$status"
 fi
 
-echo "Canonical VasirBench capture and QA passed at desktop, mobile, and the 820px identity-fit width for Combined, Engineering, benchmark ledger, Efficiency, and the hyper-scale chat report."
+echo "Canonical VasirBench capture and QA passed at desktop, mobile, and 820px for Engineering and every selected AI Workflows view."

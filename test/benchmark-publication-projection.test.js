@@ -290,6 +290,7 @@ test("selected immutable runs deterministically project the exact real developme
     }
   });
   const second = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
+  const workflow = first.projection.aiWorkflows;
 
   assert.match(first.basisSha256, /^[a-f0-9]{64}$/);
   assert.equal(first.basisSha256, second.basisSha256);
@@ -297,8 +298,9 @@ test("selected immutable runs deterministically project the exact real developme
   assert.equal(first.responsesSource, second.responsesSource);
   assert.deepEqual(first.projection, second.projection);
   assert.deepEqual(first.responseBundle, second.responseBundle);
-  assert.deepEqual(first.counts, EXPECTED_COUNTS);
-  assert.deepEqual(first.routes, EXPECTED_ROUTES);
+  assert.deepEqual(first.projection.counts, EXPECTED_COUNTS, "Engineering retains its complete family-local cohort");
+  assert.deepEqual(first.counts, workflow ? { ...EXPECTED_COUNTS, families: 2, tracks: 2, benchmarks: 4, categories: 2, resultEntries: 124, responses: 268, developmentResultSets: 4 } : EXPECTED_COUNTS);
+  assert.deepEqual(first.routes, workflow ? { ...EXPECTED_ROUTES, familyFragments: [...EXPECTED_ROUTES.familyFragments, "/#capabilities/ai-workflows"], viewFragments: [...EXPECTED_ROUTES.viewFragments, "/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"], reportFragments: [...EXPECTED_ROUTES.reportFragments, "/benchmark-report.html#work-spec-chat"] } : EXPECTED_ROUTES);
   assert.deepEqual({
     runs: first.projection.meta.runs,
     settings: first.projection.meta.settings,
@@ -308,7 +310,7 @@ test("selected immutable runs deterministically project the exact real developme
     settings: 36,
     aggregateCells: 216
   });
-  assert.deepEqual(reads, [
+  const engineeringReads = [
     "benchmarks/public-results.json",
     "benchmarks/capability-taxonomy.json",
     "benchmarks/hyper-scale-chat/benchmark.json",
@@ -317,12 +319,20 @@ test("selected immutable runs deterministically project the exact real developme
     ...EXPECTED_BENCHMARK_IDS.map((benchmarkId) => (
       publicResults.selectedRuns.find((selection) => selection.benchmarkId === benchmarkId).runPath
     ))
-  ]);
+  ];
+  assert.deepEqual(reads.slice(0, engineeringReads.length), engineeringReads);
+  if (workflow) {
+    assert.equal(workflow.counts.settings, 26);
+    assert.equal(workflow.counts.responses, 52);
+    assert.equal(first.responseBundle.aiWorkflows.counts.judgments, 104);
+    assert.ok(reads.includes(publicResults.workSpecRun.runPath));
+    assert.ok(reads.includes("benchmarks/work-spec-chat/publication.json"));
+  } else assert.equal(reads.length, engineeringReads.length);
 
   const { projection } = first;
   const { responseBundle } = first;
   assert.equal(responseBundle.kind, "vasirbenchmark-public-responses");
-  assert.equal(responseBundle.schemaVersion, 2);
+  assert.equal(responseBundle.schemaVersion, workflow ? 3 : 2);
   assert.deepEqual(responseBundle.counts, EXPECTED_RESPONSE_BUNDLE_COUNTS);
   assert.equal(responseBundle.responses.length, EXPECTED_COUNTS.responses);
   assert.ok(responseBundle.messageSets.length > 0);
@@ -402,7 +412,7 @@ test("selected immutable runs deterministically project the exact real developme
     }));
   }
   validateBenchmarkPublicationResponses(responseBundle, projection);
-  assert.equal(projection.schemaVersion, 2);
+  assert.equal(projection.schemaVersion, workflow ? 3 : 2);
   assert.deepEqual({
     label: projection.scoreBasis.label,
     edition: projection.scoreBasis.edition,
@@ -649,12 +659,24 @@ test("selected immutable runs deterministically project the exact real developme
   vm.runInNewContext(first.responsesSource, sandbox);
   assert.deepEqual(JSON.parse(JSON.stringify(sandbox.window.VASIR_RESPONSES)), responseBundle);
   assert.match(first.responsesSource, /window\.VASIR_RESPONSES/);
-  assert.doesNotMatch(first.dataSource, /(?:^|[/\\])\.agents(?:[/\\]|$)|file:\/\/|\/Users\//i);
+  assert.doesNotMatch(first.dataSource, /(?:^|[/\\])\.agents(?:[/\\]|$)|file:\/\//i);
+  assert.doesNotMatch(first.dataSource, /\/Users\//);
   assert.doesNotMatch(first.dataSource, /\b(?:fake|illustrative|synthetic|simulated|fixture|mock)\b/i);
   assert.doesNotMatch(first.dataSource, /"(?:outputText|rationale|synthesisReason|exactMessages|promptFiles|runPath)"\s*:/);
   assert.doesNotMatch(first.responsesSource, /"(?:reviewerId|evaluationHash|promptText|runtimeReceipt|costUsd|usage)"\s*:/);
-  assert.doesNotMatch(first.responsesSource, /(?:^|[/\\])\.agents(?:[/\\]|$)|file:\/\/|\/Users\//i);
+  assert.doesNotMatch(first.responsesSource, /(?:^|[/\\])\.agents(?:[/\\]|$)|file:\/\//i);
+  assert.doesNotMatch(first.responsesSource, /\/Users\//);
   assert.doesNotMatch(first.dataSource, /peer index/i);
+});
+
+test("Engineering projection accepts lowercase users API routes and rejects literal private Mac homes", () => {
+  const { projection } = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
+  const allowed = structuredClone(projection);
+  allowed.callouts.value = "The user routes are /users/me and /users/lookup?handle=friend.";
+  assert.doesNotThrow(() => validateBenchmarkPublicationProjection(allowed));
+  const privateHome = structuredClone(projection);
+  privateHome.callouts.value = "Read /Users/private-user/code/work-spec.md.";
+  assert.throws(() => validateBenchmarkPublicationProjection(privateHome), /private local path/);
 });
 
 test("an append-only Engineering v2 lineage projects without changing incumbent scores", () => {

@@ -1,7 +1,13 @@
 (function () {
   'use strict';
 
-  const data = window.VASIR_DATA;
+  const rootData = window.VASIR_DATA;
+  const workflowData = rootData?.aiWorkflows;
+  const isWorkflowCategory = (categoryId) => Boolean(workflowData?.categories?.some((category) => category.id === categoryId));
+  const initialCategory = decodeURIComponent(window.location.hash.replace(/^#/, '')).split('/')[1];
+  const isWorkSpec = isWorkflowCategory(initialCategory);
+  const data = isWorkSpec ? workflowData : rootData;
+  const TREATMENT_LABEL = data?.conditions?.find((condition) => condition.id === 'skill')?.label || 'Architecture skill';
   const d3 = window.d3;
   const capabilityView = document.querySelector('#capability-view');
   const REQUIRED_CONDITION_IDS = ['baseline', 'skill'];
@@ -31,7 +37,7 @@
         <section class="development-unavailable" role="alert">
           <p class="ui-eyebrow">Benchmark data unavailable</p>
           <h2>RESULTS COULD NOT BE VERIFIED</h2>
-          <p>The public dataset must provide one complete Minimal baseline and Architecture skill result for every matched setting and frozen task. No partial comparison is shown.</p>
+          <p>The public dataset must provide one complete Minimal baseline and skill result for every matched setting and frozen task. No partial comparison is shown.</p>
         </section>
       `;
     }
@@ -66,7 +72,7 @@
     : `${SCORE_EDITION_LABEL} score`;
   const QUALITY_DOMAIN = [SCORE_MINIMUM, SCORE_MAXIMUM];
   const taskCoverageLabel = `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
-  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges`;
+  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec ? ' · Uncalibrated development' : ''}`;
   const COMPOSITE_SCORE_SCALE = d3.scaleLinear()
     .domain(QUALITY_DOMAIN)
     .range([0, 100])
@@ -74,12 +80,12 @@
   const CAPABILITY_MODES = ['models', 'benchmarks', 'efficiency'];
   const COMBINED_CAPABILITY = {
     id: 'overall',
-    name: 'Combined',
-    short: 'ALL',
+    name: workflowData ? 'Engineering overall' : 'Combined',
+    short: workflowData ? 'ENG' : 'ALL',
     color: 'var(--category-combined)',
     isCombined: true
   };
-  const capabilityFields = [COMBINED_CAPABILITY, ...data.categories];
+  const capabilityFields = [COMBINED_CAPABILITY, ...rootData.categories, ...(workflowData?.categories || [])];
   const capabilityIndexMedia = window.matchMedia('(min-width: 67.501rem)');
   const combinedScoreGuideMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 67.501rem)');
 
@@ -138,18 +144,20 @@
   );
 
   const fieldConfig = {
-    overall: { label: 'Combined', short: 'Combined' },
+    overall: { label: COMBINED_CAPABILITY.name, short: COMBINED_CAPABILITY.name },
     ...Object.fromEntries(data.categories.map((category) => [
       category.id,
       { label: category.name, short: category.short }
     ]))
   };
   const capabilityMobileLabel = {
-    overall: 'Combined',
-    engineering: 'Eng'
+    overall: workflowData ? 'Eng overall' : 'Combined',
+    engineering: 'Eng',
+    'ai-workflows': 'AI Workflows'
   };
   const suiteDescriptions = {
-    'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.'
+    'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.',
+    'Work Specification': 'Plans that preserve the requested user value and give an implementer a grounded route to delivering it.'
   };
 
   const elements = {
@@ -211,17 +219,39 @@
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
 
-  const formatScore = (value) => value.toFixed(1);
+  const formatScore = (value) => Number.isFinite(value) ? value.toFixed(1) : '—';
 
   const signed = (value) => {
+    if (!Number.isFinite(value)) return '—';
     if (value > 0) return `+${value.toFixed(1)}`;
     if (value < 0) return `−${Math.abs(value).toFixed(1)}`;
     return '±0.0';
   };
 
   const scoreFor = (entry, field = 'overall') => {
+    if (!entry) return null;
     if (field === 'overall') return entry.score;
-    return entry.categories.find((reading) => reading.category === field).score;
+    return entry.categories.find((reading) => reading.category === field)?.score ?? null;
+  };
+
+  const workflowExactScores = new Map((workflowData?.benchmarkResults || []).map((result) => [
+    `${result.settingId}:${result.condition}`, result.exactScore
+  ]));
+  const rankingScoreFor = (entry, field = 'overall') => {
+    if (isWorkflowCategory(field) || (isWorkSpec && field === 'overall')) {
+      const exactScore = workflowExactScores.get(`${entry.settingId}:${entry.condition}`);
+      if (exactScore !== undefined) return exactScore;
+    }
+    return scoreFor(entry, field);
+  };
+  const conditionRanks = (entries, field) => {
+    const ranks = new Map();
+    entries.forEach((entry, index) => {
+      const score = rankingScoreFor(entry, field);
+      const tied = isWorkSpec && index > 0 && score === rankingScoreFor(entries[index - 1], field);
+      ranks.set(entry.id, Number.isFinite(score) ? tied ? ranks.get(entries[index - 1].id) : index + 1 : null);
+    });
+    return ranks;
   };
 
   const baselineScoreFor = (entry, field = 'overall') => {
@@ -229,22 +259,26 @@
     return entry.baselineCategories.find((reading) => reading.category === field).score;
   };
 
-  const deltaFor = (entry, field = 'overall') => (
-    Math.round((scoreFor(entry, field) - baselineScoreFor(entry, field)) * 10) / 10
-  );
+  const deltaFor = (entry, field = 'overall') => {
+    if (isWorkSpec) return entry.delta;
+    const current = scoreFor(entry, field);
+    const baseline = baselineScoreFor(entry, field);
+    return Number.isFinite(current) && Number.isFinite(baseline)
+      ? Math.round((current - baseline) * 10) / 10
+      : null;
+  };
 
   const rankedField = (field = 'overall') => {
     const entries = [...data.entries].sort((left, right) => (
-      scoreFor(right, field) - scoreFor(left, field) ||
+      (rankingScoreFor(right, field) ?? -1) - (rankingScoreFor(left, field) ?? -1) ||
       right.score - left.score ||
       left.latency - right.latency ||
       left.id.localeCompare(right.id)
     ));
     const ranks = new Map();
     data.conditions.forEach((condition) => {
-      entries
-        .filter((entry) => entry.condition === condition.id)
-        .forEach((entry, index) => ranks.set(entry.id, index + 1));
+      conditionRanks(entries.filter((entry) => entry.condition === condition.id), field)
+        .forEach((rank, entryId) => ranks.set(entryId, rank));
     });
     return {
       entries,
@@ -256,14 +290,14 @@
     const entries = data.entries
       .filter((entry) => entry.condition === conditionId)
       .sort((left, right) => (
-        scoreFor(right, field) - scoreFor(left, field) ||
+        (rankingScoreFor(right, field) ?? -1) - (rankingScoreFor(left, field) ?? -1) ||
         right.score - left.score ||
         left.latency - right.latency ||
         left.id.localeCompare(right.id)
       ));
     return {
       entries,
-      ranks: new Map(entries.map((entry, index) => [entry.id, index + 1]))
+      ranks: conditionRanks(entries, field)
     };
   };
 
@@ -354,7 +388,7 @@
                   data-delta="${categoryDelta.toFixed(1)}"
                   style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%"
                   tabindex="${index === 0 ? '0' : '-1'}"
-                  aria-label="Open ${escapeHtml(category.name)} results for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with Architecture skill selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
+                  aria-label="Open ${escapeHtml(category.name)} results for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with ${escapeHtml(TREATMENT_LABEL)} selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
                   title="${escapeHtml(insight)}"
                 >
                   <span class="capability-composition__abbr" aria-hidden="true">${escapeHtml(category.short)}</span>
@@ -439,6 +473,20 @@
     };
   };
 
+  const workflowLeadersMarkup = (conditionId, field) => {
+    const ranking = rankedCondition(conditionId, field);
+    const leaders = ranking.entries.filter((entry) => ranking.ranks.get(entry.id) === 1);
+    const label = conditionById.get(conditionId).label;
+    return `
+      <div class="capability-canvas__reading capability-canvas__reading--${conditionVisualClass(conditionId)}" data-leader-condition="${conditionId}" data-leader-count="${leaders.length}">
+        <dt>${escapeHtml(label)} ${leaders.length > 1 ? `${leaders.length} co-leaders` : 'leader'} /${SCORE_MAXIMUM}</dt>
+        <dd>${formatScore(scoreFor(leaders[0], field))}${leaders.length ? leaders.map((entry) => `
+          <small data-leader-entry-id="${escapeHtml(entry.id)}">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}<span class="work-spec-leader__readiness">${escapeHtml(entry.readinessLabel)}</span></small>
+        `).join('') : '<small>No assessable panel total</small>'}</dd>
+      </div>
+    `;
+  };
+
   const capabilityHeaderMarkup = (category) => {
     const benchmarks = categoryBenchmarks(category.id);
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
@@ -452,12 +500,12 @@
     const identityLabel = `Capabilities / ${category.name} / ${showingBenchmarks ? 'Benchmark tests' : showingEfficiency ? 'Efficiency' : modelViewLabel}`;
     const modelSummary = category.isCombined
       ? `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
-      : `${SETTING_COUNT} matched settings · ${SCORE_EDITION_LABEL} rubric score /${SCORE_MAXIMUM}`;
+      : `${SETTING_COUNT} matched settings · ${isWorkSpec ? 'one authored chat task · spec quality' : SCORE_EDITION_LABEL + ' rubric score'} /${SCORE_MAXIMUM}`;
     return `
-      <header class="capability-canvas__header">
+      <header class="capability-canvas__header${isWorkSpec ? ' capability-canvas__header--work-spec' : ''}">
         <div class="capability-canvas__identity">
           <p class="ui-eyebrow">${escapeHtml(identityLabel)}</p>
-          <p class="capability-canvas__status"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
+          <p class="capability-canvas__status${isWorkSpec ? ' capability-canvas__status--work-spec' : ''}"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
           <h3 id="capability-question" tabindex="-1">${escapeHtml(category.name)}</h3>
           <p>${showingBenchmarks
             ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests`
@@ -476,9 +524,9 @@
               <dd>${SETTING_COUNT}<small> matched settings</small></dd>
             </div>
           ` : outcome ? `
-            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
-              <dt>Best Architecture skill /${SCORE_MAXIMUM}</dt>
-              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
+            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${formatScore(scoreFor(fullWinner, category.id))}">
+              <dt>Best ${escapeHtml(TREATMENT_LABEL)} /${SCORE_MAXIMUM}</dt>
+              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(fullWinner.readinessLabel)}</small>` : ''}</dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${outcome.median.toFixed(1)}">
               <dt>Median paired uplift</dt>
@@ -488,14 +536,17 @@
               <dt>Improved settings</dt>
               <dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd>
             </div>
+          ` : isWorkSpec ? `
+            ${workflowLeadersMarkup(TREATMENT_CONDITION_ID, category.id)}
+            ${workflowLeadersMarkup(BASELINE_CONDITION_ID, category.id)}
           ` : `
-            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${scoreFor(fullWinner, category.id).toFixed(1)}">
-              <dt>Architecture skill leader /${SCORE_MAXIMUM}</dt>
-              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd>
+            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${formatScore(scoreFor(fullWinner, category.id))}">
+              <dt>${escapeHtml(TREATMENT_LABEL)} leader /${SCORE_MAXIMUM}</dt>
+              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(fullWinner.readinessLabel)}</small>` : ''}</dd>
             </div>
-            <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${scoreFor(baselineWinner, category.id).toFixed(1)}">
+            <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${formatScore(scoreFor(baselineWinner, category.id))}">
               <dt>Minimal baseline leader /${SCORE_MAXIMUM}</dt>
-              <dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small></dd>
+              <dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(baselineWinner.readinessLabel)}</small>` : ''}</dd>
             </div>
           `}
         </dl>
@@ -520,7 +571,7 @@
               aria-selected="${state.capabilityMode === 'models'}"
               aria-controls="capability-ranking"
               tabindex="${state.capabilityMode === 'models' ? '0' : '-1'}"
-            ><strong>Leaderboard</strong><span>${SETTING_COUNT} ranked settings</span></button>
+            ><strong>Leaderboard</strong><span>${SETTING_COUNT} ${isWorkSpec ? 'matched' : 'ranked'} settings</span></button>
             <button
               class="capability-mode__tab${state.capabilityMode === 'benchmarks' ? ' is-selected' : ''}"
               id="capability-mode-benchmarks"
@@ -530,7 +581,7 @@
               aria-selected="${state.capabilityMode === 'benchmarks'}"
               aria-controls="capability-benchmarks"
               tabindex="${state.capabilityMode === 'benchmarks' ? '0' : '-1'}"
-            ><strong>Benchmark tests</strong><span>${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} tests</span></button>
+            ><strong>Benchmark tests</strong><span>${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} ${benchmarks.length === 1 ? 'test' : 'tests'}</span></button>
             <button
               class="capability-mode__tab${state.capabilityMode === 'efficiency' ? ' is-selected' : ''}"
               id="capability-mode-efficiency"
@@ -589,8 +640,8 @@
         href="${escapeHtml(reportHref)}"
         data-benchmark-id="${escapeHtml(benchmark.id)}"
         data-evidence-kind="development"
-        data-baseline-score="${summary.baseline.toFixed(1)}"
-        data-treatment-score="${summary.treatment.toFixed(1)}"
+        data-baseline-score="${formatScore(summary.baseline)}"
+        data-treatment-score="${formatScore(summary.treatment)}"
         data-report-href="${escapeHtml(reportHref)}"
         aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. Across ${SETTING_COUNT} matched settings, ${escapeHtml(summary.baselineLabel)} field mean ${formatScore(summary.baseline)} of ${SCORE_MAXIMUM}, ${escapeHtml(summary.treatmentLabel)} field mean ${formatScore(summary.treatment)} of ${SCORE_MAXIMUM}, paired uplift ${signed(summary.delta)} points."
       >
@@ -684,7 +735,7 @@
             data-entry-id="${escapeHtml(fullEntry.id)}"
             aria-pressed="${selected}"
             aria-describedby="${escapeHtml(compositionDescriptionId)}"
-            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. Architecture skill ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${SETTING_COUNT}. Minimal baseline score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
+            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${SETTING_COUNT}. Minimal baseline score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
           >
             <span class="setting-row__identity">
               <span class="setting-row__rank" aria-hidden="true">${String(fullRank).padStart(2, '0')}</span>
@@ -702,7 +753,7 @@
           </span>
           <span class="setting-row__delta${deltaClass}"><strong>${signed(delta)}</strong><span>pts</span></span>
         </div>
-        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both profiles use the ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM} to ${SCORE_MAXIMUM} scale. Architecture skill profile: ${escapeHtml(fullDescription)}. Minimal baseline profile: ${escapeHtml(baselineDescription)}. Rank is secondary and condition-specific. Each colored segment opens the Engineering leaderboard.</span>
+        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both profiles use the ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM} to ${SCORE_MAXIMUM} scale. ${escapeHtml(TREATMENT_LABEL)} profile: ${escapeHtml(fullDescription)}. Minimal baseline profile: ${escapeHtml(baselineDescription)}. Rank is secondary and condition-specific. Each colored segment opens the Engineering leaderboard.</span>
       </li>
     `;
   };
@@ -732,7 +783,7 @@
             <span class="score-axis-header__identity">Model setting / skill rank</span>
             <div class="score-axis-header__profile">
               <div class="score-axis-header__profile-title">
-                <strong>${escapeHtml(SCORE_EDITION_LABEL)} score <span>Architecture skill vs Minimal baseline · ${escapeHtml(taskCoverageLabel)}</span></strong>
+                <strong>${escapeHtml(SCORE_EDITION_LABEL)} score <span>${escapeHtml(TREATMENT_LABEL)} vs Minimal baseline · ${escapeHtml(taskCoverageLabel)}</span></strong>
                 <span>Overall /${SCORE_MAXIMUM}</span>
               </div>
               <div class="capability-legend" aria-label="Weighted capability categories">
@@ -744,7 +795,7 @@
             <span class="score-axis-header__effect">Uplift</span>
           </div>
 
-          <ol class="result-list" id="result-list" aria-label="Matched model and reasoning settings ordered by Architecture skill ${SCORE_EDITION_LABEL} score. Each row compares Minimal baseline and Architecture skill on one shared ${SCORE_MINIMUM}-to-${SCORE_MAXIMUM} scale; condition-specific ranks are secondary.">
+          <ol class="result-list" id="result-list" aria-label="Matched model and reasoning settings ordered by ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score. Each row compares Minimal baseline and ${escapeHtml(TREATMENT_LABEL)} on one shared ${SCORE_MINIMUM}-to-${SCORE_MAXIMUM} scale; condition-specific ranks are secondary.">
             ${visible.map((entry) => settingRowMarkup(entry, baselineRanking.ranks, fullRanking.ranks)).join('')}
           </ol>
           <div class="capability-score-guide" aria-hidden="true">
@@ -763,36 +814,49 @@
         <strong>Capabilities</strong>
         <span>
           <i class="condition-mark condition-mark--full" aria-hidden="true"></i>
-          <span class="capability-selector__instruction capability-selector__instruction--long">Best Architecture skill /${SCORE_MAXIMUM}</span>
+          <span class="capability-selector__instruction capability-selector__instruction--long">${workflowData ? 'Task-local skill' : `Best ${escapeHtml(TREATMENT_LABEL)}`} /${SCORE_MAXIMUM}</span>
           <span class="capability-selector__instruction capability-selector__instruction--short">Best /${SCORE_MAXIMUM}</span>
         </span>
       </header>
       <div class="capability-selector__tabs" role="tablist" aria-label="Capability score fields" aria-orientation="${capabilityIndexMedia.matches ? 'vertical' : 'horizontal'}">
         ${capabilityFields.map((category, categoryIndex) => {
-          const winner = rankedCondition(TREATMENT_CONDITION_ID, category.id).entries[0];
+          const categoryData = isWorkflowCategory(category.id) ? workflowData : rootData;
+          const candidates = categoryData.entries.filter((entry) => entry.condition === TREATMENT_CONDITION_ID)
+            .sort((left, right) => (rankingScoreFor(right, category.id) ?? -1) - (rankingScoreFor(left, category.id) ?? -1)
+              || right.score - left.score || left.latency - right.latency || left.id.localeCompare(right.id));
+          const winner = candidates[0];
+          const workflowLeaders = isWorkflowCategory(category.id) ? candidates.filter((entry) => (
+            Number.isFinite(rankingScoreFor(entry, category.id)) && rankingScoreFor(entry, category.id) === rankingScoreFor(winner, category.id)
+          )) : [];
+          const categoryEdition = categoryData.scoreBasis.label;
+          const categoryTreatment = categoryData.conditions.find((condition) => condition.id === TREATMENT_CONDITION_ID).label;
+          const categoryTaskCount = categoryData.benchmarks.length;
           const selected = category.id === state.capabilityCategory;
           const accessibleFieldName = category.isCombined
-            ? `Combined ${SCORE_EDITION_LABEL} score, equal-weighted across ${TASK_COUNT} fixed tasks.`
-            : `${category.name} ${SCORE_EDITION_LABEL} score across ${TASK_COUNT} fixed tasks.`;
+            ? `Combined ${categoryEdition} score, equal-weighted across ${categoryTaskCount} Engineering tasks. AI Workflows is scored separately.`
+            : `${category.name} ${categoryEdition} score across ${categoryTaskCount} fixed ${categoryTaskCount === 1 ? 'task' : 'tasks'}.`;
+          const winnerDescription = workflowLeaders.length > 1
+            ? `${workflowLeaders.length} ${categoryTreatment} co-leaders: ${workflowLeaders.map(entry => `${entry.family}, ${entry.reasoning}`).join('; ')}, tied at ${formatScore(winner.score)} of ${SCORE_MAXIMUM}.`
+            : `Best ${categoryTreatment} result: ${winner.family}, ${winner.reasoning} reasoning, ${formatScore(scoreFor(winner, category.id))} of ${SCORE_MAXIMUM}.`;
           return `
             <button
-              class="capability-selector__tab${category.isCombined ? ' capability-selector__tab--combined' : ''}${selected ? ' is-selected' : ''}"
+              class="capability-selector__tab${category.isCombined ? ' capability-selector__tab--combined' : ''}${isWorkflowCategory(category.id) ? ' capability-selector__tab--workflow' : ''}${selected ? ' is-selected' : ''}"
               id="capability-category-${escapeHtml(category.id)}"
               type="button"
               role="tab"
               data-category-id="${escapeHtml(category.id)}"
               data-winner-entry-id="${escapeHtml(winner.id)}"
-              data-winner-score="${scoreFor(winner, category.id).toFixed(1)}"
+              data-winner-score="${formatScore(scoreFor(winner, category.id))}"
               data-winner-condition="skill"
               aria-selected="${selected}"
               aria-controls="capability-field-panel"
               tabindex="${selected ? '0' : '-1'}"
               style="--category-color:${category.color}"
-              aria-label="${escapeHtml(accessibleFieldName)} Best Architecture skill result: ${escapeHtml(winner.family)}, ${escapeHtml(winner.reasoning)} reasoning, ${formatScore(scoreFor(winner, category.id))} of ${SCORE_MAXIMUM}."
+              aria-label="${escapeHtml(accessibleFieldName)} ${escapeHtml(winnerDescription)}"
             >
               <span class="capability-selector__index" aria-hidden="true">${category.isCombined ? '00' : String(categoryIndex).padStart(2, '0')}</span>
               <span class="capability-selector__name">
-                <span class="capability-selector__long">${escapeHtml(category.name)}</span>
+                <span class="capability-selector__long${category.isCombined && workflowData ? ' capability-selector__long--wrapped' : ''}">${escapeHtml(category.name)}</span>
                 <span class="capability-selector__short">${escapeHtml(capabilityMobileLabel[category.id])}</span>
               </span>
               <span class="capability-selector__state">${selected ? 'Selected' : ''}</span>
@@ -810,7 +874,8 @@
     const fullScore = scoreFor(fullEntry, category.id);
     const baselineRank = baselineRanking.ranks.get(baselineEntry.id);
     const fullRank = fullRanking.ranks.get(fullEntry.id);
-    const delta = Math.round((fullScore - baselineScore) * 10) / 10;
+    const comparable = Number.isFinite(fullScore) && Number.isFinite(baselineScore);
+    const delta = comparable ? (isWorkSpec ? fullEntry.delta : Math.round((fullScore - baselineScore) * 10) / 10) : null;
     const start = Math.min(baselineScore, fullScore);
     const connectorWidth = Math.max(Math.abs(fullScore - baselineScore), 0.25);
     const selected = selectedEntry().settingId === fullEntry.settingId;
@@ -820,11 +885,11 @@
         data-setting-id="${escapeHtml(fullEntry.settingId)}"
         data-baseline-entry-id="${escapeHtml(baselineEntry.id)}"
         data-full-entry-id="${escapeHtml(fullEntry.id)}"
-        data-baseline-score="${baselineScore.toFixed(1)}"
-        data-full-score="${fullScore.toFixed(1)}"
+        data-baseline-score="${formatScore(baselineScore)}"
+        data-full-score="${formatScore(fullScore)}"
         data-baseline-rank="${baselineRank}"
         data-full-rank="${fullRank}"
-        data-delta="${delta.toFixed(1)}"
+        data-delta="${formatScore(delta)}"
         style="--category-color:${category.color};--baseline-score:${baselineScore}%;--full-score:${fullScore}%;--connector-start:${start}%;--connector-width:${connectorWidth}%"
       >
         <button
@@ -832,34 +897,34 @@
           type="button"
           data-entry-id="${escapeHtml(fullEntry.id)}"
           aria-pressed="${selected}"
-          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} Architecture skill ${SCORE_EDITION_LABEL} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank} of ${SETTING_COUNT}; Minimal baseline score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank} of ${SETTING_COUNT}; paired uplift ${signed(delta)} points. Rank is secondary and condition-specific."
+          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank} of ${SETTING_COUNT}; Minimal baseline score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank} of ${SETTING_COUNT}; paired uplift ${signed(delta)} points. Rank is secondary and condition-specific."
         >
           <span class="capability-rank-row__identity">
-            <span class="capability-rank-row__position">#${String(fullRank).padStart(2, '0')}</span>
+            <span class="capability-rank-row__position">${fullRank ? `#${String(fullRank).padStart(2, '0')}` : '—'}</span>
             <span class="capability-rank-row__model">
               <strong>${escapeHtml(fullEntry.family)}</strong>
               <small>${escapeHtml(fullEntry.reasoning)}</small>
             </span>
           </span>
-          <span
+          ${comparable ? `<span
             class="capability-rank-row__track"
             role="img"
-            aria-label="Minimal baseline circle at ${formatScore(baselineScore)}. Architecture skill square at ${formatScore(fullScore)}."
+            aria-label="Minimal baseline circle at ${formatScore(baselineScore)}. ${escapeHtml(TREATMENT_LABEL)} square at ${formatScore(fullScore)}."
           >
             <span class="capability-rank-row__axis" aria-hidden="true"></span>
             <span class="capability-rank-row__connector" aria-hidden="true"></span>
             <span class="capability-rank-row__marker capability-rank-row__marker--baseline" aria-hidden="true"></span>
             <span class="capability-rank-row__marker capability-rank-row__marker--full" aria-hidden="true"></span>
-          </span>
-          <span class="capability-rank-row__reading capability-rank-row__reading--baseline">
+          </span>` : '<span class="work-spec-unassessable">Panel total not assessable</span>'}
+          <span class="capability-rank-row__reading capability-rank-row__reading--baseline${isWorkSpec ? ' capability-rank-row__reading--work-spec' : ''}">
             <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Baseline</span></span>
             <strong>${formatScore(baselineScore)}</strong>
-            <small>#${baselineRank}</small>
+            ${isWorkSpec ? `<span class="work-spec-readiness" data-condition-readiness="baseline">${escapeHtml(baselineEntry.readinessLabel || 'Readiness not reported')}</span>` : `<small>#${baselineRank}</small>`}
           </span>
-          <span class="capability-rank-row__reading capability-rank-row__reading--full">
+          <span class="capability-rank-row__reading capability-rank-row__reading--full${isWorkSpec ? ' capability-rank-row__reading--work-spec' : ''}">
             <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Skill</span></span>
             <strong>${formatScore(fullScore)}</strong>
-            <small>#${fullRank}</small>
+            ${isWorkSpec ? `<span class="work-spec-readiness" data-condition-readiness="skill">${escapeHtml(fullEntry.readinessLabel || 'Readiness not reported')}</span>` : `<small>#${fullRank}</small>`}
           </span>
           <strong class="capability-rank-row__delta">${signed(delta)}<small>pts</small></strong>
         </button>
@@ -1039,10 +1104,10 @@
               <span class="capability-ranking__scale-values"><i>0</i><i>25</i><i>50</i><i>75</i><i>100</i></span>
             </span>
             <span class="capability-ranking__condition-heading"><i class="capability-key__baseline"></i>Minimal baseline</span>
-            <span class="capability-ranking__condition-heading"><i class="capability-key__full"></i>Architecture skill</span>
+            <span class="capability-ranking__condition-heading"><i class="capability-key__full"></i>${escapeHtml(TREATMENT_LABEL)}</span>
             <span>Uplift</span>
           </div>
-          <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by Architecture skill ${SCORE_EDITION_LABEL} score. Ranks are secondary and condition-specific.">
+          <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score. Ranks are secondary and condition-specific.">
             ${fullRanking.entries.map((entry) => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, category)).join('')}
           </ol>
         </section>
@@ -1152,7 +1217,7 @@
     const score = scoreFor(entry, field);
     const baseline = baselineBySetting.get(entry.settingId);
     const baselineScore = scoreFor(baseline, field);
-    const scoreDelta = Math.round((score - baselineScore) * 10) / 10;
+    const scoreDelta = isWorkSpec ? entry.delta : Math.round((score - baselineScore) * 10) / 10;
     const resourceDelta = resourceDeltaPercent(entry, metricKey);
     const bestScore = Math.max(...data.entries.map((candidate) => scoreFor(candidate, field)));
     const highestScore = Math.abs(score - bestScore) < 0.05;
@@ -1178,7 +1243,7 @@
 
     const treatmentSentence = entry.condition === BASELINE_CONDITION_ID
       ? 'Minimal baseline is the matched reference for this model setting.'
-      : `Architecture skill changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus Minimal baseline.`;
+      : `${escapeHtml(TREATMENT_LABEL)} changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus Minimal baseline.`;
 
     let tradeoffSentence = `No result has both a higher ${SCORE_EDITION_LABEL} score and lower resource use.`;
     if (!isFrontier) {
@@ -1262,7 +1327,7 @@
     const metric = metricConfig[state.metric];
     const field = state.capabilityCategory;
     const current = plotCoordinates(entry, field, state.metric);
-    const trajectory = matchedEntries(entry);
+    const trajectory = matchedEntries(entry).filter(candidate => Number.isFinite(scoreFor(candidate, field)));
     const trajectoryPoints = trajectory.map((candidate) => {
       const { x, y } = plotCoordinates(candidate, field, state.metric);
       return `${x.toFixed(3)},${y.toFixed(3)}`;
@@ -1321,7 +1386,7 @@
             aria-hidden="true"
           >Efficient frontier</span>
           <div class="efficiency-plane__points" role="group" aria-label="${ENTRY_COUNT} model, reasoning, and condition results">
-            ${data.entries.map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
+            ${data.entries.filter(candidate => Number.isFinite(scoreFor(candidate, field))).map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
           </div>
           <div class="efficiency-plane__pointer-layer" aria-hidden="true"></div>
           <div
@@ -1337,13 +1402,15 @@
         </div>
         <span class="efficiency-plane__axis-label efficiency-plane__axis-label--x">${escapeHtml(metric.axis)}</span>
       </div>
-      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one matched result under Minimal baseline or Architecture skill. The line connects results that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} ${SCORE_EDITION_LABEL} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM}–${SCORE_MAXIMUM} scale · ${escapeHtml(taskCoverageLabel)}.</p>
+      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one matched result under Minimal baseline or ${escapeHtml(TREATMENT_LABEL)}. The line connects results that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} ${SCORE_EDITION_LABEL} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM}–${SCORE_MAXIMUM} scale · ${escapeHtml(taskCoverageLabel)}.</p>
     `;
   };
 
   const efficientFrontier = (field, metric) => data.entries
+    .filter((entry) => Number.isFinite(scoreFor(entry, field)))
     .filter((entry) => Number.isFinite(Number(entry[metric])) && Number(entry[metric]) > 0)
     .filter((entry) => !data.entries.some((other) => (
+      Number.isFinite(scoreFor(other, field)) &&
       scoreFor(other, field) >= scoreFor(entry, field) &&
       other[metric] <= entry[metric] &&
       (scoreFor(other, field) > scoreFor(entry, field) || other[metric] < entry[metric])
@@ -1373,6 +1440,15 @@
     const entry = selectedEntry();
     const field = state.capabilityCategory;
     const ranking = rankedField(field);
+    entrySelect.innerHTML = ranking.entries.map((candidate) => `
+      <option value="${escapeHtml(candidate.id)}">${ranking.ranks.get(candidate.id) ? `#${ranking.ranks.get(candidate.id)}` : 'Not assessable'} · ${escapeHtml(candidate.family)} · ${escapeHtml(candidate.reasoning)} · ${escapeHtml(conditionById.get(candidate.condition).short)}</option>
+    `).join('');
+    entrySelect.value = entry.id;
+    resourceAxis.value = state.metric;
+    if (!Number.isFinite(scoreFor(entry, field))) {
+      efficiencyView.innerHTML = `<section class="efficiency-story"><h4>Efficiency is not assessable for this result</h4><p>The selected condition has no comparable panel total. Choose an assessable result above, or inspect this run’s available judgments in its <a href="${escapeHtml(data.benchmarkSummaries[0].detailHref)}">benchmark report</a>.</p></section>`;
+      return;
+    }
     const frontier = efficientFrontier(field, state.metric);
     const decision = efficiencyDecision(entry, frontier, field, state.metric);
     const sampled = sampleFrontier(frontier, 8, entry.id);
@@ -1384,12 +1460,6 @@
     const comparisonQualityDifference = comparison
       ? Math.round((scoreFor(entry, field) - scoreFor(comparison, field)) * 10) / 10
       : 0;
-
-    entrySelect.innerHTML = ranking.entries.map((candidate) => `
-      <option value="${escapeHtml(candidate.id)}">#${ranking.ranks.get(candidate.id)} · ${escapeHtml(candidate.family)} · ${escapeHtml(candidate.reasoning)} · ${escapeHtml(conditionById.get(candidate.condition).short)}</option>
-    `).join('');
-    entrySelect.value = entry.id;
-    resourceAxis.value = state.metric;
 
     efficiencyView.innerHTML = `
       <div class="efficiency-story">
@@ -1416,6 +1486,7 @@
               <p class="ui-eyebrow">Selected configuration</p>
               <h4 id="efficiency-selected-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4>
               <span class="efficiency-summary__status${decision.isFrontier ? ' is-frontier' : ''}">${decision.isFrontier ? 'On the frontier' : 'Dominated trade-off'}</span>
+              ${isWorkSpec ? `<span class="work-spec-readiness" data-selected-readiness>${escapeHtml(entry.readinessLabel)}</span>` : ''}
             </div>
             <span class="efficiency-summary__score">
               <small>${escapeHtml(conditionById.get(entry.condition).short)} rank #${ranking.ranks.get(entry.id)}</small>
@@ -1423,7 +1494,7 @@
               <small>${escapeHtml(fieldConfig[field].short)}</small>
             </span>
           </header>
-          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched Minimal baseline and Architecture skill results">
+          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched Minimal baseline and ${escapeHtml(TREATMENT_LABEL)} results">
             ${efficiencyTrajectoryMarkup(entry, field, state.metric, ranking.ranks, decision.frontierIds)}
           </div>
           <dl class="efficiency-summary__resources">
@@ -1714,6 +1785,11 @@
 
   const selectCapabilityCategory = (categoryId, { focusSelector, writeHash = true, skipMotion = false } = {}) => {
     if (!categoryById.has(categoryId)) return;
+    if (isWorkflowCategory(categoryId) !== isWorkSpec) {
+      window.location.hash = `capabilities/${categoryId}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`;
+      window.history.replaceState({ ...window.history.state, focusCapability: categoryId }, '');
+      return;
+    }
     state.capabilityCategory = categoryId;
     renderCapabilities({ animate: true, skipMotion });
     syncCapabilityRoute({ writeHash });
@@ -1894,6 +1970,10 @@
     const restoreCapabilityFocus = elements.capabilityView.contains(document.activeElement);
     const restoreModeFocus = Boolean(document.activeElement?.closest?.('.capability-mode__tab'));
     const route = routeFromHash();
+    if (isWorkflowCategory(route.category) !== isWorkSpec) {
+      window.location.reload();
+      return;
+    }
     state.capabilityCategory = route.category;
     state.capabilityMode = CAPABILITY_MODES.includes(route.mode) ? route.mode : 'models';
     renderCapabilities({ animate: true });
@@ -1914,9 +1994,21 @@
 
   capabilityIndexMedia.addEventListener('change', syncCapabilityIndexOrientation);
 
+  if (workflowData) {
+    document.querySelector('.benchmark-mast__scope').innerHTML = `${escapeHtml(data.categories[0].name)} <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} ${BENCHMARK_COUNT === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${SETTING_COUNT} model settings <span aria-hidden="true">·</span> ${data.benchmarkResults.length} responses <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> ${escapeHtml(SCORE_EDITION_LABEL)}</span>`;
+  }
+  if (isWorkSpec) {
+    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · AI Workflows · Uncalibrated development</span><span>${BENCHMARK_COUNT} benchmark × ${SETTING_COUNT} settings × 2 conditions = ${data.benchmarkResults.length} responses</span>`;
+  }
+
   renderDynamic();
   const initialHash = capabilityHash();
   if (window.location.hash !== initialHash) {
     window.history.replaceState(null, '', initialHash);
+  }
+  if (window.history.state?.focusCapability === state.capabilityCategory) {
+    window.requestAnimationFrame(() => document.querySelector('.capability-selector__tab[aria-selected="true"]')?.focus({ preventScroll: true }));
+    const { focusCapability, ...restoredHistoryState } = window.history.state;
+    window.history.replaceState(restoredHistoryState, '');
   }
 }());

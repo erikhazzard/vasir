@@ -32,6 +32,8 @@ let finishedAt = 0;
 const reduceQuery = matchMedia('(prefers-reduced-motion: reduce)');
 $('motion-setting').checked = reduceQuery.matches;
 renderer.setReducedMotion(reduceQuery.matches);
+$('game-hud').inert = true;
+$('touch-controls').inert = true;
 
 function resize() {
   const { width, height } = frame.getBoundingClientRect();
@@ -60,6 +62,8 @@ function begin() {
   game.start(); started = true; paused = false;
   frame.classList.add('echo-game--playing');
   $('intro').inert = true;
+  $('game-hud').inert = false;
+  $('touch-controls').inert = false;
   canvas.focus({ preventScroll: true });
   showMessage('Hold jump to rise higher. Jump again in the air.', 5200);
 }
@@ -70,6 +74,8 @@ function restart() {
   frame.classList.remove('echo-game--paused', 'echo-game--won');
   $('pause-panel').hidden = true; $('win-panel').hidden = true;
   $('intro').inert = true;
+  $('game-hud').inert = false;
+  $('touch-controls').inert = false;
   audio.unlock(); canvas.focus({ preventScroll: true });
   accumulator = 0;
 }
@@ -79,6 +85,8 @@ function pause(value = !paused) {
   paused = value; clearInput(); accumulator = 0;
   frame.classList.toggle('echo-game--paused', paused);
   $('pause-panel').hidden = !paused;
+  $('game-hud').inert = paused;
+  $('touch-controls').inert = paused;
   $('pause-button').setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
   if (paused) $('resume-button').focus({ preventScroll: true });
   else { audio.unlock(); canvas.focus({ preventScroll: true }); }
@@ -101,6 +109,14 @@ $('motion-setting').addEventListener('change', (event) => renderer.setReducedMot
 const moveKeys = new Set(['ArrowLeft','ArrowRight','KeyA','KeyD','Space','ArrowUp','KeyW']);
 const jumpKeys = new Set(['Space','ArrowUp','KeyW']);
 window.addEventListener('keydown', (event) => {
+  const openPanel = !$('pause-panel').hidden ? $('pause-panel') : !$('win-panel').hidden ? $('win-panel') : null;
+  if (openPanel && event.code === 'Tab') {
+    const focusable = [...openPanel.querySelectorAll('button,input')];
+    const first = focusable[0], last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    return;
+  }
   if (event.code === 'Escape') { event.preventDefault(); pause(); return; }
   if (event.code === 'KeyM' && !event.repeat) { setMuted(!muted); return; }
   if (event.code === 'KeyR' && started && !event.repeat) { restart(); return; }
@@ -184,6 +200,8 @@ function finish() {
   clearInput();
   frame.classList.add('echo-game--won');
   $('win-panel').hidden = false;
+  $('game-hud').inert = true;
+  $('touch-controls').inert = true;
   $('final-time').textContent = formatTime(game.elapsed);
   $('final-falls').textContent = String(game.deaths);
   let best = null;
@@ -239,7 +257,7 @@ async function loadImage(key, required = true) {
   try { await image.decode(); assets[key] = image; }
   catch (error) { if (required) throw error; }
 }
-Promise.all([loadImage('background'),loadImage('stone'),loadImage('hero'),loadImage('midground',false),loadImage('foreground',false)]).then(() => {
+Promise.all([loadImage('background'),loadImage('stone'),loadImage('hero'),loadImage('midground',false),loadImage('spider',false),loadImage('corbel'),loadImage('shrine')]).then(() => {
   $('start-button').disabled = false; $('start-label').textContent = 'Begin the ascent';
 }).catch(() => { $('load-error').hidden = false; });
 

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "work-spec-chat",
+  "title": "Work spec: private web chat",
+  "description": "Compares complete work specifications for a mobile-friendly private chat app supporting ten million simultaneous connections, using a frozen task and skill treatment.",
+  "edition": "work-spec-generation-v1",
+  "evidenceAdapter": "controlled-work-spec-artifacts-v1",
+  "weights": {
+    "V": 25,
+    "G": 15,
+    "A": 20,
+    "D": 15,
+    "S": 15,
+    "C": 10
+  },
+  "judges": [
+    "codex:gpt-6-astra@xhigh",
+    "claude:claude-fable-5-1@max"
+  ],
+  "gates": null,
+  "caps": null,
+  "inputSha256": {
+    "task": "e80a5df3e154c68fbe8fe869a354fd617556f9a231199ded5837f63590969371",
+    "treatment": "d0258c2a838d17f44d83e57551997e73c167e8dbe880b99fd139a75d7f733570",
+    "rubric": "7b6229a59a12fb8c2da467fc38303a91f414c2cee442305eeb26ac0d5eb4b263",
+    "adapter": "6a8e474c2689de6f48fd3854e996881f3784db1a6e451eaef55b4cb43f409f28"
+  },
+  "generationContractSha256": "48e78ef956bce943d82efe0e5d10224205fe138c3bf9d45a03d5010c028e06c7"
+}

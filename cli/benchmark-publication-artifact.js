@@ -18,7 +18,7 @@ const DEPLOYMENT_CONFIG_PATH = path.join("site", "vasirbenchmark.com", "deployme
 const TEMPLATE_LOCK_FILE_NAME = "template-lock.json";
 const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js"]);
 const RELEASE_ID_PATTERN = /^[a-f0-9]{64}$/;
-const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|\/Users\/|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
+const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
 const PRIVATE_PARENT_PATH_PATTERN = /(?:^|[^.])\.\.[/\\]/i;
 const ACCEPTANCE_QA_FILE_PATHS = Object.freeze(["capture.mjs", "capture.sh"]);
 const FIXTURE_TOKEN_PATTERN = /\b(?:fake|illustrative|synthetic|simulated|fixture|mock)\b/i;
@@ -474,12 +474,15 @@ export function buildBenchmarkPublicationArtifact({
     ["data.js", Buffer.from(publicationProjection.dataSource, "utf8")],
     ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")]
   ]);
+  const fileByteLimit = relativePath => relativePath === "responses.js"
+    ? (config.limits.maxResponseFileBytes ?? config.limits.maxFileBytes)
+    : config.limits.maxFileBytes;
   const sourceFiles = config.publicFiles.map((fileConfig) => {
     const generatedContents = generatedFiles.get(fileConfig.path);
     if (generatedContents) {
-      if (generatedContents.length > config.limits.maxFileBytes) {
+      if (generatedContents.length > fileByteLimit(fileConfig.path)) {
         throw artifactError({
-          message: `Generated production file exceeds the ${config.limits.maxFileBytes}-byte limit: ${fileConfig.path}`,
+          message: `Generated production file exceeds the ${fileByteLimit(fileConfig.path)}-byte limit: ${fileConfig.path}`,
           suggestion: "Reduce the public projection or explicitly revise and re-audit the publication budget.",
           context: { path: fileConfig.path, bytes: generatedContents.length }
         });
@@ -514,9 +517,9 @@ export function buildBenchmarkPublicationArtifact({
     }
     assertFileWithinSiteRoot({ siteRootDirectory, filePath, relativePath: fileConfig.path });
     const contents = fs.readFileSync(filePath);
-    if (contents.length > config.limits.maxFileBytes) {
+    if (contents.length > fileByteLimit(fileConfig.path)) {
       throw artifactError({
-        message: `Production file exceeds the ${config.limits.maxFileBytes}-byte limit: ${fileConfig.path}`,
+        message: `Production file exceeds the ${fileByteLimit(fileConfig.path)}-byte limit: ${fileConfig.path}`,
         suggestion: "Reduce the file size or explicitly revise and re-audit the publication budget.",
         context: { path: fileConfig.path, bytes: contents.length }
       });
@@ -557,9 +560,9 @@ export function buildBenchmarkPublicationArtifact({
             publicFiles: config.publicFiles
           })
         : sourceFile.contents;
-      if (body.length > config.limits.maxFileBytes) {
+      if (body.length > fileByteLimit(sourceFile.path)) {
         throw artifactError({
-          message: `Release-qualified production file exceeds the ${config.limits.maxFileBytes}-byte limit: ${sourceFile.path}`,
+          message: `Release-qualified production file exceeds the ${fileByteLimit(sourceFile.path)}-byte limit: ${sourceFile.path}`,
           suggestion: "Reduce the file size or explicitly revise and re-audit the publication budget.",
           context: { path: sourceFile.path, bytes: body.length, releaseId }
         });
@@ -640,7 +643,12 @@ export function buildBenchmarkPublicationArtifact({
       .filter((file) => /^(?:text\/|application\/(?:javascript|json))/.test(file.contentType))
       .filter((file) => {
         const source = file.body.toString("utf8");
-        return PRIVATE_LOCAL_PATH_PATTERN.test(source) || PRIVATE_PARENT_PATH_PATTERN.test(source);
+        // Candidate documents can legitimately route their authored supporting
+        // files through ../work-spec.md. They are preserved as response text,
+        // independently validated against pinned evidence before reaching here.
+        const authoredResponseText = file.path === "responses.js" && publicationProjection.projection.aiWorkflows;
+        // Preserve authored /users/ API routes while rejecting the literal Mac /Users/ home prefix.
+        return PRIVATE_LOCAL_PATH_PATTERN.test(source) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(source));
       })
       .map((file) => file.path);
     if (textualLeakPaths.length > 0) {

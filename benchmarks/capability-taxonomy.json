@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "version": "vasir-capabilities-development-v5",
+  "version": "vasir-capabilities-development-v6",
   "status": "development",
   "categories": [
     {
@@ -37,6 +37,40 @@
       "uncertainty": {
         "status": "not-estimated",
         "reason": "Only one trial per task and condition is published; per-response judge spread is retained."
+      }
+    },
+    {
+      "id": "work-specification",
+      "title": "Work Specification",
+      "description": "Product intent, observable behavior, and useful direction for subsequent work.",
+      "benchmarkIds": [
+        "work-spec-chat"
+      ],
+      "modelScore": {
+        "label": "Work Specs v1",
+        "edition": "work-spec-generation-v1",
+        "method": "equal-benchmark-absolute-mean-v1",
+        "benchmarkWeighting": "equal",
+        "scaleMaximum": 100,
+        "judging": {
+          "panel": [
+            "codex:gpt-6-astra@xhigh",
+            "claude:claude-fable-5-1@max"
+          ],
+          "judgeCount": 2,
+          "batchUnit": "individual-response",
+          "aggregation": "mean-weighted-dimensions-no-gates-v1",
+          "synthesizer": null
+        }
+      },
+      "effect": {
+        "method": "paired-absolute-delta-v1",
+        "benchmarkWeighting": "equal",
+        "unit": "rubric-points"
+      },
+      "uncertainty": {
+        "status": "not-estimated",
+        "reason": "One authored scenario and one trial per condition; human calibration and downstream implementation validation remain pending."
       }
     }
   ]

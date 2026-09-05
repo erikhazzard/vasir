@@ -3,11 +3,11 @@
 
   window.VASIR_DATA = Object.freeze({
   "kind": "vasirbenchmark-public-projection",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "program": {
     "id": "vasirbench",
     "title": "VasirBench",
-    "taxonomyVersion": "vasir-capabilities-development-v5",
+    "taxonomyVersion": "vasir-capabilities-development-v6",
     "status": "development",
     "evidenceStatus": "development",
     "verification": "unverified"
@@ -11292,6 +11292,8671 @@
     "developmentResultSets": 3,
     "eligibleResultSets": 0,
     "withheldResultSets": 0
+  },
+  "aiWorkflows": {
+    "kind": "vasirbenchmark-work-spec-projection",
+    "schemaVersion": 1,
+    "program": {
+      "id": "vasirbench",
+      "title": "VasirBench",
+      "status": "development",
+      "evidenceStatus": "development",
+      "verification": "unverified"
+    },
+    "meta": {
+      "release": "Development snapshot · September 2026",
+      "status": "Exploratory development results · unverified",
+      "categories": 1,
+      "benchmarks": 1,
+      "settings": 26,
+      "conditions": 2,
+      "trials": 1,
+      "aggregateCells": 52,
+      "runs": 1,
+      "calibration": 0,
+      "vasirVersion": null
+    },
+    "scoreBasis": {
+      "id": "work-spec-generation-v1:747d4e4276a0990cfdf687ba723b5db32308a7a3883d3e5916bbdd2c18f9b2c3",
+      "label": "Work Specs v1",
+      "edition": "work-spec-generation-v1",
+      "method": "equal-benchmark-absolute-mean-v1",
+      "unit": "rubric-points",
+      "range": {
+        "minimum": 0,
+        "maximum": 100
+      },
+      "benchmarkWeighting": "equal",
+      "benchmarkIds": [
+        "work-spec-chat"
+      ],
+      "taskCount": 1,
+      "trialsPerTask": 1,
+      "judgeCount": 2,
+      "judges": [
+        "codex:gpt-6-astra@xhigh",
+        "claude:claude-fable-5-1@max"
+      ],
+      "aggregation": "mean-weighted-dimensions-no-gates-v1",
+      "batchUnit": "individual-response",
+      "effectMethod": "paired-absolute-delta-v1",
+      "effectUnit": "rubric-points",
+      "calibrationStatus": "development-uncalibrated",
+      "uncertainty": {
+        "status": "not-estimated",
+        "reason": "One authored scenario and one trial per condition; human calibration and downstream implementation validation remain pending."
+      },
+      "weights": {
+        "V": 25,
+        "G": 15,
+        "A": 20,
+        "D": 15,
+        "S": 15,
+        "C": 10
+      },
+      "ratingMaximum": 4,
+      "gates": null,
+      "caps": null,
+      "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+      "inputSha256": {
+        "task": "e80a5df3e154c68fbe8fe869a354fd617556f9a231199ded5837f63590969371",
+        "treatment": "d0258c2a838d17f44d83e57551997e73c167e8dbe880b99fd139a75d7f733570",
+        "rubric": "7b6229a59a12fb8c2da467fc38303a91f414c2cee442305eeb26ac0d5eb4b263",
+        "adapter": "6a8e474c2689de6f48fd3854e996881f3784db1a6e451eaef55b4cb43f409f28"
+      }
+    },
+    "conditions": [
+      {
+        "id": "baseline",
+        "sourceId": "clean",
+        "short": "Minimal",
+        "label": "Minimal baseline",
+        "color": "#72777f",
+        "shape": "circle"
+      },
+      {
+        "id": "skill",
+        "sourceId": "skill:plan__maintain-work-spec",
+        "short": "Work spec",
+        "label": "Work-spec skill",
+        "color": "#1f6fff",
+        "shape": "square"
+      }
+    ],
+    "categories": [
+      {
+        "id": "ai-workflows",
+        "name": "AI Workflows",
+        "title": "AI Workflows",
+        "short": "AI",
+        "weight": 1,
+        "color": "#7650bc",
+        "trackIds": [
+          "work-specification"
+        ]
+      }
+    ],
+    "families": [
+      {
+        "id": "ai-workflows",
+        "title": "AI Workflows",
+        "description": "Useful specifications that preserve product intent and direct subsequent work.",
+        "trackIds": [
+          "work-specification"
+        ]
+      }
+    ],
+    "tracks": [
+      {
+        "id": "work-specification",
+        "familyId": "ai-workflows",
+        "title": "Work Specification",
+        "description": "Product intent, observable behavior, and useful direction for subsequent work.",
+        "benchmarkIds": [
+          "work-spec-chat"
+        ],
+        "resultAvailability": {
+          "status": "development",
+          "verification": "unverified",
+          "code": "development-unverified-results",
+          "message": "Exploratory development results — unverified.",
+          "detail": "One scenario, one trial, two independent judges; human calibration and downstream validation remain pending.",
+          "blockers": [
+            {
+              "code": "author-calibration-pending",
+              "message": "Human calibration and downstream implementation validation are pending."
+            }
+          ]
+        }
+      }
+    ],
+    "benchmarks": [
+      {
+        "id": "work-spec-chat",
+        "trackId": "work-specification",
+        "familyId": "ai-workflows",
+        "category": "ai-workflows",
+        "suite": "Work Specification",
+        "name": "Work spec: private web chat",
+        "title": "Work spec: private web chat",
+        "description": "Compares complete work specifications for a mobile-friendly private chat app supporting ten million simultaneous connections, using a frozen task and skill treatment.",
+        "taskKind": "work-spec-generation",
+        "task": {
+          "id": "ten-million-concurrent-chat",
+          "text": "Write a work spec for building a mobile-friendly web chat app that can support **10 million simultaneously connected users**.\n\nThe product helps friends and small groups coordinate plans. A person should be able to invite others into a private conversation, exchange messages, leave, and return without losing the conversation or being unsure whether their own message was sent.\n\nThe initial product needs:\n\n- Account sign-in, one-to-one conversations, and private group conversations with up to 50 members. A user can create a group and invite another person who can join it.\n- Text messages and conversation history on mobile and desktop browsers. People can return later and continue where they left off.\n- Honest message status during slow or interrupted connections. A brief disconnection, reconnect, or retry must not silently lose a message or display duplicate copies of the same send.\n- Private membership: people outside a conversation cannot read its messages, and removing a member stops their access to future messages.\n- A usable, responsive conversation experience as the service grows to the stated concurrency target.\n\nVoice/video, attachments, public channels, bots, payments, and end-to-end encryption are outside this task. This does not remove ordinary account security or conversation privacy.\n\nThis is a greenfield benchmark scenario, not an existing repository. There is no implemented chat backend, existing schema, or approved technology choice to inherit. Ten million means concurrent connections, not registered accounts or messages per second. Message rates, regional distribution, retention duration, numerical latency targets, operating budget, and rollout timing have not yet been determined. The concurrency target is a requirement; the other unknowns are not measured facts.\n\nProduce the work spec an implementation team could use to begin this work and carry it through to the intended product. Return Markdown, including any supporting material needed to understand the spec. Do not implement the application.\n"
+        },
+        "prompt": "Write a work spec for building a mobile-friendly web chat app that can support **10 million simultaneously connected users**.\n\nThe product helps friends and small groups coordinate plans. A person should be able to invite others into a private conversation, exchange messages, leave, and return without losing the conversation or being unsure whether their own message was sent.\n\nThe initial product needs:\n\n- Account sign-in, one-to-one conversations, and private group conversations with up to 50 members. A user can create a group and invite another person who can join it.\n- Text messages and conversation history on mobile and desktop browsers. People can return later and continue where they left off.\n- Honest message status during slow or interrupted connections. A brief disconnection, reconnect, or retry must not silently lose a message or display duplicate copies of the same send.\n- Private membership: people outside a conversation cannot read its messages, and removing a member stops their access to future messages.\n- A usable, responsive conversation experience as the service grows to the stated concurrency target.\n\nVoice/video, attachments, public channels, bots, payments, and end-to-end encryption are outside this task. This does not remove ordinary account security or conversation privacy.\n\nThis is a greenfield benchmark scenario, not an existing repository. There is no implemented chat backend, existing schema, or approved technology choice to inherit. Ten million means concurrent connections, not registered accounts or messages per second. Message rates, regional distribution, retention duration, numerical latency targets, operating budget, and rollout timing have not yet been determined. The concurrency target is a requirement; the other unknowns are not measured facts.\n\nProduce the work spec an implementation team could use to begin this work and carry it through to the intended product. Return Markdown, including any supporting material needed to understand the spec. Do not implement the application.\n",
+        "judging": {
+          "panel": [
+            "codex:gpt-6-astra@xhigh",
+            "claude:claude-fable-5-1@max"
+          ],
+          "synthesizer": null
+        },
+        "limitations": [
+          "One authored chat scenario and one trial per condition; this does not establish performance across AI workflows.",
+          "The rubric is not yet calibrated against human judgments or downstream implementation outcomes.",
+          "The treatment is the frozen work-spec skill plus its required dependency excerpts; it is not Full Vasir.",
+          "The judges also appear among the candidates. Candidates are anonymized, but judge agreement does not establish correctness.",
+          "Readiness is reported separately from the numerical score; disagreements remain unresolved."
+        ],
+        "reportFragment": "work-spec-chat",
+        "detailHref": "benchmark-report.html#work-spec-chat",
+        "evidenceKind": "development",
+        "resultAvailability": {
+          "status": "development",
+          "verification": "unverified",
+          "code": "development-unverified-results",
+          "message": "Exploratory development results — unverified.",
+          "detail": "One scenario, one trial, two independent judges; human calibration and downstream validation remain pending.",
+          "blockers": [
+            {
+              "code": "author-calibration-pending",
+              "message": "Human calibration and downstream implementation validation are pending."
+            }
+          ]
+        },
+        "measured": {
+          "baseline": 87.4,
+          "treatment": 94.6,
+          "delta": 7.2,
+          "wins": 26,
+          "ties": 0,
+          "losses": 0,
+          "complete": 52,
+          "total": 52,
+          "treatmentLabel": "Work-spec skill",
+          "calibration": "Calibration pending"
+        }
+      }
+    ],
+    "results": [
+      {
+        "benchmarkId": "work-spec-chat",
+        "runId": "2026-09-05T05-06-00Z__chat__expanded-26",
+        "readinessLabel": "Readiness varies by candidate",
+        "assessmentStatus": "assessable",
+        "completedAt": null,
+        "status": "development",
+        "verification": "unverified",
+        "blockers": [
+          {
+            "code": "author-calibration-pending",
+            "message": "Human calibration and downstream implementation validation are pending."
+          }
+        ],
+        "judgingScope": {
+          "mode": "independent-response-panel",
+          "aggregationMethod": "mean-weighted-dimensions-no-gates-v1",
+          "judgeCount": 2,
+          "responseCount": 52,
+          "completedJudgmentCount": 104,
+          "gates": null,
+          "caps": null
+        },
+        "baselineScore": 87.4,
+        "treatmentScore": 94.6,
+        "delta": 7.2,
+        "record": {
+          "wins": 26,
+          "ties": 0,
+          "losses": 0
+        },
+        "responseCount": 52,
+        "matchedConfigurationCount": 26,
+        "configurations": [
+          {
+            "settingId": "codex-gpt-6-astra-ultra",
+            "configurationId": "codex:gpt-6-astra@ultra",
+            "baselineScore": 96.3,
+            "treatmentScore": 100,
+            "delta": 3.8,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 605492,
+              "meanInputTokens": 15627,
+              "meanOutputTokens": 13523,
+              "meanTotalTokens": 29150,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 797136,
+              "meanInputTokens": 20843,
+              "meanOutputTokens": 17210,
+              "meanTotalTokens": 38053,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-6-astra-xhigh",
+            "configurationId": "codex:gpt-6-astra@xhigh",
+            "baselineScore": 96.3,
+            "treatmentScore": 100,
+            "delta": 3.8,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 748479,
+              "meanInputTokens": 15580,
+              "meanOutputTokens": 15845,
+              "meanTotalTokens": 31425,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 822706,
+              "meanInputTokens": 20796,
+              "meanOutputTokens": 19305,
+              "meanTotalTokens": 40101,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-sol-max",
+            "configurationId": "codex:gpt-5.6-sol@max",
+            "baselineScore": 93.8,
+            "treatmentScore": 98.8,
+            "delta": 5,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 738419,
+              "meanInputTokens": 14687,
+              "meanOutputTokens": 38199,
+              "meanTotalTokens": 52886,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 918743,
+              "meanInputTokens": 19903,
+              "meanOutputTokens": 41384,
+              "meanTotalTokens": 61287,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-luna-max",
+            "configurationId": "codex:gpt-5.6-luna@max",
+            "baselineScore": 88.1,
+            "treatmentScore": 98.1,
+            "delta": 10,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 538181,
+              "meanInputTokens": 12898,
+              "meanOutputTokens": 29742,
+              "meanTotalTokens": 42640,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 537415,
+              "meanInputTokens": 18116,
+              "meanOutputTokens": 29591,
+              "meanTotalTokens": 47707,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-sol-high",
+            "configurationId": "codex:gpt-5.6-sol@high",
+            "baselineScore": 94.4,
+            "treatmentScore": 98.1,
+            "delta": 3.8,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 302361,
+              "meanInputTokens": 14687,
+              "meanOutputTokens": 12331,
+              "meanTotalTokens": 27018,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 457934,
+              "meanInputTokens": 19903,
+              "meanOutputTokens": 19684,
+              "meanTotalTokens": 39587,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-sol-medium",
+            "configurationId": "codex:gpt-5.6-sol@medium",
+            "baselineScore": 85,
+            "treatmentScore": 97.5,
+            "delta": 12.5,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 189194,
+              "meanInputTokens": 14685,
+              "meanOutputTokens": 7878,
+              "meanTotalTokens": 22563,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 335978,
+              "meanInputTokens": 19903,
+              "meanOutputTokens": 14111,
+              "meanTotalTokens": 34014,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-sol-ultra",
+            "configurationId": "codex:gpt-5.6-sol@ultra",
+            "baselineScore": 93.1,
+            "treatmentScore": 97.5,
+            "delta": 4.4,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 759055,
+              "meanInputTokens": 14732,
+              "meanOutputTokens": 37324,
+              "meanTotalTokens": 52056,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 892537,
+              "meanInputTokens": 19952,
+              "meanOutputTokens": 37982,
+              "meanTotalTokens": 57934,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-luna-xhigh",
+            "configurationId": "codex:gpt-5.6-luna@xhigh",
+            "baselineScore": 85,
+            "treatmentScore": 96.9,
+            "delta": 11.9,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 254897,
+              "meanInputTokens": 12900,
+              "meanOutputTokens": 13892,
+              "meanTotalTokens": 26792,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 356298,
+              "meanInputTokens": 18114,
+              "meanOutputTokens": 19519,
+              "meanTotalTokens": 37633,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-sol-xhigh",
+            "configurationId": "codex:gpt-5.6-sol@xhigh",
+            "baselineScore": 93.1,
+            "treatmentScore": 96.9,
+            "delta": 3.8,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 517320,
+              "meanInputTokens": 14685,
+              "meanOutputTokens": 20824,
+              "meanTotalTokens": 35509,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 508220,
+              "meanInputTokens": 19903,
+              "meanOutputTokens": 21917,
+              "meanTotalTokens": 41820,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-terra-max",
+            "configurationId": "codex:gpt-5.6-terra@max",
+            "baselineScore": 86.3,
+            "treatmentScore": 96.3,
+            "delta": 10,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 739223,
+              "meanInputTokens": 14463,
+              "meanOutputTokens": 40779,
+              "meanTotalTokens": 55242,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 742781,
+              "meanInputTokens": 19903,
+              "meanOutputTokens": 41033,
+              "meanTotalTokens": 60936,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-terra-xhigh",
+            "configurationId": "codex:gpt-5.6-terra@xhigh",
+            "baselineScore": 81.3,
+            "treatmentScore": 96.3,
+            "delta": 15,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 287365,
+              "meanInputTokens": 14467,
+              "meanOutputTokens": 15788,
+              "meanTotalTokens": 30255,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 264301,
+              "meanInputTokens": 19681,
+              "meanOutputTokens": 14475,
+              "meanTotalTokens": 34156,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-sol-low",
+            "configurationId": "codex:gpt-5.6-sol@low",
+            "baselineScore": 82.5,
+            "treatmentScore": 95.6,
+            "delta": 13.1,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 200448,
+              "meanInputTokens": 14687,
+              "meanOutputTokens": 9306,
+              "meanTotalTokens": 23993,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 208000,
+              "meanInputTokens": 19899,
+              "meanOutputTokens": 8776,
+              "meanTotalTokens": 28675,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-terra-low",
+            "configurationId": "codex:gpt-5.6-terra@low",
+            "baselineScore": 91.3,
+            "treatmentScore": 95.6,
+            "delta": 4.4,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 111709,
+              "meanInputTokens": 14687,
+              "meanOutputTokens": 5819,
+              "meanTotalTokens": 20506,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 105134,
+              "meanInputTokens": 19903,
+              "meanOutputTokens": 5484,
+              "meanTotalTokens": 25387,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-terra-medium",
+            "configurationId": "codex:gpt-5.6-terra@medium",
+            "baselineScore": 86.3,
+            "treatmentScore": 95.6,
+            "delta": 9.4,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 103415,
+              "meanInputTokens": 14687,
+              "meanOutputTokens": 5580,
+              "meanTotalTokens": 20267,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 100786,
+              "meanInputTokens": 19679,
+              "meanOutputTokens": 5380,
+              "meanTotalTokens": 25059,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-terra-high",
+            "configurationId": "codex:gpt-5.6-terra@high",
+            "baselineScore": 94.4,
+            "treatmentScore": 95,
+            "delta": 0.6,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 120032,
+              "meanInputTokens": 14685,
+              "meanOutputTokens": 6487,
+              "meanTotalTokens": 21172,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 127943,
+              "meanInputTokens": 19683,
+              "meanOutputTokens": 6950,
+              "meanTotalTokens": 26633,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-terra-ultra",
+            "configurationId": "codex:gpt-5.6-terra@ultra",
+            "baselineScore": 81.9,
+            "treatmentScore": 94.4,
+            "delta": 12.5,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 594814,
+              "meanInputTokens": 14514,
+              "meanOutputTokens": 32867,
+              "meanTotalTokens": 47381,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 535144,
+              "meanInputTokens": 19952,
+              "meanOutputTokens": 29529,
+              "meanTotalTokens": 49481,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-opus-xhigh",
+            "configurationId": "claude:opus@xhigh",
+            "baselineScore": 77.5,
+            "treatmentScore": 93.8,
+            "delta": 16.3,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 742621,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 53419,
+              "meanTotalTokens": 56965,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 396913,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 27707,
+              "meanTotalTokens": 39906,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-luna-low",
+            "configurationId": "codex:gpt-5.6-luna@low",
+            "baselineScore": 91.9,
+            "treatmentScore": 93.8,
+            "delta": 1.9,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 110125,
+              "meanInputTokens": 12896,
+              "meanOutputTokens": 5885,
+              "meanTotalTokens": 18781,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 103574,
+              "meanInputTokens": 18338,
+              "meanOutputTokens": 5493,
+              "meanTotalTokens": 23831,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-luna-medium",
+            "configurationId": "codex:gpt-5.6-luna@medium",
+            "baselineScore": 86.9,
+            "treatmentScore": 93.1,
+            "delta": 6.3,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 115502,
+              "meanInputTokens": 12898,
+              "meanOutputTokens": 6271,
+              "meanTotalTokens": 19169,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 126799,
+              "meanInputTokens": 18116,
+              "meanOutputTokens": 6869,
+              "meanTotalTokens": 24985,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-claude-fable-5-1-max",
+            "configurationId": "claude:claude-fable-5-1@max",
+            "baselineScore": 88.1,
+            "treatmentScore": 92.5,
+            "delta": 4.4,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 1099068,
+              "meanInputTokens": 6,
+              "meanOutputTokens": 83137,
+              "meanTotalTokens": 156064,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 889385,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 63655,
+              "meanTotalTokens": 76739,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-claude-fable-5-1-xhigh",
+            "configurationId": "claude:claude-fable-5-1@xhigh",
+            "baselineScore": 90.6,
+            "treatmentScore": 91.9,
+            "delta": 1.3,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 622916,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 44990,
+              "meanTotalTokens": 49420,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 642489,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 46807,
+              "meanTotalTokens": 59890,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "codex-gpt-5-6-luna-high",
+            "configurationId": "codex:gpt-5.6-luna@high",
+            "baselineScore": 85,
+            "treatmentScore": 91.9,
+            "delta": 6.9,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 190549,
+              "meanInputTokens": 12900,
+              "meanOutputTokens": 10316,
+              "meanTotalTokens": 23216,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 207373,
+              "meanInputTokens": 18116,
+              "meanOutputTokens": 11263,
+              "meanTotalTokens": 29379,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-opus-high",
+            "configurationId": "claude:opus@high",
+            "baselineScore": 81.3,
+            "treatmentScore": 87.5,
+            "delta": 6.3,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 460984,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 31923,
+              "meanTotalTokens": 35467,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 359837,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 24462,
+              "meanTotalTokens": 36662,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-opus-low",
+            "configurationId": "claude:opus@low",
+            "baselineScore": 76.9,
+            "treatmentScore": 87.5,
+            "delta": 10.6,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 324940,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 23002,
+              "meanTotalTokens": 26543,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 194222,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 13658,
+              "meanTotalTokens": 25852,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-opus-max",
+            "configurationId": "claude:opus@max",
+            "baselineScore": 81.3,
+            "treatmentScore": 87.5,
+            "delta": 6.3,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 696168,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 53042,
+              "meanTotalTokens": 56588,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 580443,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 39357,
+              "meanTotalTokens": 51558,
+              "costUsd": null
+            }
+          },
+          {
+            "settingId": "claude-opus-medium",
+            "configurationId": "claude:opus@medium",
+            "baselineScore": 83.1,
+            "treatmentScore": 87.5,
+            "delta": 4.4,
+            "baselineMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 473677,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 33967,
+              "meanTotalTokens": 37513,
+              "costUsd": null
+            },
+            "skillMetrics": {
+              "sampleCount": 1,
+              "meanLatencyMs": 241613,
+              "meanInputTokens": 2,
+              "meanOutputTokens": 17278,
+              "meanTotalTokens": 29478,
+              "costUsd": null
+            }
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "id": "codex-gpt-6-astra-ultra",
+        "configurationId": "codex:gpt-6-astra@ultra",
+        "modelId": "codex:gpt-6-astra",
+        "provider": "codex",
+        "family": "GPT-6 Astra",
+        "reasoning": "ultra",
+        "label": "GPT-6 Astra · ultra",
+        "scores": {
+          "baseline": 96.3,
+          "skill": 100
+        },
+        "deltas": {
+          "skill": 3.8
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 96.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 100
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 605492,
+            "meanInputTokens": 15627,
+            "meanOutputTokens": 13523,
+            "meanTotalTokens": 29150,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 797136,
+            "meanInputTokens": 20843,
+            "meanOutputTokens": 17210,
+            "meanTotalTokens": 38053,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement as written"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement as written"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-6-astra-xhigh",
+        "configurationId": "codex:gpt-6-astra@xhigh",
+        "modelId": "codex:gpt-6-astra",
+        "provider": "codex",
+        "family": "GPT-6 Astra",
+        "reasoning": "xhigh",
+        "label": "GPT-6 Astra · xhigh",
+        "scores": {
+          "baseline": 96.3,
+          "skill": 100
+        },
+        "deltas": {
+          "skill": 3.8
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 96.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 100
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 748479,
+            "meanInputTokens": 15580,
+            "meanOutputTokens": 15845,
+            "meanTotalTokens": 31425,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 822706,
+            "meanInputTokens": 20796,
+            "meanOutputTokens": 19305,
+            "meanTotalTokens": 40101,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Sound spec; decision required",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement as written"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Implement as written"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-sol-max",
+        "configurationId": "codex:gpt-5.6-sol@max",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "max",
+        "label": "GPT-5.6 Sol · max",
+        "scores": {
+          "baseline": 93.8,
+          "skill": 98.8
+        },
+        "deltas": {
+          "skill": 5
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 93.8
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 98.8
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 738419,
+            "meanInputTokens": 14687,
+            "meanOutputTokens": 38199,
+            "meanTotalTokens": 52886,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 918743,
+            "meanInputTokens": 19903,
+            "meanOutputTokens": 41384,
+            "meanTotalTokens": 61287,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Sound spec; decision required",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement as written"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-luna-max",
+        "configurationId": "codex:gpt-5.6-luna@max",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "max",
+        "label": "GPT-5.6 Luna · max",
+        "scores": {
+          "baseline": 88.1,
+          "skill": 98.1
+        },
+        "deltas": {
+          "skill": 10
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 88.1
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 98.1
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 538181,
+            "meanInputTokens": 12898,
+            "meanOutputTokens": 29742,
+            "meanTotalTokens": 42640,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 537415,
+            "meanInputTokens": 18116,
+            "meanOutputTokens": 29591,
+            "meanTotalTokens": 47707,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-sol-high",
+        "configurationId": "codex:gpt-5.6-sol@high",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "high",
+        "label": "GPT-5.6 Sol · high",
+        "scores": {
+          "baseline": 94.4,
+          "skill": 98.1
+        },
+        "deltas": {
+          "skill": 3.8
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 94.4
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 98.1
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 302361,
+            "meanInputTokens": 14687,
+            "meanOutputTokens": 12331,
+            "meanTotalTokens": 27018,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 457934,
+            "meanInputTokens": 19903,
+            "meanOutputTokens": 19684,
+            "meanTotalTokens": 39587,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-sol-medium",
+        "configurationId": "codex:gpt-5.6-sol@medium",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Sol · medium",
+        "scores": {
+          "baseline": 85,
+          "skill": 97.5
+        },
+        "deltas": {
+          "skill": 12.5
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 85
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 97.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 189194,
+            "meanInputTokens": 14685,
+            "meanOutputTokens": 7878,
+            "meanTotalTokens": 22563,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 335978,
+            "meanInputTokens": 19903,
+            "meanOutputTokens": 14111,
+            "meanTotalTokens": 34014,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-sol-ultra",
+        "configurationId": "codex:gpt-5.6-sol@ultra",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "ultra",
+        "label": "GPT-5.6 Sol · ultra",
+        "scores": {
+          "baseline": 93.1,
+          "skill": 97.5
+        },
+        "deltas": {
+          "skill": 4.4
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 93.1
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 97.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 759055,
+            "meanInputTokens": 14732,
+            "meanOutputTokens": 37324,
+            "meanTotalTokens": 52056,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 892537,
+            "meanInputTokens": 19952,
+            "meanOutputTokens": 37982,
+            "meanTotalTokens": 57934,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement as written"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-luna-xhigh",
+        "configurationId": "codex:gpt-5.6-luna@xhigh",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Luna · xhigh",
+        "scores": {
+          "baseline": 85,
+          "skill": 96.9
+        },
+        "deltas": {
+          "skill": 11.9
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 85
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 96.9
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 254897,
+            "meanInputTokens": 12900,
+            "meanOutputTokens": 13892,
+            "meanTotalTokens": 26792,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 356298,
+            "meanInputTokens": 18114,
+            "meanOutputTokens": 19519,
+            "meanTotalTokens": 37633,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-sol-xhigh",
+        "configurationId": "codex:gpt-5.6-sol@xhigh",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Sol · xhigh",
+        "scores": {
+          "baseline": 93.1,
+          "skill": 96.9
+        },
+        "deltas": {
+          "skill": 3.8
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 93.1
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 96.9
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 517320,
+            "meanInputTokens": 14685,
+            "meanOutputTokens": 20824,
+            "meanTotalTokens": 35509,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 508220,
+            "meanInputTokens": 19903,
+            "meanOutputTokens": 21917,
+            "meanTotalTokens": 41820,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-terra-max",
+        "configurationId": "codex:gpt-5.6-terra@max",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "max",
+        "label": "GPT-5.6 Terra · max",
+        "scores": {
+          "baseline": 86.3,
+          "skill": 96.3
+        },
+        "deltas": {
+          "skill": 10
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 86.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 96.3
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 739223,
+            "meanInputTokens": 14463,
+            "meanOutputTokens": 40779,
+            "meanTotalTokens": 55242,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 742781,
+            "meanInputTokens": 19903,
+            "meanOutputTokens": 41033,
+            "meanTotalTokens": 60936,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-terra-xhigh",
+        "configurationId": "codex:gpt-5.6-terra@xhigh",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Terra · xhigh",
+        "scores": {
+          "baseline": 81.3,
+          "skill": 96.3
+        },
+        "deltas": {
+          "skill": 15
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 81.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 96.3
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 287365,
+            "meanInputTokens": 14467,
+            "meanOutputTokens": 15788,
+            "meanTotalTokens": 30255,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 264301,
+            "meanInputTokens": 19681,
+            "meanOutputTokens": 14475,
+            "meanTotalTokens": 34156,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-sol-low",
+        "configurationId": "codex:gpt-5.6-sol@low",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "low",
+        "label": "GPT-5.6 Sol · low",
+        "scores": {
+          "baseline": 82.5,
+          "skill": 95.6
+        },
+        "deltas": {
+          "skill": 13.1
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 82.5
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 95.6
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 200448,
+            "meanInputTokens": 14687,
+            "meanOutputTokens": 9306,
+            "meanTotalTokens": 23993,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 208000,
+            "meanInputTokens": 19899,
+            "meanOutputTokens": 8776,
+            "meanTotalTokens": 28675,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-terra-low",
+        "configurationId": "codex:gpt-5.6-terra@low",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "low",
+        "label": "GPT-5.6 Terra · low",
+        "scores": {
+          "baseline": 91.3,
+          "skill": 95.6
+        },
+        "deltas": {
+          "skill": 4.4
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 91.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 95.6
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 111709,
+            "meanInputTokens": 14687,
+            "meanOutputTokens": 5819,
+            "meanTotalTokens": 20506,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 105134,
+            "meanInputTokens": 19903,
+            "meanOutputTokens": 5484,
+            "meanTotalTokens": 25387,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-terra-medium",
+        "configurationId": "codex:gpt-5.6-terra@medium",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Terra · medium",
+        "scores": {
+          "baseline": 86.3,
+          "skill": 95.6
+        },
+        "deltas": {
+          "skill": 9.4
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 86.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 95.6
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 103415,
+            "meanInputTokens": 14687,
+            "meanOutputTokens": 5580,
+            "meanTotalTokens": 20267,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 100786,
+            "meanInputTokens": 19679,
+            "meanOutputTokens": 5380,
+            "meanTotalTokens": 25059,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-terra-high",
+        "configurationId": "codex:gpt-5.6-terra@high",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "high",
+        "label": "GPT-5.6 Terra · high",
+        "scores": {
+          "baseline": 94.4,
+          "skill": 95
+        },
+        "deltas": {
+          "skill": 0.6
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 94.4
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 95
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 120032,
+            "meanInputTokens": 14685,
+            "meanOutputTokens": 6487,
+            "meanTotalTokens": 21172,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 127943,
+            "meanInputTokens": 19683,
+            "meanOutputTokens": 6950,
+            "meanTotalTokens": 26633,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-terra-ultra",
+        "configurationId": "codex:gpt-5.6-terra@ultra",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "ultra",
+        "label": "GPT-5.6 Terra · ultra",
+        "scores": {
+          "baseline": 81.9,
+          "skill": 94.4
+        },
+        "deltas": {
+          "skill": 12.5
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 81.9
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 94.4
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 594814,
+            "meanInputTokens": 14514,
+            "meanOutputTokens": 32867,
+            "meanTotalTokens": 47381,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 535144,
+            "meanInputTokens": 19952,
+            "meanOutputTokens": 29529,
+            "meanTotalTokens": 49481,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement as written",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-opus-xhigh",
+        "configurationId": "claude:opus@xhigh",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "xhigh",
+        "label": "Claude Opus 5 · xhigh",
+        "scores": {
+          "baseline": 77.5,
+          "skill": 93.8
+        },
+        "deltas": {
+          "skill": 16.3
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 77.5
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 93.8
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 742621,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 53419,
+            "meanTotalTokens": 56965,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 396913,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 27707,
+            "meanTotalTokens": 39906,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-luna-low",
+        "configurationId": "codex:gpt-5.6-luna@low",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "low",
+        "label": "GPT-5.6 Luna · low",
+        "scores": {
+          "baseline": 91.9,
+          "skill": 93.8
+        },
+        "deltas": {
+          "skill": 1.9
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 91.9
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 93.8
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 110125,
+            "meanInputTokens": 12896,
+            "meanOutputTokens": 5885,
+            "meanTotalTokens": 18781,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 103574,
+            "meanInputTokens": 18338,
+            "meanOutputTokens": 5493,
+            "meanTotalTokens": 23831,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-luna-medium",
+        "configurationId": "codex:gpt-5.6-luna@medium",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Luna · medium",
+        "scores": {
+          "baseline": 86.9,
+          "skill": 93.1
+        },
+        "deltas": {
+          "skill": 6.3
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 86.9
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 93.1
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 115502,
+            "meanInputTokens": 12898,
+            "meanOutputTokens": 6271,
+            "meanTotalTokens": 19169,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 126799,
+            "meanInputTokens": 18116,
+            "meanOutputTokens": 6869,
+            "meanTotalTokens": 24985,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-claude-fable-5-1-max",
+        "configurationId": "claude:claude-fable-5-1@max",
+        "modelId": "claude:claude-fable-5-1",
+        "provider": "claude",
+        "family": "Claude Fable 5.1",
+        "reasoning": "max",
+        "label": "Claude Fable 5.1 · max",
+        "scores": {
+          "baseline": 88.1,
+          "skill": 92.5
+        },
+        "deltas": {
+          "skill": 4.4
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 88.1
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 92.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 1099068,
+            "meanInputTokens": 6,
+            "meanOutputTokens": 83137,
+            "meanTotalTokens": 156064,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 889385,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 63655,
+            "meanTotalTokens": 76739,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "modelId": "claude:claude-fable-5-1",
+        "provider": "claude",
+        "family": "Claude Fable 5.1",
+        "reasoning": "xhigh",
+        "label": "Claude Fable 5.1 · xhigh",
+        "scores": {
+          "baseline": 90.6,
+          "skill": 91.9
+        },
+        "deltas": {
+          "skill": 1.3
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 90.6
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 91.9
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 622916,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 44990,
+            "meanTotalTokens": 49420,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 642489,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 46807,
+            "meanTotalTokens": 59890,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Fix spec first",
+            "Implement as written"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "codex-gpt-5-6-luna-high",
+        "configurationId": "codex:gpt-5.6-luna@high",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "high",
+        "label": "GPT-5.6 Luna · high",
+        "scores": {
+          "baseline": 85,
+          "skill": 91.9
+        },
+        "deltas": {
+          "skill": 6.9
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 85
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 91.9
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 190549,
+            "meanInputTokens": 12900,
+            "meanOutputTokens": 10316,
+            "meanTotalTokens": 23216,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 207373,
+            "meanInputTokens": 18116,
+            "meanOutputTokens": 11263,
+            "meanTotalTokens": 29379,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": false,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Implement after the named correction",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-opus-high",
+        "configurationId": "claude:opus@high",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "high",
+        "label": "Claude Opus 5 · high",
+        "scores": {
+          "baseline": 81.3,
+          "skill": 87.5
+        },
+        "deltas": {
+          "skill": 6.3
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 81.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 87.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 460984,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 31923,
+            "meanTotalTokens": 35467,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 359837,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 24462,
+            "meanTotalTokens": 36662,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Implement after the named correction",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": false
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Implement after the named correction"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-opus-low",
+        "configurationId": "claude:opus@low",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "low",
+        "label": "Claude Opus 5 · low",
+        "scores": {
+          "baseline": 76.9,
+          "skill": 87.5
+        },
+        "deltas": {
+          "skill": 10.6
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 76.9
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 87.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 324940,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 23002,
+            "meanTotalTokens": 26543,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 194222,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 13658,
+            "meanTotalTokens": 25852,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-opus-max",
+        "configurationId": "claude:opus@max",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "max",
+        "label": "Claude Opus 5 · max",
+        "scores": {
+          "baseline": 81.3,
+          "skill": 87.5
+        },
+        "deltas": {
+          "skill": 6.3
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 81.3
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 87.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 696168,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 53042,
+            "meanTotalTokens": 56588,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 580443,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 39357,
+            "meanTotalTokens": 51558,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      },
+      {
+        "id": "claude-opus-medium",
+        "configurationId": "claude:opus@medium",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "medium",
+        "label": "Claude Opus 5 · medium",
+        "scores": {
+          "baseline": 83.1,
+          "skill": 87.5
+        },
+        "deltas": {
+          "skill": 4.4
+        },
+        "categories": {
+          "baseline": [
+            {
+              "category": "ai-workflows",
+              "score": 83.1
+            }
+          ],
+          "skill": [
+            {
+              "category": "ai-workflows",
+              "score": 87.5
+            }
+          ]
+        },
+        "metrics": {
+          "baseline": {
+            "sampleCount": 1,
+            "meanLatencyMs": 473677,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 33967,
+            "meanTotalTokens": 37513,
+            "costUsd": null
+          },
+          "skill": {
+            "sampleCount": 1,
+            "meanLatencyMs": 241613,
+            "meanInputTokens": 2,
+            "meanOutputTokens": 17278,
+            "meanTotalTokens": 29478,
+            "costUsd": null
+          }
+        },
+        "readiness": {
+          "baseline": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ],
+          "skill": [
+            "Fix spec first",
+            "Implement after the named correction"
+          ]
+        },
+        "readinessConflict": {
+          "baseline": true,
+          "skill": true
+        },
+        "readinessLabel": {
+          "baseline": "Readiness unresolved",
+          "skill": "Readiness unresolved"
+        },
+        "assessmentStatus": {
+          "baseline": "assessable",
+          "skill": "assessable"
+        },
+        "coverage": {
+          "baseline": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "skill": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          }
+        }
+      }
+    ],
+    "entries": [
+      {
+        "id": "codex-gpt-6-astra-ultra-baseline",
+        "settingId": "codex-gpt-6-astra-ultra",
+        "configurationId": "codex:gpt-6-astra@ultra",
+        "modelId": "codex:gpt-6-astra",
+        "provider": "codex",
+        "family": "GPT-6 Astra",
+        "reasoning": "ultra",
+        "label": "GPT-6 Astra · ultra",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 96.3,
+        "baselineScore": 96.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "cost": null,
+        "latency": 605.492,
+        "tokens": 13523,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 605492,
+          "meanInputTokens": 15627,
+          "meanOutputTokens": 13523,
+          "meanTotalTokens": 29150,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 1
+      },
+      {
+        "id": "codex-gpt-6-astra-ultra-skill",
+        "settingId": "codex-gpt-6-astra-ultra",
+        "configurationId": "codex:gpt-6-astra@ultra",
+        "modelId": "codex:gpt-6-astra",
+        "provider": "codex",
+        "family": "GPT-6 Astra",
+        "reasoning": "ultra",
+        "label": "GPT-6 Astra · ultra",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 100,
+        "baselineScore": 96.3,
+        "delta": 3.8,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 100
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "cost": null,
+        "latency": 797.136,
+        "tokens": 17210,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 797136,
+          "meanInputTokens": 20843,
+          "meanOutputTokens": 17210,
+          "meanTotalTokens": 38053,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement as written"
+        ],
+        "readinessLabel": "Implement as written",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 1
+      },
+      {
+        "id": "codex-gpt-6-astra-xhigh-baseline",
+        "settingId": "codex-gpt-6-astra-xhigh",
+        "configurationId": "codex:gpt-6-astra@xhigh",
+        "modelId": "codex:gpt-6-astra",
+        "provider": "codex",
+        "family": "GPT-6 Astra",
+        "reasoning": "xhigh",
+        "label": "GPT-6 Astra · xhigh",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 96.3,
+        "baselineScore": 96.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "cost": null,
+        "latency": 748.479,
+        "tokens": 15845,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 748479,
+          "meanInputTokens": 15580,
+          "meanOutputTokens": 15845,
+          "meanTotalTokens": 31425,
+          "costUsd": null
+        },
+        "readiness": [
+          "Sound spec; decision required",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 1
+      },
+      {
+        "id": "codex-gpt-6-astra-xhigh-skill",
+        "settingId": "codex-gpt-6-astra-xhigh",
+        "configurationId": "codex:gpt-6-astra@xhigh",
+        "modelId": "codex:gpt-6-astra",
+        "provider": "codex",
+        "family": "GPT-6 Astra",
+        "reasoning": "xhigh",
+        "label": "GPT-6 Astra · xhigh",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 100,
+        "baselineScore": 96.3,
+        "delta": 3.8,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 100
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "cost": null,
+        "latency": 822.706,
+        "tokens": 19305,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 822706,
+          "meanInputTokens": 20796,
+          "meanOutputTokens": 19305,
+          "meanTotalTokens": 40101,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement as written"
+        ],
+        "readinessLabel": "Implement as written",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 1
+      },
+      {
+        "id": "codex-gpt-5-6-sol-max-baseline",
+        "settingId": "codex-gpt-5-6-sol-max",
+        "configurationId": "codex:gpt-5.6-sol@max",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "max",
+        "label": "GPT-5.6 Sol · max",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 93.8,
+        "baselineScore": 93.8,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.8
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.8
+          }
+        ],
+        "cost": null,
+        "latency": 738.419,
+        "tokens": 38199,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 738419,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 38199,
+          "meanTotalTokens": 52886,
+          "costUsd": null
+        },
+        "readiness": [
+          "Sound spec; decision required",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 5
+      },
+      {
+        "id": "codex-gpt-5-6-sol-max-skill",
+        "settingId": "codex-gpt-5-6-sol-max",
+        "configurationId": "codex:gpt-5.6-sol@max",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "max",
+        "label": "GPT-5.6 Sol · max",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 98.8,
+        "baselineScore": 93.8,
+        "delta": 5,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 98.8
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.8
+          }
+        ],
+        "cost": null,
+        "latency": 918.743,
+        "tokens": 41384,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 918743,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 41384,
+          "meanTotalTokens": 61287,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement as written"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 3
+      },
+      {
+        "id": "codex-gpt-5-6-luna-max-baseline",
+        "settingId": "codex-gpt-5-6-luna-max",
+        "configurationId": "codex:gpt-5.6-luna@max",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "max",
+        "label": "GPT-5.6 Luna · max",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 88.1,
+        "baselineScore": 88.1,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 88.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 88.1
+          }
+        ],
+        "cost": null,
+        "latency": 538.181,
+        "tokens": 29742,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 538181,
+          "meanInputTokens": 12898,
+          "meanOutputTokens": 29742,
+          "meanTotalTokens": 42640,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 11
+      },
+      {
+        "id": "codex-gpt-5-6-luna-max-skill",
+        "settingId": "codex-gpt-5-6-luna-max",
+        "configurationId": "codex:gpt-5.6-luna@max",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "max",
+        "label": "GPT-5.6 Luna · max",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 98.1,
+        "baselineScore": 88.1,
+        "delta": 10,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 98.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 88.1
+          }
+        ],
+        "cost": null,
+        "latency": 537.415,
+        "tokens": 29591,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 537415,
+          "meanInputTokens": 18116,
+          "meanOutputTokens": 29591,
+          "meanTotalTokens": 47707,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 4
+      },
+      {
+        "id": "codex-gpt-5-6-sol-high-baseline",
+        "settingId": "codex-gpt-5-6-sol-high",
+        "configurationId": "codex:gpt-5.6-sol@high",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "high",
+        "label": "GPT-5.6 Sol · high",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 94.4,
+        "baselineScore": 94.4,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "cost": null,
+        "latency": 302.361,
+        "tokens": 12331,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 302361,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 12331,
+          "meanTotalTokens": 27018,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 3
+      },
+      {
+        "id": "codex-gpt-5-6-sol-high-skill",
+        "settingId": "codex-gpt-5-6-sol-high",
+        "configurationId": "codex:gpt-5.6-sol@high",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "high",
+        "label": "GPT-5.6 Sol · high",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 98.1,
+        "baselineScore": 94.4,
+        "delta": 3.8,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 98.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "cost": null,
+        "latency": 457.934,
+        "tokens": 19684,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 457934,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 19684,
+          "meanTotalTokens": 39587,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 4
+      },
+      {
+        "id": "codex-gpt-5-6-sol-medium-baseline",
+        "settingId": "codex-gpt-5-6-sol-medium",
+        "configurationId": "codex:gpt-5.6-sol@medium",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Sol · medium",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 85,
+        "baselineScore": 85,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "cost": null,
+        "latency": 189.194,
+        "tokens": 7878,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 189194,
+          "meanInputTokens": 14685,
+          "meanOutputTokens": 7878,
+          "meanTotalTokens": 22563,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 16
+      },
+      {
+        "id": "codex-gpt-5-6-sol-medium-skill",
+        "settingId": "codex-gpt-5-6-sol-medium",
+        "configurationId": "codex:gpt-5.6-sol@medium",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Sol · medium",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 97.5,
+        "baselineScore": 85,
+        "delta": 12.5,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 97.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "cost": null,
+        "latency": 335.978,
+        "tokens": 14111,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 335978,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 14111,
+          "meanTotalTokens": 34014,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 6
+      },
+      {
+        "id": "codex-gpt-5-6-sol-ultra-baseline",
+        "settingId": "codex-gpt-5-6-sol-ultra",
+        "configurationId": "codex:gpt-5.6-sol@ultra",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "ultra",
+        "label": "GPT-5.6 Sol · ultra",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 93.1,
+        "baselineScore": 93.1,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "cost": null,
+        "latency": 759.055,
+        "tokens": 37324,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 759055,
+          "meanInputTokens": 14732,
+          "meanOutputTokens": 37324,
+          "meanTotalTokens": 52056,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 6
+      },
+      {
+        "id": "codex-gpt-5-6-sol-ultra-skill",
+        "settingId": "codex-gpt-5-6-sol-ultra",
+        "configurationId": "codex:gpt-5.6-sol@ultra",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "ultra",
+        "label": "GPT-5.6 Sol · ultra",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 97.5,
+        "baselineScore": 93.1,
+        "delta": 4.4,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 97.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "cost": null,
+        "latency": 892.537,
+        "tokens": 37982,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 892537,
+          "meanInputTokens": 19952,
+          "meanOutputTokens": 37982,
+          "meanTotalTokens": 57934,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement as written"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 6
+      },
+      {
+        "id": "codex-gpt-5-6-luna-xhigh-baseline",
+        "settingId": "codex-gpt-5-6-luna-xhigh",
+        "configurationId": "codex:gpt-5.6-luna@xhigh",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Luna · xhigh",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 85,
+        "baselineScore": 85,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "cost": null,
+        "latency": 254.897,
+        "tokens": 13892,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 254897,
+          "meanInputTokens": 12900,
+          "meanOutputTokens": 13892,
+          "meanTotalTokens": 26792,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 16
+      },
+      {
+        "id": "codex-gpt-5-6-luna-xhigh-skill",
+        "settingId": "codex-gpt-5-6-luna-xhigh",
+        "configurationId": "codex:gpt-5.6-luna@xhigh",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Luna · xhigh",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 96.9,
+        "baselineScore": 85,
+        "delta": 11.9,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "cost": null,
+        "latency": 356.298,
+        "tokens": 19519,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 356298,
+          "meanInputTokens": 18114,
+          "meanOutputTokens": 19519,
+          "meanTotalTokens": 37633,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 8
+      },
+      {
+        "id": "codex-gpt-5-6-sol-xhigh-baseline",
+        "settingId": "codex-gpt-5-6-sol-xhigh",
+        "configurationId": "codex:gpt-5.6-sol@xhigh",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Sol · xhigh",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 93.1,
+        "baselineScore": 93.1,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "cost": null,
+        "latency": 517.32,
+        "tokens": 20824,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 517320,
+          "meanInputTokens": 14685,
+          "meanOutputTokens": 20824,
+          "meanTotalTokens": 35509,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 6
+      },
+      {
+        "id": "codex-gpt-5-6-sol-xhigh-skill",
+        "settingId": "codex-gpt-5-6-sol-xhigh",
+        "configurationId": "codex:gpt-5.6-sol@xhigh",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Sol · xhigh",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 96.9,
+        "baselineScore": 93.1,
+        "delta": 3.8,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "cost": null,
+        "latency": 508.22,
+        "tokens": 21917,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 508220,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 21917,
+          "meanTotalTokens": 41820,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 8
+      },
+      {
+        "id": "codex-gpt-5-6-terra-max-baseline",
+        "settingId": "codex-gpt-5-6-terra-max",
+        "configurationId": "codex:gpt-5.6-terra@max",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "max",
+        "label": "GPT-5.6 Terra · max",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 86.3,
+        "baselineScore": 86.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.3
+          }
+        ],
+        "cost": null,
+        "latency": 739.223,
+        "tokens": 40779,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 739223,
+          "meanInputTokens": 14463,
+          "meanOutputTokens": 40779,
+          "meanTotalTokens": 55242,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 14
+      },
+      {
+        "id": "codex-gpt-5-6-terra-max-skill",
+        "settingId": "codex-gpt-5-6-terra-max",
+        "configurationId": "codex:gpt-5.6-terra@max",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "max",
+        "label": "GPT-5.6 Terra · max",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 96.3,
+        "baselineScore": 86.3,
+        "delta": 10,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.3
+          }
+        ],
+        "cost": null,
+        "latency": 742.781,
+        "tokens": 41033,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 742781,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 41033,
+          "meanTotalTokens": 60936,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 10
+      },
+      {
+        "id": "codex-gpt-5-6-terra-xhigh-baseline",
+        "settingId": "codex-gpt-5-6-terra-xhigh",
+        "configurationId": "codex:gpt-5.6-terra@xhigh",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Terra · xhigh",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 81.3,
+        "baselineScore": 81.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "cost": null,
+        "latency": 287.365,
+        "tokens": 15788,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 287365,
+          "meanInputTokens": 14467,
+          "meanOutputTokens": 15788,
+          "meanTotalTokens": 30255,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 22
+      },
+      {
+        "id": "codex-gpt-5-6-terra-xhigh-skill",
+        "settingId": "codex-gpt-5-6-terra-xhigh",
+        "configurationId": "codex:gpt-5.6-terra@xhigh",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "xhigh",
+        "label": "GPT-5.6 Terra · xhigh",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 96.3,
+        "baselineScore": 81.3,
+        "delta": 15,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 96.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "cost": null,
+        "latency": 264.301,
+        "tokens": 14475,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 264301,
+          "meanInputTokens": 19681,
+          "meanOutputTokens": 14475,
+          "meanTotalTokens": 34156,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 10
+      },
+      {
+        "id": "codex-gpt-5-6-sol-low-baseline",
+        "settingId": "codex-gpt-5-6-sol-low",
+        "configurationId": "codex:gpt-5.6-sol@low",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "low",
+        "label": "GPT-5.6 Sol · low",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 82.5,
+        "baselineScore": 82.5,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 82.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 82.5
+          }
+        ],
+        "cost": null,
+        "latency": 200.448,
+        "tokens": 9306,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 200448,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 9306,
+          "meanTotalTokens": 23993,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 20
+      },
+      {
+        "id": "codex-gpt-5-6-sol-low-skill",
+        "settingId": "codex-gpt-5-6-sol-low",
+        "configurationId": "codex:gpt-5.6-sol@low",
+        "modelId": "codex:gpt-5.6-sol",
+        "provider": "codex",
+        "family": "GPT-5.6 Sol",
+        "reasoning": "low",
+        "label": "GPT-5.6 Sol · low",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 95.6,
+        "baselineScore": 82.5,
+        "delta": 13.1,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 95.6
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 82.5
+          }
+        ],
+        "cost": null,
+        "latency": 208,
+        "tokens": 8776,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 208000,
+          "meanInputTokens": 19899,
+          "meanOutputTokens": 8776,
+          "meanTotalTokens": 28675,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 12
+      },
+      {
+        "id": "codex-gpt-5-6-terra-low-baseline",
+        "settingId": "codex-gpt-5-6-terra-low",
+        "configurationId": "codex:gpt-5.6-terra@low",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "low",
+        "label": "GPT-5.6 Terra · low",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 91.3,
+        "baselineScore": 91.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.3
+          }
+        ],
+        "cost": null,
+        "latency": 111.709,
+        "tokens": 5819,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 111709,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 5819,
+          "meanTotalTokens": 20506,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 9
+      },
+      {
+        "id": "codex-gpt-5-6-terra-low-skill",
+        "settingId": "codex-gpt-5-6-terra-low",
+        "configurationId": "codex:gpt-5.6-terra@low",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "low",
+        "label": "GPT-5.6 Terra · low",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 95.6,
+        "baselineScore": 91.3,
+        "delta": 4.4,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 95.6
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.3
+          }
+        ],
+        "cost": null,
+        "latency": 105.134,
+        "tokens": 5484,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 105134,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 5484,
+          "meanTotalTokens": 25387,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 12
+      },
+      {
+        "id": "codex-gpt-5-6-terra-medium-baseline",
+        "settingId": "codex-gpt-5-6-terra-medium",
+        "configurationId": "codex:gpt-5.6-terra@medium",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Terra · medium",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 86.3,
+        "baselineScore": 86.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.3
+          }
+        ],
+        "cost": null,
+        "latency": 103.415,
+        "tokens": 5580,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 103415,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 5580,
+          "meanTotalTokens": 20267,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 14
+      },
+      {
+        "id": "codex-gpt-5-6-terra-medium-skill",
+        "settingId": "codex-gpt-5-6-terra-medium",
+        "configurationId": "codex:gpt-5.6-terra@medium",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Terra · medium",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 95.6,
+        "baselineScore": 86.3,
+        "delta": 9.4,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 95.6
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.3
+          }
+        ],
+        "cost": null,
+        "latency": 100.786,
+        "tokens": 5380,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 100786,
+          "meanInputTokens": 19679,
+          "meanOutputTokens": 5380,
+          "meanTotalTokens": 25059,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 12
+      },
+      {
+        "id": "codex-gpt-5-6-terra-high-baseline",
+        "settingId": "codex-gpt-5-6-terra-high",
+        "configurationId": "codex:gpt-5.6-terra@high",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "high",
+        "label": "GPT-5.6 Terra · high",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 94.4,
+        "baselineScore": 94.4,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "cost": null,
+        "latency": 120.032,
+        "tokens": 6487,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 120032,
+          "meanInputTokens": 14685,
+          "meanOutputTokens": 6487,
+          "meanTotalTokens": 21172,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 3
+      },
+      {
+        "id": "codex-gpt-5-6-terra-high-skill",
+        "settingId": "codex-gpt-5-6-terra-high",
+        "configurationId": "codex:gpt-5.6-terra@high",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "high",
+        "label": "GPT-5.6 Terra · high",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 95,
+        "baselineScore": 94.4,
+        "delta": 0.6,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 95
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "cost": null,
+        "latency": 127.943,
+        "tokens": 6950,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 127943,
+          "meanInputTokens": 19683,
+          "meanOutputTokens": 6950,
+          "meanTotalTokens": 26633,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 15
+      },
+      {
+        "id": "codex-gpt-5-6-terra-ultra-baseline",
+        "settingId": "codex-gpt-5-6-terra-ultra",
+        "configurationId": "codex:gpt-5.6-terra@ultra",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "ultra",
+        "label": "GPT-5.6 Terra · ultra",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 81.9,
+        "baselineScore": 81.9,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.9
+          }
+        ],
+        "cost": null,
+        "latency": 594.814,
+        "tokens": 32867,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 594814,
+          "meanInputTokens": 14514,
+          "meanOutputTokens": 32867,
+          "meanTotalTokens": 47381,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 21
+      },
+      {
+        "id": "codex-gpt-5-6-terra-ultra-skill",
+        "settingId": "codex-gpt-5-6-terra-ultra",
+        "configurationId": "codex:gpt-5.6-terra@ultra",
+        "modelId": "codex:gpt-5.6-terra",
+        "provider": "codex",
+        "family": "GPT-5.6 Terra",
+        "reasoning": "ultra",
+        "label": "GPT-5.6 Terra · ultra",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 94.4,
+        "baselineScore": 81.9,
+        "delta": 12.5,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 94.4
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.9
+          }
+        ],
+        "cost": null,
+        "latency": 535.144,
+        "tokens": 29529,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 535144,
+          "meanInputTokens": 19952,
+          "meanOutputTokens": 29529,
+          "meanTotalTokens": 49481,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 16
+      },
+      {
+        "id": "claude-opus-xhigh-baseline",
+        "settingId": "claude-opus-xhigh",
+        "configurationId": "claude:opus@xhigh",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "xhigh",
+        "label": "Claude Opus 5 · xhigh",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 77.5,
+        "baselineScore": 77.5,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 77.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 77.5
+          }
+        ],
+        "cost": null,
+        "latency": 742.621,
+        "tokens": 53419,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 742621,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 53419,
+          "meanTotalTokens": 56965,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 25
+      },
+      {
+        "id": "claude-opus-xhigh-skill",
+        "settingId": "claude-opus-xhigh",
+        "configurationId": "claude:opus@xhigh",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "xhigh",
+        "label": "Claude Opus 5 · xhigh",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 93.8,
+        "baselineScore": 77.5,
+        "delta": 16.3,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.8
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 77.5
+          }
+        ],
+        "cost": null,
+        "latency": 396.913,
+        "tokens": 27707,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 396913,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 27707,
+          "meanTotalTokens": 39906,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 17
+      },
+      {
+        "id": "codex-gpt-5-6-luna-low-baseline",
+        "settingId": "codex-gpt-5-6-luna-low",
+        "configurationId": "codex:gpt-5.6-luna@low",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "low",
+        "label": "GPT-5.6 Luna · low",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 91.9,
+        "baselineScore": 91.9,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.9
+          }
+        ],
+        "cost": null,
+        "latency": 110.125,
+        "tokens": 5885,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 110125,
+          "meanInputTokens": 12896,
+          "meanOutputTokens": 5885,
+          "meanTotalTokens": 18781,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 8
+      },
+      {
+        "id": "codex-gpt-5-6-luna-low-skill",
+        "settingId": "codex-gpt-5-6-luna-low",
+        "configurationId": "codex:gpt-5.6-luna@low",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "low",
+        "label": "GPT-5.6 Luna · low",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 93.8,
+        "baselineScore": 91.9,
+        "delta": 1.9,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.8
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.9
+          }
+        ],
+        "cost": null,
+        "latency": 103.574,
+        "tokens": 5493,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 103574,
+          "meanInputTokens": 18338,
+          "meanOutputTokens": 5493,
+          "meanTotalTokens": 23831,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 17
+      },
+      {
+        "id": "codex-gpt-5-6-luna-medium-baseline",
+        "settingId": "codex-gpt-5-6-luna-medium",
+        "configurationId": "codex:gpt-5.6-luna@medium",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Luna · medium",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 86.9,
+        "baselineScore": 86.9,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.9
+          }
+        ],
+        "cost": null,
+        "latency": 115.502,
+        "tokens": 6271,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 115502,
+          "meanInputTokens": 12898,
+          "meanOutputTokens": 6271,
+          "meanTotalTokens": 19169,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 13
+      },
+      {
+        "id": "codex-gpt-5-6-luna-medium-skill",
+        "settingId": "codex-gpt-5-6-luna-medium",
+        "configurationId": "codex:gpt-5.6-luna@medium",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "medium",
+        "label": "GPT-5.6 Luna · medium",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 93.1,
+        "baselineScore": 86.9,
+        "delta": 6.3,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 93.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 86.9
+          }
+        ],
+        "cost": null,
+        "latency": 126.799,
+        "tokens": 6869,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 126799,
+          "meanInputTokens": 18116,
+          "meanOutputTokens": 6869,
+          "meanTotalTokens": 24985,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 19
+      },
+      {
+        "id": "claude-claude-fable-5-1-max-baseline",
+        "settingId": "claude-claude-fable-5-1-max",
+        "configurationId": "claude:claude-fable-5-1@max",
+        "modelId": "claude:claude-fable-5-1",
+        "provider": "claude",
+        "family": "Claude Fable 5.1",
+        "reasoning": "max",
+        "label": "Claude Fable 5.1 · max",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 88.1,
+        "baselineScore": 88.1,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 88.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 88.1
+          }
+        ],
+        "cost": null,
+        "latency": 1099.068,
+        "tokens": 83137,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 1099068,
+          "meanInputTokens": 6,
+          "meanOutputTokens": 83137,
+          "meanTotalTokens": 156064,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 11
+      },
+      {
+        "id": "claude-claude-fable-5-1-max-skill",
+        "settingId": "claude-claude-fable-5-1-max",
+        "configurationId": "claude:claude-fable-5-1@max",
+        "modelId": "claude:claude-fable-5-1",
+        "provider": "claude",
+        "family": "Claude Fable 5.1",
+        "reasoning": "max",
+        "label": "Claude Fable 5.1 · max",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 92.5,
+        "baselineScore": 88.1,
+        "delta": 4.4,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 92.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 88.1
+          }
+        ],
+        "cost": null,
+        "latency": 889.385,
+        "tokens": 63655,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 889385,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 63655,
+          "meanTotalTokens": 76739,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 20
+      },
+      {
+        "id": "claude-claude-fable-5-1-xhigh-baseline",
+        "settingId": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "modelId": "claude:claude-fable-5-1",
+        "provider": "claude",
+        "family": "Claude Fable 5.1",
+        "reasoning": "xhigh",
+        "label": "Claude Fable 5.1 · xhigh",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 90.6,
+        "baselineScore": 90.6,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 90.6
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 90.6
+          }
+        ],
+        "cost": null,
+        "latency": 622.916,
+        "tokens": 44990,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 622916,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 44990,
+          "meanTotalTokens": 49420,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 10
+      },
+      {
+        "id": "claude-claude-fable-5-1-xhigh-skill",
+        "settingId": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "modelId": "claude:claude-fable-5-1",
+        "provider": "claude",
+        "family": "Claude Fable 5.1",
+        "reasoning": "xhigh",
+        "label": "Claude Fable 5.1 · xhigh",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 91.9,
+        "baselineScore": 90.6,
+        "delta": 1.3,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 90.6
+          }
+        ],
+        "cost": null,
+        "latency": 642.489,
+        "tokens": 46807,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 642489,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 46807,
+          "meanTotalTokens": 59890,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement as written"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 21
+      },
+      {
+        "id": "codex-gpt-5-6-luna-high-baseline",
+        "settingId": "codex-gpt-5-6-luna-high",
+        "configurationId": "codex:gpt-5.6-luna@high",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "high",
+        "label": "GPT-5.6 Luna · high",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 85,
+        "baselineScore": 85,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "cost": null,
+        "latency": 190.549,
+        "tokens": 10316,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 190549,
+          "meanInputTokens": 12900,
+          "meanOutputTokens": 10316,
+          "meanTotalTokens": 23216,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 16
+      },
+      {
+        "id": "codex-gpt-5-6-luna-high-skill",
+        "settingId": "codex-gpt-5-6-luna-high",
+        "configurationId": "codex:gpt-5.6-luna@high",
+        "modelId": "codex:gpt-5.6-luna",
+        "provider": "codex",
+        "family": "GPT-5.6 Luna",
+        "reasoning": "high",
+        "label": "GPT-5.6 Luna · high",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 91.9,
+        "baselineScore": 85,
+        "delta": 6.9,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 91.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 85
+          }
+        ],
+        "cost": null,
+        "latency": 207.373,
+        "tokens": 11263,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 207373,
+          "meanInputTokens": 18116,
+          "meanOutputTokens": 11263,
+          "meanTotalTokens": 29379,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 21
+      },
+      {
+        "id": "claude-opus-high-baseline",
+        "settingId": "claude-opus-high",
+        "configurationId": "claude:opus@high",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "high",
+        "label": "Claude Opus 5 · high",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 81.3,
+        "baselineScore": 81.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "cost": null,
+        "latency": 460.984,
+        "tokens": 31923,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 460984,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 31923,
+          "meanTotalTokens": 35467,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 22
+      },
+      {
+        "id": "claude-opus-high-skill",
+        "settingId": "claude-opus-high",
+        "configurationId": "claude:opus@high",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "high",
+        "label": "Claude Opus 5 · high",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 87.5,
+        "baselineScore": 81.3,
+        "delta": 6.3,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 87.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "cost": null,
+        "latency": 359.837,
+        "tokens": 24462,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 359837,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 24462,
+          "meanTotalTokens": 36662,
+          "costUsd": null
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 23
+      },
+      {
+        "id": "claude-opus-low-baseline",
+        "settingId": "claude-opus-low",
+        "configurationId": "claude:opus@low",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "low",
+        "label": "Claude Opus 5 · low",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 76.9,
+        "baselineScore": 76.9,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 76.9
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 76.9
+          }
+        ],
+        "cost": null,
+        "latency": 324.94,
+        "tokens": 23002,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 324940,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 23002,
+          "meanTotalTokens": 26543,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 26
+      },
+      {
+        "id": "claude-opus-low-skill",
+        "settingId": "claude-opus-low",
+        "configurationId": "claude:opus@low",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "low",
+        "label": "Claude Opus 5 · low",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 87.5,
+        "baselineScore": 76.9,
+        "delta": 10.6,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 87.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 76.9
+          }
+        ],
+        "cost": null,
+        "latency": 194.222,
+        "tokens": 13658,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 194222,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 13658,
+          "meanTotalTokens": 25852,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 23
+      },
+      {
+        "id": "claude-opus-max-baseline",
+        "settingId": "claude-opus-max",
+        "configurationId": "claude:opus@max",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "max",
+        "label": "Claude Opus 5 · max",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 81.3,
+        "baselineScore": 81.3,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "cost": null,
+        "latency": 696.168,
+        "tokens": 53042,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 696168,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 53042,
+          "meanTotalTokens": 56588,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 22
+      },
+      {
+        "id": "claude-opus-max-skill",
+        "settingId": "claude-opus-max",
+        "configurationId": "claude:opus@max",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "max",
+        "label": "Claude Opus 5 · max",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 87.5,
+        "baselineScore": 81.3,
+        "delta": 6.3,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 87.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 81.3
+          }
+        ],
+        "cost": null,
+        "latency": 580.443,
+        "tokens": 39357,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 580443,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 39357,
+          "meanTotalTokens": 51558,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 23
+      },
+      {
+        "id": "claude-opus-medium-baseline",
+        "settingId": "claude-opus-medium",
+        "configurationId": "claude:opus@medium",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "medium",
+        "label": "Claude Opus 5 · medium",
+        "condition": "baseline",
+        "conditionLabel": "Minimal baseline",
+        "score": 83.1,
+        "baselineScore": 83.1,
+        "delta": 0,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 83.1
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 83.1
+          }
+        ],
+        "cost": null,
+        "latency": 473.677,
+        "tokens": 33967,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 473677,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 33967,
+          "meanTotalTokens": 37513,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 19
+      },
+      {
+        "id": "claude-opus-medium-skill",
+        "settingId": "claude-opus-medium",
+        "configurationId": "claude:opus@medium",
+        "modelId": "claude:opus",
+        "provider": "claude",
+        "family": "Claude Opus 5",
+        "reasoning": "medium",
+        "label": "Claude Opus 5 · medium",
+        "condition": "skill",
+        "conditionLabel": "Work-spec skill",
+        "score": 87.5,
+        "baselineScore": 83.1,
+        "delta": 4.4,
+        "categories": [
+          {
+            "category": "ai-workflows",
+            "score": 87.5
+          }
+        ],
+        "baselineCategories": [
+          {
+            "category": "ai-workflows",
+            "score": 83.1
+          }
+        ],
+        "cost": null,
+        "latency": 241.613,
+        "tokens": 17278,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 241613,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 17278,
+          "meanTotalTokens": 29478,
+          "costUsd": null
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "rank": 23
+      }
+    ],
+    "benchmarkResults": [
+      {
+        "settingId": "codex-gpt-6-astra-xhigh",
+        "configurationId": "codex:gpt-6-astra@xhigh",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 96.3,
+        "exactScore": 96.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 748479,
+        "inputTokens": 15580,
+        "outputTokens": 15845,
+        "totalTokens": 31425,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 748479,
+          "meanInputTokens": 15580,
+          "meanOutputTokens": 15845,
+          "meanTotalTokens": 31425,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 3.5,
+          "C": 4
+        },
+        "readiness": [
+          "Sound spec; decision required",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "43859854f7",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "68ae870cfe99201921bdc2b78864d0c202e52b9d824d6d089500ce5d50d3dbde",
+          "candidateSha256": "f6866e167a1d22c10ec0f841003fbc9f35867590aeccbd8174bdd1577f0b0831",
+          "assessmentSha256": [
+            "40416482270e62b7d8f7a324d0f9b46f868770ae035c3804f2556859a3eafcaa",
+            "da2e04e2cade2936117590c8879f3b0faa32a5b8f1c46d960957ed8ea5a81313"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-6-astra-xhigh",
+        "configurationId": "codex:gpt-6-astra@xhigh",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 100,
+        "exactScore": 100,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 822706,
+        "inputTokens": 20796,
+        "outputTokens": 19305,
+        "totalTokens": 40101,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 822706,
+          "meanInputTokens": 20796,
+          "meanOutputTokens": 19305,
+          "meanTotalTokens": 40101,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 4,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement as written"
+        ],
+        "readinessLabel": "Implement as written",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "950e8b131d",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "e536a12e7e943c9a38eaf68649a54008964a2b24c5a166e8575de23e427616c8",
+          "candidateSha256": "377776dc50ade5b06f80fb866b265e09c03231189f8d86d78cf64fea7d6bb6cc",
+          "assessmentSha256": [
+            "1a8acc28b43572ec9fe07b4e8380865af2127b1d78db97cce081c582cd626c3a",
+            "c906f907e77eee3693fdffb5da8fae4199284ae058ceb6f28de52b1db2244c6b"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-6-astra-ultra",
+        "configurationId": "codex:gpt-6-astra@ultra",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 96.3,
+        "exactScore": 96.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 605492,
+        "inputTokens": 15627,
+        "outputTokens": 13523,
+        "totalTokens": 29150,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 605492,
+          "meanInputTokens": 15627,
+          "meanOutputTokens": 13523,
+          "meanTotalTokens": 29150,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 4,
+          "S": 3,
+          "C": 4
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "357867e351",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "d539894e00eaf14d8504648eebba3fb7a9571e83b470ebab37b8937fb3e5f787",
+          "candidateSha256": "50bb52658fc2529307e20a9c1ad346ed3e9d2a2441683d45a7b62d6f89d0d4f9",
+          "assessmentSha256": [
+            "92922e63c08dbe23466df7ebf1a86fd4bf1fb66091b775656f9a8aa79e87f97a",
+            "a73bcde75984e66af9f67434792392ea7fb7f32f5f180485d053f0d6bd9cf8ab"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-6-astra-ultra",
+        "configurationId": "codex:gpt-6-astra@ultra",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 100,
+        "exactScore": 100,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 797136,
+        "inputTokens": 20843,
+        "outputTokens": 17210,
+        "totalTokens": 38053,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 797136,
+          "meanInputTokens": 20843,
+          "meanOutputTokens": 17210,
+          "meanTotalTokens": 38053,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 4,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement as written"
+        ],
+        "readinessLabel": "Implement as written",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "6f2ceedd9b",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "dbe22c7d284ac91001679ad386c61f8bb8b90b45f18e8d47c6bbbd3e57baa325",
+          "candidateSha256": "d0a80c83ec06358186223b08047ef3f3a665cf8554a77b5aa01cccbe76d228f5",
+          "assessmentSha256": [
+            "ab0b62f8e58f0b184db655ca3d9f4d5f6518fd0003a6671e7388179fc266d7a9",
+            "06f4fc5a69cd144f1b350d005cef9775dc096294c023ae2801d50d5ea5729182"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-xhigh",
+        "configurationId": "codex:gpt-5.6-sol@xhigh",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 93.1,
+        "exactScore": 93.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 517320,
+        "inputTokens": 14685,
+        "outputTokens": 20824,
+        "totalTokens": 35509,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 517320,
+          "meanInputTokens": 14685,
+          "meanOutputTokens": 20824,
+          "meanTotalTokens": 35509,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 3.5,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "9bce3916d1",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "e78e31a9328ea87a9484991ab96abe1cb8139ed733e4e08fb52e62e5d33b69a3",
+          "candidateSha256": "b6e86b5771ca664db6c2ce1302abf9e64b70157213ea0634519c6e1b54242004",
+          "assessmentSha256": [
+            "7823e2e90b843da10e048a7b3235d8f0566ab747220d4a4b5bd0776a38b495a7",
+            "5c5cff68e5212ab1fc89f60c79a9e8ce23eb3a2ccc83bdb27500aa840ddb6c73"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-xhigh",
+        "configurationId": "codex:gpt-5.6-sol@xhigh",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 96.9,
+        "exactScore": 96.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 508220,
+        "inputTokens": 19903,
+        "outputTokens": 21917,
+        "totalTokens": 41820,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 508220,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 21917,
+          "meanTotalTokens": 41820,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "a3a7f76f14",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "ee438229d5d998f1b2cb0c4fec5b24aaf31fd9fe87f2cf536e0cecea4735edbf",
+          "candidateSha256": "1dac22c478b5ea0935f64dbd79db07638bcbbfa6bfc3febc05b527866b03df09",
+          "assessmentSha256": [
+            "8f823efd2631bebebb0de706a3b6a86696f83bf9c63c114cc9243c087af1699a",
+            "c951eaf9d1314b93fba91bbbd7c1ac7b9020ca88caafa24b9bd23dbfde7d285b"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-claude-fable-5-1-max",
+        "configurationId": "claude:claude-fable-5-1@max",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 88.1,
+        "exactScore": 88.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 1099068,
+        "inputTokens": 6,
+        "outputTokens": 83137,
+        "totalTokens": 156064,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 1099068,
+          "meanInputTokens": 6,
+          "meanOutputTokens": 83137,
+          "meanTotalTokens": 156064,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 2.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "ca7407ad57",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "97f8f11595a9d78cad7b6f71be80e7d32cb11425f36aae402593dd06363dca37",
+          "candidateSha256": "fd03b73848f1eaa7cfe0dfea0891d954c0a34cfb4f743fd9c70ea0bb0ce1123b",
+          "assessmentSha256": [
+            "f657d5fd377ef9f78ba95046d8c270d63bee8544dac684317d065a586451d55a",
+            "8362c6cb4ab0850a28b77363ee629056fe64d5580bc25f8a9704a2334cb81b13"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-claude-fable-5-1-max",
+        "configurationId": "claude:claude-fable-5-1@max",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 92.5,
+        "exactScore": 92.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 889385,
+        "inputTokens": 2,
+        "outputTokens": 63655,
+        "totalTokens": 76739,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 889385,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 63655,
+          "meanTotalTokens": 76739,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3,
+          "D": 4,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "7e43c5e559",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "2f3828a2f4287b389dfdea3f924e0ee8a09a6c504923106369d5ddae6bd4b418",
+          "candidateSha256": "92ee53e0d6878ff1db758f86b519c414177066c66c356d1fdc3b462ad49e7342",
+          "assessmentSha256": [
+            "e9ac5b9dc62570f3e7d60427020af9d7a512f74e9461cbabcf3c9d6b62540b16",
+            "ae62e6e51b4fe15b29c39e6bd80337fae1519b6e7e99e1ff6dbba010e646d0ad"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-low",
+        "configurationId": "codex:gpt-5.6-sol@low",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 82.5,
+        "exactScore": 82.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 200448,
+        "inputTokens": 14687,
+        "outputTokens": 9306,
+        "totalTokens": 23993,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 200448,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 9306,
+          "meanTotalTokens": 23993,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 3.5,
+          "D": 2,
+          "S": 3.5,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "cf2c1abae7",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "fa05043f68a603195704b74f331ca78e0a0813b0bcf321b8c3cd5663a775e6da",
+          "candidateSha256": "76daa0e9dcd441c93d935b26a7a40365ca16c6c8e70391b3264b7045905ed1f0",
+          "assessmentSha256": [
+            "94418af0fea5f6a3ffcbd29754af88cc61171435dfee4492a9449457fcbdf1c6",
+            "c471338049405b9b0f249eb6892334a8f623b3858a4c68077ef87b2313ad0ee2"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-low",
+        "configurationId": "codex:gpt-5.6-sol@low",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 95.6,
+        "exactScore": 95.625,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 208000,
+        "inputTokens": 19899,
+        "outputTokens": 8776,
+        "totalTokens": 28675,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 208000,
+          "meanInputTokens": 19899,
+          "meanOutputTokens": 8776,
+          "meanTotalTokens": 28675,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "2281560792",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "67076fc41643aa08da6f52b052ecfff663bf9a092f785a62642876f7858678b1",
+          "candidateSha256": "1b71f005ddd4cf495d730c15c13ffc0438569300777b5fcc0d18b68e8aae6a5a",
+          "assessmentSha256": [
+            "c49ad47cc275417c93a77dffcbee7f419b342f2a42518445dabb611f70e4eb9d",
+            "292e183dbb68a45b3c3c51fc6943995fab3f10222fd4bab0235251f646f6071b"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-medium",
+        "configurationId": "codex:gpt-5.6-sol@medium",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 85,
+        "exactScore": 85,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 189194,
+        "inputTokens": 14685,
+        "outputTokens": 7878,
+        "totalTokens": 22563,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 189194,
+          "meanInputTokens": 14685,
+          "meanOutputTokens": 7878,
+          "meanTotalTokens": 22563,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 3.5,
+          "A": 3,
+          "D": 3.5,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "f8fda322d8",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "93afedb5ebb069dfaa4f498893100abd9ff1cf21e88cd665e03dbe5a8f5eb0de",
+          "candidateSha256": "553a15bc5527f15f4885c04c388f14e7caaae727ee227ec1777e2e21adcedb04",
+          "assessmentSha256": [
+            "6c4493fea65d6321e18717c48117f298deaea57404d07bd691810af36c9900aa",
+            "cf4bec76b88e808aa13c9fba4b34a5702229feb1a92832d632660d3a71e75e12"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-medium",
+        "configurationId": "codex:gpt-5.6-sol@medium",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 97.5,
+        "exactScore": 97.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 335978,
+        "inputTokens": 19903,
+        "outputTokens": 14111,
+        "totalTokens": 34014,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 335978,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 14111,
+          "meanTotalTokens": 34014,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 4,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "719ad18b68",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "7e57babb87bc15bf78c50c504ecdc29d0d2856ff05751eaf7924d1946a06ef18",
+          "candidateSha256": "4812e0489a85a00f540b37be928b515dc24da0e87a7eb700f2cb110133597a9b",
+          "assessmentSha256": [
+            "2324825bee4d09b2974141c439a193f2547445a571e6bbffa2a77c32d38c6593",
+            "aab7f21520ba7bbb75ba28c8c026182cc80545ce67c69dbebfbe1849f0c9dcb0"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-high",
+        "configurationId": "codex:gpt-5.6-sol@high",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 94.4,
+        "exactScore": 94.375,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 302361,
+        "inputTokens": 14687,
+        "outputTokens": 12331,
+        "totalTokens": 27018,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 302361,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 12331,
+          "meanTotalTokens": 27018,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "baeaf0a1b9",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "8c8c26fc3d107642c5f1860a27097ede083c730e2c2fa9a0e19855b04157945a",
+          "candidateSha256": "74194adc925433a9cea884ef0ab461deb6feec495e551ecd4ce5b72b6b3f5401",
+          "assessmentSha256": [
+            "9f17d4844fde8249652cf3150f497e1a1cceb085ef1d02ec6eb8567271cf3524",
+            "3d39e049361fdbfbf23d2611b7f80072e584ca62730617795c89d8bef6661371"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-high",
+        "configurationId": "codex:gpt-5.6-sol@high",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 98.1,
+        "exactScore": 98.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 457934,
+        "inputTokens": 19903,
+        "outputTokens": 19684,
+        "totalTokens": 39587,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 457934,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 19684,
+          "meanTotalTokens": 39587,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "181774a0a2",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "2a149161930fb3a4592d50ec91c04245cfa969b7808452d4320cdeee44cdff4e",
+          "candidateSha256": "c2e2ac2e942c0738c973d7eec35d0716c39acb46af818045153bca88ad442b93",
+          "assessmentSha256": [
+            "b2e37c9e7871ed8a6326c82e82c4208de76c8cd04931101e48a1096c94b52732",
+            "38b4af92a936f188d6f7458eb632dd46d11db32b674b5d2298bd90828196d221"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-max",
+        "configurationId": "codex:gpt-5.6-sol@max",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 93.8,
+        "exactScore": 93.75,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 738419,
+        "inputTokens": 14687,
+        "outputTokens": 38199,
+        "totalTokens": 52886,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 738419,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 38199,
+          "meanTotalTokens": 52886,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 3.5,
+          "S": 3.5,
+          "C": 4
+        },
+        "readiness": [
+          "Sound spec; decision required",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "7db99a9b09",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "a8e4a3415313394199ece77d667e76b4082155e0d2298b33447293f4ea199138",
+          "candidateSha256": "bf2a2ec2b2c63561e2b627d9100293a7bc6a10b43205be97322ca10bfd17e01b",
+          "assessmentSha256": [
+            "cc34030540a8323760b99dd5c93ddb9561620f01bffa305002f2c007aed9cc99",
+            "03cd7bb9d4bce8e687a44f5c72c49980a4e5b0e76ea0d6c9372b133003fe1e8c"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-max",
+        "configurationId": "codex:gpt-5.6-sol@max",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 98.8,
+        "exactScore": 98.75,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 918743,
+        "inputTokens": 19903,
+        "outputTokens": 41384,
+        "totalTokens": 61287,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 918743,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 41384,
+          "meanTotalTokens": 61287,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 4,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement as written"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "5c5a4b6ff3",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "43fe202dcc0789adcc7027c7b307aa5c9fe476b61ead8d1b15bcc7d909c0af2f",
+          "candidateSha256": "1eb435a34889f33a770c6f590d12c0733e3762e3f1137dc8f12391e5428b14f4",
+          "assessmentSha256": [
+            "ba6b14526bb81633644ffa0abd6e7f1484c0bdb4b1a58882d20a1619d0ebffc4",
+            "a5c845df35f412eea5afaaec7e687c4dca8bfbe4f429a2871c0a400f3429a1bb"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-ultra",
+        "configurationId": "codex:gpt-5.6-sol@ultra",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 93.1,
+        "exactScore": 93.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 759055,
+        "inputTokens": 14732,
+        "outputTokens": 37324,
+        "totalTokens": 52056,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 759055,
+          "meanInputTokens": 14732,
+          "meanOutputTokens": 37324,
+          "meanTotalTokens": 52056,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "a8fe0fbfd5",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "0bae3854d16ddb65197f3783ff0400be70b1f2225d467f84aad0c118ff6a0416",
+          "candidateSha256": "8d9679a6122c88bce89d8ba82d75397eae9a3b713996f112eaa62566f99b001a",
+          "assessmentSha256": [
+            "039cf9688f6a534c77a033df4cb63cadc881408760e431ef505a6be52f247ff1",
+            "3925bcb94df942406784bc4b4e5478887efd3329074f943990b7dc1b9bfa026f"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-sol-ultra",
+        "configurationId": "codex:gpt-5.6-sol@ultra",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 97.5,
+        "exactScore": 97.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 892537,
+        "inputTokens": 19952,
+        "outputTokens": 37982,
+        "totalTokens": 57934,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 892537,
+          "meanInputTokens": 19952,
+          "meanOutputTokens": 37982,
+          "meanTotalTokens": 57934,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement as written"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "3723a5a071",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "2468e1584df3caf5ca6017df199729e126fe2a363f9b2863be4717be04acbc16",
+          "candidateSha256": "a4499822e1468a99c3b565cf824349f9f9b05f6967ceed8a753a08b661a149ec",
+          "assessmentSha256": [
+            "7630d5b1e78b914aeb70afba65438a0b0be28c1d12a5b6c08c4760fab473d5cc",
+            "63cb1e0bf6c6894618847fcf97f13a594b07e14a4a5873135d0e84b1f5a998a5"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-low",
+        "configurationId": "codex:gpt-5.6-terra@low",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 91.3,
+        "exactScore": 91.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 111709,
+        "inputTokens": 14687,
+        "outputTokens": 5819,
+        "totalTokens": 20506,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 111709,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 5819,
+          "meanTotalTokens": 20506,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 3.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "90f49b5ca5",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "6163d73ba8cfe5b99a3fb2aa0cdd14bbe044023ca374ebded92f22e9650be3a5",
+          "candidateSha256": "12122b750ac706ae6ba610a48f65d0f9377ce04a939229c95fc7d86e5639437e",
+          "assessmentSha256": [
+            "8a3c2bc5b168f33b7b0b0b162b0a7ae028bbcb1ec819bb0f4aa3b37d235baaf2",
+            "b997a259d806da80cf62668996c2be9fd0496d9e1cb66e6649d710803e13f03a"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-low",
+        "configurationId": "codex:gpt-5.6-terra@low",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 95.6,
+        "exactScore": 95.625,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 105134,
+        "inputTokens": 19903,
+        "outputTokens": 5484,
+        "totalTokens": 25387,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 105134,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 5484,
+          "meanTotalTokens": 25387,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "9a810e7982",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "adefa4bddd4e8d1d608da69433fbae033f572fb09278d3a93279dd15c298fb99",
+          "candidateSha256": "ef19b22a6768e1577b5063f34d4accd654f540919ec518588cd1c2bb57379a99",
+          "assessmentSha256": [
+            "a0adc662c3e54c3a12c13c5178b7c7d7dbbcd94b0d5a7d630fe8aed026eedbc3",
+            "37160aec7f1c63514e4c736dd2ef7f1bd5d49a8b957a0941bf27bd07fb1408a5"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-medium",
+        "configurationId": "codex:gpt-5.6-terra@medium",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 86.3,
+        "exactScore": 86.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 103415,
+        "inputTokens": 14687,
+        "outputTokens": 5580,
+        "totalTokens": 20267,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 103415,
+          "meanInputTokens": 14687,
+          "meanOutputTokens": 5580,
+          "meanTotalTokens": 20267,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 3,
+          "D": 3.5,
+          "S": 3,
+          "C": 4
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "c92e5e112c",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "32a66e916d18153202e0a9437b738831f13b8f4b87ae182c0f987deb67ef4d35",
+          "candidateSha256": "37bb4ae3069b46a31d5d2ab5c228894913951d1fe243e3aed77d51d11eacfc65",
+          "assessmentSha256": [
+            "f3848aac61f7d928a6b937cc6ec0ec6df292e032aad27fe97f0626703f7b2514",
+            "97220334044ce506e75daf489f1bfc40e56bfebdf2e3cdc50ec833b896477027"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-medium",
+        "configurationId": "codex:gpt-5.6-terra@medium",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 95.6,
+        "exactScore": 95.625,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 100786,
+        "inputTokens": 19679,
+        "outputTokens": 5380,
+        "totalTokens": 25059,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 100786,
+          "meanInputTokens": 19679,
+          "meanOutputTokens": 5380,
+          "meanTotalTokens": 25059,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "75bc4d0002",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "4e930f2c7558d3e07f16614c77cca83ae94295a4872338b9db33cf34a402d825",
+          "candidateSha256": "c60132a0cbcf0c6b0d2fe98c10f4ce06294ab4eaffd4c8d1beef4114c89becfa",
+          "assessmentSha256": [
+            "8a58351e7d96bd80a6a859620a4dc47693f4283bfea76ce116e25cbca5a9530f",
+            "4fc09a5acc684e4f0228cdb84abeeb7eb7e7a28d45d578d5b4c4b2c8fc168b56"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-high",
+        "configurationId": "codex:gpt-5.6-terra@high",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 94.4,
+        "exactScore": 94.375,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 120032,
+        "inputTokens": 14685,
+        "outputTokens": 6487,
+        "totalTokens": 21172,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 120032,
+          "meanInputTokens": 14685,
+          "meanOutputTokens": 6487,
+          "meanTotalTokens": 21172,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "441104a7c9",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "2e05e6afcc2964f5f6720c02d06ce9e62be95a5510a2e6f5734bdefe538e1e2c",
+          "candidateSha256": "628aeb6e1d4308494cb4e6c978a4a393ed46e1f823eb8e75c18c62831b7b1433",
+          "assessmentSha256": [
+            "b7213c46e46e5adae6fa52c0c56d074b39846211060c980732e279c0abc90101",
+            "ed06c615093a0f3a36776d075512a47b1323f3729867071d85067c7fe8a455cb"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-high",
+        "configurationId": "codex:gpt-5.6-terra@high",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 95,
+        "exactScore": 95,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 127943,
+        "inputTokens": 19683,
+        "outputTokens": 6950,
+        "totalTokens": 26633,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 127943,
+          "meanInputTokens": 19683,
+          "meanOutputTokens": 6950,
+          "meanTotalTokens": 26633,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "7722d4426b",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "98ea4adad80fe574eeaca1afb6276c6708f0039330d3368f9df3a078028f25ba",
+          "candidateSha256": "a914d077f53f50de217ca530a48a284fbf91d4643b3d9d7febe36facc8cd7fed",
+          "assessmentSha256": [
+            "7ea8fa4eb532fb3c0e6bc9a8fb0fa2a0cdd07f8ab0be46b1a4e21d27ba7564e5",
+            "1336e847cbd48b6aa151649a41e9ecedd7a49bdd702fd28d6f68158fe014a60f"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-xhigh",
+        "configurationId": "codex:gpt-5.6-terra@xhigh",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 81.3,
+        "exactScore": 81.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 287365,
+        "inputTokens": 14467,
+        "outputTokens": 15788,
+        "totalTokens": 30255,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 287365,
+          "meanInputTokens": 14467,
+          "meanOutputTokens": 15788,
+          "meanTotalTokens": 30255,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 2.5,
+          "D": 3.5,
+          "S": 3,
+          "C": 3
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "eb928b43ac",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "e426fe959905222bcc5849868d5c079649a610965ed625aad79df71183866e59",
+          "candidateSha256": "9d3ade7c94bfd615ce72912f4a56189e96edc8240aadb3937a3cc63b2f8651ac",
+          "assessmentSha256": [
+            "5bb2689e3d19277c413acf2adb86cf8777c1cb81948ef6ad38f336c3dcf01448",
+            "5489526c02d9fbbe2a6cc3d376abed87701a54e344e92b0f7c813deb2f34f30f"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-xhigh",
+        "configurationId": "codex:gpt-5.6-terra@xhigh",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 96.3,
+        "exactScore": 96.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 264301,
+        "inputTokens": 19681,
+        "outputTokens": 14475,
+        "totalTokens": 34156,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 264301,
+          "meanInputTokens": 19681,
+          "meanOutputTokens": 14475,
+          "meanTotalTokens": 34156,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "fccd0b40c9",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "0a7628f6d84755105f6b63089280a8cbc94793d45cfa507bc4f454f49bc55917",
+          "candidateSha256": "8940fc75c9360bab9424ae4551d924a6292e5b055926f90e75d2b1502f41e696",
+          "assessmentSha256": [
+            "25d0c3d8f9bf40c271327974192b59abc24352d6cfc30b4f77724aa72582cb98",
+            "2f234403f0c328cf0391feb36002e1e7b958058db9f40de213a9d7a2277bf3b5"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-max",
+        "configurationId": "codex:gpt-5.6-terra@max",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 86.3,
+        "exactScore": 86.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 739223,
+        "inputTokens": 14463,
+        "outputTokens": 40779,
+        "totalTokens": 55242,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 739223,
+          "meanInputTokens": 14463,
+          "meanOutputTokens": 40779,
+          "meanTotalTokens": 55242,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 4,
+          "D": 2,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "40be720611",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "da619db99e10d84c9d905b745bc23095fe670f5031ca3cc932caa29d852e80d3",
+          "candidateSha256": "f2b82af0cee474b96d3d9d0e9c7dbfb0a609336489139bca1978515d02244f5c",
+          "assessmentSha256": [
+            "53506dd304cc613f52691c4cccb7349d4f5c91ee2aed18b5c7d1ddf93ecd35d0",
+            "6f11144e3a0dc480cf8ee987b82ac1c05403640e26cede3b8a611964f95e0629"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-max",
+        "configurationId": "codex:gpt-5.6-terra@max",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 96.3,
+        "exactScore": 96.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 742781,
+        "inputTokens": 19903,
+        "outputTokens": 41033,
+        "totalTokens": 60936,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 742781,
+          "meanInputTokens": 19903,
+          "meanOutputTokens": 41033,
+          "meanTotalTokens": 60936,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "c2a8e78301",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "3254d7079b677acf4455d53bdfe8db1cbe39f9c710ffe8dac67aee3f17a43373",
+          "candidateSha256": "8c780f9f2b4dbb172a9fc2947338703f80fa703fdff4e2f63759081334e526ac",
+          "assessmentSha256": [
+            "380f172294fe78784e0194e3843659f53d41c834b5859e2ad6bc9bf877108b67",
+            "d4625faff3d8a40cf7dbc4472e05dd7302605319bca5943e28a9041d98d9526e"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-ultra",
+        "configurationId": "codex:gpt-5.6-terra@ultra",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 81.9,
+        "exactScore": 81.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 594814,
+        "inputTokens": 14514,
+        "outputTokens": 32867,
+        "totalTokens": 47381,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 594814,
+          "meanInputTokens": 14514,
+          "meanOutputTokens": 32867,
+          "meanTotalTokens": 47381,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 2.5,
+          "D": 2,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "39b847d7af",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "39f01e16569a17f9cb06963f3003ac3800cbeba478adb91fb8efea887faab1da",
+          "candidateSha256": "9b7ef91079801f76b240877597049c4a3af241d900050dc0280d9e3abd7a31c7",
+          "assessmentSha256": [
+            "94cb4085a00de77ea77c4a728341efb74babaca8689fb67a56e6a41d0ae6c19f",
+            "2749d5f887ee56f1c737c79b0d89c29080c72f34a6846d2662b9e56a797429cb"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-terra-ultra",
+        "configurationId": "codex:gpt-5.6-terra@ultra",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 94.4,
+        "exactScore": 94.375,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 535144,
+        "inputTokens": 19952,
+        "outputTokens": 29529,
+        "totalTokens": 49481,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 535144,
+          "meanInputTokens": 19952,
+          "meanOutputTokens": 29529,
+          "meanTotalTokens": 49481,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 3.5,
+          "D": 4,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "491dc4d85f",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "1dee321abf1d64290520ed69e6dd54ad0d0389c2ee4952847f51ebe1c1c46bab",
+          "candidateSha256": "22bb45ae3bfc2f35790290b2d167eb2cd076a56937620c12959a5b783a87ff6a",
+          "assessmentSha256": [
+            "10b3484e391cbaf11f1f87d8662676b1d4eb8b6a575f5a8bbb33b4657af3d3d5",
+            "a65f14c285f48bedbcae61bfbb7c083aefe69150a9efe6921fa8d2c3b6299811"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-low",
+        "configurationId": "codex:gpt-5.6-luna@low",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 91.9,
+        "exactScore": 91.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 110125,
+        "inputTokens": 12896,
+        "outputTokens": 5885,
+        "totalTokens": 18781,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 110125,
+          "meanInputTokens": 12896,
+          "meanOutputTokens": 5885,
+          "meanTotalTokens": 18781,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "2ff0e6be73",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "748b745876c2bb336ffd68b92c4459256ab138db1fa3ba79efbfc05ea5c57c47",
+          "candidateSha256": "ac691678fedb4ec50a0b86dfa3048ec710230290001aab97163793a522585882",
+          "assessmentSha256": [
+            "d483632ba069c48ad2dd9228d0192e0dbf834ade8b34fdb107b7695ad521a04c",
+            "0307f763d6f68d738061ba5a574afff1ea823e16cbcdf9e312a09a48aaf182df"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-low",
+        "configurationId": "codex:gpt-5.6-luna@low",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 93.8,
+        "exactScore": 93.75,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 103574,
+        "inputTokens": 18338,
+        "outputTokens": 5493,
+        "totalTokens": 23831,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 103574,
+          "meanInputTokens": 18338,
+          "meanOutputTokens": 5493,
+          "meanTotalTokens": 23831,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 3.5,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "9ecff3f478",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "19f957e5f8e75a4fd43a4555996d5bb49fe921642a0dc2e8d95071015c77cf94",
+          "candidateSha256": "919bc3cec522625e55322832dc40ef5bd029515f72782c8d888e3e446a35326a",
+          "assessmentSha256": [
+            "d9d2fc400705830516fa48bc423243dd3386dfefd618e7d88248dbecd410e746",
+            "767c6eaee21050d5ca8c8e3f8d899084aae0242f1c3005b0deefc94f0e40694d"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-medium",
+        "configurationId": "codex:gpt-5.6-luna@medium",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 86.9,
+        "exactScore": 86.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 115502,
+        "inputTokens": 12898,
+        "outputTokens": 6271,
+        "totalTokens": 19169,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 115502,
+          "meanInputTokens": 12898,
+          "meanOutputTokens": 6271,
+          "meanTotalTokens": 19169,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 2.5,
+          "D": 3,
+          "S": 3.5,
+          "C": 4
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "6d2201326c",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "e9c7e0a2f679e9e70c2dde176ef92a63ef0450d3e21f386945a122f8932c3d4f",
+          "candidateSha256": "b919323459b5054500a8377f8c44c7959b2e12a71254822c48fe18d2ebde38cf",
+          "assessmentSha256": [
+            "921bed79ac6282287fb5f5b89f96a4b8e611ededb213a57200d6aa279eb18073",
+            "6ae7cde5a9bd5b0c8ed8db17339802a654f21b353313545e3a2b81dd82520d6b"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-medium",
+        "configurationId": "codex:gpt-5.6-luna@medium",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 93.1,
+        "exactScore": 93.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 126799,
+        "inputTokens": 18116,
+        "outputTokens": 6869,
+        "totalTokens": 24985,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 126799,
+          "meanInputTokens": 18116,
+          "meanOutputTokens": 6869,
+          "meanTotalTokens": 24985,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "c9dd10e204",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "90ac5fcf0e13b1aa0eec3c94492a87adcf43947bcb96d4d0bde07e4762add718",
+          "candidateSha256": "edaf9e7346645c6dd3027fd0df4ef1110e913dadbf10d33ea4d9f72c59c206ef",
+          "assessmentSha256": [
+            "09a104e5c907ac4123dbf5a38e3dc1f285501e0c431c97afa2ec569b51eb69a1",
+            "429495056c74a1da165d1e3e65b5768e9ba077236108a20c17b5742eed83e83a"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-high",
+        "configurationId": "codex:gpt-5.6-luna@high",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 85,
+        "exactScore": 85,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 190549,
+        "inputTokens": 12900,
+        "outputTokens": 10316,
+        "totalTokens": 23216,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 190549,
+          "meanInputTokens": 12900,
+          "meanOutputTokens": 10316,
+          "meanTotalTokens": 23216,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 3,
+          "D": 3.5,
+          "S": 3,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "307d162e7c",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "c3ca53c145133efe5801314d88cd0cbf185858ddd830319f9ed6ff9b51a5238e",
+          "candidateSha256": "12979da1560316677f4a3bd0c1a33e1ec1301d887ec7265db8a22fa33aa81842",
+          "assessmentSha256": [
+            "880af739b5a62ba4301d39e069ee050f2b096b75b27e60c4dda2c5822698a25b",
+            "482fbcf5ff0aec041c12632817e1f26d7da311b090967a4feefbf3b6d9bde547"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-high",
+        "configurationId": "codex:gpt-5.6-luna@high",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 91.9,
+        "exactScore": 91.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 207373,
+        "inputTokens": 18116,
+        "outputTokens": 11263,
+        "totalTokens": 29379,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 207373,
+          "meanInputTokens": 18116,
+          "meanOutputTokens": 11263,
+          "meanTotalTokens": 29379,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "812587f811",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "4ccdebaf7d78c131e954d0128a26f48b0a7b9f0311c67f59a2fc9390de8ed3af",
+          "candidateSha256": "66308c375dfb35ca732831fd0ce8adf576103a187034908453b2b7e9d08a51ff",
+          "assessmentSha256": [
+            "53980c72533a705785e261682d2f844711d48972b8465b1bbd8df7a914217fd7",
+            "4c5cc586f6a9794c46d456e7f9512c52a1894856154a0b54ebf1a1df4e78b792"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-xhigh",
+        "configurationId": "codex:gpt-5.6-luna@xhigh",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 85,
+        "exactScore": 85,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 254897,
+        "inputTokens": 12900,
+        "outputTokens": 13892,
+        "totalTokens": 26792,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 254897,
+          "meanInputTokens": 12900,
+          "meanOutputTokens": 13892,
+          "meanTotalTokens": 26792,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 4,
+          "A": 3,
+          "D": 4,
+          "S": 2.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "90a4704f4a",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "590a4b5baa25d16c7ecdf7c3b9f5629a930d31b1411c8a8a3f7c00a041d1e97a",
+          "candidateSha256": "2b63b9fc4e9ec4deac443cf4a0f12ebf562ccffd8564c9236cdeaab764061cd5",
+          "assessmentSha256": [
+            "d985afd71f01e2e3f2c559276118d6364eac55f38606f1ad5cd5321a5ec7f032",
+            "668350fa7769d18ab1a49f82e9e7b2d52a66cd71e24b0edf54574328d86e0977"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-xhigh",
+        "configurationId": "codex:gpt-5.6-luna@xhigh",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 96.9,
+        "exactScore": 96.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 356298,
+        "inputTokens": 18114,
+        "outputTokens": 19519,
+        "totalTokens": 37633,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 356298,
+          "meanInputTokens": 18114,
+          "meanOutputTokens": 19519,
+          "meanTotalTokens": 37633,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "74647c7ece",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "7d582bc3edfac3ca21fd95a87e90238e2ca3c5c9e0f948d27891d4eb0527184b",
+          "candidateSha256": "c3a363764fede8b8746474977aea952d6482b8f26f540e91fcc3fd9cc7616860",
+          "assessmentSha256": [
+            "85f914f49720e9e5e9a278150fa89277a830871bc719b4aad509b958a01c8d9b",
+            "49aa30480d6d9df9b7fa959825152c7e6d498e533e0ba0a640663a3ab040982b"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-max",
+        "configurationId": "codex:gpt-5.6-luna@max",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 88.1,
+        "exactScore": 88.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 538181,
+        "inputTokens": 12898,
+        "outputTokens": 29742,
+        "totalTokens": 42640,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 538181,
+          "meanInputTokens": 12898,
+          "meanOutputTokens": 29742,
+          "meanTotalTokens": 42640,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3,
+          "D": 3,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "2bd27ea3d8",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "d04574af43c419a1bd8a4260906ccd8df4b57fb00833ce1092c8053618d0950c",
+          "candidateSha256": "e20085e5bfe4e34ee386f37591198b97b20660e1f8bb366af7c977de7e8f8267",
+          "assessmentSha256": [
+            "1a713987ada9cca80e0d66818c79f18fa084f179b884a9f671c26e50afa46eab",
+            "b9da17fa423786db02ce895097af31ac9ed129c3d3a6396150b148fb3e5347cf"
+          ]
+        }
+      },
+      {
+        "settingId": "codex-gpt-5-6-luna-max",
+        "configurationId": "codex:gpt-5.6-luna@max",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 98.1,
+        "exactScore": 98.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 537415,
+        "inputTokens": 18116,
+        "outputTokens": 29591,
+        "totalTokens": 47707,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 537415,
+          "meanInputTokens": 18116,
+          "meanOutputTokens": 29591,
+          "meanTotalTokens": 47707,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 4,
+          "D": 3.5,
+          "S": 4,
+          "C": 4
+        },
+        "readiness": [
+          "Implement as written",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "da31b0fa51",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "edc6eef5ca02b0001e229287aad4e89ac8d09e9e4c2e09e63ff5abddc19fb46b",
+          "candidateSha256": "3009ea3ed1f635d56a0ae5619d406a6a8be9d8936f131825b6737aa0e9655ef3",
+          "assessmentSha256": [
+            "d2f866b653df2fffc3e92801e4aa9cc81965c9d6c8a82bc4e8c2d2e4d46018fd",
+            "ea78844777743cc38f247beea360984de56d7082f93f34712b79b51fc0978479"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 90.6,
+        "exactScore": 90.625,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 622916,
+        "inputTokens": 2,
+        "outputTokens": 44990,
+        "totalTokens": 49420,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 622916,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 44990,
+          "meanTotalTokens": 49420,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 3.5,
+          "A": 3,
+          "D": 4,
+          "S": 4,
+          "C": 3
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "411579979b",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "14cd293fd513dac222abf2595e88d353d4591deb143a184d3f2fdd7ba7132a3f",
+          "candidateSha256": "944b1bbfbec2e55edb0c9412ba585015f7c87f22ca3bf0e69de15c5bcc076d4d",
+          "assessmentSha256": [
+            "4a9cfb057253847dac9ab89b2be229d4e12141d62367b1f710dff00190cb3351",
+            "d422b681563250455f88bf363b66c5640c25d1bd3ac718629c7b541f12c71c75"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 91.9,
+        "exactScore": 91.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 642489,
+        "inputTokens": 2,
+        "outputTokens": 46807,
+        "totalTokens": 59890,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 642489,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 46807,
+          "meanTotalTokens": 59890,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 3.5,
+          "A": 3,
+          "D": 4,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement as written"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "d05eceb761",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "2419b64e9729c0bb2c97ae7c2f00fc504b0c11202b39d446993052b5c2f5c60f",
+          "candidateSha256": "22a9f7b445463e2e99dfced16a3488c724da4cccae52e128bf2af1ecd427dc37",
+          "assessmentSha256": [
+            "2f5d6a4e4d46903ae9672c066c259cdc8551ed17949e5015db5199e0531f4c95",
+            "379cd4b7b2217a9b83c710c2bcb37bddd00020bbf5bb9f6c0ddfa5575432c7d9"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-low",
+        "configurationId": "claude:opus@low",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 76.9,
+        "exactScore": 76.875,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 324940,
+        "inputTokens": 2,
+        "outputTokens": 23002,
+        "totalTokens": 26543,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 324940,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 23002,
+          "meanTotalTokens": 26543,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 2.5,
+          "A": 2.5,
+          "D": 3.5,
+          "S": 2.5,
+          "C": 3
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "62a4bb02a2",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "2c00761bcd31dc73009b142ff1745cf4a6902f6f4a032064bfc9e8f02c3a63e4",
+          "candidateSha256": "5315cabb6c77b9bc12f35d5e00897d8635b4549e37ab67dcc49243f2b7f6f849",
+          "assessmentSha256": [
+            "a487877eb3ea26db4fbfe60567b1d9fdcef32cecc809cf2486552d59eb436556",
+            "e5cabd18cf31be2c981d5c54ccc485631988c928eea5a5bad3468e5cc81f4049"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-low",
+        "configurationId": "claude:opus@low",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 87.5,
+        "exactScore": 87.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 194222,
+        "inputTokens": 2,
+        "outputTokens": 13658,
+        "totalTokens": 25852,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 194222,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 13658,
+          "meanTotalTokens": 25852,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 3.5,
+          "A": 2.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "68f7ab2ddf",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "892f16345c6ccff54734a6c04b1c7a386676b935c7b594395d0daf7b023ef6dc",
+          "candidateSha256": "e891e08c5fbf898e5f9ca5f77045787688dc0dc84389a36b30989405c3df55e5",
+          "assessmentSha256": [
+            "c3bb6e5c603fcf0b1699222dfaff1660e75e84412c86328ba801276490fb854d",
+            "e8bfbee9c8cdb6daa8c15541c293f433be70f0046d9651361cd684c7002a5e7e"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-medium",
+        "configurationId": "claude:opus@medium",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 83.1,
+        "exactScore": 83.125,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 473677,
+        "inputTokens": 2,
+        "outputTokens": 33967,
+        "totalTokens": 37513,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 473677,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 33967,
+          "meanTotalTokens": 37513,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 2.5,
+          "A": 3,
+          "D": 4,
+          "S": 3,
+          "C": 3
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "ea422df3b9",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "7b497ef4841cf7bc9a0db3e0e8b3344f36897c897b77c2df438c949de9aa3772",
+          "candidateSha256": "351809cc687cb5a9215f48a907df9ec287e8c8ad28a32a2cc92468b68baafca4",
+          "assessmentSha256": [
+            "e6542e876fda2d4f80eb717589e771e481aa165ed7d58b60f6a84d581fbc65b8",
+            "6a5b77683817359bda278962683bbc0a0b55c3c8bbb99d5af56daebea1fb63ec"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-medium",
+        "configurationId": "claude:opus@medium",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 87.5,
+        "exactScore": 87.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 241613,
+        "inputTokens": 2,
+        "outputTokens": 17278,
+        "totalTokens": 29478,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 241613,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 17278,
+          "meanTotalTokens": 29478,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 3.5,
+          "A": 2.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "f0c28e5ca1",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "74404c652ae5ac72352b255d0d51714ae116106b7e0588ad2ce51787d9f3ef01",
+          "candidateSha256": "b3071125e516362d47fbe66a6234ce60a2936cb52e9ad9e61e99efb6ae7315a1",
+          "assessmentSha256": [
+            "649650cc1e63edd6ca9b26ffd9bd53b774ce1f61544a4522565413f2cb8030d5",
+            "7a0b6cca4b744854f491b5553cad163181c646c64b28f17e4994c690afb84275"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-high",
+        "configurationId": "claude:opus@high",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 81.3,
+        "exactScore": 81.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 460984,
+        "inputTokens": 2,
+        "outputTokens": 31923,
+        "totalTokens": 35467,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 460984,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 31923,
+          "meanTotalTokens": 35467,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 2.5,
+          "A": 3,
+          "D": 3.5,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "3005e02e89",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "b07259b509fb0dcca24740b723d638eccdf0253148836aa7eb82a573ee540548",
+          "candidateSha256": "82a2daa1a3574f043fd09e6e8b2053fecd5ea75426c74309689bd5eff70d63c6",
+          "assessmentSha256": [
+            "82a87d3a1c399342763db5cd22a65b6f6b49a1de77231d1727c42eaf699eae65",
+            "0427899a9975c69e20ba1465a932c1ebf3d3132616e797734fac4fa71ea55722"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-high",
+        "configurationId": "claude:opus@high",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 87.5,
+        "exactScore": 87.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 359837,
+        "inputTokens": 2,
+        "outputTokens": 24462,
+        "totalTokens": 36662,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 359837,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 24462,
+          "meanTotalTokens": 36662,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 2.5,
+          "A": 3.5,
+          "D": 4,
+          "S": 3.5,
+          "C": 3
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "3b4d6f1418",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "52425f0a35a5b065c9ef483fdd77b768b010a179a2d8e0a47824d9b6f8161421",
+          "candidateSha256": "479461aec57d828c91f9f1589375d8237e9b8b3c2de2b3b8da8064b55e57731a",
+          "assessmentSha256": [
+            "8e32c4ed06753e025dbbbea0d95998f53b4dd81ddb3dd5be7a5ff806df5dbf35",
+            "6cef92b1a73caa93934093ea78922fea9ed4c92a7366d56e75d16b547409f1ba"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-xhigh",
+        "configurationId": "claude:opus@xhigh",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 77.5,
+        "exactScore": 77.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 742621,
+        "inputTokens": 2,
+        "outputTokens": 53419,
+        "totalTokens": 56965,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 742621,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 53419,
+          "meanTotalTokens": 56965,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 3.5,
+          "G": 3,
+          "A": 2,
+          "D": 4,
+          "S": 3.5,
+          "C": 2.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "a3cd594022",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "ab635c164a629fbaa46ef52a71a0b1aa3ecedb49ac7afa613bfd02e062ade43c",
+          "candidateSha256": "57642c0e2d3c3dabe20740e564df54809374db21ae238db1eabbd5d26614c477",
+          "assessmentSha256": [
+            "b4ac74b50cea7750b268dd46a478b5a049d3ca42666be8860e9f4698d8b9a6e4",
+            "9743f1befac82ae39c5a4270c60a636912172cb7f494209610da281aa5336cef"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-xhigh",
+        "configurationId": "claude:opus@xhigh",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 93.8,
+        "exactScore": 93.75,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 396913,
+        "inputTokens": 2,
+        "outputTokens": 27707,
+        "totalTokens": 39906,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 396913,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 27707,
+          "meanTotalTokens": 39906,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 4,
+          "A": 3,
+          "D": 4,
+          "S": 4,
+          "C": 3.5
+        },
+        "readiness": [
+          "Implement after the named correction",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Implement after the named correction",
+        "assessmentStatus": "assessable",
+        "readinessConflict": false,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "bbd5377f50",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "39c45a4281e88bfa794744c7235fe6ec9f657ba47f4cdbde2ed1763ea9725429",
+          "candidateSha256": "0432ce5bdc9fa6d47cb571969dd664999146b1452f4ca727ca8bb68fde4da7fa",
+          "assessmentSha256": [
+            "4b6b0a91c34254af62d3cfe13ed8918213bc79bec408442a7066dbcc94e499e1",
+            "d9a8bb1e7f9d6b8fd8983e3130ea88a95d9a393e41262d16521d4931c0c69a13"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-max",
+        "configurationId": "claude:opus@max",
+        "condition": "baseline",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 81.3,
+        "exactScore": 81.25,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 696168,
+        "inputTokens": 2,
+        "outputTokens": 53042,
+        "totalTokens": 56588,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 696168,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 53042,
+          "meanTotalTokens": 56588,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 2.5,
+          "A": 2.5,
+          "D": 3.5,
+          "S": 4,
+          "C": 2.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "5a3ff9a68e",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "2535014850dba5ef2a383e72f8e6d4e02c7ec9d78dcc4d0fda85c8602145e1c5",
+          "answerSha256": "1660fd5c054c8f093cb4e7836c3d822ed48f8b8e2c5057a1a89ba579da2b5e5b",
+          "candidateSha256": "77280d8d49bb244b91cffe33cb9f63fc8b81f6f9838ba89e3417bf5d7b99b8d5",
+          "assessmentSha256": [
+            "f66cbede5d5f8a96fa13e12b2762d9059ef4e95119b61fef5755cdab953f00aa",
+            "1ae01c2ae3ba959fee43b1db4a138d7fc9833a845413af5164007af2601b9215"
+          ]
+        }
+      },
+      {
+        "settingId": "claude-opus-max",
+        "configurationId": "claude:opus@max",
+        "condition": "skill",
+        "benchmarkId": "work-spec-chat",
+        "category": "ai-workflows",
+        "score": 87.5,
+        "exactScore": 87.5,
+        "trials": 1,
+        "calibrated": false,
+        "status": "development",
+        "latencyMs": 580443,
+        "inputTokens": 2,
+        "outputTokens": 39357,
+        "totalTokens": 51558,
+        "costUsd": null,
+        "metrics": {
+          "sampleCount": 1,
+          "meanLatencyMs": 580443,
+          "meanInputTokens": 2,
+          "meanOutputTokens": 39357,
+          "meanTotalTokens": 51558,
+          "costUsd": null
+        },
+        "dimensions": {
+          "V": 4,
+          "G": 3.5,
+          "A": 2.5,
+          "D": 4,
+          "S": 3.5,
+          "C": 3.5
+        },
+        "readiness": [
+          "Fix spec first",
+          "Implement after the named correction"
+        ],
+        "readinessLabel": "Readiness unresolved",
+        "assessmentStatus": "assessable",
+        "readinessConflict": true,
+        "coverage": {
+          "expectedJudgments": 2,
+          "completedJudgments": 2,
+          "assessableJudgments": 2
+        },
+        "provenance": {
+          "candidateId": "a5500a0a05",
+          "sourceSha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2",
+          "promptSha256": "f90bc88f44fcb6cffde220b75629997da8497693d67d06ef5a23d781b3bd12f1",
+          "answerSha256": "535a484c1d141aba20ca74bf844f3b8d8ba1d14eb101afbbd3db9006fbd02948",
+          "candidateSha256": "4767db55224a48b1a7560a46656a431db5b93a82096bfe695593be1398e8e30f",
+          "assessmentSha256": [
+            "b134ab931215453ff45ff20c4b17ea8c8b5b1f57698dc16ec678e67900b6159c",
+            "18ecd403d1b060365679b4997e5647dee254c5608b7dff2e6067d24ad2f430c1"
+          ]
+        }
+      }
+    ],
+    "benchmarkSummaries": [
+      {
+        "benchmarkId": "work-spec-chat",
+        "runId": "2026-09-05T05-06-00Z__chat__expanded-26",
+        "status": "development",
+        "verification": "unverified",
+        "blockers": [
+          {
+            "code": "author-calibration-pending",
+            "message": "Human calibration and downstream implementation validation are pending."
+          }
+        ],
+        "evidenceKind": "development",
+        "baselineLabel": "Minimal baseline",
+        "treatmentLabel": "Work-spec skill",
+        "baseline": 87.4,
+        "treatment": 94.6,
+        "delta": 7.2,
+        "wins": 26,
+        "ties": 0,
+        "losses": 0,
+        "complete": 52,
+        "total": 52,
+        "completionLabel": "responses",
+        "calibration": "Calibration pending",
+        "judgingScope": {
+          "mode": "independent-response-panel",
+          "aggregationMethod": "mean-weighted-dimensions-no-gates-v1",
+          "judgeCount": 2,
+          "responseCount": 52,
+          "completedJudgmentCount": 104,
+          "gates": null,
+          "caps": null
+        },
+        "detailHref": "./benchmark-report.html#work-spec-chat",
+        "sourceHref": null
+      }
+    ],
+    "categoryLeaders": [
+      {
+        "category": "ai-workflows",
+        "entry": {
+          "id": "codex-gpt-6-astra-ultra-skill",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "modelId": "codex:gpt-6-astra",
+          "provider": "codex",
+          "family": "GPT-6 Astra",
+          "reasoning": "ultra",
+          "label": "GPT-6 Astra · ultra",
+          "condition": "skill",
+          "conditionLabel": "Work-spec skill",
+          "score": 100,
+          "baselineScore": 96.3,
+          "delta": 3.8,
+          "categories": [
+            {
+              "category": "ai-workflows",
+              "score": 100
+            }
+          ],
+          "baselineCategories": [
+            {
+              "category": "ai-workflows",
+              "score": 96.3
+            }
+          ],
+          "cost": null,
+          "latency": 797.136,
+          "tokens": 17210,
+          "metrics": {
+            "sampleCount": 1,
+            "meanLatencyMs": 797136,
+            "meanInputTokens": 20843,
+            "meanOutputTokens": 17210,
+            "meanTotalTokens": 38053,
+            "costUsd": null
+          },
+          "readiness": [
+            "Implement as written",
+            "Implement as written"
+          ],
+          "readinessLabel": "Implement as written",
+          "assessmentStatus": "assessable",
+          "readinessConflict": false,
+          "coverage": {
+            "expectedJudgments": 2,
+            "completedJudgments": 2,
+            "assessableJudgments": 2
+          },
+          "rank": 1,
+          "categoryScore": 100
+        }
+      }
+    ],
+    "efficientFrontier": [],
+    "regressions": [],
+    "callouts": {
+      "overall": "One authored work-spec scenario; model scores are exploratory.",
+      "value": "Cost comparison is withheld because provider cost coverage is incomplete.",
+      "regression": "0 matched settings score lower with the Work-spec skill.",
+      "category": "Scores measure specification quality; readiness remains a separate judgment."
+    },
+    "availability": {
+      "status": "development",
+      "verification": "unverified",
+      "code": "development-unverified-results",
+      "message": "Exploratory development results — unverified.",
+      "detail": "One scenario, one trial, two independent judges; human calibration and downstream validation remain pending.",
+      "blockers": [
+        {
+          "code": "author-calibration-pending",
+          "message": "Human calibration and downstream implementation validation are pending."
+        }
+      ]
+    },
+    "counts": {
+      "families": 1,
+      "tracks": 1,
+      "benchmarks": 1,
+      "categories": 1,
+      "conditions": 2,
+      "settings": 26,
+      "resultEntries": 52,
+      "responses": 52,
+      "developmentResultSets": 1,
+      "eligibleResultSets": 0,
+      "withheldResultSets": 0
+    }
   }
 });
 }());

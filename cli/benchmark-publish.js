@@ -19,7 +19,7 @@ const UPDATE_STACK_TIMEOUT_MS = 30 * 60 * 1000;
 const FUNCTION_LIVE_TIMEOUT_MS = 5 * 60 * 1000;
 const INVALIDATION_TIMEOUT_MS = 15 * 60 * 1000;
 const HTTP_VERIFICATION_TIMEOUT_MS = 2 * 60 * 1000;
-const BROWSER_VERIFICATION_TIMEOUT_MS = 5 * 60 * 1000;
+const BROWSER_CHECK_TIMEOUT_MS = 75 * 1000;
 const HTTP_ATTEMPTS = 8;
 const HTTP_REQUEST_TIMEOUT_MS = 15 * 1000;
 const ACTION_DEFINITIONS = Object.freeze([
@@ -1263,7 +1263,13 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
     { page: `${artifact.config.target.url}/benchmark-report.html`, target: "report", width: 1440, height: 1000, file: "live-report-desktop.png" },
     { page: `${artifact.config.target.url}/benchmark-report.html`, target: "report", width: 390, height: 844, file: "live-report-mobile.png" }
   ];
-  const perCheckTimeout = Math.floor(BROWSER_VERIFICATION_TIMEOUT_MS / checks.length);
+  if (artifact.routes.familyFragments.includes("/#capabilities/ai-workflows")) {
+    for (const [width, height, viewport] of [[1440, 1000, "desktop"], [390, 844, "mobile"]]) {
+      for (const target of ["workflows", "workflow-benchmarks", "workflow-efficiency", "workflow-report"]) {
+        checks.push({ page: `${artifact.config.target.url}/${target === "workflow-report" ? "benchmark-report.html" : ""}`, target, width, height, file: `live-${target}-${viewport}.png` });
+      }
+    }
+  }
   for (const check of checks) {
     const destinationPath = path.join(artifact.temporaryDirectory, check.file);
     const result = spawnSyncImplementation(process.execPath, [
@@ -1276,7 +1282,7 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
     ], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-      timeout: perCheckTimeout,
+      timeout: BROWSER_CHECK_TIMEOUT_MS,
       maxBuffer: DEFAULT_COMMAND_BUFFER_BYTES,
       env: { ...environmentVariables, CHROME_BIN: chromeBinary }
     });

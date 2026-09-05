@@ -1,0 +1,86 @@
+{
+  "capturedAt": "2026-09-05T05:40:38.548615+00:00",
+  "page": "http://localhost:8317/",
+  "phoneOnSameNetwork": "http://192.168.1.167:8317/",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 6011,
+      "sha256": "66b87acd3bf6d8f20b7518f4e765aa634c461a5308951710371740dfb8bce753",
+      "httpStatus": 200
+    },
+    {
+      "path": "style.css",
+      "bytes": 10735,
+      "sha256": "1f9043ad19fe57a72a918ec4efa077be145653e2cd7bacb04929afb173675c72",
+      "httpStatus": 200
+    },
+    {
+      "path": "main.js",
+      "bytes": 12096,
+      "sha256": "8cb7ffbdf5360a7a9118814318abf1fa2d0f69881caf76798ef4a03adaa8537d",
+      "httpStatus": 200
+    },
+    {
+      "path": "game.js",
+      "bytes": 14167,
+      "sha256": "a3cf01f9268624c4172dd01c04091f71b050fb2a9264bfa38cc9394692eefd92",
+      "httpStatus": 200
+    },
+    {
+      "path": "renderer.js",
+      "bytes": 49528,
+      "sha256": "619b3ce45d491cbb86c6a1732f6146de98823bf5a0d23184137408e900a9ce60",
+      "httpStatus": 200
+    },
+    {
+      "path": "audio.js",
+      "bytes": 15976,
+      "sha256": "2495a36f965744e8372d074b94ce78c41b11c32107f9b2beb8a72cb0c87d9703",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/background.png",
+      "bytes": 1908130,
+      "sha256": "95b23f0a6b6a34063572cc6084379724e96c3d997acf954b9da104fdecc5a6f4",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/corbel.png",
+      "bytes": 1070519,
+      "sha256": "8c897c67f077a8ff117c02e8ed56e3ebc20c173d72f1979b7b8427c298bfbbc7",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/hero.png",
+      "bytes": 661856,
+      "sha256": "5b928c2667825f1ba5196b957fbdebb1d6989903c5cc388e977fcc19705901b9",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/midground.png",
+      "bytes": 1566305,
+      "sha256": "fc9ef4d13192959e7f8cc7cab59986c993e4f5962e521aed0df39959a62f6f6e",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/shrine.png",
+      "bytes": 2620292,
+      "sha256": "b0738f8be5da9c7bdea7e3d0be352deb81f5a3b380bbb1c3fff42d8db54bf07d",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/spider.png",
+      "bytes": 1201393,
+      "sha256": "7b840f2e49f6d61cf33858923ffe7fc77d0db5b7fb6cb94fd299c172445c7b45",
+      "httpStatus": 200
+    },
+    {
+      "path": "assets/stone.png",
+      "bytes": 2923875,
+      "sha256": "df9e37370b56c8949574cd089a07f9bbe6e265dfdf7912ccb67083f8f244a480",
+      "httpStatus": 200
+    }
+  ],
+  "totalBytes": 12060883
+}
