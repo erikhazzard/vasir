@@ -1,0 +1,121 @@
+{
+  "status": "pass",
+  "name": "writing-storytelling",
+  "category": "writing",
+  "references": 21,
+  "localLinksChecked": 315,
+  "reachablePromptFiles": 22,
+  "totalWords": 60750,
+  "inventory": [
+    {
+      "file": "SKILL.md",
+      "words": 1560,
+      "lines": 78
+    },
+    {
+      "file": "references/antagonism-and-irony.md",
+      "words": 2710,
+      "lines": 139
+    },
+    {
+      "file": "references/applied-narrative.md",
+      "words": 1149,
+      "lines": 74
+    },
+    {
+      "file": "references/character-arcs.md",
+      "words": 2637,
+      "lines": 152
+    },
+    {
+      "file": "references/characters.md",
+      "words": 3076,
+      "lines": 181
+    },
+    {
+      "file": "references/controlling-idea.md",
+      "words": 3508,
+      "lines": 198
+    },
+    {
+      "file": "references/core-model.md",
+      "words": 1939,
+      "lines": 108
+    },
+    {
+      "file": "references/dialogue.md",
+      "words": 2874,
+      "lines": 229
+    },
+    {
+      "file": "references/genre-and-form.md",
+      "words": 3358,
+      "lines": 214
+    },
+    {
+      "file": "references/interactive-and-adaptation.md",
+      "words": 1868,
+      "lines": 118
+    },
+    {
+      "file": "references/lotr-case-study.md",
+      "words": 2616,
+      "lines": 150
+    },
+    {
+      "file": "references/narration-and-prose.md",
+      "words": 3115,
+      "lines": 203
+    },
+    {
+      "file": "references/plot-and-structure.md",
+      "words": 3525,
+      "lines": 197
+    },
+    {
+      "file": "references/relationships-and-cast.md",
+      "words": 2539,
+      "lines": 156
+    },
+    {
+      "file": "references/revision-and-diagnosis.md",
+      "words": 3174,
+      "lines": 216
+    },
+    {
+      "file": "references/scenes-and-beats.md",
+      "words": 2429,
+      "lines": 185
+    },
+    {
+      "file": "references/sources-and-lineage.md",
+      "words": 1668,
+      "lines": 95
+    },
+    {
+      "file": "references/story-development.md",
+      "words": 1813,
+      "lines": 126
+    },
+    {
+      "file": "references/story-overview.md",
+      "words": 1198,
+      "lines": 48
+    },
+    {
+      "file": "references/suspense-mystery-and-horror.md",
+      "words": 2387,
+      "lines": 177
+    },
+    {
+      "file": "references/twists-and-revelations.md",
+      "words": 8659,
+      "lines": 471
+    },
+    {
+      "file": "references/world-and-myth.md",
+      "words": 2948,
+      "lines": 169
+    }
+  ]
+}

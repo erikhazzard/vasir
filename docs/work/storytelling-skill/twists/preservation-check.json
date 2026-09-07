@@ -1,0 +1,22 @@
+{
+  "changed": [
+    ".agents/skills/writing-storytelling/SKILL.md",
+    ".agents/skills/writing-storytelling/references/antagonism-and-irony.md",
+    ".agents/skills/writing-storytelling/references/controlling-idea.md",
+    ".agents/skills/writing-storytelling/references/sources-and-lineage.md",
+    ".agents/skills/writing-storytelling/references/suspense-mystery-and-horror.md",
+    "registry.json",
+    ".vasir-catalog-manifest.json"
+  ],
+  "unexpected": [
+    ".agents/skills/writing-storytelling/SKILL.md",
+    ".agents/skills/writing-storytelling/references/controlling-idea.md"
+  ],
+  "checkedFiles": 24,
+  "observedExternalChanges": [
+    ".agents/skills/writing-storytelling/references/controlling-idea.md",
+    "New protagonist-orientation wording in SKILL.md explain/diagnose mode"
+  ],
+  "resolution": "Preserved both changes. No edits were made by this task to controlling-idea.md. Removing only our root description/routing additions and the separately observed protagonist-orientation sentence reproduces the root baseline SHA256.",
+  "rootNormalizedMatchesBaseline": true
+}

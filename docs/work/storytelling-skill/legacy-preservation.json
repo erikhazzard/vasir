@@ -1,0 +1,95 @@
+{
+  "verifiedIdentical": true,
+  "files": [
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/SKILL.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/SKILL.md",
+      "sha256": "7c7a7d959d47c3a6face85470c8b02e2feb81abdca9a1432b48170c8898ae0c8"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/controlling-idea-method.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/controlling-idea-method.md",
+      "sha256": "35b20a4b6d22e26fada91ec7a05bae49412bf87e4eb62c7ce1205c505e8aad00"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genre-index.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genre-index.md",
+      "sha256": "f2bff3c6777cca256535704182f1df16c498a92d05c1a4b1b45fd59735ceafcf"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genre-map.json",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genre-map.json",
+      "sha256": "259fb3d6f5a884e3ba3f7d36627c0c952a858b072e4a7b759783e14af1b41d48"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genre-reference-template.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genre-reference-template.md",
+      "sha256": "bf4d0fa2c33b5543844760e447a3e4b0baf0d5bcef03736a4ee72fd87a4a6947"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/action.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/action.md",
+      "sha256": "439262323450955c1bf5a173218a7ca4040654abe9ba4b885b929eea86d766e2"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/crime.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/crime.md",
+      "sha256": "b9262f594e19c633a2c9f91debc9c7bec53ec8f40c37dd5d47a1b6e1377bce71"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/horror.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/horror.md",
+      "sha256": "0146047e0c0ac4defcfc7230619316adbba2a5493ec8ef345fdd673114f81015"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/love.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/love.md",
+      "sha256": "927ad106674ce5f23a6f40c495eade438891dec66a0083c3904d4e96c4c06582"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/performance.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/performance.md",
+      "sha256": "26116878b7835e0ab9be1c3284221fa849b87e7a3cbd250e24315306366fd8d7"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/society.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/society.md",
+      "sha256": "7f260143a65840691fe1c51fe1647d16de408dc34524bb9ce3d2aac61c45b0b9"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/thriller.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/thriller.md",
+      "sha256": "5f8e2690764e193574990fe0fd7fd34314cee93ca0ca526021531f0a4b7800f2"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/war.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/war.md",
+      "sha256": "52a95f6ceeb19880220c2129ffaf99bb8d6553a9155f14fa90153b7a1ac02376"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/genres/western.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/genres/western.md",
+      "sha256": "9d2f69e5848d6d7339a52e785094c4eab275ed6592881e76e8b1e7287e3996ab"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/philosophy-source-protocol.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/philosophy-source-protocol.md",
+      "sha256": "82bcd00eee3f9974fe1494f59513356208620cc43349a2bf2a43b05910ab9072"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/references/quality-rubric.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/references/quality-rubric.md",
+      "sha256": "dc091c8fb767df400a736770ce8a575ba7cf18009242587c47b78303d97ebb39"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/scripts/validate_skill.py",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/scripts/validate_skill.py",
+      "sha256": "b150c2aa4b8b88f9ce3769dc214e8c6330421085b3d3daca699fac43c234dbc0"
+    },
+    {
+      "original": ".agents/skills/writing__story-controlling-idea/tests/acceptance-tests.md",
+      "archived": "docs/retired-skills/writing__story-controlling-idea/tests/acceptance-tests.md",
+      "sha256": "18c01af1aadda481b644d6e8da6c5d73284feec7e3d85b0b1d81d66987ee1b7b"
+    }
+  ]
+}
