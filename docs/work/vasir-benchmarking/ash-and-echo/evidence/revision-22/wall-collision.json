@@ -1,0 +1,45 @@
+{
+  "contract": "A swaying ledge cannot carry its rider through a solid wall; the rider can still jump away.",
+  "browserEntry": "Normal start, visible mobile touch controls, first-hop \u2192 second-hop \u2192 wall-transfer \u2192 resonant-stone \u2192 hold right. No state placement or level mutation.",
+  "legalMaxPlayerX": 336,
+  "browser": {
+    "before": {
+      "gameSha256": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+      "naturalRoute": true,
+      "maxObservedPlayerX": 426.52391232090554,
+      "deaths": 0,
+      "pageErrors": []
+    },
+    "after": {
+      "gameSha256": "47f2219507a1f15d0d85c10cc00103bff792d97f6433717cbd7a248dc57c50ed",
+      "naturalRoute": true,
+      "maxObservedPlayerX": 336,
+      "deaths": 0,
+      "pageErrors": [],
+      "leftJumpDeparture": {
+        "x": 278.77870758662976,
+        "y": 3825.7038751748614,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -364.6723646723643,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "groundedBeforeDeparture": true
+    }
+  },
+  "regression": {
+    "command": "node --test test/ash-and-echo.test.js",
+    "result": "23/23 pass, including both full-input summit routes",
+    "addedTest": "a swaying bell platform cannot carry its rider through the right wall, with or without movement input",
+    "fixture": "Legal landing at the authored resonant stone beside the right wall; all authored platforms/hazards remain intact. Tests right-held and neutral input for 120 fixed steps each.",
+    "watchedRedMaxX": 574.6023214400191
+  },
+  "gameSha256": "47f2219507a1f15d0d85c10cc00103bff792d97f6433717cbd7a248dc57c50ed",
+  "scope": "Horizontal rider carry now uses existing solid collision. Spring evolution, vertical carry, jump tuning and rendering are unchanged in this correction.",
+  "limitations": "Automated desktop Chrome with mobile touch emulation, not a physical phone. Scoped collision proof, not a new visual or whole-game quality grade."
+}

@@ -1,0 +1,395 @@
+{
+  "method": "Ordinary real browser keyboard, normal RAF, no screenshots inside action windows. Starting positions arranged; repeated releases preserve event history. Video + 25fps sequence for temporal review, not physical phone/performance proof.",
+  "source": {
+    "/main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "/game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "/audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "/renderer.js": "85985563550ae3a35e4bf4df6540796ff98c5f03c940cced7e9a6242e1404511",
+    "/character.js": "ae994f7a33bb3c5b6896c3453b17a77391fee8f4532b95d151d7b715eabaf155",
+    "/atmosphere.js": "c46a9681447c1f72b168b39f7839da11220fac4b3eb40fd23a7721f7f437c510",
+    "/depth.js": "4fca92db19db1ca893d52ec5711fee682e67fc3b71bf44b15b4860d69a74a4f1",
+    "/surface-ash.js": "1071b4217f2c48865a7e6307649fe672e373443846277be794773bbb045db1d2",
+    "/cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "/lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "/ash-flow.js": "bc033879258846cf5f53058c097a9779641350aaca99a1321c9c326820e1b9ae",
+    "/cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "/fog-volume.js": "7a44948f3b9aad2655ea70183e115e930ce74c9d1b2cdb0df2d42cd0780bad46",
+    "/wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "/foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed"
+  },
+  "errors": [],
+  "actions": [
+    {
+      "name": "repeat-0-before",
+      "wallTime": 1788660481229,
+      "clock": 1346.300000000745,
+      "state": "playing",
+      "player": {
+        "x": 190,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 0.5250000000000006,
+      "deaths": 0,
+      "maxAltitude": 606,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-0-ground-jump",
+      "wallTime": 1788660481233,
+      "clock": 1349.300000000745,
+      "state": "playing",
+      "player": {
+        "x": 190,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 0.5250000000000006,
+      "deaths": 0,
+      "maxAltitude": 606,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-0-double-jump",
+      "wallTime": 1788660481398,
+      "clock": 1515.0999999996275,
+      "state": "playing",
+      "player": {
+        "x": 217.30694444444453,
+        "y": 3756.9746146541015,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.80604865220243,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 0.6833333333333333,
+      "deaths": 0,
+      "maxAltitude": 695.0253853458985,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-0-after",
+      "wallTime": 1788660482577,
+      "clock": 2696.7000000011176,
+      "state": "playing",
+      "player": {
+        "x": 281.06250000000017,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3169.9155975391777,
+      "elapsed": 1.8666666666666625,
+      "deaths": 0,
+      "maxAltitude": 819.3445028855281,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-1-before",
+      "wallTime": 1788660482826,
+      "clock": 2942.800000000745,
+      "state": "playing",
+      "player": {
+        "x": 190,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 2.116666666666662,
+      "deaths": 0,
+      "maxAltitude": 819.3445028855281,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-1-ground-jump",
+      "wallTime": 1788660482833,
+      "clock": 2949.0999999996275,
+      "state": "playing",
+      "player": {
+        "x": 190,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 2.116666666666662,
+      "deaths": 0,
+      "maxAltitude": 819.3445028855281,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-1-double-jump",
+      "wallTime": 1788660482999,
+      "clock": 3115.9000000003725,
+      "state": "playing",
+      "player": {
+        "x": 160.54305555555547,
+        "y": 3746.9292862882603,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -259.8706991014683,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 2.283333333333328,
+      "deaths": 0,
+      "maxAltitude": 819.3445028855281,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-1-after",
+      "wallTime": 1788660484207,
+      "clock": 4323.9000000003725,
+      "state": "playing",
+      "player": {
+        "x": 101.08749999999982,
+        "y": 3760,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "cameraY": 3155.3190672073397,
+      "elapsed": 3.4999999999999902,
+      "deaths": 0,
+      "maxAltitude": 834.2399663963761,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-2-before",
+      "wallTime": 1788660484410,
+      "clock": 4530.700000001118,
+      "state": "playing",
+      "player": {
+        "x": 190,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 3.6999999999999895,
+      "deaths": 0,
+      "maxAltitude": 834.2399663963761,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-2-ground-jump",
+      "wallTime": 1788660484418,
+      "clock": 4534.5999999996275,
+      "state": "playing",
+      "player": {
+        "x": 190,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 3.6999999999999895,
+      "deaths": 0,
+      "maxAltitude": 834.2399663963761,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-2-double-jump",
+      "wallTime": 1788660484583,
+      "clock": 4699.200000001118,
+      "state": "playing",
+      "player": {
+        "x": 219.45694444444453,
+        "y": 3746.9292862882603,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -259.8706991014683,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 3.8666666666666556,
+      "deaths": 0,
+      "maxAltitude": 834.2399663963761,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "repeat-2-after",
+      "wallTime": 1788660485789,
+      "clock": 5906,
+      "state": "playing",
+      "player": {
+        "x": 283.21250000000015,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3155.3190672073397,
+      "elapsed": 5.083333333333376,
+      "deaths": 0,
+      "maxAltitude": 834.2399663963761,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  ]
+}

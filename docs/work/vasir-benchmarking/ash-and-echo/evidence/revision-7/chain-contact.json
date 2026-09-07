@@ -1,0 +1,4137 @@
+{
+  "errors": [],
+  "samples": [
+    {
+      "name": "00-opening-still",
+      "state": "playing",
+      "player": {
+        "x": 96,
+        "y": 4452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.45000000000000057,
+      "deaths": 0,
+      "maxAltitude": 0,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 10.76663600000001,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 10.76663600000001,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.21430556291481653,
+            "lookY": 0.8266071712428636,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7347619299936567,
+            "lookY": 0.8266071712428636,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "name": "01-first-stone-approach",
+      "state": "playing",
+      "player": {
+        "x": 206.4125000000002,
+        "y": 4318.6929651545015,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 368.35415296953795,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.0166666666666655,
+      "deaths": 0,
+      "maxAltitude": 157.11885455475385,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": -0.04648314469197779,
+            "velocity": 0.23235128280286185
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 11.333236000000019,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 11.333236000000019,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.5841384519971395,
+            "lookY": 0.8880263760077772,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7741813661785196,
+            "lookY": 0.8880263760077772,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        }
+      ]
+    },
+    {
+      "name": "02-first-stone-contact",
+      "state": "playing",
+      "player": {
+        "x": 206.3698347455934,
+        "y": 4333.480392999624,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.2333333333333314,
+      "deaths": 0,
+      "maxAltitude": 157.11885455475385,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0.15864946329253887,
+            "velocity": 0.6507919187422648
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 0.21670000000000006,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": -19.349602888432322,
+            "rightBow": 20.363024885740334
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 11.549936000000022,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.692100825600663,
+            "lookY": 0.8940149408021858,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.75899539258527,
+            "lookY": 0.8940149408021858,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 161.95733474559322,
+          "y": 4361.480392999624,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": -0.042665254406782094,
+            "y": 7.480392999623863,
+            "vx": -0.2891415051948447,
+            "vy": -4.466588691392403
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        }
+      ]
+    },
+    {
+      "name": "03-first-stone-loaded",
+      "state": "playing",
+      "player": {
+        "x": 206.33763334672489,
+        "y": 4328.986699694858,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.5333333333333303,
+      "deaths": 0,
+      "maxAltitude": 157.11885455475385,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0.17974154593489816,
+            "velocity": -0.43864108141421515
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 0.5167,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 5.4696566307662735,
+            "rightBow": -3.3603015067430304
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 11.849936000000026,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7586861737199059,
+            "lookY": 0.8977083634110171,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7498074223387963,
+            "lookY": 0.8977083634110171,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 161.9251333467247,
+          "y": 4356.986699694858,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": -0.07486665327531723,
+            "y": 2.9866996948573123,
+            "vx": 0.0570714992717514,
+            "vy": 5.871843727747671
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        }
+      ]
+    },
+    {
+      "name": "04-first-stone-follow-through",
+      "state": "playing",
+      "player": {
+        "x": 206.35715660308236,
+        "y": 4330.397187383961,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.883333333333329,
+      "deaths": 0,
+      "maxAltitude": 157.11885455475385,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": -0.050603672378792645,
+            "velocity": -0.61086083890534
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 0.8667000000000004,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0.6398157032761974,
+            "rightBow": -2.3359342655686146
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 12.199936000000031,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.786520133246239,
+            "lookY": 0.8992522852843962,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7459241890603806,
+            "lookY": 0.8992522852843962,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 161.94465660308217,
+          "y": 4358.397187383961,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": -0.05534339691782083,
+            "y": 4.397187383961182,
+            "vx": 0.0023797341764258597,
+            "vy": -4.496532069540982
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        }
+      ]
+    },
+    {
+      "name": "05-first-stone-settled",
+      "state": "playing",
+      "player": {
+        "x": 206.3521035925533,
+        "y": 4330.1729500042065,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 2.533333333333327,
+      "deaths": 0,
+      "maxAltitude": 157.11885455475385,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": -0.009436836786564384,
+            "velocity": 0.4586554324842828
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 1.5167,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 12.84993600000004,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7983159573860441,
+            "lookY": 0.8999065878419156,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7442789410326858,
+            "lookY": 0.8999065878419156,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 161.9396035925531,
+          "y": 4358.1729500042065,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": -0.06039640744689623,
+            "y": 4.172950004206139,
+            "vx": 0.006132853705223493,
+            "vy": -0.361664655658253
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        }
+      ]
+    },
+    {
+      "name": "06-stone-release-and-cage",
+      "state": "playing",
+      "player": {
+        "x": 206.3524131726269,
+        "y": 4179.429670433973,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 30.28928336620654,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3630.08824333436,
+      "elapsed": 2.966666666666659,
+      "deaths": 0,
+      "maxAltitude": 272.8486917546452,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0.20221095603729652,
+            "velocity": -0.1845734730260105
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 1.949999999999999,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 13.283236000000047,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7995791011684568,
+            "lookY": 0.8999766531631301,
+            "alert": 0.0013166006148169751
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7441013405442064,
+            "lookY": 0.8999766531631301,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162.0158761701323,
+          "y": 4353.7897760982405,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0.0158761701322832,
+            "y": -0.21022390175948807,
+            "vx": 0.059216358398705884,
+            "vy": 15.08499152230001
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        },
+        {
+          "type": "jump",
+          "x": 218.3524131726269,
+          "y": 4358.16347129598,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 2.916666666666659,
+          "elapsed": 2.59166666666666
+        }
+      ]
+    },
+    {
+      "name": "10-spider-attention",
+      "state": "playing",
+      "player": {
+        "x": 112,
+        "y": 4142.294177806999,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 900,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3495.3822676956115,
+      "elapsed": 0.3166666666666668,
+      "deaths": 0,
+      "maxAltitude": 479.2735407991818,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 10.316700000000003,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 10.316700000000003,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 10.233400000000003,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.19758928546405022,
+            "lookY": 0.40845945914630744,
+            "alert": 0.29478964764465876
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.5096254249410396,
+            "lookY": 0.5733286030586696,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        },
+        {
+          "type": "jump",
+          "x": 218.3524131726269,
+          "y": 4358.16347129598,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 2.916666666666659,
+          "elapsed": 2.59166666666666
+        }
+      ]
+    },
+    {
+      "name": "11-spider-response",
+      "state": "playing",
+      "player": {
+        "x": 112,
+        "y": 4018.253422455988,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 30.28928336620654,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3467.5092354964963,
+      "elapsed": 0.6666666666666667,
+      "deaths": 0,
+      "maxAltitude": 479.2735407991818,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": -0.11661136418579007,
+            "velocity": 0.014706516395059642
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 10.6668,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 10.6668,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 10.5835,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.2815700239985458,
+            "lookY": 0.49394884836254094,
+            "alert": 0.49719519665351813
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7052869563098162,
+            "lookY": 0.7934478258485432,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "jump",
+          "x": 108,
+          "y": 4480,
+          "vx": 28.166666666666668,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.783333333333333,
+          "elapsed": 0.4583333333333339
+        },
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        },
+        {
+          "type": "jump",
+          "x": 218.3524131726269,
+          "y": 4358.16347129598,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 2.916666666666659,
+          "elapsed": 2.59166666666666
+        },
+        {
+          "type": "doubleJump",
+          "x": 124,
+          "y": 4170.294177806999,
+          "vx": 0,
+          "vy": -746,
+          "intensity": 0.9,
+          "at": 0.3250000000000002,
+          "elapsed": 0.3250000000000002
+        }
+      ]
+    },
+    {
+      "name": "12-spider-settling",
+      "state": "playing",
+      "player": {
+        "x": 112,
+        "y": 4190,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3616.859449202346,
+      "elapsed": 1.3166666666666644,
+      "deaths": 0,
+      "maxAltitude": 479.2735407991818,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": -0.33819454629815787,
+            "velocity": 0.6834522744412205
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 11.316799999999995,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 11.316799999999995,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 11.233499999999996,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.31714353447179955,
+            "lookY": 0.8136348469713941,
+            "alert": 0.22299220965078237
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.7881674793538117,
+            "lookY": 0.8866884142730382,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 218.4125000000002,
+          "y": 4354,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.6162732400877822,
+          "platformId": "ledge-1",
+          "suspended": true,
+          "at": 1.3666666666666643,
+          "elapsed": 1.0416666666666654
+        },
+        {
+          "type": "jump",
+          "x": 218.3524131726269,
+          "y": 4358.16347129598,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 2.916666666666659,
+          "elapsed": 2.59166666666666
+        },
+        {
+          "type": "doubleJump",
+          "x": 124,
+          "y": 4170.294177806999,
+          "vx": 0,
+          "vy": -746,
+          "intensity": 0.9,
+          "at": 0.3250000000000002,
+          "elapsed": 0.3250000000000002
+        },
+        {
+          "type": "land",
+          "x": 124,
+          "y": 4218,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 1.2328767123287672,
+          "platformId": "ledge-2",
+          "suspended": false,
+          "at": 0.9833333333333323,
+          "elapsed": 0.9833333333333323
+        }
+      ]
+    },
+    {
+      "name": "10-bell-attention",
+      "state": "playing",
+      "player": {
+        "x": 218,
+        "y": 2420,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 1852.9896702705096,
+      "elapsed": 1.6166666666666634,
+      "deaths": 0,
+      "maxAltitude": 2042.2735407991818,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": true
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0.006484951370529825,
+            "velocity": 1.253956749628338
+          },
+          {
+            "x": 290.07,
+            "y": 2763,
+            "length": 51,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 11.616799999999994,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 11.616799999999994,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 11.533499999999995,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 10.283299999999999,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-13",
+            "age": 10.283299999999999,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 10.283299999999999,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0.26473920375644633,
+            "velocity": -0.5738911479223718,
+            "clapper": -0.19768752514916743,
+            "clapperVelocity": 1.3643571949307947
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.6151176944021652,
+            "lookY": -0.24386140793560357,
+            "alert": 0.08538213070315527
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.721005153595751,
+            "lookY": 0.8949030885240985,
+            "alert": 0
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "doubleJump",
+          "x": 124,
+          "y": 4170.294177806999,
+          "vx": 0,
+          "vy": -746,
+          "intensity": 0.9,
+          "at": 0.3250000000000002,
+          "elapsed": 0.3250000000000002
+        },
+        {
+          "type": "land",
+          "x": 124,
+          "y": 4218,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 1.2328767123287672,
+          "platformId": "ledge-2",
+          "suspended": false,
+          "at": 0.9833333333333323,
+          "elapsed": 0.9833333333333323
+        },
+        {
+          "type": "checkpoint",
+          "x": 210,
+          "y": 2415,
+          "vx": 0,
+          "vy": 327.175104098181,
+          "intensity": 1,
+          "at": 1.3249999999999977,
+          "elapsed": 1.3249999999999977
+        },
+        {
+          "type": "land",
+          "x": 230,
+          "y": 2448,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.5970897540971302,
+          "platformId": "ledge-14",
+          "suspended": false,
+          "at": 1.358333333333331,
+          "elapsed": 1.358333333333331
+        }
+      ]
+    },
+    {
+      "name": "11-bell-response",
+      "state": "playing",
+      "player": {
+        "x": 218,
+        "y": 2289.6913580246915,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 30.28928336620654,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 1745.628980151404,
+      "elapsed": 1.9499999999999955,
+      "deaths": 0,
+      "maxAltitude": 2162.5870041639273,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": true
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": 0.241606292263725,
+            "velocity": 0.02379007967489042
+          },
+          {
+            "x": 290.07,
+            "y": 2763,
+            "length": 51,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 11.950199999999992,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 11.950199999999992,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 11.866899999999992,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 10.616699999999996,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-13",
+            "age": 10.616699999999996,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 10.616699999999996,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0.10558167955530272,
+            "velocity": -0.6947606971958011,
+            "clapper": 0.10295635458931156,
+            "clapperVelocity": 1.1607173878934287
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7363856269180376,
+            "lookY": -0.6742355870450214,
+            "alert": 0.0293783155695729
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.6936717888853986,
+            "lookY": 0.8982462527868998,
+            "alert": 0.03381671723914226
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 124,
+          "y": 4218,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 1.2328767123287672,
+          "platformId": "ledge-2",
+          "suspended": false,
+          "at": 0.9833333333333323,
+          "elapsed": 0.9833333333333323
+        },
+        {
+          "type": "checkpoint",
+          "x": 210,
+          "y": 2415,
+          "vx": 0,
+          "vy": 327.175104098181,
+          "intensity": 1,
+          "at": 1.3249999999999977,
+          "elapsed": 1.3249999999999977
+        },
+        {
+          "type": "land",
+          "x": 230,
+          "y": 2448,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.5970897540971302,
+          "platformId": "ledge-14",
+          "suspended": false,
+          "at": 1.358333333333331,
+          "elapsed": 1.358333333333331
+        },
+        {
+          "type": "jump",
+          "x": 230,
+          "y": 2448,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 1.6249999999999967,
+          "elapsed": 1.6249999999999967
+        }
+      ]
+    },
+    {
+      "name": "12-bell-settling",
+      "state": "playing",
+      "player": {
+        "x": 218,
+        "y": 2420,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 1846.2837684959943,
+      "elapsed": 2.5166666666666604,
+      "deaths": 0,
+      "maxAltitude": 2162.5870041639273,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": true
+      },
+      "paused": false,
+      "scenery": {
+        "cages": [
+          {
+            "x": 131.82,
+            "y": 4237.5,
+            "length": 62,
+            "angle": -0.10563669183326153,
+            "velocity": -0.5225370591992434
+          },
+          {
+            "x": 290.07,
+            "y": 2763,
+            "length": 51,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-1",
+            "age": 12.516799999999986,
+            "strength": 0.6162732400877822,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-4",
+            "age": 12.516799999999986,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 12.433499999999986,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 11.18329999999999,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-13",
+            "age": 11.18329999999999,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 11.18329999999999,
+            "strength": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0.25403364936335704,
+            "velocity": 0.7688362842695728,
+            "clapper": -0.20160438528286662,
+            "clapperVelocity": 1.736243910859303
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7896216756230378,
+            "lookY": -0.8631678157481425,
+            "alert": 0.004792905657294641
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.6816725710806306,
+            "lookY": 0.8997138860831138,
+            "alert": 0.009400747089330716
+          }
+        ]
+      },
+      "ledges": [
+        {
+          "id": "ledge-1",
+          "x": 162,
+          "y": 4354,
+          "suspension": {
+            "homeX": 162,
+            "homeY": 4354,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-4",
+          "x": 126,
+          "y": 3936,
+          "suspension": {
+            "homeX": 126,
+            "homeY": 3936,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-7",
+          "x": 145,
+          "y": 3492,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 3492,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-10",
+          "x": 149,
+          "y": 3056,
+          "suspension": {
+            "homeX": 149,
+            "homeY": 3056,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-13",
+          "x": 148,
+          "y": 2600,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 2600,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-17",
+          "x": 145,
+          "y": 1984,
+          "suspension": {
+            "homeX": 145,
+            "homeY": 1984,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-20",
+          "x": 148,
+          "y": 1516,
+          "suspension": {
+            "homeX": 148,
+            "homeY": 1516,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-23",
+          "x": 140,
+          "y": 1046,
+          "suspension": {
+            "homeX": 140,
+            "homeY": 1046,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "id": "ledge-26",
+          "x": 143,
+          "y": 566,
+          "suspension": {
+            "homeX": 143,
+            "homeY": 566,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "checkpoint",
+          "x": 210,
+          "y": 2415,
+          "vx": 0,
+          "vy": 327.175104098181,
+          "intensity": 1,
+          "at": 1.3249999999999977,
+          "elapsed": 1.3249999999999977
+        },
+        {
+          "type": "land",
+          "x": 230,
+          "y": 2448,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.5970897540971302,
+          "platformId": "ledge-14",
+          "suspended": false,
+          "at": 1.358333333333331,
+          "elapsed": 1.358333333333331
+        },
+        {
+          "type": "jump",
+          "x": 230,
+          "y": 2448,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 1.6249999999999967,
+          "elapsed": 1.6249999999999967
+        },
+        {
+          "type": "land",
+          "x": 230,
+          "y": 2448,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 1.2328767123287672,
+          "platformId": "ledge-14",
+          "suspended": false,
+          "at": 2.2249999999999948,
+          "elapsed": 2.2249999999999948
+        }
+      ]
+    }
+  ],
+  "mode": "Opening interaction uses native keyboard down/up and touch start. Later creature and bell composition probes explicitly arrange state; they do not establish route reachability.",
+  "firstLanding": {
+    "state": "playing",
+    "player": {
+      "x": 206.3521035925533,
+      "y": 4330.1729500042065,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 2.533333333333327,
+    "deaths": 0,
+    "maxAltitude": 157.11885455475385,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false,
+    "scenery": {
+      "cages": [
+        {
+          "x": 131.82,
+          "y": 4237.5,
+          "length": 62,
+          "angle": -0.009436836786564384,
+          "velocity": 0.4586554324842828
+        }
+      ],
+      "rigging": [
+        {
+          "platformId": "ledge-1",
+          "age": 1.5167,
+          "strength": 0.6162732400877822,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-4",
+          "age": 12.84993600000004,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        }
+      ],
+      "bells": [
+        {
+          "x": 210,
+          "y": 2458,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        },
+        {
+          "x": 210,
+          "y": 248,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        }
+      ],
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.7983159573860441,
+          "lookY": 0.8999065878419156,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.7442789410326858,
+          "lookY": 0.8999065878419156,
+          "alert": 0
+        }
+      ]
+    },
+    "ledges": [
+      {
+        "id": "ledge-1",
+        "x": 161.9396035925531,
+        "y": 4358.1729500042065,
+        "suspension": {
+          "homeX": 162,
+          "homeY": 4354,
+          "x": -0.06039640744689623,
+          "y": 4.172950004206139,
+          "vx": 0.006132853705223493,
+          "vy": -0.361664655658253
+        }
+      },
+      {
+        "id": "ledge-4",
+        "x": 126,
+        "y": 3936,
+        "suspension": {
+          "homeX": 126,
+          "homeY": 3936,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-7",
+        "x": 145,
+        "y": 3492,
+        "suspension": {
+          "homeX": 145,
+          "homeY": 3492,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-10",
+        "x": 149,
+        "y": 3056,
+        "suspension": {
+          "homeX": 149,
+          "homeY": 3056,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-13",
+        "x": 148,
+        "y": 2600,
+        "suspension": {
+          "homeX": 148,
+          "homeY": 2600,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-17",
+        "x": 145,
+        "y": 1984,
+        "suspension": {
+          "homeX": 145,
+          "homeY": 1984,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-20",
+        "x": 148,
+        "y": 1516,
+        "suspension": {
+          "homeX": 148,
+          "homeY": 1516,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-23",
+        "x": 140,
+        "y": 1046,
+        "suspension": {
+          "homeX": 140,
+          "homeY": 1046,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-26",
+        "x": 143,
+        "y": 566,
+        "suspension": {
+          "homeX": 143,
+          "homeY": 566,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      }
+    ],
+    "events": [
+      {
+        "type": "jump",
+        "x": 108,
+        "y": 4480,
+        "vx": 28.166666666666668,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 0.783333333333333,
+        "elapsed": 0.4583333333333339
+      },
+      {
+        "type": "land",
+        "x": 218.4125000000002,
+        "y": 4354,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 0.6162732400877822,
+        "platformId": "ledge-1",
+        "suspended": true,
+        "at": 1.3666666666666643,
+        "elapsed": 1.0416666666666654
+      }
+    ]
+  },
+  "pause": {
+    "playerUnchanged": true,
+    "sceneryUnchanged": true,
+    "platformsUnchanged": true
+  },
+  "restart": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4452,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.049999999999999996,
+    "deaths": 0,
+    "maxAltitude": 0,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false,
+    "scenery": {
+      "cages": [
+        {
+          "x": 131.82,
+          "y": 4237.5,
+          "length": 62,
+          "angle": 0,
+          "velocity": 0
+        }
+      ],
+      "rigging": [
+        {
+          "platformId": "ledge-1",
+          "age": 10.05,
+          "strength": 0.6162732400877822,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-4",
+          "age": 10.05,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        }
+      ],
+      "bells": [
+        {
+          "x": 210,
+          "y": 2458,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        },
+        {
+          "x": 210,
+          "y": 248,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        }
+      ],
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.03449978257455068,
+          "lookY": 0.13307058993040977,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.1182849688270309,
+          "lookY": 0.13307058993040977,
+          "alert": 0
+        }
+      ]
+    },
+    "ledges": [
+      {
+        "id": "ledge-1",
+        "x": 162,
+        "y": 4354,
+        "suspension": {
+          "homeX": 162,
+          "homeY": 4354,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-4",
+        "x": 126,
+        "y": 3936,
+        "suspension": {
+          "homeX": 126,
+          "homeY": 3936,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-7",
+        "x": 145,
+        "y": 3492,
+        "suspension": {
+          "homeX": 145,
+          "homeY": 3492,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-10",
+        "x": 149,
+        "y": 3056,
+        "suspension": {
+          "homeX": 149,
+          "homeY": 3056,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-13",
+        "x": 148,
+        "y": 2600,
+        "suspension": {
+          "homeX": 148,
+          "homeY": 2600,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-17",
+        "x": 145,
+        "y": 1984,
+        "suspension": {
+          "homeX": 145,
+          "homeY": 1984,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-20",
+        "x": 148,
+        "y": 1516,
+        "suspension": {
+          "homeX": 148,
+          "homeY": 1516,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-23",
+        "x": 140,
+        "y": 1046,
+        "suspension": {
+          "homeX": 140,
+          "homeY": 1046,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-26",
+        "x": 143,
+        "y": 566,
+        "suspension": {
+          "homeX": 143,
+          "homeY": 566,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      }
+    ],
+    "events": [
+      {
+        "type": "jump",
+        "x": 108,
+        "y": 4480,
+        "vx": 28.166666666666668,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 0.783333333333333,
+        "elapsed": 0.4583333333333339
+      },
+      {
+        "type": "land",
+        "x": 218.4125000000002,
+        "y": 4354,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 0.6162732400877822,
+        "platformId": "ledge-1",
+        "suspended": true,
+        "at": 1.3666666666666643,
+        "elapsed": 1.0416666666666654
+      },
+      {
+        "type": "jump",
+        "x": 218.3524131726269,
+        "y": 4358.16347129598,
+        "vx": 0,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 2.916666666666659,
+        "elapsed": 2.59166666666666
+      }
+    ]
+  },
+  "final": {
+    "state": "playing",
+    "player": {
+      "x": 218,
+      "y": 2420,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 1848.2636490217697,
+    "elapsed": 2.56666666666666,
+    "deaths": 0,
+    "maxAltitude": 2162.5870041639273,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": true
+    },
+    "paused": false,
+    "scenery": {
+      "cages": [
+        {
+          "x": 131.82,
+          "y": 4237.5,
+          "length": 62,
+          "angle": -0.12796997059009912,
+          "velocity": -0.39071921262693643
+        },
+        {
+          "x": 290.07,
+          "y": 2763,
+          "length": 51,
+          "angle": 0,
+          "velocity": 0
+        }
+      ],
+      "rigging": [
+        {
+          "platformId": "ledge-1",
+          "age": 12.566799999999986,
+          "strength": 0.6162732400877822,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-4",
+          "age": 12.566799999999986,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-7",
+          "age": 12.483499999999987,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-10",
+          "age": 11.233299999999991,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-13",
+          "age": 11.233299999999991,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-17",
+          "age": 11.233299999999991,
+          "strength": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        }
+      ],
+      "bells": [
+        {
+          "x": 210,
+          "y": 2458,
+          "size": 48,
+          "angle": 0.28790827912424427,
+          "velocity": 0.610720497779513,
+          "clapper": -0.10197344278819627,
+          "clapperVelocity": 2.1442892570467267
+        },
+        {
+          "x": 210,
+          "y": 248,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        }
+      ],
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.791156175342295,
+          "lookY": -0.8686136829557205,
+          "alert": 0.004084244786964644
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.681326700250608,
+          "lookY": 0.8997561898027886,
+          "alert": 0.008010788243815358
+        }
+      ]
+    },
+    "ledges": [
+      {
+        "id": "ledge-1",
+        "x": 162,
+        "y": 4354,
+        "suspension": {
+          "homeX": 162,
+          "homeY": 4354,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-4",
+        "x": 126,
+        "y": 3936,
+        "suspension": {
+          "homeX": 126,
+          "homeY": 3936,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-7",
+        "x": 145,
+        "y": 3492,
+        "suspension": {
+          "homeX": 145,
+          "homeY": 3492,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-10",
+        "x": 149,
+        "y": 3056,
+        "suspension": {
+          "homeX": 149,
+          "homeY": 3056,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-13",
+        "x": 148,
+        "y": 2600,
+        "suspension": {
+          "homeX": 148,
+          "homeY": 2600,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-17",
+        "x": 145,
+        "y": 1984,
+        "suspension": {
+          "homeX": 145,
+          "homeY": 1984,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-20",
+        "x": 148,
+        "y": 1516,
+        "suspension": {
+          "homeX": 148,
+          "homeY": 1516,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-23",
+        "x": 140,
+        "y": 1046,
+        "suspension": {
+          "homeX": 140,
+          "homeY": 1046,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      },
+      {
+        "id": "ledge-26",
+        "x": 143,
+        "y": 566,
+        "suspension": {
+          "homeX": 143,
+          "homeY": 566,
+          "x": 0,
+          "y": 0,
+          "vx": 0,
+          "vy": 0
+        }
+      }
+    ],
+    "events": [
+      {
+        "type": "checkpoint",
+        "x": 210,
+        "y": 2415,
+        "vx": 0,
+        "vy": 327.175104098181,
+        "intensity": 1,
+        "at": 1.3249999999999977,
+        "elapsed": 1.3249999999999977
+      },
+      {
+        "type": "land",
+        "x": 230,
+        "y": 2448,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 0.5970897540971302,
+        "platformId": "ledge-14",
+        "suspended": false,
+        "at": 1.358333333333331,
+        "elapsed": 1.358333333333331
+      },
+      {
+        "type": "jump",
+        "x": 230,
+        "y": 2448,
+        "vx": 0,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 1.6249999999999967,
+        "elapsed": 1.6249999999999967
+      },
+      {
+        "type": "land",
+        "x": 230,
+        "y": 2448,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "ledge-14",
+        "suspended": false,
+        "at": 2.2249999999999948,
+        "elapsed": 2.2249999999999948
+      }
+    ]
+  }
+}

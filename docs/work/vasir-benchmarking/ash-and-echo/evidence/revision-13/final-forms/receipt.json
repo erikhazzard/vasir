@@ -1,0 +1,97 @@
+{
+  "method": "Final served source, real browser keys and actual gentle setting; desktop opening and arranged small portrait refuge start. Native-size captures are visual smoke evidence, not tactile or physical phone proof.",
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "renderer.js": "85985563550ae3a35e4bf4df6540796ff98c5f03c940cced7e9a6242e1404511",
+    "atmosphere.js": "c46a9681447c1f72b168b39f7839da11220fac4b3eb40fd23a7721f7f437c510",
+    "depth.js": "4fca92db19db1ca893d52ec5711fee682e67fc3b71bf44b15b4860d69a74a4f1",
+    "character.js": "ae994f7a33bb3c5b6896c3453b17a77391fee8f4532b95d151d7b715eabaf155",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "surface-ash.js": "2ce6528ab3429c0b6c2012d3106b11258488de6388bd5ad7f0871b0c709e81a5",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "fog-volume.js": "7a44948f3b9aad2655ea70183e115e930ce74c9d1b2cdb0df2d42cd0780bad46",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "ash-flow.js": "bc033879258846cf5f53058c097a9779641350aaca99a1321c9c326820e1b9ae",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed"
+  },
+  "errors": [],
+  "samples": [
+    {
+      "form": "desktop",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 189.95694444444464,
+          "y": 4227.128402366863,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -325.22419460880974,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 3822.132060369808,
+        "elapsed": 0.6583333333333334,
+        "deaths": 0,
+        "maxAltitude": 224.87159763313684,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "overflow": false,
+      "gentle": false,
+      "events": [
+        "jump",
+        "doubleJump"
+      ]
+    },
+    {
+      "form": "small-gentle",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 281.20694444444433,
+          "y": 3635.48625173497,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -377.8211702827085,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 3297.6657336708936,
+        "elapsed": 0.7749999999999997,
+        "deaths": 0,
+        "maxAltitude": 816.5137482650298,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "overflow": false,
+      "gentle": true,
+      "events": [
+        "jump",
+        "doubleJump"
+      ]
+    }
+  ]
+}

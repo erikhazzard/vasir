@@ -1,0 +1,74 @@
+{
+  "native-common-before": {
+    "stage": "round2-native",
+    "frame": 42,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "native-common-impact": {
+    "stage": "round2-native",
+    "frame": 43,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "native-common-rebound": {
+    "stage": "round2-native",
+    "frame": 47,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "native-146-impact": {
+    "stage": "round2-native",
+    "frame": 90,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "native-146-rebound": {
+    "stage": "round2-native",
+    "frame": 93,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "native-ascent-impact": {
+    "stage": "round2-native",
+    "frame": 411,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "native-ascent-rebound": {
+    "stage": "round2-native",
+    "frame": 413,
+    "extractedFps": 25,
+    "receipt": "../round2-native/receipt.json"
+  },
+  "desktop-common-impact": {
+    "stage": "round2-desktop",
+    "frame": 45,
+    "extractedFps": 25,
+    "receipt": "../round2-desktop/receipt.json"
+  },
+  "desktop-146-impact": {
+    "stage": "round2-desktop",
+    "frame": 94,
+    "extractedFps": 25,
+    "receipt": "../round2-desktop/receipt.json"
+  },
+  "gentle-146-contact": {
+    "stage": "round2-gentle",
+    "frame": 95,
+    "extractedFps": 25,
+    "receipt": "../round2-gentle/receipt.json"
+  },
+  "bound508-impact": {
+    "stage": "round2-bound",
+    "frame": 45,
+    "extractedFps": 25,
+    "receipt": "../round2-bound/receipt.json"
+  },
+  "bound508-settle": {
+    "stage": "round2-bound",
+    "frame": 51,
+    "extractedFps": 25,
+    "receipt": "../round2-bound/receipt.json"
+  }
+}

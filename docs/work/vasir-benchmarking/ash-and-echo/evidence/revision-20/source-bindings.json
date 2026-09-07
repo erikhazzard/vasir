@@ -1,0 +1,34 @@
+{
+  "played-touch-opening/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "played-full-route/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "resources/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "fallback/checks.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "routine-performance/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "landing-performance/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "critic/round3-native/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  },
+  "critic/round3-desktop/receipt.json": {
+    "javascriptModules": 16,
+    "allMatchFinal": true
+  }
+}

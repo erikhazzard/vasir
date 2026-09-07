@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "source": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+  "scope": "Seven browser-native OfflineAudioContext baseline/candidate pairs, adapted from existing audio-rebuild harness. Structural routing and sample checks; no listening judgment.",
+  "assertions": [
+    "silent before unlock",
+    "zero new nodes or sources",
+    "zero clipped or nonfinite samples",
+    "unchanged peak level",
+    "body-only release on same-frame and 40ms rebound",
+    "iron/pin/bell schedule and envelopes unchanged",
+    "different-surface and stale jumps leave tail alone",
+    "speed shapes scuff at unchanged envelope level",
+    "all transients end/disconnect",
+    "all nodes disconnect on dispose",
+    "all sources receive stop",
+    "pre-cut decay waveform preserved"
+  ],
+  "beforeCutMaxPcmDifference": 0,
+  "maxPeak": 0.2883441746234894,
+  "ironStartsAfterContactMs": [
+    55,
+    170,
+    350
+  ],
+  "lifecycleNote": "The nine persistent looping sources are stopped by dispose. OfflineAudioContext does not dispatch a second ended callback after its render has completed; graph disconnection and stop calls are separately verified."
+}

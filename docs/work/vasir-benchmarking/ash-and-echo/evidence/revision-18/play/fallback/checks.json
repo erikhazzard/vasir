@@ -1,0 +1,120 @@
+{
+  "method": "Chrome on Mac; capability interception and WEBGL_lose_context; no physical-phone claim",
+  "errors": [],
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "audio.js": "ad692ff33a0e7a3f1839777ddda949c5794085e02ac48bfe3574c75d63d37eca",
+    "renderer.js": "ed7fdfc0b114b9c6d97d6e1d1bff82cfc238e946ca1c59c18f3b1bd8b128d5cd",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "depth.js": "8f8f2d4cb375a8289c0fd9e6189b76883f8baf72f90ae938b972a631ab2121f8",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "character.js": "55c0f68021e55bfd443033353f2453bc481db0fac5e61d427660e487632ef3bc",
+    "surface-ash.js": "fb5ad607a32a502647280524df1acff57f5860f88b544384a919aa77ae31a055",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8"
+  },
+  "initial": {
+    "backend": "webgl",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "gl": {
+    "error": 0,
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+  },
+  "lost": {
+    "backend": "canvas2d",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "restored": {
+    "backend": "webgl",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "afterRestarts": {
+    "backend": "webgl",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "pausedGentlePixelsIdentical": true,
+  "restoredJump": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4334.786598728906,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": -277.4030243261012,
+      "grounded": false,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "rise"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.4250000000000005,
+    "deaths": 0,
+    "maxAltitude": 117.21340127109397,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "unavailable": {
+    "backend": "canvas2d"
+  },
+  "fallbackJump": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4331.728248959017,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": -399.7370151216302,
+      "grounded": false,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "rise"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.9333333333333325,
+    "deaths": 0,
+    "maxAltitude": 120.27175104098296,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "sidelightFallback": {
+    "backend": "canvas2d"
+  }
+}

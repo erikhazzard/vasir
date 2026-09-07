@@ -1,0 +1,23 @@
+# Integrated candidate2 independent closure review
+
+The bounded visual repairs are suitable for handoff. Fog now reads behind and in front of architectural planes; the character has stronger bodily wing action and a quieter shaded interior. I found no new concrete blocking defect in the reviewed movement. The ordinary-character material gain is restrained at native phone scale. This does not establish an S grade or a fully volumetric smoke character.
+
+Active-play verdict: CLOSE to the highest material ambition, with readable, authored and inviting action. I am the ash creature; I should climb the next visible shelf and use the second impulse to make the crossing. The world makes the next ledge clear and the body visibly loads, drives an asymmetric wingbeat, folds, lands and gathers. That visual answer makes another jump appealing. I would keep playing from these moments. The residual aesthetic limit is the compact form's reliance on a dark graphic core and exterior soot; its native-scale material improvement should not be described as dramatic.
+
+## What closed and what remains
+
+1. Near-solid character interior: reduced enough for this bounded repair. The second pass shows a broader graphite underside/lower body and continuous shade through wing roots, rather than only narrow grey patches on black strips. Enlarged ordinary run/brake frames show the diffuse side and underside clearly. At native scale this is subtle; rise/fall and folded wing forms carry the gain more clearly than idle. The result remains stylized shaded ash with a crisp silhouette, rather than a visibly volumetric smoke simulation. Further raising a material coefficient does not itself prove a higher aesthetic grade.
+2. Bodily motion gain: preserved. Foreshortened rear wing, overlapping roots, load/drive/fold chronology and tail gathering remain clear. The first jump is compact and distinct from double. Steering retains direction, run/brake/reversal and wall launch remain readable. Immediate contact cancels into compact landing; buffered rebound returns to compact airborne motion. Gentle retains the action phases. No newly stuck pose, bright shoulder tear, dominant glow, or obscured platform edge observed.
+3. Pillar fog depth: closure preserved. Across first-hop, ledge7 and ledge20, changing dark rolling masses are held inside open bays behind continuous stone flutes/arch frames, while softer front veils cross their faces. That is visible temporal interleaving rather than a statement about render order. Native and enlarged pairs retain architecture detail and selective depth contrast. No crop boundary, broad washout, or newly hidden playable edge observed. Ordinary keyboard ascent through the opening also keeps this spatial read as camera position changes.
+
+No further concrete blocking visual repair identified in this bounded second review. Do not convert this into user aesthetic acceptance, an exceptional-grade promise, a large multiplier improvement, physical-phone timing certification, or full route proof.
+
+## Evidence
+
+- round2-native/double-pose-context.png: actual full 390×844 play frame showing the graphite lower body and asymmetric wings; manually selected from the continuous video sequence because recorder/navigation clock origins vary slightly.
+- round2-desktop/double-context.png: full enlarged 780×1688 game within 1000×1800 viewport; root overlap, asymmetric fold and quiet internal value.
+- round2-native and round2-desktop: complete ordinary-RAF keyboard videos, action receipts, double/steering/Gentle and contact/rebound ordered sheets. Capture calls occur outside the action windows. Sheets support chronology, not exact millisecond measurements from video timestamps.
+- round2-environment-native and round2-environment-desktop: native/enlarged run/brake/reversal and wall-launch views; first-hop/ledge7/ledge20 fog pairs; ordinary-ascent-whole.png samples the full opening attempt, including two wall launches and ascent to roughly 43m. Blank trailing contact-sheet cells represent the end of the clip, not rendered game frames.
+- Fixtures are explicit: initial platforms/wall contact positions and special immediate-contact cases are arranged, then ordinary keyboard inputs drive normal RAF. The final ascent begins with real restart and only keyboard inputs.
+
+All four receipts independently match every served source against candidate2-source: 16 JavaScript modules plus HTML/CSS, zero mismatches, zero page errors. Exact served source files are retained in each source/ folder. Fog cameras match between each pair at 3691.08, 2873.93 and 897.93 world Y, paused=false. Quiet performance, fallback, full-route and physical-device evidence remain root-owned. All critic browsers and ffmpeg processes are closed.

@@ -1,0 +1,150 @@
+{
+  "cycles": [
+    {
+      "fallback": true,
+      "lost": {
+        "status": "context-lost",
+        "reason": "WebGL context lost",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 2,
+        "precision": "highp",
+        "restores": 0
+      },
+      "restored": {
+        "status": "ready",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 1,
+        "buffers": 1,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 3,
+        "precision": "highp",
+        "restores": 1
+      },
+      "sameContext": true,
+      "pausedChangedBytes": 0
+    },
+    {
+      "fallback": true,
+      "lost": {
+        "status": "context-lost",
+        "reason": "WebGL context lost",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 3,
+        "precision": "highp",
+        "restores": 1
+      },
+      "restored": {
+        "status": "ready",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 1,
+        "buffers": 1,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 4,
+        "precision": "highp",
+        "restores": 2
+      },
+      "sameContext": true,
+      "pausedChangedBytes": 0
+    },
+    {
+      "fallback": true,
+      "lost": {
+        "status": "context-lost",
+        "reason": "WebGL context lost",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 4,
+        "precision": "highp",
+        "restores": 2
+      },
+      "restored": {
+        "status": "ready",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 1,
+        "buffers": 1,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 5,
+        "precision": "highp",
+        "restores": 3
+      },
+      "sameContext": true,
+      "pausedChangedBytes": 0
+    }
+  ],
+  "reset": {
+    "status": "ready",
+    "reason": "",
+    "width": 256,
+    "height": 256,
+    "contexts": 1,
+    "programs": 1,
+    "buffers": 1,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 0,
+    "precision": "highp",
+    "restores": 3
+  },
+  "disposed": {
+    "status": "disposed",
+    "reason": "",
+    "width": 256,
+    "height": 256,
+    "contexts": 0,
+    "programs": 0,
+    "buffers": 0,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 0,
+    "precision": "highp",
+    "restores": 3
+  },
+  "mediump": {
+    "status": "ready",
+    "reason": "",
+    "width": 256,
+    "height": 256,
+    "contexts": 1,
+    "programs": 1,
+    "buffers": 1,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 1,
+    "precision": "mediump",
+    "restores": 0,
+    "redRange": [
+      11,
+      85
+    ],
+    "live": true
+  }
+}

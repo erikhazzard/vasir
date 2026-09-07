@@ -1,0 +1,49 @@
+{
+  "touch-opening.json": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "full-route.json": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "performance.json": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "runtime/resource-receipt.json": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "runtime/fallback-receipt.json": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "final-forms/receipt.json": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "critic/round-2": {
+    "matchedModules": 15,
+    "errors": 0
+  },
+  "character": {
+    "matchedCharacter": true,
+    "anatomyPreserved": true
+  },
+  "character/beam-candidate-report.json": {
+    "matchedStage": "round-01",
+    "scope": "light comparison before final soot-opacity correction"
+  },
+  "live-http": {
+    "matchedModules": 15
+  },
+  "runtime-diff-v15": [
+    "renderer.js",
+    "ash-flow.js",
+    "atmosphere.js",
+    "character.js",
+    "depth.js",
+    "fog-volume.js"
+  ]
+}

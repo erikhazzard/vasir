@@ -1,0 +1,169 @@
+{
+  "method": "Qualified presentation fixture, six recovery ages in each capability mode; frozen character source. This checks bounded material, fallback shape and pause stability, not natural route reachability.",
+  "hashes": {
+    "character.js": "41188b7d3c6f1b8f7737f9eb8e7fed6ce7934e4ae103baae3a4780c1f830d197",
+    "ash-material.js": "f9f1ec9b6ad8252bad8a3f046307249d05f587498c86c17671a4c54fdc03d77a"
+  },
+  "modes": {
+    "normal": {
+      "status": {
+        "status": "ready",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 1,
+        "buffers": 1,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 12,
+        "precision": "highp",
+        "restores": 0
+      },
+      "disposed": {
+        "status": "disposed",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 0,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 14,
+        "precision": "highp",
+        "restores": 0
+      },
+      "pauseChanged": 0,
+      "ages": [
+        0.12,
+        0.3,
+        0.4,
+        0.46,
+        0.52,
+        0.58
+      ],
+      "errors": []
+    },
+    "gentle": {
+      "status": {
+        "status": "ready",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 1,
+        "buffers": 1,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 12,
+        "precision": "highp",
+        "restores": 0
+      },
+      "disposed": {
+        "status": "disposed",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 0,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 14,
+        "precision": "highp",
+        "restores": 0
+      },
+      "pauseChanged": 0,
+      "ages": [
+        0.12,
+        0.3,
+        0.4,
+        0.46,
+        0.52,
+        0.58
+      ],
+      "errors": []
+    },
+    "unavailable": {
+      "status": {
+        "status": "unavailable",
+        "reason": "WebGL unavailable",
+        "width": 256,
+        "height": 256,
+        "contexts": 0,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 0,
+        "precision": "",
+        "restores": 0
+      },
+      "disposed": {
+        "status": "disposed",
+        "reason": "WebGL unavailable",
+        "width": 256,
+        "height": 256,
+        "contexts": 0,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 0,
+        "precision": "",
+        "restores": 0
+      },
+      "pauseChanged": 0,
+      "ages": [
+        0.12,
+        0.3,
+        0.4,
+        0.46,
+        0.52,
+        0.58
+      ],
+      "errors": []
+    },
+    "mediump": {
+      "status": {
+        "status": "ready",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 1,
+        "programs": 1,
+        "buffers": 1,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 12,
+        "precision": "mediump",
+        "restores": 0
+      },
+      "disposed": {
+        "status": "disposed",
+        "reason": "",
+        "width": 256,
+        "height": 256,
+        "contexts": 0,
+        "programs": 0,
+        "buffers": 0,
+        "textures": 0,
+        "framebuffers": 0,
+        "draws": 14,
+        "precision": "mediump",
+        "restores": 0
+      },
+      "pauseChanged": 0,
+      "ages": [
+        0.12,
+        0.3,
+        0.4,
+        0.46,
+        0.52,
+        0.58
+      ],
+      "errors": []
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "source": {
+    "CONTRACT.md": "f05148655e4a39d65543a9efb2983ad775fa8be437ea7f8f2c185d4767cffd3b",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "audio.js": "a42f26a9fbfd9d65556f13b3e056039ae6299ab0c3dab4293c6a8344a19e23eb",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "character.js": "bf3809c27e790a50e5aaac7f714e1cc797e70c02954decaf8aa46ca392dfc134",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "depth.js": "8ddfb5dc3c141efef64502defc5e9d4a5c6e7197d46a45b4b625d477644e44f9",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "index.html": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "renderer.js": "a7fa6687f92005f559b4f06296fd33edd592057e84b9760be61819dd3e3930ea",
+    "style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0"
+  },
+  "unchangedAssets": {
+    "assets/ash-flow-atlas.png": "e4529aa77d971d75a02f1b934e5c0c86e94c22dc18683a125bd2ba925bc5b116",
+    "assets/background-birdless.png": "618dd727547e7b22b3b2591e7b410a78d237abb04246f214226468441c453b1e",
+    "assets/background.png": "95b23f0a6b6a34063572cc6084379724e96c3d997acf954b9da104fdecc5a6f4",
+    "assets/charcoal-arcade.png": "a8b5db8349f57e1eb6c28dd611b8fee646372c0a4be3bbbcf8abb0733f159828",
+    "assets/charcoal-architecture.png": "c2792480e5ced5af1632260fe0b4190691dc624ed1bf5a4f48e5313981231052",
+    "assets/charcoal-belfry.png": "fdd10aac8f31ea4d1a8e572b7da6686402c85a48bcf51c34fc1f71a188a27760",
+    "assets/charcoal-bell.png": "59f32f7084adb0d4be233151ebff85042d141cd3d3a3569e05bf86857894ae84",
+    "assets/charcoal-buttress.png": "d3e33eec45d8baf1268a1828af8bdbdd1b08578d30ebc82446ef0d3d97a40fbd",
+    "assets/charcoal-refuge.png": "9dbee335a2ef24f780dfd6829f26b57aa179cf2b1979723de7ede503aaf0046b",
+    "assets/charcoal-vertical-facade.png": "3a2afb771b58b26b0cb5446e351fbe13dd06a4d3c6f8f378ea9acea1a9fb208e",
+    "assets/corbel.png": "8c897c67f077a8ff117c02e8ed56e3ebc20c173d72f1979b7b8427c298bfbbc7",
+    "assets/depth-arch.png": "93a512fd09cb155ae24d7baafbf22c9a0a5e3d126a74ba5c487add46aed8669f",
+    "assets/hero.png": "5b928c2667825f1ba5196b957fbdebb1d6989903c5cc388e977fcc19705901b9",
+    "assets/midground.png": "fc9ef4d13192959e7f8cc7cab59986c993e4f5962e521aed0df39959a62f6f6e",
+    "assets/shrine.png": "b0738f8be5da9c7bdea7e3d0be352deb81f5a3b380bbb1c3fff42d8db54bf07d",
+    "assets/spider.png": "7b840f2e49f6d61cf33858923ffe7fc77d0db5b7fb6cb94fd299c172445c7b45",
+    "assets/stone.png": "df9e37370b56c8949574cd089a07f9bbe6e265dfdf7912ccb67083f8f244a480"
+  },
+  "sourceClaims": {
+    "play/landing-performance/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": []
+    },
+    "play/fallback/checks.json": {
+      "moduleCount": 15,
+      "mismatches": []
+    },
+    "play/routine-performance/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": []
+    },
+    "play/played-touch-opening/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": []
+    },
+    "play/played-full-route/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": []
+    },
+    "critique/round2-native/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [
+        "renderer.js",
+        "surface-ash.js"
+      ],
+      "stage": "round2-native"
+    },
+    "critique/round1-desktop/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [
+        "renderer.js",
+        "surface-ash.js"
+      ],
+      "stage": "round1-desktop"
+    },
+    "critique/round3-desktop/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [],
+      "stage": "round3-desktop"
+    },
+    "critique/round2-desktop/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [
+        "renderer.js",
+        "surface-ash.js"
+      ],
+      "stage": "round2-desktop"
+    },
+    "critique/round3-native/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [],
+      "stage": "round3-native"
+    },
+    "critique/round3-route/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [],
+      "stage": "round3-route"
+    },
+    "critique/round1-native/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [
+        "renderer.js",
+        "surface-ash.js"
+      ],
+      "stage": "round1-native"
+    },
+    "critique/round3-gentle/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [],
+      "stage": "round3-gentle"
+    },
+    "critique/baseline-native/receipt.json": {
+      "moduleCount": 15,
+      "mismatches": [
+        "renderer.js",
+        "audio.js",
+        "depth.js",
+        "surface-ash.js",
+        "character.js"
+      ],
+      "stage": "baseline-native"
+    }
+  }
+}

@@ -10,6 +10,7 @@ import { normalizeBenchmarkReportData } from "./benchmark-report.js";
 import { VasirCliError } from "../cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
 import { buildWorkSpecPublication, validateWorkSpecPublication, validateWorkSpecTrack, WORK_SPEC_TRACK_ID } from "./work-spec-publication.js";
+import { buildOverallPublication, validateOverallPublication } from "./overall-publication.js";
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -1833,6 +1834,12 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 }
 
 export function validateBenchmarkPublicationProjection(projection) {
+  if (projection?.schemaVersion === 4 && projection.overall && projection.aiWorkflows) {
+    const { overall, ...sources } = projection;
+    validateBenchmarkPublicationProjection({ ...sources, schemaVersion: 3 });
+    validateOverallPublication(overall, { engineering: sources, aiWorkflows: sources.aiWorkflows });
+    return projection;
+  }
   if (projection?.schemaVersion === 3 && projection.aiWorkflows) {
     const { aiWorkflows, ...engineering } = projection;
     validateBenchmarkPublicationProjection({ ...engineering, schemaVersion: 2 });
@@ -2203,6 +2210,11 @@ export function validateBenchmarkPublicationProjection(projection) {
 }
 
 export function validateBenchmarkPublicationResponses(responseBundle, projection) {
+  if (projection?.schemaVersion === 4 && projection.overall) {
+    validateBenchmarkPublicationProjection(projection);
+    const { overall, ...sources } = projection;
+    return validateBenchmarkPublicationResponses(responseBundle, { ...sources, schemaVersion: 3 });
+  }
   if (projection?.schemaVersion === 3 && projection.aiWorkflows) {
     validateBenchmarkPublicationProjection(projection);
     const { aiWorkflows, ...engineeringProjection } = projection;
@@ -2483,13 +2495,15 @@ export function buildBenchmarkPublicationProjection({
     projection.aiWorkflows = workflows.projection;
     responseBundle.schemaVersion = 3;
     responseBundle.aiWorkflows = workflows.responseBundle;
+    projection.overall = buildOverallPublication({ engineering: projection, aiWorkflows: workflows.projection });
+    projection.schemaVersion = 4;
   }
 
   const basisSha256 = sha256(stableSerialize({
     taxonomy,
     definitions: EXPECTED_BENCHMARK_IDS.map((benchmarkId) => definitions.get(benchmarkId)),
     selectedRuns: selections.map(({ benchmarkId, observedSha256 }) => ({ benchmarkId, sha256: observedSha256 })),
-    ...(workflows ? { aiWorkflows: workflows.basisSha256 } : {})
+    ...(workflows ? { aiWorkflows: workflows.basisSha256, overall: projection.overall.scoreBasis.id } : {})
   }));
   return {
     projection,

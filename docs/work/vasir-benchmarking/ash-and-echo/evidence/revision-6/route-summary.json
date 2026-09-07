@@ -1,0 +1,38 @@
+{
+  "gameSeconds": 39.03333333333176,
+  "state": "won",
+  "grounded": true,
+  "deaths": 1,
+  "authoredLedgesLanded": 28,
+  "wallKicks": 1,
+  "restart": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4452,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.24166666666666664,
+    "deaths": 0,
+    "maxAltitude": 0,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "errors": [],
+  "note": "Route before only summit scenery framing/air changes; simulation, character, props and final spider placement identical. Later static summit captures and quiet timing cover final rendering."
+}

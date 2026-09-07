@@ -1,0 +1,188 @@
+{
+  "passed": true,
+  "scope": "Real Chromium OfflineAudioContext DSP; a scheduling-clock adapter positions isolated event calls. All audio nodes, envelopes, compression, convolution and final sample renders are browser-native. This is objective audio evidence, not a human listening grade.",
+  "sourceHashes": {
+    "baseline": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "candidate": "ad692ff33a0e7a3f1839777ddda949c5794085e02ac48bfe3574c75d63d37eca"
+  },
+  "rows": [
+    {
+      "version": "baseline",
+      "label": "height-24",
+      "peakDb": -20.73076028119703,
+      "rms": 0.002830427795751351,
+      "lastAudibleMs": 230.5625,
+      "bodyHz": 111.51005112470473,
+      "bodyDurationMs": 230.87382429848182,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-80",
+      "peakDb": -12.866854743271873,
+      "rms": 0.00747426747655279,
+      "lastAudibleMs": 458.75,
+      "bodyHz": 121.98926254996161,
+      "bodyDurationMs": 288.9466494945947,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-300",
+      "peakDb": -10.397719781533786,
+      "rms": 0.010557171605689886,
+      "lastAudibleMs": 622.8125,
+      "bodyHz": 127.64226188534718,
+      "bodyDurationMs": 320.2739726027397,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-508",
+      "peakDb": -10.397719781533786,
+      "rms": 0.010557171565934016,
+      "lastAudibleMs": 622.8125,
+      "bodyHz": 127.64226188534718,
+      "bodyDurationMs": 320.2739726027397,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "same-frame-rebound",
+      "peakDb": -9.25458945051699,
+      "rms": 0.008534835639527918,
+      "lastAudibleMs": 548.0208333333334,
+      "bodyHz": 127.64226188534718,
+      "bodyDurationMs": 320.2739726027397,
+      "maxTransientSources": 10
+    },
+    {
+      "version": "baseline",
+      "label": "40ms-rebound",
+      "peakDb": -10.397719781533786,
+      "rms": 0.010537906620830092,
+      "lastAudibleMs": 623.3124999999999,
+      "bodyHz": 127.64226188534718,
+      "bodyDurationMs": 320.2739726027397,
+      "maxTransientSources": 10
+    },
+    {
+      "version": "baseline",
+      "label": "heavy-resonance",
+      "peakDb": -10.397719781533786,
+      "rms": 0.011741999111292815,
+      "lastAudibleMs": 1790.3333333333333,
+      "bodyHz": 127.64226188534718,
+      "bodyDurationMs": 320.2739726027397,
+      "maxTransientSources": 9
+    },
+    {
+      "version": "baseline",
+      "label": "heavy-resonance-rebound",
+      "peakDb": -10.397719781533786,
+      "rms": 0.011724630943907762,
+      "lastAudibleMs": 1790.3333333333333,
+      "bodyHz": 127.64226188534718,
+      "bodyDurationMs": 320.2739726027397,
+      "maxTransientSources": 13
+    },
+    {
+      "version": "candidate",
+      "label": "height-24",
+      "peakDb": -35.706631727236854,
+      "rms": 0.00037363741750400783,
+      "lastAudibleMs": 189.43750000000003,
+      "bodyHz": 152.12472470539473,
+      "bodyDurationMs": 85.71357318384945,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-80",
+      "peakDb": -24.402194312467262,
+      "rms": 0.001592217257251732,
+      "lastAudibleMs": 217.85416666666669,
+      "bodyHz": 140.44440197877432,
+      "bodyDurationMs": 139.88680405479707,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-300",
+      "peakDb": -14.585431017050201,
+      "rms": 0.006386178308729578,
+      "lastAudibleMs": 367.12500000000006,
+      "bodyHz": 104.66484149755098,
+      "bodyDurationMs": 305.83208106266693,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-508",
+      "peakDb": -11.61827024451683,
+      "rms": 0.010088922161558342,
+      "lastAudibleMs": 696.3333333333333,
+      "bodyHz": 81.12708116682246,
+      "bodyDurationMs": 415.00000000000006,
+      "maxTransientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "same-frame-rebound",
+      "peakDb": -10.502824406393875,
+      "rms": 0.006808132395252404,
+      "lastAudibleMs": 391.45833333333337,
+      "bodyHz": 81.12708116682246,
+      "bodyDurationMs": 415.00000000000006,
+      "maxTransientSources": 10
+    },
+    {
+      "version": "candidate",
+      "label": "40ms-rebound",
+      "peakDb": -11.61827024451683,
+      "rms": 0.009846080002308497,
+      "lastAudibleMs": 682.9583333333334,
+      "bodyHz": 81.12708116682246,
+      "bodyDurationMs": 415.00000000000006,
+      "maxTransientSources": 10
+    },
+    {
+      "version": "candidate",
+      "label": "heavy-resonance",
+      "peakDb": -11.61827024451683,
+      "rms": 0.010898848211623048,
+      "lastAudibleMs": 1684.6666666666667,
+      "bodyHz": 81.12708116682246,
+      "bodyDurationMs": 415.00000000000006,
+      "maxTransientSources": 9
+    },
+    {
+      "version": "candidate",
+      "label": "heavy-resonance-rebound",
+      "peakDb": -11.61827024451683,
+      "rms": 0.010674503449400621,
+      "lastAudibleMs": 1684.6666666666667,
+      "bodyHz": 81.12708116682246,
+      "bodyDurationMs": 415.00000000000006,
+      "maxTransientSources": 13
+    }
+  ],
+  "cancellation": [
+    {
+      "name": "same-frame-rebound",
+      "canceledBodyEnvelopes": 4,
+      "unchangedMetalOscillators": 2
+    },
+    {
+      "name": "40ms-rebound",
+      "canceledBodyEnvelopes": 4,
+      "unchangedMetalOscillators": 2
+    },
+    {
+      "name": "heavy-resonance-rebound",
+      "canceledBodyEnvelopes": 4,
+      "unchangedMetalOscillators": 5
+    }
+  ],
+  "limitations": "Offline scheduling clock adapter; native browser DSP. All nodes disconnect and every persistent source receives stop on dispose. Offline rendering is already complete at dispose, so its 9 persistent source ended callbacks cannot run; these remain counter entries, not connected/live playback. No listening tool available; no human listening quality claim."
+}

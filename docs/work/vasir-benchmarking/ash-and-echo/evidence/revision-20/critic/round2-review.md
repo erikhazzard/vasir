@@ -1,0 +1,13 @@
+# Candidate 2 independent character review
+
+Verdict: CLOSE; materially improved motion, requested live-material bar remains open. No S claim and no human acceptance inferred.
+
+Source binding verified in fresh native receipt: character e8130695c52480858d62c129713a177f505ec2ddc1375e0bfb7418a4a676cca4; ash-material 180fff09fb000344a85bbdf75d71aef0f40615014c437d0026ffcb1783b5c64f; renderer 79f2509e0ac60673bbb6adf682050aab9324014a760ed6e20f92304f6f9653ea. Every served module is frozen beside each viewport's raw video.
+
+Ordinary input now produces a visibly bent loaded pose, opposed wrist/arm angles, forceful extension, asymmetrical hooked feathers, and a compact gathering recovery. The near-static baseline spread-wing stamp is substantially improved. I can tell the second impulse apart from first jump immediately; eyes and nearby platform edge remain legible. Broad satin-like horizontal bands are removed.
+
+Remaining visible gap: the bright right-shoulder zigzag/tear persists through several ordinary frames despite the intended removal. It is visible even in 390×844 double-context.png and plainly visible in the enlarged double-crops.png. Material has also become nearly solid black: native cadence does not convey moving internal ash density; enlarged frames show very little internal life. That leaves a highly articulated black cutout rather than the requested living ash substance. A shader implementation or changing pixel metric alone cannot close this aesthetic condition. Next repair should remove the actual bright notch source and bring back restrained irregular moving midtone ash pockets, avoiding broad bands or glowing outlines.
+
+Supporting interruption read: Gentle retains distinguishable bird phases and clear eyes. Delayed-right reaches the wall with clean reversion. Arranged buffered landing visibly rebounds without a stuck wing; receipt events prove land and jump at the same simulation time 10.175000000000063. Immediate contact and first jump stay readable. No broad flash/glow obscures geometry; no long held feather tail or static character trail observed. Both viewport page-error lists are empty. These are art and interruption observations, not root's physics/performance/resource certification.
+
+Evidence: round2-native/{double-context.png,double-ordered.png,delayed-right-ordered.png,buffer-rebound-ordered.png,gentle-ordered.png}; round2-desktop/{double-context.png,double-crops.png,double-ordered.png}; both directories contain raw normal-time video and 1.8-second double/delayed/rebound/Gentle MP4 excerpts. Whole-level context is primary; bounded crops support the material diagnosis only. Browsers closed after capture.

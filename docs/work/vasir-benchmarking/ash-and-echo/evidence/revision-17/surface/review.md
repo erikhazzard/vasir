@@ -1,0 +1,13 @@
+Surface ash revision 17 local review
+
+The action is a controlled descent onto an authored stone. The effect communicates transferred weight through lateral pressure, fragment size and delayed settling, while the next ledge and thorn silhouette remain readable. Character squash is supplied by the separate character pass.
+
+Implementation: only surface-ash.js. landingSeverity is authoritative and clamped 0..1; legacy intensity is a diagnostic fallback. Landing ignores first-hop/second-hop blanket scaling. Severity controls 6–38 shards, 340–1190 ms contact lifetime, 0.75–approximately 5.5 px heavy fragment radius, 9–90 px pressure reach and 70–190 ms pressure lifetime. Last 30% of shards launch after 45–245 ms from the current live stone. Grounded residue spreads outward during the first ~160 ms and stays clipped to the actual ledge. High fall is low sideways charcoal motion, without white curved rays. Wall and departure retain prior random sequence and parameters.
+
+Evidence: stage-00/stage-01 each contain 390×844 native diagnostic sequences at 0, 50, 100, 180, 300, 550, 850 ms for severity .03, .45, 1 on first-hop. These are explicitly controlled renderer event diagnostics, not a substitute for the root's real collision/input captures. View high 50/100/180 sequentially: pressure widens, fragments detach sideways, and dark grit separates beyond the edge. Tiny 100 is already essentially clear. Hazard teeth retain foreground visibility. Character body differs by severity because the current character branch also consumes that field.
+
+Checks: node check.mjs passed. WallJump and jump visible state matches revision 16 exactly through 30 updates. Ground residue clipping, pause, reset, pooled overflow, Gentle 3 shard cap, immediate rebound all pass. report.json has complete native capture state and pause identity.
+
+Topology disposition: SAFE_LOCAL_CHANGE. Existing main requestAnimationFrame→renderer.render→surfaceAsh.update/draw owner unchanged. Delta 0 for frame owners, scene submissions, logical passes, full scene passes, G-buffer passes, offscreen targets, terminal target write passes. No new canvas, texture, sampler, loop, timer or GPU work. Existing 16 contact × 38 shard + 14 grain pool retained. Added six pressure wedge draws per landing only while age < 190 ms replace former 5 wedge + 3 white stroke landing crest. Wall and departure draw topology unchanged. No measured performance-win claim.
+
+Active-play visual gate: deferred to root's real-fall sequence and desktop evidence. Diagnostic mobile comparison supports local readability and proportionality but is not full input/consequence proof.

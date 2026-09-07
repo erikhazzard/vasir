@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "sourceHash": "bf3809c27e790a50e5aaac7f714e1cc797e70c02954decaf8aa46ca392dfc134",
+  "baselineHash": "55c0f68021e55bfd443033353f2453bc481db0fac5e61d427660e487632ef3bc",
+  "medium160Comparisons": 16,
+  "checks": [
+    {
+      "name": "real-common-report.json",
+      "passed": true
+    },
+    {
+      "name": "real-common-moving-report.json",
+      "passed": true
+    },
+    {
+      "name": "actual-buffered-report.json",
+      "passed": true
+    }
+  ],
+  "sourceScope": "Existing224body surface;144wake/38burst capacities unchanged. New shoulder crust emission≤16normal/3gentle, only whilegrounded; surfaceoriginatingeruption separatelyowned.",
+  "selection": [
+    "real-common-normal-medium-100.png",
+    "real-common-normal-max-100.png",
+    "real-common-normal-max-420.png",
+    "real-common-gentle-max-100.png",
+    "actual-buffered-normal.png"
+  ],
+  "limitation": "Controlled real-gravity same-support fixtures clear interveningcolliders; root/critic own unmodifiedroute ordinaryplay verdict."
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "capture": "round2-native",
+    "sourceCount": 18,
+    "mismatches": [],
+    "errors": []
+  },
+  {
+    "capture": "round2-desktop",
+    "sourceCount": 18,
+    "mismatches": [],
+    "errors": []
+  },
+  {
+    "capture": "round2-intent-native",
+    "sourceCount": 18,
+    "mismatches": [],
+    "errors": []
+  },
+  {
+    "capture": "round2-intent-desktop",
+    "sourceCount": 18,
+    "mismatches": [],
+    "errors": []
+  }
+]

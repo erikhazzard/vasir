@@ -649,7 +649,7 @@
     const summary = summaryById.get(benchmark.id);
     const category = categoryById.get(benchmark.category);
     const returnContext = returnFieldId === 'overall'
-      ? { id: 'overall', name: rootData.aiWorkflows ? 'Engineering overall' : 'Combined' }
+      ? { id: 'overall', name: 'Overall' }
       : category;
     const returnHref = `./index.html#capabilities/${returnContext.id}/benchmarks`;
     activeBenchmarkId = benchmark.id;

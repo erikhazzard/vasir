@@ -1,0 +1,5 @@
+import {chromium} from '/tmp/cloudbreak-playwright-validation/node_modules/playwright/index.mjs';
+const b=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
+const p=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:1});
+p.on('pageerror',e=>console.log(String(e)));await p.goto('http://127.0.0.1:8317/');await p.waitForFunction(()=>window.__echo&&!document.querySelector('#start-button').disabled);await p.locator('#start-button').click();await p.waitForTimeout(400);await p.screenshot({path:'tmp/ash-and-echo/depth-pass/01-opening.png'});console.log(await p.evaluate(()=>window.__echo.snapshot()));
+await p.keyboard.down('ArrowRight');await p.keyboard.down('Space');await p.waitForTimeout(430);await p.keyboard.up('Space');await p.keyboard.up('ArrowRight');await p.screenshot({path:'tmp/ash-and-echo/depth-pass/02-jump.png'});await p.waitForTimeout(700);await p.screenshot({path:'tmp/ash-and-echo/depth-pass/03-land.png'});await b.close();

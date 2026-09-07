@@ -1,0 +1,8855 @@
+{
+  "proof": "Actual Chrome DevTools touch contacts on the visible controls through normal browser handlers, read-only game observations. Informed route, not newcomer or human feel evidence.",
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "renderer.js": "860e5cf6c5ab95d3aea1b47901e619f5bd18536cfba1d7142e0559bfd0159000",
+    "depth.js": "a6884bad0045bcb2022f6c82452b24abf7a5e8b5364a13cac98f21b5bc77fec1",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "character.js": "c70b10e39927aedff00cadfe620b24973f6e531afacda6ca323c9ebef5ee3505",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "surface-ash.js": "2ce6528ab3429c0b6c2012d3106b11258488de6388bd5ad7f0871b0c709e81a5",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8"
+  },
+  "errors": [],
+  "samples": [
+    {
+      "stage": 0,
+      "t": 0.483333333333334,
+      "p": {
+        "x": 96,
+        "y": 4452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 0,
+      "t": 0.5500000000000005,
+      "p": {
+        "x": 98.02222222222221,
+        "y": 4452,
+        "w": 24,
+        "h": 28,
+        "vx": 93.16666666666667,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 0,
+      "t": 0.5666666666666671,
+      "p": {
+        "x": 100.08194444444443,
+        "y": 4438.763094455402,
+        "w": 24,
+        "h": 28,
+        "vx": 132.33333333333334,
+        "vy": -785.4481700635546,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 0,
+      "t": 0.5750000000000004,
+      "p": {
+        "x": 101.33055555555555,
+        "y": 4432.363795748411,
+        "w": 24,
+        "h": 28,
+        "vx": 149.83333333333334,
+        "vy": -767.9158448389217,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 0,
+      "t": 0.5750000000000004,
+      "p": {
+        "x": 101.33055555555555,
+        "y": 4432.363795748411,
+        "w": 24,
+        "h": 28,
+        "vx": 149.83333333333334,
+        "vy": -767.9158448389217,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 0,
+      "t": 0.6000000000000003,
+      "p": {
+        "x": 105.95138888888889,
+        "y": 4414.042515888669,
+        "w": 24,
+        "h": 28,
+        "vx": 202.33333333333334,
+        "vy": -715.3188691650229,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.6333333333333335,
+      "p": {
+        "x": 114.03472222222223,
+        "y": 4391.659580685221,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -645.1895682664912,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.6500000000000001,
+      "p": {
+        "x": 118.33472222222224,
+        "y": 4386.597888815837,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -294.93534955073414,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.6500000000000001,
+      "p": {
+        "x": 118.33472222222224,
+        "y": 4386.597888815837,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -294.93534955073414,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.6666666666666667,
+      "p": {
+        "x": 122.63472222222225,
+        "y": 4382.120607787274,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -259.8706991014683,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.6833333333333333,
+      "p": {
+        "x": 126.93472222222226,
+        "y": 4378.227737599532,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.80604865220243,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.6833333333333333,
+      "p": {
+        "x": 126.93472222222226,
+        "y": 4378.227737599532,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.80604865220243,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7,
+      "p": {
+        "x": 131.23472222222227,
+        "y": 4374.919278252611,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -189.74139820293658,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7166666666666666,
+      "p": {
+        "x": 135.53472222222229,
+        "y": 4372.195229746511,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -154.67674775367072,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7166666666666666,
+      "p": {
+        "x": 135.53472222222229,
+        "y": 4372.195229746511,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -154.67674775367072,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7249999999999999,
+      "p": {
+        "x": 137.6847222222223,
+        "y": 4371.052359558769,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -137.1444225290378,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7249999999999999,
+      "p": {
+        "x": 137.6847222222223,
+        "y": 4371.052359558769,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -137.1444225290378,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7499999999999998,
+      "p": {
+        "x": 144.1347222222223,
+        "y": 4368.500365256775,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -84.54744685513906,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7583333333333331,
+      "p": {
+        "x": 146.2847222222223,
+        "y": 4367.941905909854,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -67.01512163050614,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7583333333333331,
+      "p": {
+        "x": 146.2847222222223,
+        "y": 4367.941905909854,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -67.01512163050614,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7749999999999997,
+      "p": {
+        "x": 150.58472222222233,
+        "y": 4367.263295346628,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -31.950471181240314,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7999999999999996,
+      "p": {
+        "x": 157.03472222222234,
+        "y": 4367.421506318941,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 30.28928336620654,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.7999999999999996,
+      "p": {
+        "x": 157.03472222222234,
+        "y": 4367.421506318941,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 30.28928336620654,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8166666666666662,
+      "p": {
+        "x": 161.33472222222235,
+        "y": 4368.6057053108325,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 84.63949156256858,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8166666666666662,
+      "p": {
+        "x": 161.33472222222235,
+        "y": 4368.6057053108325,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 84.63949156256858,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8249999999999995,
+      "p": {
+        "x": 163.48472222222236,
+        "y": 4369.537493608005,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 111.8145956607496,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8499999999999994,
+      "p": {
+        "x": 169.93472222222238,
+        "y": 4373.691613704434,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 193.33990795529263,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8833333333333326,
+      "p": {
+        "x": 178.5347222222224,
+        "y": 4382.400869311125,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 302.04032434801667,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8999999999999992,
+      "p": {
+        "x": 182.43888888888907,
+        "y": 4388.114252319379,
+        "w": 24,
+        "h": 28,
+        "vx": 226.33333333333331,
+        "vy": 356.3905325443787,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.8999999999999992,
+      "p": {
+        "x": 182.43888888888907,
+        "y": 4388.114252319379,
+        "w": 24,
+        "h": 28,
+        "vx": 226.33333333333331,
+        "vy": 356.3905325443787,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 0,
+      "t": 0.9166666666666659,
+      "p": {
+        "x": 185.81527777777796,
+        "y": 4394.733472130907,
+        "w": 24,
+        "h": 28,
+        "vx": 194.66666666666663,
+        "vy": 410.7407407407407,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "kind": "target-land",
+      "id": "first-hop",
+      "p": {
+        "x": 188.58750000000018,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 153.8333333333333,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "time": 0.9333333333333325,
+      "deaths": 0,
+      "platforms": [
+        {
+          "h": 54,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "first-hop",
+          "x": 150,
+          "y": 4426,
+          "w": 92,
+          "solid": true,
+          "structure": "pier",
+          "support": {
+            "type": "plinth",
+            "bottom": 4480
+          },
+          "landmark": "first-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "second-hop",
+          "x": 258,
+          "y": 4368,
+          "w": 102,
+          "structure": "right-corbel",
+          "landmark": "second-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "wall-transfer",
+          "x": 88,
+          "y": 4204,
+          "w": 96,
+          "structure": "left-corbel",
+          "landmark": "wall-transfer",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "recovery",
+          "id": "crossing-recovery",
+          "x": 250,
+          "y": 4144,
+          "w": 110,
+          "structure": "right-corbel",
+          "landmark": "crossing-recovery",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "resonant-stone",
+          "x": 266,
+          "y": 3976,
+          "w": 90,
+          "structure": "suspended",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "landmark": "resonant-stone",
+          "suspension": {
+            "homeX": 266,
+            "homeY": 3976,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "h": 20,
+          "kind": "refuge",
+          "route": "opening",
+          "id": "opening-refuge",
+          "x": 138,
+          "y": 3874,
+          "w": 150,
+          "structure": "arch",
+          "support": {
+            "type": "cantilever",
+            "side": -1
+          },
+          "landmark": "opening-refuge",
+          "suspension": null
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 199.30555555555574,
+          "y": 4426,
+          "vx": 178.8333333333333,
+          "vy": 0,
+          "intensity": 0.599884718957427,
+          "platformId": "first-hop",
+          "suspended": false,
+          "landmark": "first-hop",
+          "contactX": 199.30555555555574,
+          "contactY": 4426,
+          "contactOffset": 0.07185990338164656,
+          "at": 1.2583333333333313,
+          "elapsed": 0.9249999999999992
+        }
+      ],
+      "cursor": 2
+    },
+    {
+      "stage": 1,
+      "t": 1.0499999999999987,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.0499999999999987,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.0666666666666653,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.0749999999999986,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.0749999999999986,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.0999999999999985,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.0999999999999985,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1166666666666651,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1249999999999984,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1249999999999984,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1499999999999984,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1499999999999984,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1583333333333317,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1583333333333317,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1833333333333316,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1999999999999982,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.1999999999999982,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.2083333333333315,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.2083333333333315,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.224999999999998,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.249999999999998,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.249999999999998,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.2666666666666646,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.2833333333333312,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.2833333333333312,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.2999999999999978,
+      "p": {
+        "x": 191.90416666666684,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 1,
+      "t": 1.358333333333331,
+      "p": {
+        "x": 193.92638888888908,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 93.16666666666667,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 1,
+      "t": 1.3833333333333309,
+      "p": {
+        "x": 197.23472222222242,
+        "y": 4378.363795748411,
+        "w": 24,
+        "h": 28,
+        "vx": 149.83333333333334,
+        "vy": -767.9158448389217,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 1,
+      "t": 1.3833333333333309,
+      "p": {
+        "x": 197.23472222222242,
+        "y": 4378.363795748411,
+        "w": 24,
+        "h": 28,
+        "vx": 149.83333333333334,
+        "vy": -767.9158448389217,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 1,
+      "t": 1.3999999999999975,
+      "p": {
+        "x": 200.16944444444465,
+        "y": 4366.003506465045,
+        "w": 24,
+        "h": 28,
+        "vx": 184.83333333333334,
+        "vy": -732.8511943896558,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 1,
+      "t": 1.416666666666664,
+      "p": {
+        "x": 203.6875000000002,
+        "y": 4354.2276280225,
+        "w": 24,
+        "h": 28,
+        "vx": 219.83333333333334,
+        "vy": -697.78654394039,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.4499999999999973,
+      "p": {
+        "x": 212.0888888888891,
+        "y": 4332.429103659872,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -627.6572430418582,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.466666666666664,
+      "p": {
+        "x": 216.3888888888891,
+        "y": 4327.367411790488,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -294.93534955073414,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.466666666666664,
+      "p": {
+        "x": 216.3888888888891,
+        "y": 4327.367411790488,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -294.93534955073414,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.4749999999999972,
+      "p": {
+        "x": 218.53888888888912,
+        "y": 4325.055719921104,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -277.4030243261012,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.4999999999999971,
+      "p": {
+        "x": 224.98888888888914,
+        "y": 4318.997260574183,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.80604865220243,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.4999999999999971,
+      "p": {
+        "x": 224.98888888888914,
+        "y": 4318.997260574183,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.80604865220243,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5166666666666637,
+      "p": {
+        "x": 229.28888888888915,
+        "y": 4315.688801227262,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -189.74139820293658,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5166666666666637,
+      "p": {
+        "x": 229.28888888888915,
+        "y": 4315.688801227262,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -189.74139820293658,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.524999999999997,
+      "p": {
+        "x": 231.43888888888915,
+        "y": 4314.25372561911,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -172.20907297830365,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.549999999999997,
+      "p": {
+        "x": 237.88888888888917,
+        "y": 4310.8251150558835,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -119.61209730440488,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.549999999999997,
+      "p": {
+        "x": 237.88888888888917,
+        "y": 4310.8251150558835,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -119.61209730440488,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5583333333333302,
+      "p": {
+        "x": 240.03888888888918,
+        "y": 4309.974450288552,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -102.07977207977197,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5583333333333302,
+      "p": {
+        "x": 240.03888888888918,
+        "y": 4309.974450288552,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -102.07977207977197,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5833333333333302,
+      "p": {
+        "x": 246.4888888888892,
+        "y": 4308.29907224779,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -49.48279640587323,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5999999999999968,
+      "p": {
+        "x": 250.7888888888892,
+        "y": 4307.912667104974,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -14.418145956607397,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.5999999999999968,
+      "p": {
+        "x": 250.7888888888892,
+        "y": 4307.912667104974,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -14.418145956607397,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.60833333333333,
+      "p": {
+        "x": 252.9388888888892,
+        "y": 4307.938618598874,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 3.11417926802552,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.60833333333333,
+      "p": {
+        "x": 252.9388888888892,
+        "y": 4307.938618598874,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 3.11417926802552,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6249999999999967,
+      "p": {
+        "x": 257.2388888888892,
+        "y": 4308.669899189129,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 57.464387464387556,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6499999999999966,
+      "p": {
+        "x": 263.68888888888915,
+        "y": 4311.465264080648,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 138.9896997589306,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6499999999999966,
+      "p": {
+        "x": 263.68888888888915,
+        "y": 4311.465264080648,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 138.9896997589306,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6666666666666632,
+      "p": {
+        "x": 267.9888888888891,
+        "y": 4314.461136679085,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 193.33990795529263,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6833333333333298,
+      "p": {
+        "x": 272.28888888888906,
+        "y": 4318.362846080794,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 247.69011615165465,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6833333333333298,
+      "p": {
+        "x": 272.28888888888906,
+        "y": 4318.362846080794,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 247.69011615165465,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6999999999999964,
+      "p": {
+        "x": 276.588888888889,
+        "y": 4323.170392285776,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 302.04032434801667,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.6999999999999964,
+      "p": {
+        "x": 276.588888888889,
+        "y": 4323.170392285776,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 302.04032434801667,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.7083333333333297,
+      "p": {
+        "x": 278.738888888889,
+        "y": 4325.9138541894945,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 329.2154284461977,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 1,
+      "t": 1.7249999999999963,
+      "p": {
+        "x": 283.03888888888895,
+        "y": 4332.080155599386,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 383.5656366425597,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "kind": "target-land",
+      "id": "second-hop",
+      "p": {
+        "x": 293.78888888888883,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "time": 1.7666666666666628,
+      "deaths": 0,
+      "platforms": [
+        {
+          "h": 54,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "first-hop",
+          "x": 150,
+          "y": 4426,
+          "w": 92,
+          "solid": true,
+          "structure": "pier",
+          "support": {
+            "type": "plinth",
+            "bottom": 4480
+          },
+          "landmark": "first-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "second-hop",
+          "x": 258,
+          "y": 4368,
+          "w": 102,
+          "structure": "right-corbel",
+          "landmark": "second-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "wall-transfer",
+          "x": 88,
+          "y": 4204,
+          "w": 96,
+          "structure": "left-corbel",
+          "landmark": "wall-transfer",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "recovery",
+          "id": "crossing-recovery",
+          "x": 250,
+          "y": 4144,
+          "w": 110,
+          "structure": "right-corbel",
+          "landmark": "crossing-recovery",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "resonant-stone",
+          "x": 266,
+          "y": 3976,
+          "w": 90,
+          "structure": "suspended",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "landmark": "resonant-stone",
+          "suspension": {
+            "homeX": 266,
+            "homeY": 3976,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "h": 20,
+          "kind": "refuge",
+          "route": "opening",
+          "id": "opening-refuge",
+          "x": 138,
+          "y": 3874,
+          "w": 150,
+          "structure": "arch",
+          "support": {
+            "type": "cantilever",
+            "side": -1
+          },
+          "landmark": "opening-refuge",
+          "suspension": null
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 301.4888888888889,
+          "y": 4368,
+          "vx": 258,
+          "vy": 0,
+          "intensity": 0.6371108889549353,
+          "platformId": "second-hop",
+          "suspended": false,
+          "landmark": "second-hop",
+          "contactX": 301.4888888888889,
+          "contactY": 4368,
+          "contactOffset": -0.14727668845315922,
+          "at": 2.0833333333333286,
+          "elapsed": 1.7499999999999962
+        }
+      ],
+      "cursor": 4
+    },
+    {
+      "stage": 2,
+      "t": 1.883333333333329,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.883333333333329,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.8999999999999957,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.8999999999999957,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.908333333333329,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.933333333333329,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.933333333333329,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9416666666666622,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9583333333333288,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9583333333333288,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9833333333333287,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9833333333333287,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9999999999999953,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 1.9999999999999953,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.016666666666662,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.0333333333333288,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.0333333333333288,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.0499999999999954,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.0499999999999954,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.066666666666662,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.0833333333333286,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.0833333333333286,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.099999999999995,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.1083333333333285,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.1083333333333285,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.1333333333333284,
+      "p": {
+        "x": 303.83055555555546,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.199999999999995,
+      "p": {
+        "x": 306.80972222222215,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 114.83333333333334,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.208333333333328,
+      "p": {
+        "x": 307.94722222222214,
+        "y": 4333.3084958725985,
+        "w": 24,
+        "h": 28,
+        "vx": 136.5,
+        "vy": -802.9804952881875,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.208333333333328,
+      "p": {
+        "x": 307.94722222222214,
+        "y": 4333.3084958725985,
+        "w": 24,
+        "h": 28,
+        "vx": 136.5,
+        "vy": -802.9804952881875,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.233333333333328,
+      "p": {
+        "x": 312.23472222222216,
+        "y": 4314.110599751625,
+        "w": 24,
+        "h": 28,
+        "vx": 189,
+        "vy": -750.3835196142887,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.2416666666666614,
+      "p": {
+        "x": 313.9555555555555,
+        "y": 4308.003506465045,
+        "w": 24,
+        "h": 28,
+        "vx": 206.5,
+        "vy": -732.8511943896558,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.2416666666666614,
+      "p": {
+        "x": 313.9555555555555,
+        "y": 4308.003506465045,
+        "w": 24,
+        "h": 28,
+        "vx": 206.5,
+        "vy": -732.8511943896558,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.258333333333328,
+      "p": {
+        "x": 317.8347222222222,
+        "y": 4296.2276280225,
+        "w": 24,
+        "h": 28,
+        "vx": 241.5,
+        "vy": -697.78654394039,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.258333333333328,
+      "p": {
+        "x": 317.8347222222222,
+        "y": 4296.2276280225,
+        "w": 24,
+        "h": 28,
+        "vx": 241.5,
+        "vy": -697.78654394039,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.283333333333328,
+      "p": {
+        "x": 324.2847222222221,
+        "y": 4279.659580685221,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -645.1895682664912,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.2999999999999945,
+      "p": {
+        "x": 328.58472222222207,
+        "y": 4269.344729344729,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -610.1249178172253,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.2999999999999945,
+      "p": {
+        "x": 328.58472222222207,
+        "y": 4269.344729344729,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -610.1249178172253,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.308333333333328,
+      "p": {
+        "x": 330.73472222222205,
+        "y": 4264.40645773979,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -592.5925925925924,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3333333333333277,
+      "p": {
+        "x": 336,
+        "y": 4250.468259186207,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -539.9956169186936,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3333333333333277,
+      "p": {
+        "x": 336,
+        "y": 4250.468259186207,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -539.9956169186936,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3499999999999943,
+      "p": {
+        "x": 336,
+        "y": 4241.906640368178,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -504.93096646942774,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3583333333333276,
+      "p": {
+        "x": 336,
+        "y": 4237.8449850244715,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -487.3986412447948,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3583333333333276,
+      "p": {
+        "x": 336,
+        "y": 4237.8449850244715,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -487.3986412447948,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3833333333333275,
+      "p": {
+        "x": 336,
+        "y": 4226.536635254583,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -434.80166557089603,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.3833333333333275,
+      "p": {
+        "x": 336,
+        "y": 4226.536635254583,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -434.80166557089603,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.391666666666661,
+      "p": {
+        "x": 336,
+        "y": 4223.059390751698,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -417.2693403462631,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4083333333333274,
+      "p": {
+        "x": 336,
+        "y": 4216.543209876542,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -382.20468989699725,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4083333333333274,
+      "p": {
+        "x": 336,
+        "y": 4216.543209876542,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -382.20468989699725,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.424999999999994,
+      "p": {
+        "x": 336,
+        "y": 4210.611439842208,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -347.1400394477314,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4416666666666607,
+      "p": {
+        "x": 336,
+        "y": 4205.264080648695,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -312.07538899846554,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4416666666666607,
+      "p": {
+        "x": 336,
+        "y": 4205.264080648695,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -312.07538899846554,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4666666666666606,
+      "p": {
+        "x": 336,
+        "y": 4198.338812184965,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4666666666666606,
+      "p": {
+        "x": 336,
+        "y": 4198.338812184965,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.483333333333327,
+      "p": {
+        "x": 336,
+        "y": 4194.452480093504,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -224.4137628753009,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4916666666666605,
+      "p": {
+        "x": 336,
+        "y": 4192.728468113082,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -206.88143765066798,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.4916666666666605,
+      "p": {
+        "x": 336,
+        "y": 4192.728468113082,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -206.88143765066798,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.508333333333327,
+      "p": {
+        "x": 336,
+        "y": 4189.7187522828535,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -171.81678720140212,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.508333333333327,
+      "p": {
+        "x": 336,
+        "y": 4189.7187522828535,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -171.81678720140212,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.5249999999999937,
+      "p": {
+        "x": 336,
+        "y": 4187.293447293446,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -136.75213675213627,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.5416666666666603,
+      "p": {
+        "x": 336,
+        "y": 4185.452553144859,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -101.68748630287044,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.5416666666666603,
+      "p": {
+        "x": 336,
+        "y": 4185.452553144859,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -101.68748630287044,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.558333333333327,
+      "p": {
+        "x": 336,
+        "y": 4184.196069837094,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -66.62283585360461,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.583333333333327,
+      "p": {
+        "x": 336,
+        "y": 4183.19672729929,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -30.85689239535347,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.583333333333327,
+      "p": {
+        "x": 336,
+        "y": 4183.19672729929,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -30.85689239535347,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.5999999999999934,
+      "p": {
+        "x": 336,
+        "y": 4182.910365987287,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -12.623274161735237,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.6083333333333267,
+      "p": {
+        "x": 336,
+        "y": 4182.881145445246,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -3.50646504492612,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.6083333333333267,
+      "p": {
+        "x": 336,
+        "y": 4182.881145445246,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -3.50646504492612,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.6249999999999933,
+      "p": {
+        "x": 336,
+        "y": 4183.050624589084,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 14.727153188692114,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 2,
+      "t": 2.6583333333333266,
+      "p": {
+        "x": 336,
+        "y": 4184.301263788441,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 51.194389655928575,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.699999999999993,
+      "p": {
+        "x": 336,
+        "y": 4188.533881218494,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.758333333333326,
+      "p": {
+        "x": 319.14191666666665,
+        "y": 4145.374757104241,
+        "w": 24,
+        "h": 28,
+        "vx": -282.94000000000005,
+        "vy": -687.2737234275695,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "wallJump"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.783333333333326,
+      "p": {
+        "x": 312.17341666666664,
+        "y": 4129.069530279784,
+        "w": 24,
+        "h": 28,
+        "vx": -276.64,
+        "vy": -634.6767477536707,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "wallJump"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.783333333333326,
+      "p": {
+        "x": 312.17341666666664,
+        "y": 4129.069530279784,
+        "w": 24,
+        "h": 28,
+        "vx": -276.64,
+        "vy": -634.6767477536707,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "wallJump"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.7916666666666594,
+      "p": {
+        "x": 309.88558333333333,
+        "y": 4123.926660092042,
+        "w": 24,
+        "h": 28,
+        "vx": -274.53999999999996,
+        "vy": -617.1444225290378,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "wallJump"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.808333333333326,
+      "p": {
+        "x": 305.36241666666666,
+        "y": 4114.079227847174,
+        "w": 24,
+        "h": 28,
+        "vx": -270.3399999999999,
+        "vy": -582.0797720797719,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "wallJump"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.808333333333326,
+      "p": {
+        "x": 305.36241666666666,
+        "y": 4114.079227847174,
+        "w": 24,
+        "h": 28,
+        "vx": -270.3399999999999,
+        "vy": -582.0797720797719,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "wallJump"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.833333333333326,
+      "p": {
+        "x": 298.75925,
+        "y": 4100.403849806411,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -529.4827964058732,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.833333333333326,
+      "p": {
+        "x": 298.75925,
+        "y": 4100.403849806411,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -529.4827964058732,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.8499999999999925,
+      "p": {
+        "x": 294.45925000000005,
+        "y": 4092.0174446635956,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -494.4181459566073,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.858333333333326,
+      "p": {
+        "x": 292.3092500000001,
+        "y": 4088.043396157496,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -476.8858207319744,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.858333333333326,
+      "p": {
+        "x": 292.3092500000001,
+        "y": 4088.043396157496,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -476.8858207319744,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.8749999999999925,
+      "p": {
+        "x": 288.0092500000001,
+        "y": 4080.533607275912,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -441.8211702827085,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.8749999999999925,
+      "p": {
+        "x": 288.0092500000001,
+        "y": 4080.533607275912,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -441.8211702827085,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.8999999999999924,
+      "p": {
+        "x": 281.5592500000002,
+        "y": 4070.364694280076,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -389.22419460880974,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.9083333333333257,
+      "p": {
+        "x": 279.4092500000002,
+        "y": 4067.2672620352078,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -371.6918693841768,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.9083333333333257,
+      "p": {
+        "x": 279.4092500000002,
+        "y": 4067.2672620352078,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -371.6918693841768,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.9333333333333256,
+      "p": {
+        "x": 272.9592500000003,
+        "y": 4058.851581561835,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -319.09489371027803,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.9333333333333256,
+      "p": {
+        "x": 272.9592500000003,
+        "y": 4058.851581561835,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -319.09489371027803,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.949999999999992,
+      "p": {
+        "x": 268.6592500000003,
+        "y": 4053.971641463946,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -284.0302432610122,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.9583333333333255,
+      "p": {
+        "x": 266.50925000000035,
+        "y": 4051.7508254803097,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -266.49791803637925,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.9583333333333255,
+      "p": {
+        "x": 266.50925000000035,
+        "y": 4051.7508254803097,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -266.49791803637925,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.974999999999992,
+      "p": {
+        "x": 262.2092500000004,
+        "y": 4047.7475016436524,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -231.4332675871134,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.974999999999992,
+      "p": {
+        "x": 262.2092500000004,
+        "y": 4047.7475016436524,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -231.4332675871134,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.999999999999992,
+      "p": {
+        "x": 255.75925000000043,
+        "y": 4042.838286215206,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -178.8362919132146,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 2.999999999999992,
+      "p": {
+        "x": 255.75925000000043,
+        "y": 4042.838286215206,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -178.8362919132146,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.0083333333333253,
+      "p": {
+        "x": 253.60925000000043,
+        "y": 4041.494086492801,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -161.30396668858168,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.024999999999992,
+      "p": {
+        "x": 249.30925000000042,
+        "y": 4039.2439951786073,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -126.23931623931584,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.024999999999992,
+      "p": {
+        "x": 249.30925000000042,
+        "y": 4039.2439951786073,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -126.23931623931584,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.0416666666666585,
+      "p": {
+        "x": 245.0092500000004,
+        "y": 4037.5783147052343,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -91.17466579005001,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.0416666666666585,
+      "p": {
+        "x": 245.0092500000004,
+        "y": 4037.5783147052343,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -91.17466579005001,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.058333333333325,
+      "p": {
+        "x": 240.7092500000004,
+        "y": 4036.497045072683,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -56.11001534078419,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.083333333333325,
+      "p": {
+        "x": 234.25925000000038,
+        "y": 4035.550135145004,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -28.75958799035684,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.083333333333325,
+      "p": {
+        "x": 234.25925000000038,
+        "y": 4035.550135145004,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -28.75958799035684,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.0999999999999917,
+      "p": {
+        "x": 229.95925000000037,
+        "y": 4035.298728906418,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -10.52596975673861,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.0999999999999917,
+      "p": {
+        "x": 229.95925000000037,
+        "y": 4035.298728906418,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -10.52596975673861,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.108333333333325,
+      "p": {
+        "x": 227.80925000000036,
+        "y": 4035.2869859010852,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -1.4091606399294925,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.108333333333325,
+      "p": {
+        "x": 227.80925000000036,
+        "y": 4035.2869859010852,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -1.4091606399294925,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.133333333333325,
+      "p": {
+        "x": 221.35925000000034,
+        "y": 4035.7075973409274,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 25.941266710497857,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.141666666666658,
+      "p": {
+        "x": 219.20925000000034,
+        "y": 4035.9997479728218,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 35.05807582730697,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.141666666666658,
+      "p": {
+        "x": 219.20925000000034,
+        "y": 4035.9997479728218,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 35.05807582730697,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.1583333333333248,
+      "p": {
+        "x": 214.90925000000033,
+        "y": 4036.8119694645306,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 53.2916940609252,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.1583333333333248,
+      "p": {
+        "x": 214.90925000000033,
+        "y": 4036.8119694645306,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 53.2916940609252,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.1833333333333247,
+      "p": {
+        "x": 208.4592500000003,
+        "y": 4038.7505880634058,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 98.70041639272446,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.191666666666658,
+      "p": {
+        "x": 206.3092500000003,
+        "y": 4039.7995507341634,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 125.87552049090549,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.191666666666658,
+      "p": {
+        "x": 206.3092500000003,
+        "y": 4039.7995507341634,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 125.87552049090549,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2083333333333246,
+      "p": {
+        "x": 202.0092500000003,
+        "y": 4042.5768536781334,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 180.22572868726752,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2083333333333246,
+      "p": {
+        "x": 202.0092500000003,
+        "y": 4042.5768536781334,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 180.22572868726752,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2333333333333245,
+      "p": {
+        "x": 195.55925000000028,
+        "y": 4048.4412521002237,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 261.75104098181055,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2333333333333245,
+      "p": {
+        "x": 195.55925000000028,
+        "y": 4048.4412521002237,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 261.75104098181055,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.241666666666658,
+      "p": {
+        "x": 193.40925000000027,
+        "y": 4050.84896997589,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 288.92614507999156,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2583333333333244,
+      "p": {
+        "x": 189.10925000000026,
+        "y": 4056.343783329678,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 343.2763532763536,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2583333333333244,
+      "p": {
+        "x": 189.10925000000026,
+        "y": 4056.343783329678,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 343.2763532763536,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2833333333333243,
+      "p": {
+        "x": 182.65925000000024,
+        "y": 4066.2844473664964,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 424.8016655708966,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2916666666666576,
+      "p": {
+        "x": 180.50925000000024,
+        "y": 4070.050920447072,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 451.9767696690776,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.2916666666666576,
+      "p": {
+        "x": 180.50925000000024,
+        "y": 4070.050920447072,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 451.9767696690776,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3083333333333242,
+      "p": {
+        "x": 176.20925000000022,
+        "y": 4078.2632442106774,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 506.32697786543963,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3083333333333242,
+      "p": {
+        "x": 176.20925000000022,
+        "y": 4078.2632442106774,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 506.32697786543963,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.333333333333324,
+      "p": {
+        "x": 169.7592500000002,
+        "y": 4092.2801738622225,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 587.8522901599827,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3499999999999908,
+      "p": {
+        "x": 165.4592500000002,
+        "y": 4102.757089634009,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 642.2024983563447,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3499999999999908,
+      "p": {
+        "x": 165.4592500000002,
+        "y": 4102.757089634009,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 642.2024983563447,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.358333333333324,
+      "p": {
+        "x": 163.3092500000002,
+        "y": 4108.335236321131,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 669.3776024545257,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.358333333333324,
+      "p": {
+        "x": 163.3092500000002,
+        "y": 4108.335236321131,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 669.3776024545257,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3749999999999907,
+      "p": {
+        "x": 159.00925000000018,
+        "y": 4120.170907297827,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 723.7278106508877,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3916666666666573,
+      "p": {
+        "x": 154.70925000000017,
+        "y": 4132.912415077797,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 778.0780188472497,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.3916666666666573,
+      "p": {
+        "x": 154.70925000000017,
+        "y": 4132.912415077797,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 778.0780188472497,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.408333333333324,
+      "p": {
+        "x": 150.40925000000016,
+        "y": 4146.559759661039,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 832.4282270436117,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.408333333333324,
+      "p": {
+        "x": 150.40925000000016,
+        "y": 4146.559759661039,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 832.4282270436117,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 2,
+      "t": 3.433333333333324,
+      "p": {
+        "x": 143.95925000000014,
+        "y": 4168.612941047553,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 900,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "kind": "target-land",
+      "id": "wall-transfer",
+      "p": {
+        "x": 141.80925000000013,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "run"
+      },
+      "time": 3.441666666666657,
+      "deaths": 0,
+      "platforms": [
+        {
+          "h": 54,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "first-hop",
+          "x": 150,
+          "y": 4426,
+          "w": 92,
+          "solid": true,
+          "structure": "pier",
+          "support": {
+            "type": "plinth",
+            "bottom": 4480
+          },
+          "landmark": "first-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "second-hop",
+          "x": 258,
+          "y": 4368,
+          "w": 102,
+          "structure": "right-corbel",
+          "landmark": "second-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "wall-transfer",
+          "x": 88,
+          "y": 4204,
+          "w": 96,
+          "structure": "left-corbel",
+          "landmark": "wall-transfer",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "recovery",
+          "id": "crossing-recovery",
+          "x": 250,
+          "y": 4144,
+          "w": 110,
+          "structure": "right-corbel",
+          "landmark": "crossing-recovery",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "resonant-stone",
+          "x": 266,
+          "y": 3976,
+          "w": 90,
+          "structure": "suspended",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "landmark": "resonant-stone",
+          "suspension": {
+            "homeX": 266,
+            "homeY": 3976,
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          }
+        },
+        {
+          "h": 20,
+          "kind": "refuge",
+          "route": "opening",
+          "id": "opening-refuge",
+          "x": 138,
+          "y": 3874,
+          "w": 150,
+          "structure": "arch",
+          "support": {
+            "type": "cantilever",
+            "side": -1
+          },
+          "landmark": "opening-refuge",
+          "suspension": null
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 153.80925000000013,
+          "y": 4204,
+          "vx": -258,
+          "vy": 0,
+          "intensity": 1.2328767123287672,
+          "platformId": "wall-transfer",
+          "suspended": false,
+          "landmark": "wall-transfer",
+          "contactX": 153.80925000000013,
+          "contactY": 4204,
+          "contactOffset": 0.37102604166666947,
+          "at": 3.7749999999999893,
+          "elapsed": 3.441666666666657
+        }
+      ],
+      "cursor": 7
+    },
+    {
+      "stage": 3,
+      "t": 3.5916666666666566,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.608333333333323,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.608333333333323,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.62499999999999,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.6416666666666564,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.6416666666666564,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.658333333333323,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.658333333333323,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.6749999999999896,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.691666666666656,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.691666666666656,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.708333333333323,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.708333333333323,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.7249999999999894,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.741666666666656,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.741666666666656,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.7583333333333226,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.7749999999999893,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.7749999999999893,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.791666666666656,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.791666666666656,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 3.8083333333333225,
+      "p": {
+        "x": 123.16758333333345,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.874999999999989,
+      "p": {
+        "x": 125.18980555555567,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 93.16666666666667,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.8916666666666555,
+      "p": {
+        "x": 127.24952777777789,
+        "y": 4162.763094455402,
+        "w": 24,
+        "h": 28,
+        "vx": 132.33333333333334,
+        "vy": -785.4481700635546,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.8916666666666555,
+      "p": {
+        "x": 127.24952777777789,
+        "y": 4162.763094455402,
+        "w": 24,
+        "h": 28,
+        "vx": 132.33333333333334,
+        "vy": -785.4481700635546,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.908333333333322,
+      "p": {
+        "x": 129.89258333333345,
+        "y": 4150.110599751625,
+        "w": 24,
+        "h": 28,
+        "vx": 167.33333333333334,
+        "vy": -750.3835196142887,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.9249999999999887,
+      "p": {
+        "x": 133.11897222222234,
+        "y": 4138.042515888669,
+        "w": 24,
+        "h": 28,
+        "vx": 202.33333333333334,
+        "vy": -715.3188691650229,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.9249999999999887,
+      "p": {
+        "x": 133.11897222222234,
+        "y": 4138.042515888669,
+        "w": 24,
+        "h": 28,
+        "vx": 202.33333333333334,
+        "vy": -715.3188691650229,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.9416666666666553,
+      "p": {
+        "x": 136.92869444444457,
+        "y": 4126.558842866535,
+        "w": 24,
+        "h": 28,
+        "vx": 237.33333333333334,
+        "vy": -680.254218715757,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.9416666666666553,
+      "p": {
+        "x": 136.92869444444457,
+        "y": 4126.558842866535,
+        "w": 24,
+        "h": 28,
+        "vx": 237.33333333333334,
+        "vy": -680.254218715757,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.958333333333322,
+      "p": {
+        "x": 141.20230555555568,
+        "y": 4115.659580685221,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -645.1895682664912,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.958333333333322,
+      "p": {
+        "x": 141.20230555555568,
+        "y": 4115.659580685221,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -645.1895682664912,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.9749999999999885,
+      "p": {
+        "x": 145.5023055555557,
+        "y": 4105.344729344729,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -610.1249178172253,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.991666666666655,
+      "p": {
+        "x": 149.8023055555557,
+        "y": 4095.614288845057,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -575.0602673679595,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 3.991666666666655,
+      "p": {
+        "x": 149.8023055555557,
+        "y": 4095.614288845057,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -575.0602673679595,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.008333333333322,
+      "p": {
+        "x": 154.10230555555572,
+        "y": 4086.468259186207,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -539.9956169186936,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.008333333333322,
+      "p": {
+        "x": 154.10230555555572,
+        "y": 4086.468259186207,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -539.9956169186936,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.02499999999999,
+      "p": {
+        "x": 158.40230555555573,
+        "y": 4077.906640368178,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -504.93096646942774,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.041666666666657,
+      "p": {
+        "x": 162.70230555555574,
+        "y": 4069.9294323909703,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -469.8663160201619,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.041666666666657,
+      "p": {
+        "x": 162.70230555555574,
+        "y": 4069.9294323909703,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -469.8663160201619,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.058333333333325,
+      "p": {
+        "x": 167.00230555555575,
+        "y": 4062.5366352545834,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -434.80166557089603,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.058333333333325,
+      "p": {
+        "x": 167.00230555555575,
+        "y": 4062.5366352545834,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -434.80166557089603,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.074999999999992,
+      "p": {
+        "x": 171.30230555555576,
+        "y": 4055.7282489590175,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -399.7370151216302,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.09166666666666,
+      "p": {
+        "x": 175.60230555555577,
+        "y": 4049.504273504273,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -364.6723646723643,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.09166666666666,
+      "p": {
+        "x": 175.60230555555577,
+        "y": 4049.504273504273,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -364.6723646723643,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.108333333333327,
+      "p": {
+        "x": 179.90230555555578,
+        "y": 4043.8647088903494,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -329.60771422309847,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.108333333333327,
+      "p": {
+        "x": 179.90230555555578,
+        "y": 4043.8647088903494,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -329.60771422309847,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.124999999999995,
+      "p": {
+        "x": 184.2023055555558,
+        "y": 4038.809555117247,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -294.5430637738326,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.141666666666662,
+      "p": {
+        "x": 188.5023055555558,
+        "y": 4034.3388121849657,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.141666666666662,
+      "p": {
+        "x": 188.5023055555558,
+        "y": 4034.3388121849657,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.15833333333333,
+      "p": {
+        "x": 192.80230555555582,
+        "y": 4030.4524800935055,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.4137628753009,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.15833333333333,
+      "p": {
+        "x": 192.80230555555582,
+        "y": 4030.4524800935055,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -224.4137628753009,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.174999999999997,
+      "p": {
+        "x": 197.10230555555583,
+        "y": 4027.1505588428663,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -189.34911242603505,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.191666666666665,
+      "p": {
+        "x": 201.40230555555584,
+        "y": 4024.433048433048,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -154.2844619767692,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.191666666666665,
+      "p": {
+        "x": 201.40230555555584,
+        "y": 4024.433048433048,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -154.2844619767692,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.208333333333332,
+      "p": {
+        "x": 205.70230555555585,
+        "y": 4022.299948864051,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -119.21981152750335,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": false
+    },
+    {
+      "stage": 3,
+      "t": 4.241666666666667,
+      "p": {
+        "x": 214.30230555555588,
+        "y": 4019.7869822485204,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -49.0905106289717,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.275000000000002,
+      "p": {
+        "x": 222.9023055555559,
+        "y": 4019.692015486887,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 30.68156914310807,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.29166666666667,
+      "p": {
+        "x": 227.2023055555559,
+        "y": 4007.6969902841697,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -710.9353495507341,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.29166666666667,
+      "p": {
+        "x": 227.2023055555559,
+        "y": 4007.6969902841697,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -710.9353495507341,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.308333333333337,
+      "p": {
+        "x": 231.50230555555592,
+        "y": 3996.2863759222732,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -675.8706991014683,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.325000000000005,
+      "p": {
+        "x": 235.80230555555593,
+        "y": 3985.460172401198,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -640.8060486522024,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.325000000000005,
+      "p": {
+        "x": 235.80230555555593,
+        "y": 3985.460172401198,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -640.8060486522024,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.341666666666672,
+      "p": {
+        "x": 240.10230555555594,
+        "y": 3975.218379720944,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -605.7413982029366,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.341666666666672,
+      "p": {
+        "x": 240.10230555555594,
+        "y": 3975.218379720944,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -605.7413982029366,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.35833333333334,
+      "p": {
+        "x": 244.40230555555596,
+        "y": 3965.560997881511,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -570.6767477536707,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.375000000000007,
+      "p": {
+        "x": 248.70230555555597,
+        "y": 3956.488026882899,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -535.6120973044049,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.375000000000007,
+      "p": {
+        "x": 248.70230555555597,
+        "y": 3956.488026882899,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -535.6120973044049,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.391666666666675,
+      "p": {
+        "x": 253.00230555555598,
+        "y": 3947.999466725108,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -500.547446855139,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.391666666666675,
+      "p": {
+        "x": 253.00230555555598,
+        "y": 3947.999466725108,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -500.547446855139,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.408333333333342,
+      "p": {
+        "x": 257.30230555555596,
+        "y": 3940.0953174081383,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -465.48279640587316,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.42500000000001,
+      "p": {
+        "x": 261.6023055555559,
+        "y": 3932.7755789319895,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -430.4181459566073,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.42500000000001,
+      "p": {
+        "x": 261.6023055555559,
+        "y": 3932.7755789319895,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -430.4181459566073,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.441666666666677,
+      "p": {
+        "x": 265.90230555555587,
+        "y": 3926.040251296662,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -395.35349550734145,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.458333333333345,
+      "p": {
+        "x": 270.2023055555558,
+        "y": 3919.8893345021556,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -360.2888450580756,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.458333333333345,
+      "p": {
+        "x": 270.2023055555558,
+        "y": 3919.8893345021556,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -360.2888450580756,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.475000000000012,
+      "p": {
+        "x": 274.5023055555558,
+        "y": 3914.32282854847,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -325.22419460880974,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.49166666666668,
+      "p": {
+        "x": 278.80230555555573,
+        "y": 3909.3407334356057,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -290.1595441595439,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.508333333333347,
+      "p": {
+        "x": 283.1023055555557,
+        "y": 3904.9430491635626,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -255.09489371027803,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.541666666666682,
+      "p": {
+        "x": 291.7023055555556,
+        "y": 3897.9009131419393,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -184.96559281174632,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.55833333333335,
+      "p": {
+        "x": 295.6064722222223,
+        "y": 3895.2564613923596,
+        "w": 24,
+        "h": 28,
+        "vx": 226.33333333333331,
+        "vy": -149.90094236248046,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.55833333333335,
+      "p": {
+        "x": 295.6064722222223,
+        "y": 3895.2564613923596,
+        "w": 24,
+        "h": 28,
+        "vx": 226.33333333333331,
+        "vy": -149.90094236248046,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.575000000000017,
+      "p": {
+        "x": 298.98286111111116,
+        "y": 3893.196420483601,
+        "w": 24,
+        "h": 28,
+        "vx": 194.66666666666663,
+        "vy": -114.83629191321462,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.5916666666666845,
+      "p": {
+        "x": 301.8314722222223,
+        "y": 3891.720790415663,
+        "w": 24,
+        "h": 28,
+        "vx": 162.99999999999994,
+        "vy": -79.7716414639488,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.5916666666666845,
+      "p": {
+        "x": 301.8314722222223,
+        "y": 3891.720790415663,
+        "w": 24,
+        "h": 28,
+        "vx": 162.99999999999994,
+        "vy": -79.7716414639488,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.608333333333352,
+      "p": {
+        "x": 304.15230555555564,
+        "y": 3890.759441887648,
+        "w": 24,
+        "h": 28,
+        "vx": 131.33333333333326,
+        "vy": -53.12250712250677,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.641666666666687,
+      "p": {
+        "x": 307.210638888889,
+        "y": 3889.748425743299,
+        "w": 24,
+        "h": 28,
+        "vx": 67.99999999999994,
+        "vy": -16.655270655270307,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.6583333333333545,
+      "p": {
+        "x": 307.77522222222234,
+        "y": 3889.6987581269645,
+        "w": 24,
+        "h": 28,
+        "vx": 22.499999999999943,
+        "vy": 1.5783475783479268,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.6583333333333545,
+      "p": {
+        "x": 307.77522222222234,
+        "y": 3889.6987581269645,
+        "w": 24,
+        "h": 28,
+        "vx": 22.499999999999943,
+        "vy": 1.5783475783479268,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.675000000000022,
+      "p": {
+        "x": 307.6252222222223,
+        "y": 3889.952984147857,
+        "w": 24,
+        "h": 28,
+        "vx": -17.750000000000057,
+        "vy": 19.81196581196616,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.6916666666666895,
+      "p": {
+        "x": 306.89188888888896,
+        "y": 3890.5111038059763,
+        "w": 24,
+        "h": 28,
+        "vx": -52.75000000000006,
+        "vy": 38.04558404558439,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.6916666666666895,
+      "p": {
+        "x": 306.89188888888896,
+        "y": 3890.5111038059763,
+        "w": 24,
+        "h": 28,
+        "vx": -52.75000000000006,
+        "vy": 38.04558404558439,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.708333333333357,
+      "p": {
+        "x": 305.5752222222223,
+        "y": 3891.3731171013233,
+        "w": 24,
+        "h": 28,
+        "vx": -87.75000000000006,
+        "vy": 56.27920227920262,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.708333333333357,
+      "p": {
+        "x": 305.5752222222223,
+        "y": 3891.3731171013233,
+        "w": 24,
+        "h": 28,
+        "vx": -87.75000000000006,
+        "vy": 56.27920227920262,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.7250000000000245,
+      "p": {
+        "x": 303.67522222222226,
+        "y": 3892.6895098254085,
+        "w": 24,
+        "h": 28,
+        "vx": -122.75000000000006,
+        "vy": 92.57111549419277,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.741666666666692,
+      "p": {
+        "x": 301.1918888888889,
+        "y": 3894.9117393527663,
+        "w": 24,
+        "h": 28,
+        "vx": -157.75000000000006,
+        "vy": 146.9213236905548,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.775000000000027,
+      "p": {
+        "x": 294.4752222222222,
+        "y": 3902.0737088172996,
+        "w": 24,
+        "h": 28,
+        "vx": -227.75000000000006,
+        "vy": 255.62174008327884,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.7916666666666945,
+      "p": {
+        "x": 291.07522222222224,
+        "y": 3907.0134487544756,
+        "w": 24,
+        "h": 28,
+        "vx": -196.08333333333337,
+        "vy": 309.97194827964086,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.7916666666666945,
+      "p": {
+        "x": 291.07522222222224,
+        "y": 3907.0134487544756,
+        "w": 24,
+        "h": 28,
+        "vx": -196.08333333333337,
+        "vy": 309.97194827964086,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.808333333333362,
+      "p": {
+        "x": 288.203,
+        "y": 3912.8590254949245,
+        "w": 24,
+        "h": 28,
+        "vx": -164.41666666666669,
+        "vy": 364.3221564760029,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.841666666666697,
+      "p": {
+        "x": 284.0418888888889,
+        "y": 3927.267689385639,
+        "w": 24,
+        "h": 28,
+        "vx": -101.08333333333334,
+        "vy": 473.0225728687269,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.8583333333333645,
+      "p": {
+        "x": 282.92591666666664,
+        "y": 3935.830776535906,
+        "w": 24,
+        "h": 28,
+        "vx": -55.58333333333334,
+        "vy": 527.3727810650889,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.8583333333333645,
+      "p": {
+        "x": 282.92591666666664,
+        "y": 3935.830776535906,
+        "w": 24,
+        "h": 28,
+        "vx": -55.58333333333334,
+        "vy": 527.3727810650889,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 3,
+      "t": 4.875000000000032,
+      "p": {
+        "x": 282.5682777777777,
+        "y": 3945.2997004894455,
+        "w": 24,
+        "h": 28,
+        "vx": -10.083333333333343,
+        "vy": 581.722989261451,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "kind": "target-land",
+      "id": "resonant-stone",
+      "p": {
+        "x": 282.9645211020575,
+        "y": 3948.7377487900494,
+        "w": 24,
+        "h": 28,
+        "vx": 34.33333333333333,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "time": 4.8916666666666995,
+      "deaths": 0,
+      "platforms": [
+        {
+          "h": 54,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "first-hop",
+          "x": 150,
+          "y": 4426,
+          "w": 92,
+          "solid": true,
+          "structure": "pier",
+          "support": {
+            "type": "plinth",
+            "bottom": 4480
+          },
+          "landmark": "first-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "second-hop",
+          "x": 258,
+          "y": 4368,
+          "w": 102,
+          "structure": "right-corbel",
+          "landmark": "second-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "wall-transfer",
+          "x": 88,
+          "y": 4204,
+          "w": 96,
+          "structure": "left-corbel",
+          "landmark": "wall-transfer",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "recovery",
+          "id": "crossing-recovery",
+          "x": 250,
+          "y": 4144,
+          "w": 110,
+          "structure": "right-corbel",
+          "landmark": "crossing-recovery",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "resonant-stone",
+          "x": 266.00457665761314,
+          "y": 3976.7377487900494,
+          "w": 90,
+          "structure": "suspended",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "landmark": "resonant-stone",
+          "suspension": {
+            "homeX": 266,
+            "homeY": 3976,
+            "x": 0.004576657613168715,
+            "y": 0.7377487900494049,
+            "vx": 0.5491989135802459,
+            "vy": 88.52985480592858
+          }
+        },
+        {
+          "h": 20,
+          "kind": "refuge",
+          "route": "opening",
+          "id": "opening-refuge",
+          "x": 138,
+          "y": 3874,
+          "w": 150,
+          "structure": "arch",
+          "support": {
+            "type": "cantilever",
+            "side": -1
+          },
+          "landmark": "opening-refuge",
+          "suspension": null
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 294.6738333333333,
+          "y": 3976,
+          "vx": 12.666666666666657,
+          "vy": 0,
+          "intensity": 0.8341069772049753,
+          "platformId": "resonant-stone",
+          "suspended": true,
+          "landmark": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "contactX": 294.6738333333333,
+          "contactY": 3976,
+          "contactOffset": -0.36280370370370496,
+          "at": 5.216666666666716,
+          "elapsed": 4.883333333333366
+        }
+      ],
+      "cursor": 10
+    },
+    {
+      "stage": 4,
+      "t": 5.041666666666707,
+      "p": {
+        "x": 287.7895904762867,
+        "y": 3956.5665990064977,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.058333333333374,
+      "p": {
+        "x": 287.7726881683793,
+        "y": 3956.526480212546,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.058333333333374,
+      "p": {
+        "x": 287.7726881683793,
+        "y": 3956.526480212546,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.075000000000042,
+      "p": {
+        "x": 287.75552039374725,
+        "y": 3956.3294982021503,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.075000000000042,
+      "p": {
+        "x": 287.75552039374725,
+        "y": 3956.3294982021503,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.091666666666709,
+      "p": {
+        "x": 287.73840039769954,
+        "y": 3955.9992703898197,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.091666666666709,
+      "p": {
+        "x": 287.73840039769954,
+        "y": 3955.9992703898197,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.108333333333377,
+      "p": {
+        "x": 287.72161107485925,
+        "y": 3955.561921489197,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.125000000000044,
+      "p": {
+        "x": 287.70540308307227,
+        "y": 3955.044850856897,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.125000000000044,
+      "p": {
+        "x": 287.70540308307227,
+        "y": 3955.044850856897,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.141666666666712,
+      "p": {
+        "x": 287.68999367640686,
+        "y": 3954.4755803721646,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.158333333333379,
+      "p": {
+        "x": 287.675566209002,
+        "y": 3953.880717372028,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.158333333333379,
+      "p": {
+        "x": 287.675566209002,
+        "y": 3953.880717372028,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.175000000000047,
+      "p": {
+        "x": 287.6622702548125,
+        "y": 3953.2850592954196,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.191666666666714,
+      "p": {
+        "x": 287.65022228314257,
+        "y": 3952.7108586482227,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.208333333333382,
+      "p": {
+        "x": 287.6395068261998,
+        "y": 3952.177259001834,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.208333333333382,
+      "p": {
+        "x": 287.6395068261998,
+        "y": 3952.177259001834,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.225000000000049,
+      "p": {
+        "x": 287.63017807265646,
+        "y": 3951.69990525988,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": 0,
+      "h": false
+    },
+    {
+      "stage": 4,
+      "t": 5.241666666666717,
+      "p": {
+        "x": 287.6222618202807,
+        "y": 3951.290724605776,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.308333333333387,
+      "p": {
+        "x": 285.5819101748837,
+        "y": 3950.4448639932916,
+        "w": 24,
+        "h": 28,
+        "vx": -93.16666666666667,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "run"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.325000000000054,
+      "p": {
+        "x": 283.52109252344616,
+        "y": 3937.191058262787,
+        "w": 24,
+        "h": 28,
+        "vx": -132.33333333333334,
+        "vy": -785.4481700635546,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.325000000000054,
+      "p": {
+        "x": 283.52109252344616,
+        "y": 3937.191058262787,
+        "w": 24,
+        "h": 28,
+        "vx": -132.33333333333334,
+        "vy": -785.4481700635546,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.341666666666722,
+      "p": {
+        "x": 280.8780369678906,
+        "y": 3924.53856355901,
+        "w": 24,
+        "h": 28,
+        "vx": -167.33333333333334,
+        "vy": -750.3835196142887,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.358333333333389,
+      "p": {
+        "x": 277.6516480790017,
+        "y": 3912.4704796960546,
+        "w": 24,
+        "h": 28,
+        "vx": -202.33333333333334,
+        "vy": -715.3188691650229,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.358333333333389,
+      "p": {
+        "x": 277.6516480790017,
+        "y": 3912.4704796960546,
+        "w": 24,
+        "h": 28,
+        "vx": -202.33333333333334,
+        "vy": -715.3188691650229,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.375000000000057,
+      "p": {
+        "x": 273.8419258567795,
+        "y": 3900.98680667392,
+        "w": 24,
+        "h": 28,
+        "vx": -237.33333333333334,
+        "vy": -680.254218715757,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.391666666666724,
+      "p": {
+        "x": 269.5683147456684,
+        "y": 3890.0875444926064,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -645.1895682664912,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.408333333333392,
+      "p": {
+        "x": 265.2683147456684,
+        "y": 3879.772693152114,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -610.1249178172253,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.408333333333392,
+      "p": {
+        "x": 265.2683147456684,
+        "y": 3879.772693152114,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -610.1249178172253,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.425000000000059,
+      "p": {
+        "x": 260.96831474566847,
+        "y": 3870.0422526524426,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -575.0602673679595,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.441666666666727,
+      "p": {
+        "x": 256.6683147456685,
+        "y": 3860.8962229935923,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -539.9956169186936,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.441666666666727,
+      "p": {
+        "x": 256.6683147456685,
+        "y": 3860.8962229935923,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -539.9956169186936,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.458333333333394,
+      "p": {
+        "x": 252.3683147456685,
+        "y": 3852.3346041755635,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -504.93096646942774,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.458333333333394,
+      "p": {
+        "x": 252.3683147456685,
+        "y": 3852.3346041755635,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -504.93096646942774,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.475000000000062,
+      "p": {
+        "x": 248.0683147456685,
+        "y": 3844.3573961983557,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -469.8663160201619,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.491666666666729,
+      "p": {
+        "x": 243.76831474566848,
+        "y": 3836.964599061969,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -434.80166557089603,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.491666666666729,
+      "p": {
+        "x": 243.76831474566848,
+        "y": 3836.964599061969,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -434.80166557089603,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.508333333333397,
+      "p": {
+        "x": 239.46831474566847,
+        "y": 3830.156212766403,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -399.7370151216302,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.508333333333397,
+      "p": {
+        "x": 239.46831474566847,
+        "y": 3830.156212766403,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -399.7370151216302,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.525000000000064,
+      "p": {
+        "x": 235.16831474566845,
+        "y": 3823.9322373116584,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -364.6723646723643,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.541666666666732,
+      "p": {
+        "x": 230.86831474566844,
+        "y": 3818.292672697735,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -329.60771422309847,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.541666666666732,
+      "p": {
+        "x": 230.86831474566844,
+        "y": 3818.292672697735,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -329.60771422309847,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.558333333333399,
+      "p": {
+        "x": 226.56831474566843,
+        "y": 3813.2375189246322,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -294.5430637738326,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.575000000000067,
+      "p": {
+        "x": 222.26831474566842,
+        "y": 3808.766775992351,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.575000000000067,
+      "p": {
+        "x": 222.26831474566842,
+        "y": 3808.766775992351,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.591666666666734,
+      "p": {
+        "x": 217.9683147456684,
+        "y": 3804.880443900891,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -224.4137628753009,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.625000000000069,
+      "p": {
+        "x": 209.36831474566839,
+        "y": 3798.8610122404334,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -154.2844619767692,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.641666666666737,
+      "p": {
+        "x": 205.46414807900172,
+        "y": 3796.7279126714366,
+        "w": 24,
+        "h": 28,
+        "vx": -226.33333333333331,
+        "vy": -119.21981152750335,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.641666666666737,
+      "p": {
+        "x": 205.46414807900172,
+        "y": 3796.7279126714366,
+        "w": 24,
+        "h": 28,
+        "vx": -226.33333333333331,
+        "vy": -119.21981152750335,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.658333333333404,
+      "p": {
+        "x": 202.08775919011282,
+        "y": 3795.1792239432607,
+        "w": 24,
+        "h": 28,
+        "vx": -194.66666666666663,
+        "vy": -84.15516107823753,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.675000000000072,
+      "p": {
+        "x": 199.23914807900172,
+        "y": 3794.214946055906,
+        "w": 24,
+        "h": 28,
+        "vx": -162.99999999999994,
+        "vy": -49.0905106289717,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.675000000000072,
+      "p": {
+        "x": 199.23914807900172,
+        "y": 3794.214946055906,
+        "w": 24,
+        "h": 28,
+        "vx": -162.99999999999994,
+        "vy": -49.0905106289717,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.691666666666739,
+      "p": {
+        "x": 196.9183147456684,
+        "y": 3793.624691106677,
+        "w": 24,
+        "h": 28,
+        "vx": -131.33333333333326,
+        "vy": -30.85689239535347,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.691666666666739,
+      "p": {
+        "x": 196.9183147456684,
+        "y": 3793.624691106677,
+        "w": 24,
+        "h": 28,
+        "vx": -131.33333333333326,
+        "vy": -30.85689239535347,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.708333333333407,
+      "p": {
+        "x": 195.12525919011284,
+        "y": 3793.338329794675,
+        "w": 24,
+        "h": 28,
+        "vx": -99.6666666666666,
+        "vy": -12.623274161735237,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.741666666666742,
+      "p": {
+        "x": 193.12248141233505,
+        "y": 3793.677288082351,
+        "w": 24,
+        "h": 28,
+        "vx": -36.33333333333327,
+        "vy": 23.84396230550123,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.758333333333409,
+      "p": {
+        "x": 193.0856758567795,
+        "y": 3794.3026076820292,
+        "w": 24,
+        "h": 28,
+        "vx": 9.166666666666728,
+        "vy": 42.07758053911946,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.758333333333409,
+      "p": {
+        "x": 193.0856758567795,
+        "y": 3794.3026076820292,
+        "w": 24,
+        "h": 28,
+        "vx": 9.166666666666728,
+        "vy": 42.07758053911946,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.775000000000077,
+      "p": {
+        "x": 193.67595363455726,
+        "y": 3795.231820918935,
+        "w": 24,
+        "h": 28,
+        "vx": 44.16666666666673,
+        "vy": 60.31119877273769,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.791666666666744,
+      "p": {
+        "x": 194.84956474566837,
+        "y": 3796.615413584579,
+        "w": 24,
+        "h": 28,
+        "vx": 79.16666666666673,
+        "vy": 96.60311198772783,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.791666666666744,
+      "p": {
+        "x": 194.84956474566837,
+        "y": 3796.615413584579,
+        "w": 24,
+        "h": 28,
+        "vx": 79.16666666666673,
+        "vy": 96.60311198772783,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.808333333333412,
+      "p": {
+        "x": 196.6065091901128,
+        "y": 3798.9048430534954,
+        "w": 24,
+        "h": 28,
+        "vx": 114.16666666666673,
+        "vy": 150.95332018408988,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.825000000000079,
+      "p": {
+        "x": 198.94678696789057,
+        "y": 3802.1001093256846,
+        "w": 24,
+        "h": 28,
+        "vx": 149.16666666666674,
+        "vy": 205.3035283804519,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.858333333333414,
+      "p": {
+        "x": 205.37734252344612,
+        "y": 3811.2081522798817,
+        "w": 24,
+        "h": 28,
+        "vx": 219.16666666666674,
+        "vy": 314.00394477317593,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.875000000000082,
+      "p": {
+        "x": 208.63428696789057,
+        "y": 3817.120928961889,
+        "w": 24,
+        "h": 28,
+        "vx": 187.50000000000006,
+        "vy": 368.35415296953795,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.875000000000082,
+      "p": {
+        "x": 208.63428696789057,
+        "y": 3817.120928961889,
+        "w": 24,
+        "h": 28,
+        "vx": 187.50000000000006,
+        "vy": 368.35415296953795,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": 0,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.891666666666749,
+      "p": {
+        "x": 211.36345363455723,
+        "y": 3823.939542447169,
+        "w": 24,
+        "h": 28,
+        "vx": 155.83333333333337,
+        "vy": 422.70436116589997,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "stage": 4,
+      "t": 5.925000000000084,
+      "p": {
+        "x": 215.23845363455723,
+        "y": 3840.2942798275476,
+        "w": 24,
+        "h": 28,
+        "vx": 92.50000000000004,
+        "vy": 531.404777558624,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "a": -1,
+      "h": true
+    },
+    {
+      "kind": "target-land",
+      "id": "opening-refuge",
+      "p": {
+        "x": 216.21137030122392,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 47.00000000000004,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "run"
+      },
+      "time": 5.941666666666752,
+      "deaths": 0,
+      "platforms": [
+        {
+          "h": 54,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "first-hop",
+          "x": 150,
+          "y": 4426,
+          "w": 92,
+          "solid": true,
+          "structure": "pier",
+          "support": {
+            "type": "plinth",
+            "bottom": 4480
+          },
+          "landmark": "first-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "second-hop",
+          "x": 258,
+          "y": 4368,
+          "w": 102,
+          "structure": "right-corbel",
+          "landmark": "second-hop",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "wall-transfer",
+          "x": 88,
+          "y": 4204,
+          "w": 96,
+          "structure": "left-corbel",
+          "landmark": "wall-transfer",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "recovery",
+          "id": "crossing-recovery",
+          "x": 250,
+          "y": 4144,
+          "w": 110,
+          "structure": "right-corbel",
+          "landmark": "crossing-recovery",
+          "suspension": null
+        },
+        {
+          "h": 20,
+          "kind": "ledge",
+          "route": "opening",
+          "id": "resonant-stone",
+          "x": 265.9666987809224,
+          "y": 3976.038459577581,
+          "w": 90,
+          "structure": "suspended",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "landmark": "resonant-stone",
+          "suspension": {
+            "homeX": 266,
+            "homeY": 3976,
+            "x": -0.033301219077596894,
+            "y": 0.03845957758089156,
+            "vx": -0.2349116034720198,
+            "vy": -4.493994926583114
+          }
+        },
+        {
+          "h": 20,
+          "kind": "refuge",
+          "route": "opening",
+          "id": "opening-refuge",
+          "x": 138,
+          "y": 3874,
+          "w": 150,
+          "structure": "arch",
+          "support": {
+            "type": "cantilever",
+            "side": -1
+          },
+          "landmark": "opening-refuge",
+          "suspension": null
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 228.21137030122392,
+          "y": 3874,
+          "vx": 47.00000000000004,
+          "vy": 0,
+          "intensity": 0.8024040900753233,
+          "platformId": "opening-refuge",
+          "suspended": false,
+          "landmark": "opening-refuge",
+          "contactX": 228.21137030122392,
+          "contactY": 3874,
+          "contactOffset": 0.20281827068298564,
+          "at": 6.275000000000102,
+          "elapsed": 5.941666666666752
+        }
+      ],
+      "cursor": 12
+    }
+  ],
+  "events": [
+    {
+      "type": "jump",
+      "x": 110.02222222222221,
+      "y": 4480,
+      "vx": 114.83333333333334,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "at": 0.8916666666666659,
+      "elapsed": 0.5583333333333338
+    },
+    {
+      "type": "land",
+      "x": 199.30555555555574,
+      "y": 4426,
+      "vx": 178.8333333333333,
+      "vy": 0,
+      "intensity": 0.599884718957427,
+      "platformId": "first-hop",
+      "suspended": false,
+      "landmark": "first-hop",
+      "contactX": 199.30555555555574,
+      "contactY": 4426,
+      "contactOffset": 0.07185990338164656,
+      "at": 1.2583333333333313,
+      "elapsed": 0.9249999999999992
+    },
+    {
+      "type": "jump",
+      "x": 205.92638888888908,
+      "y": 4426,
+      "vx": 114.83333333333334,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "first-hop",
+      "at": 1.6999999999999964,
+      "elapsed": 1.3666666666666643
+    },
+    {
+      "type": "land",
+      "x": 301.4888888888889,
+      "y": 4368,
+      "vx": 258,
+      "vy": 0,
+      "intensity": 0.6371108889549353,
+      "platformId": "second-hop",
+      "suspended": false,
+      "landmark": "second-hop",
+      "contactX": 301.4888888888889,
+      "contactY": 4368,
+      "contactOffset": -0.14727668845315922,
+      "at": 2.0833333333333286,
+      "elapsed": 1.7499999999999962
+    },
+    {
+      "type": "jump",
+      "x": 318.80972222222215,
+      "y": 4368,
+      "vx": 136.5,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "second-hop",
+      "at": 2.5416666666666603,
+      "elapsed": 2.208333333333328
+    },
+    {
+      "type": "wallJump",
+      "x": 348,
+      "y": 4216.533881218494,
+      "vx": -296,
+      "vy": -810,
+      "intensity": 1,
+      "at": 3.0416666666666585,
+      "elapsed": 2.7083333333333264
+    },
+    {
+      "type": "land",
+      "x": 153.80925000000013,
+      "y": 4204,
+      "vx": -258,
+      "vy": 0,
+      "intensity": 1.2328767123287672,
+      "platformId": "wall-transfer",
+      "suspended": false,
+      "landmark": "wall-transfer",
+      "contactX": 153.80925000000013,
+      "contactY": 4204,
+      "contactOffset": 0.37102604166666947,
+      "at": 3.7749999999999893,
+      "elapsed": 3.441666666666657
+    },
+    {
+      "type": "jump",
+      "x": 137.18980555555567,
+      "y": 4204,
+      "vx": 114.83333333333334,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "wall-transfer",
+      "at": 4.216666666666666,
+      "elapsed": 3.883333333333322
+    },
+    {
+      "type": "doubleJump",
+      "x": 234.9023055555559,
+      "y": 4047.692015486887,
+      "vx": 258,
+      "vy": -746,
+      "intensity": 0.9,
+      "at": 4.616666666666686,
+      "elapsed": 4.283333333333336
+    },
+    {
+      "type": "land",
+      "x": 294.6738333333333,
+      "y": 3976,
+      "vx": 12.666666666666657,
+      "vy": 0,
+      "intensity": 0.8341069772049753,
+      "platformId": "resonant-stone",
+      "suspended": true,
+      "landmark": "resonant-stone",
+      "resonance": {
+        "x": 311,
+        "y": 4002,
+        "size": 42
+      },
+      "contactX": 294.6738333333333,
+      "contactY": 3976,
+      "contactOffset": -0.36280370370370496,
+      "at": 5.216666666666716,
+      "elapsed": 4.883333333333366
+    },
+    {
+      "type": "jump",
+      "x": 297.58081474566836,
+      "y": 3978.427963807385,
+      "vx": -114.83333333333334,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "resonant-stone",
+      "at": 5.6500000000000705,
+      "elapsed": 5.316666666666721
+    },
+    {
+      "type": "land",
+      "x": 228.21137030122392,
+      "y": 3874,
+      "vx": 47.00000000000004,
+      "vy": 0,
+      "intensity": 0.8024040900753233,
+      "platformId": "opening-refuge",
+      "suspended": false,
+      "landmark": "opening-refuge",
+      "contactX": 228.21137030122392,
+      "contactY": 3874,
+      "contactOffset": 0.20281827068298564,
+      "at": 6.275000000000102,
+      "elapsed": 5.941666666666752
+    }
+  ],
+  "cueAtRest": "",
+  "stage": 5,
+  "final": {
+    "state": "playing",
+    "player": {
+      "x": 215.34053696789059,
+      "y": 3846,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": -1,
+      "motion": "idle"
+    },
+    "cameraY": 3326.769586046464,
+    "elapsed": 7.191666666666814,
+    "deaths": 0,
+    "maxAltitude": 658.6908907473662,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "scenery": {
+    "cages": [
+      {
+        "x": 295.74,
+        "y": 4390,
+        "length": 62,
+        "angle": 0.001878842680484694,
+        "velocity": 0.012595820142770449
+      },
+      {
+        "x": 114.18,
+        "y": 3801.5,
+        "length": 64,
+        "angle": -0.03755028956016949,
+        "velocity": 0.09244899049683278
+      }
+    ],
+    "rigging": [
+      {
+        "platformId": "resonant-stone",
+        "age": 2.3165999999999998,
+        "strength": 0.8341069772049753,
+        "contactOffset": -0.36280370370370496,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-7",
+        "age": 12.749899999999998,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      }
+    ],
+    "activeParticles": 0,
+    "surfaceAsh": {
+      "pending": 0,
+      "capacity": 16,
+      "grainCapacity": 224,
+      "shardCapacity": 608,
+      "contacts": [
+        {
+          "platformId": "opening-refuge",
+          "wall": false,
+          "age": 1.2666000000000006,
+          "duration": 1.3218030675564925,
+          "x": 228.2113703012239,
+          "y": 3874,
+          "left": 138,
+          "right": 288,
+          "strength": 0.8024040900753233,
+          "braking": 0.38630490956072355,
+          "direction": 1,
+          "rebound": false,
+          "departure": false,
+          "shardCount": 32,
+          "shards": [
+            {
+              "x": 262.09501509621407,
+              "y": 4144.0752710480665,
+              "size": 3.8729177219930664
+            },
+            {
+              "x": 193.6966716310446,
+              "y": 4128.016711430344,
+              "size": 2.5656551689804985
+            },
+            {
+              "x": 299.7996861531428,
+              "y": 4140.710195540694,
+              "size": 5.446229086415617
+            },
+            {
+              "x": 194.60634137481773,
+              "y": 4118.654937189752,
+              "size": 1.9815824165675602
+            },
+            {
+              "x": 247.486988543137,
+              "y": 4122.345918088312,
+              "size": 1.4124122317209509
+            },
+            {
+              "x": 178.93521385889866,
+              "y": 4121.481521493289,
+              "size": 1.5571731826717705
+            },
+            {
+              "x": 285.7822104284283,
+              "y": 4153.7488741555735,
+              "size": 1.3881941960009374
+            },
+            {
+              "x": 186.56763116005231,
+              "y": 4096.962596190311,
+              "size": 1.2698685029425825
+            },
+            {
+              "x": 270.78352327619734,
+              "y": 4101.261355535271,
+              "size": 1.3688846860419388
+            },
+            {
+              "x": 141.454077409381,
+              "y": 4074.8978372762253,
+              "size": 1.630367973449555
+            },
+            {
+              "x": 307.42029672296036,
+              "y": 4102.874468341353,
+              "size": 1.656716151193006
+            },
+            {
+              "x": 160.29884735386457,
+              "y": 4097.556076965004,
+              "size": 1.423993638149207
+            },
+            {
+              "x": 321.89141034146286,
+              "y": 4151.320430016473,
+              "size": 1.689308011948398
+            },
+            {
+              "x": 206.2265315167327,
+              "y": 4077.3508101333837,
+              "size": 0.7335390100267117
+            },
+            {
+              "x": 318.75063734759834,
+              "y": 4079.9740275365743,
+              "size": 0.3732783197202245
+            },
+            {
+              "x": 148.1317062760736,
+              "y": 4148.076978705077,
+              "size": 0.4905834489178078
+            },
+            {
+              "x": 295.91908244770815,
+              "y": 4108.437477741028,
+              "size": 0.4675538922425789
+            },
+            {
+              "x": 187.91706320413434,
+              "y": 4094.6001335116466,
+              "size": 0.3524630709139175
+            },
+            {
+              "x": 246.70494613759618,
+              "y": 4097.193157825804,
+              "size": 0.679272036692419
+            },
+            {
+              "x": 143.494754275018,
+              "y": 4120.841091124713,
+              "size": 0.5932154841330072
+            },
+            {
+              "x": 249.1981847736155,
+              "y": 4088.102628003191,
+              "size": 0.3951894832065201
+            },
+            {
+              "x": 200.2185719463761,
+              "y": 4136.8324256939995,
+              "size": 0.6935447108070447
+            },
+            {
+              "x": 258.62681142170163,
+              "y": 4097.620874968444,
+              "size": 0.652497193228455
+            },
+            {
+              "x": 135.06142932248156,
+              "y": 4103.39779387666,
+              "size": 0.424128624235826
+            },
+            {
+              "x": 270.97004012761556,
+              "y": 4116.860890887497,
+              "size": 0.32639199626521564
+            },
+            {
+              "x": 166.24907216002265,
+              "y": 4147.700798134969,
+              "size": 0.3654920310808403
+            },
+            {
+              "x": 274.8841591908671,
+              "y": 4086.1040882719108,
+              "size": 0.4384772248499358
+            },
+            {
+              "x": 137.44170479789304,
+              "y": 4135.8691483,
+              "size": 0.6370496847705165
+            },
+            {
+              "x": 282.321740948359,
+              "y": 4137.454729474394,
+              "size": 0.36334155139836266
+            },
+            {
+              "x": 204.98129160054305,
+              "y": 4119.260790298433,
+              "size": 0.45755690774402363
+            },
+            {
+              "x": 299.1486888698642,
+              "y": 4079.5389740088613,
+              "size": 0.6371520556224584
+            },
+            {
+              "x": 190.76956066819977,
+              "y": 4081.069192202746,
+              "size": 0.37794792592628434
+            }
+          ],
+          "grains": [
+            {
+              "x": 271.561279643766,
+              "y": 3869.157422579026,
+              "released": true
+            },
+            {
+              "x": 192.13464900316032,
+              "y": 3869.887425938253,
+              "released": true
+            },
+            {
+              "x": 256.45151285070517,
+              "y": 3871.265643289381,
+              "released": true
+            },
+            {
+              "x": 228.58761582051085,
+              "y": 3870.9663851241894,
+              "released": true
+            },
+            {
+              "x": 260.8106552187302,
+              "y": 3868.90138413947,
+              "released": true
+            },
+            {
+              "x": 210.28038570472123,
+              "y": 3870.9852043840115,
+              "released": true
+            },
+            {
+              "x": 249.06845531386065,
+              "y": 3871.407956815919,
+              "released": true
+            },
+            {
+              "x": 223.96215137735695,
+              "y": 3869.2449395624462,
+              "released": true
+            },
+            {
+              "x": 273.3327469022295,
+              "y": 3869.7791021073135,
+              "released": true
+            },
+            {
+              "x": 200.57814908633603,
+              "y": 3870.6460155927048,
+              "released": true
+            },
+            {
+              "x": 254.6132135775349,
+              "y": 3870.507362003031,
+              "released": true
+            }
+          ]
+        }
+      ]
+    },
+    "shadowCasters": [
+      {
+        "id": "resonant-stone",
+        "bounds": [
+          311.0006103515625,
+          3988.993896484375,
+          41.400001525878906,
+          16
+        ]
+      },
+      {
+        "id": "ledge-7",
+        "bounds": [
+          200,
+          3505,
+          50.599998474121094,
+          16
+        ]
+      },
+      {
+        "id": "ledge-10",
+        "bounds": [
+          202,
+          3069,
+          48.7599983215332,
+          16
+        ]
+      },
+      {
+        "id": "bell-2",
+        "bounds": [
+          310.25689697265625,
+          4023.3369140625,
+          20.9110164642334,
+          20.466102600097656
+        ]
+      }
+    ],
+    "bells": [
+      {
+        "x": 210,
+        "y": 2458,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 210,
+        "y": 248,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 311,
+        "y": 4002,
+        "size": 42,
+        "angle": 0.034831965498042385,
+        "velocity": 0.33126942512798596,
+        "clapper": -0.009457799158994692,
+        "clapperVelocity": 0.03525334314239172,
+        "platform": "resonant-stone",
+        "age": 2.3165999999999967,
+        "strength": 0.8341069772049753,
+        "direction": 1
+      }
+    ],
+    "spiders": [
+      {
+        "x": -18,
+        "y": 3880,
+        "scale": 1,
+        "lookX": 0.7999077376044295,
+        "lookY": -0.5621173984292283,
+        "alert": 0.3188474873047467
+      },
+      {
+        "x": 422,
+        "y": 2015,
+        "scale": -0.83,
+        "lookX": 0.6932922667951487,
+        "lookY": 0.899999999969445,
+        "alert": 0
+      }
+    ]
+  }
+}

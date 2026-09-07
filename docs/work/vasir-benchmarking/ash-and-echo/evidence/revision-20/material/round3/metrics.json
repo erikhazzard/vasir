@@ -1,0 +1,112 @@
+{
+  "backend": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+  "cpuSubmissionAnd2DCopy": {
+    "baseline": {
+      "n": 140,
+      "median": 0.10000000149011612,
+      "p95": 0.20000000298023224,
+      "max": 0.20000000298023224
+    },
+    "live": {
+      "n": 140,
+      "median": 0.10000000149011612,
+      "p95": 0.20000000298023224,
+      "max": 0.20000000298023224
+    }
+  },
+  "rAF": {
+    "baseline": {
+      "n": 140,
+      "median": 16.600000001490116,
+      "p95": 17.5,
+      "max": 17.700000002980232
+    },
+    "live": {
+      "n": 140,
+      "median": 16.69999999552965,
+      "p95": 17.399999998509884,
+      "max": 17.700000002980232
+    }
+  },
+  "pausedDiff": 0,
+  "changedOver150ms": 4761,
+  "alphaChangedOver150ms": 1012,
+  "resources": {
+    "status": "ready",
+    "reason": "",
+    "width": 256,
+    "height": 256,
+    "contexts": 1,
+    "programs": 1,
+    "buffers": 1,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 171,
+    "precision": "highp",
+    "restores": 0
+  },
+  "reset": {
+    "status": "ready",
+    "reason": "",
+    "width": 256,
+    "height": 256,
+    "contexts": 1,
+    "programs": 1,
+    "buffers": 1,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 0,
+    "precision": "highp",
+    "restores": 0
+  },
+  "reduced": {
+    "timeChangedPixels": 0,
+    "poseChangedPixels": 30383
+  },
+  "lifecycle": {
+    "lost": {
+      "status": "context-lost",
+      "reason": "WebGL context lost",
+      "width": 256,
+      "height": 256,
+      "contexts": 1,
+      "programs": 0,
+      "buffers": 0,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 11,
+      "precision": "highp",
+      "restores": 0
+    },
+    "fallback": true,
+    "disposed": {
+      "status": "disposed",
+      "reason": "WebGL context lost",
+      "width": 256,
+      "height": 256,
+      "contexts": 0,
+      "programs": 0,
+      "buffers": 0,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 11,
+      "precision": "highp",
+      "restores": 0
+    }
+  },
+  "unavailable": {
+    "status": "unavailable",
+    "nullResult": true,
+    "reason": "WebGL unavailable",
+    "width": 256,
+    "height": 256,
+    "contexts": 0,
+    "programs": 0,
+    "buffers": 0,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 0,
+    "precision": "",
+    "restores": 0
+  }
+}

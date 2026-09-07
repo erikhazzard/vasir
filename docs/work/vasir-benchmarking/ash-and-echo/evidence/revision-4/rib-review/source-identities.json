@@ -1,0 +1,9 @@
+{
+  "capturedAt": "2026-09-05T17:07:47.315Z",
+  "hashes": {
+    "game.js": "a16e9e8fc6aca268836c8aeb66fb792c90d9b2e0cac741aec22966a27989cc1f",
+    "renderer.js": "029e3d771c567a4aa20e0013d63bbbea2ff8cfb7256d450c4600d65ca27b27ea",
+    "main.js": "11c0366931c926e2ef125e418896bb727dde83fd6f05bc5ac630d8c8009847b7",
+    "depth.js": "1d219765aa86890926a79538ae8d97e9e36005c09ad09336dc9ca97c064eb5c7"
+  }
+}

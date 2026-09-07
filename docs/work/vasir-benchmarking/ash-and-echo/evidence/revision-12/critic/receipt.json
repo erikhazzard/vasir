@@ -1,0 +1,1013 @@
+{
+  "method": "Live unmodified served source, normal RAF and browser keyboard. Opening begins from actual start; subsequent scenes arrange initial player/camera only then use real browser input. Screenshots have variable capture overhead; video supplies continuous timing. No route or human-grade claim.",
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "renderer.js": "8b486d7216e61b9234f311fbe3039ab48c1e90a7f980972c6d9d3be4a37d9201",
+    "game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "character.js": "b59d089f02f926d5ba92fcf373e4f01a6bfeef54d67105dcf12bcd89709b1846",
+    "depth.js": "4fca92db19db1ca893d52ec5711fee682e67fc3b71bf44b15b4860d69a74a4f1",
+    "atmosphere.js": "c46a9681447c1f72b168b39f7839da11220fac4b3eb40fd23a7721f7f437c510",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "surface-ash.js": "3d9a90ab4b1b70a4e03b112a94eb6be6ff7c1bcbbed6208ee371c2db9cb36391",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "ash-flow.js": "bc033879258846cf5f53058c097a9779641350aaca99a1321c9c326820e1b9ae",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "fog-volume.js": "7a44948f3b9aad2655ea70183e115e930ce74c9d1b2cdb0df2d42cd0780bad46"
+  },
+  "errors": [],
+  "samples": [
+    {
+      "form": "mobile",
+      "name": "opening-before",
+      "state": "playing",
+      "player": {
+        "x": 96,
+        "y": 4452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.4666666666666673,
+      "deaths": 0,
+      "maxAltitude": 0,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "opening-rise",
+      "state": "playing",
+      "player": {
+        "x": 134.0569444444445,
+        "y": 4331.728248959017,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -399.7370151216302,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.6666666666666667,
+      "deaths": 0,
+      "maxAltitude": 120.27175104098296,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "opening-after",
+      "state": "playing",
+      "player": {
+        "x": 150.51250000000005,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.2833333333333312,
+      "deaths": 0,
+      "maxAltitude": 144.78818759588103,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "diagonal-before",
+      "state": "playing",
+      "player": {
+        "x": 178,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 0.3583333333333336,
+      "deaths": 0,
+      "maxAltitude": 606,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "diagonal-rise",
+      "state": "playing",
+      "player": {
+        "x": 250.45694444444464,
+        "y": 3715.6913580246915,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 30.28928336620654,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3246.4087165068913,
+      "elapsed": 0.6916666666666667,
+      "deaths": 0,
+      "maxAltitude": 736.5870041639273,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "diagonal-comet",
+      "state": "playing",
+      "player": {
+        "x": 293.4569444444443,
+        "y": 3622.0395938344664,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -395.35349550734145,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3193.8657760841784,
+      "elapsed": 0.8583333333333327,
+      "deaths": 0,
+      "maxAltitude": 829.9604061655336,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "diagonal-knit",
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 3586.758784425452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -53.12250712250677,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3138.2735561749532,
+      "elapsed": 1.0249999999999988,
+      "deaths": 0,
+      "maxAltitude": 865.2412155745478,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "diagonal-spent",
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 3608,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3124.094631079792,
+      "elapsed": 1.3416666666666643,
+      "deaths": 0,
+      "maxAltitude": 865.6926619913788,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "wall--1-before",
+      "state": "playing",
+      "player": {
+        "x": 60,
+        "y": 4326.999999999989,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": -1,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.24999999999999997,
+      "deaths": 0,
+      "maxAltitude": 151.10000000000036,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "wall--1-comet",
+      "state": "playing",
+      "player": {
+        "x": 103.51899999999996,
+        "y": 4218.999726057407,
+        "w": 24,
+        "h": 28,
+        "vx": 121.27999999999975,
+        "vy": -441.8211702827085,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.4250000000000005,
+      "deaths": 0,
+      "maxAltitude": 233.00027394259268,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "wall--1-after",
+      "state": "playing",
+      "player": {
+        "x": 106.89922222222216,
+        "y": 4225.722916210085,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 437.9158448389217,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.7166666666666666,
+      "deaths": 0,
+      "maxAltitude": 257.51671049749075,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "wall-1-before",
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 4326.099999999989,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.24166666666666664,
+      "deaths": 0,
+      "maxAltitude": 151.10000000000036,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "wall-1-comet",
+      "state": "playing",
+      "player": {
+        "x": 291.65991666666673,
+        "y": 4214.563985681923,
+        "w": 24,
+        "h": 28,
+        "vx": -98.52999999999975,
+        "vy": -424.2888450580756,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.4250000000000005,
+      "deaths": 0,
+      "maxAltitude": 237.43601431807656,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "wall-1-after",
+      "state": "playing",
+      "player": {
+        "x": 289.50425000000007,
+        "y": 4211.018657316082,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 356.3905325443787,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.6916666666666667,
+      "deaths": 0,
+      "maxAltitude": 261.9524508729746,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "landing-before",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 0.3583333333333336,
+      "deaths": 0,
+      "maxAltitude": 606,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "landing-air-comet",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3612.6463803053553,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -290.1595441595439,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3181.7289349256826,
+      "elapsed": 0.7916666666666663,
+      "deaths": 0,
+      "maxAltitude": 839.3536196946447,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "landing-contact",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3145.0627048790598,
+      "elapsed": 1.4749999999999972,
+      "deaths": 0,
+      "maxAltitude": 858.1715903279996,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "landing-rebound",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3149.661078767273,
+      "elapsed": 1.6583333333333299,
+      "deaths": 0,
+      "maxAltitude": 858.1715903279996,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "landing-rest",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3150.9441877937857,
+      "elapsed": 1.991666666666662,
+      "deaths": 0,
+      "maxAltitude": 858.1715903279996,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "belfry-before",
+      "state": "playing",
+      "player": {
+        "x": 191,
+        "y": 543.4040815895333,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 0,
+      "elapsed": 0.35000000000000026,
+      "deaths": 0,
+      "maxAltitude": 3914,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "belfry-action",
+      "state": "playing",
+      "player": {
+        "x": 148.64305555555543,
+        "y": 416.80371933141987,
+        "w": 24,
+        "h": 28,
+        "vx": -258,
+        "vy": -364.6723646723643,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "rise"
+      },
+      "cameraY": 0,
+      "elapsed": 0.5666666666666671,
+      "deaths": 0,
+      "maxAltitude": 4035.19628066858,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "belfry-after",
+      "state": "playing",
+      "player": {
+        "x": 132.1874999999999,
+        "y": 478.61550251499784,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 736.8419899189129,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "fall"
+      },
+      "cameraY": 0,
+      "elapsed": 0.9499999999999991,
+      "deaths": 0,
+      "maxAltitude": 4059.712717223478,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "gentle-before",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3255.9323076923074,
+      "elapsed": 0.4250000000000005,
+      "deaths": 0,
+      "maxAltitude": 606,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "gentle-comet",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3634.672116297758,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -360.2888450580756,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3203.854229787888,
+      "elapsed": 0.8083333333333329,
+      "deaths": 0,
+      "maxAltitude": 817.3278837022422,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "mobile",
+      "name": "gentle-after",
+      "state": "playing",
+      "player": {
+        "x": 198,
+        "y": 3768.0816421944637,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 900,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3148.2577697910706,
+      "elapsed": 1.274999999999998,
+      "deaths": 0,
+      "maxAltitude": 841.8443202571402,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "opening-before",
+      "state": "playing",
+      "player": {
+        "x": 96,
+        "y": 4452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3822.2020043096077,
+      "elapsed": 0.5000000000000007,
+      "deaths": 0,
+      "maxAltitude": 0,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "opening-rise",
+      "state": "playing",
+      "player": {
+        "x": 146.95694444444453,
+        "y": 4314.809555117246,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -294.5430637738326,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3822.2020043096077,
+      "elapsed": 0.7499999999999998,
+      "deaths": 0,
+      "maxAltitude": 137.19044488275358,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "opening-after",
+      "state": "playing",
+      "player": {
+        "x": 163.41250000000008,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3822.2020043096077,
+      "elapsed": 1.3999999999999975,
+      "deaths": 0,
+      "maxAltitude": 156.5928847980149,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "diagonal-before",
+      "state": "playing",
+      "player": {
+        "x": 178,
+        "y": 3846,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3345.097362930533,
+      "elapsed": 0.4000000000000004,
+      "deaths": 0,
+      "maxAltitude": 606,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "diagonal-rise",
+      "state": "playing",
+      "player": {
+        "x": 259.05694444444464,
+        "y": 3718.965592811747,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 138.9896997589306,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 3319.4142633757997,
+      "elapsed": 0.7666666666666664,
+      "deaths": 0,
+      "maxAltitude": 736.5870041639273,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "diagonal-comet",
+      "state": "playing",
+      "player": {
+        "x": 314.95694444444405,
+        "y": 3616.5922784717663,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -325.22419460880974,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3256.815479325629,
+      "elapsed": 0.9833333333333323,
+      "deaths": 0,
+      "maxAltitude": 835.4077215282337,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "diagonal-knit",
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 3592.7805537292725,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 38.04558404558439,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3201.0347795200773,
+      "elapsed": 1.1999999999999982,
+      "deaths": 0,
+      "maxAltitude": 860.0449448462255,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "form": "desktop",
+      "name": "diagonal-spent",
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 3608,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3196.801963616984,
+      "elapsed": 1.549999999999997,
+      "deaths": 0,
+      "maxAltitude": 860.0449448462255,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  ]
+}

@@ -1,0 +1,395 @@
+{
+  "method": "Ordinary real browser keyboard, normal RAF, no screenshots inside action windows. Starting positions arranged; repeated releases preserve event history. Video + 25fps sequence for temporal review, not physical phone/performance proof.",
+  "source": {
+    "/main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "/game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "/audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "/renderer.js": "85985563550ae3a35e4bf4df6540796ff98c5f03c940cced7e9a6242e1404511",
+    "/character.js": "2c3cbc2961a854400cd7e2f86ae180087e54fc79eed8a68ee62dd861562f96f8",
+    "/depth.js": "4fca92db19db1ca893d52ec5711fee682e67fc3b71bf44b15b4860d69a74a4f1",
+    "/atmosphere.js": "c46a9681447c1f72b168b39f7839da11220fac4b3eb40fd23a7721f7f437c510",
+    "/surface-ash.js": "f03d27a845d6409743a6b07b5ced3557c60a6c5e92384d80a0501c942992b289",
+    "/cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "/lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "/ash-flow.js": "bc033879258846cf5f53058c097a9779641350aaca99a1321c9c326820e1b9ae",
+    "/wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "/fog-volume.js": "7a44948f3b9aad2655ea70183e115e930ce74c9d1b2cdb0df2d42cd0780bad46",
+    "/foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "/cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0"
+  },
+  "errors": [],
+  "actions": [
+    {
+      "name": "rib-left-before",
+      "wallTime": 1788660302970,
+      "clock": 1183.9000000003725,
+      "state": "playing",
+      "player": {
+        "x": 88,
+        "y": 4008.000000000002,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": -1,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3499.1815384615384,
+      "elapsed": 0.4666666666666673,
+      "deaths": 0,
+      "maxAltitude": 461.0999999999999,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "rib-left-kick",
+      "wallTime": 1788660302972,
+      "clock": 1185.7999999998137,
+      "state": "playing",
+      "player": {
+        "x": 88,
+        "y": 4008.000000000002,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": -1,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3499.1815384615384,
+      "elapsed": 0.4666666666666673,
+      "deaths": 0,
+      "maxAltitude": 461.0999999999999,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "rib-left-after",
+      "wallTime": 1788660303738,
+      "clock": 1951.2000000001863,
+      "state": "playing",
+      "player": {
+        "x": 139.41097222222214,
+        "y": 4176,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3466.5515913993627,
+      "elapsed": 1.224999999999998,
+      "deaths": 0,
+      "maxAltitude": 538.1204251588847,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "rib-right-before",
+      "wallTime": 1788660303894,
+      "clock": 2107.2999999998137,
+      "state": "playing",
+      "player": {
+        "x": 302,
+        "y": 3486.2000000000016,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 2979.1815384615384,
+      "elapsed": 1.3749999999999976,
+      "deaths": 0,
+      "maxAltitude": 981.0999999999999,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "rib-right-kick",
+      "wallTime": 1788660303896,
+      "clock": 2108.7000000001863,
+      "state": "playing",
+      "player": {
+        "x": 302,
+        "y": 3486.2000000000016,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 2979.1815384615384,
+      "elapsed": 1.3749999999999976,
+      "deaths": 0,
+      "maxAltitude": 981.0999999999999,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "rib-right-after",
+      "wallTime": 1788660304658,
+      "clock": 2871,
+      "state": "playing",
+      "player": {
+        "x": 251.78220221678237,
+        "y": 3470.23760298798,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "cameraY": 2914.752062641048,
+      "elapsed": 2.149999999999995,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "outer-left-before",
+      "wallTime": 1788660304816,
+      "clock": 3029,
+      "state": "playing",
+      "player": {
+        "x": 60,
+        "y": 4316.199999999993,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": -1,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 2.2999999999999945,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "outer-left-kick",
+      "wallTime": 1788660304818,
+      "clock": 3030.9000000003725,
+      "state": "playing",
+      "player": {
+        "x": 60,
+        "y": 4316.199999999993,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": -1,
+        "airJumps": 0,
+        "facing": -1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 2.2999999999999945,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "outer-left-after",
+      "wallTime": 1788660305582,
+      "clock": 3795.2999999998137,
+      "state": "playing",
+      "player": {
+        "x": 111.27955555555549,
+        "y": 4452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 3.058333333333325,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "outer-right-before",
+      "wallTime": 1788660305738,
+      "clock": 3952.5,
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 4317.999999999993,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 3.224999999999991,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "outer-right-kick",
+      "wallTime": 1788660305742,
+      "clock": 3954.9000000003725,
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 4317.999999999993,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 108,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "wallSlide"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 3.224999999999991,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "name": "outer-right-after",
+      "wallTime": 1788660306506,
+      "clock": 4719.200000000186,
+      "state": "playing",
+      "player": {
+        "x": 284.84494444444454,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": -1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 3.991666666666655,
+      "deaths": 0,
+      "maxAltitude": 1074.0341113302634,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  ]
+}

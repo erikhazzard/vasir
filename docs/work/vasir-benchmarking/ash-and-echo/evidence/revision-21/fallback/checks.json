@@ -1,0 +1,187 @@
+{
+  "method": "Chrome on Mac; capability interception and WEBGL_lose_context; no physical-phone claim",
+  "errors": [],
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "renderer.js": "79f2509e0ac60673bbb6adf682050aab9324014a760ed6e20f92304f6f9653ea",
+    "audio.js": "23e64254cf2f2f6bc920ec2490efa9df63019afa5286744c2bd13c2e690436d0",
+    "depth.js": "400728e21636c730b78b99fce6adda66fbf4acaf305026b24174ce39c2c9dade",
+    "character.js": "3056f72a2189dcd33e3d2603f619fecebf3a24b74a6ceaaee8050cb255571cb2",
+    "atmosphere.js": "472626c7b8945a057eed7dbd7b847a8c9661e1b92637ad01634cb96ffc9b51bb",
+    "surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "ash-material.js": "2db00794f3627dc76ec53897c312914e129c705512db8ba40c767df2094d23dc",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306"
+  },
+  "initial": {
+    "backend": "webgl",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "materialInitial": {
+    "status": "ready",
+    "reason": "",
+    "width": 256,
+    "height": 256,
+    "contexts": 1,
+    "programs": 1,
+    "buffers": 1,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 61,
+    "precision": "highp",
+    "restores": 0
+  },
+  "gl": {
+    "error": 0,
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+  },
+  "lost": {
+    "backend": "canvas2d",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "restored": {
+    "backend": "webgl",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "afterRestarts": {
+    "backend": "webgl",
+    "textures": 5,
+    "buffer": [
+      585,
+      1266
+    ]
+  },
+  "pausedGentlePixelsIdentical": true,
+  "restoredJump": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4333.474943385199,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": -294.93534955073414,
+      "grounded": false,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "rise"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.4000000000000004,
+    "deaths": 0,
+    "maxAltitude": 118.52505661480063,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "unavailable": {
+    "backend": "canvas2d"
+  },
+  "materialUnavailable": {
+    "status": "unavailable",
+    "reason": "WebGL unavailable",
+    "width": 256,
+    "height": 256,
+    "contexts": 0,
+    "programs": 0,
+    "buffers": 0,
+    "textures": 0,
+    "framebuffers": 0,
+    "draws": 0,
+    "precision": "",
+    "restores": 0
+  },
+  "fallbackJump": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4331.728248959017,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": -399.7370151216302,
+      "grounded": false,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "rise"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.9333333333333325,
+    "deaths": 0,
+    "maxAltitude": 120.27175104098296,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "fallbackDouble": {
+    "events": [
+      {
+        "type": "jump",
+        "x": 108,
+        "y": 4480,
+        "vx": 0,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 1.0916666666666652,
+        "elapsed": 0.7416666666666665
+      },
+      {
+        "type": "doubleJump",
+        "x": 108,
+        "y": 4359.728248959017,
+        "vx": 0,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 1.2916666666666645,
+        "elapsed": 0.9416666666666658
+      }
+    ],
+    "material": {
+      "status": "unavailable",
+      "reason": "WebGL unavailable",
+      "width": 256,
+      "height": 256,
+      "contexts": 0,
+      "programs": 0,
+      "buffers": 0,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 0,
+      "precision": "",
+      "restores": 0
+    }
+  },
+  "sidelightFallback": {
+    "backend": "canvas2d"
+  }
+}

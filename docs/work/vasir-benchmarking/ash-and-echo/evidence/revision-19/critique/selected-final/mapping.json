@@ -1,0 +1,142 @@
+[
+  {
+    "label": "native160-impact",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0040.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native160-impact.png",
+    "frame": 40,
+    "extractionFps": 25,
+    "videoTimeSeconds": 1.56,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "5cab350468a59b3add14eafb9243e84d78f57148552963c13e77a4677a9ca827"
+  },
+  {
+    "label": "native300-onset",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0084.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native300-onset.png",
+    "frame": 84,
+    "extractionFps": 25,
+    "videoTimeSeconds": 3.32,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "670b0b11a575c084ccca0c4fba529961afd01bbae4cd195422bef91e0ed870a8"
+  },
+  {
+    "label": "native300-fines",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0086.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native300-fines.png",
+    "frame": 86,
+    "extractionFps": 25,
+    "videoTimeSeconds": 3.4,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "664a45b318dac9fa2c120ef0c19f21c9d1bab8fbaa701ebd39bf6b93c862b8dd"
+  },
+  {
+    "label": "native508-initial-wedge-limit",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0134.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native508-initial-wedge-limit.png",
+    "frame": 134,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.32,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "8021cf26de98f8b6a174973bfdcb7a98f3ee20aba9215485b3cfb929136ac523"
+  },
+  {
+    "label": "native508-porous-eruption",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0135.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native508-porous-eruption.png",
+    "frame": 135,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.36,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "2ed2bbce85d9f0a6c124ce6800edc93f127d567914c4dc72ae05aa24f810c5a7"
+  },
+  {
+    "label": "native508-erosion",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0137.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native508-erosion.png",
+    "frame": 137,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.44,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "d5cbb59b82ebaeb96a581ebc151fa1316abe85869ac35a041edf624b074a0a7a"
+  },
+  {
+    "label": "native508-fines",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0140.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native508-fines.png",
+    "frame": 140,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.56,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "75b5bab09ae85d9bcab7593b5d19a34211ad3da3eeb713041adb70f863c546a0"
+  },
+  {
+    "label": "native508-buffered-rebound",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-native/sequence/frame-0188.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/native508-buffered-rebound.png",
+    "frame": 188,
+    "extractionFps": 25,
+    "videoTimeSeconds": 7.48,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-native/receipt.json",
+    "sha256": "883ea01a244a93fdbdd6722607f6ce4e1c4328091e2d87d1b9aba562a066d3de"
+  },
+  {
+    "label": "desktop508-porous-eruption",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-desktop/sequence/frame-0141.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/desktop508-porous-eruption.png",
+    "frame": 141,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.6,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-desktop/receipt.json",
+    "sha256": "baea3dcaf204a50c4d83f69d82e8b91fbfea7bcffdcc41f4c17c27919629633a"
+  },
+  {
+    "label": "desktop508-fines",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-desktop/sequence/frame-0143.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/desktop508-fines.png",
+    "frame": 143,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.68,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-desktop/receipt.json",
+    "sha256": "f489e469ea54bbd2090ba1a909016c8a290496ad0f5731ece0d0bead19e7f063"
+  },
+  {
+    "label": "desktop508-buffered-rebound",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-desktop/sequence/frame-0194.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/desktop508-buffered-rebound.png",
+    "frame": 194,
+    "extractionFps": 25,
+    "videoTimeSeconds": 7.72,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-desktop/receipt.json",
+    "sha256": "fb4db1e623a06f7a6baa685cd5d0680b370cebf85013d2652ac6c8d99cb3fcb3"
+  },
+  {
+    "label": "gentle508-compression",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-gentle/sequence/frame-0139.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/gentle508-compression.png",
+    "frame": 139,
+    "extractionFps": 25,
+    "videoTimeSeconds": 5.52,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-gentle/receipt.json",
+    "sha256": "1a0ae8eaae8ff689132fbb17796bd669c981a8758ae4362b2f2242edfd72b1e1"
+  },
+  {
+    "label": "ordinary77-impact",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-route/sequence/frame-0048.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/ordinary77-impact.png",
+    "frame": 48,
+    "extractionFps": 25,
+    "videoTimeSeconds": 1.88,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-route/receipt.json",
+    "sha256": "e7f2d6220d12e894c925d1ee822e5ef95095a2a65398e38b1a2c0b575bd3c0b5"
+  },
+  {
+    "label": "ordinary146-impact",
+    "original": "tmp/ash-and-echo/slam-pass/critic/round3-route/sequence/frame-0095.png",
+    "selected": "tmp/ash-and-echo/slam-pass/critic/selected-final/ordinary146-impact.png",
+    "frame": 95,
+    "extractionFps": 25,
+    "videoTimeSeconds": 3.76,
+    "receipt": "tmp/ash-and-echo/slam-pass/critic/round3-route/receipt.json",
+    "sha256": "4228f8ca206fac210f34346fca987c1e3e12c54cc93f045bc81116b1fc941d20"
+  }
+]

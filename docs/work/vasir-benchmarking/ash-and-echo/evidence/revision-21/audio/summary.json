@@ -1,0 +1,150 @@
+{
+  "checksPassed": true,
+  "scope": "Real Chromium OfflineAudioContext DSP; a scheduling-clock adapter positions isolated event calls. All audio nodes, envelopes, compression, convolution and final sample renders are browser-native. This is objective audio evidence, not a human listening grade.",
+  "conditions": [
+    {
+      "version": "baseline",
+      "label": "double",
+      "peak": 0.12638120353221893,
+      "rms": 0.004308468119869974,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 14,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "baseline",
+      "label": "first-then-double",
+      "peak": 0.1292835921049118,
+      "rms": 0.00484422927023805,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 18,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "baseline",
+      "label": "double-contact-rebound",
+      "peak": 0.12638120353221893,
+      "rms": 0.004948959943313861,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 24,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "baseline",
+      "label": "maximum-land-control",
+      "peak": 0.341923326253891,
+      "rms": 0.017569324074425505,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 15,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "double",
+      "peak": 0.12638120353221893,
+      "rms": 0.004282006586838362,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 14,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "first-then-double",
+      "peak": 0.1292835921049118,
+      "rms": 0.004821027981281792,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 18,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "double-contact-rebound",
+      "peak": 0.12638120353221893,
+      "rms": 0.004925538915473427,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 24,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "maximum-land-control",
+      "peak": 0.341923326253891,
+      "rms": 0.017569324080623634,
+      "clipped": 0,
+      "nonFinite": 0,
+      "persistentSources": 9,
+      "maxSources": 15,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    }
+  ]
+}

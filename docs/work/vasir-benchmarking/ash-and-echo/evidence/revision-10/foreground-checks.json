@@ -1,0 +1,58 @@
+{
+  "arrangedCompositionOnly": true,
+  "snapshots": [
+    {
+      "shot": "opening",
+      "camera": 3691.076923076923,
+      "height": 908.9230769230769,
+      "canvases": 69
+    },
+    {
+      "shot": "opening-arch",
+      "camera": 3820,
+      "height": 908.9230769230769,
+      "canvases": 69
+    },
+    {
+      "shot": "opening-release",
+      "camera": 3460,
+      "height": 908.9230769230769,
+      "canvases": 71
+    },
+    {
+      "shot": "middle",
+      "camera": 2340,
+      "height": 908.9230769230769,
+      "canvases": 81
+    },
+    {
+      "shot": "upper-arch",
+      "camera": 1230,
+      "height": 908.9230769230769,
+      "canvases": 90
+    },
+    {
+      "shot": "summit",
+      "camera": 0,
+      "height": 908.9230769230769,
+      "canvases": 98
+    }
+  ],
+  "sweep": {
+    "counts": [
+      99,
+      99,
+      99,
+      99
+    ],
+    "atmosphere": {
+      "backend": "webgl",
+      "textures": 6,
+      "buffer": [
+        585,
+        1266
+      ]
+    }
+  },
+  "errors": []
+}

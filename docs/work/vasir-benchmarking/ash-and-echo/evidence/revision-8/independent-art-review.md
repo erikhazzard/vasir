@@ -1,0 +1,15 @@
+# Revision 8 — bounded independent art critique
+
+Scope: current native 390 × 844 mobile composition, material continuity, and approach/release contrast. No source edits. This is not a learning, reachability, performance, or whole-game S-grade verdict.
+
+Material: current actual-route opening, second-hop, wall-transfer, resonant-stone and opening-refuge captures from `played-full-route`; the supplied current `material/phase-clapper-strike.png`; and fresh browser captures saved beside this file. My `opening-refuge`, `ledge-14`, and `ledge-27` captures explicitly arrange the player for composition inspection. They establish visual appearance only. Browser closed after captures.
+
+Style diagnosis: painted charcoal environment and stone with a small high-contrast spirit, exploration/platforming priorities, low state density, portrait view. Terrain silhouette, believable attachments, player separation, and visual pacing govern this review.
+
+Bounded verdict: CLOSE on the intended approach/release phrase. The dark small steps and opening sightline do read. The bellstone is a convincing punctuation mark: its narrow suspended slab, links and bell share one physical silhouette, with an intelligible destination above-left. The later checkpoint and summit retain coherent masonry and clean arch silhouettes in the fresh captures. I found no clear remaining later-architecture cut-off or off-style seam worth prioritizing over the opening release.
+
+Single highest-leverage repair: let the existing refuge light touch the refuge stone. In `opening-refuge.png`, the hero sits near (198,538), above the near-black landing extending roughly x128–267 at y559. The white-gray space above opens out, but the destination itself reads as another broken left corbel. The chain diagonal and crowded dark support keep it inside the preceding tense visual language. There is no strong local material change announcing a quiet place to settle.
+
+The source already supplies a pale refuge shaft in `atmosphere.js`, centered at worldY3780. The issue is its visible coupling to the foreground: it remains distant atmosphere behind an ordinary dark stone. Preserve that existing motif and give only `opening-refuge` a broad, feathered, muted warm-gray lift on its top and upper face. As a bounded starting shape, confine the material spill to the central two-thirds of the landing and about 30–45 world pixels of depth; taper before its chipped outer edges. Lift texture values enough to distinguish this landing at native size while keeping the eyes and actual checkpoint beacon brighter. Align a shallow pocket of the existing pale air with the settled hero. No shrine, beacon ring, checkpoint pulse, or additional motion is needed.
+
+Review target: while following the existing action sequence at 390px, the final leap should visibly finish in quiet local light; the player should remain a crisp dark silhouette and the following ledge should remain readable. This is a visual hierarchy and material rhythm repair, not a claim that one more feature earns S.

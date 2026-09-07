@@ -1,0 +1,16 @@
+{
+  "mode": "Isolated character contract check, real deterministic game steps; desktop headless Chrome, not device performance",
+  "events": 73,
+  "failures": [],
+  "frames": 1800,
+  "activeCostMs": {
+    "median": 0.09999996423721313,
+    "p95": 0.20000004768371582,
+    "max": 5.699999988079071
+  },
+  "idleCostMs": {
+    "median": 0,
+    "p95": 0.10000002384185791,
+    "max": 0.5
+  }
+}

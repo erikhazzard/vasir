@@ -1,0 +1,29 @@
+{
+  "report": [
+    {
+      "severity": 0,
+      "count": 6,
+      "duration": 0.34,
+      "size": 0.75
+    },
+    {
+      "severity": 0.03,
+      "count": 7,
+      "duration": 0.36550000000000005,
+      "size": 0.8195241631027311
+    },
+    {
+      "severity": 0.45,
+      "count": 20,
+      "duration": 0.7225,
+      "size": 2.1614046124555166
+    },
+    {
+      "severity": 1,
+      "count": 38,
+      "duration": 1.19,
+      "size": 4.477262345515191
+    }
+  ],
+  "checks": "wall/jump baseline identity, clipping, pause, reset, pool cap, gentle cap, immediate rebound passed"
+}

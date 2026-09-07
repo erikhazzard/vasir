@@ -1,0 +1,35 @@
+{
+  "inspectedSourceSha256": {
+    "lighting.js": "b61ccb956aebd79b11e44a3915ead456e46f930324a1864ad3bcfb2e0227ea94",
+    "renderer.js": "3c82acc0acd0dfbc9e31faf671730a3b5b688fab81a10a6163983a6e886906bd",
+    "atmosphere.js": "482e8246cf43d7d7c823557ceea7864e1a4a4261737d4c9729934f40e9bce94a",
+    "depth.js": "c3fc5d3ab1d46d0937ef07e906656b4fd5b24659f11fa00152c94adc7be13426",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "surface-ash.js": "463145e824e2e09ab103ebd82d953c2c09f858caa93178bed029ef57e5c25544",
+    "character.js": "27f29c8d7dc745f0489f4f42fe2efee5a64bdf0fa16d44aed2000b8775aaeab1",
+    "game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "main.js": "03b3aed0bfaac1308f9f2acc739b2e8d0e17bb4762fc8542209ba0678bd90b33"
+  },
+  "materialCaptureSourceMatch": {
+    "lighting.js": true,
+    "renderer.js": true,
+    "atmosphere.js": true,
+    "depth.js": true,
+    "foreground.js": true,
+    "surface-ash.js": true,
+    "character.js": true,
+    "game.js": true,
+    "main.js": true
+  },
+  "browserAttempt": {
+    "status": "launch failed before page creation",
+    "error": "Chrome SIGABRT; Playwright reports process exited and temporary directories cleaned. No surviving browser session from this attempt.",
+    "freshBrowserFrames": false
+  },
+  "evidenceClasses": {
+    "material": "Existing browser keyboard route, no fixture placement; source hashes match current files at review. Screenshot contact ages vary; contact label is not exact contact time.",
+    "character": "Existing controlled RAF browser input charge sequence at 420x844; named bell/refuge contacts arranged before actual simulation landing. Read-only inspector inserted.",
+    "combined": "Arranged composition views; not ordinary route. Sourcewindow images not accepted as independent proof of latest repair.",
+    "functional-probe": "Independent Node game/character simulation. Arranged release/braking landing cases; ordinary from-start charge sequence. No draw or sensory proof."
+  }
+}

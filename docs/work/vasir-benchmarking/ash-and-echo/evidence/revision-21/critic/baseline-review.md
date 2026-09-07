@@ -1,0 +1,14 @@
+# Frozen20 independent active-play baseline
+
+Style: painted monochrome architectural world, graphic procedural ash character; exploration/physics platforming; low gameplay density; 390×844 native phone and 780×1688 enlarged game inside 1000×1800 desktop viewport. Physics route/quiet performance belongs to root.
+
+Verdict: CLOSE against requested elevation. Existing movement is readable and inviting; this is not an S-grade assertion. I am a compact ash creature; I should climb the next solid ledge and avoid wall thorns; the extra airborne input answers with a loaded, articulated raven extension, asymmetric fold and return to compact body. I can read the extra impulse and the next landing. I would keep playing. The biggest remaining visual confusion is material/depth, not next-action comprehension.
+
+Observed highest-payoff gaps:
+
+1. Enlarged raven shoulders and wings read as folded dark paper/leather. Broad spread is a narrow black feather strip. Moving grey deposits are present, but do not describe a cohesive smoked volume through the roots/body. Preserve clear eyes and asymmetric pose chronology while giving the mass a broad quiet core and softer moving interior.
+2. Compact idle/run/brake/rise body remains a black nub with external small chips. Its edge changes and eyes communicate direction, but those ordinary states deserve the same convincing mass as the special jump. Added particles alone would not solve this.
+3. Fixed-camera ledge7 pairs prove existing fog already changes coherent diagonal banks. The gap is spatial classification: strongest white bank crosses a pillar shaft and its adjacent open bay as one continuous layer. It lacks an immediately legible bank held behind a crisp nearer shaft, followed by a separate softer bank across the face. Preserve existing bank character and architecture detail.
+4. The brightest middle gap tends toward uniform pale value during the airborne sequence; stronger depth requires selective separation of planes, not a global opacity increase. Platform top edges and the player currently remain clear and must survive.
+
+Material: baseline-native and baseline-desktop retain complete normal-time videos and action receipts; double/first context and ordered contact sheets support chronology. baseline-environment-native and baseline-environment-desktop include run/brake/reversal, actual wall-launch keyboard inputs from an arranged wall fixture, ordinary restart/ascent input, and unpaused fog pairs at first-hop, ledge7, ledge20. Each camera is numerically unchanged between its pair (3691.08, 2873.93, 897.93 world Y). Fixtures are declared; no screenshot calls occur within action windows. Each capture receipt hashes all 16 served JavaScript modules plus HTML/CSS and stores exact served sources. All four captures had zero page errors. This is visual review evidence, not native-device timing or full route certification.

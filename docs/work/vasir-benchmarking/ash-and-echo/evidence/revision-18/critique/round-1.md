@@ -1,0 +1,13 @@
+# Revision18 first candidate: camera succeeds, combined impact remains open
+
+The ordinary impact gate is not closed by the camera improvement alone. Fresh native and enlarged actual keyboard routes each reached19 contacts without death/error; actual gentle also reached19. No arranged starting state or forced contact was used. The recorded routes retain all gameplay and allow the next useful jump to interrupt landing recovery.
+
+At ordinary146-unit wall-transfer contact, native candidate85–88 visibly moves the whole cathedral down and back while surface material stays at the foot contact. This is a real perceptual improvement over revision17, where the world appears static and the following jump supplies the stronger pressure cue. Eyes, crimson hazards and fixed HUD remain readable through the punch. Repeated ascent contacts preserve the next decision surface.
+
+A separate final-source actual opening traversal holds the first jumps slightly longer with real keys, producing69/73-unit contacts. Scratch-only observation after the actual renderer call records camera state plus both canvases' computed CSS matrices. First69-unit punch is3.17CSSpx,73 is3.28px,145.5 is5.86px,58.6 is2.59px and51 is2.16px before the next jump. Both canvas matrices match at every observed sample. This is actual rendered displacement, not a cap. Instrumented observations are not performance evidence; uninstrumented normal-time videos remain separate.
+
+However, in final-common native48 the69-unit eruption birth still blends into body/stone. At146-unit native95–97 the larger shoulders read as low rounded dark lobes rather than a sharp release of force. The combined bar remains open: a user requesting a big world impact could still reasonably perceive mostly camera motion here. Surface author was asked for two asymmetric upward/outward ash wedges outside body width, broken ivory leading edges, and early existing chips, keeping an open eye/head corridor rather than multiplying particle counts.
+
+The separate508 bound clip confirms no visible camera border exposure, but native51 reveals smooth gray oval/petal shoulder silhouettes. That same shape language needs repair; this maximum case is a bounds check, not proof of ordinary impact quality. Actual gentle keeps eyes/controls clear but its surface contact is much quieter.
+
+Candidate native/desktop/gentle were frozen before a renderer smooth-helper hoist. Their original source snapshots remain intact. Final-common and final-bound load renderer ed7fdfc0b114b9c6d97d6e1d1bff82cfc238e946ca1c59c18f3b1bd8b128d5cd with the same camera behavior after the hoist. The second surface correction is pending; no whole-impact approval is issued yet.

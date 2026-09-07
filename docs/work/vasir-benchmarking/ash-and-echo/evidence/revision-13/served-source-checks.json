@@ -1,0 +1,38 @@
+{
+  "touch-opening.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "full-route.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "performance.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "critic/contact-closure/receipt.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "character/edge-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "character/candidate-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "contact/receipt.json": {
+    "module": "surface-ash.js",
+    "matches": true
+  },
+  "contact/causal-check.json": {
+    "module": "surface-ash.js",
+    "matches": true
+  },
+  "final-forms/receipt.json": {
+    "servedModules": 15,
+    "allMatch": true
+  }
+}

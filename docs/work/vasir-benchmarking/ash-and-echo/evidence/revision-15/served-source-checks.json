@@ -1,0 +1,64 @@
+{
+  "touch-opening.json": {
+    "servedModules": 15,
+    "allMatch": true,
+    "browserErrors": 0
+  },
+  "full-route.json": {
+    "servedModules": 15,
+    "allMatch": true,
+    "browserErrors": 0
+  },
+  "performance.json": {
+    "servedModules": 15,
+    "allMatch": true,
+    "browserErrors": 0
+  },
+  "final-forms/receipt.json": {
+    "servedModules": 15,
+    "allMatch": true,
+    "browserErrors": 0
+  },
+  "critic/candidate-full/receipt.json": {
+    "servedModules": 15,
+    "allMatch": true,
+    "browserErrors": 0
+  },
+  "character/candidate-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "character/gentle-candidate-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "character/diagonal-desktop-candidate-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "character/edge-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "character/cost-report.json": {
+    "module": "character.js",
+    "matches": true
+  },
+  "critic/candidate-body": {
+    "originalMatches": true,
+    "instrumentedServedHash": "861399b511381bb56995ee1a59f2d1aa4a69b690094e75ab9f1e26eea14ea12e",
+    "onlyChange": "omit drawWake(c)"
+  },
+  "critic/candidate-body-open": {
+    "originalMatches": true,
+    "instrumentedServedHash": "861399b511381bb56995ee1a59f2d1aa4a69b690094e75ab9f1e26eea14ea12e",
+    "onlyChange": "omit drawWake(c)"
+  },
+  "live-http": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "runtime-diff-v14": [
+    "character.js"
+  ]
+}

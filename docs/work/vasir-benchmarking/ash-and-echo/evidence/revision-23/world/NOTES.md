@@ -1,0 +1,13 @@
+# Revision23 world composition candidate
+
+Scope: depth.js and foreground.js. atmosphere.js and shader/resource topology are unchanged.
+
+The repeated arch was a placement problem: one vertical facade moved at only 0.12 camera parallax and consequently framed almost every altitude. The same authored facade now sits at 1110 on a 0.36 plane. At the opening it retains essentially the established enclosure; during ascent its broken roof clears the play corridor and the distant spires become the dominant mass. The two existing belfries draw behind that nearer facade. One upper flying rib sits farther overhead/left. The last three foreground shoulders narrow from 108/94/91 to 96/80/76 logical pixels, preserving actual pinned scenery while allowing the upper reveal room.
+
+The far source grade stretches its actual luminance from 90–255 to 111–220, revealing tower silhouettes rather than adding a screen tint. All changes are cached image grading and fixed placements. No new image/cache, GPU texture, fog draw, render target, particle, frame owner or per-frame allocation was introduced. Three fog banks still interleave with transparent stone openings. Fallback uses the identical new placements and corrected belfry/facade ordering; Gentle retains the existing stationary scenery camera.
+
+Evidence: baseline22-native and candidate2-native, plus corresponding desktop directories. Each receipt stores served source hashes and exact source copies. Three settled platform fixtures (first-hop, ledge-12, ledge-22) use ordinary RAF and unchanged authored geometry. Native cameras are 3691.0769, 2129.9323 and 587.9323; the camera stays unchanged across each 3-second fog pair. Fog fixture state is arranged; this is a controlled visual comparison, not natural route reachability. A final ordinary keyboard opening attempt starts with real restart, reaches the crossing-recovery ledge and records zero deaths on native candidate. Videos are continuous, and screenshots are taken outside action windows. Root/independent critic own the full natural climb and integrated performance verdict.
+
+Candidate 2 depth hash 5d2fe3bc6df06316b07e2ac814c4b9e81b200760767ca1eb9cd78e3789ab8596; foreground hash 6a8e033b74748bd979b554ecf02f6eb3026785186a782162e4aee167e0dd60f9. These match integrated candidate 1 at freeze.
+
+Local visual read: the opening remains dark enclosed stone, the middle crosses a broken nave crown, and the upper section opens into spires and suspended air. Player eyes, black collision surfaces and hazard positions remain readable. This is an improvement in spatial rhythm, not a claim of user acceptance or S tier. The underlying distant city remains a painted image and fog a three-plane approximation.

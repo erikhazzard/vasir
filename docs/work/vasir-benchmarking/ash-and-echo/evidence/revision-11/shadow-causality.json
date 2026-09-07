@@ -1,0 +1,2184 @@
+{
+  "method": "Arranged initial drops; ordinary keyboard events and shipping RAF advanced at120Hz. Paired same-frame GPU captures only toggle four caster uniforms, no production changes. Not real-time or performance proof.",
+  "scenes": [
+    {
+      "id": "resonant-stone",
+      "samples": [
+        {
+          "elapsed": 0.06666666666666667,
+          "count": 13393,
+          "max": 24,
+          "meanChanged": 7.907563652654372,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "resonant-stone",
+              "bounds": [
+                311,
+                3989,
+                41.400001525878906,
+                16
+              ]
+            },
+            {
+              "id": "ledge-7",
+              "bounds": [
+                200,
+                3505,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "bell-2",
+              "bounds": [
+                311,
+                4023.35595703125,
+                20.9110164642334,
+                20.466102600097656
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.074999999999996,
+              "strength": 0,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.16666666666666666,
+          "count": 13412,
+          "max": 23,
+          "meanChanged": 7.695123769758426,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "resonant-stone",
+              "bounds": [
+                311,
+                3994.22509765625,
+                41.400001525878906,
+                16
+              ]
+            },
+            {
+              "id": "ledge-7",
+              "bounds": [
+                200,
+                3505,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "bell-2",
+              "bounds": [
+                311,
+                4028.5810546875,
+                20.9110164642334,
+                20.466102600097656
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 0.06666666666666606,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.33333333333333354,
+          "count": 13446,
+          "max": 23,
+          "meanChanged": 7.595716198125837,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "resonant-stone",
+              "bounds": [
+                311,
+                3996.76513671875,
+                41.400001525878906,
+                16
+              ]
+            },
+            {
+              "id": "ledge-7",
+              "bounds": [
+                200,
+                3505,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "bell-2",
+              "bounds": [
+                310.7008056640625,
+                4031.119140625,
+                20.9110164642334,
+                20.466102600097656
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0.014009974522406054,
+              "velocity": 0.8377753542720853,
+              "clapper": -0.027515060401398585,
+              "clapperVelocity": -1.6307202751618375,
+              "platform": "resonant-stone",
+              "age": 0.23333333333333112,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.5000000000000007,
+          "count": 13495,
+          "max": 23,
+          "meanChanged": 7.822823267876991,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "resonant-stone",
+              "bounds": [
+                311,
+                3991.491943359375,
+                41.400001525878906,
+                16
+              ]
+            },
+            {
+              "id": "ledge-7",
+              "bounds": [
+                200,
+                3505,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "bell-2",
+              "bounds": [
+                308.0777587890625,
+                4025.64697265625,
+                20.9110164642334,
+                20.466102600097656
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0.13726504530717293,
+              "velocity": 0.6218879269223333,
+              "clapper": -0.18018448534576048,
+              "clapperVelocity": -0.12187949707705939,
+              "platform": "resonant-stone",
+              "age": 0.3999999999999961,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.7499999999999998,
+          "count": 13519,
+          "max": 22,
+          "meanChanged": 7.7379244026925065,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "resonant-stone",
+              "bounds": [
+                311,
+                3993.72998046875,
+                41.400001525878906,
+                16
+              ]
+            },
+            {
+              "id": "ledge-7",
+              "bounds": [
+                200,
+                3505,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "bell-2",
+              "bounds": [
+                306.2279968261719,
+                4027.5458984375,
+                20.9110164642334,
+                20.466102600097656
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0.22535309726214003,
+              "velocity": 0.08007640583534555,
+              "clapper": 0.04836123955852161,
+              "clapperVelocity": 1.3954669344554704,
+              "platform": "resonant-stone",
+              "age": 0.6499999999999945,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 1.1333333333333317,
+          "count": 13790,
+          "max": 23,
+          "meanChanged": 7.586149383611312,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "resonant-stone",
+              "bounds": [
+                311,
+                3988.49951171875,
+                41.400001525878906,
+                16
+              ]
+            },
+            {
+              "id": "ledge-7",
+              "bounds": [
+                200,
+                3505,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "bell-2",
+              "bounds": [
+                308.64739990234375,
+                4022.725341796875,
+                20.9110164642334,
+                20.466102600097656
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0.11038536823407386,
+              "velocity": -0.5624608873684509,
+              "clapper": 0.17430643517698818,
+              "clapperVelocity": -0.9229824625830965,
+              "platform": "resonant-stone",
+              "age": 1.033333333333328,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 311,
+          "y": 3976,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "resonant-stone",
+          "suspended": true,
+          "landmark": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "contactX": 311,
+          "contactY": 3976,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 311,
+          "y": 3980.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "landmark": "resonant-stone",
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        }
+      ]
+    },
+    {
+      "id": "ledge-13",
+      "samples": [
+        {
+          "elapsed": 0.06666666666666667,
+          "count": 35852,
+          "max": 35,
+          "meanChanged": 9.29842128751534,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-13",
+              "bounds": [
+                214,
+                2613,
+                60.720001220703125,
+                16
+              ]
+            },
+            {
+              "id": "ledge-14",
+              "bounds": [
+                209,
+                2461,
+                137.0800018310547,
+                16
+              ]
+            },
+            {
+              "id": "ledge-17",
+              "bounds": [
+                205,
+                1997,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "bell-0",
+              "bounds": [
+                210,
+                2482.40673828125,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.066666666666663,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.16666666666666666,
+          "count": 35888,
+          "max": 35,
+          "meanChanged": 9.251504681230495,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-13",
+              "bounds": [
+                214,
+                2618.22509765625,
+                60.720001220703125,
+                16
+              ]
+            },
+            {
+              "id": "ledge-14",
+              "bounds": [
+                209,
+                2461,
+                137.0800018310547,
+                16
+              ]
+            },
+            {
+              "id": "ledge-17",
+              "bounds": [
+                205,
+                1997,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "bell-0",
+              "bounds": [
+                209.50254821777344,
+                2482.401611328125,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0.020383191764054936,
+              "velocity": 0.2947674523226739,
+              "clapper": -0.022552352509494278,
+              "clapperVelocity": -0.2813558753155725
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.166666666666657,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.33333333333333354,
+          "count": 36012,
+          "max": 35,
+          "meanChanged": 9.19865600355437,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-13",
+              "bounds": [
+                214,
+                2620.76513671875,
+                60.720001220703125,
+                16
+              ]
+            },
+            {
+              "id": "ledge-14",
+              "bounds": [
+                209,
+                2461,
+                137.0800018310547,
+                16
+              ]
+            },
+            {
+              "id": "ledge-17",
+              "bounds": [
+                205,
+                1997,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "bell-0",
+              "bounds": [
+                208.49342346191406,
+                2482.3603515625,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0.0617671675480372,
+              "velocity": 0.19475628170604684,
+              "clapper": -0.03385466663555844,
+              "clapperVelocity": 0.14199727465542833
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.333333333333314,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.5000000000000007,
+          "count": 36147,
+          "max": 35,
+          "meanChanged": 9.186267186765154,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-13",
+              "bounds": [
+                214,
+                2615.491943359375,
+                60.720001220703125,
+                16
+              ]
+            },
+            {
+              "id": "ledge-14",
+              "bounds": [
+                209,
+                2461,
+                137.0800018310547,
+                16
+              ]
+            },
+            {
+              "id": "ledge-17",
+              "bounds": [
+                205,
+                1997,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "bell-0",
+              "bounds": [
+                207.98492431640625,
+                2482.323486328125,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0.0826561383716009,
+              "velocity": 0.05627276542494809,
+              "clapper": 0.014443069596525445,
+              "clapperVelocity": 0.36753196833457685
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.499999999999972,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.7499999999999998,
+          "count": 36460,
+          "max": 35,
+          "meanChanged": 9.10543060888645,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-13",
+              "bounds": [
+                214,
+                2617.72998046875,
+                60.720001220703125,
+                16
+              ]
+            },
+            {
+              "id": "ledge-14",
+              "bounds": [
+                209,
+                2461,
+                137.0800018310547,
+                16
+              ]
+            },
+            {
+              "id": "ledge-17",
+              "bounds": [
+                205,
+                1997,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "bell-0",
+              "bounds": [
+                208.2751007080078,
+                2482.345703125,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0.07073184169011618,
+              "velocity": -0.13765065716846753,
+              "clapper": 0.0744054773277521,
+              "clapperVelocity": 0.018926291312417867
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.749999999999957,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 1.1333333333333317,
+          "count": 37401,
+          "max": 34,
+          "meanChanged": 8.980214432769177,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-13",
+              "bounds": [
+                214,
+                2612.49951171875,
+                60.720001220703125,
+                16
+              ]
+            },
+            {
+              "id": "ledge-14",
+              "bounds": [
+                209,
+                2461,
+                137.0800018310547,
+                16
+              ]
+            },
+            {
+              "id": "ledge-17",
+              "bounds": [
+                205,
+                1997,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "bell-0",
+              "bounds": [
+                209.7917938232422,
+                2482.406005859375,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0.008530831218467318,
+              "velocity": -0.2002869740457055,
+              "clapper": -0.01886472007818653,
+              "clapperVelocity": -0.21104546654032882
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 11.133333333333269,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 311,
+          "y": 3976,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "resonant-stone",
+          "suspended": true,
+          "landmark": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "contactX": 311,
+          "contactY": 3976,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 311,
+          "y": 3980.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "landmark": "resonant-stone",
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        },
+        {
+          "type": "land",
+          "x": 214,
+          "y": 2600,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "ledge-13",
+          "suspended": true,
+          "contactX": 214,
+          "contactY": 2600,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 214,
+          "y": 2604.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        }
+      ]
+    },
+    {
+      "id": "ledge-20",
+      "samples": [
+        {
+          "elapsed": 0.06666666666666667,
+          "count": 13315,
+          "max": 26,
+          "meanChanged": 8.94419827262486,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-20",
+              "bounds": [
+                203,
+                1529,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "ledge-23",
+              "bounds": [
+                203,
+                1059,
+                57.959999084472656,
+                16
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.066666666666663,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.16666666666666666,
+          "count": 13212,
+          "max": 25,
+          "meanChanged": 8.933318195579776,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-20",
+              "bounds": [
+                203,
+                1534.2249755859375,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "ledge-23",
+              "bounds": [
+                203,
+                1059,
+                57.959999084472656,
+                16
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.166666666666657,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.33333333333333354,
+          "count": 13123,
+          "max": 25,
+          "meanChanged": 8.940714775584851,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-20",
+              "bounds": [
+                203,
+                1536.7652587890625,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "ledge-23",
+              "bounds": [
+                203,
+                1059,
+                57.959999084472656,
+                16
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.333333333333314,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.5000000000000007,
+          "count": 13228,
+          "max": 25,
+          "meanChanged": 8.99047475052918,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-20",
+              "bounds": [
+                203,
+                1531.4920654296875,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "ledge-23",
+              "bounds": [
+                203,
+                1059,
+                57.959999084472656,
+                16
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.499999999999972,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.7499999999999998,
+          "count": 13180,
+          "max": 26,
+          "meanChanged": 8.974734446130501,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-20",
+              "bounds": [
+                203,
+                1533.7298583984375,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "ledge-23",
+              "bounds": [
+                203,
+                1059,
+                57.959999084472656,
+                16
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.749999999999957,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 1.1333333333333317,
+          "count": 13403,
+          "max": 27,
+          "meanChanged": 9.10699097217041,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-20",
+              "bounds": [
+                203,
+                1528.49951171875,
+                50.599998474121094,
+                16
+              ]
+            },
+            {
+              "id": "ledge-23",
+              "bounds": [
+                203,
+                1059,
+                57.959999084472656,
+                16
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 11.133333333333269,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 311,
+          "y": 3976,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "resonant-stone",
+          "suspended": true,
+          "landmark": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "contactX": 311,
+          "contactY": 3976,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 311,
+          "y": 3980.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "landmark": "resonant-stone",
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        },
+        {
+          "type": "land",
+          "x": 214,
+          "y": 2600,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "ledge-13",
+          "suspended": true,
+          "contactX": 214,
+          "contactY": 2600,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 214,
+          "y": 2604.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        },
+        {
+          "type": "land",
+          "x": 203,
+          "y": 1516,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "ledge-20",
+          "suspended": true,
+          "contactX": 203,
+          "contactY": 1516,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 203,
+          "y": 1520.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        }
+      ]
+    },
+    {
+      "id": "ledge-26",
+      "samples": [
+        {
+          "elapsed": 0.05833333333333333,
+          "count": 21293,
+          "max": 22,
+          "meanChanged": 8.850138543183206,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-26",
+              "bounds": [
+                203,
+                579,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "ledge-28",
+              "bounds": [
+                210,
+                253,
+                73.5999984741211,
+                16
+              ]
+            },
+            {
+              "id": "bell-1",
+              "bounds": [
+                210,
+                272.4067687988281,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.066666666666663,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.15833333333333333,
+          "count": 21035,
+          "max": 23,
+          "meanChanged": 8.809698122177323,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-26",
+              "bounds": [
+                203,
+                583.5733642578125,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "ledge-28",
+              "bounds": [
+                210,
+                253,
+                73.5999984741211,
+                16
+              ]
+            },
+            {
+              "id": "bell-1",
+              "bounds": [
+                210,
+                272.4067687988281,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.166666666666657,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.3250000000000002,
+          "count": 20896,
+          "max": 23,
+          "meanChanged": 8.746171516079633,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-26",
+              "bounds": [
+                203,
+                587.0316772460938,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "ledge-28",
+              "bounds": [
+                210,
+                253,
+                73.5999984741211,
+                16
+              ]
+            },
+            {
+              "id": "bell-1",
+              "bounds": [
+                210,
+                272.4067687988281,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.333333333333314,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.49166666666666736,
+          "count": 21195,
+          "max": 23,
+          "meanChanged": 8.763010143901864,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-26",
+              "bounds": [
+                203,
+                581.6077270507812,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "ledge-28",
+              "bounds": [
+                210,
+                253,
+                73.5999984741211,
+                16
+              ]
+            },
+            {
+              "id": "bell-1",
+              "bounds": [
+                210,
+                272.4067687988281,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.499999999999972,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 0.7416666666666665,
+          "count": 21009,
+          "max": 23,
+          "meanChanged": 8.74196772811652,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-26",
+              "bounds": [
+                203,
+                583.6563720703125,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "ledge-28",
+              "bounds": [
+                210,
+                253,
+                73.5999984741211,
+                16
+              ]
+            },
+            {
+              "id": "bell-1",
+              "bounds": [
+                210,
+                272.4067687988281,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 10.749999999999957,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        },
+        {
+          "elapsed": 1.1249999999999984,
+          "count": 21298,
+          "max": 23,
+          "meanChanged": 8.728049582120386,
+          "glError": 0,
+          "casters": [
+            {
+              "id": "ledge-26",
+              "bounds": [
+                203,
+                578.4867553710938,
+                55.20000076293945,
+                16
+              ]
+            },
+            {
+              "id": "ledge-28",
+              "bounds": [
+                210,
+                253,
+                73.5999984741211,
+                16
+              ]
+            },
+            {
+              "id": "bell-1",
+              "bounds": [
+                210,
+                272.4067687988281,
+                23.898305892944336,
+                23.389829635620117
+              ]
+            },
+            {
+              "id": "",
+              "bounds": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "bells": [
+            {
+              "x": 210,
+              "y": 2458,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 210,
+              "y": 248,
+              "size": 48,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0
+            },
+            {
+              "x": 311,
+              "y": 4002,
+              "size": 42,
+              "angle": 0,
+              "velocity": 0,
+              "clapper": 0,
+              "clapperVelocity": 0,
+              "platform": "resonant-stone",
+              "age": 11.133333333333269,
+              "strength": 0.9222963743511686,
+              "direction": 1
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "type": "land",
+          "x": 311,
+          "y": 3976,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "resonant-stone",
+          "suspended": true,
+          "landmark": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          },
+          "contactX": 311,
+          "contactY": 3976,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 311,
+          "y": 3980.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "landmark": "resonant-stone",
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        },
+        {
+          "type": "land",
+          "x": 214,
+          "y": 2600,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "ledge-13",
+          "suspended": true,
+          "contactX": 214,
+          "contactY": 2600,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 214,
+          "y": 2604.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        },
+        {
+          "type": "land",
+          "x": 203,
+          "y": 1516,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "ledge-20",
+          "suspended": true,
+          "contactX": 203,
+          "contactY": 1516,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 203,
+          "y": 1520.794456950358,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.7583333333333331,
+          "elapsed": 0.7583333333333331
+        },
+        {
+          "type": "land",
+          "x": 203,
+          "y": 566,
+          "vx": 0,
+          "vy": 0,
+          "intensity": 0.9222963743511686,
+          "platformId": "ledge-26",
+          "suspended": true,
+          "contactX": 203,
+          "contactY": 566,
+          "contactOffset": 0,
+          "at": 0.10833333333333332,
+          "elapsed": 0.10833333333333332
+        },
+        {
+          "type": "jump",
+          "x": 203,
+          "y": 570.7299045939554,
+          "vx": 0,
+          "vy": -820.5128205128204,
+          "intensity": 1,
+          "at": 0.7499999999999998,
+          "elapsed": 0.7499999999999998
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

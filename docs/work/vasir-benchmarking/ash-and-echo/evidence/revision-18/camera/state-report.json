@@ -1,0 +1,22 @@
+{
+  "initial": {
+    "os": false,
+    "checked": false,
+    "storage": {}
+  },
+  "changedOS": {
+    "os": true,
+    "checked": false,
+    "storage": {}
+  },
+  "manualBeforeReload": {
+    "os": false,
+    "checked": true,
+    "storage": {}
+  },
+  "afterReload": {
+    "os": false,
+    "checked": false,
+    "storage": {}
+  }
+}

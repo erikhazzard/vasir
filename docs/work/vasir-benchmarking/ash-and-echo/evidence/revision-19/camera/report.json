@@ -1,0 +1,798 @@
+{
+  "method": "Synthetic presentation events; DOM inverse-corner coverage and composed motion only, not a real-fall or feel claim.",
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "audio.js": "a42f26a9fbfd9d65556f13b3e056039ae6299ab0c3dab4293c6a8344a19e23eb",
+    "renderer.js": "a7fa6687f92005f559b4f06296fd33edd592057e84b9760be61819dd3e3930ea",
+    "depth.js": "8ddfb5dc3c141efef64502defc5e9d4a5c6e7197d46a45b4b625d477644e44f9",
+    "character.js": "bf3809c27e790a50e5aaac7f714e1cc797e70c02954decaf8aa46ca392dfc134",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306"
+  },
+  "cases": [
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 80,
+      "severity": 0.19084354133763837,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -0.19863601135178566,
+        "y": 4.30512614588271,
+        "cssX": -0.15134172293469383,
+        "cssY": 3.2800961111487315,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 8.192292411601073
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 80,
+      "severity": 0.19084354133763837,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 0.8988367584887381,
+        "y": 4.30512614588271,
+        "cssX": 0.68482800646761,
+        "cssY": 3.2800961111487315,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 8.000264865580675
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 160,
+      "severity": 0.4242960416894798,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -0.3480430183739153,
+        "y": 7.195583714450338,
+        "cssX": -0.26517563304679265,
+        "cssY": 5.4823494967240665,
+        "scale": 1.057160661553692,
+        "roll": -0.0000027839763989396646,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 7.822207802313244
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 160,
+      "severity": 0.4242960416894798,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 1.5357035009217248,
+        "y": 7.195583714450338,
+        "cssX": 1.1700598102260762,
+        "cssY": 5.4823494967240665,
+        "scale": 1.057160661553692,
+        "roll": 0.000004381782240681888,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 7.542807825616364
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 300,
+      "severity": 0.6789178854784322,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -2.4568333239527504,
+        "y": 21.44669237434559,
+        "cssX": -1.871873008725905,
+        "cssY": 16.34033704712045,
+        "scale": 1.0997323437193531,
+        "roll": -0.0066594804271662734,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 7.309042804735384
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 300,
+      "severity": 0.6789178854784322,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 5.704730089611129,
+        "y": 21.44669237434559,
+        "cssX": 4.346461020656098,
+        "cssY": 16.34033704712045,
+        "scale": 1.0997323437193531,
+        "roll": 0.010481551883500079,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 6.883972787508355
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 508,
+      "severity": 1,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -4.297183652117689,
+        "y": 33.23022621747111,
+        "cssX": -3.274044687327763,
+        "cssY": 25.318267594263705,
+        "scale": 1.137997358225418,
+        "roll": -0.012642767281086759,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 6.833274247223869
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "fall": 508,
+      "severity": 1,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 9.225012513788386,
+        "y": 33.23022621747111,
+        "cssX": 7.028580962886389,
+        "cssY": 25.318267594263705,
+        "scale": 1.137997358225418,
+        "roll": 0.019898822837161774,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 6.342259586169234
+    },
+    {
+      "width": 320,
+      "states": {
+        "pauseIdentical": true,
+        "gentle": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": true
+        },
+        "restart": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        }
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 80,
+      "severity": 0.19084354133763837,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -0.19863601135178566,
+        "y": 4.30512614588271,
+        "cssX": -0.1844477248266581,
+        "cssY": 3.9976171354625163,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 9.984770229108705
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 80,
+      "severity": 0.19084354133763837,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 0.8988367584887381,
+        "y": 4.30512614588271,
+        "cssX": 0.8346341328823996,
+        "cssY": 3.9976171354625163,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 9.75017500047295
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 160,
+      "severity": 0.4242960416894798,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -0.3480430183739153,
+        "y": 7.195583714450338,
+        "cssX": -0.3231828027757785,
+        "cssY": 6.681613449132457,
+        "scale": 1.057160661553692,
+        "roll": -0.0000027839763989396646,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 9.533927501740806
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 160,
+      "severity": 0.4242960416894798,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 1.5357035009217248,
+        "y": 7.195583714450338,
+        "cssX": 1.4260103937130302,
+        "cssY": 6.681613449132457,
+        "scale": 1.057160661553692,
+        "roll": 0.000004381782240681888,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 9.192857855513182
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 300,
+      "severity": 0.6789178854784322,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -2.4568333239527504,
+        "y": 21.44669237434559,
+        "cssX": -2.281345229384697,
+        "cssY": 19.914785776178046,
+        "scale": 1.0997323437193531,
+        "roll": -0.0066594804271662734,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 9.107172189183643
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 300,
+      "severity": 0.6789178854784322,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 5.704730089611129,
+        "y": 21.44669237434559,
+        "cssX": 5.29724936892462,
+        "cssY": 19.914785776178046,
+        "scale": 1.0997323437193531,
+        "roll": 0.010481551883500079,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 8.665351268266647
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 508,
+      "severity": 1,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -4.297183652117689,
+        "y": 33.23022621747111,
+        "cssX": -3.9902419626807117,
+        "cssY": 30.85663863050889,
+        "scale": 1.137997358225418,
+        "roll": -0.012642767281086759,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 8.697183004944918
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fall": 508,
+      "severity": 1,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 9.225012513788386,
+        "y": 33.23022621747111,
+        "cssX": 8.566083048517786,
+        "cssY": 30.85663863050889,
+        "scale": 1.137997358225418,
+        "roll": 0.019898822837161774,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 8.236102705334758
+    },
+    {
+      "width": 390,
+      "states": {
+        "pauseIdentical": true,
+        "gentle": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": true
+        },
+        "restart": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        }
+      }
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 80,
+      "severity": 0.19084354133763837,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -0.19863601135178566,
+        "y": 4.30512614588271,
+        "cssX": -0.21605361100789275,
+        "cssY": 4.682625488362083,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 11.695306165692301
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 80,
+      "severity": 0.19084354133763837,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 0.8988367584887381,
+        "y": 4.30512614588271,
+        "cssX": 0.9776521691940192,
+        "cssY": 4.682625488362083,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 11.420981099948875
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 160,
+      "severity": 0.4242960416894798,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -0.3480430183739153,
+        "y": 7.195583714450338,
+        "cssX": -0.37856152262641973,
+        "cssY": 7.826535753697341,
+        "scale": 1.057160661553692,
+        "roll": -0.0000027839763989396646,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 11.167496756595511
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 160,
+      "severity": 0.4242960416894798,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 1.5357035009217248,
+        "y": 7.195583714450338,
+        "cssX": 1.6703632163857316,
+        "cssY": 7.826535753697341,
+        "scale": 1.057160661553692,
+        "roll": 0.000004381782240681888,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.00022020308821980915,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 10.768716610775442
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 300,
+      "severity": 0.6789178854784322,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -2.4568333239527504,
+        "y": 21.44669237434559,
+        "cssX": -2.6722632400448867,
+        "cssY": 23.327267297200226,
+        "scale": 1.0997323437193531,
+        "roll": -0.0066594804271662734,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 11.157717231343184
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 300,
+      "severity": 0.6789178854784322,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 5.704730089611129,
+        "y": 21.44669237434559,
+        "cssX": 6.204955120162224,
+        "cssY": 23.327267297200226,
+        "scale": 1.0997323437193531,
+        "roll": 0.010481551883500079,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 0.5267423087925281,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 10.829548379853577
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 508,
+      "severity": 1,
+      "side": -1,
+      "samples": 120,
+      "peak": {
+        "x": -4.297183652117689,
+        "y": 33.23022621747111,
+        "cssX": -4.673986548994229,
+        "cssY": 36.144052229174214,
+        "scale": 1.137997358225418,
+        "roll": -0.012642767281086759,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 11.097137569335842
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "fall": 508,
+      "severity": 1,
+      "side": 1,
+      "samples": 120,
+      "peak": {
+        "x": 9.225012513788386,
+        "y": 33.23022621747111,
+        "cssX": 10.033917070894011,
+        "cssY": 36.144052229174214,
+        "scale": 1.137997358225418,
+        "roll": 0.019898822837161774,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "last": {
+        "x": 0,
+        "y": 0,
+        "cssX": 0,
+        "cssY": 0,
+        "scale": 1.0571428571428572,
+        "roll": 0,
+        "slam": 1,
+        "reducedMotion": false
+      },
+      "minimumLocalMargin": 10.894096805601862
+    },
+    {
+      "width": 1280,
+      "states": {
+        "pauseIdentical": true,
+        "gentle": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": true
+        },
+        "restart": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "failures": []
+}

@@ -1,0 +1,18 @@
+READ-ONLY settings/camera diagnosis of served app, 2026-09-06.
+No production files edited. probe.mjs loaded actual HTTP8317 modules (no route/source substitution). Native390x844 and1280x900; OSnormal/reduce explicit. Instrumentation records existing main-canvas world translations only. Emitted current300px severity to existing renderer with actual world intact and fixedcamera to isolate impact, not gameplay camera follow. report.json includes full samples, exact loaded module SHA, HTTP headers; four native screenshots. All contexts had zero pageerrors.
+
+DECISIVE RESPONSE SCALE (rendererSHA0f37ea98aef97954b206c8ea75e53b538071e42e52c01729c7f36920224705b9):
+80px fall severity.19084 -> peak .18289 logicalpx, .16983CSSpx mobile.
+300px severity.67892 -> peak1.77383logicalpx,1.64713CSSpx mobile.
+508px severity1 -> peak3.71211logicalpx,3.447CSSpx mobile.
+Peak occurs tick4 of1/120 steps (41.7ms). Desktop app canvas456.828CSSpx, not1280;300px impact still only1.929CSSpx.
+Reduced motion all impulses displayed exactly0offset. Camera transform applied consistently to foregroundworld and character/hazards, but depth.drawBehind and depth.drawNear are outside it; most cathedral/fog imagery does not move. Separate WebGL atmosphere canvas receives image coordinates directly, so merely wrapping Canvas2D depth calls in a translation will not shift GPU scenery. Existing capped5logicalpx spring is materially too small to read as screen shake for common80/300falls.
+
+SETTINGS:
+main.js35-37 reads OS prefers-reduced-motion only at page initialization; checkbox checked and renderer mode agree. No stored motion preference (only app localStorage key in source is ash-and-echo-best). ManualGentle survives pause/restart but resets to OS on reload. state-report.json separately proves OSchange after load does not update mode checkbox, and reload does not retain manualGentle. Reduced renderer setter zeroes impact spring. Pause supplies dt0 to renderer/audio; blur/hidden page automatically pauses, and restart exits pause. Cannot infer user's own OS preference or existing-tab state from fresh contexts.
+
+LOADING:
+/?v=17 loads unversioned /main.js and nested plain relative /renderer.js,/character.js,etc. Query on HTML is not module cachebusting. Server is PythonSimpleHTTP: Last-Modified provided; no Cache-Control seen. No service-worker controller. Actual loaded main/game/renderer/character/surface-ash/depth source SHA all match disk exactly in all sampled contexts. No stale-module evidence in fresh diagnostic runs; an already-open tab naturally retains its loaded ES module graph until reload. Current accepted character SHA55c0f68021e55bfd443033353f2453bc481db0fac5e61d427660e487632ef3bc is what browser actually loads.
+
+CONCLUSION:
+User's lack-of-screen-shake observation is supported by actual tiny foreground-only offsets, independently of settings. OSreduce or manualGentle can additionally remove camera motion entirely. No further character strengthening indicated by this diagnostic; root's camera/world response and surface owner's eruption address the dominant gap.

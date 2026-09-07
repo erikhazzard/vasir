@@ -1,0 +1,1232 @@
+{
+  "method": "Frozen source through scratch routes; native390\u00d7844 normalRAF, unmodified physics. Normal and actual-gentle8/24/80/300-unit falls arrange only initial height and zero velocity above the SAME resonant-stone; all colliders remain. Gravity produces contact. A ninth case uses actual buffered Space near80-unit contact. No screenshot during fall/contact/recovery. Not physical-phone performance evidence.",
+  "source": {
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "audio.js": "ad692ff33a0e7a3f1839777ddda949c5794085e02ac48bfe3574c75d63d37eca",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "character.js": "55c0f68021e55bfd443033353f2453bc481db0fac5e61d427660e487632ef3bc",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "depth.js": "8f8f2d4cb375a8289c0fd9e6189b76883f8baf72f90ae938b972a631ab2121f8",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "index.html": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "renderer.js": "0f37ea98aef97954b206c8ea75e53b538071e42e52c01729c7f36920224705b9",
+    "style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "surface-ash.js": "614c0d9f7840df726ea53bc4a5c17e27d90bc1627d624f889a1e6eb7f101f4ba",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0"
+  },
+  "served": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "audio.js": "ad692ff33a0e7a3f1839777ddda949c5794085e02ac48bfe3574c75d63d37eca",
+    "renderer.js": "0f37ea98aef97954b206c8ea75e53b538071e42e52c01729c7f36920224705b9",
+    "depth.js": "8f8f2d4cb375a8289c0fd9e6189b76883f8baf72f90ae938b972a631ab2121f8",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "character.js": "55c0f68021e55bfd443033353f2453bc481db0fac5e61d427660e487632ef3bc",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "surface-ash.js": "614c0d9f7840df726ea53bc4a5c17e27d90bc1627d624f889a1e6eb7f101f4ba",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8"
+  },
+  "errors": [],
+  "cases": [
+    {
+      "mode": "normal",
+      "name": "tiny",
+      "height": 8,
+      "start": {
+        "clock": 1254,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 0
+      },
+      "contact": {
+        "clock": 1334.3999999985099,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.3218262438494261,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 8,
+            "impactSpeed": 234.93315801008106,
+            "landingSeverity": 0,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.075,
+            "elapsed": 0.075
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948.0875833333334,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.08333333333333333,
+          "deaths": 0,
+          "maxAltitude": 511.85389728979453,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 2336.7999999970198,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.3218262438494261,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 8,
+            "impactSpeed": 234.93315801008106,
+            "landingSeverity": 0,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.075,
+            "elapsed": 0.075
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3952.147218807207,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.0749999999999986,
+          "deaths": 0,
+          "maxAltitude": 511.85389728979453,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": false
+      }
+    },
+    {
+      "mode": "normal",
+      "name": "small",
+      "height": 24,
+      "start": {
+        "clock": 2673.1999999955297,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 1
+      },
+      "contact": {
+        "clock": 2800.60000000149,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.5451832638344755,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 24,
+            "impactSpeed": 397.9837825991671,
+            "landingSeverity": 0.031510509364263056,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.12499999999999999,
+            "elapsed": 0.12499999999999999
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948.1570710776164,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.13333333333333333,
+          "deaths": 0,
+          "maxAltitude": 527.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 3804.7999999970198,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.5451832638344755,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 24,
+            "impactSpeed": 397.9837825991671,
+            "landingSeverity": 0.031510509364263056,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.12499999999999999,
+            "elapsed": 0.12499999999999999
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3952.1119108242196,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.1333333333333317,
+          "deaths": 0,
+          "maxAltitude": 527.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": false
+      }
+    },
+    {
+      "mode": "normal",
+      "name": "medium",
+      "height": 80,
+      "start": {
+        "clock": 4156.79999999702,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 2
+      },
+      "contact": {
+        "clock": 4383.10000000149,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.9918973038045743,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 80,
+            "impactSpeed": 724.0850317773393,
+            "landingSeverity": 0.19084354133763837,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.22499999999999998,
+          "deaths": 0,
+          "maxAltitude": 583.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 5385.89999999851,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.9918973038045743,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 80,
+            "impactSpeed": 724.0850317773393,
+            "landingSeverity": 0.19084354133763837,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3952.041099254461,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.224999999999998,
+          "deaths": 0,
+          "maxAltitude": 583.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": false
+      }
+    },
+    {
+      "mode": "normal",
+      "name": "heavy",
+      "height": 300,
+      "start": {
+        "clock": 5705.10000000149,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 3
+      },
+      "contact": {
+        "clock": 6208,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 1.2328767123287672,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 300,
+            "impactSpeed": 900,
+            "landingSeverity": 0.6789178854784322,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.47500000000000064,
+            "elapsed": 0.47500000000000064
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3950.637089577317,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3235.4459838349226,
+          "elapsed": 0.5000000000000007,
+          "deaths": 0,
+          "maxAltitude": 803.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 7225.19999999553,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 1.2328767123287672,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 300,
+            "impactSpeed": 900,
+            "landingSeverity": 0.6789178854784322,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.47500000000000064,
+            "elapsed": 0.47500000000000064
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3951.9107430350964,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3257.87263205359,
+          "elapsed": 1.5083333333333304,
+          "deaths": 0,
+          "maxAltitude": 803.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": false
+      }
+    },
+    {
+      "mode": "normal",
+      "name": "buffered-rebound",
+      "height": 80,
+      "rebound": true,
+      "start": {
+        "clock": 7580,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 4
+      },
+      "contact": {
+        "clock": 7801.89999999851,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.9918973038045743,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 80,
+            "impactSpeed": 724.0850317773393,
+            "landingSeverity": 0.19084354133763837,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          },
+          {
+            "type": "jump",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": -820.5128205128204,
+            "intensity": 1,
+            "landmark": "resonant-stone",
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": -820.5128205128204,
+            "grounded": false,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "rise"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.22499999999999998,
+          "deaths": 0,
+          "maxAltitude": 583.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 8706.39999999851,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.9918973038045743,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 80,
+            "impactSpeed": 724.0850317773393,
+            "landingSeverity": 0.19084354133763837,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          },
+          {
+            "type": "jump",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": -820.5128205128204,
+            "intensity": 1,
+            "landmark": "resonant-stone",
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          },
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976.1783447290136,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 1.2328767123287672,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 144.9665323248937,
+            "impactSpeed": 900,
+            "landingSeverity": 0.3936443374189613,
+            "contactX": 311,
+            "contactY": 3976.1783447290136,
+            "contactOffset": 0,
+            "at": 0.8833333333333326,
+            "elapsed": 0.8833333333333326
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3954.7544714720616,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.1249999999999984,
+          "deaths": 0,
+          "maxAltitude": 648.7881875958801,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": false
+      }
+    },
+    {
+      "mode": "gentle",
+      "name": "tiny",
+      "height": 8,
+      "start": {
+        "clock": 9173.89999999851,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 7
+      },
+      "contact": {
+        "clock": 9253.60000000149,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.3218262438494261,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 8,
+            "impactSpeed": 234.93315801008106,
+            "landingSeverity": 0,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.075,
+            "elapsed": 0.075
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948.0875833333334,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.08333333333333333,
+          "deaths": 0,
+          "maxAltitude": 511.85389728979453,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 10256.60000000149,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.3218262438494261,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 8,
+            "impactSpeed": 234.93315801008106,
+            "landingSeverity": 0,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.075,
+            "elapsed": 0.075
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3952.147218807207,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.0749999999999986,
+          "deaths": 0,
+          "maxAltitude": 511.85389728979453,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": true
+      }
+    },
+    {
+      "mode": "gentle",
+      "name": "small",
+      "height": 24,
+      "start": {
+        "clock": 10589.60000000149,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 8
+      },
+      "contact": {
+        "clock": 10716,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.5451832638344755,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 24,
+            "impactSpeed": 397.9837825991671,
+            "landingSeverity": 0.031510509364263056,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.12499999999999999,
+            "elapsed": 0.12499999999999999
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948.1570710776164,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.13333333333333333,
+          "deaths": 0,
+          "maxAltitude": 527.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 11717.29999999702,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.5451832638344755,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 24,
+            "impactSpeed": 397.9837825991671,
+            "landingSeverity": 0.031510509364263056,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.12499999999999999,
+            "elapsed": 0.12499999999999999
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3952.122098914719,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.1249999999999984,
+          "deaths": 0,
+          "maxAltitude": 527.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": true
+      }
+    },
+    {
+      "mode": "gentle",
+      "name": "medium",
+      "height": 80,
+      "start": {
+        "clock": 12084.29999999702,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 9
+      },
+      "contact": {
+        "clock": 12317.79999999702,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.9918973038045743,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 80,
+            "impactSpeed": 724.0850317773393,
+            "landingSeverity": 0.19084354133763837,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 0.22499999999999998,
+          "deaths": 0,
+          "maxAltitude": 583.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 13320.79999999702,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 0.9918973038045743,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 80,
+            "impactSpeed": 724.0850317773393,
+            "landingSeverity": 0.19084354133763837,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.22499999999999998,
+            "elapsed": 0.22499999999999998
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3952.041099254461,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3321.575384615385,
+          "elapsed": 1.224999999999998,
+          "deaths": 0,
+          "maxAltitude": 583.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": true
+      }
+    },
+    {
+      "mode": "gentle",
+      "name": "heavy",
+      "height": 300,
+      "start": {
+        "clock": 13633.69999999553,
+        "platformId": "resonant-stone",
+        "x": 266,
+        "y": 3976,
+        "eventStart": 10
+      },
+      "contact": {
+        "clock": 14115.60000000149,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 1.2328767123287672,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 300,
+            "impactSpeed": 900,
+            "landingSeverity": 0.6789178854784322,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.47500000000000064,
+            "elapsed": 0.47500000000000064
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3948,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3231.149874976451,
+          "elapsed": 0.47500000000000064,
+          "deaths": 0,
+          "maxAltitude": 803.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        }
+      },
+      "after": {
+        "clock": 15117.60000000149,
+        "events": [
+          {
+            "type": "land",
+            "x": 311,
+            "y": 3976,
+            "vx": 0,
+            "vy": 0,
+            "intensity": 1.2328767123287672,
+            "platformId": "resonant-stone",
+            "suspended": true,
+            "landmark": "resonant-stone",
+            "resonance": {
+              "x": 311,
+              "y": 4002,
+              "size": 42
+            },
+            "fallDistance": 300,
+            "impactSpeed": 900,
+            "landingSeverity": 0.6789178854784322,
+            "contactX": 311,
+            "contactY": 3976,
+            "contactOffset": 0,
+            "at": 0.47500000000000064,
+            "elapsed": 0.47500000000000064
+          }
+        ],
+        "snapshot": {
+          "state": "playing",
+          "player": {
+            "x": 299,
+            "y": 3951.8543269907846,
+            "w": 24,
+            "h": 28,
+            "vx": 0,
+            "vy": 0,
+            "grounded": true,
+            "wallDir": 0,
+            "airJumps": 1,
+            "facing": 1,
+            "motion": "idle"
+          },
+          "cameraY": 3257.87263205359,
+          "elapsed": 1.4749999999999972,
+          "deaths": 0,
+          "maxAltitude": 803.8538972897945,
+          "checkpoint": {
+            "x": 190,
+            "y": 2382,
+            "w": 40,
+            "h": 66,
+            "active": false
+          },
+          "paused": false
+        },
+        "gentle": true
+      }
+    }
+  ]
+}

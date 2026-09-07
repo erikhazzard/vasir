@@ -1,0 +1,51 @@
+{
+  "sourceSHA": "ed7fdfc0b114b9c6d97d6e1d1bff82cfc238e946ca1c59c18f3b1bd8b128d5cd",
+  "matchesCurrentSource": true,
+  "viewports": [
+    320,
+    390,
+    1280
+  ],
+  "samples": 1152,
+  "failures": [],
+  "errors": [],
+  "minimumCanvasCoverMarginCSS": 7.405853271484375,
+  "mobileVerticalPeaks": [
+    {
+      "fall": 80,
+      "cssY": 3.9976171354625163
+    },
+    {
+      "fall": 160,
+      "cssY": 6.676991283490178
+    },
+    {
+      "fall": 300,
+      "cssY": 8.858218760164291
+    },
+    {
+      "fall": 508,
+      "cssY": 9.866171695435545
+    }
+  ],
+  "stateChecks": [
+    {
+      "width": 320,
+      "pauseIdentical": true,
+      "gentleZero": true,
+      "restartZero": true
+    },
+    {
+      "width": 390,
+      "pauseIdentical": true,
+      "gentleZero": true,
+      "restartZero": true
+    },
+    {
+      "width": 1280,
+      "pauseIdentical": true,
+      "gentleZero": true,
+      "restartZero": true
+    }
+  ]
+}

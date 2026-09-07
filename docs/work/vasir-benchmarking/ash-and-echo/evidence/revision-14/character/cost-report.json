@@ -1,0 +1,167 @@
+{
+  "sourceHashes": {
+    "baseline": "ae994f7a33bb3c5b6896c3453b17a77391fee8f4532b95d151d7b715eabaf155",
+    "candidate": "98783a6ad9c584267547e8efcc8a46fbe1a225055f3856e191300ff57162ba88"
+  },
+  "decodeMilliseconds": 4.900000000372529,
+  "samples": [
+    {
+      "variant": "baseline",
+      "trial": 0,
+      "frames": 600,
+      "submissionPerFrame": 0.10300000000124176,
+      "batchWithFinalFlushPerFrame": 0.10483333333395421
+    },
+    {
+      "variant": "candidate",
+      "trial": 0,
+      "frames": 600,
+      "submissionPerFrame": 0.18449999999875824,
+      "batchWithFinalFlushPerFrame": 0.18766666666604578
+    },
+    {
+      "variant": "candidate",
+      "trial": 1,
+      "frames": 600,
+      "submissionPerFrame": 0.17766666666604577,
+      "batchWithFinalFlushPerFrame": 0.17966666666480402
+    },
+    {
+      "variant": "baseline",
+      "trial": 1,
+      "frames": 600,
+      "submissionPerFrame": 0.09133333333147069,
+      "batchWithFinalFlushPerFrame": 0.0925
+    },
+    {
+      "variant": "baseline",
+      "trial": 2,
+      "frames": 600,
+      "submissionPerFrame": 0.07733333333395422,
+      "batchWithFinalFlushPerFrame": 0.07900000000062088
+    },
+    {
+      "variant": "candidate",
+      "trial": 2,
+      "frames": 600,
+      "submissionPerFrame": 0.1609999999993791,
+      "batchWithFinalFlushPerFrame": 0.16216666666790844
+    },
+    {
+      "variant": "candidate",
+      "trial": 3,
+      "frames": 600,
+      "submissionPerFrame": 0.13583333333333333,
+      "batchWithFinalFlushPerFrame": 0.13733333333395423
+    },
+    {
+      "variant": "baseline",
+      "trial": 3,
+      "frames": 600,
+      "submissionPerFrame": 0.06616666666852931,
+      "batchWithFinalFlushPerFrame": 0.07116666666852932
+    },
+    {
+      "variant": "baseline",
+      "trial": 4,
+      "frames": 600,
+      "submissionPerFrame": 0.052333333333954214,
+      "batchWithFinalFlushPerFrame": 0.053666666665424904
+    },
+    {
+      "variant": "candidate",
+      "trial": 4,
+      "frames": 600,
+      "submissionPerFrame": 0.14549999999813734,
+      "batchWithFinalFlushPerFrame": 0.1473333333308498
+    },
+    {
+      "variant": "candidate",
+      "trial": 5,
+      "frames": 600,
+      "submissionPerFrame": 0.13799999999813736,
+      "batchWithFinalFlushPerFrame": 0.13933333333271244
+    },
+    {
+      "variant": "baseline",
+      "trial": 5,
+      "frames": 600,
+      "submissionPerFrame": 0.0588333333345751,
+      "batchWithFinalFlushPerFrame": 0.06050000000124176
+    },
+    {
+      "variant": "baseline",
+      "trial": 6,
+      "frames": 600,
+      "submissionPerFrame": 0.05366666666852931,
+      "batchWithFinalFlushPerFrame": 0.058500000002483524
+    },
+    {
+      "variant": "candidate",
+      "trial": 6,
+      "frames": 600,
+      "submissionPerFrame": 0.11733333333395421,
+      "batchWithFinalFlushPerFrame": 0.1186666666654249
+    },
+    {
+      "variant": "candidate",
+      "trial": 7,
+      "frames": 600,
+      "submissionPerFrame": 0.11883333333147068,
+      "batchWithFinalFlushPerFrame": 0.12066666666418314
+    },
+    {
+      "variant": "baseline",
+      "trial": 7,
+      "frames": 600,
+      "submissionPerFrame": 0.0686666666654249,
+      "batchWithFinalFlushPerFrame": 0.07099999999937912
+    },
+    {
+      "variant": "baseline",
+      "trial": 8,
+      "frames": 600,
+      "submissionPerFrame": 0.056666666666666664,
+      "batchWithFinalFlushPerFrame": 0.05816666666418314
+    },
+    {
+      "variant": "candidate",
+      "trial": 8,
+      "frames": 600,
+      "submissionPerFrame": 0.12416666666666666,
+      "batchWithFinalFlushPerFrame": 0.12566666666728754
+    },
+    {
+      "variant": "candidate",
+      "trial": 9,
+      "frames": 600,
+      "submissionPerFrame": 0.11433333333271245,
+      "batchWithFinalFlushPerFrame": 0.11550000000124176
+    },
+    {
+      "variant": "baseline",
+      "trial": 9,
+      "frames": 600,
+      "submissionPerFrame": 0.07099999999937912,
+      "batchWithFinalFlushPerFrame": 0.07266666666604578
+    }
+  ],
+  "invariants": [
+    {
+      "mode": "normal",
+      "mutations": 0,
+      "drawCompleted": true
+    },
+    {
+      "mode": "gentle",
+      "mutations": 0,
+      "drawCompleted": true
+    },
+    {
+      "mode": "fallback",
+      "mutations": 0,
+      "drawCompleted": true
+    }
+  ],
+  "proof": "Ten alternating baseline/candidate batches, 600 actual fixed game steps each. Timed character update+draw plus game simulation to bound total scripted cost. Separate final 1px flush reports batch completion cost. Headless desktop Chrome CPU wall time; no hardware-phone GPU/thermal or full-game performance claim."
+}

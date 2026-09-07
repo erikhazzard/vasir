@@ -1,0 +1,542 @@
+{
+  "scope": "Real Chromium OfflineAudioContext DSP; a scheduling-clock adapter positions isolated event calls. All audio nodes, envelopes, compression, convolution and final sample renders are browser-native. This is objective audio evidence, not a human listening grade.",
+  "errors": [],
+  "versions": {
+    "baseline": [
+      {
+        "label": "jump",
+        "event": {
+          "type": "jump"
+        },
+        "duration": 3,
+        "peak": 0.07421143352985382,
+        "peakDb": -22.59058358272314,
+        "rms": 0.002709432062635808,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.3481875,
+        "tailRms": 0.0000024739904331018492,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "wall-kick",
+        "event": {
+          "type": "wallJump",
+          "x": 390
+        },
+        "duration": 3,
+        "peak": 0.13426664471626282,
+        "peakDb": -17.44063727676264,
+        "rms": 0.0031018771044232047,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.4329791666666667,
+        "tailRms": 0.0000023675170331046,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "double-jump",
+        "event": {
+          "type": "doubleJump"
+        },
+        "duration": 3,
+        "peak": 0.06499321013689041,
+        "peakDb": -23.742640237637378,
+        "rms": 0.004095899735494654,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.9022083333333333,
+        "tailRms": 0.000009110057082926582,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "soft-land",
+        "event": {
+          "type": "land",
+          "intensity": 0.25
+        },
+        "duration": 3,
+        "peak": 0.026349814608693123,
+        "peakDb": -31.5844487207591,
+        "rms": 0.001351966343825816,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.11547916666666669,
+        "tailRms": 0.0000011814655555549086,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "hard-land",
+        "event": {
+          "type": "land",
+          "intensity": 1.2
+        },
+        "duration": 3,
+        "peak": 0.13236871361732483,
+        "peakDb": -17.564293033422523,
+        "rms": 0.006011582754012227,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.682375,
+        "tailRms": 0.000005284039102429755,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "thorn-death",
+        "event": {
+          "type": "death",
+          "cause": "thorns",
+          "contactX": 330
+        },
+        "duration": 3,
+        "peak": 0.1785060614347458,
+        "peakDb": -14.966940643924534,
+        "rms": 0.010053218000332726,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.7654166666666666,
+        "tailRms": 0.000008885005946787105,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "fall-death",
+        "event": {
+          "type": "death",
+          "cause": "fall"
+        },
+        "duration": 3,
+        "peak": 0.1785060614347458,
+        "peakDb": -14.966940643924534,
+        "rms": 0.010053217944158001,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.7654166666666666,
+        "tailRms": 0.000008885005946787105,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "reform",
+        "event": {
+          "type": "respawn"
+        },
+        "duration": 3,
+        "peak": 0.05246459320187569,
+        "peakDb": -25.602673804114502,
+        "rms": 0.004308380377814678,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.9859583333333333,
+        "tailRms": 0.000014476198311686793,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 56,
+        "maxSources": 12,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "checkpoint",
+        "event": {
+          "type": "checkpoint"
+        },
+        "duration": 7,
+        "peak": 0.12214116007089615,
+        "peakDb": -18.262759189669243,
+        "rms": 0.013386255030348031,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 2.3538125,
+        "tailRms": 6.130692668689461e-9,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 64,
+        "maxSources": 15,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "win",
+        "event": {
+          "type": "win"
+        },
+        "duration": 7,
+        "peak": 0.10834626853466034,
+        "peakDb": -19.303720825362674,
+        "rms": 0.011976461991006602,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 3.012875,
+        "tailRms": 1.4830275112493408e-7,
+        "persistentNodes": 46,
+        "persistentSources": 9,
+        "maxNodes": 59,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 46,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      }
+    ],
+    "candidate": [
+      {
+        "label": "jump",
+        "event": {
+          "type": "jump"
+        },
+        "duration": 3,
+        "peak": 0.1569514125585556,
+        "peakDb": -16.08469542615033,
+        "rms": 0.005093521195630325,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.25302083333333336,
+        "tailRms": 0.0000018154979663088492,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 61,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "wall-kick",
+        "event": {
+          "type": "wallJump",
+          "x": 390
+        },
+        "duration": 3,
+        "peak": 0.24993790686130524,
+        "peakDb": -12.043357431115155,
+        "rms": 0.0051759604314203745,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.3388541666666667,
+        "tailRms": 0.000001770301051102346,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 62,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "double-jump",
+        "event": {
+          "type": "doubleJump"
+        },
+        "duration": 3,
+        "peak": 0.12638120353221893,
+        "peakDb": -17.96635026304361,
+        "rms": 0.005416061486772559,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.6706458333333334,
+        "tailRms": 0.000005381155459725018,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 62,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "soft-land",
+        "event": {
+          "type": "land",
+          "intensity": 0.25
+        },
+        "duration": 3,
+        "peak": 0.061323098838329315,
+        "peakDb": -24.247518141460127,
+        "rms": 0.002317434918033884,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.09554166666666664,
+        "tailRms": 8.087999074988336e-7,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 60,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "hard-land",
+        "event": {
+          "type": "land",
+          "intensity": 1.2
+        },
+        "duration": 3,
+        "peak": 0.2708800733089447,
+        "peakDb": -11.344458834018669,
+        "rms": 0.011896580328045006,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.5923958333333332,
+        "tailRms": 0.000004522415825449002,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 60,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "thorn-death",
+        "event": {
+          "type": "death",
+          "cause": "thorns",
+          "contactX": 330
+        },
+        "duration": 3,
+        "peak": 0.31509360671043396,
+        "peakDb": -10.031208172543366,
+        "rms": 0.009710047010505807,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.17831249999999998,
+        "tailRms": 0.000003000119648304124,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 63,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "fall-death",
+        "event": {
+          "type": "death",
+          "cause": "fall"
+        },
+        "duration": 3,
+        "peak": 0.23249408602714539,
+        "peakDb": -12.67176179642188,
+        "rms": 0.009853188100406557,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.1907916666666667,
+        "tailRms": 0.000002929028967895267,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 63,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "reform",
+        "event": {
+          "type": "respawn"
+        },
+        "duration": 3,
+        "peak": 0.07066319137811661,
+        "peakDb": -23.016135046314673,
+        "rms": 0.003896053160851214,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.6965416666666666,
+        "tailRms": 0.000006212904209236332,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 60,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "checkpoint",
+        "event": {
+          "type": "checkpoint"
+        },
+        "duration": 7,
+        "peak": 0.12214116007089615,
+        "peakDb": -18.262759189669243,
+        "rms": 0.013386255011901715,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 2.3538125,
+        "tailRms": 6.130692668689461e-9,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 65,
+        "maxSources": 15,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "win",
+        "event": {
+          "type": "win"
+        },
+        "duration": 7,
+        "peak": 0.10834626853466034,
+        "peakDb": -19.303720825362674,
+        "rms": 0.011976462006790796,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 3.012875,
+        "tailRms": 1.4830275112493408e-7,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 60,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+Wall-kick route proof: 33.22s, 29 main-route landings, no deaths, checkpoint active, grounded summit.
+Air-jump route proof: 33.10s, 29 main-route landings, no deaths, checkpoint active, grounded summit.
+✔ ready waits for start; one press stays one action across a large fully simulated step (4.189833ms)
+✔ jump height varies with hold, and holding never auto-repeats (1.913709ms)
+✔ a late jump after walking off the ledge uses coyote time and preserves the air jump (0.751291ms)
+✔ a press just before landing is buffered, consumed once, and launches immediately on landing (0.281166ms)
+✔ wall slide limits the fall; wall kicks preserve both full and exhausted air resources (0.2615ms)
+✔ a shallow head corner is corrected, while a centered ceiling stops ascent (0.246042ms)
+✔ checkpoint death returns safely in under 300ms; restart clears the entire attempt (1.086708ms)
+✔ a late retry press launches on respawn once, while stale held input expires (3.724167ms)
+✔ camera follows ascent and falls at short and tall portrait sizes (1.842209ms)
+✔ 60Hz batches and 120Hz steps resolve to the same controller state (1.562667ms)
+✔ the camera lets the suspended landing settle against a steady frame at short and tall portrait sizes (18.306458ms)
+✔ opening plays two low taps, a wall transfer, a delayed air crossing, and a simple refuge jump (3.778625ms)
+✔ holding the low hops remains viable and visibly raises their arcs (6.065791ms)
+✔ an early air jump misses the high stone, catches the lower shelf, and can recover through ordinary inputs (6.361042ms)
+✔ the opening wall-kick phrase joins the full climb through real inputs (21.4985ms)
+✔ a direct air-jump alternative reaches the same transfer and summit without a mandatory wall kick (18.311875ms)
+✔ longer falls keep gaining landing weight after speed reaches its cap (0.624208ms)
+✔ wall braking and a late air jump reduce landing weight instead of banking the earlier fall (1.706791ms)
+✔ restart clears descent history before the next short contact (0.607792ms)
+✔ a hanging stone takes weight and carries planted feet without repeated landing or changing the jump impulse (1.727167ms)
+✔ suspended contacts remain identical in 60Hz batches and 120Hz steps, including an immediate jump (4.375667ms)
+✔ unloaded hanging stones return to rest, zero time freezes them, and restart restores their authored positions (2.794208ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 152.473166

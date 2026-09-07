@@ -1,0 +1,1258 @@
+{
+  "method": "Arranged gameplay inspection, native CSS scale. Actual four collider ribs; identical camera and player state before/after. RAF disabled only for deterministic static inspection. Not a played route or feel proof.",
+  "errors": [],
+  "samples": [
+    {
+      "version": "before",
+      "format": "mobile",
+      "ribId": "cinder-rib",
+      "rib": {
+        "id": "cinder-rib",
+        "x": 0,
+        "y": 3880,
+        "w": 88,
+        "h": 320,
+        "segments": [
+          {
+            "x": 0,
+            "y": 3880,
+            "w": 88,
+            "h": 208
+          },
+          {
+            "x": 0,
+            "y": 4088,
+            "w": 83,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4110,
+            "w": 79,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4133,
+            "w": 74,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4155,
+            "w": 69,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4178,
+            "w": 65,
+            "h": 22
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 118,
+          "y": 3920,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 3660,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "mobile",
+      "ribId": "hollow-rib",
+      "rib": {
+        "id": "hollow-rib",
+        "x": 326,
+        "y": 3400,
+        "w": 94,
+        "h": 180,
+        "segments": [
+          {
+            "x": 326,
+            "y": 3400,
+            "w": 94,
+            "h": 117
+          },
+          {
+            "x": 332,
+            "y": 3517,
+            "w": 88,
+            "h": 13
+          },
+          {
+            "x": 337,
+            "y": 3530,
+            "w": 83,
+            "h": 12
+          },
+          {
+            "x": 343,
+            "y": 3542,
+            "w": 77,
+            "h": 13
+          },
+          {
+            "x": 349,
+            "y": 3555,
+            "w": 71,
+            "h": 12
+          },
+          {
+            "x": 354,
+            "y": 3567,
+            "w": 66,
+            "h": 13
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 276,
+          "y": 3440,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 3180,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "mobile",
+      "ribId": "refuge-rib",
+      "rib": {
+        "id": "refuge-rib",
+        "x": 0,
+        "y": 2188,
+        "w": 96,
+        "h": 200,
+        "segments": [
+          {
+            "x": 0,
+            "y": 2188,
+            "w": 96,
+            "h": 130
+          },
+          {
+            "x": 0,
+            "y": 2318,
+            "w": 90,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2332,
+            "w": 84,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2346,
+            "w": 78,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2360,
+            "w": 72,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2374,
+            "w": 66,
+            "h": 14
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 126,
+          "y": 2228,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 1968,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "mobile",
+      "ribId": "belfry-rib",
+      "rib": {
+        "id": "belfry-rib",
+        "x": 318,
+        "y": 810,
+        "w": 102,
+        "h": 270,
+        "segments": [
+          {
+            "x": 318,
+            "y": 810,
+            "w": 102,
+            "h": 176
+          },
+          {
+            "x": 325,
+            "y": 986,
+            "w": 95,
+            "h": 19
+          },
+          {
+            "x": 332,
+            "y": 1005,
+            "w": 88,
+            "h": 19
+          },
+          {
+            "x": 339,
+            "y": 1024,
+            "w": 81,
+            "h": 18
+          },
+          {
+            "x": 346,
+            "y": 1042,
+            "w": 74,
+            "h": 19
+          },
+          {
+            "x": 353,
+            "y": 1061,
+            "w": 67,
+            "h": 19
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 268,
+          "y": 850,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 590,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "desktop",
+      "ribId": "cinder-rib",
+      "rib": {
+        "id": "cinder-rib",
+        "x": 0,
+        "y": 3880,
+        "w": 88,
+        "h": 320,
+        "segments": [
+          {
+            "x": 0,
+            "y": 3880,
+            "w": 88,
+            "h": 208
+          },
+          {
+            "x": 0,
+            "y": 4088,
+            "w": 83,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4110,
+            "w": 79,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4133,
+            "w": 74,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4155,
+            "w": 69,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4178,
+            "w": 65,
+            "h": 22
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 118,
+          "y": 3920,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 3660,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "desktop",
+      "ribId": "hollow-rib",
+      "rib": {
+        "id": "hollow-rib",
+        "x": 326,
+        "y": 3400,
+        "w": 94,
+        "h": 180,
+        "segments": [
+          {
+            "x": 326,
+            "y": 3400,
+            "w": 94,
+            "h": 117
+          },
+          {
+            "x": 332,
+            "y": 3517,
+            "w": 88,
+            "h": 13
+          },
+          {
+            "x": 337,
+            "y": 3530,
+            "w": 83,
+            "h": 12
+          },
+          {
+            "x": 343,
+            "y": 3542,
+            "w": 77,
+            "h": 13
+          },
+          {
+            "x": 349,
+            "y": 3555,
+            "w": 71,
+            "h": 12
+          },
+          {
+            "x": 354,
+            "y": 3567,
+            "w": 66,
+            "h": 13
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 276,
+          "y": 3440,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 3180,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "desktop",
+      "ribId": "refuge-rib",
+      "rib": {
+        "id": "refuge-rib",
+        "x": 0,
+        "y": 2188,
+        "w": 96,
+        "h": 200,
+        "segments": [
+          {
+            "x": 0,
+            "y": 2188,
+            "w": 96,
+            "h": 130
+          },
+          {
+            "x": 0,
+            "y": 2318,
+            "w": 90,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2332,
+            "w": 84,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2346,
+            "w": 78,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2360,
+            "w": 72,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2374,
+            "w": 66,
+            "h": 14
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 126,
+          "y": 2228,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 1968,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "before",
+      "format": "desktop",
+      "ribId": "belfry-rib",
+      "rib": {
+        "id": "belfry-rib",
+        "x": 318,
+        "y": 810,
+        "w": 102,
+        "h": 270,
+        "segments": [
+          {
+            "x": 318,
+            "y": 810,
+            "w": 102,
+            "h": 176
+          },
+          {
+            "x": 325,
+            "y": 986,
+            "w": 95,
+            "h": 19
+          },
+          {
+            "x": 332,
+            "y": 1005,
+            "w": 88,
+            "h": 19
+          },
+          {
+            "x": 339,
+            "y": 1024,
+            "w": 81,
+            "h": 18
+          },
+          {
+            "x": 346,
+            "y": 1042,
+            "w": 74,
+            "h": 19
+          },
+          {
+            "x": 353,
+            "y": 1061,
+            "w": 67,
+            "h": 19
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 268,
+          "y": 850,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 590,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "mobile",
+      "ribId": "cinder-rib",
+      "rib": {
+        "id": "cinder-rib",
+        "x": 0,
+        "y": 3880,
+        "w": 88,
+        "h": 320,
+        "segments": [
+          {
+            "x": 0,
+            "y": 3880,
+            "w": 88,
+            "h": 208
+          },
+          {
+            "x": 0,
+            "y": 4088,
+            "w": 83,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4110,
+            "w": 79,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4133,
+            "w": 74,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4155,
+            "w": 69,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4178,
+            "w": 65,
+            "h": 22
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 118,
+          "y": 3920,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 3660,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "mobile",
+      "ribId": "hollow-rib",
+      "rib": {
+        "id": "hollow-rib",
+        "x": 326,
+        "y": 3400,
+        "w": 94,
+        "h": 180,
+        "segments": [
+          {
+            "x": 326,
+            "y": 3400,
+            "w": 94,
+            "h": 117
+          },
+          {
+            "x": 332,
+            "y": 3517,
+            "w": 88,
+            "h": 13
+          },
+          {
+            "x": 337,
+            "y": 3530,
+            "w": 83,
+            "h": 12
+          },
+          {
+            "x": 343,
+            "y": 3542,
+            "w": 77,
+            "h": 13
+          },
+          {
+            "x": 349,
+            "y": 3555,
+            "w": 71,
+            "h": 12
+          },
+          {
+            "x": 354,
+            "y": 3567,
+            "w": 66,
+            "h": 13
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 276,
+          "y": 3440,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 3180,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "mobile",
+      "ribId": "refuge-rib",
+      "rib": {
+        "id": "refuge-rib",
+        "x": 0,
+        "y": 2188,
+        "w": 96,
+        "h": 200,
+        "segments": [
+          {
+            "x": 0,
+            "y": 2188,
+            "w": 96,
+            "h": 130
+          },
+          {
+            "x": 0,
+            "y": 2318,
+            "w": 90,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2332,
+            "w": 84,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2346,
+            "w": 78,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2360,
+            "w": 72,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2374,
+            "w": 66,
+            "h": 14
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 126,
+          "y": 2228,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 1968,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "mobile",
+      "ribId": "belfry-rib",
+      "rib": {
+        "id": "belfry-rib",
+        "x": 318,
+        "y": 810,
+        "w": 102,
+        "h": 270,
+        "segments": [
+          {
+            "x": 318,
+            "y": 810,
+            "w": 102,
+            "h": 176
+          },
+          {
+            "x": 325,
+            "y": 986,
+            "w": 95,
+            "h": 19
+          },
+          {
+            "x": 332,
+            "y": 1005,
+            "w": 88,
+            "h": 19
+          },
+          {
+            "x": 339,
+            "y": 1024,
+            "w": 81,
+            "h": 18
+          },
+          {
+            "x": 346,
+            "y": 1042,
+            "w": 74,
+            "h": 19
+          },
+          {
+            "x": 353,
+            "y": 1061,
+            "w": 67,
+            "h": 19
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 268,
+          "y": 850,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 590,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "desktop",
+      "ribId": "cinder-rib",
+      "rib": {
+        "id": "cinder-rib",
+        "x": 0,
+        "y": 3880,
+        "w": 88,
+        "h": 320,
+        "segments": [
+          {
+            "x": 0,
+            "y": 3880,
+            "w": 88,
+            "h": 208
+          },
+          {
+            "x": 0,
+            "y": 4088,
+            "w": 83,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4110,
+            "w": 79,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4133,
+            "w": 74,
+            "h": 22
+          },
+          {
+            "x": 0,
+            "y": 4155,
+            "w": 69,
+            "h": 23
+          },
+          {
+            "x": 0,
+            "y": 4178,
+            "w": 65,
+            "h": 22
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 118,
+          "y": 3920,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 3660,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "desktop",
+      "ribId": "hollow-rib",
+      "rib": {
+        "id": "hollow-rib",
+        "x": 326,
+        "y": 3400,
+        "w": 94,
+        "h": 180,
+        "segments": [
+          {
+            "x": 326,
+            "y": 3400,
+            "w": 94,
+            "h": 117
+          },
+          {
+            "x": 332,
+            "y": 3517,
+            "w": 88,
+            "h": 13
+          },
+          {
+            "x": 337,
+            "y": 3530,
+            "w": 83,
+            "h": 12
+          },
+          {
+            "x": 343,
+            "y": 3542,
+            "w": 77,
+            "h": 13
+          },
+          {
+            "x": 349,
+            "y": 3555,
+            "w": 71,
+            "h": 12
+          },
+          {
+            "x": 354,
+            "y": 3567,
+            "w": 66,
+            "h": 13
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 276,
+          "y": 3440,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 3180,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "desktop",
+      "ribId": "refuge-rib",
+      "rib": {
+        "id": "refuge-rib",
+        "x": 0,
+        "y": 2188,
+        "w": 96,
+        "h": 200,
+        "segments": [
+          {
+            "x": 0,
+            "y": 2188,
+            "w": 96,
+            "h": 130
+          },
+          {
+            "x": 0,
+            "y": 2318,
+            "w": 90,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2332,
+            "w": 84,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2346,
+            "w": 78,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2360,
+            "w": 72,
+            "h": 14
+          },
+          {
+            "x": 0,
+            "y": 2374,
+            "w": 66,
+            "h": 14
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 126,
+          "y": 2228,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 1968,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    },
+    {
+      "version": "after",
+      "format": "desktop",
+      "ribId": "belfry-rib",
+      "rib": {
+        "id": "belfry-rib",
+        "x": 318,
+        "y": 810,
+        "w": 102,
+        "h": 270,
+        "segments": [
+          {
+            "x": 318,
+            "y": 810,
+            "w": 102,
+            "h": 176
+          },
+          {
+            "x": 325,
+            "y": 986,
+            "w": 95,
+            "h": 19
+          },
+          {
+            "x": 332,
+            "y": 1005,
+            "w": 88,
+            "h": 19
+          },
+          {
+            "x": 339,
+            "y": 1024,
+            "w": 81,
+            "h": 18
+          },
+          {
+            "x": 346,
+            "y": 1042,
+            "w": 74,
+            "h": 19
+          },
+          {
+            "x": 353,
+            "y": 1061,
+            "w": 67,
+            "h": 19
+          }
+        ]
+      },
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 268,
+          "y": 850,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 30,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 590,
+        "elapsed": 0,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      }
+    }
+  ],
+  "identities": {
+    "before": "068c18e1e73f61f0a7849bbb7845f2596ce56c7d922340ef3b0415ccc0655a51",
+    "after": "4ddc820213a7ce126db97dba6e6bab5741502b89dab74b0791b43ba95198f7ee"
+  }
+}

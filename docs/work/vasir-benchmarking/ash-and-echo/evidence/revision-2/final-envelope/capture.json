@@ -1,0 +1,422 @@
+{
+  "mode": "LIVE production build. Actual browser keyboard edges. Read-only post-render full-canvas captures every ~33 ms through 300 ms plus apex. No game, animation, time, controller, source or route replacement. Video is the unmodified native Playwright page recording.",
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "deviceScaleFactor": 1
+  },
+  "hashes": {
+    "character.js": "e4f6c01f534446c40581af4563bc6bcfb89b59fbb70b4f86524ef5ed89f1fffd",
+    "renderer.js": "a26fceebe79f37b3c16cf8171a607e214cc04a72c69309dcacfa9bf04f2b2765",
+    "game.js": "b2a0a0e1a15bb3972bb7631a50cac8fba3a62223487fc93e64cb24dd131f6d9f",
+    "main.js": "9ab39191bfbe11a037f2313d21c9d265b438816785d30a06d44685dcf75787fc"
+  },
+  "liveHashes": {
+    "character.js": "e4f6c01f534446c40581af4563bc6bcfb89b59fbb70b4f86524ef5ed89f1fffd",
+    "renderer.js": "a26fceebe79f37b3c16cf8171a607e214cc04a72c69309dcacfa9bf04f2b2765",
+    "game.js": "b2a0a0e1a15bb3972bb7631a50cac8fba3a62223487fc93e64cb24dd131f6d9f",
+    "main.js": "9ab39191bfbe11a037f2313d21c9d265b438816785d30a06d44685dcf75787fc"
+  },
+  "identityStable": true,
+  "video": "/Users/erikhazzard/code/vasir/tmp/ash-and-echo/final-envelope/video/0ac25a8fe27f0717beb165e8be7d02e1.webm",
+  "errors": [],
+  "records": [
+    {
+      "label": "00-8ms",
+      "targetAge": 0,
+      "eventAge": 0.008333333333333304,
+      "gameTime": 0.7166666666666666,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 131.2861111111111,
+        "y": 4332.372642267514,
+        "w": 24,
+        "h": 28,
+        "vx": 162.99999999999994,
+        "vy": -710.9353495507341,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "00-8ms.png"
+    },
+    {
+      "label": "01-42ms",
+      "targetAge": 0.03333333333333333,
+      "eventAge": 0.04166666666666652,
+      "gameTime": 0.7499999999999998,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 135.39999999999998,
+        "y": 4310.135824384542,
+        "w": 24,
+        "h": 28,
+        "vx": 99.6666666666666,
+        "vy": -640.8060486522024,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "01-42ms.png"
+    },
+    {
+      "label": "02-75ms",
+      "targetAge": 0.06666666666666667,
+      "eventAge": 0.07499999999999973,
+      "gameTime": 0.783333333333333,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.40277777777777,
+        "y": 4290.236649864854,
+        "w": 24,
+        "h": 28,
+        "vx": 36.33333333333327,
+        "vy": -570.6767477536707,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "02-75ms.png"
+    },
+    {
+      "label": "03-108ms",
+      "targetAge": 0.1,
+      "eventAge": 0.10833333333333295,
+      "gameTime": 0.8166666666666662,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4272.675118708452,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -500.547446855139,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "03-108ms.png"
+    },
+    {
+      "label": "04-142ms",
+      "targetAge": 0.13333333333333333,
+      "eventAge": 0.14166666666666616,
+      "gameTime": 0.8499999999999994,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4257.451230915333,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -430.4181459566073,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3690.990730652341,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "04-142ms.png"
+    },
+    {
+      "label": "05-175ms",
+      "targetAge": 0.16666666666666666,
+      "eventAge": 0.17499999999999938,
+      "gameTime": 0.8833333333333326,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4244.5649864854995,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -360.2888450580756,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3688.7088399752124,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "05-175ms.png"
+    },
+    {
+      "label": "06-208ms",
+      "targetAge": 0.19999999999999998,
+      "eventAge": 0.2083333333333326,
+      "gameTime": 0.9166666666666659,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4234.0163854189495,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -290.1595441595439,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3684.2981408068963,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "06-208ms.png"
+    },
+    {
+      "label": "07-242ms",
+      "targetAge": 0.2333333333333333,
+      "eventAge": 0.2416666666666658,
+      "gameTime": 0.9499999999999991,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4225.805427715684,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -220.03024326101217,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3678.804102954583,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "07-242ms.png"
+    },
+    {
+      "label": "08-275ms",
+      "targetAge": 0.26666666666666666,
+      "eventAge": 0.274999999999999,
+      "gameTime": 0.9833333333333323,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4219.932113375703,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -149.90094236248046,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3673.0274813705046,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "08-275ms.png"
+    },
+    {
+      "label": "09-308ms",
+      "targetAge": 0.3,
+      "eventAge": 0.30833333333333224,
+      "gameTime": 1.0166666666666655,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4216.396442399006,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -79.7716414639488,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3667.581596964661,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "09-308ms.png"
+    },
+    {
+      "label": "11-apex-325ms",
+      "targetAge": null,
+      "eventAge": 0.32499999999999885,
+      "gameTime": 1.033333333333332,
+      "event": {
+        "type": "doubleJump",
+        "x": 140.4375,
+        "y": 4372.367667470231,
+        "vx": 178.8333333333333,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.7083333333333333,
+        "elapsed": 0.5166666666666673
+      },
+      "player": {
+        "x": 137.61249999999998,
+        "y": 4215.435093870991,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -53.12250712250677,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3665.1295885308846,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "11-apex-325ms.png"
+    }
+  ],
+  "event": {
+    "type": "doubleJump",
+    "x": 140.4375,
+    "y": 4372.367667470231,
+    "vx": 178.8333333333333,
+    "vy": -746,
+    "intensity": 0.9,
+    "at": 0.7083333333333333,
+    "elapsed": 0.5166666666666673
+  },
+  "done": true,
+  "apex": true
+}

@@ -1,0 +1,3202 @@
+{
+  "source": {
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "ash-material.js": "6d779f4603777f2e3ffa976653756f660f4a01dd5ce0db349c488371a12ccd94",
+    "atmosphere.js": "472626c7b8945a057eed7dbd7b847a8c9661e1b92637ad01634cb96ffc9b51bb",
+    "audio.js": "df068c82ccdec6de1e48af93cb93d583c2d6e5226b819d7451201b3c2627b21a",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "character.js": "2e148a55f61e502f45667bc09b4a82909172e70ed0c880039a05c58fc5f745ac",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "depth.js": "8a0dc70ecd3824f57734e27ba7fbbacba3e67ccf75868113e20a9da6d15eae4f",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "index.html": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "renderer.js": "79f2509e0ac60673bbb6adf682050aab9324014a760ed6e20f92304f6f9653ea",
+    "style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0"
+  },
+  "errors": [],
+  "frames": [
+    {
+      "scale": "native",
+      "camera": 3500,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 295.74,
+            "y": 4390,
+            "length": 62,
+            "angle": 0,
+            "velocity": 0
+          },
+          {
+            "x": 114.18,
+            "y": 3801.5,
+            "length": 64,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "resonant-stone",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "resonant-stone",
+            "bounds": [
+              311,
+              3989,
+              41.400001525878906,
+              16
+            ]
+          },
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-2",
+            "bounds": [
+              311,
+              4023.35595703125,
+              20.9110164642334,
+              20.466102600097656
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": 0.7988888888888895,
+            "alert": 0.2731950686991274
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 3500,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 295.74,
+            "y": 4390,
+            "length": 62,
+            "angle": 0,
+            "velocity": 0
+          },
+          {
+            "x": 114.18,
+            "y": 3801.5,
+            "length": 64,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "resonant-stone",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "resonant-stone",
+            "bounds": [
+              311,
+              3989,
+              41.400001525878906,
+              16
+            ]
+          },
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-2",
+            "bounds": [
+              311,
+              4023.35595703125,
+              20.9110164642334,
+              20.466102600097656
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": 0.7988888888888895,
+            "alert": 0.2731950686991274
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 2700,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [],
+        "rigging": [
+          {
+            "platformId": "ledge-7",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "ledge-13",
+            "bounds": [
+              214,
+              2613,
+              60.720001220703125,
+              16
+            ]
+          },
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 2700,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [],
+        "rigging": [
+          {
+            "platformId": "ledge-7",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "ledge-13",
+            "bounds": [
+              214,
+              2613,
+              60.720001220703125,
+              16
+            ]
+          },
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 1700,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 126.15,
+            "y": 2313.5,
+            "length": 48,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-13",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-13",
+            "bounds": [
+              214,
+              2613,
+              60.720001220703125,
+              16
+            ]
+          },
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          },
+          {
+            "id": "ledge-17",
+            "bounds": [
+              205,
+              1997,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0.05656806413920799
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 1700,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 126.15,
+            "y": 2313.5,
+            "length": 48,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-13",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-13",
+            "bounds": [
+              214,
+              2613,
+              60.720001220703125,
+              16
+            ]
+          },
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          },
+          {
+            "id": "ledge-17",
+            "bounds": [
+              205,
+              1997,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0.05656806413920799
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 800,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-17",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-20",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-23",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-20",
+            "bounds": [
+              203,
+              1529,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "ledge-23",
+            "bounds": [
+              203,
+              1059,
+              57.959999084472656,
+              16
+            ]
+          },
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 800,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-17",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-20",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-23",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-20",
+            "bounds": [
+              203,
+              1529,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "ledge-23",
+            "bounds": [
+              203,
+              1059,
+              57.959999084472656,
+              16
+            ]
+          },
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 0,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-23",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-26",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-28",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "ledge-28",
+            "bounds": [
+              210,
+              253,
+              73.5999984741211,
+              16
+            ]
+          },
+          {
+            "id": "bell-1",
+            "bounds": [
+              210,
+              272.4067687988281,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "native",
+      "camera": 0,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-23",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-26",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-28",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "ledge-28",
+            "bounds": [
+              210,
+              253,
+              73.5999984741211,
+              16
+            ]
+          },
+          {
+            "id": "bell-1",
+            "bounds": [
+              210,
+              272.4067687988281,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 3500,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 114.18,
+            "y": 3801.5,
+            "length": 64,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "resonant-stone",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "resonant-stone",
+            "bounds": [
+              311,
+              3989,
+              41.400001525878906,
+              16
+            ]
+          },
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-2",
+            "bounds": [
+              311,
+              4023.35595703125,
+              20.9110164642334,
+              20.466102600097656
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": 0.3239869281045759,
+            "alert": 0.4451403473271332
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 3500,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 114.18,
+            "y": 3801.5,
+            "length": 64,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "resonant-stone",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-7",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "resonant-stone",
+            "bounds": [
+              311,
+              3989,
+              41.400001525878906,
+              16
+            ]
+          },
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-2",
+            "bounds": [
+              311,
+              4023.35595703125,
+              20.9110164642334,
+              20.466102600097656
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": 0.3239869281045759,
+            "alert": 0.4451403473271332
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 2700,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [],
+        "rigging": [
+          {
+            "platformId": "ledge-7",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "ledge-13",
+            "bounds": [
+              214,
+              2613,
+              60.720001220703125,
+              16
+            ]
+          },
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 2700,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [],
+        "rigging": [
+          {
+            "platformId": "ledge-7",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-10",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-7",
+            "bounds": [
+              200,
+              3505,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "ledge-13",
+            "bounds": [
+              214,
+              2613,
+              60.720001220703125,
+              16
+            ]
+          },
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 1700,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 126.15,
+            "y": 2313.5,
+            "length": 48,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-13",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          },
+          {
+            "id": "ledge-17",
+            "bounds": [
+              205,
+              1997,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "ledge-20",
+            "bounds": [
+              203,
+              1529,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.7615980392156868,
+            "alert": 0.29436830500523764
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 1700,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 126.15,
+            "y": 2313.5,
+            "length": 48,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-13",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-17",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-14",
+            "bounds": [
+              209,
+              2461,
+              137.0800018310547,
+              16
+            ]
+          },
+          {
+            "id": "ledge-17",
+            "bounds": [
+              205,
+              1997,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "ledge-20",
+            "bounds": [
+              203,
+              1529,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "bell-0",
+            "bounds": [
+              210,
+              2482.40673828125,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": 0.7615980392156868,
+            "alert": 0.29436830500523764
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 800,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-20",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-23",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-20",
+            "bounds": [
+              203,
+              1529,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "ledge-23",
+            "bounds": [
+              203,
+              1059,
+              57.959999084472656,
+              16
+            ]
+          },
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 800,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-20",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-23",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-20",
+            "bounds": [
+              203,
+              1529,
+              50.599998474121094,
+              16
+            ]
+          },
+          {
+            "id": "ledge-23",
+            "bounds": [
+              203,
+              1059,
+              57.959999084472656,
+              16
+            ]
+          },
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 0,
+      "t": 12,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 240,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-23",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-26",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-28",
+            "age": 21.95000000000017,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "ledge-28",
+            "bounds": [
+              210,
+              253,
+              73.5999984741211,
+              16
+            ]
+          },
+          {
+            "id": "bell-1",
+            "bounds": [
+              210,
+              272.4067687988281,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 21.999999999999318,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    },
+    {
+      "scale": "large",
+      "camera": 0,
+      "t": 16,
+      "scenery": {
+        "characterMaterial": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 320,
+          "precision": "highp",
+          "restores": 0
+        },
+        "cameraImpact": {
+          "x": 0,
+          "y": 0,
+          "cssX": 0,
+          "cssY": 0,
+          "scale": 1.0571428571428572,
+          "roll": 0,
+          "slam": 0,
+          "reducedMotion": false
+        },
+        "cages": [
+          {
+            "x": 296.37,
+            "y": 743.5,
+            "length": 56,
+            "angle": 0,
+            "velocity": 0
+          }
+        ],
+        "rigging": [
+          {
+            "platformId": "ledge-23",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-26",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          },
+          {
+            "platformId": "ledge-28",
+            "age": 25.950000000000227,
+            "strength": 0,
+            "contactOffset": 0,
+            "segments": 8,
+            "leftBow": 0,
+            "rightBow": 0
+          }
+        ],
+        "activeParticles": 0,
+        "surfaceAsh": {
+          "pending": 0,
+          "capacity": 16,
+          "grainCapacity": 224,
+          "shardCapacity": 608,
+          "contacts": []
+        },
+        "shadowCasters": [
+          {
+            "id": "ledge-26",
+            "bounds": [
+              203,
+              579,
+              55.20000076293945,
+              16
+            ]
+          },
+          {
+            "id": "ledge-28",
+            "bounds": [
+              210,
+              253,
+              73.5999984741211,
+              16
+            ]
+          },
+          {
+            "id": "bell-1",
+            "bounds": [
+              210,
+              272.4067687988281,
+              23.898305892944336,
+              23.389829635620117
+            ]
+          },
+          {
+            "id": "",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "bells": [
+          {
+            "x": 210,
+            "y": 2458,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 210,
+            "y": 248,
+            "size": 48,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0
+          },
+          {
+            "x": 311,
+            "y": 4002,
+            "size": 42,
+            "angle": 0,
+            "velocity": 0,
+            "clapper": 0,
+            "clapperVelocity": 0,
+            "platform": "resonant-stone",
+            "age": 25.99999999999909,
+            "strength": 0,
+            "direction": 1
+          }
+        ],
+        "spiders": [
+          {
+            "x": -18,
+            "y": 3880,
+            "scale": 1,
+            "lookX": 0.7999999999999997,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          },
+          {
+            "x": 422,
+            "y": 2015,
+            "scale": -0.83,
+            "lookX": 0.790444444444444,
+            "lookY": -0.8999999999999997,
+            "alert": 0
+          }
+        ]
+      }
+    }
+  ],
+  "method": "Controlled exact renderer clock and camera; RAF disabled only in this composition harness. Gameplay geometry and player visible. Temporal pairs are renderer dt-driven air, not simulation proof."
+}

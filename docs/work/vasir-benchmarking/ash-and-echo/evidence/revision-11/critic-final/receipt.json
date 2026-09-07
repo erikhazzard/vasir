@@ -1,0 +1,172 @@
+{
+  "source": {
+    "http://localhost:8317/main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "http://localhost:8317/game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "http://localhost:8317/audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "http://localhost:8317/renderer.js": "068c18e1e73f61f0a7849bbb7845f2596ce56c7d922340ef3b0415ccc0655a51",
+    "http://localhost:8317/depth.js": "4fca92db19db1ca893d52ec5711fee682e67fc3b71bf44b15b4860d69a74a4f1",
+    "http://localhost:8317/atmosphere.js": "c46a9681447c1f72b168b39f7839da11220fac4b3eb40fd23a7721f7f437c510",
+    "http://localhost:8317/cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "http://localhost:8317/character.js": "0ad59b75a34463ffcbf306fd01fd25dcf22c652700176482993c31981668bfd3",
+    "http://localhost:8317/surface-ash.js": "3d9a90ab4b1b70a4e03b112a94eb6be6ff7c1bcbbed6208ee371c2db9cb36391",
+    "http://localhost:8317/lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "http://localhost:8317/wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "http://localhost:8317/foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "http://localhost:8317/fog-volume.js": "7a44948f3b9aad2655ea70183e115e930ce74c9d1b2cdb0df2d42cd0780bad46",
+    "http://localhost:8317/ash-flow.js": "bc033879258846cf5f53058c097a9779641350aaca99a1321c9c326820e1b9ae",
+    "http://localhost:8317/cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0"
+  },
+  "method": "Arranged starting ledge/camera only. After arrangement, real browser keyboard input and normal simulation/rendering; no injected motion or timers.",
+  "samples": [
+    {
+      "id": "ledge-26",
+      "frame": 1,
+      "state": "playing",
+      "player": {
+        "x": 246.2569444444446,
+        "y": 400.8097637474776,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 0,
+      "elapsed": 1.1083333333333318,
+      "deaths": 0,
+      "maxAltitude": 4051.1902362525225,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "id": "ledge-26",
+      "frame": 2,
+      "state": "playing",
+      "player": {
+        "x": 321.50694444444395,
+        "y": 406.09429877560245,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 341.17904887135694,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 0,
+      "elapsed": 1.3999999999999975,
+      "deaths": 0,
+      "maxAltitude": 4066.6479029922402,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "id": "ledge-26",
+      "frame": 3,
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 623.0139057593121,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 900,
+        "grounded": false,
+        "wallDir": 1,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "fall"
+      },
+      "cameraY": 0,
+      "elapsed": 1.691666666666663,
+      "deaths": 0,
+      "maxAltitude": 4066.6479029922402,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "id": "ledge-26",
+      "frame": 4,
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 702,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 5.461356308709819,
+      "elapsed": 1.9583333333333288,
+      "deaths": 0,
+      "maxAltitude": 4066.6479029922402,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "id": "ledge-26",
+      "frame": 5,
+      "state": "playing",
+      "player": {
+        "x": 336,
+        "y": 702,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 6.896788675352878,
+      "elapsed": 2.258333333333328,
+      "deaths": 0,
+      "maxAltitude": 4066.6479029922402,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  ]
+}

@@ -412,7 +412,7 @@ test("selected immutable runs deterministically project the exact real developme
     }));
   }
   validateBenchmarkPublicationResponses(responseBundle, projection);
-  assert.equal(projection.schemaVersion, workflow ? 3 : 2);
+  assert.equal(projection.schemaVersion, workflow ? 4 : 2);
   assert.deepEqual({
     label: projection.scoreBasis.label,
     edition: projection.scoreBasis.edition,

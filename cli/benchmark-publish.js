@@ -1260,6 +1260,8 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
   const checks = [
     { page: `${artifact.config.target.url}/`, target: "leaderboard", width: 1440, height: 1000, file: "live-desktop.png" },
     { page: `${artifact.config.target.url}/`, target: "leaderboard", width: 390, height: 844, file: "live-mobile.png" },
+    { page: `${artifact.config.target.url}/`, target: "capabilities", width: 1440, height: 1000, file: "live-engineering-desktop.png" },
+    { page: `${artifact.config.target.url}/`, target: "capabilities", width: 390, height: 844, file: "live-engineering-mobile.png" },
     { page: `${artifact.config.target.url}/benchmark-report.html`, target: "report", width: 1440, height: 1000, file: "live-report-desktop.png" },
     { page: `${artifact.config.target.url}/benchmark-report.html`, target: "report", width: 390, height: 844, file: "live-report-mobile.png" }
   ];

@@ -1,0 +1,136 @@
+{
+  "mode": "Actual browser keyboard down/up calls, read-only snapshots; no debug movement, state arrangement, or teleport",
+  "errors": [],
+  "final": {
+    "state": "won",
+    "player": {
+      "x": 194.19027777778052,
+      "y": 212,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 0,
+    "elapsed": 68.05000000000022,
+    "deaths": 1,
+    "maxAltitude": 4353.7064613923585,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": true
+    },
+    "paused": false
+  },
+  "restart": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4452,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.24999999999999997,
+    "deaths": 0,
+    "maxAltitude": 0,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "wallKick": {
+    "state": "playing",
+    "player": {
+      "x": 331.0894166666667,
+      "y": 3968.283037475345,
+      "w": 24,
+      "h": 28,
+      "vx": -293.27,
+      "vy": -774.9353495507341,
+      "grounded": false,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": -1,
+      "motion": "wallJump"
+    },
+    "cameraY": 3441.8692106364238,
+    "elapsed": 3.883333333333322,
+    "deaths": 0,
+    "maxAltitude": 545.7064613923576,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false,
+    "input": {
+      "axis": 1,
+      "jumpHeld": true,
+      "jumpPressed": false
+    },
+    "respawnTimer": 0,
+    "latest": [
+      {
+        "type": "land",
+        "x": 305.60972222222256,
+        "y": 4080,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "at": 4.02499999999999,
+        "elapsed": 3.6499999999999897
+      },
+      {
+        "type": "jump",
+        "x": 324.5722222222225,
+        "y": 4080,
+        "vx": 258,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 4.149999999999996,
+        "elapsed": 3.7749999999999893
+      },
+      {
+        "type": "wallJump",
+        "x": 348,
+        "y": 4009.344729344729,
+        "vx": -296,
+        "vy": -810,
+        "intensity": 1,
+        "at": 4.250000000000001,
+        "elapsed": 3.874999999999989
+      }
+    ]
+  },
+  "timing": {
+    "count": 1800,
+    "median": 16.69999999999709,
+    "p95": 16.799999999995634,
+    "p99": 16.80000000000291,
+    "max": 250,
+    "over33": 7,
+    "over50": 7
+  },
+  "note": "Integration reachability run on first rebuilt hero, before final aerial/material repairs. Source-aware navigator used real key events; this is not cold play or a quality score. Full original route/video remain in tmp/ash-and-echo/c-iteration/route. Frame pacing includes screenshot overhead."
+}

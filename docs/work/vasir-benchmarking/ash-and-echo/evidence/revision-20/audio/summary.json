@@ -1,0 +1,167 @@
+{
+  "scope": "Real Chromium OfflineAudioContext DSP; a scheduling-clock adapter positions isolated event calls. All audio nodes, envelopes, compression, convolution and final sample renders are browser-native. This is objective audio evidence, not a human listening grade.",
+  "checksPassed": true,
+  "conditions": [
+    {
+      "version": "baseline",
+      "label": "double",
+      "silentBeforeUnlock": true,
+      "peak": 0.12638120353221893,
+      "rms": 0.004195263220286291,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 14,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "baseline",
+      "label": "first-then-double",
+      "silentBeforeUnlock": true,
+      "peak": 0.1292835921049118,
+      "rms": 0.004758521595088376,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 18,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "baseline",
+      "label": "double-contact-rebound",
+      "silentBeforeUnlock": true,
+      "peak": 0.12638120353221893,
+      "rms": 0.004851254408788574,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 24,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "baseline",
+      "label": "maximum-land-control",
+      "silentBeforeUnlock": true,
+      "peak": 0.341923326253891,
+      "rms": 0.017569324077936453,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 15,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "double",
+      "silentBeforeUnlock": true,
+      "peak": 0.12638120353221893,
+      "rms": 0.004308468115294865,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 14,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "first-then-double",
+      "silentBeforeUnlock": true,
+      "peak": 0.1292835921049118,
+      "rms": 0.0048442292650030475,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 18,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "double-contact-rebound",
+      "silentBeforeUnlock": true,
+      "peak": 0.12638120353221893,
+      "rms": 0.004948959942620807,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 24,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    },
+    {
+      "version": "candidate",
+      "label": "maximum-land-control",
+      "silentBeforeUnlock": true,
+      "peak": 0.341923326253891,
+      "rms": 0.0175693240848139,
+      "clipped": 0,
+      "nonFinite": 0,
+      "tailRms": 0,
+      "persistentSources": 9,
+      "maxSources": 15,
+      "afterTail": {
+        "nodes": 47,
+        "sources": 9
+      },
+      "afterDispose": {
+        "nodes": 0,
+        "sources": 9
+      }
+    }
+  ],
+  "qualification": "Persistent sources are nine scheduled/stopped ambient source identities retained by instrumentation; connected nodes return to zero at disposal. No human listening grade."
+}

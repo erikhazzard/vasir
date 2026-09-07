@@ -1,0 +1,13 @@
+# Revision19 first integrated read — force succeeds, material rejected
+
+The upper tier is now unmistakably more intense than18.300 already separates from160 through a larger scene clap and taller eruption;508 adds a major down/roll/zoom beat, extended camera response and much larger material. This is not merely a deeper crouch or small shake.160 retains the18 visual grammar.
+
+However, the final appearance is blocked by the eruption's material language. Native508 frames132–138 show several enormous clean flat polygon blades radiating from one anchor and holding as a coherent fan/crystal/fern. Native145 and enlarged143 show regular punched polygon chips. The effect is visibly large but reads as an added geometric graphic rather than ash shattering out of the world. This should be repaired while preserving the violence, tall reach and aftermath; shrinking back to subtle would fail the explicit user request.
+
+Requested repair: fracture the continuous spokes early into irregular opaque masses, gaps and independently moving fragments; vary large chips' silhouettes and perforation instead of scaling a regular token. Keep the localized origin, open eye corridor and ballistic settling. The surface author and parent accepted this blocker.
+
+Normal native and enlarged each contain actual160/300/508 plus buffered508 rebound, all from unmodified real physics after initial zero-velocity placement.160/300 share resonant-stone;508 is the intact clear ledge-25 column. All8 first-round contacts have correct fallDistance/impactSpeed/severity and no browser errors. Buffered508 leaves immediately with clear eyes while the surface response remains behind. No input-lock concern was visible. These are prepared contact cases, not a human play test; ordinary route and actual gentle will be judged on the repaired candidate.
+
+Frozen source/receipts/normal-time video are preserved under round1-native/ and round1-desktop/. Native key frames: sequence/frame-0082.png300;0132/0138/0145.png508 material;0184.png immediate rebound. Enlarged0138/0140/0143.png confirm the same material issue. Frame numbers refer to25fps extraction and are approximate observational phases.
+
+Source identities include renderer `7950e5f7b79a1a152c681443aa2a43447f5bc2d25bbb22f09229235df879ebf1`, surface `9eb9edf82fcace11ebaa40be5e59cc9e5ba8ce59f921285c0966d9282772d16d`, character `bf3809c27e790a50e5aaac7f714e1cc797e70c02954decaf8aa46ca392dfc134`. Remaining exact modules are in the receipts. Both first-round browsers were closed before parent quiet performance work. Combined visual gate remains open pending the material correction.

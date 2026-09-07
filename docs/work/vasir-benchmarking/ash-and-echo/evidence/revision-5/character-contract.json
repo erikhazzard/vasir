@@ -1,0 +1,6 @@
+{
+  "mode": "Isolated character contract check, real deterministic game steps; desktop headless Chrome, not device performance",
+  "events": 73,
+  "failures": [],
+  "frames": 1800
+}

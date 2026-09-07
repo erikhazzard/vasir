@@ -1,0 +1,127 @@
+{
+  "method": "Real key events. Read-only character age instrumentation; before disables only explicit presentation reset on restart.",
+  "modes": {
+    "before": [
+      {
+        "hero": {
+          "jumpAge": 10.05,
+          "jumpType": ""
+        },
+        "elapsed": 0.049999999999999996,
+        "vy": -715.3188691650229,
+        "events": [
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 10.05,
+          "jumpType": ""
+        },
+        "elapsed": 0.049999999999999996,
+        "vy": -715.3188691650229,
+        "events": [
+          "land",
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 10.05,
+          "jumpType": ""
+        },
+        "elapsed": 0.049999999999999996,
+        "vy": -715.3188691650229,
+        "events": [
+          "land",
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 10.049900000000001,
+          "jumpType": ""
+        },
+        "elapsed": 0.041666666666666664,
+        "vy": -732.8511943896558,
+        "events": [
+          "land",
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 10.0501,
+          "jumpType": ""
+        },
+        "elapsed": 0.049999999999999996,
+        "vy": -715.3188691650229,
+        "events": [
+          "land",
+          "jump"
+        ]
+      }
+    ],
+    "after": [
+      {
+        "hero": {
+          "jumpAge": 0.05,
+          "jumpType": "jump"
+        },
+        "elapsed": 0.06666666666666667,
+        "vy": -715.3188691650229,
+        "events": [
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 0.05010000000000013,
+          "jumpType": "jump"
+        },
+        "elapsed": 0.049999999999999996,
+        "vy": -715.3188691650229,
+        "events": [
+          "land",
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 0.03340000000000009,
+          "jumpType": "jump"
+        },
+        "elapsed": 0.03333333333333333,
+        "vy": -750.3835196142887,
+        "events": [
+          "land",
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 0.06669999999999981,
+          "jumpType": "jump"
+        },
+        "elapsed": 0.06666666666666667,
+        "vy": -680.254218715757,
+        "events": [
+          "land",
+          "jump"
+        ]
+      },
+      {
+        "hero": {
+          "jumpAge": 0.0499000000000001,
+          "jumpType": "jump"
+        },
+        "elapsed": 0.041666666666666664,
+        "vy": -732.8511943896558,
+        "events": [
+          "land",
+          "jump"
+        ]
+      }
+    ]
+  }
+}

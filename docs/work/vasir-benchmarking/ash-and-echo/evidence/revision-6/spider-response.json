@@ -1,0 +1,251 @@
+{
+  "method": "Arranged initial standing position at ordinary right ledge16; subsequent real keyboard approach/jump/leave, read-only response snapshots. Proves local response, not full route.",
+  "errors": [],
+  "samples": [
+    {
+      "name": "00-approach-start",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 260,
+          "y": 2114,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1546.657229709371,
+        "elapsed": 0.7749999999999997,
+        "deaths": 0,
+        "maxAltitude": 2338,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.7369065592920002,
+          "lookY": -0.7409985598839207,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.46154966386694596,
+          "lookY": 0.2967537186426116,
+          "alert": 0.6023278839176802
+        }
+      ]
+    },
+    {
+      "name": "01-near",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 329.8541666666661,
+          "y": 2114,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1546.29803072526,
+        "elapsed": 1.2416666666666647,
+        "deaths": 0,
+        "maxAltitude": 2338,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.7858292948875579,
+          "lookY": -0.8642884823675042,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.24342938047646856,
+          "lookY": 0.2638178191135289,
+          "alert": 0.7465029451451907
+        }
+      ]
+    },
+    {
+      "name": "02-near-answer",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 329.8541666666661,
+          "y": 2114,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1546.2892312908427,
+        "elapsed": 2.4583333333333273,
+        "deaths": 0,
+        "maxAltitude": 2338,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.7997111775635959,
+          "lookY": -0.8992721401335737,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.06170225824705952,
+          "lookY": 0.2544722196181889,
+          "alert": 0.8305988215129814
+        }
+      ]
+    },
+    {
+      "name": "03-pass-head",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 329.8541666666661,
+          "y": 1984.875557016582,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 84.63949156256858,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "fall"
+        },
+        "cameraY": 1436.7397007457364,
+        "elapsed": 2.8249999999999926,
+        "deaths": 0,
+        "maxAltitude": 2468.587004163928,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.7999106383077184,
+          "lookY": -0.8997748000805699,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.05909112632259295,
+          "lookY": -0.14177328876903056,
+          "alert": 0.7891097687865001
+        }
+      ]
+    },
+    {
+      "name": "04-leave",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 198.57361111111092,
+          "y": 2169.526335013514,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 588.2095112864342,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "fall"
+        },
+        "cameraY": 1564.4025704447592,
+        "elapsed": 3.4749999999999903,
+        "deaths": 0,
+        "maxAltitude": 2468.587004163928,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.7999888324517772,
+          "lookY": -0.8999718567218703,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.5192861043416881,
+          "lookY": 0.20552764323694075,
+          "alert": 0.5933909886753781
+        }
+      ]
+    }
+  ]
+}

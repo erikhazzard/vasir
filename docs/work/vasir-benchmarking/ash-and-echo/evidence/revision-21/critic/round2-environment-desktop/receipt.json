@@ -1,0 +1,925 @@
+{
+  "source": {
+    "/": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "/style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "/main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "/game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "/renderer.js": "79f2509e0ac60673bbb6adf682050aab9324014a760ed6e20f92304f6f9653ea",
+    "/audio.js": "23e64254cf2f2f6bc920ec2490efa9df63019afa5286744c2bd13c2e690436d0",
+    "/character.js": "3056f72a2189dcd33e3d2603f619fecebf3a24b74a6ceaaee8050cb255571cb2",
+    "/depth.js": "400728e21636c730b78b99fce6adda66fbf4acaf305026b24174ce39c2c9dade",
+    "/atmosphere.js": "472626c7b8945a057eed7dbd7b847a8c9661e1b92637ad01634cb96ffc9b51bb",
+    "/surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "/cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "/lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "/wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "/foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "/ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "/ash-material.js": "2db00794f3627dc76ec53897c312914e129c705512db8ba40c767df2094d23dc",
+    "/cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "/fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306"
+  },
+  "actions": [
+    {
+      "name": "run-start",
+      "clock": 3007.7000000029802,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 140,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1829.9323076923076,
+        "elapsed": 2.2249999999999948,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "checkpoint",
+        "x": 210,
+        "y": 2415,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1,
+        "at": 0.7249999999999999,
+        "elapsed": 0.4250000000000005
+      }
+    },
+    {
+      "name": "brake",
+      "clock": 3393.2000000029802,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 225.67916666666684,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 158,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "run"
+        },
+        "cameraY": 1829.9323076923076,
+        "elapsed": 2.6083333333333267,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "checkpoint",
+        "x": 210,
+        "y": 2415,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1,
+        "at": 0.7249999999999999,
+        "elapsed": 0.4250000000000005
+      }
+    },
+    {
+      "name": "reverse",
+      "clock": 3647,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 229.20416666666682,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1829.9323076923076,
+        "elapsed": 2.858333333333326,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "checkpoint",
+        "x": 210,
+        "y": 2415,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1,
+        "at": 0.7249999999999999,
+        "elapsed": 0.4250000000000005
+      }
+    },
+    {
+      "name": "run-end",
+      "clock": 4511.39999999851,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 135.7,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": -1,
+          "motion": "idle"
+        },
+        "cameraY": 1829.9323076923076,
+        "elapsed": 3.7249999999999894,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "checkpoint",
+        "x": 210,
+        "y": 2415,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1,
+        "at": 0.7249999999999999,
+        "elapsed": 0.4250000000000005
+      }
+    },
+    {
+      "name": "wall-start",
+      "clock": 4661.89999999851,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 336,
+          "y": 4316.026459200812,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 108,
+          "grounded": false,
+          "wallDir": 1,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "wallSlide"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 3.874999999999989,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "checkpoint",
+        "x": 210,
+        "y": 2415,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1,
+        "at": 0.7249999999999999,
+        "elapsed": 0.4250000000000005
+      }
+    },
+    {
+      "name": "wall-end",
+      "clock": 5767.39999999851,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 287.41650000000004,
+          "y": 4340,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 4.975000000000037,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "first-hop-fog-a",
+      "clock": 7574.20000000298,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 184,
+          "y": 4398,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 6.791666666666794,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "first-hop-fog-b",
+      "clock": 10858.60000000149,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 184,
+          "y": 4398,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 10.075000000000069,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "ledge-7-fog-a",
+      "clock": 12979.89999999851,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 188,
+          "y": 3468.1983813526094,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2873.9323076923074,
+        "elapsed": 12.191666666666615,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "ledge-7-fog-b",
+      "clock": 16299.10000000149,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 188,
+          "y": 3468.200000031099,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2873.9323076923074,
+        "elapsed": 15.508333333333093,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "ledge-20-fog-a",
+      "clock": 18451.79999999702,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 191,
+          "y": 1492.1983813526094,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 897.9323076923076,
+        "elapsed": 17.658333333332973,
+        "deaths": 0,
+        "maxAltitude": 2964,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "ledge-20-fog-b",
+      "clock": 21791.60000000149,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 191,
+          "y": 1492.200000098056,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 897.9323076923076,
+        "elapsed": 21.008333333332782,
+        "deaths": 0,
+        "maxAltitude": 2964,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "ordinary-ascent-start",
+      "clock": 22698.60000000149,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 96,
+          "y": 4452,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 0.6000000000000003,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 299.41650000000004,
+        "y": 4368,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 1.2328767123287672,
+        "platformId": "second-hop",
+        "suspended": false,
+        "landmark": "second-hop",
+        "fallDistance": 145.00641390898454,
+        "impactSpeed": 900,
+        "landingSeverity": 0.39372686074856744,
+        "contactX": 299.41650000000004,
+        "contactY": 4368,
+        "contactOffset": -0.18791176470588153,
+        "at": 4.783333333333361,
+        "elapsed": 4.483333333333346
+      }
+    },
+    {
+      "name": "ordinary-ascent-end",
+      "clock": 28513.20000000298,
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 318.3864767983974,
+          "y": 3953.5908860615355,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3452.590435680325,
+        "elapsed": 6.408333333333442,
+        "deaths": 0,
+        "maxAltitude": 545.4996858791715,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "lastEvent": {
+        "type": "land",
+        "x": 329.99152777777755,
+        "y": 3976,
+        "vx": 0,
+        "vy": 0,
+        "intensity": 0.19039684898483644,
+        "platformId": "resonant-stone",
+        "suspended": true,
+        "landmark": "resonant-stone",
+        "resonance": {
+          "x": 311,
+          "y": 4002,
+          "size": 42
+        },
+        "fallDistance": 3.5366279494483024,
+        "impactSpeed": 138.9896997589306,
+        "landingSeverity": 0,
+        "contactX": 329.99152777777755,
+        "contactY": 3976,
+        "contactOffset": 0.4220339506172789,
+        "at": 6.091666666666759,
+        "elapsed": 6.091666666666759
+      }
+    }
+  ],
+  "errors": [],
+  "method": "Frozen whole source. Ordinary normal-time keyboard actions; opening platform arranged before each trial only. No screenshots during action windows. Native viewport or enlarged desktop 780×1688 game context. Ground run/brake/reversal on arranged checkpoint shelf; wall fixture begins beside wall, real input launches. Fog idle pairs settle on three arranged ledges with normal RAF, unchanged camera verified in receipt. Final ordinary ascent starts by real restart and uses only keyboard.",
+  "events": [
+    {
+      "type": "checkpoint",
+      "x": 210,
+      "y": 2415,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1,
+      "at": 0.7249999999999999,
+      "elapsed": 0.4250000000000005
+    },
+    {
+      "type": "wallJump",
+      "x": 348,
+      "y": 4344.026459200812,
+      "vx": -296,
+      "vy": -810,
+      "intensity": 1,
+      "at": 4.183333333333331,
+      "elapsed": 3.883333333333322
+    },
+    {
+      "type": "land",
+      "x": 299.41650000000004,
+      "y": 4368,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1.2328767123287672,
+      "platformId": "second-hop",
+      "suspended": false,
+      "landmark": "second-hop",
+      "fallDistance": 145.00641390898454,
+      "impactSpeed": 900,
+      "landingSeverity": 0.39372686074856744,
+      "contactX": 299.41650000000004,
+      "contactY": 4368,
+      "contactOffset": -0.18791176470588153,
+      "at": 4.783333333333361,
+      "elapsed": 4.483333333333346
+    },
+    {
+      "type": "jump",
+      "x": 108,
+      "y": 4480,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "at": 0.6083333333333336,
+      "elapsed": 0.6083333333333336
+    },
+    {
+      "type": "doubleJump",
+      "x": 266.45694444444484,
+      "y": 4451.441851121335,
+      "vx": 258,
+      "vy": -746,
+      "intensity": 0.9,
+      "at": 1.274999999999998,
+      "elapsed": 1.274999999999998
+    },
+    {
+      "type": "land",
+      "x": 310.8625000000002,
+      "y": 4368,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.33930152897486937,
+      "platformId": "second-hop",
+      "suspended": false,
+      "landmark": "second-hop",
+      "fallDistance": 8.595905471549486,
+      "impactSpeed": 247.69011615165465,
+      "landingSeverity": 0.0016690475374889885,
+      "contactX": 310.8625000000002,
+      "contactY": 4368,
+      "contactOffset": 0.036519607843140824,
+      "at": 1.60833333333333,
+      "elapsed": 1.60833333333333
+    },
+    {
+      "type": "jump",
+      "x": 310.8625000000002,
+      "y": 4368,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "second-hop",
+      "at": 1.883333333333329,
+      "elapsed": 1.883333333333329
+    },
+    {
+      "type": "wallJump",
+      "x": 348,
+      "y": 4215.582752575057,
+      "vx": -296,
+      "vy": -810,
+      "intensity": 1,
+      "at": 2.3249999999999944,
+      "elapsed": 2.3249999999999944
+    },
+    {
+      "type": "land",
+      "x": 296.4506944444445,
+      "y": 4144,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.4509800389673941,
+      "platformId": "crossing-recovery",
+      "suspended": false,
+      "landmark": "crossing-recovery",
+      "fallDistance": 17.540905106292485,
+      "impactSpeed": 329.2154284461977,
+      "landingSeverity": 0.017295427312239424,
+      "contactX": 296.4506944444445,
+      "contactY": 4144,
+      "contactOffset": -0.15544191919191855,
+      "at": 2.66666666666666,
+      "elapsed": 2.66666666666666
+    },
+    {
+      "type": "jump",
+      "x": 296.4506944444445,
+      "y": 4144,
+      "vx": -28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "crossing-recovery",
+      "at": 2.916666666666659,
+      "elapsed": 2.916666666666659
+    },
+    {
+      "type": "doubleJump",
+      "x": 142.2937499999999,
+      "y": 4071.9026955950044,
+      "vx": -258,
+      "vy": -746,
+      "intensity": 0.9,
+      "at": 3.5666666666666567,
+      "elapsed": 3.5666666666666567
+    },
+    {
+      "type": "wallJump",
+      "x": 100.0381944444443,
+      "y": 4172.108232887722,
+      "vx": 296,
+      "vy": -810,
+      "intensity": 1,
+      "at": 4.166666666666663,
+      "elapsed": 4.166666666666663
+    },
+    {
+      "type": "wallJump",
+      "x": 100,
+      "y": 4028.620739279715,
+      "vx": 296,
+      "vy": -810,
+      "intensity": 1,
+      "at": 4.633333333333353,
+      "elapsed": 4.633333333333353
+    },
+    {
+      "type": "land",
+      "x": 161.51722222222213,
+      "y": 4204,
+      "vx": 197.75,
+      "vy": 0,
+      "intensity": 1.2328767123287672,
+      "platformId": "wall-transfer",
+      "suspended": false,
+      "landmark": "wall-transfer",
+      "fallDistance": 269.49968587917147,
+      "impactSpeed": 900,
+      "landingSeverity": 0.6270769543786269,
+      "contactX": 161.51722222222213,
+      "contactY": 4204,
+      "contactOffset": 0.5316087962962944,
+      "at": 5.316666666666721,
+      "elapsed": 5.316666666666721
+    },
+    {
+      "type": "jump",
+      "x": 161.51722222222213,
+      "y": 4204,
+      "vx": 197.75,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "wall-transfer",
+      "at": 5.316666666666721,
+      "elapsed": 5.316666666666721
+    },
+    {
+      "type": "doubleJump",
+      "x": 283.43597222222223,
+      "y": 4060.183797209438,
+      "vx": 258,
+      "vy": -746,
+      "intensity": 0.9,
+      "at": 5.800000000000078,
+      "elapsed": 5.800000000000078
+    },
+    {
+      "type": "land",
+      "x": 329.99152777777755,
+      "y": 3976,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.19039684898483644,
+      "platformId": "resonant-stone",
+      "suspended": true,
+      "landmark": "resonant-stone",
+      "resonance": {
+        "x": 311,
+        "y": 4002,
+        "size": 42
+      },
+      "fallDistance": 3.5366279494483024,
+      "impactSpeed": 138.9896997589306,
+      "landingSeverity": 0,
+      "contactX": 329.99152777777755,
+      "contactY": 3976,
+      "contactOffset": 0.4220339506172789,
+      "at": 6.091666666666759,
+      "elapsed": 6.091666666666759
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "scenario": "Chrome headless, 390x844 DPR2; manually swept render camera for bounded resources; actual keyboard jump then pause; forced context loss/restore; UI gentler effects. No timing claims.",
+  "warm": {
+    "counters": {
+      "uploads": 6,
+      "subUploads": 0,
+      "textures": 6,
+      "buffers": 1,
+      "programs": 1,
+      "targets": 0,
+      "canvases": 90,
+      "draws": 2141
+    },
+    "gpu": {
+      "backend": "webgl",
+      "textures": 5,
+      "buffer": [
+        585,
+        1266
+      ]
+    },
+    "scenery": {
+      "cages": [
+        {
+          "x": 131.82,
+          "y": 4237.5,
+          "length": 62,
+          "angle": 0,
+          "velocity": 0
+        },
+        {
+          "x": 131.19,
+          "y": 425.5,
+          "length": 56,
+          "angle": 0,
+          "velocity": 0
+        },
+        {
+          "x": 295.74,
+          "y": 1224.5,
+          "length": 54,
+          "angle": 0,
+          "velocity": 0
+        },
+        {
+          "x": 290.07,
+          "y": 2763,
+          "length": 51,
+          "angle": 0,
+          "velocity": 0
+        }
+      ],
+      "bells": [
+        {
+          "x": 210,
+          "y": 2458,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        },
+        {
+          "x": 210,
+          "y": 248,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        }
+      ],
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.16117846825195106,
+          "lookY": 0.6216883775432398,
+          "alert": 0
+        },
+        {
+          "x": 454,
+          "y": 2208,
+          "scale": -0.83,
+          "lookX": 0.5526118911495465,
+          "lookY": 0.6216883775432398,
+          "alert": 0
+        }
+      ]
+    }
+  },
+  "plateau": {
+    "counters": {
+      "uploads": 6,
+      "subUploads": 0,
+      "textures": 6,
+      "buffers": 1,
+      "programs": 1,
+      "targets": 0,
+      "canvases": 90,
+      "draws": 3967
+    },
+    "gpu": {
+      "backend": "webgl",
+      "textures": 5,
+      "buffer": [
+        585,
+        1266
+      ]
+    },
+    "error": 0
+  },
+  "activeSceneryOnPause": {
+    "cages": [
+      {
+        "x": 131.82,
+        "y": 4237.5,
+        "length": 62,
+        "angle": -0.016991587174309854,
+        "velocity": -0.18531886926848817
+      },
+      {
+        "x": 131.19,
+        "y": 425.5,
+        "length": 56,
+        "angle": 0,
+        "velocity": 0
+      },
+      {
+        "x": 295.74,
+        "y": 1224.5,
+        "length": 54,
+        "angle": 0,
+        "velocity": 0
+      },
+      {
+        "x": 290.07,
+        "y": 2763,
+        "length": 51,
+        "angle": 0,
+        "velocity": 0
+      }
+    ],
+    "bells": [
+      {
+        "x": 210,
+        "y": 2458,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 210,
+        "y": 248,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      }
+    ],
+    "spiders": [
+      {
+        "x": -18,
+        "y": 3880,
+        "scale": 1,
+        "lookX": 0.17806198212025012,
+        "lookY": 0.6868105024638218,
+        "alert": 0
+      },
+      {
+        "x": 454,
+        "y": 2208,
+        "scale": -0.83,
+        "lookX": 0.6104982244122861,
+        "lookY": 0.6868105024638218,
+        "alert": 0
+      }
+    ]
+  },
+  "pauseFrozen": true,
+  "pausedFrameUploads": 0,
+  "recovery": {
+    "extension": true,
+    "lost": {
+      "gpu": {
+        "backend": "canvas2d",
+        "textures": 5,
+        "buffer": [
+          585,
+          1266
+        ]
+      },
+      "hidden": true
+    },
+    "restored": {
+      "gpu": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          585,
+          1266
+        ]
+      },
+      "error": 0
+    }
+  },
+  "gentle": {
+    "time": 0,
+    "wake": [
+      0,
+      -3691.076904296875,
+      0,
+      0
+    ],
+    "error": 0
+  },
+  "errors": [],
+  "warnings": []
+}

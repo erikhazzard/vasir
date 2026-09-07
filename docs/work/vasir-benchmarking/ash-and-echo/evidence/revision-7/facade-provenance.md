@@ -1,0 +1,15 @@
+# Vertical facade asset
+
+Generated 2026-09-05 with built-in image_gen. No model identity was supplied in returned tool metadata. Generated source preserved without raster editing.
+
+Source: `/Users/erikhazzard/Library/Application Support/Ratatosk/workspace/agent-account-contexts/codex/acct_Ah4F4kNtKtC-JmD5/generated_images/01a0730f-1cf4-7760-9a6e-725c67746440/exec-6c5d63b5-18a7-4375-82a7-5bd4a4dd39e2.png`
+
+Destination: `site/ash-and-echo/assets/charcoal-vertical-facade.png`
+
+## Exact prompt
+
+Use case: stylized-concept. Asset type: transparent PNG parallax architecture for Ash & Echo, a monochrome painted Gothic climbing game. Create a single portrait image approximately 1024 x 2048 (1:2 aspect). A SECTION OF A COLOSSAL VERTICAL CATHEDRAL FACADE, front view, charcoal weathered stone painted in broad faceted dark-gray planes with restrained stone texture, almost monochrome. Two or three UNEQUAL extremely tall pointed Gothic lancet openings, their pointed arch heads connected logically into uninterrupted load-bearing vertical piers. Arch heads occupy upper third. The dark vertical piers CONTINUE STRAIGHT DOWN THROUGH THE BOTTOM IMAGE BOUNDARY, with NO terminal feet, NO rubble, NO ground, NO base, NO bottom ledge, NO underside, NO pedestal. Lower two thirds are very long continuous piers and transparent narrow openings; image framing cuts the ongoing building in mid-height at its lower boundary. It must visibly read as an immense vertical building continuing downward indefinitely, NEVER a complete freestanding ruin sitting on an invisible floor. A modest broken asymmetric upper parapet/crown may be visible; architectural gravity and continuity paramount. Exterior left and right contours cleanly exposed with slight irregular stone chips, but no disconnected fragments. True transparent alpha outside the building and THROUGH EVERY WINDOW OPENING, including all the way down where opening continues beyond bottom edge. No background whatsoever, no fog, no sky, no birds, no people, no vegetation, no text, no checkerboard pattern. Strong broad contrasting planes preserve scale at 750 CSS pixels wide. Light comes gently from upper left; stone ranges charcoal black through medium gray, no bright-white ornament. Sparse ribbing following vertical piers and arch curves, avoid excessively intricate lace. Premium atmospheric hand-painted game environment, not photoreal stock architecture. The bottom 200 pixels must contain uninterrupted straight vertical pier cross-sections continuing through the canvas edge and transparent apertures between them; absolutely no stone joining piers into a bottom sill.
+
+## Visual inspection
+
+Three unequal tall lancet openings with intact upper arch-to-pier relationships. Piers and apertures continue through the bottom boundary without rubble, plinths, bottom sill or floating underside. Source looks slightly more rendered/detailed than the broad charcoal buttress; runtime grading at distant depth should control texture. Outer contours have occasional chipped stone projections, including at the image sides. No pasted-ground semantic remains. Generated aspect approximately 1:2.

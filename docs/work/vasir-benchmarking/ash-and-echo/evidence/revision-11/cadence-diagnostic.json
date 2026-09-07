@@ -1,0 +1,108 @@
+[
+  {
+    "name": "blank",
+    "metrics": {
+      "count": 119,
+      "p50": 33.30000000000018,
+      "p95": 33.40000000000009,
+      "max": 33.40000000000009,
+      "visibility": "visible",
+      "focused": true,
+      "backend": null
+    },
+    "errors": []
+  },
+  {
+    "name": "baseline",
+    "metrics": {
+      "count": 120,
+      "p50": 33.30000000000018,
+      "p95": 33.40000000000009,
+      "max": 33.400000000000546,
+      "visibility": "visible",
+      "focused": true,
+      "backend": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          585,
+          1266
+        ]
+      }
+    },
+    "errors": []
+  },
+  {
+    "name": "current",
+    "metrics": {
+      "count": 121,
+      "p50": 33.30000000000018,
+      "p95": 33.400000000000546,
+      "max": 33.400000000000546,
+      "visibility": "visible",
+      "focused": true,
+      "backend": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          585,
+          1266
+        ]
+      }
+    },
+    "errors": []
+  },
+  {
+    "name": "baseline",
+    "metrics": {
+      "count": 120,
+      "p50": 33.30000000000018,
+      "p95": 33.40000000000009,
+      "max": 33.5,
+      "visibility": "visible",
+      "focused": true,
+      "backend": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          585,
+          1266
+        ]
+      }
+    },
+    "errors": []
+  },
+  {
+    "name": "current",
+    "metrics": {
+      "count": 120,
+      "p50": 33.30000000000018,
+      "p95": 33.400000000000546,
+      "max": 33.400000000000546,
+      "visibility": "visible",
+      "focused": true,
+      "backend": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          585,
+          1266
+        ]
+      }
+    },
+    "errors": []
+  },
+  {
+    "name": "blank",
+    "metrics": {
+      "count": 119,
+      "p50": 33.30000000000018,
+      "p95": 33.40000000000009,
+      "max": 33.40000000000009,
+      "visibility": "visible",
+      "focused": true,
+      "backend": null
+    },
+    "errors": []
+  }
+]

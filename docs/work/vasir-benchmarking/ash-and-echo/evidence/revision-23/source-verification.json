@@ -1,0 +1,88 @@
+{
+  "finalRuntime": {
+    "game.js": "47f2219507a1f15d0d85c10cc00103bff792d97f6433717cbd7a248dc57c50ed",
+    "renderer.js": "61862fc4eaa8fcb2fcef48c3dc27de97b8a5d4a2c2aff2c7bc67593a47905d88",
+    "foreground.js": "6a8e033b74748bd979b554ecf02f6eb3026785186a782162e4aee167e0dd60f9",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "index.html": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "ash-material.js": "f9f1ec9b6ad8252bad8a3f046307249d05f587498c86c17671a4c54fdc03d77a",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "audio.js": "23e64254cf2f2f6bc920ec2490efa9df63019afa5286744c2bd13c2e690436d0",
+    "style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "atmosphere.js": "472626c7b8945a057eed7dbd7b847a8c9661e1b92637ad01634cb96ffc9b51bb",
+    "surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "character.js": "41188b7d3c6f1b8f7737f9eb8e7fed6ce7934e4ae103baae3a4780c1f830d197",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "depth.js": "5d2fe3bc6df06316b07e2ac814c4b9e81b200760767ca1eb9cd78e3789ab8596",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306"
+  },
+  "receipts": {
+    "proof/touch.json": {
+      "matchedSources": 16,
+      "mismatches": []
+    },
+    "proof/fallback.json": {
+      "matchedSources": 16,
+      "mismatches": []
+    },
+    "proof/resources.json": {
+      "matchedSources": 16,
+      "mismatches": []
+    },
+    "proof/keyboard.json": {
+      "matchedSources": 16,
+      "mismatches": []
+    },
+    "proof/character-material.json": {
+      "matchedSources": 2,
+      "mismatches": []
+    },
+    "proof/ordinary-pacing.json": {
+      "matchedSources": 16,
+      "mismatches": []
+    },
+    "proof/heavy-pacing.json": {
+      "matchedSources": 16,
+      "mismatches": []
+    },
+    "reviews/round2-native/receipt.json": {
+      "matchedSources": 18,
+      "mismatches": []
+    },
+    "reviews/round2-desktop/receipt.json": {
+      "matchedSources": 18,
+      "mismatches": []
+    },
+    "reviews/round2-intent-native/receipt.json": {
+      "matchedSources": 18,
+      "mismatches": []
+    },
+    "reviews/round2-intent-desktop/receipt.json": {
+      "matchedSources": 18,
+      "mismatches": []
+    }
+  },
+  "live": {
+    "game.js": true,
+    "renderer.js": true,
+    "foreground.js": true,
+    "lighting.js": true,
+    "index.html": true,
+    "ash-material.js": true,
+    "cloud-texture.js": true,
+    "ash-flow.js": true,
+    "main.js": true,
+    "audio.js": true,
+    "style.css": true,
+    "atmosphere.js": true,
+    "surface-ash.js": true,
+    "wildlife.js": true,
+    "character.js": true,
+    "cast-shadows.js": true,
+    "depth.js": true,
+    "fog-volume.js": true
+  }
+}

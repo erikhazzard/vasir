@@ -1,0 +1,97 @@
+{
+  "before": {
+    "game.js": "a16e9e8fc6aca268836c8aeb66fb792c90d9b2e0cac741aec22966a27989cc1f",
+    "renderer.js": "029e3d771c567a4aa20e0013d63bbbea2ff8cfb7256d450c4600d65ca27b27ea",
+    "main.js": "11c0366931c926e2ef125e418896bb727dde83fd6f05bc5ac630d8c8009847b7",
+    "depth.js": "1d219765aa86890926a79538ae8d97e9e36005c09ad09336dc9ca97c064eb5c7"
+  },
+  "errors": [],
+  "sequence": [
+    "Begin",
+    "hold right+Space 300ms",
+    "release right",
+    "release Space100ms",
+    "hold Space180ms",
+    "release Space",
+    "settle950ms"
+  ],
+  "phone": {
+    "stage": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "snapshot": {
+      "state": "playing",
+      "player": {
+        "x": 181.77777777777789,
+        "y": 4326,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3690.9914830601297,
+      "elapsed": 2.3333333333333277,
+      "deaths": 0,
+      "maxAltitude": 285.73291694061027,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  },
+  "retina": {
+    "stage": {
+      "x": 394.328125,
+      "y": 29.046875,
+      "width": 491.34375,
+      "height": 909.90625
+    },
+    "snapshot": {
+      "state": "playing",
+      "player": {
+        "x": 184.91250000000014,
+        "y": 4326,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3822.20868602036,
+      "elapsed": 3.0166666666666586,
+      "deaths": 0,
+      "maxAltitude": 280.0246730951876,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  },
+  "after": {
+    "game.js": "a16e9e8fc6aca268836c8aeb66fb792c90d9b2e0cac741aec22966a27989cc1f",
+    "renderer.js": "029e3d771c567a4aa20e0013d63bbbea2ff8cfb7256d450c4600d65ca27b27ea",
+    "main.js": "11c0366931c926e2ef125e418896bb727dde83fd6f05bc5ac630d8c8009847b7",
+    "depth.js": "1d219765aa86890926a79538ae8d97e9e36005c09ad09336dc9ca97c064eb5c7"
+  },
+  "unchanged": true
+}

@@ -1,0 +1,33 @@
+{
+  "scope": "Only site/ash-and-echo/foreground.js and this scratch folder edited",
+  "style": "Painted charcoal architecture; low-density portrait platformer; 390x844 CSS, DPR2",
+  "change": "Three cached complete silhouettes across the existing six foreground placements: arch shoulder with supported pier, clustered capital and shaft, and broken buttress. Existing stone material, local cloth pins and ambient/gust response retained.",
+  "renderDisposition": "SAFE_LOCAL_CHANGE",
+  "topology": {
+    "owner": "Existing main.js animation owner -> renderer.render -> depth.drawNear -> foreground.draw",
+    "frameOwnerDelta": 0,
+    "sceneSubmissionDelta": 0,
+    "logicalPassDelta": 0,
+    "fullScenePassDelta": 0,
+    "gpuOffscreenTargetDelta": 0,
+    "terminalOutputDelta": 0,
+    "gpuTextureDelta": 0,
+    "foregroundPlacementsBeforeAfter": [6, 6],
+    "cachedShapeImagesBeforeAfter": [1, 3],
+    "oneTimePreparationSurfacesBeforeAfter": [1, 1],
+    "nominalAdditionalCachedRgbaBytes": 6051200,
+    "runtimeWork": "Existing six-placement culling loop, one cached image per visible placement, same bounded cloth paths. No per-frame shape/material preparation or new async work."
+  },
+  "threading": "Kept existing synchronous one-time asset-identity preparation. Three small fixed variants reuse one preparation surface; a worker lifecycle or transfer protocol is not warranted by this local cached-art change. No startup timing claim.",
+  "checks": {
+    "nativeComposition": "opening, opening-arch, opening-release, middle, upper-arch, summit PNGs; arranged renderer poses, not play proof",
+    "ordinaryInput": "Actual keyboard down/up through first-hop and second-hop; no deaths; native before/after captures",
+    "landingCoverage": "873 platform/camera samples at viewpoint0; minimum 67 logical pixels of landing top below alpha128; no fully concealed landing in this sampled sweep",
+    "cloth": "Identical time produced zero pixel differences; later ambient time and gust produced distinct pixels; reduced motion remained identical across time/gust",
+    "cache": "Isolated foreground created 4 canvases on first preparation and remained at4 after the sweep. Whole-game four camera sweeps plateaued at99 canvas creations.",
+    "syntax": "node --check site/ash-and-echo/foreground.js passed",
+    "browserErrors": 0,
+    "browserClosed": true
+  },
+  "limits": "Other agents were editing adjacent visuals during checks. Receipt isolates foreground source SHA in probe.json. No complete-run, subjective S-tier, sound, physical-phone, thermal or timing claim."
+}

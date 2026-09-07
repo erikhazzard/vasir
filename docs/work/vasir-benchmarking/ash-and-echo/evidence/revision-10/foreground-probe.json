@@ -1,0 +1,78 @@
+{
+  "hops": [
+    {
+      "state": "playing",
+      "player": {
+        "x": 180.61250000000013,
+        "y": 4398,
+        "w": 24,
+        "h": 28,
+        "vx": 4.666666666666602,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "idle"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.2166666666666648,
+      "deaths": 0,
+      "maxAltitude": 104.90214770984039,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    {
+      "state": "playing",
+      "player": {
+        "x": 278.8694444444445,
+        "y": 4340,
+        "w": 24,
+        "h": 28,
+        "vx": 258,
+        "vy": 0,
+        "grounded": true,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "run"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.7833333333333294,
+      "deaths": 0,
+      "maxAltitude": 149.1717072101692,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    }
+  ],
+  "proof": {
+    "initialCreations": 4,
+    "afterSweeps": 4,
+    "surfaces": 873,
+    "minimumClear": 67,
+    "worst": {
+      "id": "ledge-9",
+      "camera": 3125,
+      "width": 98,
+      "clearPixels": 67
+    },
+    "sameTimeDifference": 0,
+    "windDifference": 951,
+    "gustDifference": 1884,
+    "reducedDifference": 0
+  },
+  "source": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+  "errors": []
+}

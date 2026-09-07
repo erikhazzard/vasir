@@ -1,0 +1,429 @@
+{
+  "scenario": "Chrome headless, 390x844 DPR2; manually swept render camera for bounded resources; actual keyboard jump then pause; forced context loss/restore; UI gentler effects. No timing claims.",
+  "warm": {
+    "counters": {
+      "uploads": 7,
+      "subUploads": 0,
+      "textures": 7,
+      "buffers": 1,
+      "programs": 1,
+      "targets": 0,
+      "canvases": 99,
+      "draws": 2021
+    },
+    "gpu": {
+      "backend": "webgl",
+      "textures": 6,
+      "buffer": [
+        585,
+        1266
+      ]
+    },
+    "scenery": {
+      "cages": [
+        {
+          "x": 295.74,
+          "y": 4390,
+          "length": 62,
+          "angle": 0,
+          "velocity": 0
+        },
+        {
+          "x": 114.18,
+          "y": 3801.5,
+          "length": 64,
+          "angle": 0,
+          "velocity": 0
+        },
+        {
+          "x": 296.37,
+          "y": 743.5,
+          "length": 56,
+          "angle": 0,
+          "velocity": 0
+        },
+        {
+          "x": 126.15,
+          "y": 2313.5,
+          "length": 48,
+          "angle": 0,
+          "velocity": 0
+        }
+      ],
+      "rigging": [
+        {
+          "platformId": "resonant-stone",
+          "age": 10.233300000000003,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-23",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-26",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-28",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-20",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-17",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-13",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-10",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        },
+        {
+          "platformId": "ledge-7",
+          "age": 10,
+          "strength": 0,
+          "contactOffset": 0,
+          "segments": 8,
+          "leftBow": 0,
+          "rightBow": 0
+        }
+      ],
+      "activeParticles": 0,
+      "surfaceAsh": {
+        "pending": 0,
+        "capacity": 16,
+        "grainCapacity": 224,
+        "contacts": []
+      },
+      "bells": [
+        {
+          "x": 210,
+          "y": 2458,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        },
+        {
+          "x": 210,
+          "y": 248,
+          "size": 48,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0
+        },
+        {
+          "x": 311,
+          "y": 4002,
+          "size": 42,
+          "angle": 0,
+          "velocity": 0,
+          "clapper": 0,
+          "clapperVelocity": 0,
+          "platform": "resonant-stone",
+          "age": 10.249966666666655,
+          "strength": 0,
+          "direction": 1
+        }
+      ],
+      "spiders": [
+        {
+          "x": -18,
+          "y": 3880,
+          "scale": 1,
+          "lookX": 0.12847872447752204,
+          "lookY": 0.4955607944132993,
+          "alert": 0
+        },
+        {
+          "x": 422,
+          "y": 2015,
+          "scale": -0.83,
+          "lookX": 0.4404984839229327,
+          "lookY": 0.4955607944132993,
+          "alert": 0
+        }
+      ]
+    }
+  },
+  "plateau": {
+    "counters": {
+      "uploads": 7,
+      "subUploads": 0,
+      "textures": 7,
+      "buffers": 1,
+      "programs": 1,
+      "targets": 0,
+      "canvases": 99,
+      "draws": 3836
+    },
+    "gpu": {
+      "backend": "webgl",
+      "textures": 6,
+      "buffer": [
+        585,
+        1266
+      ]
+    },
+    "error": 0
+  },
+  "activeSceneryOnPause": {
+    "cages": [
+      {
+        "x": 295.74,
+        "y": 4390,
+        "length": 62,
+        "angle": 0.003996751781306422,
+        "velocity": 0.04391538119558648
+      },
+      {
+        "x": 114.18,
+        "y": 3801.5,
+        "length": 64,
+        "angle": 0,
+        "velocity": 0
+      },
+      {
+        "x": 296.37,
+        "y": 743.5,
+        "length": 56,
+        "angle": 0,
+        "velocity": 0
+      },
+      {
+        "x": 126.15,
+        "y": 2313.5,
+        "length": 48,
+        "angle": 0,
+        "velocity": 0
+      }
+    ],
+    "rigging": [
+      {
+        "platformId": "resonant-stone",
+        "age": 10.316700000000004,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-23",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-26",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-28",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-20",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-17",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-13",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-10",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-7",
+        "age": 10.083400000000001,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      }
+    ],
+    "activeParticles": 0,
+    "surfaceAsh": {
+      "pending": 0,
+      "capacity": 16,
+      "grainCapacity": 224,
+      "contacts": []
+    },
+    "bells": [
+      {
+        "x": 210,
+        "y": 2458,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 210,
+        "y": 248,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 311,
+        "y": 4002,
+        "size": 42,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0,
+        "platform": "resonant-stone",
+        "age": 10.333366666666656,
+        "strength": 0,
+        "direction": 1
+      }
+    ],
+    "spiders": [
+      {
+        "x": -18,
+        "y": 3880,
+        "scale": 1,
+        "lookX": 0.15303934821328305,
+        "lookY": 0.5902946288226631,
+        "alert": 0
+      },
+      {
+        "x": 422,
+        "y": 2015,
+        "scale": -0.83,
+        "lookX": 0.5247063367312562,
+        "lookY": 0.5902946288226631,
+        "alert": 0
+      }
+    ]
+  },
+  "pauseFrozen": true,
+  "pausedFrameUploads": 0,
+  "recovery": {
+    "extension": true,
+    "lost": {
+      "gpu": {
+        "backend": "canvas2d",
+        "textures": 6,
+        "buffer": [
+          585,
+          1266
+        ]
+      },
+      "hidden": true
+    },
+    "restored": {
+      "gpu": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          585,
+          1266
+        ]
+      },
+      "error": 0
+    }
+  },
+  "gentle": {
+    "time": 0,
+    "jumpWarpUniformRemoved": true,
+    "error": 0
+  },
+  "errors": [],
+  "warnings": [
+    "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+    "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+    "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+    "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "report": [
+    {
+      "severity": 0,
+      "count": 6,
+      "duration": 0.34,
+      "size": 0.75
+    },
+    {
+      "severity": 0.03,
+      "count": 7,
+      "duration": 0.36550000000000005,
+      "size": 0.8708736051712185
+    },
+    {
+      "severity": 0.45,
+      "count": 31,
+      "duration": 1.0129238489501622,
+      "size": 5.832792863904887
+    },
+    {
+      "severity": 1,
+      "count": 38,
+      "duration": 1.8399999999999999,
+      "size": 17.109049382060764
+    }
+  ],
+  "checks": "wall/jump baseline identity, clipping, pause, reset, pool cap, gentle cap, immediate rebound passed"
+}
+Medium severity0–.42 identical to18; maxslam chunks >2x radius with >30px additional rise; Gentle motion identical; existing fixed pools retained.
+Porous material: at most18texture draws per fullslam at100ms; zero at250ms; missing-atlas fallback draws without error.

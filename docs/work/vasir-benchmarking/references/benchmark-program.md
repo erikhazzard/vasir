@@ -11,7 +11,7 @@ VasirBench helps one author decide:
 3. What changes when it runs through the complete normally routed Vasir workflow?
 4. Did a model release or Vasir edit improve quality, regress important behavior, or merely spend more time and tokens?
 
-The primary product is a routing policy by job family, with quality, cost, latency, and failure evidence. A single overall winner answers only the separate question, "Which one configuration should be my default when I refuse to route?"
+The primary product is a routing policy by job family, with quality, cost, latency, and failure evidence. A workload-personalized default-model recommendation answers the separate question, "Which one configuration should be my default when I refuse to route?" The category-priority Overall v2 development index is defined in §6.
 
 ## 2. Experimental grid
 
@@ -140,7 +140,9 @@ The creator never receives the sealed executor tasks. A fluent-looking skill tha
 
 ### Cross-family level
 
-Category profiles and per-job routing remain primary. Publish one overall default-model score only after the author declares workload-frequency and regret weights, all included families have compatible calibrated contracts, and missing evidence stays visible. Never infer equal importance from the existence of five headings.
+Category profiles and per-job routing remain primary. Overall v2 uses declared category priorities under M1P in the [work spec](../work-spec.md): Engineering, Games, and Product Design each 25%; Writing and AI Workflows each 12.5%. Tasks have equal weight within their category. The development index normalizes priorities over globally measured categories and exposes both measured-category coverage and covered target weight. All five categories appear in navigation; unmeasured ones show Coming soon without a score. Only exact configurations with assessable results in both conditions for every published task receive an Overall score; incomplete configurations retain visible coverage gaps and null scores. Its scope spans the declared task rubric editions and task-specific skills, with calibration pending.
+
+A future workload-personalized default-model recommendation requires declared workload-frequency and regret weights, compatible calibrated contracts across the included families, and visible missing evidence. Never infer equal importance from the existence of five headings.
 
 ## 7. Judge aggregation
 

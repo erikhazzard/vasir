@@ -1,0 +1,3740 @@
+{
+  "seconds": 5.416666666666726,
+  "stage": 5,
+  "player": {
+    "x": 200.15947297477652,
+    "y": 3846,
+    "w": 24,
+    "h": 28,
+    "vx": 0,
+    "vy": 0,
+    "grounded": true,
+    "wallDir": 0,
+    "airJumps": 1,
+    "facing": -1,
+    "motion": "idle"
+  },
+  "deaths": 0,
+  "peakRises": [
+    104.90214770984039,
+    104.90214770984039
+  ],
+  "recovered": false,
+  "events": [
+    {
+      "frame": 42,
+      "seconds": 0.358,
+      "stage": 0,
+      "type": "jump",
+      "x": 108,
+      "y": 4480,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1
+    },
+    {
+      "frame": 95,
+      "seconds": 0.8,
+      "stage": 0,
+      "type": "land",
+      "x": 196.70277777777792,
+      "y": 4426,
+      "vx": 36.33333333333327,
+      "vy": 0,
+      "intensity": 0.7860155689449683,
+      "platformId": "first-hop",
+      "suspended": false,
+      "landmark": "first-hop",
+      "contactX": 196.70277777777792,
+      "contactY": 4426,
+      "contactOffset": 0.015277777777780976
+    },
+    {
+      "frame": 138,
+      "seconds": 1.158,
+      "stage": 1,
+      "type": "jump",
+      "x": 196.79722222222236,
+      "y": 4426,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "first-hop"
+    },
+    {
+      "frame": 190,
+      "seconds": 1.592,
+      "stage": 1,
+      "type": "land",
+      "x": 296.80833333333345,
+      "y": 4368,
+      "vx": 226.33333333333331,
+      "vy": 0,
+      "intensity": 0.74878939894746,
+      "platformId": "second-hop",
+      "suspended": false,
+      "landmark": "second-hop",
+      "contactX": 296.80833333333345,
+      "contactY": 4368,
+      "contactOffset": -0.23905228758169705
+    },
+    {
+      "frame": 233,
+      "seconds": 1.95,
+      "stage": 2,
+      "type": "jump",
+      "x": 304.40833333333353,
+      "y": 4368,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "second-hop"
+    },
+    {
+      "frame": 284,
+      "seconds": 2.375,
+      "stage": 2,
+      "type": "wallJump",
+      "x": 348,
+      "y": 4211.201110380595,
+      "vx": -296,
+      "vy": -810,
+      "intensity": 1
+    },
+    {
+      "frame": 373,
+      "seconds": 3.117,
+      "stage": 2,
+      "type": "land",
+      "x": 151.58750000000023,
+      "y": 4204,
+      "vx": -258,
+      "vy": 0,
+      "intensity": 1.2328767123287672,
+      "platformId": "wall-transfer",
+      "suspended": false,
+      "landmark": "wall-transfer",
+      "contactX": 151.58750000000023,
+      "contactY": 4204,
+      "contactOffset": 0.3247395833333382
+    },
+    {
+      "frame": 416,
+      "seconds": 3.475,
+      "stage": 3,
+      "type": "jump",
+      "x": 141.5458333333336,
+      "y": 4204,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "wall-transfer"
+    },
+    {
+      "frame": 459,
+      "seconds": 3.833,
+      "stage": 3,
+      "type": "doubleJump",
+      "x": 220.45277777777827,
+      "y": 4048.1960698370954,
+      "vx": 258,
+      "vy": -746,
+      "intensity": 0.9
+    },
+    {
+      "frame": 531,
+      "seconds": 4.433,
+      "stage": 3,
+      "type": "land",
+      "x": 313.90763888888927,
+      "y": 3976,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.8341069772049753,
+      "platformId": "resonant-stone",
+      "suspended": true,
+      "landmark": "resonant-stone",
+      "resonance": {
+        "x": 311,
+        "y": 4002,
+        "size": 42
+      },
+      "contactX": 313.90763888888927,
+      "contactY": 3976,
+      "contactOffset": 0.0646141975308726
+    },
+    {
+      "frame": 574,
+      "seconds": 4.792,
+      "stage": 4,
+      "type": "jump",
+      "x": 313.97197297477624,
+      "y": 3979.290724605776,
+      "vx": -28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "resonant-stone"
+    },
+    {
+      "frame": 649,
+      "seconds": 5.417,
+      "stage": 4,
+      "type": "land",
+      "x": 212.15947297477652,
+      "y": 3874,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.8024040900753233,
+      "platformId": "opening-refuge",
+      "suspended": false,
+      "landmark": "opening-refuge",
+      "contactX": 212.15947297477652,
+      "contactY": 3874,
+      "contactOffset": -0.011207027002979734
+    }
+  ],
+  "segments": [
+    {
+      "startFrame": 0,
+      "seconds": 0,
+      "frames": 42,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 42,
+      "seconds": 0.35,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 43,
+      "seconds": 0.35833333333333334,
+      "frames": 13,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 56,
+      "seconds": 0.4666666666666667,
+      "frames": 26,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 82,
+      "seconds": 0.6833333333333333,
+      "frames": 56,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 138,
+      "seconds": 1.15,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 139,
+      "seconds": 1.1583333333333334,
+      "frames": 13,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 152,
+      "seconds": 1.2666666666666666,
+      "frames": 37,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 189,
+      "seconds": 1.575,
+      "frames": 44,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 233,
+      "seconds": 1.9416666666666667,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 234,
+      "seconds": 1.95,
+      "frames": 49,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 283,
+      "seconds": 2.3583333333333334,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 284,
+      "seconds": 2.3666666666666667,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 285,
+      "seconds": 2.375,
+      "frames": 89,
+      "input": {
+        "axis": -1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 374,
+      "seconds": 3.1166666666666667,
+      "frames": 42,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 416,
+      "seconds": 3.466666666666667,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 417,
+      "seconds": 3.475,
+      "frames": 41,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 458,
+      "seconds": 3.816666666666667,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 459,
+      "seconds": 3.825,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 460,
+      "seconds": 3.8333333333333335,
+      "frames": 33,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 493,
+      "seconds": 4.108333333333333,
+      "frames": 2,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 495,
+      "seconds": 4.125,
+      "frames": 1,
+      "input": {
+        "axis": 1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 496,
+      "seconds": 4.133333333333334,
+      "frames": 14,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 510,
+      "seconds": 4.25,
+      "frames": 2,
+      "input": {
+        "axis": -1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 512,
+      "seconds": 4.266666666666667,
+      "frames": 20,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 532,
+      "seconds": 4.433333333333334,
+      "frames": 42,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": false
+      }
+    },
+    {
+      "startFrame": 574,
+      "seconds": 4.783333333333333,
+      "frames": 1,
+      "input": {
+        "axis": -1,
+        "jumpPressed": true,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 575,
+      "seconds": 4.791666666666667,
+      "frames": 45,
+      "input": {
+        "axis": -1,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    },
+    {
+      "startFrame": 620,
+      "seconds": 5.166666666666667,
+      "frames": 30,
+      "input": {
+        "axis": 0,
+        "jumpPressed": false,
+        "jumpHeld": true
+      }
+    }
+  ],
+  "frames": [
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": false
+    },
+    {
+      "axis": -1,
+      "jumpPressed": true,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": -1,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    },
+    {
+      "axis": 0,
+      "jumpPressed": false,
+      "jumpHeld": true
+    }
+  ]
+}

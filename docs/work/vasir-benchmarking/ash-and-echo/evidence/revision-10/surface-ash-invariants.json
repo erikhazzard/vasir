@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "assertions": [
+    "bounded intents and pools",
+    "no simulation mutation",
+    "live suspension attachment",
+    "paused dt zero",
+    "support-edge draw clipping",
+    "same-frame rebound lift and residual ash",
+    "released ash detaches",
+    "reduced-motion static residue",
+    "light/heavy contact distinction",
+    "exact rib wall trace",
+    "invalid contacts ignored",
+    "expiry",
+    "reset clears pending and active state"
+  ],
+  "limits": {
+    "contacts": 16,
+    "grains": 224,
+    "intents": 24
+  }
+}

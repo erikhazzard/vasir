@@ -222,7 +222,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
       settingCount: EXPECTED_SETTING_COUNT,
       resultEntryCount: EXPECTED_RESULT_ENTRY_COUNT + (WORKFLOW_SELECTED ? 52 : 0),
       responseCount: EXPECTED_RESPONSE_COUNT + (WORKFLOW_SELECTED ? 52 : 0)
-    });
+    }, "publication coverage counts original result sets; derived Overall rows are not new evidence");
     assert.match(first.projection.basisSha256, /^[a-f0-9]{64}$/);
     assert.ok(first.files.every((file) => file.bytes <= (file.path === "responses.js" ? first.config.limits.maxResponseFileBytes : first.config.limits.maxFileBytes)));
     assert.ok(first.totalBytes <= first.config.limits.maxArtifactBytes);
@@ -256,11 +256,18 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     vm.runInNewContext(dataFile.body.toString("utf8"), dataSandbox);
     const publicData = JSON.parse(JSON.stringify(dataSandbox.window.VASIR_DATA));
     validateBenchmarkPublicationResponses(publicResponses, publicData);
+    assert.equal(publicData.schemaVersion, WORKFLOW_SELECTED ? 4 : 2);
     assert.equal(publicResponses.schemaVersion, WORKFLOW_SELECTED ? 3 : 2);
     if (WORKFLOW_SELECTED) {
+      assert.ok(publicData.overall, "the published Overall view includes every selected benchmark");
       assert.equal(publicResponses.aiWorkflows.counts.responses, 52);
       assert.equal(publicResponses.aiWorkflows.counts.judgments, 104);
     }
+    assert.equal(
+      responseFile.body.toString("utf8"),
+      fs.readFileSync(path.join(SITE_ROOT, "responses.js"), "utf8"),
+      "publishing a derived Overall score preserves the canonical model responses and judgments byte-for-byte"
+    );
     assert.deepEqual(publicResponses.counts, {
       benchmarks: 3,
       settings: 36,

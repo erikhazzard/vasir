@@ -1,0 +1,170 @@
+{
+  "passed": true,
+  "sourceHash": "a42f26a9fbfd9d65556f13b3e056039ae6299ab0c3dab4293c6a8344a19e23eb",
+  "baselineHash": "ad692ff33a0e7a3f1839777ddda949c5794085e02ac48bfe3574c75d63d37eca",
+  "rows": [
+    {
+      "version": "baseline",
+      "label": "height-24",
+      "peak": 0.016393376514315605,
+      "rms": 0.00037363742049366285,
+      "transientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-80",
+      "peak": 0.060240738093853,
+      "rms": 0.001592217256850737,
+      "transientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-300",
+      "peak": 0.18652130663394928,
+      "rms": 0.006386178306795732,
+      "transientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-508",
+      "peak": 0.2624741196632385,
+      "rms": 0.01008892216203416,
+      "transientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "height-160",
+      "peak": 0.11916729062795639,
+      "rms": 0.003714038834743731,
+      "transientSources": 6
+    },
+    {
+      "version": "baseline",
+      "label": "same-frame-rebound",
+      "peak": 0.29844120144844055,
+      "rms": 0.006808132377909517,
+      "transientSources": 10
+    },
+    {
+      "version": "baseline",
+      "label": "40ms-rebound",
+      "peak": 0.2624741196632385,
+      "rms": 0.009846079995997991,
+      "transientSources": 10
+    },
+    {
+      "version": "baseline",
+      "label": "400ms-rebound",
+      "peak": 0.2624741196632385,
+      "rms": 0.010264862146743395,
+      "transientSources": 10
+    },
+    {
+      "version": "baseline",
+      "label": "heavy-resonance",
+      "peak": 0.2624741196632385,
+      "rms": 0.010898848212200824,
+      "transientSources": 9
+    },
+    {
+      "version": "baseline",
+      "label": "heavy-resonance-rebound",
+      "peak": 0.2624741196632385,
+      "rms": 0.01067450345047924,
+      "transientSources": 13
+    },
+    {
+      "version": "candidate",
+      "label": "height-24",
+      "peak": 0.016393376514315605,
+      "rms": 0.0003736374209970843,
+      "transientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-80",
+      "peak": 0.060240738093853,
+      "rms": 0.0015922172664641803,
+      "transientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-300",
+      "peak": 0.2562357485294342,
+      "rms": 0.009338038935706752,
+      "transientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-508",
+      "peak": 0.341923326253891,
+      "rms": 0.017569324086721082,
+      "transientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "height-160",
+      "peak": 0.11916729062795639,
+      "rms": 0.0037140388301133797,
+      "transientSources": 6
+    },
+    {
+      "version": "candidate",
+      "label": "same-frame-rebound",
+      "peak": 0.37283429503440857,
+      "rms": 0.009084332550698468,
+      "transientSources": 10
+    },
+    {
+      "version": "candidate",
+      "label": "40ms-rebound",
+      "peak": 0.341923326253891,
+      "rms": 0.014551152952753485,
+      "transientSources": 10
+    },
+    {
+      "version": "candidate",
+      "label": "400ms-rebound",
+      "peak": 0.341923326253891,
+      "rms": 0.01767002552335864,
+      "transientSources": 10
+    },
+    {
+      "version": "candidate",
+      "label": "heavy-resonance",
+      "peak": 0.341923326253891,
+      "rms": 0.01804688639436674,
+      "transientSources": 9
+    },
+    {
+      "version": "candidate",
+      "label": "heavy-resonance-rebound",
+      "peak": 0.341923326253891,
+      "rms": 0.015125514701961764,
+      "transientSources": 13
+    }
+  ],
+  "cancellation": [
+    {
+      "name": "same-frame-rebound",
+      "canceledBodyGains": 4,
+      "metalSourcesUnchanged": 2
+    },
+    {
+      "name": "40ms-rebound",
+      "canceledBodyGains": 4,
+      "metalSourcesUnchanged": 2
+    },
+    {
+      "name": "400ms-rebound",
+      "canceledBodyGains": 3,
+      "metalSourcesUnchanged": 2
+    },
+    {
+      "name": "heavy-resonance-rebound",
+      "canceledBodyGains": 4,
+      "metalSourcesUnchanged": 5
+    }
+  ],
+  "limit": "Native OfflineAudioContext DSP with schedule-clock adapter, not headphone listening. Existing persistent9source counters remain after render completion/dispose; all nodes disconnected and all source stops scheduled. No clipping or nonfinite samples in20phrases. Voicepool guards unchanged."
+}

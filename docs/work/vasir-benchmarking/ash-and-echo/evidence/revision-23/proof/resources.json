@@ -1,0 +1,444 @@
+{
+  "method": "Actual keyboard double jump and pause; controlled scenery sweeps for allocations; forced loss/restoration of the real offscreen character context. Counters and pixels qualify lifecycle, not timing or physical-phone performance.",
+  "source": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "47f2219507a1f15d0d85c10cc00103bff792d97f6433717cbd7a248dc57c50ed",
+    "audio.js": "23e64254cf2f2f6bc920ec2490efa9df63019afa5286744c2bd13c2e690436d0",
+    "renderer.js": "61862fc4eaa8fcb2fcef48c3dc27de97b8a5d4a2c2aff2c7bc67593a47905d88",
+    "character.js": "41188b7d3c6f1b8f7737f9eb8e7fed6ce7934e4ae103baae3a4780c1f830d197",
+    "depth.js": "5d2fe3bc6df06316b07e2ac814c4b9e81b200760767ca1eb9cd78e3789ab8596",
+    "atmosphere.js": "472626c7b8945a057eed7dbd7b847a8c9661e1b92637ad01634cb96ffc9b51bb",
+    "surface-ash.js": "72ab161cc351dc93f9730d88c005eb22e6d1608d43bdbfec91668e8dd29e2f30",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "ash-material.js": "f9f1ec9b6ad8252bad8a3f046307249d05f587498c86c17671a4c54fdc03d77a",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "foreground.js": "6a8e033b74748bd979b554ecf02f6eb3026785186a782162e4aee167e0dd60f9"
+  },
+  "errors": [],
+  "failures": [],
+  "warm": {
+    "canvases": 104,
+    "uploads": 7,
+    "subUploads": 0,
+    "textures": 7,
+    "programs": 2,
+    "buffers": 2,
+    "targets": 0,
+    "draws": 2102,
+    "readbacks": 0,
+    "contexts": 2,
+    "owners": [
+      {
+        "id": "atmosphere-canvas",
+        "width": 585,
+        "height": 1266
+      },
+      {
+        "id": "character-field",
+        "width": 256,
+        "height": 256
+      }
+    ],
+    "material": {
+      "status": "ready",
+      "reason": "",
+      "width": 256,
+      "height": 256,
+      "contexts": 1,
+      "programs": 1,
+      "buffers": 1,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 74,
+      "precision": "highp",
+      "restores": 0
+    }
+  },
+  "plateau": {
+    "canvases": 104,
+    "uploads": 7,
+    "subUploads": 0,
+    "textures": 7,
+    "programs": 2,
+    "buffers": 2,
+    "targets": 0,
+    "draws": 3940,
+    "readbacks": 0,
+    "contexts": 2,
+    "owners": [
+      {
+        "id": "atmosphere-canvas",
+        "width": 585,
+        "height": 1266
+      },
+      {
+        "id": "character-field",
+        "width": 256,
+        "height": 256
+      }
+    ],
+    "material": {
+      "status": "ready",
+      "reason": "",
+      "width": 256,
+      "height": 256,
+      "contexts": 1,
+      "programs": 1,
+      "buffers": 1,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 138,
+      "precision": "highp",
+      "restores": 0
+    }
+  },
+  "activePause": {
+    "game": {
+      "state": "playing",
+      "player": {
+        "x": 96,
+        "y": 4292.911878150339,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -500.547446855139,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 0,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 0.3000000000000001,
+      "deaths": 0,
+      "maxAltitude": 159.08812184966064,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": true
+    },
+    "material": {
+      "status": "ready",
+      "reason": "",
+      "width": 256,
+      "height": 256,
+      "contexts": 1,
+      "programs": 1,
+      "buffers": 1,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 158,
+      "precision": "highp",
+      "restores": 0
+    },
+    "events": [
+      {
+        "type": "jump",
+        "x": 108,
+        "y": 4480,
+        "vx": 0,
+        "vy": -820.5128205128204,
+        "intensity": 1,
+        "at": 0.275,
+        "elapsed": 0.025
+      },
+      {
+        "type": "doubleJump",
+        "x": 108,
+        "y": 4392.6044269121185,
+        "vx": 0,
+        "vy": -746,
+        "intensity": 0.9,
+        "at": 0.4416666666666672,
+        "elapsed": 0.19166666666666665
+      }
+    ]
+  },
+  "pausePixelsIdentical": true,
+  "restorations": [
+    {
+      "lost": {
+        "canvases": 104,
+        "uploads": 7,
+        "subUploads": 0,
+        "textures": 7,
+        "programs": 2,
+        "buffers": 2,
+        "targets": 0,
+        "draws": 5956,
+        "readbacks": 0,
+        "contexts": 2,
+        "owners": [
+          {
+            "id": "atmosphere-canvas",
+            "width": 585,
+            "height": 1266
+          },
+          {
+            "id": "character-field",
+            "width": 256,
+            "height": 256
+          }
+        ],
+        "material": {
+          "status": "context-lost",
+          "reason": "WebGL context lost",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 0,
+          "buffers": 0,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 210,
+          "precision": "highp",
+          "restores": 0
+        }
+      },
+      "restored": {
+        "canvases": 104,
+        "uploads": 7,
+        "subUploads": 0,
+        "textures": 7,
+        "programs": 3,
+        "buffers": 3,
+        "targets": 0,
+        "draws": 6286,
+        "readbacks": 0,
+        "contexts": 2,
+        "owners": [
+          {
+            "id": "atmosphere-canvas",
+            "width": 585,
+            "height": 1266
+          },
+          {
+            "id": "character-field",
+            "width": 256,
+            "height": 256
+          }
+        ],
+        "material": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 216,
+          "precision": "highp",
+          "restores": 1
+        }
+      },
+      "pixelsIdentical": true
+    },
+    {
+      "lost": {
+        "canvases": 104,
+        "uploads": 7,
+        "subUploads": 0,
+        "textures": 7,
+        "programs": 3,
+        "buffers": 3,
+        "targets": 0,
+        "draws": 6342,
+        "readbacks": 0,
+        "contexts": 2,
+        "owners": [
+          {
+            "id": "atmosphere-canvas",
+            "width": 585,
+            "height": 1266
+          },
+          {
+            "id": "character-field",
+            "width": 256,
+            "height": 256
+          }
+        ],
+        "material": {
+          "status": "context-lost",
+          "reason": "WebGL context lost",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 0,
+          "buffers": 0,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 218,
+          "precision": "highp",
+          "restores": 1
+        }
+      },
+      "restored": {
+        "canvases": 104,
+        "uploads": 7,
+        "subUploads": 0,
+        "textures": 7,
+        "programs": 4,
+        "buffers": 4,
+        "targets": 0,
+        "draws": 6672,
+        "readbacks": 0,
+        "contexts": 2,
+        "owners": [
+          {
+            "id": "atmosphere-canvas",
+            "width": 585,
+            "height": 1266
+          },
+          {
+            "id": "character-field",
+            "width": 256,
+            "height": 256
+          }
+        ],
+        "material": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 224,
+          "precision": "highp",
+          "restores": 2
+        }
+      },
+      "pixelsIdentical": true
+    },
+    {
+      "lost": {
+        "canvases": 104,
+        "uploads": 7,
+        "subUploads": 0,
+        "textures": 7,
+        "programs": 4,
+        "buffers": 4,
+        "targets": 0,
+        "draws": 6728,
+        "readbacks": 0,
+        "contexts": 2,
+        "owners": [
+          {
+            "id": "atmosphere-canvas",
+            "width": 585,
+            "height": 1266
+          },
+          {
+            "id": "character-field",
+            "width": 256,
+            "height": 256
+          }
+        ],
+        "material": {
+          "status": "context-lost",
+          "reason": "WebGL context lost",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 0,
+          "buffers": 0,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 226,
+          "precision": "highp",
+          "restores": 2
+        }
+      },
+      "restored": {
+        "canvases": 104,
+        "uploads": 7,
+        "subUploads": 0,
+        "textures": 7,
+        "programs": 5,
+        "buffers": 5,
+        "targets": 0,
+        "draws": 7058,
+        "readbacks": 0,
+        "contexts": 2,
+        "owners": [
+          {
+            "id": "atmosphere-canvas",
+            "width": 585,
+            "height": 1266
+          },
+          {
+            "id": "character-field",
+            "width": 256,
+            "height": 256
+          }
+        ],
+        "material": {
+          "status": "ready",
+          "reason": "",
+          "width": 256,
+          "height": 256,
+          "contexts": 1,
+          "programs": 1,
+          "buffers": 1,
+          "textures": 0,
+          "framebuffers": 0,
+          "draws": 232,
+          "precision": "highp",
+          "restores": 3
+        }
+      },
+      "pixelsIdentical": true
+    }
+  ],
+  "gentlePausedPixelsIdentical": true,
+  "afterResets": {
+    "canvases": 104,
+    "uploads": 7,
+    "subUploads": 0,
+    "textures": 7,
+    "programs": 5,
+    "buffers": 5,
+    "targets": 0,
+    "draws": 8458,
+    "readbacks": 0,
+    "contexts": 2,
+    "owners": [
+      {
+        "id": "atmosphere-canvas",
+        "width": 585,
+        "height": 1266
+      },
+      {
+        "id": "character-field",
+        "width": 256,
+        "height": 256
+      }
+    ],
+    "material": {
+      "status": "ready",
+      "reason": "",
+      "width": 256,
+      "height": 256,
+      "contexts": 1,
+      "programs": 1,
+      "buffers": 1,
+      "textures": 0,
+      "framebuffers": 0,
+      "draws": 7,
+      "precision": "highp",
+      "restores": 3
+    }
+  }
+}

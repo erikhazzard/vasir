@@ -1,0 +1,14 @@
+{
+  "mode": "Independent fixed-duration browser key presses, no product source or state snapshots used to choose input; no injected state or simulated time",
+  "mobile": {
+    "width": 390,
+    "height": 844,
+    "dpr": 1
+  },
+  "desktop": {
+    "width": 1280,
+    "height": 900,
+    "dpr": 1
+  },
+  "errors": []
+}

@@ -191,11 +191,13 @@ test("canonical publication appends an independent workflow family without chang
     return fs.readFileSync(filePath, encoding);
   };
   const built = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO, readFileSyncImplementation });
-  const { aiWorkflows, ...engineering } = built.projection;
+  const { aiWorkflows, overall, ...engineering } = built.projection;
   const { aiWorkflows: workflowResponses, ...engineeringResponses } = built.responseBundle;
   assert.deepEqual({ ...engineering, schemaVersion: 2 }, previous.projection);
   assert.deepEqual({ ...engineeringResponses, schemaVersion: 2 }, previous.responseBundle);
   assert.equal(aiWorkflows.counts.settings, 1);
+  assert.equal(overall.counts.settings, 1);
+  assert.equal(overall.coverage.totalSettings, 36);
   assert.equal(workflowResponses.counts.judgments, 4);
   assert.equal(built.counts.benchmarks, 4);
   assert.equal(built.counts.responses, 218);

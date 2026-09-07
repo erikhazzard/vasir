@@ -1,0 +1,162 @@
+{
+  "scope": "Actual running Chromium AudioContext, MediaRecorder capture, gameplay-like event sequence; synthetic visibility notifications exercise actual browser suspend/resume. Stress events are intentionally not a gameplay listening sample.",
+  "lazy": true,
+  "unlocked": true,
+  "muteSuppressesEvents": true,
+  "hiddenSuppressesEvents": true,
+  "hiddenState": "suspended",
+  "resumedState": "running",
+  "constructed": 1,
+  "maxNodes": 189,
+  "maxSources": 51,
+  "scheduled": 244,
+  "stopped": 244,
+  "trace": [
+    {
+      "label": "constructed-before-unlock",
+      "nodes": 0,
+      "sources": 0
+    },
+    {
+      "label": "unlocked",
+      "t": 0.624,
+      "state": "running",
+      "nodes": 47,
+      "sources": 9
+    },
+    {
+      "label": "jump",
+      "t": 0.624,
+      "state": "running",
+      "nodes": 61,
+      "sources": 13
+    },
+    {
+      "label": "doubleJump",
+      "t": 1.1253333333333333,
+      "state": "running",
+      "nodes": 62,
+      "sources": 14
+    },
+    {
+      "label": "land",
+      "t": 1.8293333333333333,
+      "state": "running",
+      "nodes": 60,
+      "sources": 13
+    },
+    {
+      "label": "jump",
+      "t": 2.1813333333333333,
+      "state": "running",
+      "nodes": 61,
+      "sources": 13
+    },
+    {
+      "label": "wallJump",
+      "t": 2.6826666666666665,
+      "state": "running",
+      "nodes": 62,
+      "sources": 14
+    },
+    {
+      "label": "doubleJump",
+      "t": 3.184,
+      "state": "running",
+      "nodes": 62,
+      "sources": 14
+    },
+    {
+      "label": "land",
+      "t": 3.8346666666666667,
+      "state": "running",
+      "nodes": 60,
+      "sources": 13
+    },
+    {
+      "label": "jump",
+      "t": 4.336,
+      "state": "running",
+      "nodes": 61,
+      "sources": 13
+    },
+    {
+      "label": "death",
+      "t": 4.757333333333333,
+      "state": "running",
+      "nodes": 63,
+      "sources": 14
+    },
+    {
+      "label": "respawn",
+      "t": 5.242666666666667,
+      "state": "running",
+      "nodes": 60,
+      "sources": 13
+    },
+    {
+      "label": "jump",
+      "t": 5.514666666666667,
+      "state": "running",
+      "nodes": 74,
+      "sources": 14
+    },
+    {
+      "label": "land",
+      "t": 6.165333333333334,
+      "state": "running",
+      "nodes": 60,
+      "sources": 13
+    },
+    {
+      "label": "checkpoint",
+      "t": 6.618666666666667,
+      "state": "running",
+      "nodes": 65,
+      "sources": 15
+    },
+    {
+      "label": "recording-finished",
+      "t": 8.421333333333333,
+      "state": "running",
+      "nodes": 65,
+      "sources": 13
+    },
+    {
+      "label": "synthetic-visibility-hidden",
+      "t": 8.570666666666666,
+      "state": "suspended",
+      "nodes": 65,
+      "sources": 13
+    },
+    {
+      "label": "synthetic-visibility-visible",
+      "t": 8.688,
+      "state": "running",
+      "nodes": 65,
+      "sources": 13
+    },
+    {
+      "label": "stress-finished",
+      "t": 11.690666666666667,
+      "state": "running",
+      "nodes": 161,
+      "sources": 35
+    },
+    {
+      "label": "tails-ended",
+      "t": 17.696,
+      "state": "running",
+      "nodes": 47,
+      "sources": 9
+    },
+    {
+      "label": "disposed",
+      "t": 17.696,
+      "state": "closed",
+      "nodes": 0,
+      "sources": 9
+    }
+  ],
+  "errors": []
+}

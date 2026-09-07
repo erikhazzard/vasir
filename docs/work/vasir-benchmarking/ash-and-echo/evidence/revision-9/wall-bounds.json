@@ -1,0 +1,254 @@
+{
+  "method": "Presentation-only bound probe: injection of simultaneous events is intentionally stronger than a real route. Native event and route proof lives in before/after/repeated.json.",
+  "samples": [
+    {
+      "dpr": 1,
+      "x": -1,
+      "y": -1,
+      "impact": [
+        -5,
+        -5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 10.136255924170623
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 10.326224328594007
+        },
+        {
+          "column": 388,
+          "minAlpha": 255,
+          "luminance": 9.42772511848347
+        },
+        {
+          "column": 389,
+          "minAlpha": 255,
+          "luminance": 9.32938388625597
+        }
+      ]
+    },
+    {
+      "dpr": 1,
+      "x": -1,
+      "y": 1,
+      "impact": [
+        -5,
+        5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 10.132701421800952
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 10.352685624012649
+        },
+        {
+          "column": 388,
+          "minAlpha": 255,
+          "luminance": 9.394944707740976
+        },
+        {
+          "column": 389,
+          "minAlpha": 255,
+          "luminance": 9.300157977883144
+        }
+      ]
+    },
+    {
+      "dpr": 1,
+      "x": 1,
+      "y": -1,
+      "impact": [
+        5,
+        -5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 9.328593996840434
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 9.333728278041068
+        },
+        {
+          "column": 388,
+          "minAlpha": 255,
+          "luminance": 10.774091627172213
+        },
+        {
+          "column": 389,
+          "minAlpha": 255,
+          "luminance": 10.56951026856247
+        }
+      ]
+    },
+    {
+      "dpr": 1,
+      "x": 1,
+      "y": 1,
+      "impact": [
+        5,
+        5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 9.324644549763024
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 9.33530805687203
+        },
+        {
+          "column": 388,
+          "minAlpha": 255,
+          "luminance": 10.735387045813608
+        },
+        {
+          "column": 389,
+          "minAlpha": 255,
+          "luminance": 10.52922590837289
+        }
+      ]
+    },
+    {
+      "dpr": 2,
+      "x": -1,
+      "y": -1,
+      "impact": [
+        -5,
+        -5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 10.051342812006313
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 10.236769352290668
+        },
+        {
+          "column": 778,
+          "minAlpha": 255,
+          "luminance": 9.3222748815165
+        },
+        {
+          "column": 779,
+          "minAlpha": 255,
+          "luminance": 9.49664296998414
+        }
+      ]
+    },
+    {
+      "dpr": 2,
+      "x": -1,
+      "y": 1,
+      "impact": [
+        -5,
+        5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 10.049960505529214
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 10.233807266982605
+        },
+        {
+          "column": 778,
+          "minAlpha": 255,
+          "luminance": 9.290284360189483
+        },
+        {
+          "column": 779,
+          "minAlpha": 255,
+          "luminance": 9.46228278041068
+        }
+      ]
+    },
+    {
+      "dpr": 2,
+      "x": 1,
+      "y": -1,
+      "impact": [
+        5,
+        -5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 9.31852290679307
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 9.3763823064771
+        },
+        {
+          "column": 778,
+          "minAlpha": 255,
+          "luminance": 10.60288309636636
+        },
+        {
+          "column": 779,
+          "minAlpha": 255,
+          "luminance": 10.61117693522898
+        }
+      ]
+    },
+    {
+      "dpr": 2,
+      "x": 1,
+      "y": 1,
+      "impact": [
+        5,
+        5
+      ],
+      "columns": [
+        {
+          "column": 0,
+          "minAlpha": 255,
+          "luminance": 9.316745655608235
+        },
+        {
+          "column": 1,
+          "minAlpha": 255,
+          "luminance": 9.375000000000005
+        },
+        {
+          "column": 778,
+          "minAlpha": 255,
+          "luminance": 10.567930489731292
+        },
+        {
+          "column": 779,
+          "minAlpha": 255,
+          "luminance": 10.576026856240041
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

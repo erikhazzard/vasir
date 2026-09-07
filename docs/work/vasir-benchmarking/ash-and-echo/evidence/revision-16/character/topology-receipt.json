@@ -1,0 +1,33 @@
+{
+  "disposition": "SAFE_LOCAL_CHANGE",
+  "changedFiles": [
+    "character.js",
+    "ash-flow.js"
+  ],
+  "topologyDelta": {
+    "frameOwners": 0,
+    "sceneSubmissions": 0,
+    "fullScenePasses": 0,
+    "offscreenTargets": 0,
+    "terminalOutputs": 0,
+    "assets": 0
+  },
+  "retained": {
+    "bodySurface": [
+      224,
+      224
+    ],
+    "wakeCapacity": 144,
+    "burstCapacity": 38
+  },
+  "boundedWork": {
+    "fixtureSelectionCallsPerUpdate": 33,
+    "bodyExposureCallsPerUpdate": 3,
+    "lightFromCallsPerActiveWakeItem": 1,
+    "fullFixtureScansPerWakeItem": 0,
+    "newGradientsPerLitCharacterDraw": 1,
+    "newBodyStrokeFillPairsPerLitDraw": 3
+  },
+  "round1": "Directional charcoal/feather grazing light; varied dense atlas crops, independently deformed unpunched soot wisps. Critic found preserved raven and graphite read, but unlit trail looked faint.",
+  "round2": "Stronger dark wisp interior and gentler early fade restore visible ash mass; fine particles use24-level graphite response rather than brightness threshold. No count/size/anatomy/timing change."
+}

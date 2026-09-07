@@ -1,0 +1,60 @@
+{
+  "events": [
+    {
+      "type": "death",
+      "x": 307.56249999999994,
+      "y": 4480,
+      "vx": 258,
+      "vy": 0,
+      "intensity": 1,
+      "cause": "thorns",
+      "hazardIndex": 5,
+      "contactX": 314,
+      "contactY": 4466,
+      "at": 2.0833333333333286,
+      "elapsed": 1.7499999999999962
+    },
+    {
+      "type": "respawn",
+      "x": 108,
+      "y": 4480,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.7,
+      "at": 2.3499999999999943,
+      "elapsed": 2.016666666666662
+    }
+  ],
+  "after": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4452,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 2.7083333333333264,
+    "deaths": 1,
+    "maxAltitude": 0,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "message": "Thorns Jump clear or kick away.",
+  "errors": [],
+  "base": "http://127.0.0.1:8317/",
+  "input": "Real browser ArrowRight from spawn, no jump"
+}

@@ -119,6 +119,7 @@ function createAwsPublicationFake() {
   const conditionalWrites = [];
   const conditionalDeletes = [];
   const browserCalls = [];
+  const browserTimeouts = [];
   const invalidationCalls = [];
 
   function stackDocument(activeReleaseId, status) {
@@ -236,9 +237,10 @@ function createAwsPublicationFake() {
     return failure(`Unexpected CloudFormation operation: ${operation}`, 2);
   }
 
-  function spawnSyncImplementation(command, args) {
+  function spawnSyncImplementation(command, args, options = {}) {
     if (command === process.execPath) {
       browserCalls.push(args);
+      browserTimeouts.push(options.timeout);
       return success("");
     }
     if (command !== "aws") return failure(`Unexpected executable: ${command}`, 127);
@@ -322,6 +324,7 @@ function createAwsPublicationFake() {
     spawnSyncImplementation,
     fetchImplementation,
     browserCalls,
+    browserTimeouts,
     invalidationCalls,
     conditionalWrites,
     conditionalDeletes,
@@ -399,7 +402,17 @@ test("first publication and an identical repeat reuse one immutable release thro
   assert.equal(aws.conditionalDeletes.length, 2);
   assert.ok(aws.conditionalDeletes.every(({ key, ifMatch }) => key === LOCK_KEY && /^\"etag-\d+\"$/.test(ifMatch)));
   const workflowPublished = first.artifact.routes.familyFragments.includes("/#capabilities/ai-workflows");
-  assert.equal(aws.browserCalls.length, workflowPublished ? 24 : 8);
+  assert.equal(aws.browserCalls.length, workflowPublished ? 28 : 12);
+  assert.deepEqual(
+    aws.browserCalls.filter(args => args.at(-1) === "capabilities").map(args => args.slice(-3, -1).join("x")).sort(),
+    ["1440x1000", "1440x1000", "390x844", "390x844"],
+    "Engineering receives its own desktop and mobile proof on both publications"
+  );
+  assert.ok(aws.browserTimeouts.every(timeout => timeout === 75 * 1000), "adding Overall retains the existing timeout per browser proof");
+  const leaseLimits = JSON.parse(fs.readFileSync(path.join(publicationRepoRoot, "site/vasirbenchmark.com/deployment.json"))).limits;
+  const browserBudgetMs = aws.browserTimeouts.reduce((sum, timeout) => sum + timeout, 0) / 2;
+  assert.equal(leaseLimits.maxLeaseHeldMinutes, 75, "Overall keeps the existing publication lease ceiling");
+  assert.ok(browserBudgetMs < leaseLimits.maxLeaseHeldMinutes * 60_000, "both viewport checks per live view fit within the unchanged lease ceiling");
   if (workflowPublished) {
     for (const target of ["workflows", "workflow-benchmarks", "workflow-efficiency", "workflow-report"]) {
       assert.equal(aws.browserCalls.filter(args => args.at(-1) === target).length, 4, `${target} receives desktop and mobile proof on both publications`);

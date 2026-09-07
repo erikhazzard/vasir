@@ -1,0 +1,352 @@
+{
+  "snapshot": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4452,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 245.7083333332742,
+    "deaths": 1,
+    "maxAltitude": 620.2865001095756,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "scenery": {
+    "cages": [
+      {
+        "x": 295.74,
+        "y": 4390,
+        "length": 62,
+        "angle": 2.318332843644745e-19,
+        "velocity": -3.465701348465148e-19
+      },
+      {
+        "x": 114.18,
+        "y": 3801.5,
+        "length": 64,
+        "angle": -5.564771866002478e-35,
+        "velocity": -3.1383540559762885e-35
+      }
+    ],
+    "rigging": [
+      {
+        "platformId": "resonant-stone",
+        "age": 125.72820000001585,
+        "strength": 1.103575813797099,
+        "contactOffset": 0.19506172839507044,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      },
+      {
+        "platformId": "ledge-7",
+        "age": 203.59220000003336,
+        "strength": 0,
+        "contactOffset": 0,
+        "segments": 8,
+        "leftBow": 0,
+        "rightBow": 0
+      }
+    ],
+    "activeParticles": 0,
+    "bells": [
+      {
+        "x": 210,
+        "y": 2458,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 210,
+        "y": 248,
+        "size": 48,
+        "angle": 0,
+        "velocity": 0,
+        "clapper": 0,
+        "clapperVelocity": 0
+      },
+      {
+        "x": 311,
+        "y": 4002,
+        "size": 42,
+        "angle": -6.03430705090343e-21,
+        "velocity": 1.2307248223421356e-20,
+        "clapper": -2.838279073780182e-21,
+        "clapperVelocity": 7.168722132858717e-21,
+        "platform": "resonant-stone",
+        "age": 125.72820000001443,
+        "strength": 1.103575813797099,
+        "direction": 1
+      }
+    ],
+    "spiders": [
+      {
+        "x": -18,
+        "y": 3880,
+        "scale": 1,
+        "lookX": 0.2333333333333336,
+        "lookY": 0.899999999999999,
+        "alert": 1.016014069752627e-141
+      },
+      {
+        "x": 422,
+        "y": 2015,
+        "scale": -0.83,
+        "lookX": 0.799999999999999,
+        "lookY": 0.8999999999999991,
+        "alert": 0
+      }
+    ]
+  },
+  "events": [
+    {
+      "type": "jump",
+      "x": 108.64999999999999,
+      "y": 4480,
+      "vx": 71.5,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "at": 34.06666666666538,
+      "elapsed": 15.408333333333099
+    },
+    {
+      "type": "land",
+      "x": 176.2305555555556,
+      "y": 4426,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1.1215884766991198,
+      "platformId": "first-hop",
+      "suspended": false,
+      "landmark": "first-hop",
+      "contactX": 176.2305555555556,
+      "contactY": 4426,
+      "contactOffset": -0.429770531400965,
+      "at": 34.699999999998674,
+      "elapsed": 16.041666666666398
+    },
+    {
+      "type": "jump",
+      "x": 176.2305555555556,
+      "y": 4426,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "first-hop",
+      "at": 50.36666666666445,
+      "elapsed": 31.708333333332174
+    },
+    {
+      "type": "land",
+      "x": 265.1430555555558,
+      "y": 4368,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1.0843623067016115,
+      "platformId": "second-hop",
+      "suspended": false,
+      "landmark": "second-hop",
+      "contactX": 265.1430555555558,
+      "contactY": 4368,
+      "contactOffset": -0.8599400871459646,
+      "at": 50.991666666664415,
+      "elapsed": 32.33333333333214
+    },
+    {
+      "type": "jump",
+      "x": 265.1430555555558,
+      "y": 4368,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "second-hop",
+      "at": 69.86666666666834,
+      "elapsed": 51.20833333333107
+    },
+    {
+      "type": "wallJump",
+      "x": 348,
+      "y": 4225.482752575053,
+      "vx": -296,
+      "vy": -810,
+      "intensity": 1,
+      "at": 70.4000000000021,
+      "elapsed": 51.74166666666437
+    },
+    {
+      "type": "land",
+      "x": 169.741666666667,
+      "y": 4204,
+      "vx": -36.33333333333327,
+      "vy": 0,
+      "intensity": 1.2328767123287672,
+      "platformId": "wall-transfer",
+      "suspended": false,
+      "landmark": "wall-transfer",
+      "contactX": 169.741666666667,
+      "contactY": 4204,
+      "contactOffset": 0.7029513888888955,
+      "at": 71.12500000000267,
+      "elapsed": 52.46666666666433
+    },
+    {
+      "type": "jump",
+      "x": 169.64722222222255,
+      "y": 4204,
+      "vx": 28.166666666666668,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "wall-transfer",
+      "at": 103.68333333336192,
+      "elapsed": 85.02500000001373
+    },
+    {
+      "type": "land",
+      "x": 267.15972222222274,
+      "y": 4144,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1.0843623067016115,
+      "platformId": "crossing-recovery",
+      "suspended": false,
+      "landmark": "crossing-recovery",
+      "contactX": 267.15972222222274,
+      "contactY": 4144,
+      "contactOffset": -0.6880050505050411,
+      "at": 104.30833333336241,
+      "elapsed": 85.65000000001423
+    },
+    {
+      "type": "jump",
+      "x": 267.15972222222274,
+      "y": 4144,
+      "vx": 0,
+      "vy": -820.5128205128204,
+      "intensity": 1,
+      "landmark": "crossing-recovery",
+      "at": 115.85000000003826,
+      "elapsed": 97.19166666669008
+    },
+    {
+      "type": "doubleJump",
+      "x": 267.15972222222274,
+      "y": 3988.8827525750607,
+      "vx": 0,
+      "vy": -746,
+      "intensity": 0.9,
+      "at": 116.26666666670526,
+      "elapsed": 97.60833333335708
+    },
+    {
+      "type": "land",
+      "x": 267.15972222222274,
+      "y": 3874,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.4202960681358999,
+      "platformId": "opening-refuge",
+      "suspended": false,
+      "landmark": "opening-refuge",
+      "contactX": 267.15972222222274,
+      "contactY": 3874,
+      "contactOffset": 0.7221296296296366,
+      "at": 116.70833333337228,
+      "elapsed": 98.0500000000241
+    },
+    {
+      "type": "land",
+      "x": 319.77777777777817,
+      "y": 3976,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1.103575813797099,
+      "platformId": "resonant-stone",
+      "suspended": true,
+      "landmark": "resonant-stone",
+      "resonance": {
+        "x": 311,
+        "y": 4002,
+        "size": 42
+      },
+      "contactX": 319.77777777777817,
+      "contactY": 3976,
+      "contactOffset": 0.19506172839507044,
+      "at": 138.65833333337156,
+      "elapsed": 120.00000000004157
+    },
+    {
+      "type": "land",
+      "x": 236.72708672350166,
+      "y": 4426,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 1.2328767123287672,
+      "platformId": "first-hop",
+      "suspended": false,
+      "landmark": "first-hop",
+      "contactX": 236.72708672350166,
+      "contactY": 4426,
+      "contactOffset": 0.8853714505109056,
+      "at": 163.6500000000155,
+      "elapsed": 144.99166666669913
+    },
+    {
+      "type": "land",
+      "x": 300.8395867235014,
+      "y": 4480,
+      "vx": 258,
+      "vy": 0,
+      "intensity": 0.8057664538170332,
+      "platformId": "floor",
+      "suspended": false,
+      "contactX": 300.8395867235014,
+      "contactY": 4480,
+      "contactOffset": 0.6055972448233425,
+      "at": 196.76666666665204,
+      "elapsed": 178.10833333333568
+    },
+    {
+      "type": "death",
+      "x": 307.2895867235013,
+      "y": 4480,
+      "vx": 258,
+      "vy": 0,
+      "intensity": 1,
+      "cause": "thorns",
+      "hazardIndex": 5,
+      "contactX": 314,
+      "contactY": 4466,
+      "at": 196.79166666665202,
+      "elapsed": 178.13333333333566
+    },
+    {
+      "type": "respawn",
+      "x": 108,
+      "y": 4480,
+      "vx": 0,
+      "vy": 0,
+      "intensity": 0.7,
+      "at": 197.05833333331844,
+      "elapsed": 178.40000000000208
+    }
+  ]
+}

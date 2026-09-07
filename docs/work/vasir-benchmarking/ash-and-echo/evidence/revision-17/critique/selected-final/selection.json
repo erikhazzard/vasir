@@ -1,0 +1,74 @@
+{
+  "tiny8": {
+    "stage": "round-2",
+    "frame": 33,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "small24": {
+    "stage": "round-2",
+    "frame": 70,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "medium80": {
+    "stage": "round-2",
+    "frame": 109,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "heavy300-low": {
+    "stage": "round-2",
+    "frame": 155,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "heavy300-held": {
+    "stage": "round-2",
+    "frame": 158,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "heavy300-reformed": {
+    "stage": "round-2",
+    "frame": 163,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "buffered-rebound": {
+    "stage": "round-2",
+    "frame": 196,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "gentle-heavy300": {
+    "stage": "round-2",
+    "frame": 354,
+    "fps": 25,
+    "sourceReceipt": "../round-2/receipt.json"
+  },
+  "maximum508-low": {
+    "stage": "maximum",
+    "frame": 50,
+    "fps": 25,
+    "sourceReceipt": "../maximum/receipt.json"
+  },
+  "maximum508-held": {
+    "stage": "maximum",
+    "frame": 53,
+    "fps": 25,
+    "sourceReceipt": "../maximum/receipt.json"
+  },
+  "maximum508-reformed": {
+    "stage": "maximum",
+    "frame": 58,
+    "fps": 25,
+    "sourceReceipt": "../maximum/receipt.json"
+  },
+  "gentle-maximum508": {
+    "stage": "maximum",
+    "frame": 103,
+    "fps": 25,
+    "sourceReceipt": "../maximum/receipt.json"
+  }
+}

@@ -1,0 +1,306 @@
+{
+  "scope": "Real Chromium OfflineAudioContext DSP; a scheduling-clock adapter positions isolated event calls. All audio nodes, envelopes, compression, convolution and final sample renders are browser-native. This is objective audio evidence, not a human listening grade.",
+  "errors": [],
+  "versions": {
+    "baseline": [
+      {
+        "label": "quiet-hop",
+        "event": {
+          "type": "jump",
+          "x": 175,
+          "landmark": "first-hop"
+        },
+        "duration": 5,
+        "peak": 0.16558213531970978,
+        "peakDb": -15.61973042235013,
+        "rms": 0.003945049808429639,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.21429166666666666,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 61,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "light-contact",
+        "event": {
+          "type": "land",
+          "x": 200,
+          "intensity": 0.786,
+          "landmark": "first-hop"
+        },
+        "duration": 5,
+        "peak": 0.18496036529541016,
+        "peakDb": -14.658426510603903,
+        "rms": 0.005671594332635028,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.3396041666666667,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 60,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "wall-kick",
+        "event": {
+          "type": "wallJump",
+          "x": 360,
+          "vx": -296
+        },
+        "duration": 5,
+        "peak": 0.24409043788909912,
+        "peakDb": -12.24898467002082,
+        "rms": 0.004018803408245661,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.3388541666666667,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 62,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "air-crossing",
+        "event": {
+          "type": "doubleJump",
+          "x": 210,
+          "vx": 258
+        },
+        "duration": 5,
+        "peak": 0.12638120353221893,
+        "peakDb": -17.96635026304361,
+        "rms": 0.0041952631987544325,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.6706458333333334,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 62,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "suspended-contact",
+        "event": {
+          "type": "land",
+          "x": 311,
+          "intensity": 0.8,
+          "suspended": true,
+          "platformId": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          }
+        },
+        "duration": 5,
+        "peak": 0.21193969249725342,
+        "peakDb": -13.475754002336851,
+        "rms": 0.0059273497346402386,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.41331249999999997,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 64,
+        "maxSources": 15,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      }
+    ],
+    "candidate": [
+      {
+        "label": "quiet-hop",
+        "event": {
+          "type": "jump",
+          "x": 175,
+          "landmark": "first-hop"
+        },
+        "duration": 5,
+        "peak": 0.07911334186792374,
+        "peakDb": -22.035005396795484,
+        "rms": 0.001863180672639199,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.09760416666666671,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 61,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "light-contact",
+        "event": {
+          "type": "land",
+          "x": 200,
+          "intensity": 0.786,
+          "landmark": "first-hop"
+        },
+        "duration": 5,
+        "peak": 0.06082399562001228,
+        "peakDb": -24.318501075904347,
+        "rms": 0.0018024213038321459,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.10316666666666663,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 60,
+        "maxSources": 13,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "wall-kick",
+        "event": {
+          "type": "wallJump",
+          "x": 360,
+          "vx": -296
+        },
+        "duration": 5,
+        "peak": 0.24409043788909912,
+        "peakDb": -12.24898467002082,
+        "rms": 0.004018803470154479,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.3388541666666667,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 62,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "air-crossing",
+        "event": {
+          "type": "doubleJump",
+          "x": 210,
+          "vx": 258
+        },
+        "duration": 5,
+        "peak": 0.12638120353221893,
+        "peakDb": -17.96635026304361,
+        "rms": 0.004195263210878151,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 0.6706458333333334,
+        "tailRms": 0,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 62,
+        "maxSources": 14,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      },
+      {
+        "label": "suspended-contact",
+        "event": {
+          "type": "land",
+          "x": 311,
+          "intensity": 0.8,
+          "suspended": true,
+          "platformId": "resonant-stone",
+          "resonance": {
+            "x": 311,
+            "y": 4002,
+            "size": 42
+          }
+        },
+        "duration": 5,
+        "peak": 0.18972676992416382,
+        "peakDb": -14.437427740676267,
+        "rms": 0.005854280403803456,
+        "clipped": 0,
+        "nonFinite": 0,
+        "lastAudibleSeconds": 1.5158749999999999,
+        "tailRms": 2.395915448562156e-7,
+        "persistentNodes": 47,
+        "persistentSources": 9,
+        "maxNodes": 73,
+        "maxSources": 18,
+        "afterTail": {
+          "nodes": 47,
+          "sources": 9
+        },
+        "afterDispose": {
+          "nodes": 0,
+          "sources": 9
+        }
+      }
+    ]
+  }
+}

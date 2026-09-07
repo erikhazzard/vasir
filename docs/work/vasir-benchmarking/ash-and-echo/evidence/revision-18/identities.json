@@ -1,0 +1,83 @@
+{
+  "source": {
+    "game.js": "015e2ea7d4bb541f0b044c5bad25c4a3fabd190d09ed7b81af2d7edbf080cc15",
+    "renderer.js": "ed7fdfc0b114b9c6d97d6e1d1bff82cfc238e946ca1c59c18f3b1bd8b128d5cd",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "index.html": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "CONTRACT.md": "62061e1ae268c8772fc7039cbb314059fb0d3e55f0aba92ce7a7a1e55e8a6a8e",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "audio.js": "ad692ff33a0e7a3f1839777ddda949c5794085e02ac48bfe3574c75d63d37eca",
+    "style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "surface-ash.js": "fb5ad607a32a502647280524df1acff57f5860f88b544384a919aa77ae31a055",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "character.js": "55c0f68021e55bfd443033353f2453bc481db0fac5e61d427660e487632ef3bc",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "depth.js": "8f8f2d4cb375a8289c0fd9e6189b76883f8baf72f90ae938b972a631ab2121f8",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306"
+  },
+  "assets": {
+    "spider.png": "7b840f2e49f6d61cf33858923ffe7fc77d0db5b7fb6cb94fd299c172445c7b45",
+    "hero.png": "5b928c2667825f1ba5196b957fbdebb1d6989903c5cc388e977fcc19705901b9",
+    "charcoal-architecture.png": "c2792480e5ced5af1632260fe0b4190691dc624ed1bf5a4f48e5313981231052",
+    "depth-arch.png": "93a512fd09cb155ae24d7baafbf22c9a0a5e3d126a74ba5c487add46aed8669f",
+    "charcoal-refuge.png": "9dbee335a2ef24f780dfd6829f26b57aa179cf2b1979723de7ede503aaf0046b",
+    "background.png": "95b23f0a6b6a34063572cc6084379724e96c3d997acf954b9da104fdecc5a6f4",
+    "README.md": "badfe82c93fcf2ea9ff2ee715d5835bc885c814a1cb15ecab64877922192f05a",
+    "stone.png": "df9e37370b56c8949574cd089a07f9bbe6e265dfdf7912ccb67083f8f244a480",
+    "midground.png": "fc9ef4d13192959e7f8cc7cab59986c993e4f5962e521aed0df39959a62f6f6e",
+    "ash-flow-atlas.png": "e4529aa77d971d75a02f1b934e5c0c86e94c22dc18683a125bd2ba925bc5b116",
+    "charcoal-bell.png": "59f32f7084adb0d4be233151ebff85042d141cd3d3a3569e05bf86857894ae84",
+    "shrine.png": "b0738f8be5da9c7bdea7e3d0be352deb81f5a3b380bbb1c3fff42d8db54bf07d",
+    "charcoal-belfry.png": "fdd10aac8f31ea4d1a8e572b7da6686402c85a48bcf51c34fc1f71a188a27760",
+    "background-birdless.png": "618dd727547e7b22b3b2591e7b410a78d237abb04246f214226468441c453b1e",
+    "charcoal-arcade.png": "a8b5db8349f57e1eb6c28dd611b8fee646372c0a4be3bbbcf8abb0733f159828",
+    "corbel.png": "8c897c67f077a8ff117c02e8ed56e3ebc20c173d72f1979b7b8427c298bfbbc7",
+    "charcoal-vertical-facade.png": "3a2afb771b58b26b0cb5446e351fbe13dd06a4d3c6f8f378ea9acea1a9fb208e",
+    "charcoal-buttress.png": "d3e33eec45d8baf1268a1828af8bdbdd1b08578d30ebc82446ef0d3d97a40fbd"
+  },
+  "servedChecks": {
+    "played-touch-opening": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    },
+    "played-full-route": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    },
+    "routine-performance": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    },
+    "fallback": {
+      "modules": 15,
+      "errors": []
+    },
+    "round2-native": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    },
+    "round2-desktop": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    },
+    "round2-gentle": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    },
+    "round2-bound": {
+      "modules": 15,
+      "mismatch": [],
+      "errors": []
+    }
+  }
+}

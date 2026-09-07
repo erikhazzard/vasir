@@ -1,0 +1,124 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "atDeath": {
+      "text": "THORNS — jump clear or kick away.",
+      "message": {
+        "x": 22,
+        "y": 87,
+        "w": 346,
+        "h": 37.59375,
+        "bottom": 124.59375,
+        "right": 368
+      },
+      "heroTop": 706.5714285714288,
+      "events": [
+        {
+          "type": "death",
+          "x": 307.56249999999994,
+          "y": 4480,
+          "vx": 258,
+          "vy": 0,
+          "intensity": 1,
+          "cause": "thorns",
+          "hazardIndex": 5,
+          "contactX": 314,
+          "contactY": 4466,
+          "at": 1.4083333333333308,
+          "elapsed": 1.1749999999999983
+        }
+      ]
+    },
+    "after": {
+      "state": "playing",
+      "player": {
+        "x": 96,
+        "y": 4310.338812184965,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -259.47841332456676,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3691.076923076923,
+      "elapsed": 1.7916666666666627,
+      "deaths": 1,
+      "maxAltitude": 141.6611878150352,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    "errors": []
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "atDeath": {
+      "text": "THORNS — jump clear or kick away.",
+      "message": {
+        "x": 22,
+        "y": 87,
+        "w": 276,
+        "h": 37.59375,
+        "bottom": 124.59375,
+        "right": 298
+      },
+      "heroTop": 455.23809523809524,
+      "events": [
+        {
+          "type": "death",
+          "x": 307.56249999999994,
+          "y": 4480,
+          "vx": 258,
+          "vy": 0,
+          "intensity": 1,
+          "cause": "thorns",
+          "hazardIndex": 5,
+          "contactX": 314,
+          "contactY": 4466,
+          "at": 1.3416666666666643,
+          "elapsed": 1.1333333333333317
+        }
+      ]
+    },
+    "after": {
+      "state": "playing",
+      "player": {
+        "x": 96,
+        "y": 4335.059390751698,
+        "w": 24,
+        "h": 28,
+        "vx": 0,
+        "vy": -417.2693403462631,
+        "grounded": false,
+        "wallDir": 0,
+        "airJumps": 1,
+        "facing": 1,
+        "motion": "rise"
+      },
+      "cameraY": 3854.5,
+      "elapsed": 1.6999999999999964,
+      "deaths": 1,
+      "maxAltitude": 116.94060924830228,
+      "checkpoint": {
+        "x": 190,
+        "y": 2382,
+        "w": 40,
+        "h": 66,
+        "active": false
+      },
+      "paused": false
+    },
+    "errors": []
+  }
+]

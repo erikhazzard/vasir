@@ -1,0 +1,23 @@
+Character landing pass, revision17
+Touched source: site/ash-and-echo/character.js only.
+Severity is event landingSeverity clamped0..1; old event intensity maps (.intensity-.2)/1.05 without landmark attenuation.
+Duration .10+.20*severity+.26*smooth((severity-.48)/.52): tiny .03=106ms, medium .4=180ms, heavy1=560ms.
+Tap decays immediately; medium drives down then one recoil; heavy holds pancake through34% duration then gathers and has a smaller second settling beat.
+At50ms normal body transform: tiny1.032x/.977y, medium1.302x/.782y, heavy2.295x/.412y. Gentle heavy1.751x/.659y. Crown partially compensates to preserve head/eye volume. Heavy low fans extend43logicalpx max each side (plus bounded vx asymmetry).
+Fresh observed horizontal acceleration/reversal expires pose and immediately follows movement. Land event anchors incoming vx to avoid interpreting airborne acceleration as new grounded input. Jump events retain immediate cancellation. No gameplay mutation.
+Ground plane clips connected body, fans and fibres; world-space detached wake remains independently drawn.
+Topology SAFE_LOCAL_CHANGE: fixed224x224 body surface,144 wake and38 burst slots unchanged; no new renderer/canvas/pool/pass/frame owner. Two existing landing limbs replaced by filled ash fans.
+Controlled full native390x844 captures and native145x65 body crops: normal/gentle tiny/medium/heavy at17,50,100,180,280,420,560ms. Scene same opening refuge, severity event differs. These establish pose contrast; controlled events do not independently prove actual fall metadata.
+report.json: zero browser pageerrors, pause frozen, move acceleration and same-frame buffered land+jump cancel landing in both normal/gentle.
+Real-capture.mjs awaits current root physics metadata: game.step with real gravity/contact24/260/800px, same receiving support, intervening colliders cleared in scratch fixture.
+
+Integrated real-gravity completion:
+Root depth helper error was found and fixed by root before successful runs.
+real-report.json and real-moving-report.json: actual game.step gravity/contact on same authored support, cleared intervening colliders, normal/gentle; zero errors.24px->severity.0315105,duration106ms;260->.6105904,263ms;800->1,560ms. Moving fixture applied axis1 in final100px, released at contact; impactvx250.25 and braking retain correct heavy pose. Native full/body sequences inspected: at180ms medium upright/recoiling while heavy still pancaked; heavy lifting at420ms; eyes readable in all checked normal/gentle poses.
+actual-buffered-report.json: real800px descent with spent air charge and pre-contact jump press yields land then jump, groundedfalse,vy-820.5128,airJumps1,landAge10.0083,landCompression0 in normal/gentle. No presentation lock delays launch.
+No character changes were needed after integrated real-gravity review. These controlled receiving-surface fixtures prove landing/motion contrast; overall route/full-game active-play judgment remains with root's normal play review.
+
+FINAL common-course revision (supersedes prior260/800-only acceptance):
+Independent Round1 critic showed80px(.19084) body nearly round and300px(.67892) heavy hold too brief. common-range-before/character.js preserves that stage. Retuned medium activation to smooth((severity-.04)/.20), heavy to smooth((severity-.30)/.55), duration=.10+.12*medium+.26*heavy+.08*severity, medium-drive amplitude=.36+.85*severity. Same maximum560ms; no effects/topology additions.
+Before/after real8/24/80/300 captures: real-before-common-report.json vs real-common-report.json, and associated native full/body screenshots. At50ms80px changes sx1.056/sy.964 to1.290/.794 and138ms to217ms duration.300px changes1.798/.533 to2.154/.440 and321ms to474ms. At180ms300 remains low/wide; old stage was upright.8px unchanged;24px visually quiet,103ms. Normal/gentle eyes remain readable.
+Final moving80/300 actual-gravity captures: real-common-moving-report.json; no pageerrors, pause frozen, horizontal cancellation passes. Final actual-buffered-report.json rerun: land then jump,vy-820.5128,compression0 in both modes. Critic informed stable for independent Round2 ordinary-time review; root full-play uses this final source.

@@ -8,7 +8,7 @@ status=0
 midwidth_audit_dir="$(mktemp -d "${TMPDIR:-/tmp}/vasirbenchmark-midwidth.XXXXXX")"
 
 cleanup() {
-  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/report.png" "$midwidth_audit_dir/workflows.png" "$midwidth_audit_dir/workflow-report.png"
+  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/engineering.png" "$midwidth_audit_dir/report.png" "$midwidth_audit_dir/workflows.png" "$midwidth_audit_dir/workflow-report.png"
   rmdir "$midwidth_audit_dir" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -34,6 +34,7 @@ node "$design_dir/capture.mjs" "$page" "$design_dir/mobile-efficiency.png" 390 8
 node "$design_dir/capture.mjs" "$report_page" "$design_dir/desktop-benchmark-report.png" 1440 1000 report || status=1
 node "$design_dir/capture.mjs" "$report_page" "$design_dir/mobile-benchmark-report.png" 390 844 report || status=1
 node "$design_dir/capture.mjs" "$page" "$midwidth_audit_dir/main.png" 820 1000 leaderboard || status=1
+node "$design_dir/capture.mjs" "$page" "$midwidth_audit_dir/engineering.png" 820 1000 capabilities || status=1
 node "$design_dir/capture.mjs" "$report_page" "$midwidth_audit_dir/report.png" 820 1000 report || status=1
 
 has_workflows="$(node --input-type=module - "$design_dir/data.js" <<'NODE'

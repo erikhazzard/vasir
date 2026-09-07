@@ -1,0 +1,12 @@
+{
+  "file": "tmp/ash-and-echo/audio-rebuild/candidate-runtime.wav",
+  "scope": "Decoded MediaRecorder Opus capture of running Chromium mix; peaks include codec reconstruction. This is not human listening.",
+  "duration": 8.4,
+  "channels": 2,
+  "sampleRate": 48000,
+  "peak": 0.373382568359375,
+  "peakDb": -8.556919225438198,
+  "rms": 0.02264008308906654,
+  "rmsDb": -32.902439672416584,
+  "clippedSamples": 0
+}

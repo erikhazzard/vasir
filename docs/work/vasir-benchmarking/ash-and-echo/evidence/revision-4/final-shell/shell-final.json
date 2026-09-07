@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-09-05T16:49:01.266Z",
+  "errors": [],
+  "failed": [],
+  "loaded": {
+    "background": [
+      948,
+      1659
+    ],
+    "charcoal-buttress": [
+      1024,
+      1536
+    ],
+    "spider": [
+      1254,
+      1254
+    ],
+    "hero": [
+      1254,
+      1254
+    ],
+    "stone": [
+      1254,
+      1254
+    ],
+    "charcoal-belfry": [
+      1024,
+      1536
+    ],
+    "charcoal-architecture": [
+      1536,
+      1024
+    ],
+    "charcoal-refuge": [
+      1536,
+      1024
+    ],
+    "charcoal-bell": [
+      1254,
+      1254
+    ]
+  },
+  "bounds": {
+    "width": 320,
+    "scrollWidth": 320,
+    "controls": [
+      {
+        "x": 22,
+        "y": 492,
+        "w": 64,
+        "h": 64,
+        "right": 86,
+        "bottom": 556
+      },
+      {
+        "x": 97,
+        "y": 492,
+        "w": 64,
+        "h": 64,
+        "right": 161,
+        "bottom": 556
+      },
+      {
+        "x": 214,
+        "y": 474,
+        "w": 82,
+        "h": 82,
+        "right": 296,
+        "bottom": 556
+      }
+    ]
+  },
+  "desktopKeyboard": true,
+  "pauseFocusTrap": true,
+  "gentlerEffectsToggle": true
+}

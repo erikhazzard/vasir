@@ -1,0 +1,22 @@
+{
+  "touch-opening.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "full-route.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "performance.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "fallback-checks.json": {
+    "servedModules": 15,
+    "allMatch": true
+  },
+  "critic-final/receipt.json": {
+    "servedModules": 15,
+    "allMatch": true
+  }
+}

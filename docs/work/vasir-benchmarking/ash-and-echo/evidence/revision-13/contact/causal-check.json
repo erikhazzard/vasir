@@ -1,0 +1,19 @@
+{
+  "sourceHash": "2ce6528ab3429c0b6c2012d3106b11258488de6388bd5ad7f0871b0c709e81a5",
+  "checks": [
+    "left-wall resolves face, ejects outward, large chips",
+    "left-wall zero-delta freeze",
+    "right-wall resolves face, ejects outward, large chips",
+    "right-wall zero-delta freeze",
+    "cinder-rib:0 resolves face, ejects outward, large chips",
+    "cinder-rib:0 zero-delta freeze",
+    "hollow-rib:0 resolves face, ejects outward, large chips",
+    "hollow-rib:0 zero-delta freeze",
+    "suspended support carries pressure/residue; detached ballistic origins stay in world",
+    "airborne origin does not fabricate a ledge",
+    "gentle caps burst to five shards",
+    "switching gentle during an existing burst draws at most five shards",
+    "100-intent stress bounded to24 pending/16contacts/608shards/224grains",
+    "expiry/reset remove contact effects"
+  ]
+}

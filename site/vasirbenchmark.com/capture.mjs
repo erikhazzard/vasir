@@ -11,9 +11,12 @@ const width = Number(widthInput);
 const height = Number(heightInput);
 const captureTarget = requestedTarget.toLowerCase();
 const isWorkflowCapture = captureTarget.startsWith('workflow');
+const isOverallTarget = ['leaderboard', 'efficiency', 'overall-coverage', 'overall-method'].includes(captureTarget);
 const isReportCapture = captureTarget === 'report' || captureTarget === 'workflow-report' || captureTarget === 'workflow-inspector';
 const captureTargets = new Set([
   'leaderboard',
+  'overall-coverage',
+  'overall-method',
   'capabilities',
   'capability-benchmarks',
   'efficiency',
@@ -26,6 +29,8 @@ const captureTargets = new Set([
 ]);
 const targetRoutes = {
   leaderboard: 'capabilities/overall',
+  'overall-coverage': 'capabilities/overall',
+  'overall-method': 'capabilities/overall',
   capabilities: 'capabilities/engineering',
   'capability-benchmarks': 'capabilities/engineering/benchmarks',
   efficiency: 'capabilities/overall/efficiency',
@@ -75,7 +80,7 @@ if (
   || height <= 0
   || !captureTargets.has(captureTarget)
 ) {
-  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|capabilities|capability-benchmarks|efficiency|report|workflows|workflow-benchmarks|workflow-efficiency|workflow-report|workflow-inspector]');
+  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|overall-coverage|overall-method|capabilities|capability-benchmarks|efficiency|report|workflows|workflow-benchmarks|workflow-efficiency|workflow-report|workflow-inspector]');
   console.error('PAGE must be a local file path or an HTTPS URL.');
   process.exit(1);
 }
@@ -576,11 +581,13 @@ async function auditSite(
   const auditVisibleLanguage = (context) => {
     const bodyText = text(document.body);
     const primaryText = text(document.querySelector('.capability-browser, .report-shell'));
+    const measuredText = text(document.querySelector('.capability-browser__canvas, .report-shell'));
     const retired = bodyText.match(/\b(?:illustrative|mock|fixture|fake data)\b/i);
     if (retired) failures.push(context + ': retired data language "' + retired[0] + '"');
     const retiredCondition = bodyText.match(/\b(?:with vasir|without vasir|full vasir)\b/i);
     if (retiredCondition) failures.push(context + ': retired condition label "' + retiredCondition[0] + '"');
-    const retiredScope = bodyText.match(/\b(?:5 categories|24 benchmarks|20 model settings|4,320 runs)\b/i);
+    const retiredScope = bodyText.match(/\b(?:24 benchmarks|20 model settings|4,320 runs)\b/i)
+      || measuredText.match(/\b5 categories\b/i);
     if (retiredScope) failures.push(context + ': retired scope "' + retiredScope[0] + '"');
     const retiredScore = bodyText.match(/\b(?:peer index|peer score|outcome elo)\b/i);
     if (retiredScore) failures.push(context + ': retired score language "' + retiredScore[0] + '"');
@@ -593,7 +600,7 @@ async function auditSite(
     // Keep the Engineering-v1 publication guard scoped to its own result surface.
     // Standalone pilots may be linked elsewhere on the page without becoming
     // published categories in this report.
-    const futureCategory = primaryText.match(data.aiWorkflows ? /\b(?:Product Design|Games)\b/ : /\b(?:AI Workflows|Product Design|Games)\b/);
+    const futureCategory = measuredText.match(data.aiWorkflows ? /\b(?:Product Design|Games)\b/ : /\b(?:AI Workflows|Product Design|Games)\b/);
     if (futureCategory) failures.push(context + ': unpublished category "' + futureCategory[0] + '"');
   };
 
@@ -662,7 +669,7 @@ async function auditSite(
     ['benchmarkSummaries', expectedCounts.benchmarks]
   ];
   if (data.kind !== 'vasirbenchmark-public-projection') failures.push('projection kind mismatch');
-  if (![2, 3].includes(data.schemaVersion)) failures.push('projection schema mismatch');
+  if (![2, 3, 4].includes(data.schemaVersion)) failures.push('projection schema mismatch');
   if (
     data.scoreBasis?.label !== 'Engineering v2'
     || data.scoreBasis?.edition !== 'backend-architecture-panel-consensus-v2'
@@ -739,7 +746,7 @@ async function auditSite(
   }
 
   const privatePattern = /(?:\/home\/|file:\/\/|artifacts\/evaluations|evaluations\/runs\/)/i;
-  const { aiWorkflows: separateWorkflowProjection, ...engineeringProjection } = data;
+  const { aiWorkflows: separateWorkflowProjection, overall: separateOverallProjection, ...engineeringProjection } = data;
   const serializedData = JSON.stringify(engineeringProjection);
   if (privatePattern.test(serializedData) || serializedData.includes('/Users/')) failures.push('public projection leaks a private filesystem or artifact path');
   if (/\b(?:illustrative|mock|fixture)\b/i.test(serializedData)) failures.push('public projection contains fake-data language');
@@ -872,10 +879,19 @@ async function auditSite(
     requireTruth(context, '.capability-canvas__status');
     const selectors = [...document.querySelectorAll('.capability-selector__tab[data-category-id]')];
     const modes = [...document.querySelectorAll('.capability-mode__tab[data-capability-mode]')];
-    const expectedSelectorIds = ['overall', 'engineering', ...(data.aiWorkflows?.categories || []).map(category => category.id)];
+    const expectedSelectorIds = data.overall
+      ? ['overall', 'engineering', 'games', 'writing', 'product-design', 'ai-workflows']
+      : ['overall', 'engineering', ...(data.aiWorkflows?.categories || []).map(category => category.id)];
     if (selectors.length !== expectedSelectorIds.length) failures.push(context + ': category selector count mismatch');
     if (selectors.map((tab) => tab.dataset.categoryId).join('|') !== expectedSelectorIds.join('|')) {
       failures.push(context + ': category selector ids mismatch');
+    }
+    const overallTab = document.querySelector('#capability-category-overall');
+    if (['.capability-selector__long', '.capability-selector__short'].some(selector => text(overallTab?.querySelector(selector)) !== 'Overall')) {
+      failures.push(context + ': Overall sidebar label mismatch');
+    }
+    if (expectedCategory === 'overall' && text(document.querySelector('#capability-question')) !== 'Overall') {
+      failures.push(context + ': Overall header label mismatch');
     }
     const selectedCategories = selectors.filter((tab) => tab.getAttribute('aria-selected') === 'true');
     if (selectedCategories.length !== 1 || selectedCategories[0]?.dataset.categoryId !== expectedCategory) {
@@ -1808,6 +1824,17 @@ async function auditSite(
 
   if (target === 'report') {
     await auditReports();
+  } else if (data.overall) {
+    // Overall is a distinct aggregate; cross-family reloads are driven by the
+    // protocol coordinator rather than inside a page evaluation.
+    await auditEngineering();
+    await auditBenchmarks();
+    await auditEngineeringEfficiency();
+    await routeTo(target === 'capability-benchmarks'
+      ? 'capabilities/engineering/benchmarks'
+      : 'capabilities/engineering');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    await settle();
   } else {
     await auditCombined();
     await auditEngineering();
@@ -1840,6 +1867,265 @@ async function auditSite(
     finalHash: location.hash,
     viewportWidth
   };
+}
+
+async function auditCategoryNavigation() {
+  const failures = [];
+  if (!window.VASIR_DATA?.overall) return {failures};
+  const text = element => element?.textContent.replace(/\s+/g, ' ').trim() || '';
+  const visible = element => Boolean(element?.getBoundingClientRect().width && element.getBoundingClientRect().height && getComputedStyle(element).display !== 'none' && getComputedStyle(element).visibility !== 'hidden');
+  const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const expected = [
+    ['overall', 'Overall', false], ['engineering', 'Engineering', false],
+    ['games', 'Games', true], ['writing', 'Writing', true],
+    ['product-design', 'Product Design', true], ['ai-workflows', 'AI Workflows', false]
+  ];
+  const tabs = [...document.querySelectorAll('.capability-selector__tab[data-category-id]')];
+  if (tabs.map(tab => tab.dataset.categoryId).join('|') !== expected.map(([id]) => id).join('|')) failures.push('Category navigation must contain Overall and all five declared categories.');
+  const state = () => JSON.stringify({
+    href: location.href,
+    selected: document.querySelector('.capability-selector__tab[aria-selected="true"]')?.dataset.categoryId,
+    heading: text(document.querySelector('#capability-question')),
+    content: document.querySelector('#capability-field-panel')?.innerHTML,
+    focusedId: document.activeElement?.id
+  });
+  for (const [id, name, planned] of expected) {
+    const tab = tabs.find(tab => tab.dataset.categoryId === id);
+    const labelVisible = [...(tab?.querySelectorAll('.capability-selector__long, .capability-selector__short') || [])].some(node => visible(node) && text(node));
+    if (!visible(tab) || !labelVisible || text(tab?.querySelector('.capability-selector__long')) !== name) failures.push('Category label is missing or invisible: ' + id);
+    if (!planned) {
+      if (!tab || tab.disabled || tab.getAttribute('aria-disabled') === 'true') failures.push('Measured category is disabled: ' + id);
+      continue;
+    }
+    if (!tab || tab.tagName !== 'BUTTON' || !tab.disabled || tab.getAttribute('aria-disabled') !== 'true' || tab.tabIndex !== -1 || tab.getAttribute('aria-selected') !== 'false') failures.push('Planned category is interactive or selected: ' + id);
+    if (!visible(tab?.querySelector(':scope > strong')) || text(tab?.querySelector(':scope > strong')) !== '—' || !text(tab).includes('Coming soon')) failures.push('Planned category does not visibly disclose its unavailable score: ' + id);
+    if (['data-winner-entry-id', 'data-winner-score', 'data-winner-condition', 'href', 'aria-controls'].some(attribute => tab?.hasAttribute(attribute))) failures.push('Planned category exposes a result or destination: ' + id);
+    const before = state();
+    tab?.click();
+    await settle();
+    if (state() !== before) failures.push('Clicking a planned category changes the selected result or route: ' + id);
+  }
+  return {failures};
+}
+
+async function auditOverall(target) {
+  const root = window.VASIR_DATA;
+  const data = root?.overall;
+  const sources = [root, root?.aiWorkflows].filter(Boolean);
+  const failures = [];
+  const text = element => element?.textContent.replace(/\s+/g, ' ').trim() || '';
+  const primaryText = element => [...(element?.childNodes || [])].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join('').trim();
+  const visible = element => Boolean(element && element.getBoundingClientRect().width && element.getBoundingClientRect().height && getComputedStyle(element).display !== 'none' && getComputedStyle(element).visibility !== 'hidden');
+  const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const close = (a, b, tolerance = 0.000001) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= tolerance;
+  const exactClose = (a, b) => close(a, b, 32 * Number.EPSILON * Math.max(1, Math.abs(b)));
+  const rounded = value => Number(value.toFixed(1));
+  const number = value => Number(String(value).replaceAll('−', '-').match(/-?\d+(?:\.\d+)?/)?.[0]);
+  const taskScore = cell => cell && (Object.hasOwn(cell, 'exactScore') ? cell.exactScore : cell.score);
+  if (!data) return {failures: ['Overall projection missing.']};
+  const tasks = sources.flatMap(source => source.benchmarks);
+  const cells = sources.flatMap(source => source.benchmarkResults);
+  // Independent policy oracle: declared category priorities, normalized only across published categories.
+  const priorities = new Map([['engineering', 0.25], ['games', 0.25], ['writing', 0.125], ['product-design', 0.25], ['ai-workflows', 0.125]]);
+  const measuredCategories = [...new Set(tasks.map(task => task.category))];
+  const publishedTargetWeight = measuredCategories.reduce((sum, category) => sum + priorities.get(category), 0);
+  const categoryWeight = category => priorities.get(category) / publishedTargetWeight;
+  const identities = [...new Map(sources.flatMap(source => source.settings).map(setting => [setting.id, setting])).values()];
+  const cellFor = (id, condition, task) => cells.find(cell => cell.settingId === id && cell.condition === condition && cell.benchmarkId === task);
+  const complete = identities.filter(setting => ['baseline', 'skill'].every(condition => tasks.every(task => Number.isFinite(taskScore(cellFor(setting.id, condition, task.id))))));
+  const incomplete = identities.filter(setting => !complete.some(candidate => candidate.id === setting.id));
+  const sourceMean = (id, condition, valueFor, category) => {
+    if (category) {
+      const selectedTasks = tasks.filter(task => task.category === category);
+      return selectedTasks.reduce((sum, task) => sum + valueFor(cellFor(id, condition, task.id)), 0) / selectedTasks.length;
+    }
+    return measuredCategories.reduce((sum, family) => sum + sourceMean(id, condition, valueFor, family) * priorities.get(family), 0) / publishedTargetWeight;
+  };
+  const sourceScore = (id, condition, category) => sourceMean(id, condition, taskScore, category);
+  const expected = new Map(complete.flatMap(setting => ['baseline', 'skill'].map(condition => {
+    const exactScore = sourceScore(setting.id, condition);
+    const baseline = sourceScore(setting.id, 'baseline');
+    const meanResource = field => sourceMean(setting.id, condition, cell => cell[field]);
+    const metrics = {
+      sampleCount: tasks.length,
+      meanLatencyMs: meanResource('latencyMs'),
+      meanInputTokens: meanResource('inputTokens'),
+      meanOutputTokens: meanResource('outputTokens'),
+      meanTotalTokens: meanResource('totalTokens'),
+      costUsd: null
+    };
+    return [setting.id + '-' + condition, {
+      id: setting.id + '-' + condition, settingId: setting.id, condition,
+      exactScore, score: rounded(exactScore), exactDelta: condition === 'skill' ? exactScore - baseline : 0,
+      latency: metrics.meanLatencyMs / 1000, tokens: metrics.meanOutputTokens, metrics
+    }];
+  })));
+  const rank = entry => 1 + [...expected.values()].filter(other => other.condition === entry.condition && other.exactScore > entry.exactScore).length;
+  const expectedSkill = [...expected.values()].filter(entry => entry.condition === 'skill').sort((a, b) => b.exactScore - a.exactScore || a.latency - b.latency || a.id.localeCompare(b.id));
+  if (tasks.length !== 4 || new Set(tasks.map(task => task.category)).size !== 2 || cells.length !== 268 || complete.length !== 26 || incomplete.length !== 10) failures.push('Frozen source task/cohort coverage changed.');
+  if (data.scoreBasis?.label !== 'Overall v2' || data.scoreBasis?.edition !== 'overall-v2' || data.scoreBasis?.method !== 'priority-weighted-published-category-mean-v1' || data.scoreBasis?.benchmarkWeighting !== 'equal-within-category' || data.scoreBasis?.categoryWeighting !== 'declared-priority-normalized-over-published-v1' || data.scoreBasis?.taskCount !== tasks.length) failures.push('Overall edition or category-priority weighting missing.');
+  if (data.scoreBasis?.portfolioCategoryCount !== 5 || data.scoreBasis?.publishedTargetWeight !== publishedTargetWeight || publishedTargetWeight !== 0.375) failures.push('Overall target-weight coverage is not 37.5% across two of five categories.');
+  if (data.portfolioCategories?.map(category => category.id).join('|') !== [...priorities.keys()].join('|')) failures.push('Overall omits or reorders the five-category target policy.');
+  for (const [id, targetWeight] of priorities) {
+    const category = data.portfolioCategories?.find(category => category.id === id);
+    const categoryTasks = tasks.filter(task => task.category === id);
+    if (!category || category.targetWeight !== targetWeight || !exactClose(category.weight, categoryTasks.length ? categoryWeight(id) : 0) || category.taskCount !== categoryTasks.length || category.status !== (categoryTasks.length ? 'measured' : 'coming-soon') || category.benchmarkIds?.join('|') !== categoryTasks.map(task => task.id).join('|')) failures.push('Overall category policy or measurement status differs from source coverage: ' + id);
+  }
+  if (data.conditions?.find(condition => condition.id === 'skill')?.label !== 'Task-specific skill') failures.push('Overall skill condition conceals task-specific treatments.');
+  if (data.entries.length !== expected.size || data.settings.length !== complete.length || data.benchmarkResults.length !== cells.length) failures.push('Overall cohort or source-cell counts mismatch.');
+  for (const category of data.categories) {
+    if (!exactClose(category.weight, categoryWeight(category.id)) || category.targetWeight !== priorities.get(category.id)) failures.push('Overall family weight does not follow normalized category priorities: ' + category.id);
+  }
+  for (const entry of data.entries) {
+    const oracle = expected.get(entry.id);
+    if (!oracle || !close(entry.exactScore, oracle.exactScore) || entry.score !== oracle.score || !close(entry.exactDelta, oracle.exactDelta)) failures.push('Overall entry differs from saved final task scores: ' + entry.id);
+    if (!oracle || !exactClose(entry.latency, oracle.latency) || !exactClose(entry.tokens, oracle.tokens) || Object.entries(oracle.metrics).some(([key, value]) => key === 'sampleCount' || value === null ? entry.metrics?.[key] !== value : !exactClose(entry.metrics?.[key], value))) failures.push('Overall resources differ from exact category-weighted source means: ' + entry.id);
+  }
+  if (data.coverage?.totalSettings !== identities.length || data.coverage?.eligibleSettings !== complete.length || data.coverage?.incompleteSettings !== incomplete.length || data.coverage?.observedResponseCount !== cells.length) failures.push('Overall coverage summary differs from source evidence.');
+  for (const setting of incomplete) {
+    const record = data.coverage?.records.find(record => record.id === setting.id);
+    if (!record || record.eligible || ['baseline', 'skill'].some(condition => record.scores?.[condition] !== null || record.exactScores?.[condition] !== null || record.ranks?.[condition] !== null || record.metrics?.[condition] !== null) || record.deltas?.skill !== null || record.exactDeltas?.skill !== null) failures.push('Incomplete setting acquired an Overall score, rank, uplift, or resource mean: ' + setting.id);
+  }
+
+  const documentAudit = mode => {
+    if (document.querySelector('.capability-selector__tab[aria-selected="true"]')?.dataset.categoryId !== 'overall') failures.push('Overall selection lost in ' + mode);
+    if (text(document.querySelector('#capability-question')) !== 'Overall') failures.push('Overall heading mismatch.');
+    if (!text(document.querySelector('.capability-canvas__status')).includes('Overall v2')) failures.push('Overall edition disclosure missing.');
+    const method = document.querySelector('[data-overall-method]');
+    const coverage = document.querySelector('[data-portfolio-coverage]');
+    if (!visible(method) || !['Engineering', '66.7%', 'AI Workflows', '33.3%'].every(value => text(method).includes(value))) failures.push('Overall current category weights are not visible.');
+    if (!visible(coverage) || !text(coverage).includes('2/5') || !text(coverage).includes('37.5%') || !/target weight/i.test(text(coverage))) failures.push('Overall measured categories and target-weight coverage are not visibly distinguished.');
+    if (/each benchmark\s+25%|equal[- ]weight(?:ed)? across all/i.test(text(method) + ' ' + document.querySelector('#capability-category-overall')?.getAttribute('aria-label'))) failures.push('Overall still claims equal weights across all benchmark tasks.');
+    if (Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1) failures.push('Overall ' + mode + ' overflows viewport.');
+    const ids = [...document.querySelectorAll('[id]')].map(node => node.id);
+    if (new Set(ids).size !== ids.length) failures.push('Overall contains duplicate element IDs.');
+    for (const control of [...document.querySelectorAll('button, a[href], summary, select')].filter(visible)) {
+      if (!text(control) && !control.getAttribute('aria-label') && !control.getAttribute('aria-labelledby') && !control.labels?.length) failures.push('Overall contains unnamed control.');
+    }
+  };
+  const route = async mode => {
+    location.hash = 'capabilities/overall' + (mode === 'models' ? '' : '/' + mode);
+    await settle();
+    documentAudit(mode);
+  };
+  await route('models');
+  if (!text(document.querySelector('.capability-canvas__identity')).includes('4')) failures.push('Overall task scope missing.');
+  const weightsDisclosure = document.querySelector('details.overall-weights');
+  if (!weightsDisclosure || weightsDisclosure.open) failures.push('Overall target-weight method must be available in a collapsed disclosure.');
+  weightsDisclosure?.querySelector('summary')?.click();
+  await settle();
+  const weightRows = [...document.querySelectorAll('[data-target-category-id]')];
+  if (!weightsDisclosure?.open || weightRows.length !== priorities.size) failures.push('Overall target-weight disclosure does not expose all five categories.');
+  for (const [id, weight] of priorities) {
+    const row = weightRows.find(row => row.dataset.targetCategoryId === id);
+    if (!visible(row) || Number(row.dataset.targetWeight) !== weight || !text(row).includes(weight * 100 + '%')) failures.push('Overall target-weight disclosure differs from declared policy: ' + id);
+  }
+  weightsDisclosure?.querySelector('summary')?.click();
+  await settle();
+  const inspectRows = () => {
+    const rows = [...document.querySelectorAll('.result-list > .setting-row')].filter(visible);
+    rows.forEach((row, index) => {
+      const skill = expectedSkill[index];
+      const baseline = expected.get(skill?.settingId + '-baseline');
+      if (!skill || !baseline || row.dataset.settingId !== skill.settingId) { failures.push('Overall leaderboard order mismatch.'); return; }
+      if (Number(row.dataset.fullScore) !== skill.score || Number(row.dataset.baselineScore) !== baseline.score || Number(row.dataset.delta) !== rounded(skill.exactDelta)) failures.push('Overall row score or uplift mismatch: ' + skill.settingId);
+      if (Number(row.dataset.fullRank) !== rank(skill) || Number(row.dataset.baselineRank) !== rank(baseline)) failures.push('Overall row competition rank mismatch: ' + skill.settingId);
+      const compositions = [...row.querySelectorAll('.capability-composition')];
+      if (compositions.length !== 2) failures.push('Overall does not show both conditions.');
+      for (const composition of compositions) {
+        const entry = expected.get(composition.dataset.entryId);
+        if (!entry) { failures.push('Unknown Overall composition.'); continue; }
+        if (!close(Number(composition.dataset.compositeExactScore), entry.exactScore) || number(text(composition.querySelector('.capability-composition__total'))) !== entry.score) failures.push('Overall visible total differs from exact aggregate.');
+        const segments = [...composition.querySelectorAll('.capability-composition__segment')];
+        if (segments.length !== 2) failures.push('Overall bar omits a category.');
+        let total = 0;
+        for (const segment of segments) {
+          const family = segment.dataset.categoryId;
+          const weight = categoryWeight(family);
+          const exact = sourceScore(entry.settingId, entry.condition, family);
+          const contribution = exact * weight;
+          if (!close(Number(segment.dataset.weight), weight) || !close(Number(segment.dataset.rawExactScore), exact) || !close(Number(segment.dataset.contribution), contribution)) failures.push('Overall category contribution mismatch: ' + family);
+          total += Number(segment.dataset.contribution);
+          const stack = composition.querySelector('.capability-composition__stack');
+          if (stack && !close(segment.getBoundingClientRect().width, stack.getBoundingClientRect().width * contribution / 100, 1.25)) failures.push('Overall bar width is not the weighted contribution.');
+        }
+        if (!close(total, entry.exactScore)) failures.push('Overall category contributions do not sum to the total.');
+      }
+    });
+    return rows;
+  };
+  if (inspectRows().length !== 10) failures.push('Overall collapsed cohort is not top10.');
+  document.querySelector('#show-all')?.click();
+  await settle();
+  if (inspectRows().length !== complete.length) failures.push('Overall expansion omits eligible settings.');
+  const gaps = [...document.querySelectorAll('[data-incomplete-setting-id]')];
+  if (gaps.length !== incomplete.length) failures.push('Overall omits incomplete settings.');
+  for (const setting of incomplete) {
+    const row = gaps.find(node => node.dataset.incompleteSettingId === setting.id);
+    if (!visible(row) || !text(row).includes(setting.family) || !text(row).includes('3/4') || !row.querySelector('[data-missing-task-id="work-spec-chat"]')) failures.push('Incomplete coverage or recovery link missing: ' + setting.id);
+    if (['baselineScore', 'fullScore', 'baselineRank', 'fullRank', 'delta'].some(key => row?.dataset[key] !== 'null')) failures.push('Incomplete row exposes a numeric Overall result: ' + setting.id);
+    for (const condition of ['baseline', 'skill']) {
+      const observed = tasks.filter(task => cellFor(setting.id, condition, task.id)).length;
+      const assessable = tasks.filter(task => Number.isFinite(taskScore(cellFor(setting.id, condition, task.id)))).length;
+      const reading = row?.querySelector('[data-coverage-condition="' + condition + '"]');
+      const score = reading?.querySelector('strong');
+      const rankLabel = score?.querySelector('small');
+      const coverageText = observed + '/' + tasks.length + ' tasks' + (assessable !== observed ? ' · ' + assessable + ' assessable' : '');
+      if (row?.dataset[condition + 'Coverage'] !== observed + '/' + tasks.length || !visible(reading) || !visible(score) || primaryText(score) !== '—' || !visible(rankLabel) || text(rankLabel) !== 'rank —' || text(reading?.querySelector('span:last-child')) !== coverageText) failures.push('Incomplete condition does not visibly preserve unavailable score/rank and source coverage: ' + setting.id + '-' + condition);
+    }
+    const uplift = row?.querySelector('.overall-coverage__uplift strong');
+    if (!visible(uplift) || primaryText(uplift) !== '—') failures.push('Incomplete row shows an available Overall uplift: ' + setting.id);
+  }
+  document.querySelector('#show-all')?.click();
+  await settle();
+
+  await route('benchmarks');
+  const ledgerRows = [...document.querySelectorAll('.benchmark-ledger__row[data-benchmark-id]')].filter(visible);
+  if (ledgerRows.length !== tasks.length || document.querySelectorAll('.benchmark-ledger__track').length !== 2) failures.push('Overall ledger omits a benchmark or track.');
+  for (const task of tasks) {
+    const row = ledgerRows.find(row => row.dataset.benchmarkId === task.id);
+    const summary = sources.flatMap(source => source.benchmarkSummaries).find(summary => summary.benchmarkId === task.id);
+    if (!row || row.getAttribute('href') !== './benchmark-report.html?from=overall#' + task.id) failures.push('Overall report route missing: ' + task.id);
+    if (Number(row?.dataset.baselineScore) !== summary.baseline || Number(row?.dataset.treatmentScore) !== summary.treatment || !text(row?.querySelector('.benchmark-ledger__evidence')).includes(summary.complete + '/' + summary.total)) failures.push('Overall ledger changes the source cohort: ' + task.id);
+  }
+
+  await route('efficiency');
+  if (document.querySelector('#efficiency-entry')?.options.length !== expected.size) failures.push('Overall efficiency omits conditions or includes incomplete settings.');
+  for (const metric of ['latency', 'tokens']) {
+    const select = document.querySelector('#resource-axis');
+    if (!select) { failures.push('Overall resource selector missing.'); break; }
+    select.value = metric;
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+    await settle();
+    const points = [...document.querySelectorAll('[data-plot-point][data-entry-id]')].filter(visible);
+    if (points.length !== expected.size) failures.push('Overall efficiency point count mismatch.');
+    // Resource switching animates point transforms for 220ms; inspect final geometry.
+    await Promise.allSettled(points.flatMap(point => point.getAnimations().map(animation => animation.finished)));
+    await settle();
+    const values = [...expected.values()].map(entry => entry[metric]);
+    const low = Math.min(...values) * 0.9;
+    const high = Math.max(...values) * 1.1;
+    const canvas = document.querySelector('.efficiency-plane__canvas');
+    const plotBounds = canvas?.getBoundingClientRect();
+    if (!visible(canvas)) failures.push('Overall efficiency plot has no rendered area.');
+    for (const point of points) {
+      const oracle = expected.get(point.dataset.entryId);
+      if (!oracle) { failures.push('Overall efficiency has unknown point.'); continue; }
+      const x = (Math.log(oracle[metric]) - Math.log(low)) / (Math.log(high) - Math.log(low)) * 100;
+      const y = 100 - oracle.exactScore;
+      if (Number(point.dataset.score) !== oracle.score || !exactClose(Number(point.dataset.resource), oracle[metric]) || !close(Number(point.dataset.plotX), x, 0.000501) || !close(Number(point.dataset.plotY), y, 0.000501)) failures.push('Overall efficiency values differ from exact category-weighted source means: ' + oracle.id);
+      const pointBounds = point.getBoundingClientRect();
+      // Percentage attributes round to three decimals; allow only browser pixel rounding here.
+      if (!plotBounds || !close(pointBounds.left + pointBounds.width / 2, plotBounds.left + plotBounds.width * x / 100, 1) || !close(pointBounds.top + pointBounds.height / 2, plotBounds.top + plotBounds.height * y / 100, 1)) failures.push('Overall efficiency rendered point differs from the source-derived position: ' + JSON.stringify({id: oracle.id, metric, x, y, plotBounds, pointBounds}));
+    }
+    documentAudit('efficiency');
+  }
+  const resource = document.querySelector('#resource-axis');
+  if (resource) { resource.value = 'latency'; resource.dispatchEvent(new Event('change', {bubbles: true})); await settle(); }
+  await route(target === 'efficiency' ? 'efficiency' : 'models');
+  window.scrollTo({top: 0, behavior: 'instant'});
+  await settle();
+  return {failures, categoryCount: 2, benchmarkCount: tasks.length, settingCount: complete.length, entryCount: expected.size, resultCount: cells.length, d3Version: window.d3?.version};
 }
 
 async function auditWorkflows(target) {
@@ -1935,8 +2221,9 @@ async function auditWorkflows(target) {
     }
   } else {
     const categoryIds = [...document.querySelectorAll('.capability-selector__tab')].map(node => node.dataset.categoryId);
-    if (categoryIds.join('|') !== 'overall|engineering|ai-workflows') failures.push('Family navigation is incomplete.');
-    if (!text(document.querySelector('#capability-category-overall')).includes(innerWidth > 1080 ? 'Engineering overall' : 'Eng overall')) failures.push('Engineering-only overall ranking is not named.');
+    if (categoryIds.join('|') !== (window.VASIR_DATA.overall ? 'overall|engineering|games|writing|product-design|ai-workflows' : 'overall|engineering|ai-workflows')) failures.push('Family navigation is incomplete.');
+    const overallTab = document.querySelector('#capability-category-overall');
+    if (['.capability-selector__long', '.capability-selector__short'].some(selector => text(overallTab?.querySelector(selector)) !== 'Overall')) failures.push('Overall sidebar label mismatch.');
     const rows = [...document.querySelectorAll('.capability-rank-row')];
     if (rows.length !== data.settings.length) failures.push('Work-spec leaderboard omits settings.');
     rows.forEach(row => {
@@ -1946,8 +2233,23 @@ async function auditWorkflows(target) {
         if (Number.isFinite(entry.score) && Number(numeric) !== entry.score) failures.push('Leaderboard condition score mismatch.');
         const rank = expectedRank(entry.settingId, condition);
         if ((condition === 'skill' ? row.dataset.fullRank : row.dataset.baselineRank) !== String(rank)) failures.push('Leaderboard does not preserve exact-score competition ranks.');
-        if (text(row.querySelector('[data-condition-readiness="' + condition + '"]')) !== entry.readinessLabel) failures.push('Leaderboard readiness missing or changed.');
+        const reading = row.querySelector('.capability-rank-row__reading--' + (condition === 'skill' ? 'full' : 'baseline'));
+        if ([...(reading?.children || [])].map(child => child.tagName).join('|') !== 'SPAN|STRONG|SMALL') failures.push('Leaderboard condition must share Engineering score and #rank markup.');
+        const scoreNode = reading?.querySelector(':scope > strong');
+        const rankNode = reading?.querySelector(':scope > small');
+        if (text(scoreNode) !== (Number.isFinite(entry.score) ? entry.score.toFixed(1) : '—') || text(rankNode) !== (rank ? '#' + rank : '—')) failures.push('Leaderboard visible score or #rank differs from its condition result.');
+        if (visible(reading) && scoreNode && rankNode) {
+          const scoreBox = scoreNode.getBoundingClientRect();
+          const rankBox = rankNode.getBoundingClientRect();
+          if (rankBox.left < scoreBox.right - 1 || Math.abs(rankBox.bottom - scoreBox.bottom) > 4 || reading.scrollWidth > reading.clientWidth + 1) failures.push('Leaderboard score and #rank must remain adjacent on one unclipped line.');
+        }
+        if (row.querySelector('[data-condition-readiness], .work-spec-readiness, .capability-rank-row__reading--work-spec')) failures.push('Leaderboard row retains a workflow-specific readiness layout.');
         if (condition === 'skill' && Number.isFinite(entry.delta) && Number(row.dataset.delta) !== entry.delta) failures.push('Paired uplift changed through display rounding.');
+        if (condition === 'skill' && Number.isFinite(entry.delta)) {
+          const deltaLabel = (entry.delta > 0 ? '+' : entry.delta < 0 ? '−' : '±') + Math.abs(entry.delta).toFixed(1);
+          if (text(row.querySelector('.capability-rank-row__delta')).replace(/\s*pts$/, '') !== deltaLabel) failures.push('Leaderboard visible uplift differs from its exact-score paired result.');
+          if (text(row.querySelector('.capability-rank-row__position')) !== '#' + String(rank).padStart(2, '0')) failures.push('Leaderboard visible setting rank breaks competition ties.');
+        }
       }
     });
     const mode = target === 'workflow-benchmarks' ? 'benchmarks' : target === 'workflow-efficiency' ? 'efficiency' : 'models';
@@ -1958,7 +2260,7 @@ async function auditWorkflows(target) {
         if (Number(hero?.dataset.leaderCount) !== leaders.length) failures.push('Hero omits co-leader count.');
         if (leaders.length > 1 && !text(hero?.querySelector('dt')).includes(leaders.length + ' co-leaders')) failures.push('Tied hero claims a singular leader.');
         const identities = [...(hero?.querySelectorAll('[data-leader-entry-id]') || [])];
-        if (identities.length !== leaders.length || leaders.some(entry => !identities.some(node => node.dataset.leaderEntryId === entry.id && text(node).includes(entry.readinessLabel)))) failures.push('Hero omits a tied setting or its readiness.');
+        if (identities.length !== leaders.length || leaders.some(entry => !identities.some(node => node.dataset.leaderEntryId === entry.id && text(node) === entry.family + ' · ' + entry.reasoning))) failures.push('Hero omits or changes a tied setting name.');
       }
     }
     if (document.querySelector('.capability-mode__tab[aria-selected="true"]')?.dataset.capabilityMode !== mode) failures.push('Workflow view route mismatch.');
@@ -1966,6 +2268,8 @@ async function auditWorkflows(target) {
     if (mode === 'efficiency') {
       const scoredEntries = data.entries.filter(entry => Number.isFinite(entry.score));
       if (document.querySelectorAll('[data-plot-point]').length !== scoredEntries.length) failures.push('Efficiency points do not match assessable results.');
+      const selectedEntry = data.entries.find(entry => entry.id === document.querySelector('#efficiency-entry')?.value);
+      if (text(document.querySelector('[data-selected-readiness]')) !== selectedEntry?.readinessLabel) failures.push('Selected efficiency result omits its readiness verdict.');
     }
   }
   [...document.querySelectorAll('button, a[href], summary, select')].filter(visible).forEach(element => {
@@ -2109,7 +2413,7 @@ try {
   if (
     !manifest
     || manifest.kind !== 'vasirbenchmark-public-projection'
-    || ![2, 3].includes(manifest.schemaVersion)
+    || ![2, 3, 4].includes(manifest.schemaVersion)
     || manifest.scoreEdition !== 'backend-architecture-panel-consensus-v2'
     || manifest.scoreMethod !== 'equal-benchmark-absolute-mean-v1'
     || manifest.conditions.join('|') !== 'baseline|skill'
@@ -2138,7 +2442,14 @@ try {
     throw new Error(captureTarget + ' requires the main benchmark page.');
   }
 
-  const audit = isWorkflowCapture ? await evaluate('(' + auditWorkflows.toString() + ')(' + JSON.stringify(captureTarget) + ')') : await evaluate(
+  const hasOverall = await evaluate('Boolean(window.VASIR_DATA.overall)');
+  if (!isReportCapture && hasOverall) {
+    const navigationAudit = await evaluate('(' + auditCategoryNavigation.toString() + ')()');
+    if (navigationAudit.failures.length) throw new Error('QA failed: ' + navigationAudit.failures.join('; '));
+  }
+  const audit = isOverallTarget && hasOverall
+    ? await evaluate('(' + auditOverall.toString() + ')(' + JSON.stringify(captureTarget) + ')')
+    : isWorkflowCapture ? await evaluate('(' + auditWorkflows.toString() + ')(' + JSON.stringify(captureTarget) + ')') : await evaluate(
     '(' + auditSite.toString() + ')('
       + JSON.stringify(captureTarget)
       + ',' + width
@@ -2151,13 +2462,92 @@ try {
   );
   if (audit.failures.length) throw new Error('QA failed: ' + audit.failures.join('; '));
 
+  if (captureTarget === 'report' || captureTarget === 'workflow-report') {
+    const overallReportUrl = new URL(pageUrl);
+    overallReportUrl.searchParams.set('from', 'overall');
+    const overallLoaded = protocol.once('Page.loadEventFired');
+    await protocol.send('Page.navigate', { url: overallReportUrl.href });
+    await overallLoaded;
+    await waitFor(async () => await evaluate(readinessExpression));
+    const overallBreadcrumb = await evaluate("document.querySelector('.report-breadcrumb a[href=\"./index.html#capabilities/overall/benchmarks\"]')?.textContent.trim()");
+    if (overallBreadcrumb !== 'Overall') throw new Error('QA failed: Overall report breadcrumb label mismatch.');
+    const restored = protocol.once('Page.loadEventFired');
+    await protocol.send('Page.navigate', { url: pageUrl.href });
+    await restored;
+    await waitFor(async () => await evaluate(readinessExpression));
+  }
+
+  if (isOverallTarget && hasOverall) {
+    const editions = {overall: 'Overall v2', engineering: 'Engineering v2', 'ai-workflows': 'Work Specs v1'};
+    // All measured context transitions remain covered; keyboard traversal must
+    // skip the three disabled placeholders and restore focus after each reload.
+    const navigationSteps = [
+      {category: 'engineering'}, {category: 'ai-workflows', move: 'next'},
+      {category: 'overall', move: 'next'}, {category: 'ai-workflows', key: 'End'},
+      {category: 'engineering', move: 'previous'}, {category: 'overall', key: 'Home'}
+    ];
+    for (const step of navigationSteps) {
+      const {category} = step;
+      let key = step.key;
+      if (step.move) {
+        const vertical = await evaluate('document.querySelector(".capability-selector__tabs")?.getAttribute("aria-orientation") === "vertical"');
+        key = step.move === 'next' ? vertical ? 'ArrowDown' : 'ArrowRight' : vertical ? 'ArrowUp' : 'ArrowLeft';
+      }
+      const keyCode = {End: 35, Home: 36, ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40}[key];
+      if (key) {
+        await protocol.send('Input.dispatchKeyEvent', {type: 'keyDown', key, code: key, windowsVirtualKeyCode: keyCode});
+      } else {
+        await evaluate('document.querySelector(' + JSON.stringify('#capability-category-' + category) + ').click()');
+      }
+      await waitFor(async () => {
+        try {
+          return await evaluate('document.readyState === "complete" && document.querySelector('
+            + JSON.stringify('#capability-category-' + category)
+            + ')?.getAttribute("aria-selected") === "true" && document.querySelector(".capability-canvas__status")?.textContent.includes('
+            + JSON.stringify(editions[category])
+            + ') && document.activeElement?.id === '
+            + JSON.stringify('capability-category-' + category));
+        } catch { return false; }
+      });
+      if (key) await protocol.send('Input.dispatchKeyEvent', {type: 'keyUp', key, code: key, windowsVirtualKeyCode: keyCode});
+    }
+  }
+
   if (isWorkflowCapture && !isReportCapture) {
+    const rowLayout = () => {
+      const row = document.querySelector('.capability-rank-row');
+      return ['.capability-rank-row__reading--baseline', '.capability-rank-row__reading--full', '.capability-rank-row__delta'].map(selector => {
+        const element = row?.querySelector(selector);
+        if (!element) return null;
+        const style = getComputedStyle(element);
+        return {
+          display: style.display,
+          // The shared auto track legitimately grows from #1 to #15.
+          columns: style.gridTemplateColumns === 'none' ? 0 : style.gridTemplateColumns.trim().split(/\s+/).length,
+          alignment: style.alignItems,
+          gap: style.gap,
+          whiteSpace: style.whiteSpace,
+          children: [...element.children].map(child => {
+            const childStyle = getComputedStyle(child);
+            return { tag: child.tagName, display: childStyle.display, font: childStyle.fontFamily, size: childStyle.fontSize, weight: childStyle.fontWeight, lineHeight: childStyle.lineHeight };
+          })
+        };
+      });
+    };
+    const workflowRowLayout = captureTarget === 'workflows' ? await evaluate('(' + rowLayout.toString() + ')()') : null;
     await evaluate("document.querySelector('#capability-category-engineering').click()");
     await waitFor(async () => {
       try {
         return await evaluate("document.readyState === 'complete' && document.querySelector('#capability-category-engineering')?.getAttribute('aria-selected') === 'true' && document.querySelector('.capability-canvas__status')?.textContent.includes('Engineering v2') && document.activeElement?.id === 'capability-category-engineering'");
       } catch { return false; }
     });
+    if (workflowRowLayout) {
+      const engineeringRowLayout = await evaluate('(' + rowLayout.toString() + ')()');
+      if (JSON.stringify(workflowRowLayout) !== JSON.stringify(engineeringRowLayout)) {
+        const differences = workflowRowLayout.flatMap((reading, index) => Object.keys(reading).filter(key => JSON.stringify(reading[key]) !== JSON.stringify(engineeringRowLayout[index]?.[key])).map(key => ({ reading: index, property: key, workflows: reading[key], engineering: engineeringRowLayout[index]?.[key] })));
+        throw new Error('QA failed: AI Workflows score, #rank, and uplift layout differs from Engineering at this viewport: ' + JSON.stringify(differences));
+      }
+    }
     await evaluate("document.querySelector('#capability-category-ai-workflows').click()");
     await waitFor(async () => {
       try {
@@ -2213,6 +2603,20 @@ try {
       }));
     })()`);
   }
+  if (captureTarget === 'overall-coverage') {
+    await evaluate("document.querySelector('.overall-coverage').scrollIntoView({ block: 'start', behavior: 'instant' }); new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))");
+  }
+  if (captureTarget === 'overall-method') {
+    await evaluate(`(() => {
+      const disclosure = document.querySelector('details.overall-weights');
+      if (!disclosure) throw new Error('Overall target-weight disclosure is missing.');
+      disclosure.open = true;
+      return new Promise(resolve => requestAnimationFrame(() => {
+        disclosure.scrollIntoView({ block: 'start', behavior: 'instant' });
+        requestAnimationFrame(resolve);
+      }));
+    })()`);
+  }
   const screenshot = await protocol.send('Page.captureScreenshot', {
     format: 'png',
     fromSurface: true,
@@ -2231,7 +2635,7 @@ try {
     path.basename(destination)
     + ' · #' + targetRoutes[captureTarget]
     + ' · ' + width + '×' + height
-    + ' · 1 category / '
+    + ' · ' + (audit.categoryCount || 1) + ' categories / '
     + audit.benchmarkCount + ' benchmarks / '
     + audit.settingCount + ' settings / '
     + audit.entryCount + ' condition entries / '

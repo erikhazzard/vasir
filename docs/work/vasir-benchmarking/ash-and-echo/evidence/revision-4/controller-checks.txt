@@ -1,0 +1,22 @@
+Route proof: 32.52s, 28 authored landings, 56 jump actions, 0 wall kicks, 0 deaths, checkpoint active, grounded summit.
+Wall-kick route proof: 32.24s, 28 authored landings, 56 jump actions, 1 wall kicks, 0 deaths, checkpoint active, grounded summit.
+✔ ready waits for start; one press stays one action across a large fully simulated step (3.206ms)
+✔ jump height varies with hold, and holding never auto-repeats (1.75525ms)
+✔ a late jump after walking off the ledge uses coyote time and preserves the air jump (0.316667ms)
+✔ a press just before landing is buffered, consumed once, and launches immediately on landing (0.167125ms)
+✔ wall slide limits the fall; wall kicks preserve both full and exhausted air resources (0.166625ms)
+✔ a shallow head corner is corrected, while a centered ceiling stops ascent (0.169208ms)
+✔ checkpoint death returns safely in under 300ms; restart clears the entire attempt (0.357208ms)
+✔ a late retry press launches on respawn once, while stale held input expires (2.353875ms)
+✔ camera follows ascent and falls at short and tall portrait sizes (2.648917ms)
+✔ 60Hz batches and 120Hz steps resolve to the same controller state (0.853875ms)
+✔ the authored route is completed using only real press/release edges and digital steering (10.709541ms)
+✔ the same full climb supports an optional early wall kick without spending the air jump (3.746125ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 74.18375

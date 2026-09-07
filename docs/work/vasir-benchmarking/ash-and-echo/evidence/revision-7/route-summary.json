@@ -1,0 +1,38 @@
+{
+  "gameSeconds": 34.53333333333202,
+  "state": "won",
+  "grounded": true,
+  "deaths": 1,
+  "authoredLedgesLanded": 28,
+  "wallKicks": 1,
+  "restart": {
+    "state": "playing",
+    "player": {
+      "x": 96,
+      "y": 4452,
+      "w": 24,
+      "h": 28,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "wallDir": 0,
+      "airJumps": 1,
+      "facing": 1,
+      "motion": "idle"
+    },
+    "cameraY": 3691.076923076923,
+    "elapsed": 0.24999999999999997,
+    "deaths": 0,
+    "maxAltitude": 0,
+    "checkpoint": {
+      "x": 190,
+      "y": 2382,
+      "w": 40,
+      "h": 66,
+      "active": false
+    },
+    "paused": false
+  },
+  "errors": [],
+  "scope": "Actual browser input with read-only live geometry. Final simulation/renderer/character/foreground. Predates only final presentation-only flock startle direction correction; subsequent quiet sample uses all ten final JS hashes."
+}

@@ -1,0 +1,1554 @@
+{
+  "method": "Frozen source files served through scratch routes; images served from live assets. Native390×844 and enlarged desktop1280×1300. Arranged real playable starts at opening, middle, checkpoint, upper, then ordinary keyboard/normal RAF. Before/air/after screenshots interrupt timing briefly; clips establish qualitative world motion, not performance.",
+  "source": {
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "character.js": "c70b10e39927aedff00cadfe620b24973f6e531afacda6ca323c9ebef5ee3505",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "depth.js": "a6884bad0045bcb2022f6c82452b24abf7a5e8b5364a13cac98f21b5bc77fec1",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "index.html": "6810ebafa0d8707f8d93435cae5e33e8e88313bfb4fa72667d17187835bbfa09",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "renderer.js": "860e5cf6c5ab95d3aea1b47901e619f5bd18536cfba1d7142e0559bfd0159000",
+    "style.css": "581b121995d1deb25ca28048759e907fd648b932c2e84a9dc30cc38cc70efeec",
+    "surface-ash.js": "2ce6528ab3429c0b6c2012d3106b11258488de6388bd5ad7f0871b0c709e81a5",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0"
+  },
+  "served": {
+    "main.js": "e8b43a6cbe1e97f7e80458da36e944f34d9513d6060b3ec1f9da3aab04073b44",
+    "game.js": "66529c54e9f048d2a7a5e14cb8833b0f546afe73951875084aafc1222e9e6ccb",
+    "renderer.js": "860e5cf6c5ab95d3aea1b47901e619f5bd18536cfba1d7142e0559bfd0159000",
+    "audio.js": "b18246979c7bb1a7a0fffe3fda18f0a6c4d217fa661ead094cc4aeb32ecc7ea9",
+    "depth.js": "a6884bad0045bcb2022f6c82452b24abf7a5e8b5364a13cac98f21b5bc77fec1",
+    "atmosphere.js": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+    "character.js": "c70b10e39927aedff00cadfe620b24973f6e531afacda6ca323c9ebef5ee3505",
+    "surface-ash.js": "2ce6528ab3429c0b6c2012d3106b11258488de6388bd5ad7f0871b0c709e81a5",
+    "cast-shadows.js": "26a7c62a18fa7d9398520fa7f6422e4e28b14ee616cb2d9f16bf017135459002",
+    "lighting.js": "9f6b6f46a18562bf46f4272af355f8e064fd02f3afd3aa7b308d1cdc74335fc3",
+    "wildlife.js": "efc608e589da04959be6d9a0923253b2357307aedbcc967d75a574f117e6dfb0",
+    "foreground.js": "b4ba5b9a5427ab2c8d35a7fdf19cdbd21e8bff22f7ae86e4d81309160d4fd6ed",
+    "cloud-texture.js": "8cef3ff131bfa42b8ba0f4fbcca20aa25e691d4b41efaaf5784e3c8b9c4284a0",
+    "fog-volume.js": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306",
+    "ash-flow.js": "86344d7474546293251e5813259fc8aaa7865d8cdc2c0a66d0354a4ff14b2bc8"
+  },
+  "errors": [],
+  "samples": [
+    {
+      "form": "native",
+      "name": "opening-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 92,
+          "y": 4452,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 0.5666666666666671,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 1670.5,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "opening-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 188.10694444444465,
+          "y": 4227.599214697932,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -255.09489371027803,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 1.441666666666664,
+        "deaths": 0,
+        "maxAltitude": 224.40078530206756,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 2554.5999999996275,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "opening-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 204.5625000000002,
+          "y": 4398,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 2.3749999999999942,
+        "deaths": 0,
+        "maxAltitude": 238.82107166337937,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 3482.699999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "middle-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 190,
+          "y": 3031.5083796498443,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2401.575384615385,
+        "elapsed": 0.5500000000000005,
+        "deaths": 0,
+        "maxAltitude": 1424,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 4029.699999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "middle-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 288.2569444444443,
+          "y": 2805.925594184861,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -255.09489371027803,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 2363.820849507045,
+        "elapsed": 2.774999999999993,
+        "deaths": 0,
+        "maxAltitude": 1646.074405815139,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 6268.0999999996275,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "middle-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 304.7124999999999,
+          "y": 3174,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2470.8560469905797,
+        "elapsed": 3.658333333333323,
+        "deaths": 0,
+        "maxAltitude": 1660.4946921764508,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 7159.699999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "checkpoint-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 197,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1793.5753846153848,
+        "elapsed": 0.5500000000000005,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 7714.5999999996275,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "checkpoint-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 290.9569444444442,
+          "y": 2197.618701146907,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -255.09489371027803,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 1755.589635360505,
+        "elapsed": 1.416666666666664,
+        "deaths": 0,
+        "maxAltitude": 2254.381298853093,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 8580.400000000373,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "checkpoint-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 307.41249999999985,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1724.7635873876513,
+        "elapsed": 2.2999999999999945,
+        "deaths": 0,
+        "maxAltitude": 2268.801585214405,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 9464.800000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "upper-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 191,
+          "y": 541.5481672626061,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 0,
+        "elapsed": 0.5250000000000006,
+        "deaths": 0,
+        "maxAltitude": 3914,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 10001.699999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "upper-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 280.6569444444444,
+          "y": 325.3165925458236,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -325.22419460880974,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 0,
+        "elapsed": 1.3749999999999976,
+        "deaths": 0,
+        "maxAltitude": 4126.683407454177,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 10851,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "native",
+      "name": "upper-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 297.1125,
+          "y": 702,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 5.032193792885714,
+        "elapsed": 2.258333333333328,
+        "deaths": 0,
+        "maxAltitude": 4150.483473200396,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 11738,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "opening-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 92,
+          "y": 4452,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3822.5882352941176,
+        "elapsed": 0.6166666666666669,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 1422.800000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "opening-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 201.00694444444468,
+          "y": 4222.079830520856,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -114.83629191321462,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 3821.377468621154,
+        "elapsed": 1.5416666666666636,
+        "deaths": 0,
+        "maxAltitude": 229.92016947914362,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 2357.300000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "opening-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 217.46250000000023,
+          "y": 4398,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3817.792548579436,
+        "elapsed": 2.508333333333327,
+        "deaths": 0,
+        "maxAltitude": 232.59382716049367,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 3324.60000000149,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "middle-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 190,
+          "y": 3031.530781590922,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2496.2635294117645,
+        "elapsed": 0.5750000000000004,
+        "deaths": 0,
+        "maxAltitude": 1424,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 3917.5,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "middle-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 301.15694444444415,
+          "y": 2792.1553556183158,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -149.90094236248046,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 2421.09524875023,
+        "elapsed": 2.858333333333326,
+        "deaths": 0,
+        "maxAltitude": 1659.8446443816842,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 6188.700000001118,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "middle-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 317.6124999999998,
+          "y": 3174,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2578.8483561683997,
+        "elapsed": 3.8083333333333225,
+        "deaths": 0,
+        "maxAltitude": 1664.578342971793,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 7137.5,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "checkpoint-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 197,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1888.2635294117647,
+        "elapsed": 0.5750000000000004,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 7733.700000001118,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "checkpoint-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 306.00694444444406,
+          "y": 2179.600219154066,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -167.4332675871134,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 1810.3941685115904,
+        "elapsed": 1.4999999999999971,
+        "deaths": 0,
+        "maxAltitude": 2272.399780845934,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 8653.300000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "checkpoint-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 324.61249999999967,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1826.8381909106386,
+        "elapsed": 2.4583333333333273,
+        "deaths": 0,
+        "maxAltitude": 2278.38265395573,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 9607.800000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "upper-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 191,
+          "y": 541.5748280726912,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 6.263529411764694,
+        "elapsed": 0.591666666666667,
+        "deaths": 0,
+        "maxAltitude": 3914,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 10204.800000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "upper-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 297.8569444444442,
+          "y": 310.0416171748688,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -149.90094236248046,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 0.8389976551167897,
+        "elapsed": 1.5083333333333304,
+        "deaths": 0,
+        "maxAltitude": 4141.958382825132,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 11122.10000000149,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "desktop",
+      "name": "upper-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 314.31249999999983,
+          "y": 702,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 106.65736262602975,
+        "elapsed": 2.4583333333333273,
+        "deaths": 0,
+        "maxAltitude": 4146.69208141524,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 12075.800000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 6,
+        "buffer": [
+          510,
+          944
+        ]
+      },
+      "gentle": false
+    },
+    {
+      "form": "gentle",
+      "name": "opening-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 92,
+          "y": 4452,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 0.5750000000000004,
+        "deaths": 0,
+        "maxAltitude": 0,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 1477.300000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "opening-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 194.55694444444467,
+          "y": 4222.576565125283,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -184.96559281174632,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 1.4749999999999972,
+        "deaths": 0,
+        "maxAltitude": 229.4234348747168,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 2378.300000000745,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "opening-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 211.01250000000022,
+          "y": 4398,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 3691.076923076923,
+        "elapsed": 2.391666666666661,
+        "deaths": 0,
+        "maxAltitude": 236.80158521440535,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 3308.199999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "middle-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 190,
+          "y": 3031.514276088817,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2401.575384615385,
+        "elapsed": 0.5416666666666672,
+        "deaths": 0,
+        "maxAltitude": 1424,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 3865.5999999996275,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "middle-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 283.95694444444433,
+          "y": 2810.323278456904,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -290.1595441595439,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 2368.6255450078834,
+        "elapsed": 2.758333333333326,
+        "deaths": 0,
+        "maxAltitude": 1641.676721543096,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 6080.199999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "middle-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 300.41249999999997,
+          "y": 3174,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 2470.8560469905797,
+        "elapsed": 3.658333333333323,
+        "deaths": 0,
+        "maxAltitude": 1660.4946921764508,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 6981.199999999255,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "checkpoint-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 197,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1793.5753846153848,
+        "elapsed": 0.5416666666666672,
+        "deaths": 0,
+        "maxAltitude": 2032,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 7536.5999999996275,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "checkpoint-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 295.2569444444442,
+          "y": 2189.641493169699,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -255.09489371027803,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 1749.4897384270132,
+        "elapsed": 1.4249999999999974,
+        "deaths": 0,
+        "maxAltitude": 2262.358506830301,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 8415.5,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "checkpoint-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 311.7124999999998,
+          "y": 2420,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 1724.4322365527748,
+        "elapsed": 2.3249999999999944,
+        "deaths": 0,
+        "maxAltitude": 2276.7787931916127,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": true
+        },
+        "paused": false
+      },
+      "clock": 9315,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "upper-before",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 191,
+          "y": 541.5142760888172,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 0,
+        "elapsed": 0.5416666666666672,
+        "deaths": 0,
+        "maxAltitude": 3914,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 9864,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "upper-air",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 284.95694444444433,
+          "y": 320.30239550533594,
+          "w": 24,
+          "h": 28,
+          "vx": 258,
+          "vy": -290.1595441595439,
+          "grounded": false,
+          "wallDir": 0,
+          "airJumps": 0,
+          "facing": 1,
+          "motion": "rise"
+        },
+        "cameraY": 0,
+        "elapsed": 1.4083333333333308,
+        "deaths": 0,
+        "maxAltitude": 4131.697604494664,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 10732.599999999627,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    },
+    {
+      "form": "gentle",
+      "name": "upper-after",
+      "snapshot": {
+        "state": "playing",
+        "player": {
+          "x": 301.41249999999997,
+          "y": 702,
+          "w": 24,
+          "h": 28,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "wallDir": 0,
+          "airJumps": 1,
+          "facing": 1,
+          "motion": "idle"
+        },
+        "cameraY": 5.501686712374061,
+        "elapsed": 2.308333333333328,
+        "deaths": 0,
+        "maxAltitude": 4150.515575128019,
+        "checkpoint": {
+          "x": 190,
+          "y": 2382,
+          "w": 40,
+          "h": 66,
+          "active": false
+        },
+        "paused": false
+      },
+      "clock": 11635,
+      "atmosphere": {
+        "backend": "webgl",
+        "textures": 5,
+        "buffer": [
+          390,
+          844
+        ]
+      },
+      "gentle": true
+    }
+  ]
+}

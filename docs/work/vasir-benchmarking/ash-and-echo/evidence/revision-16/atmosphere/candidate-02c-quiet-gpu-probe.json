@@ -1,0 +1,206 @@
+{
+  "scope": "Isolated production default-framebuffer atmosphere draws with real WebGL. Four draws/frame (opaque base and the existing three air layers), 390x844 CSS at DPR1.5. A 1px readback per measured batch forces completion; EXT timer queries separately report GPU elapsed time when valid; not phone thermal/full-game/input proof.",
+  "variants": {
+    "stage-00": {
+      "hashes": {
+        "atmosphere": "c46a9681447c1f72b168b39f7839da11220fac4b3eb40fd23a7721f7f437c510",
+        "fog-volume": "7a44948f3b9aad2655ea70183e115e930ce74c9d1b2cdb0df2d42cd0780bad46"
+      },
+      "status": {
+        "backend": "webgl",
+        "textures": 0,
+        "buffer": [
+          585,
+          1266
+        ]
+      },
+      "sizes": [
+        585,
+        1266
+      ],
+      "glError": 0,
+      "sameTime": {
+        "changed": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "nextFrame": {
+        "changed": 165823,
+        "max": 3,
+        "mean": 0.22427863517910912
+      },
+      "wind": {
+        "changed": 645360,
+        "max": 44,
+        "mean": 3.74297538515548
+      },
+      "draws": 576,
+      "expectedDraws": 576,
+      "batches": [
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.75,
+          "gpuMsPerFrame": 0.6835624166666667
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.26666666675979894,
+          "gpuMsPerFrame": 0.19924991666666667
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.25833333330228925,
+          "gpuMsPerFrame": 0.21670133333333333
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.24166666669771075,
+          "gpuMsPerFrame": 0.192302
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.29999999996895593,
+          "gpuMsPerFrame": 0.22120833333333334
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.2000000000310441,
+          "gpuMsPerFrame": 0.15743741666666666
+        },
+        {
+          "submissionMsPerFrame": 0.008333333457509676,
+          "completeMsPerFrame": 0.216666666790843,
+          "gpuMsPerFrame": 0.17188191666666666
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.2666666666045785,
+          "gpuMsPerFrame": 0.20798608333333335
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.2000000000310441,
+          "gpuMsPerFrame": 0.15587841666666666
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.3000000001241763,
+          "gpuMsPerFrame": 0.198684
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.2666666666045785,
+          "gpuMsPerFrame": 0.19869791666666667
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.29999999996895593,
+          "gpuMsPerFrame": 0.20665275000000002
+        }
+      ],
+      "glRenderer": "WebKit WebGL",
+      "timerExtension": true
+    },
+    "stage-02c": {
+      "hashes": {
+        "atmosphere": "34ec41131f0932e1477630c758c3aef8b7f7158f55203a0ee986008917035619",
+        "fog-volume": "2f2e764ee0162734712a6dae5f314f5a1f2a53ae0c2d1c6569cbafc17d85c306"
+      },
+      "status": {
+        "backend": "webgl",
+        "textures": 0,
+        "buffer": [
+          585,
+          1266
+        ]
+      },
+      "sizes": [
+        585,
+        1266
+      ],
+      "glError": 0,
+      "sameTime": {
+        "changed": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "nextFrame": {
+        "changed": 129842,
+        "max": 3,
+        "mean": 0.17582803364793886
+      },
+      "wind": {
+        "changed": 629424,
+        "max": 57,
+        "mean": 3.5797801812019823
+      },
+      "draws": 576,
+      "expectedDraws": 576,
+      "batches": [
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 1.1416666666045785,
+          "gpuMsPerFrame": 1.0522395833333333
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.29999999996895593,
+          "gpuMsPerFrame": 0.217934
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.25,
+          "gpuMsPerFrame": 0.21044791666666665
+        },
+        {
+          "submissionMsPerFrame": 0.008333333457509676,
+          "completeMsPerFrame": 0.3166666667287548,
+          "gpuMsPerFrame": 0.27843741666666666
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.19999999987582365,
+          "gpuMsPerFrame": 0.1635
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.1916666665735344,
+          "gpuMsPerFrame": 0.15014583333333334
+        },
+        {
+          "submissionMsPerFrame": 0.016666666604578495,
+          "completeMsPerFrame": 0.18333333327124515,
+          "gpuMsPerFrame": 0.13257983333333334
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.1833333334264656,
+          "gpuMsPerFrame": 0.12793741666666666
+        },
+        {
+          "submissionMsPerFrame": 0.008333333302289248,
+          "completeMsPerFrame": 0.22499999993791184,
+          "gpuMsPerFrame": 0.16200691666666667
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.28333333336437744,
+          "gpuMsPerFrame": 0.18220825
+        },
+        {
+          "submissionMsPerFrame": 0,
+          "completeMsPerFrame": 0.26666666675979894,
+          "gpuMsPerFrame": 0.17681241666666667
+        },
+        {
+          "submissionMsPerFrame": 0.008333333457509676,
+          "completeMsPerFrame": 0.25,
+          "gpuMsPerFrame": 0.16550691666666667
+        }
+      ],
+      "glRenderer": "WebKit WebGL",
+      "timerExtension": true
+    }
+  },
+  "concurrencyQualification": "Critic confirmed its browser contexts closed before this run. Root notified of a newly started route browser near completion; overlap with that route launch cannot be excluded. All atmosphere-probe contexts closed before root full-game pacing. Treat as bounded shader cost, not a strict isolated-system optimization comparison."
+}

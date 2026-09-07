@@ -1,0 +1,91 @@
+{
+  "scope": "Isolated production fog compositor: same camera/time/noise, changing the jump impulse only. Pixel comparison is a causal shader check, not active-play or performance proof.",
+  "before": {
+    "rows": [
+      {
+        "layer": 0,
+        "impulse": {
+          "changedPixels": 138116,
+          "maxChannelDifference": 20,
+          "meanMaxChannelDifference": 1.0713577863577863
+        },
+        "windAfterOneSecond": {
+          "changedPixels": 210318,
+          "maxChannelDifference": 24,
+          "meanMaxChannelDifference": 1.6816087516087517
+        }
+      },
+      {
+        "layer": 1,
+        "impulse": {
+          "changedPixels": 147183,
+          "maxChannelDifference": 23,
+          "meanMaxChannelDifference": 1.386100386100386
+        },
+        "windAfterOneSecond": {
+          "changedPixels": 229149,
+          "maxChannelDifference": 28,
+          "meanMaxChannelDifference": 2.111663449163449
+        }
+      },
+      {
+        "layer": 2,
+        "impulse": {
+          "changedPixels": 131484,
+          "maxChannelDifference": 8,
+          "meanMaxChannelDifference": 0.6867374517374517
+        },
+        "windAfterOneSecond": {
+          "changedPixels": 232720,
+          "maxChannelDifference": 24,
+          "meanMaxChannelDifference": 1.864642857142857
+        }
+      }
+    ],
+    "glError": 0
+  },
+  "after": {
+    "rows": [
+      {
+        "layer": 0,
+        "impulse": {
+          "changedPixels": 0,
+          "maxChannelDifference": 0,
+          "meanMaxChannelDifference": 0
+        },
+        "windAfterOneSecond": {
+          "changedPixels": 210318,
+          "maxChannelDifference": 24,
+          "meanMaxChannelDifference": 1.6816087516087517
+        }
+      },
+      {
+        "layer": 1,
+        "impulse": {
+          "changedPixels": 0,
+          "maxChannelDifference": 0,
+          "meanMaxChannelDifference": 0
+        },
+        "windAfterOneSecond": {
+          "changedPixels": 229149,
+          "maxChannelDifference": 28,
+          "meanMaxChannelDifference": 2.111663449163449
+        }
+      },
+      {
+        "layer": 2,
+        "impulse": {
+          "changedPixels": 0,
+          "maxChannelDifference": 0,
+          "meanMaxChannelDifference": 0
+        },
+        "windAfterOneSecond": {
+          "changedPixels": 232720,
+          "maxChannelDifference": 24,
+          "meanMaxChannelDifference": 1.864642857142857
+        }
+      }
+    ],
+    "glError": 0
+  }
+}
