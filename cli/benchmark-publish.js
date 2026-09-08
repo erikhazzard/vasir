@@ -256,7 +256,7 @@ function resolveChromeBinary({ environmentVariables, platform, spawnSyncImplemen
   return null;
 }
 
-function assertLocalTools({ artifact, spawnSyncImplementation, environmentVariables, platform }) {
+function assertLocalTools({ artifact, spawnSyncImplementation, environmentVariables, platform, fullAudit }) {
   const awsVersion = spawnSyncImplementation("aws", ["--version"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
@@ -273,6 +273,7 @@ function assertLocalTools({ artifact, spawnSyncImplementation, environmentVariab
       context: { tool: "aws" }
     });
   }
+  if (!fullAudit) return { chromeBinary: null };
   const chromeBinary = resolveChromeBinary({ environmentVariables, platform, spawnSyncImplementation });
   if (!chromeBinary) {
     throw publishError({
@@ -545,21 +546,23 @@ function headObject({ aws, bucketName, key, checksum = false }) {
 }
 
 function getObjectJson({ artifact, aws, bucketName, key, fileName }) {
-  const head = headObject({ aws, bucketName, key });
-  if (!head) return null;
   const outputPath = path.join(artifact.temporaryDirectory, fileName);
   try {
-    aws.runRaw([
+    // The GET response carries the ETag for these exact bytes. A separate HEAD
+    // doubles control-plane calls and can race with a concurrent state change.
+    const response = aws.runJson([
       "s3api", "get-object",
       "--bucket", bucketName,
       "--key", key
     ], { outputPath, timeout: 30_000 });
+    if (!response.ETag) throw new Error("S3 GET did not return an ownership token");
     return {
       value: JSON.parse(fs.readFileSync(outputPath, "utf8")),
-      etag: head.ETag,
-      versionId: head.VersionId ?? null
+      etag: response.ETag,
+      versionId: response.VersionId ?? null
     };
   } catch (error) {
+    if (isMissingAwsResource(error)) return null;
     throw publishError({
       code: "BENCHMARK_PUBLISH_UPLOAD_FAILED",
       message: `Could not read private publication control object ${key}.`,
@@ -912,14 +915,18 @@ function cleanupAndAssertStorageBudget({ artifact, aws, bucketName, lease, publi
       context: { physicalBytes, candidateBytes, projectedBytes, expiredReleaseIds }
     });
   }
-  return { physicalBytes, candidateBytes, projectedBytes, expiredReleaseIds, deletedVersionCount: deletions.length };
+  return {
+    physicalBytes, candidateBytes, projectedBytes, expiredReleaseIds,
+    deletedVersionCount: deletions.length,
+    existingObjectKeys: new Set(retained.versions.filter((entry) => entry.IsLatest === true).map((entry) => entry.Key))
+  };
 }
 
-function stageFile({ artifact, aws, bucketName, file }) {
+function stageFile({ artifact, aws, bucketName, file, existingObjectKeys }) {
   const key = file.key ?? `${RELEASE_PREFIX}${artifact.releaseId}/${file.path}`;
   let existing;
   try {
-    existing = headObject({ aws, bucketName, key, checksum: true });
+    existing = existingObjectKeys.has(key) ? headObject({ aws, bucketName, key, checksum: true }) : null;
   } catch (error) {
     throw publishError({
       code: "BENCHMARK_PUBLISH_UPLOAD_FAILED",
@@ -933,10 +940,11 @@ function stageFile({ artifact, aws, bucketName, file }) {
     });
   }
   if (existing) {
-    if (Number(existing.ContentLength) !== file.bytes || existing.ChecksumSHA256 !== file.checksumSha256Base64) {
+    if (Number(existing.ContentLength) !== file.bytes || existing.ChecksumSHA256 !== file.checksumSha256Base64 ||
+        existing.ContentType !== file.contentType || existing.CacheControl !== file.cacheControl) {
       throw publishError({
         code: "BENCHMARK_PUBLISH_UPLOAD_FAILED",
-        message: `Immutable release object already exists with different bytes: ${file.path}`,
+        message: `Immutable release object already exists with different bytes or metadata: ${file.path}`,
         suggestion: "Do not overwrite it; inspect the object and source-manifest derivation before retrying.",
         config: artifact.config,
         releaseId: artifact.releaseId,
@@ -949,7 +957,7 @@ function stageFile({ artifact, aws, bucketName, file }) {
   }
 
   try {
-    aws.runJson([
+    const staged = aws.runJson([
       "s3api", "put-object",
       "--bucket", bucketName,
       "--key", key,
@@ -960,12 +968,18 @@ function stageFile({ artifact, aws, bucketName, file }) {
       "--metadata", `release-id=${artifact.releaseId}`,
       "--if-none-match", "*"
     ]);
-    const staged = headObject({ aws, bucketName, key, checksum: true });
-    if (!staged || Number(staged.ContentLength) !== file.bytes || staged.ChecksumSHA256 !== file.checksumSha256Base64) {
-      throw new Error("staged checksum or byte length did not match");
+    // S3 validates the supplied SHA256 on a single-part PUT and returns it.
+    // Keep the immutable conditional write, without another HEAD round trip.
+    if (staged.ChecksumSHA256 !== file.checksumSha256Base64) {
+      throw new Error("staged checksum did not match");
     }
     return "uploaded";
   } catch (error) {
+    if (isPreconditionFailure(error) && !existingObjectKeys.has(key)) {
+      // A previous interrupted upload or concurrent immutable writer can race
+      // the listing. Verify its bytes once instead of overwriting the object.
+      return stageFile({ artifact, aws, bucketName, file, existingObjectKeys: new Set([key]) });
+    }
     throw publishError({
       code: "BENCHMARK_PUBLISH_UPLOAD_FAILED",
       message: `Failed to stage immutable release object ${file.path}.`,
@@ -979,11 +993,29 @@ function stageFile({ artifact, aws, bucketName, file }) {
   }
 }
 
-function stageRelease({ artifact, aws, bucketName, lease, now }) {
+function reusableArtifactKeys({ manifest, verifiedManifest }) {
+  if (!verifiedManifest || manifest.artifactOrigin !== GAME_ARTIFACT_ORIGIN || verifiedManifest.artifactOrigin !== GAME_ARTIFACT_ORIGIN) return new Set();
+  const verified = new Map((verifiedManifest.artifacts ?? []).map((file) => [file.key, file]));
+  return new Set((manifest.artifacts ?? []).filter((file) => {
+    const prior = verified.get(file.key);
+    return /^artifacts\/[a-f0-9]{64}\/[A-Za-z0-9_./-]+$/.test(file.key) && !file.key.includes("..") &&
+      file.publicUrl === `${GAME_ARTIFACT_ORIGIN}/${file.key}` &&
+      /^[a-f0-9]{64}$/.test(file.sha256) && Number.isSafeInteger(file.bytes) && file.bytes >= 0 &&
+      prior && ["sha256", "bytes", "contentType", "cacheControl", "publicUrl"].every((field) => prior[field] === file[field]);
+  }).map((file) => file.key));
+}
+
+function stageRelease({ artifact, aws, bucketName, lease, now, verifiedManifest, existingObjectKeys, fullAudit }) {
   proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "upload" });
+  const reusedArtifactKeys = reusableArtifactKeys({ manifest: artifact.publicManifest, verifiedManifest });
   const receipts = [...(artifact.artifactFiles ?? []), ...artifact.files].map((file) => {
-    proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "upload" });
-    return { path: file.path, status: stageFile({ artifact, aws, bucketName, file }) };
+    // Immutable uploads cannot activate anything. Check time locally during
+    // staging, and prove remote ownership again before changing active state.
+    assertLeaseTime({ artifact, lease, now, stage: "upload" });
+    if (!fullAudit && reusedArtifactKeys.has(file.key) && existingObjectKeys.has(file.key)) {
+      return { path: file.path, status: "reused" };
+    }
+    return { path: file.path, status: stageFile({ artifact, aws, bucketName, file, existingObjectKeys }) };
   });
   const manifestKey = `${MANIFEST_PREFIX}${artifact.releaseId}.json`;
   const existingManifest = getObjectJson({
@@ -1007,7 +1039,7 @@ function stageRelease({ artifact, aws, bucketName, lease, now }) {
       });
     }
   } else {
-    proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "upload" });
+    assertLeaseTime({ artifact, lease, now, stage: "upload" });
     putJsonObject({
       artifact,
       aws,
@@ -1166,7 +1198,15 @@ function responseHeader(response, name) {
   return response.headers?.get?.(name) ?? null;
 }
 
-async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementation }) {
+async function forEachConcurrent(values, visit) {
+  for (const batch of chunk(values, 8)) {
+    const results = await Promise.allSettled(batch.map(visit));
+    const failure = results.find((result) => result.status === "rejected");
+    if (failure) throw failure.reason;
+  }
+}
+
+async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementation, verifiedManifest, fullAudit }) {
   const baseUrl = artifact.config.target.url.replace(/\/$/, "");
   const releaseId = manifest.releaseId;
   const httpResponse = await fetchWithTimeout(fetchImplementation, `http://${artifact.config.target.domain}/`, {
@@ -1177,7 +1217,7 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
   }
 
   const liveFileBodies = new Map();
-  for (const file of manifest.files) {
+  await forEachConcurrent(manifest.files, async (file) => {
     const response = await fetchWithTimeout(fetchImplementation, `${baseUrl}/releases/${releaseId}/${file.path}`, {
       redirect: "error",
       cache: "no-store"
@@ -1187,9 +1227,9 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
     const digest = crypto.createHash("sha256").update(body).digest("hex");
     if (body.length !== file.bytes || digest !== file.sha256) throw new Error(`${file.path} hash mismatch`);
     liveFileBodies.set(file.path, body);
-  }
+  });
 
-  for (const [stablePath, manifestPath] of [["/", "index.html"], ["/index.html", "index.html"], ["/benchmark-report.html", "benchmark-report.html"], ...(manifest.files.some(file => file.path === "games.html") ? [["/games.html", "games.html"]] : [])]) {
+  await forEachConcurrent([["/", "index.html"], ["/index.html", "index.html"], ["/benchmark-report.html", "benchmark-report.html"], ...(manifest.files.some(file => file.path === "games.html") ? [["/games.html", "games.html"]] : [])], async ([stablePath, manifestPath]) => {
     const response = await fetchWithTimeout(fetchImplementation, `${baseUrl}${stablePath}`, {
       redirect: "error",
       cache: "no-store"
@@ -1223,11 +1263,16 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
         throw new Error("x-frame-options must be DENY");
       }
     }
-  }
+  });
 
+  const reusedArtifactKeys = fullAudit ? new Set() : reusableArtifactKeys({ manifest, verifiedManifest });
+  // One live game HTML probe preserves the isolation-policy check even when
+  // all of its immutable assets have already been verified in a prior release.
+  const isolationProbe = manifest.artifacts?.find((file) => file.contentType.startsWith("text/html"));
+  const artifactsToVerify = (manifest.artifacts ?? []).filter((file) => !reusedArtifactKeys.has(file.key) || file === isolationProbe);
   if (manifest.artifacts?.length) {
     if (manifest.artifactOrigin !== GAME_ARTIFACT_ORIGIN) throw new Error("artifact origin does not match the isolated distribution host");
-    for (const file of manifest.artifacts) {
+    await forEachConcurrent(artifactsToVerify, async (file) => {
       if (!/^artifacts\/[a-f0-9]{64}\/[A-Za-z0-9_./-]+$/.test(file.key) || file.key.includes("..") || file.publicUrl !== `${GAME_ARTIFACT_ORIGIN}/${file.key}`) throw new Error("invalid immutable artifact URL");
       const response = await fetchWithTimeout(fetchImplementation, file.publicUrl, { redirect: "error", cache: "no-store" });
       if (response.status !== 200) throw new Error(`artifact returned ${response.status}`);
@@ -1239,7 +1284,7 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
         const sameOrigin = await fetchWithTimeout(fetchImplementation, `${baseUrl}/${file.key}`, { redirect: "manual", cache: "no-store" });
         if (sameOrigin.status !== 403) throw new Error("contestant JavaScript is reachable on the site origin");
       }
-    }
+    });
     const artifactOriginResponse = await fetchWithTimeout(fetchImplementation, `https://${bucketName}.s3.${artifact.config.target.region}.amazonaws.com/${manifest.artifacts[0].key}`, { redirect: "manual", cache: "no-store" });
     if (artifactOriginResponse.status !== 403) throw new Error("anonymous game artifact origin is public");
   }
@@ -1252,15 +1297,19 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
     cache: "no-store"
   });
   if (controlResponse.status !== 403) throw new Error(`CloudFront control prefix returned ${controlResponse.status}`);
-  return { verifiedFiles: manifest.files.length + (manifest.artifacts?.length ?? 0), originPrivate: true };
+  return {
+    verifiedFiles: manifest.files.length + artifactsToVerify.length,
+    reusedArtifactFiles: (manifest.artifacts?.length ?? 0) - artifactsToVerify.length,
+    originPrivate: true
+  };
 }
 
-async function verifyHttpPublication({ artifact, manifest, bucketName, fetchImplementation, delayImplementation }) {
+async function verifyHttpPublication({ artifact, manifest, bucketName, fetchImplementation, delayImplementation, verifiedManifest, fullAudit }) {
   const startedAt = Date.now();
   let lastError = null;
   for (let attempt = 1; attempt <= HTTP_ATTEMPTS && Date.now() - startedAt < HTTP_VERIFICATION_TIMEOUT_MS; attempt += 1) {
     try {
-      return await verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementation });
+      return await verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementation, verifiedManifest, fullAudit });
     } catch (error) {
       lastError = error;
       if (attempt < HTTP_ATTEMPTS) await delayImplementation(Math.min(1000 * 2 ** (attempt - 1), 15_000));
@@ -1365,6 +1414,12 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
 }
 
 function readStoredManifest({ artifact, aws, bucketName, releaseId }) {
+  if (!/^[a-f0-9]{64}$/.test(releaseId)) throw publishError({
+    code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED",
+    message: "The verified publication state contains an invalid release identifier.",
+    suggestion: "Inspect the private publication state before retrying.",
+    config: artifact.config, releaseId, stage: "verification", safeRetry: false
+  });
   const stored = getObjectJson({
     artifact,
     aws,
@@ -1372,7 +1427,9 @@ function readStoredManifest({ artifact, aws, bucketName, releaseId }) {
     key: `${MANIFEST_PREFIX}${releaseId}.json`,
     fileName: `stored-manifest-${releaseId}.json`
   });
-  if (!stored || stored.value?.releaseId !== releaseId || !Array.isArray(stored.value.files)) {
+  if (!stored || stored.value?.kind !== "vasirbenchmark-release-manifest" || stored.value.schemaVersion !== 1 ||
+      stored.value.releaseId !== releaseId || !Array.isArray(stored.value.files) ||
+      (stored.value.artifacts !== undefined && !Array.isArray(stored.value.artifacts))) {
     throw publishError({
       code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED",
       message: `Private manifest for release ${releaseId} is missing or invalid.`,
@@ -1386,7 +1443,7 @@ function readStoredManifest({ artifact, aws, bucketName, releaseId }) {
   return stored.value;
 }
 
-async function verifyPublication({ artifact, manifest, stack, chromeBinary, spawnSyncImplementation, environmentVariables, fetchImplementation, delayImplementation }) {
+async function verifyPublication({ artifact, manifest, stack, chromeBinary, spawnSyncImplementation, environmentVariables, fetchImplementation, delayImplementation, verifiedManifest, fullAudit }) {
   const bucketName = outputMap(stack).BucketName;
   if (manifest.artifacts?.length && `https://${outputMap(stack).DistributionDomainName}` !== GAME_ARTIFACT_ORIGIN) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: "The deployed distribution hostname differs from the pinned game artifact origin.", suggestion: "Review the origin policy and source selection before republishing.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification" });
   const http = await verifyHttpPublication({
@@ -1394,11 +1451,13 @@ async function verifyPublication({ artifact, manifest, stack, chromeBinary, spaw
     manifest,
     bucketName,
     fetchImplementation,
-    delayImplementation
+    delayImplementation,
+    verifiedManifest,
+    fullAudit
   });
   // A prior verified release can predate the candidate's projection schema.
   // Exact stable bytes prove restoration; only the candidate uses its browser oracle.
-  const browser = manifest.releaseId === artifact.releaseId
+  const browser = fullAudit && manifest.releaseId === artifact.releaseId
     ? runBrowserProof({
         artifact,
         chromeBinary,
@@ -1408,7 +1467,10 @@ async function verifyPublication({ artifact, manifest, stack, chromeBinary, spaw
     : { verifiedReportRoutes: 0, verifiedCapabilityRoutes: 0 };
   return {
     status: "passed",
+    mode: fullAudit ? "full-audit" : "fast",
+    browserAuditPerformed: Boolean(fullAudit && manifest.releaseId === artifact.releaseId),
     verifiedFiles: http.verifiedFiles,
+    reusedArtifactFiles: http.reusedArtifactFiles,
     verifiedReportRoutes: browser.verifiedReportRoutes,
     verifiedCapabilityRoutes: browser.verifiedCapabilityRoutes,
     originPrivate: http.originPrivate
@@ -1454,6 +1516,8 @@ async function reconcilePublicationState({
   environmentVariables,
   fetchImplementation,
   delayImplementation,
+  verifiedManifest,
+  fullAudit,
   now
 }) {
   const bucketName = outputMap(stack).BucketName;
@@ -1486,7 +1550,9 @@ async function reconcilePublicationState({
         spawnSyncImplementation,
         environmentVariables,
         fetchImplementation,
-        delayImplementation
+        delayImplementation,
+        verifiedManifest,
+        fullAudit
       });
       proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "activation" });
       const verifiedRecord = verifiedStateRecord({ stagedRecord: state.value, verifiedReleaseId: activeReleaseId, now });
@@ -1520,7 +1586,9 @@ async function reconcilePublicationState({
               spawnSyncImplementation,
               environmentVariables,
               fetchImplementation,
-              delayImplementation
+              delayImplementation,
+              verifiedManifest: rollbackManifest,
+              fullAudit
             });
             proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "activation" });
             const restoredRecord = {
@@ -1600,6 +1668,7 @@ async function rollbackCandidate({
   environmentVariables,
   fetchImplementation,
   delayImplementation,
+  fullAudit,
   now,
   verificationError
 }) {
@@ -1645,7 +1714,9 @@ async function rollbackCandidate({
       spawnSyncImplementation,
       environmentVariables,
       fetchImplementation,
-      delayImplementation
+      delayImplementation,
+      verifiedManifest: manifest,
+      fullAudit
     });
     proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "activation" });
     const restoredRecord = {
@@ -1689,6 +1760,8 @@ async function rollbackCandidate({
 export async function publishBenchmarkSite({
   repoRootDirectory,
   dryRun = false,
+  fullAudit = false,
+  buildArtifactImplementation = buildBenchmarkPublicationArtifact,
   spawnSyncImplementation = childProcess.spawnSync,
   environmentVariables = process.env,
   platform = process.platform,
@@ -1700,7 +1773,7 @@ export async function publishBenchmarkSite({
   const actions = createActionLedger({ dryRun });
   let artifact;
   try {
-    artifact = buildBenchmarkPublicationArtifact({ repoRootDirectory, validateAcceptance: true });
+    artifact = buildArtifactImplementation({ repoRootDirectory, validateAcceptance: true });
     markAction(actions, "validate-acceptance");
     markAction(actions, "build-artifact");
     onProgress({ id: "build-artifact", stage: "artifact", detail: artifact.releaseId });
@@ -1711,9 +1784,9 @@ export async function publishBenchmarkSite({
   let lease = null;
   let bucketName = null;
   let leaseReleased = false;
-  const tools = assertLocalTools({ artifact, spawnSyncImplementation, environmentVariables, platform });
   const aws = createAwsRunner({ config: artifact.config, spawnSyncImplementation });
   try {
+    const tools = assertLocalTools({ artifact, spawnSyncImplementation, environmentVariables, platform, fullAudit });
     assertAwsIdentityAndZone({ artifact, aws });
     markAction(actions, "assert-identity");
     onProgress({ id: "assert-identity", stage: "identity", detail: artifact.config.target.accountId });
@@ -1730,7 +1803,10 @@ export async function publishBenchmarkSite({
         activeReleaseId: observedActiveReleaseId,
         verification: {
           status: "planned",
+          mode: fullAudit ? "full-audit" : "fast",
+          browserAuditPerformed: false,
           verifiedFiles: 0,
+          reusedArtifactFiles: 0,
           verifiedReportRoutes: 0,
           verifiedCapabilityRoutes: 0,
           originPrivate: null
@@ -1748,6 +1824,9 @@ export async function publishBenchmarkSite({
     onProgress({ id: "acquire-lease", stage: "lease", detail: lease.ownerId });
 
     let publicationState = readPublicationState({ artifact, aws, bucketName });
+    let verifiedManifest = publicationState?.value?.lastVerifiedReleaseId
+      ? readStoredManifest({ artifact, aws, bucketName, releaseId: publicationState.value.lastVerifiedReleaseId })
+      : null;
     const reconciliation = await reconcilePublicationState({
       artifact,
       aws,
@@ -1759,14 +1838,19 @@ export async function publishBenchmarkSite({
       environmentVariables,
       fetchImplementation,
       delayImplementation,
+      verifiedManifest,
+      fullAudit,
       now
     });
     publicationState = reconciliation.state;
     stack = inspectStack({ artifact, aws });
     const previousVerifiedReleaseId = publicationState?.value?.lastVerifiedReleaseId ?? null;
+    if (previousVerifiedReleaseId && verifiedManifest?.releaseId !== previousVerifiedReleaseId) {
+      verifiedManifest = readStoredManifest({ artifact, aws, bucketName, releaseId: previousVerifiedReleaseId });
+    }
     const previousActiveReleaseId = parameterMap(stack).ActiveReleaseId ?? BOOTSTRAP_RELEASE_ID;
 
-    cleanupAndAssertStorageBudget({
+    const storage = cleanupAndAssertStorageBudget({
       artifact,
       aws,
       bucketName,
@@ -1778,7 +1862,7 @@ export async function publishBenchmarkSite({
     markAction(actions, "cleanup-releases");
     onProgress({ id: "cleanup-releases", stage: "cleanup", detail: "within 1 GiB" });
 
-    stageRelease({ artifact, aws, bucketName, lease, now });
+    stageRelease({ artifact, aws, bucketName, lease, now, verifiedManifest, existingObjectKeys: storage.existingObjectKeys, fullAudit });
     markAction(actions, "stage-release");
     onProgress({ id: "stage-release", stage: "upload", detail: `${artifact.fileCount} files` });
 
@@ -1816,7 +1900,9 @@ export async function publishBenchmarkSite({
         spawnSyncImplementation,
         environmentVariables,
         fetchImplementation,
-        delayImplementation
+        delayImplementation,
+        verifiedManifest,
+        fullAudit
       });
     } catch (error) {
       await rollbackCandidate({
@@ -1830,6 +1916,7 @@ export async function publishBenchmarkSite({
         environmentVariables,
         fetchImplementation,
         delayImplementation,
+        fullAudit,
         now,
         verificationError: error
       });

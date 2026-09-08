@@ -527,3 +527,26 @@ test("benchmark publish JSON mode emits one stable success envelope and no progr
   assert.equal(result.dryRun, true);
   assert.deepEqual(result.actions.map(({ id }) => id), EXPECTED_ACTION_IDS);
 });
+
+test("benchmark publish --full-audit reaches the publisher through CLI parsing", async () => {
+  const { temporaryRoot } = createPublicationRepoCopy("vasirbenchmark-full-audit-");
+  const aws = createReadOnlyAwsStub();
+  const stdout = [];
+  const stderr = [];
+  try {
+    const exitCode = await runCommandLine(
+      ["node", "vasir", "benchmark", "publish", "--full-audit", "--dry-run", "--json", "--repo-root", temporaryRoot],
+      {
+        currentWorkingDirectory: REPO_ROOT,
+        spawnSyncImplementation: aws.spawnSyncImplementation,
+        environmentVariables: publicationEnvironment(),
+        stdoutWriter: (message) => stdout.push(message),
+        stderrWriter: (message) => stderr.push(message)
+      }
+    );
+    assert.equal(exitCode, 0, stderr.join(""));
+    assert.equal(JSON.parse(stdout.join("")).verification.mode, "full-audit");
+  } finally {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+  }
+});

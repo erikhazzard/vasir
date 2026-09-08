@@ -15,7 +15,7 @@ const PROGRESS_LABELS = Object.freeze({
   "cleanup-releases": "Versioned storage is within budget",
   "stage-release": "Immutable release staged and checksummed",
   "activate-release": "Release pointer reached LIVE",
-  "verify-publication": "HTTPS and browser journey verified",
+  "verify-publication": "Live release verified",
   "release-lease": "Publication lease released"
 });
 
@@ -57,10 +57,14 @@ function renderHumanResult({ result, outputStream }) {
     lines.push(
       ui.formatField("distribution", result.deployment.distributionId),
       ui.formatField("origin", result.verification.originPrivate ? "Private · CloudFront OAC only" : "Unverified"),
+      ui.formatField("verification", result.verification.mode === "full-audit" ? "Full asset and browser audit" : "Fast changed-file verification"),
       ui.formatField(
         "proof",
-        `${result.verification.verifiedFiles}/${result.artifact.fileCount} files · ${result.verification.verifiedCapabilityRoutes}/${result.artifact.routes.familyFragments.length + result.artifact.routes.viewFragments.length} benchmark routes · ${result.verification.verifiedReportRoutes}/${result.artifact.routes.reportFragments.length} reports`
-      )
+        `${result.verification.verifiedFiles} file byte checks · ${result.verification.reusedArtifactFiles ?? 0} unchanged assets reused`
+      ),
+      ui.formatField("browser", result.verification.browserAuditPerformed
+        ? `${result.verification.verifiedCapabilityRoutes} benchmark routes · ${result.verification.verifiedReportRoutes} reports`
+        : "Not requested; use --full-audit for browser regression checks")
     );
   }
 
@@ -75,6 +79,7 @@ function renderHumanResult({ result, outputStream }) {
 export async function runBenchmark({
   benchmarkArguments,
   dryRunRequested,
+  fullAuditRequested = false,
   currentWorkingDirectory,
   projectRootDirectory,
   spawnSyncImplementation,
@@ -105,7 +110,7 @@ export async function runBenchmark({
     throw new VasirCliError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
       message: `Unsupported benchmark command: ${benchmarkArguments.join(" ")}`,
-      suggestion: "Use only `vasir benchmark publish [--dry-run] [--json] [--repo-root <path>]`.",
+      suggestion: "Use only `vasir benchmark publish [--dry-run] [--full-audit] [--json] [--repo-root <path>]`.",
       docsRef: BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF,
       context: {
         stage: "acceptance",
@@ -121,6 +126,7 @@ export async function runBenchmark({
   const result = await publishBenchmarkSite({
     repoRootDirectory: findProjectRootDirectory({ currentWorkingDirectory, projectRootDirectory }),
     dryRun: dryRunRequested,
+    fullAudit: fullAuditRequested,
     spawnSyncImplementation,
     environmentVariables,
     platform,

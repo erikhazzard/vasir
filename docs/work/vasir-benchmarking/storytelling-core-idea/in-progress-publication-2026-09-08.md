@@ -80,6 +80,41 @@ Acceptance was applied to 15 locked source files and 60 captures. The guarded
 production dry-run passed for the exact release above in account `339713108333`
 with no AWS mutations.
 
+The reviewed implementation and site were committed and pushed as `acce187`.
+All 505 staged test cases passed across the full run and targeted reruns:
+the initial run passed 500; the remaining five cleared after installing the
+accepted lock, using the reviewed template snapshot, and preserving original
+module URLs in the one-release loader. These were isolation/timing corrections,
+not ignored failures. The loader's SHA-256 is
+`31ebe4196464a1bdc67fea19689a6e2c8fdce93eb590762d2f1d575786cca97d`.
+A clean checkout uses the normal publisher; this temporary loader is not a
+production dependency.
+
+## Fast publisher correction
+
+During the initial deployment the user explicitly rejected exhaustive retained
+asset checks on routine publication. The old process was stopped during its
+read-only retained-asset staging phase, before activation. Its exact publisher
+and AWS child exited; the previous active/verified release was rechecked and
+only that process's lease was conditionally released with its freshly read ETag.
+No published asset was deleted or replaced. Private recovery proof is in
+`tmp/writing-release-finalize/stopped-owner-3kHUeM/`.
+
+The revised default reuses unchanged verified assets, checks ownership at phase
+boundaries, uses checksum-validated conditional uploads, and batches live HTTP
+checks eight at a time. One retained HTML isolation probe remains. Browser and
+exhaustive retained-asset checks require the explicit `--full-audit` option.
+All 25 focused publisher tests and five CLI option tests pass. A complete
+simulated publication uses 44 AWS CLI invocations and 25 HTTP requests with
+either two or 527 retained assets, and zero browser launches. These are mocked
+request counts, not measured production timings. The old retained-asset loop
+alone required 1,581 AWS CLI invocations for 527 files.
+
+The fast release uses the same 73-file snapshot mechanism with manifest SHA-256
+`9f74dd631fd138a84b6b66794dccead7711590b6e0dd4a98db32d75998b33118`;
+only the publisher and its two CLI entry modules differ from the prior reviewed
+snapshot. Candidate website bytes and selected results are unchanged.
+
 Guarded deployment verification is recorded below when completed. Local browser
 proof alone is not a live-release claim. Missing Fable capacity continues to
 block final benchmark completion, not this explicitly approved in-progress

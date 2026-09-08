@@ -327,7 +327,7 @@ For `BENCHMARK_PUBLISH_ACCEPTANCE_REQUIRED`:
 For `BENCHMARK_PUBLISH_TOOL_MISSING`:
 
 1. Confirm `aws --version` succeeds.
-2. Confirm Chrome or Chromium is available to `site/vasirbenchmark.com/capture.mjs`.
+2. For `--full-audit`, confirm Chrome or Chromium is available to `site/vasirbenchmark.com/capture.mjs`. Normal publication does not require a browser.
 3. Rerun the dry run.
 
 Verification:
@@ -396,6 +396,7 @@ For `BENCHMARK_PUBLISH_VERIFICATION_FAILED`, inspect `context.rollback` before r
 Verification:
 
 - `vasir benchmark publish` exits successfully only after `https://vasirbenchmark.com` serves the exact active release over valid HTTPS.
+- Normal publication reuses unchanged verified assets and does not run browser journeys. Use `vasir benchmark publish --full-audit` for the exhaustive browser and asset checks below; do not interpret a fast-mode success as fresh browser proof.
 - `https://vasirbenchmark.com/benchmark-report.html#hyper-scale-chat` opens the expected report in a real browser.
 - Combined and Engineering each retain Leaderboard, Benchmark tests, and Efficiency routes, and all three current benchmark report fragments resolve in a real browser.
 - The UI states `Engineering v1 · 3 tasks × 1 trial · 3 judges`, names `Minimal baseline` and `Architecture skill`, omits cost, and contains no private run path or judge record. Report inspectors contain only exact selected generation messages and outputs.

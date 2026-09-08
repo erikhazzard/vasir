@@ -1377,7 +1377,7 @@ Usage:
   vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>] Draft a repo-specific AGENTS purpose paragraph
   vasir agents draft-routing [--json] [--write] [--repo-root <path>] Draft repo-aware Section 1 routing lanes for AGENTS.md
   vasir agents validate [--scope <path>] [--json] [--repo-root <path>] Exit nonzero when AGENTS.md contains invalid steering or scaffold placeholders
-  vasir benchmark publish [--dry-run] [--json] [--repo-root <path>] Build, publish, and verify the accepted VasirBench site at vasirbenchmark.com
+  vasir benchmark publish [--dry-run] [--full-audit] [--json] [--repo-root <path>] Publish changed VasirBench files; optionally audit every asset and browser route
   vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] Run an independent clean-vs-Vasir benchmark
   vasir eval extend <benchmark> <source-run-id> --model <provider:model@effort>... [--resume <extension-run-id>] [--open] Add or resume exact configurations without regenerating completed responses
   vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>] Regenerate the visual report from a recorded benchmark run
@@ -1413,7 +1413,7 @@ Notes:
   agents draft-purpose reads local repo context and can replace the AGENTS purpose placeholder when --write is set.
   agents draft-routing suggests repo-aware Section 1 lanes and can replace the routing placeholder when --write is set.
   agents validate exits nonzero and reports details when AGENTS.md still contains known scaffold placeholders or broken repo routes.
-  benchmark publish is the fixed production path for vasirbenchmark.com; start with --dry-run, then rerun without it to stage, activate, and verify one immutable release through the faedark account.
+  benchmark publish is the fixed production path for vasirbenchmark.com; start with --dry-run, then rerun without it to publish changed files through the faedark account. Unchanged verified assets are reused. --full-audit opts into exhaustive asset and browser checks.
   Use --replace only to refresh an unmodified project-local skill from the global catalog or intentionally overwrite AGENTS.md + CLAUDE.md during vasir agents init.
   remove mutates only the current repo root and also updates .agents/vasir.json and .agents/vasir-install-state.json.
   eval auto-resolves the local source skill when present, otherwise falls back to the installed or global catalog copy.
@@ -1481,6 +1481,7 @@ function parseCommandInvocation(argumentVector) {
   let agentsScopeArgument = null;
   let agentsSyncProfileName = null;
   let dryRunRequested = false;
+  let fullAuditRequested = false;
   let exitCodeRequested = false;
   let modelArguments = [];
   let openRequested = false;
@@ -1522,6 +1523,11 @@ function parseCommandInvocation(argumentVector) {
 
     if (rawArgument === "--dry-run") {
       dryRunRequested = true;
+      continue;
+    }
+
+    if (rawArgument === "--full-audit") {
+      fullAuditRequested = true;
       continue;
     }
 
@@ -1724,6 +1730,7 @@ function parseCommandInvocation(argumentVector) {
     agentsScopeArgument,
     agentsSyncProfileName,
     dryRunRequested,
+    fullAuditRequested,
     exitCodeRequested,
     modelArguments,
     openRequested,
@@ -4202,6 +4209,7 @@ async function runSelectedCommand({
   agentsSyncProfileName,
   debugRequested,
   dryRunRequested,
+  fullAuditRequested,
   exitCodeRequested,
   modelArguments,
   openRequested,
@@ -4356,6 +4364,15 @@ async function runSelectedCommand({
       code: "INVALID_COMMAND_FLAG",
       message: "--dry-run is only supported by `vasir update`, `vasir benchmark publish`, and `vasir agents sync`.",
       suggestion: "Use `vasir update --dry-run` for skill refresh previews, `vasir benchmark publish --dry-run` for the production site plan, or `vasir agents sync --dry-run` for AGENTS.md previews.",
+      docsRef: COMMANDS_REFERENCE_DOCS_REF
+    });
+  }
+
+  if (fullAuditRequested && !(commandName === "benchmark" && commandArguments[0] === "publish")) {
+    throw new VasirCliError({
+      code: "INVALID_COMMAND_FLAG",
+      message: "--full-audit is only supported by `vasir benchmark publish`.",
+      suggestion: "Use `vasir benchmark publish --full-audit` for exhaustive asset and browser verification; omit it for a normal fast publication.",
       docsRef: COMMANDS_REFERENCE_DOCS_REF
     });
   }
@@ -4574,6 +4591,7 @@ async function runSelectedCommand({
     return runBenchmark({
       benchmarkArguments: commandArguments,
       dryRunRequested,
+      fullAuditRequested,
       currentWorkingDirectory,
       projectRootDirectory,
       spawnSyncImplementation,
@@ -4675,6 +4693,7 @@ export async function runCommandLine(
       agentsSyncProfileName: invocation.agentsSyncProfileName,
       debugRequested: invocation.debugRequested,
       dryRunRequested: invocation.dryRunRequested,
+      fullAuditRequested: invocation.fullAuditRequested,
       exitCodeRequested: invocation.exitCodeRequested,
       modelArguments: invocation.modelArguments,
       openRequested: invocation.openRequested,

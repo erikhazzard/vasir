@@ -36,7 +36,7 @@ vasir --version
 | `agents draft-purpose` | `vasir agents draft-purpose [--json] [--write] [--model <name>] [--repo-root <path>]` | Draft a repo-specific `Purpose` paragraph for the current repo root `AGENTS.md` |
 | `agents draft-routing` | `vasir agents draft-routing [--json] [--write] [--repo-root <path>]` | Draft repo-aware Section 1 routing lanes for the current repo root `AGENTS.md` |
 | `agents validate` | `vasir agents validate [--scope <path>] [--json] [--repo-root <path>]` | Exit nonzero and identify any root or nested root `AGENTS.md` that still contains scaffold placeholders or broken repo routes |
-| `benchmark publish` | `vasir benchmark publish [--dry-run] [--json] [--repo-root <path>]` | Validate and publish the accepted VasirBench static site to `https://vasirbenchmark.com` through the fixed production target |
+| `benchmark publish` | `vasir benchmark publish [--dry-run] [--full-audit] [--json] [--repo-root <path>]` | Publish changed VasirBench files; optionally audit every asset and browser route |
 | `eval run` | `vasir eval run <benchmark> --treatment skill:<name> [--model <name>] [--reasoning <effort>] [--trials <count>] [--open] [--repo-root <path>]` | Run an independent benchmark through matched clean and skill-treated fresh agents |
 | `eval report` | `vasir eval report <benchmark> [run-id] [--open] [--repo-root <path>]` | Regenerate a self-contained visual report from a saved benchmark run |
 | `eval run` (legacy) | `vasir eval run <skill> [--json] [--model <name>] [--trials <count>] [--repo-root <path>]` | Run the built-in baseline vs treatment suite owned by a skill |
@@ -600,7 +600,7 @@ Notes:
 `vasir benchmark publish` is the only supported production publication path for the accepted static VasirBench site.
 
 ```text
-vasir benchmark publish [--dry-run] [--json] [--repo-root <path>]
+vasir benchmark publish [--dry-run] [--full-audit] [--json] [--repo-root <path>]
 ```
 
 The target is fixed in the repository deployment configuration:
@@ -617,7 +617,7 @@ Prerequisites:
 
 - Run from the Vasir source repository, or pass its root with `--repo-root <path>`.
 - Install the AWS CLI and configure an authenticated profile named `faedark`.
-- Make Chrome or Chromium available to the repository's site capture harness for the terminal browser proof.
+- Chrome or Chromium is needed only with `--full-audit`, not for a normal publication.
 - Keep `site/vasirbenchmark.com/template-lock.json` matched to the accepted presentation source, capture harness, and canonical captures. Generated public data is verified separately from source truth. There is no acceptance bypass.
 
 Confirm the AWS identity without changing cloud state:
@@ -641,12 +641,18 @@ The publishing command:
 1. Builds the bounded artifact and deterministic release identifier.
 2. Verifies the fixed AWS account and converges the `vasirbenchmark-production` stack.
 3. Acquires the conditional publisher lease so only one activation can run at a time.
-4. Uploads and verifies the complete immutable release under `releases/<release-id>/`.
-5. Activates that release through the stack-owned CloudFront Function pointer, then invalidates and awaits the three stable HTML entrypoints.
-6. Verifies the exact public bytes, HTTPS redirect, certificate, security headers, private origin, and complete Chrome route journey.
+4. Reuses unchanged content-addressed assets from the last verified release manifest and uploads new immutable files with checksums. Ownership is checked at phase boundaries, not once per retained asset.
+5. Activates that release through the stack-owned CloudFront Function pointer, then invalidates and awaits the configured stable HTML entrypoints.
+6. Verifies the active release's site bytes, newly published assets, HTTPS, security headers and private origin. It reuses the unchanged Games asset library, retaining one HTML isolation probe, and does not launch the whole-site browser suite.
 7. Retains the active release, the immediately previous verified release, and releases younger than 30 days, then releases the publisher lease.
 
 Publication is idempotent for identical source bytes. A rerun uses the same release identifier and does not create a second stack or duplicate release.
+
+Use `vasir benchmark publish --full-audit` when an exhaustive asset-integrity and
+browser regression audit is explicitly wanted. This opts back into checking
+retained assets and running the desktop/mobile browser journeys. Normal
+publication reports the checks it actually performed; manifest reuse is not a
+claim that an unchanged asset was freshly downloaded or played.
 
 #### Public score edition
 
@@ -732,7 +738,7 @@ Each action has `{id, stage, status, mutatesAws}`. Action status is `completed`,
 
 Dry-run preserves the same result keys. Unknown AWS output identifiers are `null`, `verification.status` is `planned`, local and read-only actions that ran are `completed`, and mutating actions are `planned`. `deployment.activeReleaseId` is the currently observed stack value or `null`; the candidate remains `artifact.releaseId` and is never reported as active during dry-run. Human and JSON modes expose the same target, artifact, action, deployment, and verification facts.
 
-The normal command succeeds only after the exact public bytes and browser journey pass. Its final output includes `https://vasirbenchmark.com` and the active release identifier. See [Benchmark Publication Errors](./troubleshooting.md#benchmark-publication-errors) for stable error codes and recovery.
+The normal command succeeds after the fast live-release checks pass. Its final output includes `https://vasirbenchmark.com`, the active release identifier and the verification mode; exhaustive browser checks require `--full-audit`. See [Benchmark Publication Errors](./troubleshooting.md#benchmark-publication-errors) for stable error codes and recovery.
 
 ## Version
 

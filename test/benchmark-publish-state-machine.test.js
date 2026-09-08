@@ -180,6 +180,8 @@ function createAwsPublicationFake() {
       return success({
         ContentLength: object.body.length,
         ChecksumSHA256: object.checksumSha256,
+        ContentType: object.contentType,
+        CacheControl: object.cacheControl,
         ETag: object.etag,
         VersionId: object.versionId
       });
@@ -193,13 +195,18 @@ function createAwsPublicationFake() {
     }
 
     if (operation === "put-object") {
-      return writeObject({
+      const result = writeObject({
         key,
         body: fs.readFileSync(optionValue(args, "--body")),
         checksumSha256: optionValue(args, "--checksum-sha256"),
         ifMatch: optionValue(args, "--if-match"),
         ifNoneMatch: optionValue(args, "--if-none-match")
       });
+      if (result.status === 0) Object.assign(currentObjects.get(key), {
+        contentType: optionValue(args, "--content-type"),
+        cacheControl: optionValue(args, "--cache-control")
+      });
+      return result;
     }
 
     if (operation === "delete-object") {
@@ -218,7 +225,9 @@ function createAwsPublicationFake() {
     }
 
     if (operation === "list-object-versions") {
-      return success({ Versions: versions, DeleteMarkers: deleteMarkers });
+      return success({ Versions: versions.map((version) => ({
+        ...version, IsLatest: currentObjects.get(version.Key)?.versionId === version.VersionId
+      })), DeleteMarkers: deleteMarkers });
     }
 
     if (operation === "delete-objects") {
@@ -346,12 +355,13 @@ function createAwsPublicationFake() {
   };
 }
 
-test("first publication and an identical repeat reuse one immutable release through lease and state CAS", async (context) => {
+test("full audit first publication and an identical repeat reuse one immutable release through lease and state CAS", async (context) => {
   const publicationRepoRoot = createPublicationRepoFixture();
   context.after(() => fs.rmSync(publicationRepoRoot, { recursive: true, force: true }));
   const aws = createAwsPublicationFake();
   const publish = () => publishBenchmarkSite({
     repoRootDirectory: publicationRepoRoot,
+    fullAudit: true,
     spawnSyncImplementation: aws.spawnSyncImplementation,
     environmentVariables: { ...process.env, CHROME_BIN: process.execPath },
     platform: process.platform,
