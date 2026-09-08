@@ -1,8 +1,9 @@
 # Core idea provisional score display contract
 
-Status: source and generated data implemented; renderer integration and live
-publication are not yet verified. The concurrent layout task owns `app.js` and
-`style.css`; this task does not change their layout.
+Status: implemented and published in release
+`70a2d25557481e7dad63fab72d891c9629843e76d834f1ffe670a260d928ed8b`.
+The existing layout owner's paired comparison is reused; an additive summary
+on the leaderboard links directly to its expanded 31-setting table.
 
 ## Why the existing leaderboard is empty
 
@@ -64,5 +65,9 @@ Next: Astra ultra, 83.8 / 92.3 / +8.5. Use unrounded values for rank ordering.
 4. Coordinate the shared presentation source with its layout owner, then use
    the fast publisher and verify the live response bytes and rendered numbers.
 
-This is a score-data handoff, not permission to publish another task's
-unfinished presentation changes or a claim that deployment has happened.
+The user explicitly renewed deployment approval. The release was published from
+a frozen presentation copy without replacing shared source or acceptance files.
+Focused browser checks passed at 1440, 820 and 390 pixels. Fast publication
+verified 16 files and reused 526 unchanged retained assets; no exhaustive Games
+or canonical browser audit is claimed. Proof is retained in
+`tmp/writing-score-release/`.

@@ -2,7 +2,7 @@
 
 Source: `0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5`.
 
-Same Astra xhigh judge, same twelve stories, both conditions. These are not the final two-judge scores and are not yet connected to the live website. All values below are out of 100; differences use unrounded values before display rounding.
+Same Astra xhigh judge, same twelve stories, both conditions. These are not the final two-judge scores. They are now connected to the [live expanded comparison](https://vasirbenchmark.com/?writing=storytelling-core-idea#capabilities/writing/benchmarks). All values below are out of 100; differences use unrounded values before display rounding.
 
 | Skill rank | Model / reasoning | Plain | Skill | Change |
 |---:|---|---:|---:|---:|
@@ -41,4 +41,3 @@ Same Astra xhigh judge, same twelve stories, both conditions. These are not the 
 31-setting mean: plain 78.3; skill 84.0; paired difference +5.7.
 
 Opus 5 xhigh and max have only eleven paired stories and remain unranked; The Matrix pair is missing following retained provider output-filtering failures. Their diagnostic means are available in the data bundle but are not comparable to this twelve-story ranking.
-

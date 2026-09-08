@@ -127,7 +127,7 @@ function buildWritingCategoryCollection(collection) {
   const initialFragment = decodeURIComponent(window.location.hash.replace(/^#/, ''));
   const writingSummary = rootData?.writing;
   const hasWriting = Boolean(writingSummary?.coverage?.caseCount && writingSummary?.benchmarkId);
-  const publishedWritingBenchmarkCount = (writingSummary?.benchmarks?.length || (hasWriting ? 1 : 0)) + Object.keys(writingSummary?.additionalBenchmarks || {}).length;
+  const publishedWritingBenchmarkCount = new Set([writingSummary?.benchmarkId, ...(writingSummary?.benchmarks || []).map(benchmark => benchmark.id), ...Object.keys(writingSummary?.additionalBenchmarks || {})].filter(Boolean)).size;
   const requestedWritingBenchmark = new URLSearchParams(window.location.search).get('writing');
   let writingData = window.VASIR_WRITING;
   if (hasWriting && initialFragment.split('/')[1] === 'writing' && !writingData) {
@@ -942,6 +942,29 @@ function buildWritingCategoryCollection(collection) {
     `;
   };
 
+  const writingProvisionalMarkup = benchmark => {
+    if (!isWriting) return '';
+    const publication = data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id));
+    const provisional = publication?.provisionalLeaderboard;
+    if (provisional?.status !== 'provisional' || !provisional.rankedSettingCount) return '';
+    const plain = new Map(provisional.entries.filter(entry => entry.condition === 'baseline').map(entry => [entry.settingId, entry]));
+    const ranked = provisional.entries.filter(entry => entry.condition === 'skill' && entry.eligibleForRank).sort((a, b) => b.exactScore - a.exactScore || a.id.localeCompare(b.id));
+    const linkFor = settingId => `./benchmark-report.html?setting=${encodeURIComponent(settingId)}#${encodeURIComponent(benchmark.id)}/${encodeURIComponent(publication.cases[0].id)}`;
+    const bar = entry => `<span class="capability-composition capability-composition--${conditionVisualClass(entry.condition)}" role="group" aria-label="${escapeHtml(entry.conditionLabel)}, provisional score ${formatScore(entry.score)} out of 100, provisional rank ${entry.rank}"><span class="capability-composition__meta"><span class="capability-composition__label">${escapeHtml(entry.conditionLabel)}</span><span class="capability-composition__rank">Rank #${String(entry.rank).padStart(2, '0')}</span></span><span class="capability-composition__track"><span class="capability-composition__stack"><span class="capability-composition__segment writing-provisional__segment" style="--segment-width:${COMPOSITE_SCORE_SCALE(entry.exactScore).toFixed(4)}%"><span>${formatScore(entry.score)}</span></span></span></span><strong class="capability-composition__total">${formatScore(entry.score)}</strong></span>`;
+    return `<details class="writing-provisional" data-writing-provisional-benchmark="${escapeHtml(benchmark.id)}">
+      <summary><span><strong>${escapeHtml(benchmark.name)} — ${escapeHtml(provisional.label)}</strong><small>${provisional.rankedSettingCount} complete settings · ${provisional.expectedCaseCount} stories · ${provisional.judgeCount} judge · expand comparison</small></span><span class="writing-provisional__summary-scores" data-provisional-summary><span>Plain <strong>${formatScore(provisional.summary.baseline)}</strong></span><i aria-hidden="true">→</i><span>Skill <strong>${formatScore(provisional.summary.treatment)}</strong></span><b>${signed(provisional.summary.delta)} pts</b></span></summary>
+      <div class="writing-provisional__method"><p>${escapeHtml(provisional.detail)}</p><p>Provisional benchmark results only. Not included in the Writing development index or Overall. Each rank compares both conditions on the same ${provisional.expectedCaseCount}-story corpus, using only ${escapeHtml(provisional.judgeConfigurationIds.join(' + '))}. Select a model to inspect its original answers and reviews.</p></div>
+      <ol class="result-list" aria-label="${escapeHtml(benchmark.name)} provisional single-judge paired comparison">${ranked.map(entry => {
+        const baseline = plain.get(entry.settingId);
+        return `<li class="setting-row" data-writing-provisional-setting="${escapeHtml(entry.settingId)}" data-baseline-score="${formatScore(baseline.score)}" data-full-score="${formatScore(entry.score)}" data-delta="${formatScore(entry.delta)}" data-baseline-rank="${baseline.rank}" data-full-rank="${entry.rank}"><div class="setting-row__layout"><a class="setting-row__select writing-provisional__link" href="${escapeHtml(linkFor(entry.settingId))}"><span class="setting-row__identity"><span class="setting-row__rank">${String(entry.rank).padStart(2, '0')}</span><span class="setting-row__model"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Provisional · ${provisional.expectedCaseCount}/${provisional.expectedCaseCount} stories · 1 judge</small></span></span><span class="setting-row__disclosure">Answers ↗</span></a><span class="setting-row__pair">${bar(entry)}${bar(baseline)}</span><span class="setting-row__delta${entry.delta < 0 ? ' setting-row__delta--negative' : ''}"><strong>${signed(entry.delta)}</strong><span>pts</span></span></div></li>`;
+      }).join('')}</ol>
+      ${provisional.incompleteSettings.length ? `<section class="writing-provisional__method"><h5>Incomplete cohorts — diagnostics, not ranks</h5><ul class="writing-provisional__incomplete">${provisional.incompleteSettings.map(item => {
+        const setting = publication.settings.find(setting => setting.id === item.settingId);
+        return `<li data-writing-provisional-incomplete="${escapeHtml(item.settingId)}" data-baseline-score="${formatScore(item.scores.baseline)}" data-full-score="${formatScore(item.scores.skill)}" data-delta="${formatScore(item.delta)}" data-baseline-rank="" data-full-rank=""><a href="${escapeHtml(linkFor(item.settingId))}">${escapeHtml(setting?.label || item.configurationId)} ↗</a><span>${item.completedPairCount}/${item.expectedPairCount} stories · plain ${formatScore(item.scores.baseline)} → skill ${formatScore(item.scores.skill)} · ${signed(item.delta)} pts · rank —</span></li>`;
+      }).join('')}</ul></section>` : ''}
+    </details>`;
+  };
+
   const benchmarkLedgerMarkup = (category, hidden = false) => {
     const benchmarks = categoryBenchmarks(category.id);
     const suiteNames = [...new Set(benchmarks.map((benchmark) => benchmark.suite))];
@@ -972,7 +995,7 @@ function buildWritingCategoryCollection(collection) {
                   <strong>${suiteBenchmarks.length} tests · ${suiteMeasured} scored</strong>
                 </header>
                 <div class="benchmark-ledger__rows">
-                  ${suiteBenchmarks.map((benchmark) => benchmarkLedgerRowMarkup(benchmark, benchmarks.indexOf(benchmark), category.id)).join('')}
+                  ${suiteBenchmarks.map((benchmark) => benchmarkLedgerRowMarkup(benchmark, benchmarks.indexOf(benchmark), category.id) + writingProvisionalMarkup(benchmark)).join('')}
                 </div>
               </section>
             `;
@@ -1078,6 +1101,23 @@ function buildWritingCategoryCollection(collection) {
     return `<details class="writing-index-gaps" data-writing-coverage-gaps><summary>${missing.length} settings without complete index coverage</summary><p>These settings have published Writing evidence, but not complete paired scores on every active benchmark. Their category score and rank are withheld—not scored as zero.</p><ul>${missing.map(entry => `<li data-incomplete-setting-id="${escapeHtml(entry.settingId)}"><button class="setting-row__select" data-entry-id="${escapeHtml(entry.id)}" type="button" aria-pressed="${selectedEntry().settingId === entry.settingId}"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Score — · rank — · inspect available answers ↗</small></button></li>`).join('')}</ul></details>`;
   };
 
+  const writingProvisionalSummaryMarkup = () => {
+    if (!isWriting) return '';
+    const publication = data.writingCategory.publications.find(item => item.benchmarks.some(benchmark => benchmark.id === 'storytelling-core-idea'));
+    const provisional = publication?.provisionalLeaderboard;
+    if (provisional?.status !== 'provisional' || !provisional.rankedSettingCount) return '';
+    const benchmark = publication.benchmarks.find(item => item.id === 'storytelling-core-idea');
+    return `<section class="writing-provisional" data-writing-provisional-overview aria-labelledby="writing-provisional-overview-title">
+      <div class="writing-provisional__method">
+        <h4 id="writing-provisional-overview-title">${escapeHtml(benchmark.name)} — ${escapeHtml(provisional.label)}</h4>
+        <p>${provisional.rankedSettingCount} settings · ${provisional.expectedCaseCount} stories · ${provisional.judgeCount} judge</p>
+        <p class="writing-provisional__summary-scores"><span>Plain <strong>${formatScore(provisional.summary.baseline)}</strong></span><i aria-hidden="true">→</i><span>Skill <strong>${formatScore(provisional.summary.treatment)}</strong></span><b>${signed(provisional.summary.delta)} pts</b></p>
+        <p>Both conditions use the same complete story corpus and Astra xhigh judge. These provisional scores are excluded from the Writing development index below and from Overall.</p>
+        <p><a href="?writing=${encodeURIComponent(benchmark.id)}#capabilities/writing/benchmarks">Compare all ${provisional.rankedSettingCount} settings and read original answers →</a></p>
+      </div>
+    </section>`;
+  };
+
   const combinedLeaderboardMarkup = () => {
     const baselineRanking = rankedCondition(BASELINE_CONDITION_ID);
     const fullRanking = rankedCondition(TREATMENT_CONDITION_ID);
@@ -1097,6 +1137,7 @@ function buildWritingCategoryCollection(collection) {
         aria-labelledby="capability-mode-models"
         ${state.capabilityMode === 'models' ? '' : 'hidden'}
       >
+        ${writingProvisionalSummaryMarkup()}
         <section class="score-field score-field--combined" aria-labelledby="score-field-title">
           <h3 class="visually-hidden" id="score-field-title">${isWriting ? 'Writing' : 'Overall'} model leaderboard</h3>
 
@@ -2517,6 +2558,8 @@ function buildWritingCategoryCollection(collection) {
   if (isWriting && state.capabilityMode === 'benchmarks' && requestedWritingBenchmark && benchmarkById.has(requestedWritingBenchmark)) {
     window.requestAnimationFrame(() => {
       const benchmark = document.querySelector(`#capability-benchmarks [data-benchmark-id="${CSS.escape(requestedWritingBenchmark)}"]`);
+      const provisional = document.querySelector(`#capability-benchmarks [data-writing-provisional-benchmark="${CSS.escape(requestedWritingBenchmark)}"]`);
+      if (provisional) provisional.open = true;
       benchmark?.focus({ preventScroll: true });
       benchmark?.scrollIntoView({ block: 'center', behavior: 'instant' });
     });

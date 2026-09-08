@@ -186,3 +186,26 @@ session. The implemented data interface and remaining integration checks are
 documented in [provisional-score-contract.md](provisional-score-contract.md).
 No score-visibility deployment is claimed until the display is connected and
 the shared release has been verified live.
+
+## Score visibility published after renewed approval
+
+The user explicitly authorized deployment/commits while preserving concurrent
+work. The current combined presentation and selected Core, Twists and DM sources
+were captured in an isolated copy; the layout owner's original paired-score
+renderer was reused. A compact summary now appears above the Writing index and
+opens the existing 31-setting comparison in one click. Two incomplete cohorts
+remain unranked, and the provisional results do not enter either index.
+
+Release `70a2d25557481e7dad63fab72d891c9629843e76d834f1ffe670a260d928ed8b`
+was activated successfully. Focused local browser checks verified the exact
+candidate at 1440, 820 and 390 pixels, including all 31 numeric pairs, two
+diagnostics, correct source coverage, exclusion from the index, and absence of
+page overflow/runtime errors. The fast publisher reported 16 verified files,
+526 reused unchanged assets, private origin, and released ownership. Production
+HTML independently resolved to the expected release.
+
+The accepted frozen receipt and actual proof remain under
+`tmp/writing-score-release/`. The shared presentation files, historical captures
+and template lock were not replaced. This records focused score validation, not
+another exhaustive canonical/Games audit. The direct score URL is
+`https://vasirbenchmark.com/?writing=storytelling-core-idea#capabilities/writing/benchmarks`.
