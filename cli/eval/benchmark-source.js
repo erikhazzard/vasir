@@ -61,14 +61,22 @@ export function createBenchmarkGenerationHash(benchmarkDefinition) {
     id: benchmarkDefinition.id,
     taskKind: benchmarkDefinition.taskKind,
     outputContract: benchmarkDefinition.outputContract ?? null,
-    cases: benchmarkDefinition.cases
+    cases: benchmarkDefinition.schemaVersion === 2
+      ? benchmarkDefinition.cases.map(({ id, task }) => ({ id, task }))
+      : benchmarkDefinition.cases
   });
 }
 
 export function createBenchmarkScoringHash(benchmarkDefinition) {
   return createBenchmarkHash({
     scoring: benchmarkDefinition.scoring,
-    judging: benchmarkDefinition.judging ?? null
+    judging: benchmarkDefinition.judging ?? null,
+    ...(benchmarkDefinition.schemaVersion === 2 ? {
+      judgeEvidence: benchmarkDefinition.cases.map(({ id, judgeEvidence }) => ({
+        id,
+        judgeEvidence: judgeEvidence ?? null
+      }))
+    } : {})
   });
 }
 
@@ -93,7 +101,7 @@ function validateUniqueIds(entries, { benchmarkFilePath, label }) {
   }
 }
 
-function validateScoring(scoring, benchmarkFilePath) {
+function validateScoring(scoring, benchmarkFilePath, schemaVersion = 1) {
   if (!scoring || typeof scoring !== "object") {
     failInvalidBenchmark({
       benchmarkFilePath,
@@ -136,21 +144,29 @@ function validateScoring(scoring, benchmarkFilePath) {
   if (
     scoreRange.min !== 0 ||
     scoreRange.max !== 100 ||
-    ratingScale.min !== 0 ||
-    ratingScale.max !== 4
+    ratingScale.min !== (schemaVersion === 2 ? 1 : 0) ||
+    ratingScale.max !== (schemaVersion === 2 ? 10 : 4)
   ) {
     failInvalidBenchmark({
       benchmarkFilePath,
-      message: "Benchmark schemaVersion 1 requires a 0–100 score range and 0–4 rating scale",
-      suggestion: "Use scoreRange 0–100 and ratingScale 0–4 until a later schema version defines other numeric bases."
+      message: `Benchmark schemaVersion ${schemaVersion} requires a 0–100 score range and ${schemaVersion === 2 ? "1–10" : "0–4"} rating scale`,
+      suggestion: "Use the rating scale defined by the selected benchmark schema version."
     });
   }
 
-  if (!Array.isArray(gates) || gates.length === 0 || !Array.isArray(dimensions) || dimensions.length === 0) {
+  if (!Array.isArray(gates) || (schemaVersion === 1 && gates.length === 0) || !Array.isArray(dimensions) || dimensions.length === 0) {
     failInvalidBenchmark({
       benchmarkFilePath,
       message: "Benchmark gates or dimensions are missing",
       suggestion: "Define at least one semantic gate and one anchored scoring dimension."
+    });
+  }
+
+  if (schemaVersion === 2 && gates.length !== 0) {
+    failInvalidBenchmark({
+      benchmarkFilePath,
+      message: "Benchmark schemaVersion 2 uses direct 1–10 ratings without gate caps",
+      suggestion: "Set gates to an empty array; scores equal weighted ratings divided by 10."
     });
   }
 
@@ -330,11 +346,11 @@ function validateBenchmarkDefinition({ benchmarkDefinition, benchmarkFilePath, b
     });
   }
 
-  if (benchmarkDefinition.schemaVersion !== 1 || benchmarkDefinition.taskKind !== "response") {
+  if (![1, 2].includes(benchmarkDefinition.schemaVersion) || benchmarkDefinition.taskKind !== "response") {
     failInvalidBenchmark({
       benchmarkFilePath,
       message: "Benchmark schemaVersion or taskKind is unsupported",
-      suggestion: "Use schemaVersion 1 and taskKind `response` for the current benchmark runner."
+      suggestion: "Use schemaVersion 1 (0–4 with gates) or 2 (1–10 without gates), and taskKind `response`."
     });
   }
 
@@ -377,7 +393,7 @@ function validateBenchmarkDefinition({ benchmarkDefinition, benchmarkFilePath, b
     });
   }
 
-  validateScoring(benchmarkDefinition.scoring, benchmarkFilePath);
+  validateScoring(benchmarkDefinition.scoring, benchmarkFilePath, benchmarkDefinition.schemaVersion);
   validateJudging(benchmarkDefinition.judging, benchmarkFilePath);
   validateScoringJudgingAgreement({
     scoring: benchmarkDefinition.scoring,

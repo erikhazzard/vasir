@@ -29,7 +29,7 @@ const MATCHED_PAIR_MAX_GROUPS_PER_BATCH = 1;
 const MATCHED_PAIR_MAX_CANDIDATES_PER_BATCH = 2;
 const MAX_JUDGE_PROMPT_BYTES = 64 * 1024;
 const LEGACY_MAX_JUDGE_CONCURRENCY = 4;
-const PANEL_MAX_JUDGE_CONCURRENCY = 8;
+export const DEFAULT_PANEL_JUDGE_CONCURRENCY = 8;
 // Judge batches can legitimately need the full agent deadline at ultra effort;
 // a shorter override stranded otherwise reusable panel evidence mid-rejudge.
 const PANEL_JUDGE_TIMEOUT_MS = DEFAULT_AGENT_TIMEOUT_MS;
@@ -171,7 +171,7 @@ function createCandidateCohort(rows) {
   return { candidateRows, cohortHash };
 }
 
-function createJudgeOutputSchema({ candidateIds, gateIds, dimensionIds }) {
+function createJudgeOutputSchema({ candidateIds, gateIds, dimensionIds, ratingScale = { min: 0, max: 4 } }) {
   return {
     type: "object",
     properties: {
@@ -190,7 +190,7 @@ function createJudgeOutputSchema({ candidateIds, gateIds, dimensionIds }) {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string", enum: gateIds },
+                  id: { type: "string", ...(gateIds.length > 0 ? { enum: gateIds } : {}) },
                   status: { type: "string", enum: ["pass", "fail"] }
                 },
                 required: ["id", "status"],
@@ -205,7 +205,7 @@ function createJudgeOutputSchema({ candidateIds, gateIds, dimensionIds }) {
                 type: "object",
                 properties: {
                   id: { type: "string", enum: dimensionIds },
-                  rating: { type: "integer", minimum: 0, maximum: 4 }
+                  rating: { type: "integer", minimum: ratingScale.min, maximum: ratingScale.max }
                 },
                 required: ["id", "rating"],
                 additionalProperties: false
@@ -257,30 +257,35 @@ function formatRubric(scoring) {
   const lines = [
     scoring.judgeInstructions,
     "",
-    "Hard gates (a failed gate caps the final weighted score):"
+    scoring.gates.length > 0
+      ? "Hard gates (a failed gate caps the final weighted score):"
+      : "Hard gates: none; no gate caps apply."
   ];
   for (const gate of scoring.gates) {
     lines.push(`- ${gate.id} — cap ${gate.failureCap}: ${gate.criterion}`);
   }
-  lines.push("", "Dimensions (rate each 0–4):");
+  lines.push("", `Dimensions (rate each ${scoring.ratingScale?.min ?? 0}–${scoring.ratingScale?.max ?? 4}):`);
   for (const dimension of scoring.dimensions) {
-    lines.push(
-      `- ${dimension.id} — ${dimension.weight} points: ${dimension.criterion}`,
-      `  0: ${dimension.anchors["0"]}`,
-      `  2: ${dimension.anchors["2"] ?? "Materially incomplete."}`,
-      `  4: ${dimension.anchors["4"]}`
-    );
+    // Keep legacy 0/2/4 prompts byte-for-byte stable, including their midpoint
+    // fallback. Other rating scales use the rubric's actual declared anchors.
+    const legacyScale = (scoring.ratingScale?.min ?? 0) === 0 && (scoring.ratingScale?.max ?? 4) === 4;
+    const anchors = legacyScale
+      ? [["0", dimension.anchors["0"]], ["2", dimension.anchors["2"] ?? "Materially incomplete."], ["4", dimension.anchors["4"]]]
+      : Object.entries(dimension.anchors).sort(([left], [right]) => Number(left) - Number(right));
+    lines.push(`- ${dimension.id} — ${dimension.weight} points: ${dimension.criterion}`);
+    for (const [rating, description] of anchors) lines.push(`  ${rating}: ${description}`);
   }
   return lines.join("\n");
 }
 
 function createCandidateSections({ benchmarkDefinition, candidateRows }) {
-  const tasksByCaseId = new Map(
-    benchmarkDefinition.cases.map((caseDefinition) => [caseDefinition.id, caseDefinition.task])
+  const casesById = new Map(
+    benchmarkDefinition.cases.map((caseDefinition) => [caseDefinition.id, caseDefinition])
   );
   return candidateRows.map(
     ({ candidateId, row }) => `<candidate id="${candidateId}" case="${row.caseId}">
-<task>${tasksByCaseId.get(row.caseId) ?? "Task not recorded."}</task>
+<task>${casesById.get(row.caseId)?.task ?? "Task not recorded."}</task>${casesById.get(row.caseId)?.judgeEvidence ? `
+<judge-evidence>${JSON.stringify(casesById.get(row.caseId).judgeEvidence)}</judge-evidence>` : ""}
 <answer>${row.outputText}</answer>
 </candidate>`
   );
@@ -296,10 +301,7 @@ Return exactly one evaluation for every candidate. Include every gate and every 
 For each candidate, use the single overall reason to cite decisive answer evidence, explain every failed gate, and justify the ratings that materially affect its score. Do not restate every criterion.${consensusMode ? "\nEach reason must be at most 600 characters; aim for 450 characters or fewer while retaining decisive evidence and every failed gate." : ""}
 Do not infer missing mechanisms charitably. Do not reward matching any preferred vendor or wording.
 
-OUTPUT CONTRACT
-${benchmarkDefinition.outputContract}
-
-RUBRIC
+${benchmarkDefinition.outputContract ? `OUTPUT CONTRACT\n${benchmarkDefinition.outputContract}\n\n` : ""}RUBRIC
 ${formatRubric(benchmarkDefinition.scoring)}
 
 ANONYMOUS CANDIDATES
@@ -689,12 +691,12 @@ function computeScore({ evaluation, scoring, allowHalfRatings = false }) {
       !judgment ||
       !Number.isFinite(judgment.rating) ||
       !Number.isInteger(judgment.rating * (allowHalfRatings ? 2 : 1)) ||
-      judgment.rating < 0 ||
-      judgment.rating > 4
+      judgment.rating < (scoring.ratingScale?.min ?? 0) ||
+      judgment.rating > (scoring.ratingScale?.max ?? 4)
     ) {
       throw new Error(`Judge dimension is invalid for ${evaluation.candidateId}: ${dimension.id}.`);
     }
-    const earned = dimension.weight * (judgment.rating / 4);
+    const earned = dimension.weight * (judgment.rating / (scoring.ratingScale?.max ?? 4));
     uncappedScore += earned;
     return {
       id: dimension.id,
@@ -727,7 +729,7 @@ function computeScore({ evaluation, scoring, allowHalfRatings = false }) {
   return {
     total: Math.min(roundedUncappedScore, gateCap),
     uncapped: roundedUncappedScore,
-    gateCap,
+    gateCap: scoring.gates.length ? gateCap : null,
     gates,
     dimensions,
     reason,
@@ -894,7 +896,8 @@ async function runPanelJudgeBatch({
       outputSchema: createJudgeOutputSchema({
         candidateIds: batch.candidateIds,
         gateIds: benchmarkDefinition.scoring.gates.map((entry) => entry.id),
-        dimensionIds: benchmarkDefinition.scoring.dimensions.map((entry) => entry.id)
+        dimensionIds: benchmarkDefinition.scoring.dimensions.map((entry) => entry.id),
+        ratingScale: benchmarkDefinition.scoring.ratingScale
       }),
       environmentVariables,
       timeoutMs: PANEL_JUDGE_TIMEOUT_MS
@@ -930,13 +933,15 @@ async function runPanelJudgeBatch({
       scoresByRowKey: scored.scoresByRowKey
     };
   } catch (error) {
+    const deferred = error?.code === "EVAL_BENCHMARK_JUDGE_DEFERRED";
     return {
       batchId: batch.batchId,
       reviewerId,
       configuration,
       candidateIds: batch.candidateIds,
       groupHashes: batch.groupHashes,
-      status: "error",
+      status: deferred ? "deferred" : "error",
+      ...(deferred ? { executionAttempted: false } : {}),
       basisHash,
       evaluationHash: null,
       promptHash: batch.promptHash,
@@ -949,7 +954,7 @@ async function runPanelJudgeBatch({
       runtimeReceipt: null,
       usage: null,
       costUsd: null,
-      durationMs: Date.now() - startedAt,
+      durationMs: deferred ? 0 : Date.now() - startedAt,
       error: normalizeError(error, "EVAL_BENCHMARK_JUDGE_FAILED", "Fresh benchmark judge failed."),
       reused: false,
       scoresByRowKey: new Map()
@@ -1014,7 +1019,11 @@ function combinePanelJudgeBatches({
     runtimeReceipt: {
       batched: true,
       batchCount: orderedBatches.length,
-      freshSession: true,
+      freshSession: orderedBatches.some((batchRun) => batchRun.status !== "deferred"),
+      ...(orderedBatches.some((batchRun) => batchRun.status === "deferred") ? {
+        attemptedBatchCount: orderedBatches.filter((batchRun) => batchRun.status !== "deferred").length,
+        deferredBatchCount: orderedBatches.filter((batchRun) => batchRun.status === "deferred").length
+      } : {}),
       persistedSession: false
     },
     usage: sumUsage(orderedBatches),
@@ -1479,7 +1488,8 @@ function aggregateIndependentPanel({ candidateRows, judgeRuns, scoring }) {
       const ratings = judgments.map(({ evaluation }) =>
         evaluation.dimensions.find((entry) => entry.id === dimension.id)?.rating
       );
-      if (ratings.some((rating) => !Number.isInteger(rating) || rating < 0 || rating > 4)) {
+      if (ratings.some((rating) => !Number.isInteger(rating) ||
+        rating < (scoring.ratingScale?.min ?? 0) || rating > (scoring.ratingScale?.max ?? 4))) {
         throw new Error(`Stable panel aggregation is missing dimension ${dimension.id}.`);
       }
       return {
@@ -1498,7 +1508,9 @@ function aggregateIndependentPanel({ candidateRows, judgeRuns, scoring }) {
           gates,
           dimensions,
           reason: consensusMode
-            ? "Two independent rubric reviews were combined by unanimous gate pass and mean dimension ratings."
+            ? scoring.gates.length
+              ? "Two independent rubric reviews were combined by unanimous gate pass and mean dimension ratings."
+              : "Two independent rubric reviews were combined by mean dimension ratings."
             : "Three independent rubric reviews were combined by majority gate vote and median dimension ratings."
         },
         scoring,
@@ -1712,12 +1724,18 @@ export async function judgeBenchmarkRows({
   rows,
   runSeed: _runSeed,
   judgingConfiguration = null,
+  judgeConcurrency = null,
   priorJudging = null,
   judgingCheckpointImplementation = null,
   progressImplementation = null,
   environmentVariables = process.env,
   agentRunnerImplementation = runBenchmarkAgent
 }) {
+  if (judgeConcurrency !== null && (!Number.isInteger(judgeConcurrency) || judgeConcurrency < 1 || judgeConcurrency > 16)) {
+    const error = new Error("Independent panel judge concurrency must be an integer from 1 through 16.");
+    error.code = "EVAL_BENCHMARK_JUDGE_CONCURRENCY";
+    throw error;
+  }
   const startedAt = Date.now();
   const plan = resolveBenchmarkJudgingConfiguration(
     judgingConfiguration ?? benchmarkDefinition.judging
@@ -1830,11 +1848,14 @@ export async function judgeBenchmarkRows({
       benchmarkDefinition
     })
   })));
-  const completedPanelBatchRuns = [];
+  // A checkpoint replaces the persisted judging record. Seed every compatible
+  // restored batch before scheduling any work so an interrupted resume cannot
+  // erase paid evidence merely because its reuse job has not been visited yet.
+  const completedPanelBatchRuns = panelJobs.flatMap((job) => job.restored ? [job.restored] : []);
   let checkpointChain = Promise.resolve();
   const panelBatchRuns = await mapWithConcurrency(
     panelJobs,
-    independentPanelMode ? PANEL_MAX_JUDGE_CONCURRENCY : LEGACY_MAX_JUDGE_CONCURRENCY,
+    independentPanelMode ? judgeConcurrency ?? DEFAULT_PANEL_JUDGE_CONCURRENCY : LEGACY_MAX_JUDGE_CONCURRENCY,
     async (job) => {
       const batchRun = job.restored ?? await runPanelJudgeBatch({
         configuration: job.configuration,
@@ -1844,7 +1865,7 @@ export async function judgeBenchmarkRows({
         environmentVariables,
         agentRunnerImplementation
       });
-      completedPanelBatchRuns.push(batchRun);
+      if (!job.restored) completedPanelBatchRuns.push(batchRun);
       if (typeof checkpointImplementation === "function") {
         const checkpoint = createPanelCheckpoint({
           base,
@@ -1937,7 +1958,9 @@ export async function judgeBenchmarkRows({
           promptText: judgeRuns[0].promptText,
           ranking: aggregate.ranking,
           comparativeNote: panelConsensusMode
-            ? "Unanimous gate pass and mean dimension ratings from two independent judges."
+            ? benchmarkDefinition.scoring.gates.length === 0
+              ? "Mean dimension ratings from two independent judges; no gate caps."
+              : "Unanimous gate pass and mean dimension ratings from two independent judges."
             : "Majority gate vote and median dimension ratings from three independent judges.",
           runtimeReceipt: {
             batched: true,

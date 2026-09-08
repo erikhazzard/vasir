@@ -611,6 +611,78 @@ test("stable panel checkpoints can resume at individual judge-batch granularity"
   );
 });
 
+test("resuming an interrupted provider pass never drops compatible paid batches from checkpoints", async () => {
+  const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+  const rows = createMatchedRows(12);
+  const firstRunner = createPanelRunner({ benchmarkDefinition });
+  const first = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    agentRunnerImplementation: (args) => {
+      if (args.configuration.provider === "claude") {
+        throw Object.assign(new Error("Provider intentionally deferred."), { code: "EVAL_BENCHMARK_JUDGE_DEFERRED" });
+      }
+      return firstRunner.runner(args);
+    }
+  });
+  assert.equal(first.judging.status, "error");
+  assert.equal(firstRunner.calls.length, 12);
+  const paidBatches = first.judging.judges.find((judge) => judge.configuration.provider === "codex").batches;
+  assert.equal(paidBatches.length, 12);
+  const immutableEvidence = (batch) => Object.fromEntries([
+    "promptHash", "basisHash", "evaluationHash", "evaluations", "runtimeReceipt", "usage", "costUsd"
+  ].map((key) => [key, batch[key]]));
+  const expectedEvidence = paidBatches.map(immutableEvidence);
+  let interruptedCheckpoint;
+  const resumeRunner = createPanelRunner({ benchmarkDefinition });
+  await assert.rejects(() => judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: first.judging,
+    agentRunnerImplementation: resumeRunner.runner,
+    judgingCheckpointImplementation: (checkpoint) => {
+      interruptedCheckpoint = structuredClone(checkpoint);
+      const retained = checkpoint.judging.judges.find((judge) => judge.configuration.provider === "codex").batches;
+      assert.equal(retained.length, 12, "even the first resumed checkpoint must retain every compatible paid batch");
+      assert.deepEqual(retained.map(immutableEvidence), expectedEvidence);
+      assert.equal(checkpoint.judging.judges.flatMap((judge) => judge.batches).length, checkpoint.completedBatchCount);
+      if (checkpoint.completedBatch.configuration.provider === "claude") throw new Error("Simulated interruption after checkpoint persistence.");
+    }
+  }), /Simulated interruption/);
+  assert.ok(resumeRunner.calls.every((call) => call.configuration.provider === "claude"));
+  const retainedClaude = interruptedCheckpoint.judging.judges.find((judge) => judge.configuration.provider === "claude").batches.filter((batch) => batch.status === "complete");
+  assert.ok(retainedClaude.length > 0 && retainedClaude.length < 12, "the interruption must leave a genuinely partial second provider pass");
+  const retainedPrompts = new Set(retainedClaude.map((batch) => batch.promptHash));
+  const finalRunner = createPanelRunner({ benchmarkDefinition });
+  const finished = await judgeBenchmarkRows({
+    benchmarkDefinition,
+    rows,
+    priorJudging: interruptedCheckpoint.judging,
+    agentRunnerImplementation: finalRunner.runner
+  });
+  assert.equal(finished.judging.status, "complete");
+  assert.equal(finalRunner.calls.length, 12 - retainedClaude.length);
+  assert.ok(finalRunner.calls.every((call) => call.configuration.provider === "claude" && !retainedPrompts.has(stableDigest(call.promptText))));
+  assert.deepEqual(finished.judging.judges.find((judge) => judge.configuration.provider === "codex").batches.map(immutableEvidence), expectedEvidence);
+});
+
+test("legacy rubric prompts retain their declared 0/2/4 anchors and missing midpoint fallback", async () => {
+  const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+  delete benchmarkDefinition.scoring.dimensions[0].anchors["2"];
+  const { runner, calls } = createPanelRunner({ benchmarkDefinition });
+  await judgeBenchmarkRows({ benchmarkDefinition, rows: createMatchedRows(1), agentRunnerImplementation: runner });
+  for (const { promptText } of calls) {
+    assert.match(promptText, /Dimensions \(rate each 0–4\)/);
+    for (const dimension of benchmarkDefinition.scoring.dimensions) {
+      const expectedBlock = `- ${dimension.id} — ${dimension.weight} points: ${dimension.criterion}
+  0: ${dimension.anchors["0"]}
+  2: ${dimension.anchors["2"] ?? "Materially incomplete."}
+  4: ${dimension.anchors["4"]}`;
+      assert.ok(promptText.includes(expectedBlock));
+    }
+  }
+});
+
 test("stable panel recovery reruns a Claude batch whose receipt contradicts its target model", async () => {
   const benchmarkDefinition = createStablePanelBenchmarkDefinition();
   const rows = createMatchedRows(1);
@@ -1260,6 +1332,41 @@ test("a configurable panel scales by judge count without changing the batch cont
   assert.equal(calls.filter((call) => call.outputSchema.properties.selections).length, 3);
   assert.equal(result.judging.judges.length, 3);
   assert.equal(result.judging.status, "complete");
+});
+
+test("independent panel execution concurrency is bounded and leaves prompts, score bases, and results unchanged", async () => {
+  const benchmarkDefinition = createConsensusPanelBenchmarkDefinition();
+  const rows = createMatchedRows(10);
+  let reference;
+  for (const judgeConcurrency of [undefined, 1, 3, 16]) {
+    const baseRunner = createPanelRunner({ benchmarkDefinition });
+    let activeCalls = 0;
+    let maximumActiveCalls = 0;
+    const result = await judgeBenchmarkRows({
+      benchmarkDefinition, rows, judgeConcurrency,
+      agentRunnerImplementation: async (args) => {
+        activeCalls += 1;
+        maximumActiveCalls = Math.max(maximumActiveCalls, activeCalls);
+        await new Promise((resolve) => setImmediate(resolve));
+        try { return await baseRunner.runner(args); }
+        finally { activeCalls -= 1; }
+      }
+    });
+    assert.equal(result.judging.status, "complete");
+    assert.equal(maximumActiveCalls, judgeConcurrency ?? 8);
+    const evidence = { scores: result.scoresByRowKey, basisHash: result.judging.basisHash, promptHash: result.judging.promptHash };
+    if (reference) assert.deepEqual(evidence, reference);
+    else reference = evidence;
+  }
+});
+
+test("invalid judge concurrency is rejected before any provider invocation", async () => {
+  for (const judgeConcurrency of [0, -1, 17, 1.5, NaN, "4"]) {
+    await assert.rejects(() => judgeBenchmarkRows({
+      benchmarkDefinition: createConsensusPanelBenchmarkDefinition(), rows: createMatchedRows(1), judgeConcurrency,
+      agentRunnerImplementation: () => assert.fail("Invalid concurrency cannot invoke a provider.")
+    }), (error) => error.code === "EVAL_BENCHMARK_JUDGE_CONCURRENCY");
+  }
 });
 
 test("judge and synthesis calls share one global concurrency ceiling", async () => {

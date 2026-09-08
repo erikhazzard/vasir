@@ -62,13 +62,38 @@
       "path": "assets/kanit-latin-900-normal.woff2",
       "contentType": "font/woff2",
       "cacheClass": "immutable"
+    },
+    {
+      "path": "games.html",
+      "contentType": "text/html; charset=utf-8",
+      "cacheClass": "html"
+    },
+    {
+      "path": "games.css",
+      "contentType": "text/css; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "games.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "writing-data.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
+    },
+    {
+      "path": "writing-responses.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable"
     }
   ],
   "limits": {
     "maxFileBytes": 2097152,
     "maxResponseFileBytes": 8388608,
-    "maxArtifactBytes": 10485760,
-    "maxCompressedLandingBytes": 256000,
+    "maxArtifactBytes": 16777216,
+    "maxCompressedLandingBytes": 300000,
     "maxPhysicalStorageBytes": 1073741824,
     "releaseRetentionDays": 30,
     "controlNoncurrentRetentionDays": 7,

@@ -9,8 +9,8 @@ import {
 
 test("default benchmark matrix preserves every advertised model and reasoning tuple", () => {
   const configurations = resolveBenchmarkConfigurations();
-  assert.equal(configurations.length, 36);
-  assert.equal(getDefaultBenchmarkConfigurationCount(), 36);
+  assert.equal(configurations.length, 39);
+  assert.equal(getDefaultBenchmarkConfigurationCount(), 39);
   assert.ok(configurations.some((entry) => entry.id === "codex:gpt-6-astra@ultra"));
   assert.ok(configurations.some((entry) => entry.id === "codex:gpt-5.6-sol@ultra"));
   assert.ok(configurations.some((entry) => entry.id === "claude:opus@max"));
@@ -33,12 +33,18 @@ test("explicit model and reasoning filters produce distinct visible configuratio
   );
 });
 
-test("Fable 5.1 keeps an immutable model identity and exactly three visible modes", () => {
+test("Fable 5.1 keeps an immutable model identity across five efforts and ultracode", () => {
   assert.deepEqual(
     resolveBenchmarkConfigurations({
       requestedModelArguments: ["fable-5.1"]
     }),
     [
+      ...["low", "medium", "high"].map((reasoning) => ({
+        id: `claude:claude-fable-5-1@${reasoning}`,
+        provider: "claude",
+        model: "claude-fable-5-1",
+        reasoning
+      })),
       {
         id: "claude:claude-fable-5-1@xhigh",
         provider: "claude",
@@ -70,8 +76,6 @@ test("Fable 5.1 keeps an immutable model identity and exactly three visible mode
     })[0].id,
     "claude:fable@xhigh"
   );
-  assert.throws(
-    () => resolveBenchmarkConfiguration("claude:claude-fable-5-1@high"),
-    (error) => error.code === "EVAL_BENCHMARK_REASONING_UNSUPPORTED"
-  );
+  assert.equal(resolveBenchmarkConfiguration("claude:claude-fable-5-1@high").reasoning, "high");
+  assert.equal(resolveBenchmarkConfiguration("claude:claude-opus-5@low").model, "claude-opus-5");
 });

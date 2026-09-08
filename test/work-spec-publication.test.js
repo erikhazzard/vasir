@@ -191,17 +191,22 @@ test("canonical publication appends an independent workflow family without chang
     return fs.readFileSync(filePath, encoding);
   };
   const built = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO, readFileSyncImplementation });
-  const { aiWorkflows, overall, ...engineering } = built.projection;
+  const { aiWorkflows, overall, games: ignoredGames, writing: ignoredWriting, ...engineering } = built.projection;
+  const { games: ignoredPreviousGames, writing: ignoredPreviousWriting, ...previousEngineering } = previous.projection;
   const { aiWorkflows: workflowResponses, ...engineeringResponses } = built.responseBundle;
-  assert.deepEqual({ ...engineering, schemaVersion: 2 }, previous.projection);
+  assert.deepEqual({ ...engineering, schemaVersion: 2 }, { ...previousEngineering, schemaVersion: 2 });
   assert.deepEqual({ ...engineeringResponses, schemaVersion: 2 }, previous.responseBundle);
   assert.equal(aiWorkflows.counts.settings, 1);
   assert.equal(overall.counts.settings, 1);
   assert.equal(overall.coverage.totalSettings, 36);
   assert.equal(workflowResponses.counts.judgments, 4);
-  assert.equal(built.counts.benchmarks, 4);
-  assert.equal(built.counts.responses, 218);
-  assert.equal(built.counts.settings, 36, "shared configurations are not double counted across families");
+  assert.equal(engineering.counts.benchmarks + aiWorkflows.counts.benchmarks, 4, "additive families cannot change the historical Engineering/workflow task count");
+  assert.equal(engineering.counts.responses + aiWorkflows.counts.responses, 218, "Writing does not change retained Engineering/workflow responses");
+  assert.equal(built.counts.responses, 218 + (built.writing?.coverage.responseCount ?? 0));
+  assert.equal(new Set([...engineering.settings, ...aiWorkflows.settings].map(setting => setting.configurationId)).size, 36);
+  assert.equal(built.counts.settings, new Set([
+    ...engineering.settings, ...aiWorkflows.settings, ...(built.writing?.settings ?? [])
+  ].map(setting => setting.configurationId)).size, "shared configurations are not double counted across families");
   assert.ok(built.routes.familyFragments.includes("/#capabilities/ai-workflows"));
   assert.ok(built.routes.reportFragments.includes("/benchmark-report.html#work-spec-chat"));
   validateBenchmarkPublicationProjection(built.projection);

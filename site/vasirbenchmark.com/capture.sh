@@ -8,7 +8,7 @@ status=0
 midwidth_audit_dir="$(mktemp -d "${TMPDIR:-/tmp}/vasirbenchmark-midwidth.XXXXXX")"
 
 cleanup() {
-  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/engineering.png" "$midwidth_audit_dir/report.png" "$midwidth_audit_dir/workflows.png" "$midwidth_audit_dir/workflow-report.png"
+  rm -f "$midwidth_audit_dir/main.png" "$midwidth_audit_dir/engineering.png" "$midwidth_audit_dir/report.png" "$midwidth_audit_dir/workflows.png" "$midwidth_audit_dir/workflow-report.png" "$midwidth_audit_dir/game-models.png" "$midwidth_audit_dir/game-benchmarks.png" "$midwidth_audit_dir/game-efficiency.png"
   rmdir "$midwidth_audit_dir" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -59,9 +59,28 @@ if [[ "$has_workflows" == "yes" ]]; then
   node "$design_dir/capture.mjs" "$report_page" "$midwidth_audit_dir/workflow-report.png" 820 1000 workflow-report || status=1
 fi
 
+has_games="$(node --input-type=module - "$design_dir/data.js" <<'NODE'
+import fs from 'node:fs';
+import vm from 'node:vm';
+const context = { window: {} };
+vm.runInNewContext(fs.readFileSync(process.argv[2], 'utf8'), context);
+process.stdout.write(context.window.VASIR_DATA?.games ? 'yes' : 'no');
+NODE
+)"
+
+if [[ "$has_games" == "yes" ]]; then
+  for game_view in models benchmarks efficiency; do
+    game_target="game-$game_view"
+    if [[ "$game_view" == "models" ]]; then game_target="games"; fi
+    node "$design_dir/capture.mjs" "$page" "$design_dir/desktop-game-$game_view.png" 1440 1000 "$game_target" || status=1
+    node "$design_dir/capture.mjs" "$page" "$design_dir/mobile-game-$game_view.png" 390 844 "$game_target" || status=1
+    node "$design_dir/capture.mjs" "$page" "$midwidth_audit_dir/game-$game_view.png" 820 1000 "$game_target" || status=1
+  done
+fi
+
 if [[ $status -ne 0 ]]; then
   echo "Canonical real-data capture completed with QA failures." >&2
   exit "$status"
 fi
 
-echo "Canonical VasirBench capture and QA passed at desktop, mobile, and 820px for Engineering and every selected AI Workflows view."
+echo "Canonical VasirBench capture and QA passed at desktop, mobile, and 820px for Engineering and every selected AI Workflows and Games view."

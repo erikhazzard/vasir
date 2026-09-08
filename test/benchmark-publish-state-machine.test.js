@@ -55,6 +55,12 @@ function createPublicationRepoFixture() {
   const siteRoot = path.join(temporaryRoot, "site", "vasirbenchmark.com");
   fs.mkdirSync(path.dirname(siteRoot), { recursive: true });
   fs.cpSync(sourceSiteRoot, siteRoot, { recursive: true });
+  // This historical fixture omits Writing sources, so its navigation must reflect that selection.
+  const gamesHtmlPath = path.join(siteRoot, "games.html");
+  fs.writeFileSync(gamesHtmlPath, fs.readFileSync(gamesHtmlPath, "utf8").replace(
+    '<a class="game-capabilities__link" href="./index.html#capabilities/writing/storytelling">Writing</a>',
+    '<span class="game-capabilities__unavailable">Writing <small>Coming soon</small></span>'
+  ), "utf8");
   createBenchmarkFixtureRoot(temporaryRoot);
   fs.mkdirSync(path.join(temporaryRoot, ".agents"), { recursive: true });
   fs.symlinkSync(path.join(REPO_ROOT, ".agents", "vasir-evals"), path.join(temporaryRoot, ".agents", "vasir-evals"), "dir");
@@ -65,9 +71,11 @@ function createPublicationRepoFixture() {
   const lockPath = path.join(siteRoot, "template-lock.json");
   const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
   const acceptedPaths = [
-    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js"].includes(filePath)),
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js"].includes(filePath)),
     "capture.mjs",
-    "capture.sh"
+    "capture.sh",
+    "games-browsercheck.mjs",
+    "writing-browsercheck.mjs"
   ];
   lock.files = acceptedPaths.map((relativePath) => {
     const contents = fs.readFileSync(path.join(siteRoot, relativePath));
@@ -269,7 +277,7 @@ function createAwsPublicationFake() {
       if (args[1] === "create-invalidation") {
         assert.equal(optionValue(args, "--distribution-id"), "E2VASIRBENCH");
         const pathsIndex = args.indexOf("--paths");
-        const paths = args.slice(pathsIndex + 1, pathsIndex + 4);
+        const paths = args.slice(pathsIndex + 1).filter(value => value.startsWith("/"));
         invalidationCalls.push({ operation: "create", paths });
         return success({ Invalidation: { Id: `I${invalidationCalls.length}`, Status: "InProgress" } });
       }
@@ -303,6 +311,8 @@ function createAwsPublicationFake() {
     let key;
     if (parsedUrl.pathname === "/" || parsedUrl.pathname === "/index.html") {
       key = `releases/${stack.Parameters.find(({ ParameterKey }) => ParameterKey === "ActiveReleaseId").ParameterValue}/index.html`;
+    } else if (parsedUrl.pathname === "/games.html") {
+      key = `releases/${stack.Parameters.find(({ ParameterKey }) => ParameterKey === "ActiveReleaseId").ParameterValue}/games.html`;
     } else if (parsedUrl.pathname === "/benchmark-report.html") {
       key = `releases/${stack.Parameters.find(({ ParameterKey }) => ParameterKey === "ActiveReleaseId").ParameterValue}/benchmark-report.html`;
     } else {
@@ -419,9 +429,9 @@ test("first publication and an identical repeat reuse one immutable release thro
     }
   }
   assert.deepEqual(aws.invalidationCalls, [
-    { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html"] },
+    { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html", "/games.html"] },
     { operation: "wait", id: "I1", distributionId: "E2VASIRBENCH" },
-    { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html"] },
+    { operation: "create", paths: ["/", "/index.html", "/benchmark-report.html", "/games.html"] },
     { operation: "wait", id: "I3", distributionId: "E2VASIRBENCH" }
   ]);
 });

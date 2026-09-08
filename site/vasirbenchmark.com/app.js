@@ -1,19 +1,52 @@
-(function () {
+(async function () {
   'use strict';
 
   const rootData = window.VASIR_DATA;
+  const runtimeBase = document.currentScript?.src || window.location.href;
+  const initialFragment = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+  const writingSummary = rootData?.writing;
+  const hasWriting = Boolean(writingSummary?.coverage?.caseCount && writingSummary?.benchmarkId);
+  const writingInProgress = hasWriting && (writingSummary.coverage.judgmentCount < writingSummary.coverage.expectedJudgmentCount || writingSummary.coverage.completedSettingCount < writingSummary.coverage.settingCount);
+  let writingData = window.VASIR_WRITING;
+  if (hasWriting && initialFragment.split('/')[1] === 'writing' && !writingData) {
+    try {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = new URL('./writing-data.js', runtimeBase).href;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.append(script);
+      });
+      writingData = window.VASIR_WRITING;
+      if (!writingData) throw new Error('Writing data unavailable');
+    } catch {
+      document.querySelector('#capability-view').innerHTML = '<section class="development-unavailable" role="alert"><p class="ui-eyebrow">Writing data unavailable</p><h2>RESULTS COULD NOT BE LOADED</h2><p>Reload to try again, or <a href="./index.html">return to the benchmark index</a>.</p></section>';
+      return;
+    }
+  }
+  const gameBenchmarks = (rootData?.games?.benchmarks ?? (rootData?.games ? [rootData.games] : [])).filter(report => report?.benchmark?.id && Array.isArray(report.runs)).map(report => {
+    const reference = report.reference;
+    if (!reference || report.runs.some(run => run.id === reference.id)) return report;
+    const configuration = reference.configuration || {id:'codex:gpt-6-astra@ultra',label:'GPT-6 Astra',reasoning:'ultra'};
+    return {...report, configurations:[...report.configurations.filter(item => item.id !== configuration.id), {...configuration,comparison:{controlled:false,reason:reference.provenance}}], runs:[...report.runs,{...reference,configurationId:configuration.id,conditionId:'vasir'}]};
+  });
+  const gameRuns = gameBenchmarks.flatMap(report => report.runs);
+  const hasGameEffort = gameRuns.some(run => Number.isFinite(run.metrics?.durationMs) && run.metrics.durationMs > 0);
   const workflowData = rootData?.aiWorkflows;
   const overallData = rootData?.overall;
   const isWorkflowCategory = (categoryId) => Boolean(workflowData?.categories?.some((category) => category.id === categoryId));
-  const contextForCategory = (categoryId) => isWorkflowCategory(categoryId) ? 'workflows' : categoryId === 'overall' && overallData ? 'overall' : 'engineering';
-  const initialFragment = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+  const contextForCategory = (categoryId) => categoryId === 'writing' && hasWriting ? 'writing' : isWorkflowCategory(categoryId) ? 'workflows' : categoryId === 'games' && gameBenchmarks.length ? 'games' : categoryId === 'overall' && overallData ? 'overall' : 'engineering';
   const requestedInitialCategory = initialFragment === 'vasir-effect' ? rootData?.categories?.[0]?.id : initialFragment.split('/')[1];
-  const initialCategory = isWorkflowCategory(requestedInitialCategory) || rootData?.categories?.some(category => category.id === requestedInitialCategory) ? requestedInitialCategory : 'overall';
+  const initialCategory = (requestedInitialCategory === 'writing' && hasWriting) || (requestedInitialCategory === 'games' && gameBenchmarks.length) || isWorkflowCategory(requestedInitialCategory) || rootData?.categories?.some(category => category.id === requestedInitialCategory) ? requestedInitialCategory : 'overall';
   const activeContext = contextForCategory(initialCategory);
+  const isGames = activeContext === 'games';
   const isWorkSpec = activeContext === 'workflows';
   const isOverall = activeContext === 'overall';
-  const data = isOverall ? overallData : isWorkSpec ? workflowData : rootData;
+  const isWriting = activeContext === 'writing';
+  const data = isWriting ? writingData : isOverall ? overallData : isWorkSpec ? workflowData : rootData;
   const TREATMENT_LABEL = data?.conditions?.find((condition) => condition.id === 'skill')?.label || 'Architecture skill';
+  const BASELINE_LABEL = data?.conditions?.find(condition => condition.id === 'baseline')?.label || 'Minimal baseline';
+  const BASELINE_SHORT = data?.conditions?.find(condition => condition.id === 'baseline')?.short || 'Minimal';
   const d3 = window.d3;
   const capabilityView = document.querySelector('#capability-view');
   const REQUIRED_CONDITION_IDS = ['baseline', 'skill'];
@@ -38,6 +71,7 @@
     || data.entries.length !== expectedEntryCount
     || data.benchmarkResults.length !== expectedResponseCount
     || (isOverall && (data.coverage?.eligibleSettings !== data.settings.length || !Array.isArray(data.coverage?.records) || data.coverage.records.length !== data.coverage.totalSettings))
+    || (isWriting && (!Array.isArray(data.cases) || !data.cases.length || !Array.isArray(data.caseResults) || !Array.isArray(data.caseSummaries)))
   ) {
     if (capabilityView) {
       capabilityView.innerHTML = `
@@ -78,13 +112,13 @@
     ? 'Equal-weight mean of frozen task rubric scores'
     : `${SCORE_EDITION_LABEL} score`;
   const QUALITY_DOMAIN = [SCORE_MINIMUM, SCORE_MAXIMUM];
-  const taskCoverageLabel = `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
-  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isOverall ? ' · Uncalibrated development' : ''}`;
+  const taskCoverageLabel = `${isWriting ? data.cases.length : TASK_COUNT} ${isWriting ? 'stories' : TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
+  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isOverall || isWriting ? ' · Uncalibrated development' : ''}`;
   const COMPOSITE_SCORE_SCALE = d3.scaleLinear()
     .domain(QUALITY_DOMAIN)
     .range([0, 100])
     .clamp(true);
-  const CAPABILITY_MODES = ['models', 'benchmarks', 'efficiency'];
+  const CAPABILITY_MODES = isGames && !hasGameEffort ? ['models', 'benchmarks'] : ['models', 'benchmarks', 'efficiency'];
   const COMBINED_CAPABILITY = {
     id: 'overall',
     name: 'Overall',
@@ -98,7 +132,7 @@
     ...category,
     color: categoryColors[category.id] || sourceCategories.find(source => source.id === category.id)?.color
   }));
-  const capabilityFields = [COMBINED_CAPABILITY, ...portfolioCategories.filter(category => category.status === 'measured')];
+  const capabilityFields = [COMBINED_CAPABILITY, ...portfolioCategories.filter(category => category.status === 'measured' || (category.id === 'games' && gameBenchmarks.length) || (category.id === 'writing' && hasWriting))];
   const selectorFields = [COMBINED_CAPABILITY, ...portfolioCategories];
   const capabilityIndexMedia = window.matchMedia('(min-width: 67.501rem)');
   const combinedScoreGuideMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 67.501rem)');
@@ -174,7 +208,8 @@
   };
   const suiteDescriptions = {
     'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.',
-    'Work Specification': 'Plans that preserve the requested user value and give an implementer a grounded route to delivering it.'
+    'Work Specification': 'Plans that preserve the requested user value and give an implementer a grounded route to delivering it.',
+    Storytelling: 'Core-idea analysis across a fixed story corpus. Each story is a case within this benchmark.'
   };
 
   const elements = {
@@ -197,9 +232,10 @@
       return { category: COMBINED_CAPABILITY.id, mode: 'models', canonical: false };
     }
     if (route.startsWith('capabilities/')) {
-      const [, category, requestedMode] = route.split('/');
+      const [, category, scopeOrMode, subsectionMode] = route.split('/');
+      const requestedMode = category === 'writing' && scopeOrMode === 'storytelling' ? subsectionMode : scopeOrMode;
       const categoryIsValid = categoryById.has(category);
-      const mode = requestedMode === 'benchmarks' || requestedMode === 'efficiency'
+      const mode = CAPABILITY_MODES.includes(requestedMode)
         ? requestedMode
         : 'models';
       return {
@@ -226,7 +262,7 @@
   };
 
   const capabilityHash = () => (
-    `#capabilities/${state.capabilityCategory}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`
+    `#capabilities/${state.capabilityCategory}${state.capabilityCategory === 'writing' ? '/storytelling' : ''}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`
   );
 
   const escapeHtml = (value) => String(value ?? '')
@@ -270,7 +306,7 @@
     const ranks = new Map();
     entries.forEach((entry, index) => {
       const score = rankingScoreFor(entry, field);
-      const tied = (isWorkSpec || isOverall) && index > 0 && score === rankingScoreFor(entries[index - 1], field);
+      const tied = (isWorkSpec || isOverall || isWriting) && index > 0 && score === rankingScoreFor(entries[index - 1], field);
       ranks.set(entry.id, Number.isFinite(score) ? tied ? ranks.get(entries[index - 1].id) : index + 1 : null);
     });
     return ranks;
@@ -282,7 +318,7 @@
   };
 
   const deltaFor = (entry, field = 'overall') => {
-    if (isWorkSpec || isOverall) return entry.delta;
+    if (isWorkSpec || isOverall || isWriting) return entry.delta;
     const current = scoreFor(entry, field);
     const baseline = baselineScoreFor(entry, field);
     return Number.isFinite(current) && Number.isFinite(baseline)
@@ -436,8 +472,8 @@
     const value = Number(entry[key]);
     if (!Number.isFinite(baseline) || baseline <= 0 || !Number.isFinite(value) || value <= 0) return 'Not available';
     const difference = Math.round(((value / baseline) - 1) * 100);
-    if (difference === 0) return 'Minimal reference';
-    return `${difference > 0 ? '+' : '−'}${Math.abs(difference)}% vs Minimal`;
+    if (difference === 0) return `${BASELINE_SHORT} reference`;
+    return `${difference > 0 ? '+' : '−'}${Math.abs(difference)}% vs ${BASELINE_SHORT}`;
   };
 
   const normalizedQuality = (score) => {
@@ -471,7 +507,7 @@
         >
           ${conditionMarkup(candidate.condition, true)}
           <strong>${formatScore(scoreFor(candidate, field))}</strong>
-          <span>#${String(ranking.ranks.get(candidate.id)).padStart(2, '0')} · ${signed(deltaFor(candidate, field))} vs Minimal</span>
+          <span>#${String(ranking.ranks.get(candidate.id)).padStart(2, '0')} · ${signed(deltaFor(candidate, field))} vs ${escapeHtml(BASELINE_SHORT)}</span>
         </button>
       `;
     }).join('');
@@ -482,6 +518,9 @@
       ? data.benchmarks
       : data.benchmarks.filter((benchmark) => benchmark.category === categoryId)
   );
+  const benchmarkIsMeasured = benchmark => benchmark.evidenceKind === 'development' && (!isWriting || (
+    Number.isFinite(benchmarkSummaryById.get(benchmark.id)?.baseline) && Number.isFinite(benchmarkSummaryById.get(benchmark.id)?.treatment)
+  ));
 
   const combinedOutcomeSummary = () => {
     const fullEntries = rankedCondition(TREATMENT_CONDITION_ID, COMBINED_CAPABILITY.id).entries;
@@ -522,13 +561,49 @@
         ${portfolioCategories.map(category => `<div data-target-category-id="${escapeHtml(category.id)}" data-target-weight="${category.targetWeight}"><dt>${escapeHtml(category.name)}</dt><dd>${formatWeight(category.targetWeight)}</dd></div>`).join('')}
       </dl>
       <p>Current weights normalize the measured categories’ targets. Tasks share equal weight within each category; scores and resource means use the same weights. Both conditions require ${TASK_COUNT}/${TASK_COUNT} assessable tasks.</p>
+      ${rootData.games ? '<p>The <a href="#capabilities/games">Games pilot</a> is available separately and excluded from this index.</p>' : ''}
+      ${hasWriting ? '<p><a href="#capabilities/writing/storytelling">Writing / Storytelling</a> is available separately. Core-idea analysis is excluded from this index until comparable coverage and scoring are established.</p>' : ''}
     </details>
   `;
+
+  const writingSubsectionsMarkup = () => !isWriting ? '' : `
+    <nav class="writing-subsections" aria-label="Writing subsections">
+      ${(writingSummary.subsections || []).map(subsection => subsection.id === 'storytelling'
+        ? `<a class="writing-subsections__item is-selected" href="#capabilities/writing/${escapeHtml(subsection.id)}" aria-current="page" data-writing-subsection="${escapeHtml(subsection.id)}"><strong>${escapeHtml(subsection.title)}</strong><span>${escapeHtml(writingSummary.benchmarkTitle)} · ${writingInProgress ? 'IN PROGRESS' : subsection.status === 'measured' ? 'measured' : 'unscored'}</span></a>`
+        : `<span class="writing-subsections__item" aria-disabled="true" data-writing-subsection="${escapeHtml(subsection.id)}"><strong>${escapeHtml(subsection.title)}</strong><span>Unscored · future subsection</span></span>`
+      ).join('')}
+    </nav>
+  `;
+
+  const writingProgressMarkup = () => {
+    if (!isWriting) return '';
+    const coverage = data.coverage;
+    const failures = data.caseResults.filter(cell => ['error', 'unavailable'].includes(cell.status)).length;
+    return `<aside class="writing-progress" data-writing-progress aria-label="Writing benchmark progress">
+      <div class="writing-progress__heading"><strong class="writing-progress__status" data-writing-progress-status>${writingInProgress ? 'IN PROGRESS' : 'COMPLETE SNAPSHOT'}</strong><a class="writing-progress__link" data-writing-browse-answers href="${escapeHtml(data.benchmarkSummaries[0].detailHref)}">Browse answers &amp; reviews ↗</a></div>
+      <p class="writing-progress__counts"><span data-writing-progress-count="answers">${coverage.responseCount}/${coverage.expectedResponseCount} final answers</span><span data-writing-progress-count="reviews">${coverage.judgmentCount}/${coverage.expectedJudgmentCount} planned judge reviews</span><span data-writing-progress-count="panels">${coverage.scoredResponseCount}/${coverage.expectedResponseCount} complete ${JUDGE_COUNT}-judge answer panels</span></p>
+      <p data-writing-progress-disclosure>${writingInProgress ? 'Judging incomplete; available answers and reviews are published. ' : ''}Case scores require the full judge panel. Incomplete configurations are not ranked.${failures ? ` ${failures} failed generations are retained; planned totals include unavailable slots.` : ''}</p>
+    </aside>`;
+  };
+
+  const writingSelectionMarkup = () => {
+    if (!isWriting) return '';
+    const entry = selectedEntry();
+    return `<section class="writing-selection" data-writing-selected-setting="${escapeHtml(entry.settingId)}" aria-labelledby="writing-selection-title">
+      <header><div><p class="ui-eyebrow">Read the answers</p><h4 id="writing-selection-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4></div><p>${data.cases.length} story cases · ${escapeHtml(BASELINE_LABEL)} → ${escapeHtml(TREATMENT_LABEL)} · /${SCORE_MAXIMUM}</p></header>
+      <ul>${data.cases.map(story => {
+        const results = data.caseResults.filter(result => result.caseId === story.id && result.settingId === entry.settingId);
+        const baseline = results.find(result => result.condition === BASELINE_CONDITION_ID);
+        const treatment = results.find(result => result.condition === TREATMENT_CONDITION_ID);
+        return `<li><a data-writing-case-link="${escapeHtml(story.id)}" href="./benchmark-report.html?setting=${encodeURIComponent(entry.settingId)}#${encodeURIComponent(story.benchmarkId)}/${encodeURIComponent(story.id)}"><strong>${escapeHtml(story.title)}</strong><span>${formatScore(baseline?.score)} → ${formatScore(treatment?.score)} <i aria-hidden="true">↗</i></span></a></li>`;
+      }).join('')}</ul>
+    </section>`;
+  };
 
   const capabilityHeaderMarkup = (category) => {
     const benchmarks = categoryBenchmarks(category.id);
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
-    const measuredCount = benchmarks.filter((benchmark) => benchmark.evidenceKind === 'development').length;
+    const measuredCount = benchmarks.filter(benchmarkIsMeasured).length;
     const fullWinner = rankedCondition(TREATMENT_CONDITION_ID, category.id).entries[0];
     const baselineWinner = rankedCondition(BASELINE_CONDITION_ID, category.id).entries[0];
     const showingBenchmarks = state.capabilityMode === 'benchmarks';
@@ -538,19 +613,21 @@
     const identityLabel = `Capabilities / ${category.name} / ${showingBenchmarks ? 'Benchmark tests' : showingEfficiency ? 'Efficiency' : modelViewLabel}`;
     const modelSummary = category.isCombined
       ? isOverall ? `${SETTING_COUNT} ranked settings · ${data.coverage.incompleteSettings} coverage gaps` : `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
+      : isWriting ? `${SETTING_COUNT} model settings · ${data.cases.length} story cases · core-idea analysis /${SCORE_MAXIMUM}`
       : `${SETTING_COUNT} matched settings · ${isWorkSpec ? 'one authored chat task · spec quality' : SCORE_EDITION_LABEL + ' rubric score'} /${SCORE_MAXIMUM}`;
     return `
-      <header class="capability-canvas__header${isWorkSpec ? ' capability-canvas__header--work-spec' : ''}${isOverall ? ' capability-canvas__header--overall' : ''}">
+      <header class="capability-canvas__header${isWorkSpec || isWriting ? ' capability-canvas__header--work-spec' : ''}${isOverall ? ' capability-canvas__header--overall' : ''}">
         <div class="capability-canvas__identity${isOverall ? ' capability-canvas__identity--overall' : ''}">
           <p class="ui-eyebrow">${escapeHtml(identityLabel)}</p>
-          <p class="capability-canvas__status${isWorkSpec || isOverall ? ' capability-canvas__status--work-spec' : ''}"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
+          <p class="capability-canvas__status${isWorkSpec || isOverall || isWriting ? ' capability-canvas__status--work-spec' : ''}"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
           <h3 id="capability-question" tabindex="-1">${escapeHtml(category.name)}</h3>
           <p${isOverall ? ' class="overall-summary"' : ''}>${showingBenchmarks
             ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests`
             : showingEfficiency
               ? `${ENTRY_COUNT} setting × condition results · fixed ${escapeHtml(category.name)} rubric score × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
-              : escapeHtml(modelSummary)}${isOverall ? `<span class="overall-summary__coverage" data-portfolio-coverage>${data.categories.length}/${portfolioCategories.length} categories measured · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered</span><span class="overall-method" data-overall-method>Current weights: ${data.categories.map(category => `${escapeHtml(category.name)} ${formatWeight(category.weight)}`).join(' · ')}</span>` : ''}</p>
+              : escapeHtml(modelSummary)}${isOverall ? `<span class="overall-summary__coverage" data-portfolio-coverage>${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered</span><span class="overall-method" data-overall-method>Current weights: ${data.categories.map(category => `${escapeHtml(category.name)} ${formatWeight(category.weight)}`).join(' · ')}</span>` : ''}</p>
           ${isOverall ? overallWeightsMarkup() : ''}
+          ${isWriting ? `<p class="writing-coverage" data-writing-coverage>Storytelling / ${escapeHtml(writingSummary.benchmarkTitle)} · ${data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score) && Number.isFinite(baselineBySetting.get(entry.settingId)?.score)).length}/${SETTING_COUNT} fully scored pairs across all ${data.cases.length} stories. Excluded from Overall.</p>` : ''}
         </div>
         <dl class="capability-canvas__readings${outcome ? ' capability-canvas__readings--combined' : ''}" aria-label="${escapeHtml(category.name)} summary">
           ${showingBenchmarks ? `
@@ -575,7 +652,7 @@
               <dt>Improved settings</dt>
               <dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd>
             </div>
-          ` : isWorkSpec ? `
+          ` : isWorkSpec || isWriting ? `
             ${workflowLeadersMarkup(TREATMENT_CONDITION_ID, category.id)}
             ${workflowLeadersMarkup(BASELINE_CONDITION_ID, category.id)}
           ` : `
@@ -584,7 +661,7 @@
               <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(fullWinner.readinessLabel)}</small>` : ''}</dd>
             </div>
             <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${formatScore(scoreFor(baselineWinner, category.id))}">
-              <dt>Minimal baseline leader /${SCORE_MAXIMUM}</dt>
+              <dt>${escapeHtml(BASELINE_LABEL)} leader /${SCORE_MAXIMUM}</dt>
               <dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(baselineWinner.readinessLabel)}</small>` : ''}</dd>
             </div>
           `}
@@ -598,6 +675,8 @@
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
     return `
       ${capabilityHeaderMarkup(category)}
+      ${writingSubsectionsMarkup()}
+      ${writingProgressMarkup()}
       <nav class="capability-mode" aria-label="Choose ${escapeHtml(category.name)} view">
           <span class="capability-mode__label" aria-hidden="true">View</span>
           <div class="capability-mode__tabs" role="tablist" aria-label="Choose ${escapeHtml(category.name)} evidence view">
@@ -610,7 +689,7 @@
               aria-selected="${state.capabilityMode === 'models'}"
               aria-controls="capability-ranking"
               tabindex="${state.capabilityMode === 'models' ? '0' : '-1'}"
-            ><strong>Leaderboard</strong><span>${SETTING_COUNT} ${isWorkSpec ? 'matched' : 'ranked'} settings</span></button>
+            ><strong>Leaderboard</strong><span>${SETTING_COUNT} ${isWorkSpec || isWriting ? 'matched' : 'ranked'} settings</span></button>
             <button
               class="capability-mode__tab${state.capabilityMode === 'benchmarks' ? ' is-selected' : ''}"
               id="capability-mode-benchmarks"
@@ -691,7 +770,7 @@
           <small>${escapeHtml(benchmark.description)}</small>
         </span>
         <span class="benchmark-ledger__comparison">
-          <span><small>Minimal field mean</small><strong>${formatScore(summary.baseline)}</strong></span>
+          <span><small>${escapeHtml(BASELINE_SHORT)} field mean</small><strong>${formatScore(summary.baseline)}</strong></span>
           <i aria-hidden="true">→</i>
           <span><small title="${escapeHtml(summary.treatmentLabel)}">Skill field mean</small><strong>${formatScore(summary.treatment)}</strong></span>
           <b>${signed(summary.delta)}<small> pts</small></b>
@@ -724,7 +803,7 @@
         <div class="benchmark-ledger__tracks">
           ${suiteNames.map((suite, suiteIndex) => {
             const suiteBenchmarks = benchmarks.filter((benchmark) => benchmark.suite === suite);
-            const suiteMeasured = suiteBenchmarks.filter((benchmark) => benchmark.evidenceKind === 'development').length;
+            const suiteMeasured = suiteBenchmarks.filter(benchmarkIsMeasured).length;
             return `
               <section class="benchmark-ledger__track" aria-labelledby="benchmark-track-${category.id}-${suiteIndex}">
                 <header class="benchmark-ledger__track-header">
@@ -887,6 +966,92 @@
     `;
   };
 
+  const gameScore = run => Number.isFinite(run?.score?.value) ? run.score.value : null;
+  const gameReportHref = (report, configurationId, fragment = '') => `./games.html?benchmark=${encodeURIComponent(report.benchmark.id)}${configurationId ? `&model=${encodeURIComponent(configurationId)}` : ''}${fragment ? `#${fragment}` : ''}`;
+  const gameStatus = run => run?.status === 'timeout' ? 'Generation limit reached' : run?.status === 'complete' ? 'Generation completed' : run?.status === 'reference' ? 'Existing artifact' : 'Generation incomplete';
+  const gameDisplayScore = run => gameScore(run) ?? (run?.judgments?.length === 1 && Number.isFinite(run.judgments[0].score) ? run.judgments[0].score : null);
+  const gameIndividual = run => gameScore(run) === null && gameDisplayScore(run) !== null;
+  const gameEligible = run => gameScore(run) !== null && run.score.eligible === true;
+  const gameRankReason = run => gameScore(run) === null ? 'Rank awaits two complete reviews' : run.score.eligible === false ? 'Diagnostic score: a required functional gate failed' : 'No rank: functional verification is incomplete';
+  const gameSettingCount = new Set(gameRuns.map(run => run.configurationId)).size;
+  const gameOrder = report => [...report.configurations].sort((a,b) => {
+    const run = configuration => report.runs.find(item => item.configurationId === configuration.id && item.conditionId === report.conditions[1].id);
+    return Number(gameEligible(run(b))) - Number(gameEligible(run(a))) || (gameDisplayScore(run(b)) ?? -1) - (gameDisplayScore(run(a)) ?? -1);
+  });
+  const gameRank = (report,run) => !gameEligible(run) ? null : 1 + report.runs.filter(item => item.conditionId === run.conditionId && gameEligible(item) && gameScore(item) > gameScore(run)).length;
+  const gameSelections = new Map(gameBenchmarks.map(report => [report.benchmark.id, report.runs.find(run => run.configurationId === gameOrder(report)[0]?.id && run.conditionId === report.conditions[1].id)?.id || report.runs[0]?.id]));
+  const gameSelectedRun = report => report.runs.find(run => run.id === gameSelections.get(report.benchmark.id)) || report.runs[0];
+  const gameScoreAttributes = run => `data-game-run-id="${escapeHtml(run?.id || '')}" data-game-score="${gameScore(run) ?? ''}" data-game-display-score="${gameDisplayScore(run) ?? ''}" data-game-individual="${gameIndividual(run)}"`;
+  const gameScoreText = run => `${formatScore(gameDisplayScore(run))}${gameIndividual(run) ? '†' : ''}`;
+  const gameReadingMarkup = (report,run,condition,visual) => {
+    const rank = gameRank(report,run);
+    return `<span class="capability-rank-row__reading capability-rank-row__reading--${visual}" ${gameScoreAttributes(run)} data-game-rank="${rank ?? ''}"><span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>${escapeHtml(condition === 'With Vasir' ? 'Vasir' : condition)}</span></span><strong>${gameScoreText(run)}</strong><small title="${rank === null ? gameRankReason(run) : 'Rank within this condition'}">${rank !== null ? '#'+rank : gameScore(run) !== null ? run.score.eligible === false ? 'Diag.' : 'No rank' : gameIndividual(run) ? '1 judge' : 'Pending'}</small></span>`;
+  };
+  const gamePairDelta = runs => runs.length === 2 && runs.every(run => gameScore(run) !== null) ? gameScore(runs[1]) - gameScore(runs[0]) : null;
+  const gameRowMarkup = (report, configuration) => {
+    const runs = report.conditions.map(condition => report.runs.find(run => run.configurationId === configuration.id && run.conditionId === condition.id));
+    const values = runs.map(gameDisplayScore);
+    const delta = gamePairDelta(runs);
+    const rank = gameRank(report,runs[1]);
+    const selected = gameSelectedRun(report)?.configurationId === configuration.id;
+    const both = values.every(Number.isFinite);
+    const deltaTitle = delta === null ? 'Score difference awaits two complete review panels' : configuration.comparison?.controlled === false ? `${configuration.comparison.reason} Descriptive score difference, not a controlled skill-effect estimate.` : 'Difference in artifact quality scores';
+    return `<li class="capability-rank-row${selected ? ' is-selected' : ''}${delta < 0 ? ' is-regression' : ''}" data-game-configuration="${escapeHtml(configuration.id)}" data-game-rank="${rank ?? ''}" data-game-delta="${delta ?? ''}" style="--baseline-score:${values[0] ?? 0}%;--full-score:${values[1] ?? 0}%;--connector-start:${both ? Math.min(...values) : 0}%;--connector-width:${both ? Math.max(Math.abs(values[1] - values[0]), 0.25) : 0}%">
+      <button class="capability-rank-row__select" type="button" data-game-select="${escapeHtml(configuration.id)}" data-game-report-id="${escapeHtml(report.benchmark.id)}" data-game-selection-kind="configuration" aria-pressed="${selected}" aria-label="Select ${escapeHtml(configuration.label)}, ${escapeHtml(configuration.reasoning)}. ${report.conditions.map((condition,index) => `${escapeHtml(condition.label)} ${gameScoreText(runs[index])}${gameIndividual(runs[index]) ? ', individual review' : !gameEligible(runs[index]) ? ', '+gameRankReason(runs[index]) : ''}`).join('; ')}.">
+        <span class="capability-rank-row__identity"><span class="capability-rank-row__position" title="${rank === null ? gameRankReason(runs[1]) : 'With-Vasir artifact quality rank'}">${rank === null ? '—' : '#'+String(rank).padStart(2,'0')}</span><span class="capability-rank-row__model"><strong>${escapeHtml(configuration.label)}</strong><small>${escapeHtml(configuration.reasoning)}</small></span></span>
+        <span class="capability-rank-row__track" role="img" aria-label="Bare circle and with-Vasir square on a shared 0–100 scale"><span class="capability-rank-row__axis" aria-hidden="true"></span>${both ? '<span class="capability-rank-row__connector" aria-hidden="true"></span>' : ''}${Number.isFinite(values[0]) ? '<span class="capability-rank-row__marker capability-rank-row__marker--baseline" aria-hidden="true"></span>' : ''}${Number.isFinite(values[1]) ? '<span class="capability-rank-row__marker capability-rank-row__marker--full" aria-hidden="true"></span>' : ''}</span>
+        ${runs.map((run,index) => gameReadingMarkup(report,run,report.conditions[index].label,index ? 'full':'baseline')).join('')}
+        <strong class="capability-rank-row__delta" title="${escapeHtml(deltaTitle)}">${signed(delta)}<small>pts</small></strong>
+      </button></li>`;
+  };
+  const gameHeaderMarkup = () => {
+    const report = gameBenchmarks.length === 1 ? gameBenchmarks[0] : null;
+    const readings = report ? [...report.conditions].reverse().map((condition,index) => {
+      const leader = report.runs.filter(run => run.conditionId === condition.id && gameEligible(run)).sort((a,b) => gameScore(b)-gameScore(a))[0];
+      const configuration = report.configurations.find(item => item.id === leader?.configurationId);
+      return `<div class="capability-canvas__reading capability-canvas__reading--${index ? 'baseline':'full'}" data-game-leader-condition="${escapeHtml(condition.id)}" data-game-leader-run="${escapeHtml(leader?.id || '')}" data-game-leader-score="${gameScore(leader) ?? ''}"><dt>${escapeHtml(condition.label)} leader /100</dt><dd>${formatScore(gameScore(leader))}<small>${configuration ? `${escapeHtml(configuration.label)} · ${escapeHtml(configuration.reasoning)}` : 'No eligible complete panel'}</small></dd></div>`;
+    }).join('') : `<div class="capability-canvas__reading capability-canvas__reading--measured"><dt>Benchmark tests</dt><dd>${gameBenchmarks.length}<small>published tasks</small></dd></div><div class="capability-canvas__reading capability-canvas__reading--audit"><dt>Complete review panels</dt><dd>${gameRuns.filter(run => gameScore(run) !== null).length}<small>of ${gameRuns.length} outputs</small></dd></div>`;
+    return `<header class="capability-canvas__header capability-canvas__header--games"><div class="capability-canvas__identity capability-canvas__identity--games"><p class="ui-eyebrow">Capabilities / Games / ${state.capabilityMode === 'benchmarks' ? 'Benchmark tests' : state.capabilityMode === 'efficiency' ? 'Efficiency' : 'Leaderboard'}</p><p class="capability-canvas__status capability-canvas__status--work-spec"><strong>Games v1 pilot · Artifact quality · 2 judges</strong></p><h3 id="capability-question" tabindex="-1">Games</h3><p>${gameSettingCount} model settings · ${gameRuns.length} outputs · ${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'}</p></div><dl class="capability-canvas__readings" aria-label="Games summary">${readings}</dl></header>`;
+  };
+  const gameModeMarkup = () => `${gameHeaderMarkup()}<nav class="capability-mode" aria-label="Choose Games view"><span class="capability-mode__label" aria-hidden="true">View</span><div class="capability-mode__tabs" role="tablist" aria-label="Choose Games evidence view">${[
+    ['models', 'Leaderboard', `${gameSettingCount} model settings`, 'capability-ranking'],
+    ['benchmarks', 'Benchmark tests', `${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'test' : 'tests'}`, 'capability-benchmarks'],
+    ...(hasGameEffort ? [['efficiency', 'Efficiency', 'Ratings × generation time', 'capability-efficiency']] : [])
+  ].map(([id, label, note, panel]) => `<button class="capability-mode__tab${state.capabilityMode === id ? ' is-selected' : ''}" id="capability-mode-${id}" type="button" role="tab" data-capability-mode="${id}" aria-selected="${state.capabilityMode === id}" aria-controls="${panel}" tabindex="${state.capabilityMode === id ? '0' : '-1'}"><strong>${label}</strong><span>${note}</span></button>`).join('')}</div></nav>`;
+  const gameModelsMarkup = () => `<section class="capability-ranking" id="capability-ranking" role="tabpanel" aria-labelledby="capability-mode-models" ${state.capabilityMode === 'models' ? '' : 'hidden'}>${gameBenchmarks.map(report => {
+    const configuration = report.configurations.find(item => item.id === gameSelectedRun(report)?.configurationId);
+    return `<section data-game-benchmark-id="${escapeHtml(report.benchmark.id)}" aria-label="${escapeHtml(report.benchmark.title)} leaderboard"><header class="game-capability__task-header"><h4>${escapeHtml(report.benchmark.title)}</h4><a class="game-capability__report" data-game-selected-report href="${gameReportHref(report,configuration?.id,'game-comparison')}">Watch ${escapeHtml(configuration?.label || 'selected game')} →</a></header>
+      <div class="capability-ranking__axis" aria-hidden="true"><span>Model / reasoning</span><span class="capability-ranking__ticks"><span class="capability-ranking__scale-label">Rubric / 100</span><span class="capability-ranking__scale-values"><i>0</i><i>25</i><i>50</i><i>75</i><i>100</i></span></span>${report.conditions.map((condition,index) => `<span class="capability-ranking__condition-heading"><i class="capability-key__${index ? 'full':'baseline'}"></i>${escapeHtml(condition.label)}</span>`).join('')}<span>Score Δ</span></div>
+      <ol class="capability-ranking__rows" aria-label="Ranked by eligible complete with-Vasir artifact scores">${gameOrder(report).map(config => gameRowMarkup(report,config)).join('')}</ol>
+      <p class="game-capability__note">Ranks require complete reviews with passed functional gates; ties share rank. ${report.runs.some(gameIndividual) ? '† Individual review; combined panel incomplete. ' : ''}Score Δ compares artifact quality. <a href="${gameReportHref(report,null,'game-method')}">Methodology</a></p></section>`;
+  }).join('')}</section>`;
+  const gameBenchmarksMarkup = () => `<section class="benchmark-ledger" id="capability-benchmarks" role="tabpanel" aria-labelledby="capability-mode-benchmarks" ${state.capabilityMode === 'benchmarks' ? '' : 'hidden'}><h4 class="visually-hidden">Games benchmark tests</h4><div class="benchmark-ledger__tracks"><section class="benchmark-ledger__track"><header class="benchmark-ledger__track-header"><span>01 / TRACK</span><div><h4>Game creation</h4><p>Playable games from a single request. Inspect control, visual craft, action feedback and the actual output.</p></div><strong>${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'test' : 'tests'}</strong></header><div class="benchmark-ledger__rows">${gameBenchmarks.map((report, index) => {
+    const panels = report.runs.filter(run => gameScore(run) !== null).length;
+    return `<a class="benchmark-ledger__row benchmark-ledger__row--measured" href="${gameReportHref(report)}" data-benchmark-id="${escapeHtml(report.benchmark.id)}" data-game-report-link data-report-href="${gameReportHref(report)}"><span class="benchmark-ledger__identity"><span>${String(index + 1).padStart(2, '0')} / Games</span><strong>${escapeHtml(report.benchmark.title)}</strong><small>${escapeHtml(report.benchmark.prompt)}</small></span><span class="game-capability__benchmark-reading"><strong>${report.configurations.length}</strong><span>model configurations</span><strong>${report.runs.length}</strong><span>outputs</span></span><span class="benchmark-ledger__evidence"><strong>${panels}/${report.runs.length} complete review panels</strong><span>${report.runs.filter(run => run.status === 'complete').length} generations completed</span><span>${report.runs.filter(run => run.status === 'timeout').length} reached the time limit</span></span><span class="benchmark-ledger__action">Open benchmark report <span aria-hidden="true">→</span></span></a>`;
+  }).join('')}</div></section></div></section>`;
+  const gameEfficiencyMarkup = () => hasGameEffort ? `<section class="capability-efficiency" id="capability-efficiency" role="tabpanel" aria-labelledby="capability-mode-efficiency" ${state.capabilityMode === 'efficiency' ? '' : 'hidden'}>${gameBenchmarks.map(report => {
+    const current = gameSelectedRun(report);
+    const selected = report.runs.find(run => run.id === current?.id) || report.runs[0];
+    const configFor = run => report.configurations.find(config => config.id === run.configurationId);
+    const conditionFor = run => report.conditions.find(condition => condition.id === run.conditionId);
+    const maximum = Math.max(60, ...report.runs.map(run => (run.metrics?.durationMs || 0) / 60000));
+    const position = run => ({ x: 100 * (run.metrics.durationMs / 60000) / maximum, y: 100 - gameDisplayScore(run) });
+    const plotted = report.runs.filter(run => Number.isFinite(run.metrics?.durationMs) && run.metrics.durationMs > 0 && gameDisplayScore(run) !== null);
+    const ticks = [0, 25, 50, 75, 100];
+    const config = configFor(selected);
+    const condition = conditionFor(selected);
+    const selectedPosition = plotted.includes(selected) ? position(selected) : null;
+    return `<section data-game-efficiency-benchmark="${escapeHtml(report.benchmark.id)}"><header class="efficiency-controls"><div class="efficiency-controls__label"><p class="ui-eyebrow">Efficiency explorer</p><strong>${escapeHtml(report.benchmark.title)}</strong></div><label class="field-control field-control--wide"><span>Selected result</span><select data-game-efficiency-entry data-game-report-id="${escapeHtml(report.benchmark.id)}">${report.runs.map(run => `<option value="${escapeHtml(run.id)}" ${run.id === selected.id ? 'selected' : ''}>${escapeHtml(configFor(run)?.label)} · ${escapeHtml(configFor(run)?.reasoning)} · ${escapeHtml(conditionFor(run)?.label)}</option>`).join('')}</select></label><div class="efficiency-controls__label"><span>Resource axis</span><strong>Generation wall time</strong></div></header>
+      <div class="efficiency-story"><section class="efficiency-field"><header class="efficiency-field__heading"><div><p class="ui-eyebrow">Rubric score × generation time</p><h4>${plotted.length} observed game results</h4><p>${report.runs.some(gameIndividual) ? '† Individual review. ' : ''}Capped runs show elapsed time, not completion time.</p></div><div class="efficiency-legend" aria-label="Chart legend">${report.conditions.map((item,index) => `<span class="condition-label"><i class="condition-mark condition-mark--${index ? 'full' : 'baseline'}" aria-hidden="true"></i>${escapeHtml(item.label)}</span>`).join('')}</div></header>
+        <div class="efficiency-plane"><div class="efficiency-plane__plot"><span class="efficiency-plane__axis-label efficiency-plane__axis-label--y">Higher rubric score ↑ · fixed 0–100</span><div class="efficiency-plane__canvas" data-game-plot="${escapeHtml(report.benchmark.id)}" data-selected-id="${escapeHtml(selected.id)}"><svg class="efficiency-plane__grid" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${ticks.map(tick => `<line class="efficiency-plane__grid-line efficiency-plane__grid-line--x" x1="${tick}" y1="0" x2="${tick}" y2="100"></line><line class="efficiency-plane__grid-line efficiency-plane__grid-line--y" x1="0" y1="${tick}" x2="100" y2="${tick}"></line>`).join('')}${selectedPosition ? `<line class="efficiency-plane__selection-guide" x1="0" y1="${selectedPosition.y}" x2="${selectedPosition.x}" y2="${selectedPosition.y}"></line><line class="efficiency-plane__selection-guide" x1="${selectedPosition.x}" y1="${selectedPosition.y}" x2="${selectedPosition.x}" y2="100"></line>` : ''}</svg>
+        <div class="efficiency-plane__points" role="group" aria-label="Game results; arrow keys move between points">${plotted.map(run => {
+          const {x,y}=position(run); const visual=run.conditionId===report.conditions[0].id?'baseline':'full';
+          const label=`${configFor(run)?.label}, ${configFor(run)?.reasoning}, ${conditionFor(run)?.label}. ${gameScoreText(run)} /100${gameIndividual(run)?', individual review':!gameEligible(run)?', '+gameRankReason(run):''}. ${(run.metrics.durationMs/60000).toFixed(1)} minutes. ${gameStatus(run)}.`;
+          return `<button class="plot-point plot-point--${visual}${run.id === selected.id ? ' is-selected' : run.configurationId === selected.configurationId ? ' is-counterpart' : ''}" type="button" data-game-select="${escapeHtml(run.id)}" data-game-report-id="${escapeHtml(report.benchmark.id)}" data-game-selection-kind="run" data-game-effort-run="${escapeHtml(run.id)}" data-game-duration-ms="${run.metrics.durationMs}" data-game-status="${escapeHtml(run.status)}" ${gameScoreAttributes(run)} data-plot-x="${x}" data-plot-y="${y}" style="left:${x}%;top:${y}%" tabindex="${run.id === selected.id || (!selectedPosition && run.id === plotted[0]?.id) ? '0' : '-1'}" aria-pressed="${run.id === selected.id}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}"></button>`;
+        }).join('')}</div><div class="efficiency-plane__pointer-layer efficiency-plane__pointer-layer--games" data-game-pointer aria-hidden="true"></div><div class="efficiency-plane__y-ticks" aria-hidden="true">${ticks.map(tick=>`<span style="top:${100-tick}%">${tick}</span>`).join('')}</div><div class="efficiency-plane__x-ticks" aria-hidden="true">${ticks.map(tick=>`<span style="left:${tick}%">${(maximum*tick/100).toFixed(0)}m</span>`).join('')}</div></div><span class="efficiency-plane__axis-label efficiency-plane__axis-label--x">Generation wall time · minutes · linear scale</span></div><p class="efficiency-plane__reading">${report.runs.some(gameIndividual) ? '† One review. ' : ''}Only outputs with recorded generation time are plotted. ${plotted.length < report.runs.length ? `${report.runs.length-plotted.length} ${report.runs.length-plotted.length === 1 ? 'run lacks' : 'runs lack'} a rating or duration; inspect them in Selected result.` : ''}</p></div>
+      </section><aside class="efficiency-summary" data-game-selected-run="${escapeHtml(selected.id)}"><header class="selected-result-heading"><div><p class="ui-eyebrow">Selected configuration</p><h4>${escapeHtml(config?.label)} · ${escapeHtml(config?.reasoning)}</h4><span class="efficiency-summary__status">${escapeHtml(condition?.label)}</span></div><span class="efficiency-summary__score" ${gameScoreAttributes(selected)}><strong>${gameScoreText(selected)}</strong><small title="${gameScore(selected) !== null && !gameEligible(selected) ? gameRankReason(selected) : ''}">${gameIndividual(selected)?'Individual · 1 of 2 reviews':gameScore(selected)===null?'Review unavailable':!gameEligible(selected)?selected.score.eligible===false?'Diagnostic · 2 reviews':'Unverified · 2 reviews':'Combined · 2 reviews'}</small></span></header><dl class="efficiency-summary__resources"><div><dt>Wall time</dt><dd>${Number.isFinite(selected.metrics?.durationMs)?(selected.metrics.durationMs/60000).toFixed(1)+' min':'Unavailable'}</dd></div><div><dt>Generation</dt><dd>${selected.status==='timeout'?'Capped':selected.status==='complete'?'Completed':selected.status==='reference'?'Provided':'Incomplete'}</dd><span>${gameStatus(selected)}</span></div><div><dt>Combined score</dt><dd>${formatScore(gameScore(selected))}</dd><span>Out of 100</span></div></dl><a class="efficiency-summary__alternative" data-game-selected-report href="${gameReportHref(report,selected.configurationId,'game-comparison')}"><span class="ui-eyebrow">Inspect this output</span><span class="efficiency-summary__alternative-identity"><strong>Watch & play →</strong></span><span>Recording, playable game and full review evidence</span></a></aside></div></section>`;
+  }).join('')}</section>` : '';
+
   const capabilitySelectorMarkup = () => `
     <nav class="capability-selector" aria-label="Choose a capability">
       <header class="capability-selector__header">
@@ -899,6 +1064,28 @@
       </header>
       <div class="capability-selector__tabs" role="tablist" aria-label="Capability score fields" aria-orientation="${capabilityIndexMedia.matches ? 'vertical' : 'horizontal'}">
         ${selectorFields.map((category, categoryIndex) => {
+          if (category.id === 'games' && gameBenchmarks.length) {
+            const scores = gameBenchmarks.length === 1 ? gameRuns.filter(run => run.conditionId === 'vasir' && gameEligible(run)).map(run => run.score?.value).filter(Number.isFinite) : [];
+            const best = scores.length ? Math.max(...scores) : null;
+            const selected = category.id === state.capabilityCategory;
+            return `<button class="capability-selector__tab${selected ? ' is-selected' : ''}" id="capability-category-games" type="button" role="tab" aria-selected="${selected}" aria-controls="capability-field-panel" tabindex="${selected ? '0' : '-1'}" data-category-id="games" data-category-status="pilot" style="--category-color:${category.color}" aria-label="Games. ${gameBenchmarks.length} published benchmark${gameBenchmarks.length === 1 ? '' : 's'}. ${best === null ? 'Ratings available.' : `Best eligible with-Vasir panel ${formatScore(best)} of 100.`} Exploratory pilot, excluded from Overall.">
+              <span class="capability-selector__index" aria-hidden="true">${String(categoryIndex).padStart(2, '0')}</span>
+              <span class="capability-selector__name"><span class="capability-selector__long">Games</span><span class="capability-selector__short">Games</span></span>
+              <span class="capability-selector__state">${selected ? 'Selected' : 'Pilot'}</span>
+              <strong${best === null ? ' class="game-capability__available"' : ''}>${best === null ? 'Ratings available' : `${formatScore(best)}<small>/100</small>`}</strong>
+            </button>`;
+          }
+          if (category.id === 'writing' && hasWriting) {
+            const selected = category.id === state.capabilityCategory;
+            const leader = writingSummary.leader;
+            const score = leader?.score;
+            return `<button class="capability-selector__tab${selected ? ' is-selected' : ''}" id="capability-category-writing" type="button" role="tab" aria-selected="${selected}" aria-controls="capability-field-panel" tabindex="${selected ? '0' : '-1'}" data-category-id="writing" data-category-status="${escapeHtml(writingSummary.status)}" style="--category-color:${category.color}" aria-label="Writing. ${writingInProgress ? 'In progress. ' : ''}Storytelling, ${escapeHtml(writingSummary.benchmarkTitle)}, ${writingSummary.coverage.caseCount} story cases. ${Number.isFinite(score) ? `Best ${escapeHtml(writingSummary.treatmentLabel)} result ${formatScore(score)} of ${SCORE_MAXIMUM}.` : 'No complete scored configuration.'} Excluded from Overall.">
+              <span class="capability-selector__index" aria-hidden="true">${String(categoryIndex).padStart(2, '0')}</span>
+              <span class="capability-selector__name"><span class="capability-selector__long">Writing</span><span class="capability-selector__short">Writing</span></span>
+              <span class="capability-selector__state" data-writing-category-progress>${writingInProgress ? 'IN PROGRESS' : selected ? 'Selected' : 'Storytelling'}</span>
+              <strong>${formatScore(score)}${Number.isFinite(score) ? `<small>/${SCORE_MAXIMUM}</small>` : ''}</strong>
+            </button>`;
+          }
           if (category.status === 'coming-soon') return `
             <button class="capability-selector__tab" id="capability-category-${escapeHtml(category.id)}" type="button" role="tab" data-category-id="${escapeHtml(category.id)}" data-category-status="coming-soon" disabled aria-disabled="true" aria-selected="false" tabindex="-1" style="--category-color:${category.color}" aria-label="${escapeHtml(category.name)}. Coming soon. No published score.">
               <span class="capability-selector__index" aria-hidden="true">${String(categoryIndex).padStart(2, '0')}</span>
@@ -920,7 +1107,7 @@
           const categoryTaskCount = categoryData.benchmarks.length;
           const selected = category.id === state.capabilityCategory;
           const accessibleFieldName = category.isCombined
-            ? `Overall ${categoryEdition} score uses declared category weights normalized to measured categories, with equal task weights within each category.`
+            ? `Overall ${categoryEdition} score uses declared category weights normalized to categories measured in this index, with equal task weights within each category.`
             : `${category.name} ${categoryEdition} score across ${categoryTaskCount} fixed ${categoryTaskCount === 1 ? 'task' : 'tasks'}.`;
           const winnerDescription = workflowLeaders.length > 1
             ? `${workflowLeaders.length} ${categoryTreatment} co-leaders: ${workflowLeaders.map(entry => `${entry.family}, ${entry.reasoning}`).join('; ')}, tied at ${formatScore(winner.score)} of ${SCORE_MAXIMUM}.`
@@ -962,7 +1149,7 @@
     const baselineRank = baselineRanking.ranks.get(baselineEntry.id);
     const fullRank = fullRanking.ranks.get(fullEntry.id);
     const comparable = Number.isFinite(fullScore) && Number.isFinite(baselineScore);
-    const delta = comparable ? (isWorkSpec ? fullEntry.delta : Math.round((fullScore - baselineScore) * 10) / 10) : null;
+    const delta = comparable ? (isWorkSpec || isWriting ? fullEntry.delta : Math.round((fullScore - baselineScore) * 10) / 10) : null;
     const start = Math.min(baselineScore, fullScore);
     const connectorWidth = Math.max(Math.abs(fullScore - baselineScore), 0.25);
     const selected = selectedEntry().settingId === fullEntry.settingId;
@@ -984,7 +1171,7 @@
           type="button"
           data-entry-id="${escapeHtml(fullEntry.id)}"
           aria-pressed="${selected}"
-          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank} of ${SETTING_COUNT}; Minimal baseline score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank} of ${SETTING_COUNT}; paired uplift ${signed(delta)} points. Rank is secondary and condition-specific."
+          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank || 'unscored'} of ${SETTING_COUNT}; ${escapeHtml(BASELINE_LABEL)} score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank || 'unscored'} of ${SETTING_COUNT}; paired uplift ${signed(delta)} points. Rank is secondary and condition-specific."
         >
           <span class="capability-rank-row__identity">
             <span class="capability-rank-row__position">${fullRank ? `#${String(fullRank).padStart(2, '0')}` : '—'}</span>
@@ -996,7 +1183,7 @@
           ${comparable ? `<span
             class="capability-rank-row__track"
             role="img"
-            aria-label="Minimal baseline circle at ${formatScore(baselineScore)}. ${escapeHtml(TREATMENT_LABEL)} square at ${formatScore(fullScore)}."
+            aria-label="${escapeHtml(BASELINE_LABEL)} circle at ${formatScore(baselineScore)}. ${escapeHtml(TREATMENT_LABEL)} square at ${formatScore(fullScore)}."
           >
             <span class="capability-rank-row__axis" aria-hidden="true"></span>
             <span class="capability-rank-row__connector" aria-hidden="true"></span>
@@ -1006,12 +1193,12 @@
           <span class="capability-rank-row__reading capability-rank-row__reading--baseline">
             <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Baseline</span></span>
             <strong>${formatScore(baselineScore)}</strong>
-            <small>#${baselineRank}</small>
+            <small>${baselineRank ? `#${baselineRank}` : 'Unscored'}</small>
           </span>
           <span class="capability-rank-row__reading capability-rank-row__reading--full">
             <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Skill</span></span>
             <strong>${formatScore(fullScore)}</strong>
-            <small>#${fullRank}</small>
+            <small>${fullRank ? `#${fullRank}` : 'Unscored'}</small>
           </span>
           <strong class="capability-rank-row__delta">${signed(delta)}<small>pts</small></strong>
         </button>
@@ -1172,10 +1359,11 @@
   const renderCapabilities = ({ animate = false, skipMotion = false } = {}) => {
     const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
     state.capabilityCategory = category.id;
-    const baselineRanking = rankedCondition(BASELINE_CONDITION_ID, category.id);
-    const fullRanking = rankedCondition(TREATMENT_CONDITION_ID, category.id);
+    const games = category.id === 'games';
+    const baselineRanking = games ? null : rankedCondition(BASELINE_CONDITION_ID, category.id);
+    const fullRanking = games ? null : rankedCondition(TREATMENT_CONDITION_ID, category.id);
 
-    const rankingContent = category.isCombined ? combinedLeaderboardMarkup() : `
+    const rankingContent = games ? gameModelsMarkup() : category.isCombined ? combinedLeaderboardMarkup() : `
         <section
           class="capability-ranking"
           id="capability-ranking"
@@ -1190,16 +1378,17 @@
               <span class="capability-ranking__scale-label">Rubric / ${SCORE_MAXIMUM}</span>
               <span class="capability-ranking__scale-values"><i>0</i><i>25</i><i>50</i><i>75</i><i>100</i></span>
             </span>
-            <span class="capability-ranking__condition-heading"><i class="capability-key__baseline"></i>Minimal baseline</span>
+            <span class="capability-ranking__condition-heading"><i class="capability-key__baseline"></i>${escapeHtml(BASELINE_LABEL)}</span>
             <span class="capability-ranking__condition-heading"><i class="capability-key__full"></i>${escapeHtml(TREATMENT_LABEL)}</span>
             <span>Uplift</span>
           </div>
           <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score. Ranks are secondary and condition-specific.">
             ${fullRanking.entries.map((entry) => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, category)).join('')}
           </ol>
+          ${writingSelectionMarkup()}
         </section>
       `;
-    const benchmarkContent = benchmarkLedgerMarkup(category, state.capabilityMode !== 'benchmarks');
+    const benchmarkContent = games ? gameBenchmarksMarkup() : benchmarkLedgerMarkup(category, state.capabilityMode !== 'benchmarks');
 
     elements.capabilityView.innerHTML = `
       <section class="capability-browser" style="--category-color:${category.color}">
@@ -1212,16 +1401,16 @@
           role="tabpanel"
           aria-labelledby="capability-category-${escapeHtml(category.id)}"
         >
-          ${capabilityModeMarkup(category)}
+          ${games ? gameModeMarkup() : capabilityModeMarkup(category)}
           ${rankingContent}
           ${benchmarkContent}
-          ${efficiencyPanelMarkup()}
+          ${games ? gameEfficiencyMarkup() : efficiencyPanelMarkup()}
         </div>
       </section>
     `;
 
     bindCombinedScoreGuide();
-    if (state.capabilityMode === 'efficiency') renderEfficiency();
+    if (!games && state.capabilityMode === 'efficiency') renderEfficiency();
 
     window.requestAnimationFrame(() => {
       if (animate) animateCapabilityHandoff(skipMotion);
@@ -1235,6 +1424,7 @@
   };
 
   const updateCapabilityMode = ({ animate = false, skipMotion = false } = {}) => {
+    if (state.capabilityCategory === 'games') { renderCapabilities({ animate, skipMotion }); return; }
     const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
     const header = elements.capabilityView.querySelector('.capability-canvas__header');
     if (header) header.outerHTML = capabilityHeaderMarkup(category);
@@ -1280,7 +1470,7 @@
     const delta = deltaFor(entry, field);
     const resourceDelta = resourceDeltaPercent(entry);
     const reference = entry.condition === BASELINE_CONDITION_ID
-      ? 'Minimal reference'
+      ? `${escapeHtml(BASELINE_SHORT)} reference`
       : `${signed(delta)} rubric points · ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}`;
     const rankLabel = `${conditionById.get(entry.condition).short} rank #${ranks.get(entry.id)} of ${SETTING_COUNT}`;
     return `
@@ -1304,7 +1494,7 @@
     const score = scoreFor(entry, field);
     const baseline = baselineBySetting.get(entry.settingId);
     const baselineScore = scoreFor(baseline, field);
-    const scoreDelta = isWorkSpec || isOverall ? entry.delta : Math.round((score - baselineScore) * 10) / 10;
+    const scoreDelta = isWorkSpec || isOverall || isWriting ? entry.delta : Math.round((score - baselineScore) * 10) / 10;
     const resourceDelta = resourceDeltaPercent(entry, metricKey);
     const comparisonScore = plotScoreFor(entry, field);
     const bestScore = Math.max(...data.entries.map((candidate) => plotScoreFor(candidate, field)));
@@ -1330,8 +1520,8 @@
     else if (isFrontier) finding = 'On the frontier';
 
     const treatmentSentence = entry.condition === BASELINE_CONDITION_ID
-      ? 'Minimal baseline is the matched reference for this model setting.'
-      : `${escapeHtml(TREATMENT_LABEL)} changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus Minimal baseline.`;
+      ? `${escapeHtml(BASELINE_LABEL)} is the matched reference for this model setting.`
+      : `${escapeHtml(TREATMENT_LABEL)} changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus ${escapeHtml(BASELINE_LABEL)}.`;
 
     let tradeoffSentence = `No result has both a higher ${SCORE_EDITION_LABEL} score and lower resource use.`;
     if (!isFrontier) {
@@ -1474,7 +1664,7 @@
             aria-hidden="true"
           >Efficient frontier</span>
           <div class="efficiency-plane__points" role="group" aria-label="${ENTRY_COUNT} model, reasoning, and condition results">
-            ${data.entries.filter(candidate => Number.isFinite(scoreFor(candidate, field))).map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
+            ${data.entries.filter(candidate => Number.isFinite(scoreFor(candidate, field)) && (!isWriting || (Number.isFinite(candidate[state.metric]) && candidate[state.metric] > 0))).map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
           </div>
           <div class="efficiency-plane__pointer-layer" aria-hidden="true"></div>
           <div
@@ -1490,7 +1680,7 @@
         </div>
         <span class="efficiency-plane__axis-label efficiency-plane__axis-label--x">${escapeHtml(metric.axis)}</span>
       </div>
-      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one matched result under Minimal baseline or ${escapeHtml(TREATMENT_LABEL)}. The line connects results that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} ${SCORE_EDITION_LABEL} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM}–${SCORE_MAXIMUM} scale · ${escapeHtml(taskCoverageLabel)}.</p>
+      <p class="efficiency-plane__reading" id="efficiency-plot-description">Each point is one matched result under ${escapeHtml(BASELINE_LABEL)} or ${escapeHtml(TREATMENT_LABEL)}. The line connects results that no other configuration beats on both ${escapeHtml(fieldConfig[field].label)} ${SCORE_EDITION_LABEL} score and ${escapeHtml(metric.label.toLowerCase())}. ${escapeHtml(metric.note)} · ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM}–${SCORE_MAXIMUM} scale · ${escapeHtml(taskCoverageLabel)}.</p>
     `;
   };
 
@@ -1533,8 +1723,8 @@
     `).join('');
     entrySelect.value = entry.id;
     resourceAxis.value = state.metric;
-    if (!Number.isFinite(scoreFor(entry, field))) {
-      efficiencyView.innerHTML = `<section class="efficiency-story"><h4>Efficiency is not assessable for this result</h4><p>The selected condition has no comparable panel total. Choose an assessable result above, or inspect this run’s available judgments in its <a href="${escapeHtml(data.benchmarkSummaries[0].detailHref)}">benchmark report</a>.</p></section>`;
+    if (!Number.isFinite(scoreFor(entry, field)) || (isWriting && !(Number.isFinite(entry[state.metric]) && entry[state.metric] > 0))) {
+      efficiencyView.innerHTML = `<section class="efficiency-story"><h4>Efficiency is not assessable for this result</h4><p>The selected condition needs a comparable panel total and recorded resource use. Choose an assessable result above, or inspect this run’s available judgments in its <a href="${escapeHtml(data.benchmarkSummaries[0].detailHref)}">benchmark report</a>.</p>${writingSelectionMarkup()}</section>`;
       return;
     }
     const frontier = efficientFrontier(field, state.metric);
@@ -1582,7 +1772,7 @@
               <small>${escapeHtml(fieldConfig[field].short)}</small>
             </span>
           </header>
-          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched Minimal baseline and ${escapeHtml(TREATMENT_LABEL)} results">
+          <div class="matched-triplet efficiency-summary__trajectory" aria-label="Matched ${escapeHtml(BASELINE_LABEL)} and ${escapeHtml(TREATMENT_LABEL)} results">
             ${efficiencyTrajectoryMarkup(entry, field, state.metric, ranking.ranks, decision.frontierIds)}
           </div>
           <dl class="efficiency-summary__resources">
@@ -1654,6 +1844,7 @@
           }).join('')}
           </div>
         </section>
+        ${writingSelectionMarkup()}
       </div>
     `;
 
@@ -1698,7 +1889,7 @@
     const canvas = layer.closest('.efficiency-plane__canvas');
     const points = canvas.querySelector('.efficiency-plane__points');
     const bounds = points.getBoundingClientRect();
-    return data.entries.reduce((best, entry) => {
+    return data.entries.filter(entry => !isWriting || (Number.isFinite(scoreFor(entry, state.capabilityCategory)) && Number.isFinite(entry[state.metric]) && entry[state.metric] > 0)).reduce((best, entry) => {
       const x = bounds.left + (resourcePosition(entry[state.metric]) / 100) * bounds.width;
       const y = bounds.top + ((100 - normalizedQuality(plotScoreFor(entry, state.capabilityCategory))) / 100) * bounds.height;
       const distance = Math.hypot(event.clientX - x, event.clientY - y);
@@ -1874,7 +2065,7 @@
   const selectCapabilityCategory = (categoryId, { focusSelector, writeHash = true, skipMotion = false } = {}) => {
     if (!categoryById.has(categoryId)) return;
     if (contextForCategory(categoryId) !== activeContext) {
-      window.location.hash = `capabilities/${categoryId}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`;
+      window.location.hash = `capabilities/${categoryId}${categoryId === 'writing' ? '/storytelling' : ''}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`;
       window.history.replaceState({ ...window.history.state, focusCapability: categoryId, focusCapabilitySelector: focusSelector, selectedEntryId: state.selectedId }, '');
       return;
     }
@@ -1901,6 +2092,30 @@
   };
 
   document.addEventListener('click', (event) => {
+    const gamePointer = event.target.closest('[data-game-pointer]');
+    if (gamePointer) {
+      const nearest = [...gamePointer.parentElement.querySelectorAll('[data-game-effort-run]')].map(point => {
+        const bounds = point.getBoundingClientRect();
+        return {point, distance:Math.hypot(bounds.left + bounds.width / 2 - event.clientX, bounds.top + bounds.height / 2 - event.clientY)};
+      }).sort((a,b) => a.distance - b.distance)[0];
+      if (nearest?.distance <= 28) nearest.point.click();
+      return;
+    }
+    const gameSelection = event.target.closest('[data-game-select]');
+    if (gameSelection) {
+      const report = gameBenchmarks.find(item => item.benchmark.id === gameSelection.dataset.gameReportId);
+      if (!report) return;
+      const id = gameSelection.dataset.gameSelect;
+      const run = gameSelection.dataset.gameSelectionKind === 'configuration'
+        ? report.runs.find(item => item.configurationId === id && item.conditionId === report.conditions[1]?.id) || report.runs.find(item => item.configurationId === id)
+        : report.runs.find(item => item.id === id);
+      if (!run) return;
+      gameSelections.set(report.benchmark.id, run.id);
+      const selector = `[data-game-report-id="${CSS.escape(report.benchmark.id)}"][data-game-select="${CSS.escape(id)}"]`;
+      renderCapabilities();
+      document.querySelector(selector)?.focus({ preventScroll: true });
+      return;
+    }
     const capabilitySegment = event.target.closest('.capability-composition__segment[data-category-id][data-entry-id]');
     if (capabilitySegment) {
       if (!entryById.has(capabilitySegment.dataset.entryId) || !categoryById.has(capabilitySegment.dataset.categoryId)) return;
@@ -1963,6 +2178,17 @@
   });
 
   document.addEventListener('keydown', (event) => {
+    const gamePoint = event.target.closest('.plot-point[data-game-select]');
+    if (gamePoint && ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const points = [...gamePoint.closest('.efficiency-plane__points').querySelectorAll('.plot-point')];
+      const x = Number(gamePoint.dataset.plotX), y = Number(gamePoint.dataset.plotY);
+      const horizontal = ['ArrowLeft', 'ArrowRight'].includes(event.key);
+      const direction = ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1;
+      const target = event.key === 'Home' ? points[0] : event.key === 'End' ? points.at(-1) : points.filter(point => point !== gamePoint).map(point => ({point, dx:Number(point.dataset.plotX)-x, dy:Number(point.dataset.plotY)-y})).filter(item => (horizontal ? item.dx : item.dy)*direction > 0).sort((a,b) => Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy))[0]?.point;
+      if (target) { points.forEach(point => { point.tabIndex = point === target ? 0 : -1; }); target.focus({preventScroll:true}); }
+      return;
+    }
     const plotPoint = event.target.closest('.plot-point[data-entry-id]');
     if (plotPoint && ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
       event.preventDefault();
@@ -2035,6 +2261,15 @@
   });
 
   document.addEventListener('change', (event) => {
+    if (event.target.matches('[data-game-efficiency-entry]')) {
+      const id = event.target.dataset.gameReportId;
+      const report = gameBenchmarks.find(item => item.benchmark.id === id);
+      if (!report?.runs.some(run => run.id === event.target.value)) return;
+      gameSelections.set(id, event.target.value);
+      renderCapabilities();
+      document.querySelector(`[data-game-efficiency-entry][data-game-report-id="${CSS.escape(id)}"]`)?.focus({preventScroll:true});
+      return;
+    }
     if (event.target.matches('#efficiency-entry')) {
       selectEntry(event.target.value, '#efficiency-entry');
       return;
@@ -2078,11 +2313,17 @@
 
   capabilityIndexMedia.addEventListener('change', syncCapabilityIndexOrientation);
 
-  if (workflowData) {
+  if (workflowData || isWriting) {
     document.querySelector('.benchmark-mast__scope').innerHTML = `${escapeHtml(isOverall ? 'Overall' : data.categories[0].name)} <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} ${BENCHMARK_COUNT === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${SETTING_COUNT} ${isOverall ? 'ranked' : 'model'} settings <span aria-hidden="true">·</span> ${data.benchmarkResults.length} ${isOverall ? 'published ' : ''}responses <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> ${escapeHtml(SCORE_EDITION_LABEL)}</span>`;
   }
-  if (isOverall) {
-    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Overall · Uncalibrated development</span><span>${BENCHMARK_COUNT} benchmarks · ${data.categories.length}/${portfolioCategories.length} categories measured · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered · ${SETTING_COUNT}/${data.coverage.totalSettings} complete settings</span>`;
+  if (isGames) {
+    document.querySelector('.benchmark-mast__scope').innerHTML = `Games <span aria-hidden="true">·</span> ${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${gameRuns.length} outputs <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Games v1 pilot</span>`;
+    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Games · Exploratory pilot</span><span>${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'} · ${gameRuns.length} outputs</span>`;
+  } else if (isWriting) {
+    document.querySelector('.benchmark-mast__scope').innerHTML = `Writing <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} benchmark <span aria-hidden="true">·</span> ${data.cases.length} story cases <span aria-hidden="true">·</span> ${SETTING_COUNT} model settings <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Storytelling</span>`;
+    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Writing / Storytelling · Excluded from Overall</span><span>${BENCHMARK_COUNT} benchmark · ${data.cases.length} stories · ${SETTING_COUNT} settings · ${data.coverage?.responseCount ?? writingSummary.coverage.responseCount} recorded outputs</span>`;
+  } else if (isOverall) {
+    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Overall · Uncalibrated development</span><span>${BENCHMARK_COUNT} benchmarks · ${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered · ${SETTING_COUNT}/${data.coverage.totalSettings} complete settings</span>`;
   } else if (isWorkSpec) {
     document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · AI Workflows · Uncalibrated development</span><span>${BENCHMARK_COUNT} benchmark × ${SETTING_COUNT} settings × 2 conditions = ${data.benchmarkResults.length} responses</span>`;
   }

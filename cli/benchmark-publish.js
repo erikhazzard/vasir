@@ -5,6 +5,7 @@ import path from "node:path";
 import process from "node:process";
 
 import { buildBenchmarkPublicationArtifact } from "./benchmark-publication-artifact.js";
+import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
 import { VasirCliError } from "./cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 
@@ -164,6 +165,9 @@ function createResult({ artifact, stack, dryRun, actions, previousVerifiedReleas
       compressedLandingBytes: artifact.compressedLandingBytes,
       projection: artifact.projection,
       files: artifact.files.map(serializeFileForResult),
+      artifactFileCount: artifact.artifactFiles?.length ?? 0,
+      artifactTotalBytes: artifact.artifactTotalBytes ?? 0,
+      artifactFiles: (artifact.artifactFiles ?? []).map(({ key, bytes, sha256 }) => ({ key, bytes, sha256 })),
       routes: artifact.routes
     },
     deployment: {
@@ -832,8 +836,8 @@ export function calculateProjectedPublicationBytes({ listing, artifact }) {
       .filter((entry) => entry.IsLatest === true)
       .map((entry) => entry.Key)
   );
-  const missingReleaseBytes = artifact.files.reduce((total, file) => {
-    const key = `${RELEASE_PREFIX}${artifact.releaseId}/${file.path}`;
+  const missingReleaseBytes = [...artifact.files, ...(artifact.artifactFiles ?? [])].reduce((total, file) => {
+    const key = file.key ?? `${RELEASE_PREFIX}${artifact.releaseId}/${file.path}`;
     return total + (latestVersionKeys.has(key) ? 0 : file.bytes);
   }, 0);
   const manifestKey = `${MANIFEST_PREFIX}${artifact.releaseId}.json`;
@@ -912,7 +916,7 @@ function cleanupAndAssertStorageBudget({ artifact, aws, bucketName, lease, publi
 }
 
 function stageFile({ artifact, aws, bucketName, file }) {
-  const key = `${RELEASE_PREFIX}${artifact.releaseId}/${file.path}`;
+  const key = file.key ?? `${RELEASE_PREFIX}${artifact.releaseId}/${file.path}`;
   let existing;
   try {
     existing = headObject({ aws, bucketName, key, checksum: true });
@@ -977,7 +981,7 @@ function stageFile({ artifact, aws, bucketName, file }) {
 
 function stageRelease({ artifact, aws, bucketName, lease, now }) {
   proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "upload" });
-  const receipts = artifact.files.map((file) => {
+  const receipts = [...(artifact.artifactFiles ?? []), ...artifact.files].map((file) => {
     proveLeaseOwnership({ artifact, aws, bucketName, lease, now, stage: "upload" });
     return { path: file.path, status: stageFile({ artifact, aws, bucketName, file }) };
   });
@@ -1058,7 +1062,7 @@ function invalidateStableEntrypoints({ artifact, aws, stack, targetReleaseId }) 
     invalidation = aws.runJson([
       "cloudfront", "create-invalidation",
       "--distribution-id", distributionId,
-      "--paths", "/", "/index.html", "/benchmark-report.html"
+      "--paths", "/", "/index.html", "/benchmark-report.html", "/games.html"
     ]);
   } catch (error) {
     throw publishError({
@@ -1143,7 +1147,7 @@ async function activateRelease({ artifact, aws, targetReleaseId, delayImplementa
     delayImplementation
   });
   // A viewer-request URI rewrite does not evict stable viewer cache keys. Purge
-  // only the three HTML entrypoints so every edge resolves one coherent release.
+  // only the stable HTML entrypoints so every edge resolves one coherent release.
   invalidateStableEntrypoints({ artifact, aws, stack, targetReleaseId });
   return stack;
 }
@@ -1185,7 +1189,7 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
     liveFileBodies.set(file.path, body);
   }
 
-  for (const [stablePath, manifestPath] of [["/", "index.html"], ["/index.html", "index.html"], ["/benchmark-report.html", "benchmark-report.html"]]) {
+  for (const [stablePath, manifestPath] of [["/", "index.html"], ["/index.html", "index.html"], ["/benchmark-report.html", "benchmark-report.html"], ...(manifest.files.some(file => file.path === "games.html") ? [["/games.html", "games.html"]] : [])]) {
     const response = await fetchWithTimeout(fetchImplementation, `${baseUrl}${stablePath}`, {
       redirect: "error",
       cache: "no-store"
@@ -1221,6 +1225,25 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
     }
   }
 
+  if (manifest.artifacts?.length) {
+    if (manifest.artifactOrigin !== GAME_ARTIFACT_ORIGIN) throw new Error("artifact origin does not match the isolated distribution host");
+    for (const file of manifest.artifacts) {
+      if (!/^artifacts\/[a-f0-9]{64}\/[A-Za-z0-9_./-]+$/.test(file.key) || file.key.includes("..") || file.publicUrl !== `${GAME_ARTIFACT_ORIGIN}/${file.key}`) throw new Error("invalid immutable artifact URL");
+      const response = await fetchWithTimeout(fetchImplementation, file.publicUrl, { redirect: "error", cache: "no-store" });
+      if (response.status !== 200) throw new Error(`artifact returned ${response.status}`);
+      const body = Buffer.from(await response.arrayBuffer());
+      if (body.length !== file.bytes || crypto.createHash("sha256").update(body).digest("hex") !== file.sha256) throw new Error("artifact hash mismatch");
+      if (file.contentType.startsWith("text/html")) {
+        const policy = responseHeader(response, "content-security-policy") ?? "";
+        if (!policy.includes("sandbox allow-scripts allow-same-origin") || !policy.includes("worker-src 'none'") || !policy.includes(`frame-ancestors ${baseUrl}`)) throw new Error("game artifact isolation policy missing");
+        const sameOrigin = await fetchWithTimeout(fetchImplementation, `${baseUrl}/${file.key}`, { redirect: "manual", cache: "no-store" });
+        if (sameOrigin.status !== 403) throw new Error("contestant JavaScript is reachable on the site origin");
+      }
+    }
+    const artifactOriginResponse = await fetchWithTimeout(fetchImplementation, `https://${bucketName}.s3.${artifact.config.target.region}.amazonaws.com/${manifest.artifacts[0].key}`, { redirect: "manual", cache: "no-store" });
+    if (artifactOriginResponse.status !== 403) throw new Error("anonymous game artifact origin is public");
+  }
+
   const originUrl = `https://${bucketName}.s3.${artifact.config.target.region}.amazonaws.com/releases/${releaseId}/index.html`;
   const originResponse = await fetchWithTimeout(fetchImplementation, originUrl, { redirect: "manual", cache: "no-store" });
   if (originResponse.status !== 403) throw new Error(`anonymous origin returned ${originResponse.status}`);
@@ -1229,7 +1252,7 @@ async function verifyHttpOnce({ artifact, manifest, bucketName, fetchImplementat
     cache: "no-store"
   });
   if (controlResponse.status !== 403) throw new Error(`CloudFront control prefix returned ${controlResponse.status}`);
-  return { verifiedFiles: manifest.files.length, originPrivate: true };
+  return { verifiedFiles: manifest.files.length + (manifest.artifacts?.length ?? 0), originPrivate: true };
 }
 
 async function verifyHttpPublication({ artifact, manifest, bucketName, fetchImplementation, delayImplementation }) {
@@ -1272,6 +1295,13 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
       }
     }
   }
+  if (artifact.routes.familyFragments.includes("/#capabilities/games")) {
+    for (const [width, height, viewport] of [[1440, 1000, "desktop"], [390, 844, "mobile"]]) {
+      for (const target of ["games", "game-benchmarks", "game-efficiency"]) {
+        checks.push({ page: `${artifact.config.target.url}/`, target, width, height, file: `live-home-${target}-${viewport}.png` });
+      }
+    }
+  }
   for (const check of checks) {
     const destinationPath = path.join(artifact.temporaryDirectory, check.file);
     const result = spawnSyncImplementation(process.execPath, [
@@ -1305,6 +1335,28 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
       });
     }
   }
+  if (artifact.routes.entrypoints.includes("/games.html")) {
+    for (const [width, height] of [[1440, 1000], [390, 844]]) {
+      const result = spawnSyncImplementation(process.execPath, [
+        path.join(artifact.siteRootDirectory, "games-browsercheck.mjs"),
+        "--url", `${artifact.config.target.url}/games.html`,
+        "--output-dir", path.join(artifact.temporaryDirectory, `live-games-${width}`),
+        "--width", String(width), "--height", String(height)
+      ], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 180_000, maxBuffer: DEFAULT_COMMAND_BUFFER_BYTES, env: { ...environmentVariables, CHROME_BIN: chromeBinary } });
+      if (result?.error || result?.status !== 0) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: `Games browser proof failed: ${String(result?.stderr || result?.stdout || result?.error?.message || "no proof").slice(-2000)}`, suggestion: "Inspect the playable and playback routes before retrying the unchanged release.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification", rollback: { status: "pending", releaseId: null } });
+    }
+  }
+  if (artifact.routes.familyFragments.includes("/#capabilities/writing/storytelling")) {
+    for (const [width, height] of [[1440, 1000], [390, 844]]) {
+      const result = spawnSyncImplementation(process.execPath, [
+        path.join(artifact.siteRootDirectory, "writing-browsercheck.mjs"),
+        "--url", `${artifact.config.target.url}/`,
+        "--output-dir", path.join(artifact.temporaryDirectory, `live-writing-${width}`),
+        "--width", String(width), "--height", String(height)
+      ], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 180_000, maxBuffer: DEFAULT_COMMAND_BUFFER_BYTES, env: { ...environmentVariables, CHROME_BIN: chromeBinary } });
+      if (result?.error || result?.status !== 0) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: `Writing browser proof failed: ${String(result?.stderr || result?.stdout || result?.error?.message || "no proof").slice(-2000)}`, suggestion: "Inspect the Writing explorer, story cases and blind response evidence before retrying the unchanged release.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification", rollback: { status: "pending", releaseId: null } });
+    }
+  }
   return {
     verifiedReportRoutes: artifact.routes.reportFragments.length,
     verifiedCapabilityRoutes:
@@ -1336,6 +1388,7 @@ function readStoredManifest({ artifact, aws, bucketName, releaseId }) {
 
 async function verifyPublication({ artifact, manifest, stack, chromeBinary, spawnSyncImplementation, environmentVariables, fetchImplementation, delayImplementation }) {
   const bucketName = outputMap(stack).BucketName;
+  if (manifest.artifacts?.length && `https://${outputMap(stack).DistributionDomainName}` !== GAME_ARTIFACT_ORIGIN) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: "The deployed distribution hostname differs from the pinned game artifact origin.", suggestion: "Review the origin policy and source selection before republishing.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification" });
   const http = await verifyHttpPublication({
     artifact,
     manifest,

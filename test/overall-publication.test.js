@@ -15,9 +15,15 @@ const sources = { engineering: built.projection, aiWorkflows: built.projection.a
 const overall = built.projection.overall;
 const expectedTasks = ["hyper-scale-chat", "personalized-home-feed", "device-telemetry", "work-spec-chat"];
 const within = (actual, expected) => assert.ok(Math.abs(actual - expected) <= Number.EPSILON * Math.max(1, Math.abs(actual), Math.abs(expected)) * 16, `${actual} differs from ${expected}`);
+const canonicalValue = value => Array.isArray(value)
+  ? value.map(canonicalValue)
+  : value !== null && typeof value === "object"
+    ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonicalValue(value[key])]))
+    : value;
 
 test("Overall v2 weights category means with full precision and complete paired eligibility", () => {
-  assert.equal(built.projection.schemaVersion, 4);
+  assert.equal(built.projection.schemaVersion, 6);
+  assert.equal(built.projection.writing.benchmarkId, "storytelling-core-idea");
   assert.equal(overall.scoreBasis.label, "Overall v2");
   assert.equal(overall.scoreBasis.edition, "overall-v2");
   assert.equal(overall.scoreBasis.declarationVersion, 2);
@@ -221,9 +227,13 @@ test("source reconstruction rejects forged Overall arithmetic, weights, coverage
 test("Overall adds no response artifacts and preserves the previously published Engineering and workflow datasets", () => {
   const load = (filename, key) => { const sandbox = { window: {} }; vm.runInNewContext(fs.readFileSync(path.join(REPO, "site/vasirbenchmark.com", filename), "utf8"), sandbox); return JSON.parse(JSON.stringify(sandbox.window[key])); };
   const published = load("data.js", "VASIR_DATA");
-  const withoutOverall = value => { const { overall: ignored, ...rest } = value; return { ...rest, schemaVersion: 3 }; };
-  assert.deepEqual(withoutOverall(built.projection), withoutOverall(published));
+  const historicalFamilies = value => { const { overall: ignoredOverall, games: ignoredGames, writing: ignoredWriting, ...rest } = value; return { ...rest, schemaVersion: 3 }; };
+  assert.deepEqual(historicalFamilies(built.projection), historicalFamilies(published));
   assert.deepEqual(built.responseBundle, load("responses.js", "VASIR_RESPONSES"));
-  assert.equal(crypto.createHash("sha256").update(built.responsesSource).digest("hex"), "f7b2b8367c8b2b37239248e5fed7e651a5b3315a0792f840f321e6ae66df8911");
+  // This semantic pin was independently derived from the previously published
+  // source whose byte SHA-256 was f7b2b8367c8b2b37239248e5fed7e651a5b3315a0792f840f321e6ae66df8911.
+  // Compact JSON and object key order may change; every historical value and
+  // array position, including all answer text and judge evidence, must not.
+  assert.equal(crypto.createHash("sha256").update(JSON.stringify(canonicalValue(built.responseBundle))).digest("hex"), "39d6529eaa3b4f66baab4558ee1d0f38623810450e9e9241281287fa50660ff8");
   validateBenchmarkPublicationResponses(built.responseBundle, built.projection);
 });

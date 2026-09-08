@@ -523,6 +523,14 @@ export async function runBenchmarkEval({
     currentWorkingDirectory,
     projectRootDirectory
   });
+  if (benchmarkSource.benchmarkId === "storytelling-core-idea") {
+    throw new VasirCliError({
+      code: "EVAL_STORYTELLING_RUNNER_REQUIRED",
+      message: "The storytelling benchmark requires its exact-question, progressive-skill runner.",
+      suggestion: "Use `node cli/eval/run-storytelling-benchmark.js --prepare` to freeze the matrix, then resume it with the same dedicated runner. The generic response harness would change this experiment's prompt and skill exposure.",
+      docsRef: EVAL_REFERENCE_DOCS_REF
+    });
+  }
   const judgingPlan = resolveBenchmarkJudgingConfiguration(
     benchmarkSource.benchmarkDefinition.judging
   );

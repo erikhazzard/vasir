@@ -9,8 +9,9 @@ const MODEL_REASONING_LEVELS = Object.freeze({
   "claude:fable": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
   // Ultracode is a distinct visible execution mode. The Claude runtime maps it
   // to xhigh effort plus bounded Workflow orchestration.
-  "claude:claude-fable-5-1": Object.freeze(["xhigh", "max", "ultracode"]),
-  "claude:opus": Object.freeze(["low", "medium", "high", "xhigh", "max"])
+  "claude:claude-fable-5-1": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultracode"]),
+  "claude:opus": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
+  "claude:claude-opus-5": Object.freeze(["low", "medium", "high", "xhigh", "max"])
 });
 
 const MODEL_ALIASES = Object.freeze({
@@ -96,7 +97,7 @@ export function resolveBenchmarkConfigurations({
 } = {}) {
   const selectors = requestedModelArguments.length > 0
     ? requestedModelArguments
-    : Object.keys(MODEL_REASONING_LEVELS);
+    : Object.keys(MODEL_REASONING_LEVELS).filter((id) => id !== "claude:claude-opus-5");
   const configurations = [];
   const seen = new Set();
 
@@ -144,7 +145,7 @@ export function resolveBenchmarkConfiguration(selector) {
 }
 
 export function getDefaultBenchmarkConfigurationCount() {
-  return Object.values(MODEL_REASONING_LEVELS).reduce(
+  return Object.entries(MODEL_REASONING_LEVELS).filter(([id]) => id !== "claude:claude-opus-5").map(([, levels]) => levels).reduce(
     (total, reasoningLevels) => total + reasoningLevels.length,
     0
   );

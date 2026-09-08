@@ -1,0 +1,12 @@
+{
+  "kind": "vasirbenchmark-writing-source",
+  "schemaVersion": 1,
+  "run": {
+    "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/62a85ad22f3b07fbb0e45ef43c1e817fee72891d71eedc363410755ad8da0916/run.json",
+    "sha256": "62a85ad22f3b07fbb0e45ef43c1e817fee72891d71eedc363410755ad8da0916"
+  },
+  "skill": {
+    "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/62a85ad22f3b07fbb0e45ef43c1e817fee72891d71eedc363410755ad8da0916/skill-snapshot.json",
+    "sha256": "a4db1b5ea3ae79e9655be2ab793fa71e153571359a88d098a383bf94cd4667e5"
+  }
+}

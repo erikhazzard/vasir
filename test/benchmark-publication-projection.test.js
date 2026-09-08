@@ -291,6 +291,8 @@ test("selected immutable runs deterministically project the exact real developme
   });
   const second = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
   const workflow = first.projection.aiWorkflows;
+  const games = first.projection.games;
+  const writing = first.projection.writing;
 
   assert.match(first.basisSha256, /^[a-f0-9]{64}$/);
   assert.equal(first.basisSha256, second.basisSha256);
@@ -299,8 +301,44 @@ test("selected immutable runs deterministically project the exact real developme
   assert.deepEqual(first.projection, second.projection);
   assert.deepEqual(first.responseBundle, second.responseBundle);
   assert.deepEqual(first.projection.counts, EXPECTED_COUNTS, "Engineering retains its complete family-local cohort");
-  assert.deepEqual(first.counts, workflow ? { ...EXPECTED_COUNTS, families: 2, tracks: 2, benchmarks: 4, categories: 2, resultEntries: 124, responses: 268, developmentResultSets: 4 } : EXPECTED_COUNTS);
-  assert.deepEqual(first.routes, workflow ? { ...EXPECTED_ROUTES, familyFragments: [...EXPECTED_ROUTES.familyFragments, "/#capabilities/ai-workflows"], viewFragments: [...EXPECTED_ROUTES.viewFragments, "/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"], reportFragments: [...EXPECTED_ROUTES.reportFragments, "/benchmark-report.html#work-spec-chat"] } : EXPECTED_ROUTES);
+  const expectedCounts = workflow ? { ...EXPECTED_COUNTS, families: games ? 3 : 2, tracks: games ? 3 : 2, benchmarks: games ? 5 : 4, categories: 2, resultEntries: 124, responses: 268, developmentResultSets: 4 } : { ...EXPECTED_COUNTS };
+  if (writing) {
+    const selectedWriting = first.writing;
+    assert.deepEqual(writing.coverage, selectedWriting.coverage);
+    assert.equal(first.projection.schemaVersion, 6);
+    for (const field of ["families", "tracks", "benchmarks", "categories", "resultEntries", "developmentResultSets"]) {
+      expectedCounts[field] += selectedWriting.counts[field];
+    }
+    expectedCounts.responses += selectedWriting.coverage.responseCount;
+    expectedCounts.settings = new Set([
+      ...first.projection.settings, ...(workflow?.settings ?? []), ...selectedWriting.settings
+    ].map(setting => setting.configurationId)).size;
+  }
+  assert.deepEqual(first.counts, expectedCounts, "Global counts add the selected Writing snapshot without changing family-local evidence");
+  const expectedRoutes = workflow ? { ...EXPECTED_ROUTES, familyFragments: [...EXPECTED_ROUTES.familyFragments, "/#capabilities/ai-workflows"], viewFragments: [...EXPECTED_ROUTES.viewFragments, "/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"], reportFragments: [...EXPECTED_ROUTES.reportFragments, "/benchmark-report.html#work-spec-chat"] } : EXPECTED_ROUTES;
+  assert.deepEqual(first.routes, {
+    ...expectedRoutes,
+    entrypoints: [...expectedRoutes.entrypoints, ...(games ? ["/games.html"] : [])],
+    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(games ? ["/#capabilities/games"] : []), ...(workflow ? ["/#capabilities/ai-workflows"] : []), ...(writing ? ["/#capabilities/writing/storytelling"] : [])],
+    viewFragments: [...EXPECTED_ROUTES.viewFragments, ...(games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []), ...(workflow ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []), ...(writing ? ["/#capabilities/writing/storytelling/benchmarks", "/#capabilities/writing/storytelling/efficiency"] : [])],
+    reportFragments: [...expectedRoutes.reportFragments, ...(games ? ["/games.html?benchmark=2d-jumping-demo"] : []), ...(writing ? [`/benchmark-report.html#${writing.benchmarkId}`] : [])]
+  });
+  if (games) {
+    assert.equal(games.runs.length, 10);
+    assert.equal(games.configurations.length, 5);
+    assert.equal(games.conditions.length, 2);
+    assert.equal(games.reference, null, "The already-published reference is represented once in the artifact-quality row");
+    const ultraConfiguration = games.configurations.find(configuration => configuration.reasoning === "ultra");
+    assert.equal(ultraConfiguration.comparison.kind, "artifact-quality");
+    assert.equal(ultraConfiguration.comparison.controlled, false, "The guided example is not a controlled skill-effect estimate");
+    const guidedReference = games.runs.find(run => run.id === "ash-and-echo-r23");
+    assert.equal(guidedReference.configurationId, ultraConfiguration.id);
+    assert.equal(guidedReference.status, "reference");
+    assert.match(guidedReference.provenance, /human (?:direction|directed)/i);
+    assert.match(guidedReference.provenance, /not a fresh single-prompt trial/i);
+    if (guidedReference.score !== null) assert.equal(guidedReference.judgments.length, 2, "The reference rating requires its own complete assessment panel");
+    assert.ok(!first.responseBundle.responses.some(response => games.runs.some(run => run.id === response.id)), "Game artifacts do not become response-benchmark results");
+  }
   assert.deepEqual({
     runs: first.projection.meta.runs,
     settings: first.projection.meta.settings,
@@ -412,7 +450,7 @@ test("selected immutable runs deterministically project the exact real developme
     }));
   }
   validateBenchmarkPublicationResponses(responseBundle, projection);
-  assert.equal(projection.schemaVersion, workflow ? 4 : 2);
+  assert.equal(projection.schemaVersion, writing ? 6 : games ? 5 : workflow ? 4 : 2);
   assert.deepEqual({
     label: projection.scoreBasis.label,
     edition: projection.scoreBasis.edition,

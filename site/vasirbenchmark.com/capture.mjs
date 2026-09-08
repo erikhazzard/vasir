@@ -11,6 +11,7 @@ const width = Number(widthInput);
 const height = Number(heightInput);
 const captureTarget = requestedTarget.toLowerCase();
 const isWorkflowCapture = captureTarget.startsWith('workflow');
+const isGamesCapture = ['games', 'game-benchmarks', 'game-efficiency'].includes(captureTarget);
 const isOverallTarget = ['leaderboard', 'efficiency', 'overall-coverage', 'overall-method'].includes(captureTarget);
 const isReportCapture = captureTarget === 'report' || captureTarget === 'workflow-report' || captureTarget === 'workflow-inspector';
 const captureTargets = new Set([
@@ -25,9 +26,15 @@ const captureTargets = new Set([
   'workflow-benchmarks',
   'workflow-efficiency',
   'workflow-report',
-  'workflow-inspector'
+  'workflow-inspector',
+  'games',
+  'game-benchmarks',
+  'game-efficiency'
 ]);
 const targetRoutes = {
+  games: 'capabilities/games',
+  'game-benchmarks': 'capabilities/games/benchmarks',
+  'game-efficiency': 'capabilities/games/efficiency',
   leaderboard: 'capabilities/overall',
   'overall-coverage': 'capabilities/overall',
   'overall-method': 'capabilities/overall',
@@ -80,7 +87,7 @@ if (
   || height <= 0
   || !captureTargets.has(captureTarget)
 ) {
-  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|overall-coverage|overall-method|capabilities|capability-benchmarks|efficiency|report|workflows|workflow-benchmarks|workflow-efficiency|workflow-report|workflow-inspector]');
+  console.error('Usage: capture.mjs PAGE DESTINATION WIDTH HEIGHT [leaderboard|overall-coverage|overall-method|capabilities|capability-benchmarks|efficiency|report|workflows|workflow-benchmarks|workflow-efficiency|workflow-report|workflow-inspector|games|game-benchmarks|game-efficiency]');
   console.error('PAGE must be a local file path or an HTTPS URL.');
   process.exit(1);
 }
@@ -669,7 +676,7 @@ async function auditSite(
     ['benchmarkSummaries', expectedCounts.benchmarks]
   ];
   if (data.kind !== 'vasirbenchmark-public-projection') failures.push('projection kind mismatch');
-  if (![2, 3, 4].includes(data.schemaVersion)) failures.push('projection schema mismatch');
+  if (![2, 3, 4, 5, 6].includes(data.schemaVersion)) failures.push('projection schema mismatch');
   if (
     data.scoreBasis?.label !== 'Engineering v2'
     || data.scoreBasis?.edition !== 'backend-architecture-panel-consensus-v2'
@@ -746,7 +753,7 @@ async function auditSite(
   }
 
   const privatePattern = /(?:\/home\/|file:\/\/|artifacts\/evaluations|evaluations\/runs\/)/i;
-  const { aiWorkflows: separateWorkflowProjection, overall: separateOverallProjection, ...engineeringProjection } = data;
+  const { aiWorkflows: separateWorkflowProjection, overall: separateOverallProjection, games: separateGamesProjection, ...engineeringProjection } = data;
   const serializedData = JSON.stringify(engineeringProjection);
   if (privatePattern.test(serializedData) || serializedData.includes('/Users/')) failures.push('public projection leaks a private filesystem or artifact path');
   if (/\b(?:illustrative|mock|fixture)\b/i.test(serializedData)) failures.push('public projection contains fake-data language');
@@ -1893,6 +1900,20 @@ async function auditCategoryNavigation() {
     const tab = tabs.find(tab => tab.dataset.categoryId === id);
     const labelVisible = [...(tab?.querySelectorAll('.capability-selector__long, .capability-selector__short') || [])].some(node => visible(node) && text(node));
     if (!visible(tab) || !labelVisible || text(tab?.querySelector('.capability-selector__long')) !== name) failures.push('Category label is missing or invisible: ' + id);
+    if (id === 'games' && window.VASIR_DATA.games) {
+      if (tab?.tagName !== 'BUTTON' || tab.disabled || tab.dataset.categoryStatus !== 'pilot' || tab.hasAttribute('href') || tab.getAttribute('aria-controls') !== 'capability-field-panel') failures.push('Published Games is not a native homepage category.');
+      if (!visible(tab?.querySelector(':scope > strong')) || text(tab?.querySelector(':scope > strong')).includes('↗')) failures.push('Games category must show an observed rating or ratings-available label.');
+      if (['data-winner-entry-id', 'data-winner-score', 'data-winner-condition'].some(attribute => tab?.hasAttribute(attribute))) failures.push('Games navigation invents an Overall ranking score.');
+      continue;
+    }
+    if (id === 'writing' && window.VASIR_DATA.writing?.coverage?.caseCount) {
+      const writing = window.VASIR_DATA.writing;
+      if (tab?.tagName !== 'BUTTON' || tab.disabled || tab.getAttribute('aria-disabled') === 'true' || tab.dataset.categoryStatus !== writing.status || tab.hasAttribute('href') || tab.getAttribute('aria-controls') !== 'capability-field-panel') failures.push('Published Writing is not an enabled native homepage category.');
+      const expectedScore = Number.isFinite(writing.leader?.score) ? writing.leader.score.toFixed(1) + '/100' : '—';
+      if (!visible(tab?.querySelector(':scope > strong')) || text(tab?.querySelector(':scope > strong')) !== expectedScore) failures.push('Writing category invents a score or omits its source-derived leader.');
+      if (!tab?.getAttribute('aria-label')?.includes(writing.coverage.caseCount + ' story cases') || !tab?.getAttribute('aria-label')?.includes('Excluded from Overall')) failures.push('Writing category does not disclose measured coverage and Overall exclusion.');
+      continue;
+    }
     if (!planned) {
       if (!tab || tab.disabled || tab.getAttribute('aria-disabled') === 'true') failures.push('Measured category is disabled: ' + id);
       continue;
@@ -1906,6 +1927,150 @@ async function auditCategoryNavigation() {
     if (state() !== before) failures.push('Clicking a planned category changes the selected result or route: ' + id);
   }
   return {failures};
+}
+
+async function auditGames(target) {
+  const root = window.VASIR_DATA;
+  const reports = root?.games?.benchmarks ?? (root?.games ? [root.games] : []);
+  const failures = [];
+  const text = element => element?.textContent.replace(/\s+/g, ' ').trim() || '';
+  const visible = element => Boolean(element && element.getBoundingClientRect().width && element.getBoundingClientRect().height && getComputedStyle(element).display !== 'none' && getComputedStyle(element).visibility !== 'hidden');
+  const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const pathname = location.pathname;
+  const requestedMode = target === 'game-benchmarks' ? 'benchmarks' : target === 'game-efficiency' ? 'efficiency' : 'models';
+  const score = run => Number.isFinite(run?.score?.value) ? run.score.value : null;
+  const displayScore = run => score(run) ?? ((run?.judgments || []).filter(judge => Number.isFinite(judge.score)).length === 1 ? run.judgments.find(judge => Number.isFinite(judge.score)).score : null);
+  const checkReading = (reading, run) => {
+    const expected = displayScore(run);
+    if (!reading || reading.dataset.gameScore !== String(score(run) ?? '') || reading.dataset.gameDisplayScore !== String(expected ?? '')) failures.push('Games rating differs from published evidence: ' + run.id);
+    if (expected !== null && !text(reading?.querySelector('strong')).startsWith(expected.toFixed(1))) failures.push('Available game rating is not visible: ' + run.id);
+    if (score(run) === null && expected !== null && !/individual|1 judge/i.test(text(reading))) failures.push('Individual game assessment is not qualified: ' + run.id);
+    if (expected === null && !/incomplete|unavailable|pending|—/i.test(text(reading))) failures.push('Unavailable game rating is not qualified: ' + run.id);
+    if (reading && reading.scrollWidth > reading.clientWidth + 1) failures.push('Game score or review qualification clips: ' + run.id);
+  };
+  const runs = reports.flatMap(report => report.runs || []);
+  const modes = ['models', 'benchmarks', ...(runs.some(run => Number.isFinite(run.metrics?.durationMs) && run.metrics.durationMs > 0) ? ['efficiency'] : [])];
+  if (!reports.length || reports.some(report => !report.benchmark?.id || !Array.isArray(report.configurations) || !Array.isArray(report.conditions) || !Array.isArray(report.runs))) failures.push('Games collection does not contain published benchmark payloads.');
+  if (new Set(reports.map(report => report.benchmark.id)).size !== reports.length) failures.push('Game benchmark identifiers are not unique.');
+  if (document.querySelector('#capability-category-games')?.tagName !== 'BUTTON' || document.querySelector('#capability-category-games')?.getAttribute('aria-selected') !== 'true') failures.push('Games is not the selected native category.');
+  if (text(document.querySelector('#capability-question')) !== 'Games' || !text(document.querySelector('.capability-canvas__status')).includes('Games v1 pilot')) failures.push('Games category header is missing.');
+  if (reports.length === 1) {
+    const report = reports[0];
+    for (const condition of report.conditions) {
+      const candidates = report.runs.filter(run => run.conditionId === condition.id && score(run) !== null && run.score.eligible === true).sort((a,b) => score(b)-score(a));
+      const leader = candidates[0];
+      const reading = document.querySelector(`[data-game-leader-condition="${CSS.escape(condition.id)}"]`);
+      if (!visible(reading) || reading.dataset.gameLeaderScore !== String(score(leader) ?? '') || reading.dataset.gameLeaderRun !== (leader?.id || '')) failures.push('Games header omits or misstates its condition leader: ' + condition.id);
+      if (leader && !text(reading).includes(score(leader).toFixed(1))) failures.push('Games header score is not visibly populated: ' + condition.id);
+    }
+  }
+  if (document.querySelector('iframe, video')) failures.push('Homepage unexpectedly activates a game or recording.');
+  const checkMode = async mode => {
+    document.querySelector(`[data-capability-mode="${mode}"]`)?.click();
+    await settle();
+    if (location.pathname !== pathname || location.hash !== '#capabilities/games' + (mode === 'models' ? '' : '/' + mode)) failures.push('Games mode navigated away or has an incorrect route: ' + mode);
+    if (document.querySelector('.capability-mode__tab[aria-selected="true"]')?.dataset.capabilityMode !== mode) failures.push('Games selected mode mismatch: ' + mode);
+    const panel = document.querySelector(mode === 'models' ? '#capability-ranking' : mode === 'benchmarks' ? '#capability-benchmarks' : '#capability-efficiency');
+    if (!visible(panel)) failures.push('Games panel is not visible: ' + mode);
+    if (mode === 'models') {
+      if (text(document.querySelector('#capability-mode-models strong')) !== 'Leaderboard') failures.push('Games does not use the shared Leaderboard tab label.');
+      for (const report of reports) {
+        const findTask = () => document.querySelector(`#capability-ranking [data-game-benchmark-id="${CSS.escape(report.benchmark.id)}"]`);
+        const task = findTask();
+        if (!task || task.querySelectorAll('[data-game-configuration]').length !== report.configurations.length) failures.push('Games model rows do not preserve every configuration: ' + report.benchmark.id);
+        if (text(task?.querySelector('.capability-ranking__scale-values')).replace(/\s/g, '') !== '0255075100') failures.push('Games comparison does not expose the shared 0–100 scale.');
+        for (const configuration of report.configurations) {
+          const row = findTask()?.querySelector(`[data-game-configuration="${CSS.escape(configuration.id)}"]`);
+          const pair = report.conditions.map(condition => report.runs.find(run => run.configurationId === configuration.id && run.conditionId === condition.id));
+          const select = row?.querySelector('[data-game-select]');
+          if (!visible(select) || select.getBoundingClientRect().height > (innerWidth > 1080 ? 84 : 132)) failures.push('Games model row does not preserve compact leaderboard density: ' + configuration.id);
+          const track = row?.querySelector('.capability-rank-row__track');
+          const bounds = track?.getBoundingClientRect();
+          for (let index = 0; index < pair.length; index++) {
+            const run = pair[index];
+            if (!run) { failures.push('Game configuration lacks a published condition: ' + configuration.id); continue; }
+            const expectedRank = score(run) === null || run.score.eligible !== true ? null : 1 + report.runs.filter(other => other.conditionId === run.conditionId && score(other) !== null && other.score.eligible === true && score(other) > score(run)).length;
+            const reading = row?.querySelector(`[data-game-run-id="${CSS.escape(run.id)}"]`);
+            if (reading?.dataset.gameRank !== String(expectedRank ?? '')) failures.push('Game condition rank differs from published score order: ' + run.id);
+            if (expectedRank !== null && text(reading?.querySelector('small')) !== '#' + expectedRank) failures.push('Game condition rank is not visibly populated: ' + run.id);
+            if (index === 1 && (row?.dataset.gameRank !== String(expectedRank ?? '') || expectedRank !== null && text(row.querySelector('.capability-rank-row__position')) !== '#' + String(expectedRank).padStart(2, '0'))) failures.push('Game model rank differs from its Vasir score rank: ' + run.id);
+            checkReading(row?.querySelector(`[data-game-run-id="${CSS.escape(run.id)}"]`), run);
+            if (displayScore(run) === null) continue;
+            const marker = track?.querySelector(index === 0 ? '.capability-rank-row__marker--baseline' : '.capability-rank-row__marker--full');
+            const mark = marker?.getBoundingClientRect();
+            if (!visible(marker) || !bounds?.width || Math.abs(mark.left + mark.width / 2 - bounds.left - bounds.width * displayScore(run) / 100) > 2) failures.push('Game score marker does not align with its visible rating: ' + run.id);
+          }
+          const expectedDelta = pair.length === 2 && pair.every(run => score(run) !== null) ? score(pair[1]) - score(pair[0]) : null;
+          if (row?.dataset.gameDelta !== String(expectedDelta ?? '')) failures.push('Games paired delta differs from complete-panel evidence: ' + configuration.id);
+          select?.click();
+          await settle();
+          const selected = findTask()?.querySelector(`[data-game-configuration="${CSS.escape(configuration.id)}"] [data-game-select]`);
+          if (selected?.getAttribute('aria-pressed') !== 'true') failures.push('Game leaderboard row selection is not exposed: ' + configuration.id);
+          const href = findTask()?.querySelector('[data-game-selected-report]')?.href;
+          if (!href || new URL(href).searchParams.get('benchmark') !== report.benchmark.id || new URL(href).searchParams.get('model') !== configuration.id) failures.push('Game model link loses benchmark/configuration: ' + configuration.id);
+        }
+        if (findTask()?.querySelector('[data-game-reference], .game-capability__reference-heading') || /human.directed example/i.test(text(findTask()))) failures.push('Games retains a separate human-directed reference row.');
+        if (!text(findTask()?.querySelector('.capability-ranking__axis')).includes('Score Δ')) failures.push('Games score difference is not labeled as descriptive scores.');
+        const rankedRows = [...findTask().querySelectorAll('[data-game-configuration]')].map(row => Number(row.dataset.gameRank)).filter(rank => rank > 0);
+        if (rankedRows.some((rank,index) => index > 0 && rank < rankedRows[index-1])) failures.push('Games leaderboard is not sorted by its displayed ranks.');
+        findTask()?.querySelector('[data-game-configuration] [data-game-select]')?.click();
+        await settle();
+      }
+    }
+    if (mode === 'benchmarks') {
+      const links = [...panel.querySelectorAll('[data-game-report-link]')];
+      if (links.length !== reports.length) failures.push('Games benchmark list count differs from collection.');
+      for (const report of reports) {
+        const link = links.find(item => item.dataset.benchmarkId === report.benchmark.id);
+        if (!link || new URL(link.href).searchParams.get('benchmark') !== report.benchmark.id || !new URL(link.href).pathname.endsWith('/games.html')) failures.push('Game benchmark does not open its own report: ' + report.benchmark.id);
+      }
+    }
+    if (mode === 'efficiency') {
+      for (const report of reports) {
+        const findTask = () => document.querySelector(`[data-game-efficiency-benchmark="${CSS.escape(report.benchmark.id)}"]`);
+        const plotted = report.runs.filter(run => Number.isFinite(run.metrics?.durationMs) && run.metrics.durationMs > 0 && displayScore(run) !== null);
+        if (findTask()?.querySelectorAll('[data-game-effort-run]').length !== plotted.length) failures.push('Game efficiency omits assessable timed runs.');
+        if (findTask()?.querySelectorAll('[data-game-efficiency-entry] option').length !== report.runs.length) failures.push('Efficiency result selector omits submitted runs.');
+        const maximum = Math.max(60, ...report.runs.map(run => (run.metrics?.durationMs || 0) / 60000));
+        for (const run of plotted) {
+          const point = findTask()?.querySelector(`[data-game-effort-run="${CSS.escape(run.id)}"]`);
+          if (!point || point.dataset.gameDurationMs !== String(run.metrics.durationMs) || point.dataset.gameDisplayScore !== String(displayScore(run))) failures.push('Game efficiency point differs from observed evidence: ' + run.id);
+          if (run.status === 'timeout' && !point?.getAttribute('aria-label')?.includes('Generation limit reached')) failures.push('Timeout is presented as completed generation: ' + run.id);
+          const plane = findTask()?.querySelector('[data-game-plot]')?.getBoundingClientRect();
+          const mark = point?.getBoundingClientRect();
+          if (!visible(point) || !plane?.width || Math.abs(mark.left + mark.width / 2 - plane.left - plane.width * (run.metrics.durationMs / 60000) / maximum) > 2 || Math.abs(mark.top + mark.height / 2 - plane.top - plane.height * (100 - displayScore(run)) / 100) > 2) failures.push('Game efficiency point is not on its score/time coordinates: ' + run.id);
+          point?.click();
+          await settle();
+          const summary = findTask()?.querySelector('[data-game-selected-run]');
+          if (!visible(summary) || summary.dataset.gameSelectedRun !== run.id) failures.push('Efficiency point does not select its result: ' + run.id);
+          checkReading(summary?.querySelector('[data-game-run-id]'), run);
+          const href = summary?.querySelector('[data-game-selected-report]')?.href;
+          if (!href || new URL(href).searchParams.get('benchmark') !== report.benchmark.id || new URL(href).searchParams.get('model') !== run.configurationId) failures.push('Efficiency selection loses its report: ' + run.id);
+          if (run.status === 'timeout' && !text(summary).includes('Generation limit reached')) failures.push('Selected timeout hides its generation status: ' + run.id);
+        }
+        const first = report.runs.find(run => run.conditionId === report.conditions[1]?.id) || report.runs[0];
+        const select = findTask()?.querySelector('[data-game-efficiency-entry]');
+        if (select && first) { select.value = first.id; select.dispatchEvent(new Event('change', { bubbles: true })); await settle(); }
+      }
+    }
+    if (document.documentElement.scrollWidth > innerWidth + 1) failures.push('Games has horizontal page overflow: ' + mode);
+  };
+  for (const mode of modes) await checkMode(mode);
+  // Same-document history must restore both the route and visible tab panel.
+  if (modes.includes('efficiency')) {
+    const visitHistory = async direction => {
+      const changed = new Promise(resolve => addEventListener('popstate', resolve, { once: true }));
+      history[direction]();
+      await Promise.race([changed, new Promise((_, reject) => setTimeout(() => reject(new Error('Games history did not navigate')), 3000))]);
+      await settle();
+    };
+    await visitHistory('back');
+    if (location.hash !== '#capabilities/games/benchmarks' || !visible(document.querySelector('#capability-benchmarks'))) failures.push('Games Back does not restore benchmark tab.');
+    await visitHistory('forward');
+    if (location.hash !== '#capabilities/games/efficiency' || !visible(document.querySelector('#capability-efficiency'))) failures.push('Games Forward does not restore efficiency tab.');
+  }
+  await checkMode(requestedMode);
+  return { failures, categoryCount: 1, benchmarkCount: reports.length, settingCount: new Set(runs.map(run => run.configurationId)).size, entryCount: runs.length, resultCount: runs.length, d3Version: window.d3?.version };
 }
 
 async function auditOverall(target) {
@@ -2413,7 +2578,7 @@ try {
   if (
     !manifest
     || manifest.kind !== 'vasirbenchmark-public-projection'
-    || ![2, 3, 4].includes(manifest.schemaVersion)
+    || ![2, 3, 4, 5, 6].includes(manifest.schemaVersion)
     || manifest.scoreEdition !== 'backend-architecture-panel-consensus-v2'
     || manifest.scoreMethod !== 'equal-benchmark-absolute-mean-v1'
     || manifest.conditions.join('|') !== 'baseline|skill'
@@ -2447,7 +2612,7 @@ try {
     const navigationAudit = await evaluate('(' + auditCategoryNavigation.toString() + ')()');
     if (navigationAudit.failures.length) throw new Error('QA failed: ' + navigationAudit.failures.join('; '));
   }
-  const audit = isOverallTarget && hasOverall
+  const audit = isGamesCapture ? await evaluate('(' + auditGames.toString() + ')(' + JSON.stringify(captureTarget) + ')') : isOverallTarget && hasOverall
     ? await evaluate('(' + auditOverall.toString() + ')(' + JSON.stringify(captureTarget) + ')')
     : isWorkflowCapture ? await evaluate('(' + auditWorkflows.toString() + ')(' + JSON.stringify(captureTarget) + ')') : await evaluate(
     '(' + auditSite.toString() + ')('
@@ -2478,13 +2643,17 @@ try {
   }
 
   if (isOverallTarget && hasOverall) {
-    const editions = {overall: 'Overall v2', engineering: 'Engineering v2', 'ai-workflows': 'Work Specs v1'};
-    // All measured context transitions remain covered; keyboard traversal must
-    // skip the three disabled placeholders and restore focus after each reload.
+    const editions = {overall: 'Overall v2', engineering: 'Engineering v2', games: 'Games v1 pilot', 'ai-workflows': 'Work Specs v1'};
+    // Every published category participates in the same keyboard navigation.
+    const hasGames = await evaluate('Boolean(window.VASIR_DATA.games)');
+    const hasWriting = await evaluate('Boolean(window.VASIR_DATA.writing?.coverage?.caseCount)');
+    if (hasWriting) editions.writing = await evaluate('window.VASIR_DATA.writing.scoreBasisLabel');
     const navigationSteps = [
-      {category: 'engineering'}, {category: 'ai-workflows', move: 'next'},
+      {category: 'engineering'}, ...(hasGames ? [{category: 'games', move: 'next'}] : []),
+      ...(hasWriting ? [{category: 'writing', move: 'next'}] : []), {category: 'ai-workflows', move: 'next'},
       {category: 'overall', move: 'next'}, {category: 'ai-workflows', key: 'End'},
-      {category: 'engineering', move: 'previous'}, {category: 'overall', key: 'Home'}
+      ...(hasWriting ? [{category: 'writing', move: 'previous'}] : []),
+      ...(hasGames ? [{category: 'games', move: 'previous'}] : []), {category: 'engineering', move: 'previous'}, {category: 'overall', key: 'Home'}
     ];
     for (const step of navigationSteps) {
       const {category} = step;
@@ -2508,12 +2677,15 @@ try {
             + ') && document.activeElement?.id === '
             + JSON.stringify('capability-category-' + category));
         } catch { return false; }
+      }).catch(async error => {
+        const actual = await evaluate('({hash:location.hash,selected:document.querySelector(".capability-selector__tab[aria-selected=true]")?.dataset.categoryId,edition:document.querySelector(".capability-canvas__status")?.textContent,focused:document.activeElement?.id})').catch(() => null);
+        throw new Error('Category keyboard navigation failed for ' + category + ': ' + error.message + ' · ' + JSON.stringify(actual));
       });
       if (key) await protocol.send('Input.dispatchKeyEvent', {type: 'keyUp', key, code: key, windowsVirtualKeyCode: keyCode});
     }
   }
 
-  if (isWorkflowCapture && !isReportCapture) {
+  if ((isWorkflowCapture || isGamesCapture) && !isReportCapture) {
     const rowLayout = () => {
       const row = document.querySelector('.capability-rank-row');
       return ['.capability-rank-row__reading--baseline', '.capability-rank-row__reading--full', '.capability-rank-row__delta'].map(selector => {
@@ -2534,7 +2706,7 @@ try {
         };
       });
     };
-    const workflowRowLayout = captureTarget === 'workflows' ? await evaluate('(' + rowLayout.toString() + ')()') : null;
+    const workflowRowLayout = ['workflows', 'games'].includes(captureTarget) ? await evaluate('(' + rowLayout.toString() + ')()') : null;
     await evaluate("document.querySelector('#capability-category-engineering').click()");
     await waitFor(async () => {
       try {
@@ -2545,15 +2717,66 @@ try {
       const engineeringRowLayout = await evaluate('(' + rowLayout.toString() + ')()');
       if (JSON.stringify(workflowRowLayout) !== JSON.stringify(engineeringRowLayout)) {
         const differences = workflowRowLayout.flatMap((reading, index) => Object.keys(reading).filter(key => JSON.stringify(reading[key]) !== JSON.stringify(engineeringRowLayout[index]?.[key])).map(key => ({ reading: index, property: key, workflows: reading[key], engineering: engineeringRowLayout[index]?.[key] })));
-        throw new Error('QA failed: AI Workflows score, #rank, and uplift layout differs from Engineering at this viewport: ' + JSON.stringify(differences));
+        throw new Error('QA failed: ' + (isGamesCapture ? 'Games' : 'AI Workflows') + ' score and comparison layout differs from Engineering at this viewport: ' + JSON.stringify(differences));
       }
     }
-    await evaluate("document.querySelector('#capability-category-ai-workflows').click()");
+    const returnCategory = isGamesCapture ? 'games' : 'ai-workflows';
+    const returnEdition = isGamesCapture ? 'Games v1 pilot' : 'Work Specs v1';
+    await evaluate('document.querySelector(' + JSON.stringify('#capability-category-' + returnCategory) + ').click()');
     await waitFor(async () => {
       try {
-        return await evaluate("document.readyState === 'complete' && document.querySelector('#capability-category-ai-workflows')?.getAttribute('aria-selected') === 'true' && document.querySelector('.capability-canvas__status')?.textContent.includes('Work Specs v1') && document.activeElement?.id === 'capability-category-ai-workflows'");
+        return await evaluate("document.readyState === 'complete' && document.querySelector(" + JSON.stringify('#capability-category-' + returnCategory) + ")?.getAttribute('aria-selected') === 'true' && document.querySelector('.capability-canvas__status')?.textContent.includes(" + JSON.stringify(returnEdition) + ") && document.activeElement?.id === " + JSON.stringify('capability-category-' + returnCategory));
       } catch { return false; }
     });
+    if (isGamesCapture) {
+      const mode = captureTarget === 'game-efficiency' ? 'efficiency' : captureTarget === 'game-benchmarks' ? 'benchmarks' : 'models';
+      await evaluate('document.querySelector(' + JSON.stringify('[data-capability-mode="' + mode + '"]') + ').click(); new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+    }
+  }
+
+  if (captureTarget === 'game-efficiency') {
+    const pairs = await evaluate(`(() => [...document.querySelectorAll('[data-game-plot]')].map(plot => {
+      const points = [...plot.querySelectorAll('[data-game-effort-run]')];
+      let closest = null;
+      for (let i = 0; i < points.length; i++) for (let j = i + 1; j < points.length; j++) {
+        const a = points[i].getBoundingClientRect(), b = points[j].getBoundingClientRect();
+        const distance = Math.hypot(a.left - b.left, a.top - b.top);
+        if (distance > 0 && (!closest || distance < closest.distance)) closest = { distance, ids: [points[i].dataset.gameEffortRun, points[j].dataset.gameEffortRun] };
+      }
+      return closest?.ids || [];
+    }))()`);
+    for (const id of pairs.flat()) {
+      const coordinates = await evaluate(`(async () => {
+        const point = document.querySelector('[data-game-effort-run="' + CSS.escape(${JSON.stringify(id)}) + '"]');
+        point.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const box = point.getBoundingClientRect();
+        return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+      })()`);
+      if (width <= 430) {
+        await protocol.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...coordinates, id: 1 }] });
+        await protocol.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      } else {
+        await protocol.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...coordinates });
+        await protocol.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...coordinates, button: 'left', clickCount: 1 });
+        await protocol.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...coordinates, button: 'left', clickCount: 1 });
+      }
+      try {
+        await waitFor(async () => await evaluate('Boolean(document.querySelector(' + JSON.stringify('[data-game-selected-run="' + id + '"]') + '))'));
+      } catch {
+        const actual = await evaluate(`({ selected: [...document.querySelectorAll('[data-game-selected-run]')].map(element => element.dataset.gameSelectedRun), hit: document.elementFromPoint(${coordinates.x}, ${coordinates.y})?.className })`);
+        throw new Error('Nearest game point did not select from native coordinates: ' + JSON.stringify({ id, coordinates, actual }));
+      }
+    }
+    await evaluate(`(() => {
+      const reports = window.VASIR_DATA.games.benchmarks || [window.VASIR_DATA.games];
+      reports.forEach(report => {
+        const select = document.querySelector('[data-game-efficiency-entry][data-game-report-id="' + CSS.escape(report.benchmark.id) + '"]');
+        select.value = (report.runs.find(run => run.conditionId === report.conditions[1]?.id) || report.runs[0]).id;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    })()`);
   }
 
   let guideAudit = 'mobile-not-applicable';

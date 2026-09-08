@@ -1473,3 +1473,207 @@
   justify-items: start;
   gap: var(--space-2);
 }
+
+.writing-case-picker {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  background: var(--field-soft);
+}
+
+.writing-case-picker p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--type-small);
+  line-height: var(--type-body-leading);
+}
+
+.writing-case-title {
+  margin: var(--space-3) 0;
+  color: var(--report-category);
+  font-size: var(--type-title);
+  font-weight: 700;
+}
+
+.writing-answer-status {
+  margin: 0;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-family: var(--font-data);
+  font-size: var(--type-small);
+}
+
+.writing-rubric {
+  margin-top: var(--space-5);
+  font-size: var(--type-small);
+  line-height: var(--type-body-leading);
+}
+
+.writing-rubric dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin-block: var(--space-4);
+}
+
+.writing-rubric dl > div {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.writing-rubric dt {
+  font-weight: 700;
+}
+
+.writing-rubric dt span {
+  color: var(--ink-muted);
+  font-family: var(--font-data);
+  font-weight: 400;
+}
+
+.writing-rubric dd {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-soft);
+}
+
+.writing-rubric dd > p {
+  margin: 0;
+}
+
+.writing-rubric-anchors > summary {
+  min-height: var(--touch);
+  padding-block: var(--space-2);
+  color: var(--sdk-blue-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.writing-rubric-anchors > summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.writing-rubric-anchors dl {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  margin-block: 0 var(--space-3);
+}
+
+.writing-evidence-fields {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-block: var(--space-2);
+  font-size: var(--type-small);
+  line-height: var(--type-body-leading);
+  overflow-wrap: anywhere;
+}
+
+.writing-evidence-fields dt {
+  color: var(--ink-soft);
+}
+
+.writing-evidence-fields dd {
+  margin: var(--space-1) 0 0;
+}
+
+.writing-execution .work-spec-assessment__body,
+.writing-judge-resources .work-spec-assessment__body,
+.writing-method-execution .work-spec-assessment__body {
+  min-width: 0;
+  font-size: var(--type-small);
+  line-height: var(--type-body-leading);
+}
+
+.writing-execution h4,
+.writing-judge-resources h4 {
+  margin: var(--space-2) 0 0;
+}
+
+.writing-reference-reads {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-reference-reads .writing-prompt-reference {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.writing-prompt-reference {
+  padding: var(--space-3);
+  color: var(--sdk-blue-ink);
+  border: 1px solid var(--line);
+  background: var(--field);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.writing-prompt-reference:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.writing-method-inputs dl {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 100%;
+  font-size: var(--type-small);
+  overflow-wrap: anywhere;
+}
+
+.writing-method-inputs dd {
+  margin: var(--space-1) 0 0;
+}
+
+.writing-case-evidence {
+  font-size: var(--type-small);
+  line-height: var(--type-body-leading);
+}
+
+.writing-case-evidence h4 {
+  margin: 0;
+}
+
+.writing-case-evidence ul {
+  padding-left: var(--space-4);
+}
+
+.writing-case-evidence li + li {
+  margin-top: var(--space-3);
+}
+
+.writing-case-evidence small {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--ink-soft);
+}
+
+.writing-case-evidence a {
+  color: var(--sdk-blue-ink);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 42rem) {
+  .writing-case-picker,
+  .writing-rubric dl,
+  .writing-evidence-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .writing-dimensions th,
+  .writing-dimensions td {
+    padding-inline: var(--space-2);
+    overflow-wrap: anywhere;
+  }
+}

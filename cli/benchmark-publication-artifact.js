@@ -6,6 +6,8 @@ import vm from "node:vm";
 import zlib from "node:zlib";
 
 import { VasirCliError } from "./cli-error.js";
+import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
+import { validateWritingPublication } from "./eval/writing-publication.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 import {
   buildBenchmarkPublicationProjection,
@@ -16,11 +18,11 @@ import {
 
 const DEPLOYMENT_CONFIG_PATH = path.join("site", "vasirbenchmark.com", "deployment.json");
 const TEMPLATE_LOCK_FILE_NAME = "template-lock.json";
-const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js"]);
+const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js", "writing-data.js", "writing-responses.js"]);
 const RELEASE_ID_PATTERN = /^[a-f0-9]{64}$/;
 const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
 const PRIVATE_PARENT_PATH_PATTERN = /(?:^|[^.])\.\.[/\\]/i;
-const ACCEPTANCE_QA_FILE_PATHS = Object.freeze(["capture.mjs", "capture.sh"]);
+const ACCEPTANCE_QA_FILE_PATHS = Object.freeze(["capture.mjs", "capture.sh", "games-browsercheck.mjs", "writing-browsercheck.mjs"]);
 const FIXTURE_TOKEN_PATTERN = /\b(?:fake|illustrative|synthetic|simulated|fixture|mock)\b/i;
 const CACHE_CONTROL_BY_CLASS = Object.freeze({
   html: "public, max-age=0, s-maxage=31536000, must-revalidate",
@@ -44,7 +46,12 @@ const CANONICAL_PUBLIC_FILES = Object.freeze([
   { path: "benchmark-report.html", contentType: "text/html; charset=utf-8", cacheClass: "html" },
   { path: "benchmark-report.css", contentType: "text/css; charset=utf-8", cacheClass: "immutable" },
   { path: "benchmark-report.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
-  { path: "assets/kanit-latin-900-normal.woff2", contentType: "font/woff2", cacheClass: "immutable" }
+  { path: "assets/kanit-latin-900-normal.woff2", contentType: "font/woff2", cacheClass: "immutable" },
+  { path: "games.html", contentType: "text/html; charset=utf-8", cacheClass: "html" },
+  { path: "games.css", contentType: "text/css; charset=utf-8", cacheClass: "immutable" },
+  { path: "games.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
+  { path: "writing-data.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
+  { path: "writing-responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" }
 ]);
 function sha256(contents) {
   return crypto.createHash("sha256").update(contents).digest("hex");
@@ -213,8 +220,8 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (!Array.isArray(config.publicFiles) || config.publicFiles.length !== CANONICAL_PUBLIC_FILES.length) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist must contain exactly ten files.",
-      suggestion: "Restore the reviewed ten-file allowlist in deployment.json.",
+      message: "The production allowlist must contain exactly fifteen files.",
+      suggestion: "Restore the reviewed fifteen-file allowlist in deployment.json.",
       stage: "acceptance"
     });
   }
@@ -232,7 +239,7 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (publicContractDrift.length > 0) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist drifted from the canonical ten-file publication contract.",
+      message: "The production allowlist drifted from the canonical fifteen-file publication contract.",
       suggestion: "Restore the reviewed paths, content types, cache classes, and ordering in deployment.json.",
       stage: "acceptance",
       context: { expectedPaths: CANONICAL_PUBLIC_FILES.map(({ path: filePath }) => filePath) }
@@ -356,7 +363,7 @@ export function validateBenchmarkAcceptance({ config, siteRootDirectory }) {
   return lock;
 }
 
-function evaluateSiteModule({ source, filePath, globalName, publicPath }) {
+function evaluateSiteModule({ source, filePath, globalName, publicPath, allowNull = false }) {
   const sandbox = { window: {} };
   try {
     vm.runInNewContext(source, sandbox, {
@@ -371,7 +378,7 @@ function evaluateSiteModule({ source, filePath, globalName, publicPath }) {
     });
   }
   const value = sandbox.window[globalName];
-  if (!value) {
+  if (!value && !(allowNull && value === null)) {
     throw artifactError({
       message: `${publicPath} did not produce the required window.${globalName} data.`,
       suggestion: `Repair the public projector so ${publicPath} assigns window.${globalName}.`,
@@ -394,18 +401,21 @@ function transformHtmlDependencies({ contents, releaseId, publicFiles }) {
 
 
 function validateHtmlTargets({ filesByPath, releaseId, routes }) {
-  const allowedStableTargets = new Set(["/", "/index.html", "/benchmark-report.html"]);
+  const allowedStableTargets = new Set(["/", "/index.html", "/benchmark-report.html", "/games.html"]);
   const allowedDocumentFragments = new Map([
     ["index.html", new Set(["#top", "#benchmark-results"])],
-    ["benchmark-report.html", new Set(["#top", "#overview", "#ranking", "#method", "#limitations"])]
+    ["benchmark-report.html", new Set(["#top", "#overview", "#ranking", "#method", "#limitations"])],
+    ["games.html", new Set(["#top", "#game-comparison", "#game-results", "#game-reference", "#game-method"])]
   ]);
   const allowedFragmentTargets = new Set([
+    // Games is a native shell category even in a release with no selected game dataset.
+    "/#capabilities/games",
     ...routes.familyFragments,
     ...routes.viewFragments,
     ...routes.reportFragments
   ]);
   const failures = [];
-  for (const htmlPath of ["index.html", "benchmark-report.html"]) {
+  for (const htmlPath of ["index.html", "benchmark-report.html", "games.html"]) {
     const contents = filesByPath.get(htmlPath)?.body.toString("utf8") ?? "";
     const attributePattern = /\b(?:href|src)="([^"]+)"/g;
     for (const match of contents.matchAll(attributePattern)) {
@@ -472,9 +482,11 @@ export function buildBenchmarkPublicationArtifact({
   const publicationProjection = buildBenchmarkPublicationProjection({ repoRootDirectory });
   const generatedFiles = new Map([
     ["data.js", Buffer.from(publicationProjection.dataSource, "utf8")],
-    ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")]
+    ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")],
+    ["writing-data.js", Buffer.from(publicationProjection.writingDataSource, "utf8")],
+    ["writing-responses.js", Buffer.from(publicationProjection.writingResponsesSource, "utf8")]
   ]);
-  const fileByteLimit = relativePath => relativePath === "responses.js"
+  const fileByteLimit = relativePath => ["responses.js", "writing-responses.js"].includes(relativePath)
     ? (config.limits.maxResponseFileBytes ?? config.limits.maxFileBytes)
     : config.limits.maxFileBytes;
   const sourceFiles = config.publicFiles.map((fileConfig) => {
@@ -551,7 +563,16 @@ export function buildBenchmarkPublicationArtifact({
 
   const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "vasirbenchmark-release."));
   const files = [];
+  const artifactFiles = [];
   try {
+    for (const file of publicationProjection.artifactFiles ?? []) {
+      const outputPath = path.join(temporaryDirectory, file.key);
+      fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+      fs.copyFileSync(file.sourcePath, outputPath);
+      const body = fs.readFileSync(outputPath);
+      if (body.length !== file.bytes || sha256(body) !== file.sha256) throw artifactError({ message: "A selected game artifact changed during packaging." });
+      artifactFiles.push({ ...file, outputPath, checksumSha256Base64: Buffer.from(file.sha256, "hex").toString("base64"), cacheClass: "immutable", cacheControl: CACHE_CONTROL_BY_CLASS.immutable });
+    }
     for (const sourceFile of sourceFiles) {
       const body = sourceFile.cacheClass === "html"
         ? transformHtmlDependencies({
@@ -628,6 +649,14 @@ export function buildBenchmarkPublicationArtifact({
       publicPath: "responses.js"
     });
     validateBenchmarkPublicationResponses(responseBundle, data);
+    const writingFile = filesByPath.get("writing-data.js");
+    const writingResponsesFile = filesByPath.get("writing-responses.js");
+    const writing = evaluateSiteModule({ source: writingFile.body.toString("utf8"), filePath: writingFile.outputPath, globalName: "VASIR_WRITING", publicPath: "writing-data.js", allowNull: true });
+    const writingResponses = evaluateSiteModule({ source: writingResponsesFile.body.toString("utf8"), filePath: writingResponsesFile.outputPath, globalName: "VASIR_WRITING_RESPONSES", publicPath: "writing-responses.js", allowNull: true });
+    if (data.writing) {
+      validateWritingPublication(writing, writingResponses);
+      if (JSON.stringify(writing.coverage) !== JSON.stringify(data.writing.coverage)) throw artifactError({ message: "Writing lazy evidence and landing coverage differ.", suggestion: "Regenerate both bundles from the same pinned source." });
+    } else if (writing !== null || writingResponses !== null) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
     const benchmarkRoutes = buildBenchmarkPublicationRoutes(data);
     if (JSON.stringify(benchmarkRoutes) !== JSON.stringify(publicationProjection.routes)) {
       throw artifactError({
@@ -662,7 +691,10 @@ export function buildBenchmarkPublicationArtifact({
     const fixtureTokenPaths = files
       .filter((file) => config.publicFiles.some((fileConfig) => fileConfig.path === file.path))
       .filter((file) => /^(?:text\/|application\/(?:javascript|json))/.test(file.contentType))
-      .filter((file) => file.path !== "responses.js")
+      // Story fact packets can describe a simulated world (The Matrix) or a
+      // simulated relationship. Their pinned source is validated structurally;
+      // retired-demo vocabulary is not a valid test of that literary evidence.
+      .filter((file) => !["responses.js", "writing-responses.js", "writing-data.js"].includes(file.path))
       .filter((file) => FIXTURE_TOKEN_PATTERN.test(file.body.toString("utf8")))
       .map((file) => file.path);
     if (fixtureTokenPaths.length > 0) {
@@ -704,7 +736,8 @@ export function buildBenchmarkPublicationArtifact({
       cacheClass,
       cacheControl
     })),
-    routes
+    routes,
+    ...(artifactFiles.length ? { artifactOrigin: GAME_ARTIFACT_ORIGIN, artifacts: artifactFiles.map(({ key, publicUrl, bytes, sha256, contentType, cacheControl }) => ({ key, publicUrl, bytes, sha256, contentType, cacheControl })) } : {})
   };
 
   return {
@@ -718,6 +751,8 @@ export function buildBenchmarkPublicationArtifact({
     sourceManifest,
     publicManifest,
     files,
+    artifactFiles,
+    artifactTotalBytes: artifactFiles.reduce((sum, file) => sum + file.bytes, 0),
     routes,
     fileCount: files.length,
     totalBytes,

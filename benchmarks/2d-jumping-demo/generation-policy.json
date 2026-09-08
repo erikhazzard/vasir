@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "2d-jumping-demo",
+  "prompt": "Create a 2D jumping platformer for mobile browsers in portrait mode. Pick a strong art direction.",
+  "configurations": [
+    "claude:claude-fable-5-1@max",
+    "codex:gpt-5.6-sol@max",
+    "codex:gpt-5.6-terra@max",
+    "codex:gpt-6-astra@medium"
+  ],
+  "conditions": ["bare", "vasir"],
+  "wallTimeLimitMs": 3600000,
+  "tokenLimit": null,
+  "concurrency": 2,
+  "maxStreamBytes": 67108864,
+  "delegation": "disabled for all contestants; single-agent workflow pilot",
+  "externalFeedback": "none; one user message; no externally initiated continuation, repair, retry, review, or coaching",
+  "imageGeneration": "same generate_image MCP bridge; verbatim contestant prompts; native imagegen service; 20 minute tool timeout within total wall limit",
+  "browser": { "package": "@playwright/mcp", "version": "0.0.80", "engine": "Chromium headless shell 153.0.8010.12 / Playwright revision 1243", "viewport": "390x844", "headless": true, "isolated": true, "capabilities": ["vision"] },
+  "catalog": ".agents/skills",
+  "catalogDiscovery": "frozen complete Vasir catalog installed in isolated provider-native user skill location; no skill content added to the user prompt",
+  "credentials": "auth-only runtime copies; never retained in result artifacts",
+  "isolation": "fresh temporary project and provider homes; external macOS sandbox denies original home, repository and sibling rows; no ambient AGENTS.md or CLAUDE.md",
+  "runtimeDifference": "provider-native default system prompts and built-in coding/search tools differ; shared browser/image tools and task/resource policy are identical"
+}

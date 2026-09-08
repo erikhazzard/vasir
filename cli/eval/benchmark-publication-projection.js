@@ -11,6 +11,8 @@ import { VasirCliError } from "../cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
 import { buildWorkSpecPublication, validateWorkSpecPublication, validateWorkSpecTrack, WORK_SPEC_TRACK_ID } from "./work-spec-publication.js";
 import { buildOverallPublication, validateOverallPublication } from "./overall-publication.js";
+import { buildGamesPublication, validateGamesPublication } from "./games-publication.js";
+import { buildWritingPublication, validateWritingSummary, serializeWritingModule } from "./writing-publication.js";
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -1834,6 +1836,18 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 }
 
 export function validateBenchmarkPublicationProjection(projection) {
+  if (projection?.schemaVersion === 6 && projection.writing) {
+    const { writing, ...existing } = projection;
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+    validateWritingSummary(writing);
+    return projection;
+  }
+  if (projection?.schemaVersion === 5 && projection.games) {
+    const { games, ...existing } = projection;
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+    validateGamesPublication(games);
+    return projection;
+  }
   if (projection?.schemaVersion === 4 && projection.overall && projection.aiWorkflows) {
     const { overall, ...sources } = projection;
     validateBenchmarkPublicationProjection({ ...sources, schemaVersion: 3 });
@@ -2210,6 +2224,16 @@ export function validateBenchmarkPublicationProjection(projection) {
 }
 
 export function validateBenchmarkPublicationResponses(responseBundle, projection) {
+  if (projection?.schemaVersion === 6 && projection.writing) {
+    validateBenchmarkPublicationProjection(projection);
+    const { writing, ...existing } = projection;
+    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+  }
+  if (projection?.schemaVersion === 5 && projection.games) {
+    validateBenchmarkPublicationProjection(projection);
+    const { games, ...existing } = projection;
+    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+  }
   if (projection?.schemaVersion === 4 && projection.overall) {
     validateBenchmarkPublicationProjection(projection);
     const { overall, ...sources } = projection;
@@ -2410,7 +2434,7 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
 
 export function serializeBenchmarkPublicationProjection(projection) {
   validateBenchmarkPublicationProjection(projection);
-  const serialized = JSON.stringify(projection, null, 2)
+  const serialized = JSON.stringify(projection)
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
   return `(function () {\n  'use strict';\n\n  window.VASIR_DATA = Object.freeze(${serialized});\n}());\n`;
@@ -2418,7 +2442,7 @@ export function serializeBenchmarkPublicationProjection(projection) {
 
 export function serializeBenchmarkPublicationResponses(responseBundle, projection) {
   validateBenchmarkPublicationResponses(responseBundle, projection);
-  const serialized = JSON.stringify(responseBundle, null, 2)
+  const serialized = JSON.stringify(responseBundle)
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
   return `(function () {\n  'use strict';\n\n  window.VASIR_RESPONSES = Object.freeze(${serialized});\n}());\n`;
@@ -2427,19 +2451,25 @@ export function serializeBenchmarkPublicationResponses(responseBundle, projectio
 export function buildBenchmarkPublicationRoutes(projection) {
   validateBenchmarkPublicationProjection(projection);
   return {
-    entrypoints: ["/", "/index.html", "/benchmark-report.html"],
-    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : [])],
+    entrypoints: ["/", "/index.html", "/benchmark-report.html", ...(projection.games ? ["/games.html"] : [])],
+    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.games ? ["/#capabilities/games"] : []), ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : []), ...(projection.writing ? ["/#capabilities/writing/storytelling"] : [])],
     viewFragments: [
       "/#capabilities/overall/benchmarks",
       "/#capabilities/overall/efficiency",
       "/#capabilities/engineering/benchmarks",
       "/#capabilities/engineering/efficiency",
-      ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : [])
+      ...(projection.games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []),
+      ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []),
+      ...(projection.writing ? ["/#capabilities/writing/storytelling/benchmarks", "/#capabilities/writing/storytelling/efficiency"] : [])
     ],
-    reportFragments: Array.from(
-      [...projection.benchmarks, ...(projection.aiWorkflows?.benchmarks ?? [])],
-      (benchmark) => `/benchmark-report.html#${benchmark.reportFragment}`
-    )
+    reportFragments: [
+      ...Array.from(
+        [...projection.benchmarks, ...(projection.aiWorkflows?.benchmarks ?? [])],
+        (benchmark) => `/benchmark-report.html#${benchmark.reportFragment}`
+      ),
+      ...(projection.games ? (projection.games.benchmarks ?? [projection.games]).map(report => `/games.html?benchmark=${encodeURIComponent(report.benchmark.id)}`) : []),
+      ...(projection.writing ? [`/benchmark-report.html#${projection.writing.benchmarkId}`] : [])
+    ]
   };
 }
 
@@ -2499,29 +2529,60 @@ export function buildBenchmarkPublicationProjection({
     projection.schemaVersion = 4;
   }
 
+  const games = buildGamesPublication({ repoRootDirectory, readFileSyncImplementation });
+  if (games) {
+    projection.schemaVersion = 5;
+    projection.games = games.projection;
+  }
+
+  const writing = buildWritingPublication({ repoRootDirectory, readFileSyncImplementation });
+  if (writing) {
+    projection.schemaVersion = 6;
+    projection.writing = writing.stub;
+  }
+
   const basisSha256 = sha256(stableSerialize({
     taxonomy,
     definitions: EXPECTED_BENCHMARK_IDS.map((benchmarkId) => definitions.get(benchmarkId)),
     selectedRuns: selections.map(({ benchmarkId, observedSha256 }) => ({ benchmarkId, sha256: observedSha256 })),
-    ...(workflows ? { aiWorkflows: workflows.basisSha256, overall: projection.overall.scoreBasis.id } : {})
+    ...(workflows ? { aiWorkflows: workflows.basisSha256, overall: projection.overall.scoreBasis.id } : {}),
+    ...(games ? { games: games.basisSha256 } : {}),
+    ...(writing ? { writing: writing.basisSha256 } : {})
   }));
   return {
     projection,
     dataSource: serializeBenchmarkPublicationProjection(projection),
+    artifactFiles: games?.artifactFiles ?? [],
     responseBundle,
     responsesSource: serializeBenchmarkPublicationResponses(responseBundle, projection),
+    writing: writing?.projection ?? null,
+    writingResponses: writing?.responseBundle ?? null,
+    writingDataSource: serializeWritingModule(writing?.projection ?? null, "VASIR_WRITING"),
+    writingResponsesSource: serializeWritingModule(writing?.responseBundle ?? null, "VASIR_WRITING_RESPONSES"),
     basisSha256,
     routes: buildBenchmarkPublicationRoutes(projection),
     counts: workflows ? {
       ...projection.counts,
-      families: projection.counts.families + workflows.projection.counts.families,
-      tracks: projection.counts.tracks + workflows.projection.counts.tracks,
-      benchmarks: projection.counts.benchmarks + workflows.projection.counts.benchmarks,
-      categories: projection.counts.categories + workflows.projection.counts.categories,
-      settings: new Set([...projection.settings, ...workflows.projection.settings].map(setting => setting.configurationId)).size,
-      resultEntries: projection.counts.resultEntries + workflows.projection.counts.resultEntries,
-      responses: projection.counts.responses + workflows.projection.counts.responses,
-      developmentResultSets: projection.counts.developmentResultSets + workflows.projection.counts.developmentResultSets
-    } : { ...projection.counts }
+      families: projection.counts.families + workflows.projection.counts.families + (games ? 1 : 0) + (writing ? 1 : 0),
+      tracks: projection.counts.tracks + workflows.projection.counts.tracks + (games ? 1 : 0) + (writing ? 1 : 0),
+      benchmarks: projection.counts.benchmarks + workflows.projection.counts.benchmarks + (games ? 1 : 0) + (writing ? 1 : 0),
+      categories: projection.counts.categories + workflows.projection.counts.categories + (writing ? 1 : 0),
+      settings: new Set([...projection.settings, ...workflows.projection.settings, ...(writing?.projection.settings ?? [])].map(setting => setting.configurationId)).size,
+      resultEntries: projection.counts.resultEntries + workflows.projection.counts.resultEntries + (writing?.projection.counts.resultEntries ?? 0),
+      responses: projection.counts.responses + workflows.projection.counts.responses + (writing?.projection.counts.responses ?? 0),
+      developmentResultSets: projection.counts.developmentResultSets + workflows.projection.counts.developmentResultSets + (writing ? 1 : 0)
+    } : {
+      ...projection.counts,
+      ...(writing ? {
+        families: projection.counts.families + 1,
+        tracks: projection.counts.tracks + 1,
+        benchmarks: projection.counts.benchmarks + 1,
+        categories: projection.counts.categories + 1,
+        settings: new Set([...projection.settings, ...writing.projection.settings].map(setting => setting.configurationId)).size,
+        resultEntries: projection.counts.resultEntries + writing.projection.counts.resultEntries,
+        responses: projection.counts.responses + writing.projection.counts.responses,
+        developmentResultSets: projection.counts.developmentResultSets + 1
+      } : {})
+    }
   };
 }

@@ -120,8 +120,8 @@ Resources:
             - Header: Permissions-Policy
               Override: true
               Value: >-
-                accelerometer=(), autoplay=(), camera=(), display-capture=(),
-                encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(),
+                accelerometer=(), autoplay=(self "https://d7us0tudou7ya.cloudfront.net"), camera=(), display-capture=(),
+                encrypted-media=(), fullscreen=(self "https://d7us0tudou7ya.cloudfront.net"), geolocation=(), gyroscope=(),
                 magnetometer=(), microphone=(), midi=(), payment=(),
                 publickey-credentials-get=(), screen-wake-lock=(), usb=()
         Name: vasirbenchmark-production-security-v1
@@ -130,7 +130,9 @@ Resources:
             ContentSecurityPolicy: >-
               default-src 'none'; base-uri 'none'; connect-src 'none';
               font-src 'self'; form-action 'none'; frame-ancestors 'none';
-              img-src 'self' data:; object-src 'none'; script-src 'self';
+              img-src 'self' data: https://d7us0tudou7ya.cloudfront.net; object-src 'none'; script-src 'self';
+              frame-src https://d7us0tudou7ya.cloudfront.net;
+              media-src https://d7us0tudou7ya.cloudfront.net;
               style-src 'self' 'unsafe-inline'; upgrade-insecure-requests
             Override: true
           ContentTypeOptions:
@@ -147,6 +149,55 @@ Resources:
             Override: true
             Preload: false
 
+  GameArtifactHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: vasirbenchmark-game-artifacts-v1
+        Comment: Isolated contestant runtime and playback assets; no privileged browser capabilities.
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: >-
+              sandbox allow-scripts allow-same-origin;
+              default-src 'none'; base-uri 'none'; object-src 'none';
+              script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';
+              img-src 'self' data: blob:; font-src 'self' data:;
+              media-src 'self' data: blob:; connect-src 'self';
+              worker-src 'none'; frame-src 'none'; form-action 'none';
+              frame-ancestors https://vasirbenchmark.com; upgrade-insecure-requests
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: no-referrer
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            IncludeSubdomains: false
+            Override: true
+            Preload: false
+
+  GameArtifactOriginGuard:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var host = request.headers.host && request.headers.host.value;
+          if (host !== 'd7us0tudou7ya.cloudfront.net' ||
+              !/^\/artifacts\/[a-f0-9]{64}\/[A-Za-z0-9_./-]+$/.test(request.uri) ||
+              request.uri.indexOf('..') !== -1) {
+            return { statusCode: 403, statusDescription: 'Forbidden',
+              headers: { 'cache-control': { value: 'no-store' } } };
+          }
+          return request;
+        }
+      FunctionConfig:
+        Comment: Artifact JavaScript is never served on the VasirBench site origin.
+        Runtime: cloudfront-js-2.0
+      Name: vasirbenchmark-game-artifact-origin-guard
+
   ReleaseRouterFunction:
     Type: AWS::CloudFront::Function
     Properties:
@@ -159,8 +210,13 @@ Resources:
             request.uri = '/releases/${ActiveReleaseId}/index.html';
           } else if (request.uri === '/benchmark-report.html') {
             request.uri = '/releases/${ActiveReleaseId}/benchmark-report.html';
+          } else if (request.uri === '/games.html') {
+            request.uri = '/releases/${ActiveReleaseId}/games.html';
           }
-
+          if (!/^\/releases\/[a-f0-9]{64}\/(index\.html|style\.css|app\.js|data\.js|responses\.js|writing-(data|responses)\.js|benchmark-report\.(html|css|js)|games\.(html|css|js)|assets\/(d3\.v7\.min\.js|kanit-latin-900-normal\.woff2))$/.test(request.uri)) {
+            return { statusCode: 403, statusDescription: 'Forbidden',
+              headers: { 'cache-control': { value: 'no-store' } } };
+          }
           return request;
         }
       FunctionConfig:
@@ -175,6 +231,18 @@ Resources:
         Aliases:
           - !Ref DomainName
         Comment: Production VasirBench static site.
+        CacheBehaviors:
+          - PathPattern: artifacts/*
+            AllowedMethods: [GET, HEAD]
+            CachedMethods: [GET, HEAD]
+            CachePolicyId: !Ref SiteCachePolicy
+            Compress: true
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt GameArtifactOriginGuard.FunctionMetadata.FunctionARN
+            ResponseHeadersPolicyId: !Ref GameArtifactHeadersPolicy
+            TargetOriginId: private-s3-origin
+            ViewerProtocolPolicy: redirect-to-https
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
@@ -229,7 +297,9 @@ Resources:
             Principal:
               Service: cloudfront.amazonaws.com
             Action: s3:GetObject
-            Resource: !Sub '${OriginBucket.Arn}/releases/*'
+            Resource:
+              - !Sub '${OriginBucket.Arn}/releases/*'
+              - !Sub '${OriginBucket.Arn}/artifacts/*'
             Condition:
               StringEquals:
                 AWS:SourceAccount: !Ref AWS::AccountId

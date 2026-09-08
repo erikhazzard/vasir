@@ -127,6 +127,12 @@ function createPublicationRepoCopy(prefix) {
   const copiedSiteRoot = path.join(temporaryRoot, "site", "vasirbenchmark.com");
   fs.mkdirSync(path.dirname(copiedSiteRoot), { recursive: true });
   fs.cpSync(SITE_ROOT, copiedSiteRoot, { recursive: true });
+  // This historical fixture omits Writing sources, so its navigation must reflect that selection.
+  const gamesHtmlPath = path.join(copiedSiteRoot, "games.html");
+  fs.writeFileSync(gamesHtmlPath, fs.readFileSync(gamesHtmlPath, "utf8").replace(
+    '<a class="game-capabilities__link" href="./index.html#capabilities/writing/storytelling">Writing</a>',
+    '<span class="game-capabilities__unavailable">Writing <small>Coming soon</small></span>'
+  ), "utf8");
   createBenchmarkFixtureRoot(temporaryRoot);
   fs.mkdirSync(path.join(temporaryRoot, ".agents"), { recursive: true });
   fs.symlinkSync(path.join(REPO_ROOT, ".agents", "vasir-evals"), path.join(temporaryRoot, ".agents", "vasir-evals"), "dir");
@@ -137,9 +143,11 @@ function createPublicationRepoCopy(prefix) {
   const lockPath = path.join(copiedSiteRoot, "template-lock.json");
   const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
   const acceptedPaths = [
-    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js"].includes(filePath)),
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js"].includes(filePath)),
     "capture.mjs",
-    "capture.sh"
+    "capture.sh",
+    "games-browsercheck.mjs",
+    "writing-browsercheck.mjs"
   ];
   lock.files = acceptedPaths.map((relativePath) => {
     const contents = fs.readFileSync(path.join(copiedSiteRoot, relativePath));
@@ -162,16 +170,16 @@ function createPublicationRepoCopy(prefix) {
   return { temporaryRoot, copiedSiteRoot };
 }
 
-test("public benchmark cohort is derived from selected evidence and matches registered configurations", () => {
+test("public Engineering cohort preserves selected historical evidence while remaining registered", () => {
   const registeredConfigurationIds = resolveBenchmarkConfigurations().map(({ id }) => id);
   const { projection } = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
   const publicConfigurationIds = projection.settings.map(({ configurationId }) => configurationId);
   assert.equal(publicConfigurationIds.length, EXPECTED_SETTING_COUNT);
   assert.equal(new Set(publicConfigurationIds).size, EXPECTED_SETTING_COUNT);
-  assert.deepEqual(
-    [...publicConfigurationIds].sort(),
-    registeredConfigurationIds.sort()
-  );
+  assert.ok(publicConfigurationIds.every((id) => registeredConfigurationIds.includes(id)));
+  assert.ok(registeredConfigurationIds.includes("claude:claude-fable-5-1@low"));
+  assert.ok(!publicConfigurationIds.includes("claude:claude-fable-5-1@low"),
+    "Newly advertised reasoning settings do not retroactively enter frozen Engineering evidence");
   assert.deepEqual(
     publicConfigurationIds.filter((configurationId) => (
       configurationId.startsWith("claude:claude-fable-5-1@")
@@ -191,7 +199,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
   try {
     assert.match(first.releaseId, /^[a-f0-9]{64}$/);
     assert.equal(first.releaseId, second.releaseId);
-    assert.equal(first.fileCount, 10);
+    assert.equal(first.fileCount, 15);
     assert.deepEqual(first.sourceManifest, second.sourceManifest);
     assert.deepEqual(first.publicManifest, second.publicManifest);
     assert.deepEqual(first.routes.entrypoints, ["/", "/index.html", "/benchmark-report.html"]);
@@ -229,7 +237,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     assert.ok(first.compressedLandingBytes <= first.config.limits.maxCompressedLandingBytes);
     assert.equal(first.config.limits.maxFileBytes, 2 * 1024 * 1024);
     assert.equal(first.config.limits.maxResponseFileBytes, 8 * 1024 * 1024);
-    assert.equal(first.config.limits.maxArtifactBytes, 10 * 1024 * 1024);
+    assert.equal(first.config.limits.maxArtifactBytes, 16 * 1024 * 1024);
     const landingDependencyPaths = new Set([
       "index.html",
       "style.css",
@@ -291,7 +299,30 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     assert.match(landing, new RegExp(`/releases/${first.releaseId}/app\\.js`));
     assert.match(landing, /<link rel="icon" href="data:,">/);
     assert.match(report, /<link rel="icon" href="data:,">/);
-    assert.match(report, new RegExp(`/releases/${first.releaseId}/responses\\.js`));
+    assert.match(report, new RegExp(`/releases/${first.releaseId}/benchmark-report\\.js`));
+    assert.doesNotMatch(report, /src="[^"]*\/responses\.js"/);
+    const reportRuntime = first.files.find((file) => file.path === "benchmark-report.js").body.toString("utf8");
+    for (const [benchmarkId, expectedResources] of [
+      ["hyper-scale-chat", ["responses.js"]],
+      ["storytelling-core-idea", ["writing-data.js", "writing-responses.js"]]
+    ]) {
+      const requestedUrls = [];
+      vm.runInNewContext(reportRuntime, {
+        window: {
+          VASIR_DATA: { ...publicData, writing: { benchmarkId: "storytelling-core-idea" } },
+          location: { href: "https://vasirbenchmark.com/benchmark-report.html", hash: `#${benchmarkId}` }
+        },
+        document: {
+          currentScript: { src: `https://vasirbenchmark.com/releases/${first.releaseId}/benchmark-report.js` },
+          createElement: () => ({}),
+          head: { append: (script) => requestedUrls.push(script.src) }
+        },
+        URL
+      });
+      assert.deepEqual(requestedUrls, expectedResources.map((resource) =>
+        `https://vasirbenchmark.com/releases/${first.releaseId}/${resource}`
+      ), "lazy response modules stay bound to the active release and requested benchmark family");
+    }
     assert.doesNotMatch(landing, /responses\.js/);
     assert.doesNotMatch(landing, /(?:href|src)="\.\/(?:style\.css|assets\/d3\.v7\.min\.js|app\.js|data\.js)"/);
   } finally {
@@ -356,7 +387,7 @@ test("benchmark deployment config cannot substitute accepted QA files into the p
       () => readBenchmarkDeploymentConfig({ repoRootDirectory: temporaryRoot }),
       (error) => {
         assert.equal(error.code, "BENCHMARK_PUBLISH_CONFIG_INVALID");
-        assert.match(error.message, /canonical ten-file publication contract/);
+        assert.match(error.message, /canonical fifteen-file publication contract/);
         return true;
       }
     );
