@@ -1,0 +1,97 @@
+{
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "status": "passed",
+  "captures": [
+    {
+      "path": "live-dm-links-desktop.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "d16e303bae687f13274f42b872c4cfb1d2b0a8a9ec6e0b1495a2dc4317995e48",
+      "files": [
+        {
+          "name": "app.js",
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "name": "style.css",
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/style.css",
+          "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+        }
+      ],
+      "text": "Adventure outline91.9 → 95.3 · 6 prompts · 16 matched pairs ↗",
+      "href": "https://vasirbenchmark.com/benchmark-report.html?setting=codex-gpt-6-astra-ultra#dungeon-master-adventure-outline/primary-repeat-1",
+      "box": {
+        "left": 1048,
+        "right": 1424,
+        "top": 775.75,
+        "bottom": 847.34375
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      }
+    },
+    {
+      "path": "live-dm-links-mobile.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "0d292bf97569cd3aba7be370b270b0ef9fbb002877703e57eec159183b264198",
+      "files": [
+        {
+          "name": "app.js",
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "name": "style.css",
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/style.css",
+          "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+        }
+      ],
+      "text": "Adventure outline91.9 → 95.3 · 6 prompts · 16 matched pairs ↗",
+      "href": "https://vasirbenchmark.com/benchmark-report.html?setting=codex-gpt-6-astra-ultra#dungeon-master-adventure-outline/primary-repeat-1",
+      "box": {
+        "left": 16,
+        "right": 374,
+        "top": 601.484375,
+        "bottom": 673.078125
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "path": "live-dm-links-tablet.png",
+      "width": 820,
+      "height": 1000,
+      "sha256": "ebe836e8262867ca7a690f5cf8942d877c1737571b870be48d72644e9a3779b6",
+      "files": [
+        {
+          "name": "app.js",
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "name": "style.css",
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/style.css",
+          "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+        }
+      ],
+      "text": "Adventure outline91.9 → 95.3 · 6 prompts · 16 matched pairs ↗",
+      "href": "https://vasirbenchmark.com/benchmark-report.html?setting=codex-gpt-6-astra-ultra#dungeon-master-adventure-outline/primary-repeat-1",
+      "box": {
+        "left": 16,
+        "right": 406,
+        "top": 775.203125,
+        "bottom": 846.796875
+      },
+      "viewport": {
+        "width": 820,
+        "height": 1000
+      }
+    }
+  ],
+  "completedAt": "2026-09-08T03:13:35.958Z"
+}

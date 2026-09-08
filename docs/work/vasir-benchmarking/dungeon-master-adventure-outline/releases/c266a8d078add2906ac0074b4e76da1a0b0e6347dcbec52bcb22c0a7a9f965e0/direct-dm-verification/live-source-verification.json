@@ -1,0 +1,374 @@
+{
+  "kind": "dungeon-master-adopt-existing-live-release",
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T03:10:25.162Z",
+  "recommendation": "Adopt the already published combined release; do not publish v3 or rebuild v4 over newer work.",
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "candidate": {
+    "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/candidate.json",
+    "sha256": "2aa13eef5f9e035f9979658bae41720c088ca0cefa930a0eadbdc28f29905d82"
+  },
+  "publication": {
+    "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/publish-result.json",
+    "sha256": "932f622064123a2c068d63f9e1b089f7ead7743165891f6c75c29081fe51cd2e",
+    "status": "success",
+    "dryRun": false
+  },
+  "httpVerification": {
+    "method": "Independent read-only HTTPS GET of all 15 immutable release-file URLs; every request returned 200 and its byte hash matched the candidate.",
+    "files": [
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+        "path": "app.js",
+        "status": 200,
+        "bytes": 188816,
+        "observedSha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d",
+        "expectedSha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/assets/d3.v7.min.js",
+        "path": "assets/d3.v7.min.js",
+        "status": 200,
+        "bytes": 279706,
+        "observedSha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+        "expectedSha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/assets/kanit-latin-900-normal.woff2",
+        "path": "assets/kanit-latin-900-normal.woff2",
+        "status": 200,
+        "bytes": 19216,
+        "observedSha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
+        "expectedSha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/benchmark-report.css",
+        "path": "benchmark-report.css",
+        "status": 200,
+        "bytes": 33336,
+        "observedSha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084",
+        "expectedSha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/benchmark-report.html",
+        "path": "benchmark-report.html",
+        "status": 200,
+        "bytes": 2480,
+        "observedSha256": "eda467ff1129b08ac4c82dfc97d7795c22d7952b6182b2697125c8e3084458b6",
+        "expectedSha256": "eda467ff1129b08ac4c82dfc97d7795c22d7952b6182b2697125c8e3084458b6",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/benchmark-report.js",
+        "path": "benchmark-report.js",
+        "status": 200,
+        "bytes": 86001,
+        "observedSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351",
+        "expectedSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/data.js",
+        "path": "data.js",
+        "status": 200,
+        "bytes": 874810,
+        "observedSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+        "expectedSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/games.css",
+        "path": "games.css",
+        "status": 200,
+        "bytes": 19893,
+        "observedSha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8",
+        "expectedSha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/games.html",
+        "path": "games.html",
+        "status": 200,
+        "bytes": 3450,
+        "observedSha256": "f7da4585ba40f4db40cfe64fcacd46ef60b94d3a98d6101441eceff36da27045",
+        "expectedSha256": "f7da4585ba40f4db40cfe64fcacd46ef60b94d3a98d6101441eceff36da27045",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/games.js",
+        "path": "games.js",
+        "status": 200,
+        "bytes": 31995,
+        "observedSha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2",
+        "expectedSha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/index.html",
+        "path": "index.html",
+        "status": 200,
+        "bytes": 2649,
+        "observedSha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0",
+        "expectedSha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/responses.js",
+        "path": "responses.js",
+        "status": 200,
+        "bytes": 6484506,
+        "observedSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+        "expectedSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/style.css",
+        "path": "style.css",
+        "status": 200,
+        "bytes": 151018,
+        "observedSha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a",
+        "expectedSha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+        "path": "writing-data.js",
+        "status": 200,
+        "bytes": 1363147,
+        "observedSha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+        "expectedSha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+        "matchesExpected": true
+      },
+      {
+        "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-responses.js",
+        "path": "writing-responses.js",
+        "status": 200,
+        "bytes": 6126683,
+        "observedSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+        "expectedSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+        "matchesExpected": true
+      }
+    ],
+    "executionNote": "Observed by the independent verification command in tool session 61393. Results are persisted here without rerunning the work or performing a publication mutation.",
+    "expectedFileCount": 15,
+    "verifiedFileCount": 15
+  },
+  "dm": {
+    "projectionSha256": "f1e2a5334299ebdf91b0a723224ff6b4ede0c04e5d7721e693395457b3d500a0",
+    "wholeProjectionEqualsReviewedV3": true,
+    "writingDataAndResponsesByteEqualReviewedV3": true,
+    "rawFinalRunSha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a",
+    "rawAnswerTextsAndHashesMatched": 32,
+    "publicJudgePromptAndAnswerHashesMatched": 64,
+    "matchedPairs": 16,
+    "skillSnapshotSha256": "632c1e5ed6d456cb6a8be94efc87c097c8070c485abc975a633e427068de0962",
+    "publicTreatmentSkillProvenanceMatchesSnapshot": true,
+    "referenceLibraryFilesExactlyMatched": 28,
+    "fullFrozenSkillRootContainedInProviderInstruction": true,
+    "all29SkillFilesVerified": true,
+    "preservedIncompleteReferenceReceipt": {
+      "caseId": "primary-repeat-3",
+      "condition": "skill"
+    },
+    "expectedAnswerCount": 32,
+    "expectedPublicJudgmentCount": 64,
+    "expectedSkillFileCount": 29
+  },
+  "ui": {
+    "uniqueBenchmarkCount": "Published app uses a Set of primary, list, and additional benchmark IDs: 3 distinct Writing benchmarks.",
+    "mobileWrapping": "Published CSS allows link children to shrink, limits width to 100%, and uses overflow-wrap: anywhere. Live browser receipts report zero answer-link boundary mismatches.",
+    "newerWorkPreserved": "The release also retains provisional Storytelling and adds partial-coverage rows; do not overwrite it with an older reviewed candidate."
+  },
+  "liveBrowserProofs": [
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-browsercheck.json",
+      "sha256": "2a702755b3f21905d77a9baaaec687d4acddac68b9af53825dedb334f20e4a24",
+      "status": "passed",
+      "width": 390,
+      "checks": 138,
+      "errors": [],
+      "loadedFiles": [
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/benchmark-report.js",
+          "bytes": 86001,
+          "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-responses.js",
+          "bytes": 6126683,
+          "sha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        }
+      ],
+      "answerLinkBoundaryMismatches": 0,
+      "savedAdherence": {
+        "caseId": "primary-repeat-3",
+        "settingId": "codex-gpt-6-astra-ultra",
+        "condition": "skill",
+        "status": "incomplete"
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-browsercheck.json",
+      "sha256": "accb90095b1afd05afb8ef9479fc0f1036bc684656f22c94aa21893659ac8dd2",
+      "status": "passed",
+      "width": 820,
+      "checks": 138,
+      "errors": [],
+      "loadedFiles": [
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/benchmark-report.js",
+          "bytes": 86001,
+          "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-responses.js",
+          "bytes": 6126683,
+          "sha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        }
+      ],
+      "answerLinkBoundaryMismatches": 0,
+      "savedAdherence": {
+        "caseId": "primary-repeat-3",
+        "settingId": "codex-gpt-6-astra-ultra",
+        "condition": "skill",
+        "status": "incomplete"
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-browsercheck.json",
+      "sha256": "842738e6d96782443a41b569ad269b82cd28d0fb98a1d076d6d6f030d319fd0e",
+      "status": "passed",
+      "width": 1440,
+      "checks": 138,
+      "errors": [],
+      "loadedFiles": [
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/benchmark-report.js",
+          "bytes": 86001,
+          "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-responses.js",
+          "bytes": 6126683,
+          "sha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/app.js",
+          "bytes": 188816,
+          "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+        },
+        {
+          "url": "https://vasirbenchmark.com/releases/c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0/writing-data.js",
+          "bytes": 1363147,
+          "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+        }
+      ],
+      "answerLinkBoundaryMismatches": 0,
+      "savedAdherence": {
+        "caseId": "primary-repeat-3",
+        "settingId": "codex-gpt-6-astra-ultra",
+        "condition": "skill",
+        "status": "incomplete"
+      }
+    }
+  ],
+  "publicFilesEdited": false,
+  "awsMutationsPerformed": false,
+  "observedAt": "2026-09-08T03:10:25.162Z",
+  "timestampMeaning": "Timestamp when the completed observations were first recorded; individual HTTPS request timestamps were not captured. This report persists those verified results without rerunning the requests.",
+  "currentHomepageVerification": {
+    "url": "https://vasirbenchmark.com/",
+    "status": 200,
+    "expectedSha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0",
+    "observedSha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0",
+    "matchesExpected": true,
+    "referencedReleaseIds": [
+      "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0"
+    ],
+    "executionNote": "Fresh homepage GET was independently verified in tool session 69234 after the release-file checks."
+  }
+}

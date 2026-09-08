@@ -1,0 +1,101 @@
+{
+  "kind": "vasirbenchmark-writing-browsercheck",
+  "schemaVersion": 1,
+  "status": "failed",
+  "url": "https://vasirbenchmark.com/",
+  "width": 390,
+  "height": 844,
+  "harnessSha256": "7d622c32c4fb1103bcc1a5a1b1108a6b395db66848a3fbf07854dfe52662adaa",
+  "checks": [
+    "Writing appears in capability navigation",
+    "Overall loads without Writing data or answer bundles",
+    "Writing remains excluded from Overall",
+    "Writing uses the category route and preserves raw projections",
+    "Writing category preserves Overall bytes",
+    "Writing modes follow the category header without benchmark or subgroup pickers",
+    "Writing explicitly discloses a development index excluded from Overall",
+    "Writing scores, fixed active cohort, paired bars and ranks follow independent source arithmetic",
+    "Writing answers stay lazy on the category leaderboard",
+    "Writing leaderboard: answer-card children and actual text lines fit their cards and viewport",
+    "Partial rows preserve fixed subgroup weights, known source contributions and hatched unavailable capacity without totals or ranks",
+    "Writing paired rows reuse Overall typography",
+    "Writing category leaderboard: no horizontal page overflow",
+    "Writing partial coverage: no horizontal page overflow",
+    "Partial group buttons retain roving keyboard navigation",
+    "Partial known subgroup opens its own Benchmark tests",
+    "Partial unavailable subgroup opens its own Benchmark tests",
+    "Every published setting remains inspectable, without ranking coverage gaps",
+    "Selecting a setting opens every available benchmark answer link with its original case and trial route",
+    "Writing selected setting: answer-card children and actual text lines fit their cards and viewport",
+    "A stacked group segment opens category Benchmark tests",
+    "Category Benchmark tests includes every published benchmark with unchanged field means and report links",
+    "Writing category benchmarks: no horizontal page overflow",
+    "Only raw source provisional blocks appear inside Benchmark tests",
+    "Provisional storytelling-core-idea: separate qualified rows, exact published scores, ranks and unranked gaps",
+    "Opening provisional evidence never changes the primary category cohort",
+    "Writing provisional results: no horizontal page overflow",
+    "Category latency efficiency shows only complete finite scores and recorded resources",
+    "Writing latency efficiency: answer-card children and actual text lines fit their cards and viewport",
+    "Writing category latency efficiency: no horizontal page overflow",
+    "Category tokens efficiency shows only complete finite scores and recorded resources",
+    "Writing tokens efficiency: answer-card children and actual text lines fit their cards and viewport",
+    "Writing category tokens efficiency: no horizontal page overflow",
+    "Legacy capabilities/writing/storytelling/benchmarks preserves the full category",
+    "Legacy capabilities/writing/dungeon-master/benchmarks preserves the full category",
+    "Requested report keeps its original benchmark, cases and trial count"
+  ],
+  "screenshots": [
+    {
+      "path": "writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "writing-stacked-rows.png",
+      "bytes": 74201,
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "writing-partial.png",
+      "bytes": 72601,
+      "sha256": "75fc15d8b970db717e74d2f1953b7723e7e23e6747d5e62492e417a9d4fd7b68",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "writing-benchmarks.png",
+      "bytes": 75417,
+      "sha256": "6f35293f23f5990e40d166bce86509f9703fce676c58d2295051f1e30354290b",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "writing-efficiency.png",
+      "bytes": 64901,
+      "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "writing-efficiency-tokens.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "failureScreenshots": [],
+  "errors": [],
+  "error": "Error: Timed out: https://vasirbenchmark.com/benchmark-report.html?writing=storytelling-plot-twists&setting=codex-gpt-5-6-luna-max#storytelling-plot-twists/scifi-outline/trial-1\n    at waitFor (file:///Users/erikhazzard/code/vasir/site/vasirbenchmark.com/writing-browsercheck.mjs:55:9)\n    at async navigate (file:///Users/erikhazzard/code/vasir/site/vasirbenchmark.com/writing-browsercheck.mjs:86:3)\n    at async file:///Users/erikhazzard/code/vasir/site/vasirbenchmark.com/writing-browsercheck.mjs:632:3"
+}

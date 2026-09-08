@@ -1,0 +1,10 @@
+{
+  "releaseId": "0ce6fa0920494e9e77d09810c262661568e58331502a4a9ba7b7760fa6bd68e2",
+  "status": "superseded-before-publication",
+  "reasons": [
+    "A newer live release added provisional Storytelling results during QA.",
+    "Visual review found clipping in the mobile DM answer link despite passing page overflow assertions."
+  ],
+  "preservedEvidenceDirectory": "/Users/erikhazzard/code/vasir/docs/work/vasir-benchmarking/dungeon-master-adventure-outline/publication-evidence/20260908/candidate-v2-superseded",
+  "rawReceiptsUnchanged": true
+}

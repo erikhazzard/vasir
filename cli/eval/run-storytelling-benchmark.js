@@ -92,6 +92,20 @@ export function identifyStorytellingJudgeQuotaExhaustion({ error, configuration 
   return reason ? { reason, apiErrorStatus: apiErrorStatus === null ? null : Number(apiErrorStatus) } : null;
 }
 
+// An explicit provider policy block is terminal, not an operational failure.
+// Match only the adapter's terminal error evidence; prompt/answer text and a
+// generic API 400 are not evidence of filtering. The retained stdout tail may
+// be truncated, so its enclosing JSON need not remain parseable.
+export function isStorytellingGenerationOutputPolicyBlocked({ error, configuration }) {
+  if (configuration.provider !== "claude" || error?.code !== "EVAL_AGENT_RUNTIME_FAILED") return false;
+  const context = error.context ?? {};
+  if (context.requestedConfiguration && ["id", "provider", "model", "reasoning"].some((key) =>
+    context.requestedConfiguration[key] !== configuration[key])) return false;
+  return context.apiErrorStatus === 400 && typeof context.stdout === "string" &&
+    /"type"\s*:\s*"result"/u.test(context.stdout) && /"is_error"\s*:\s*true/u.test(context.stdout) &&
+    /"result"\s*:\s*"API Error: 400 Output blocked by content filtering policy"/u.test(context.stdout);
+}
+
 function rowKey(plan) {
   return [plan.configuration.id, plan.caseDefinition.id, `trial-${plan.trialNumber}`, plan.condition.id].join("::");
 }
@@ -445,6 +459,7 @@ export async function runStorytellingBenchmark({
       return (!generateProvider || plan.configuration.provider === generateProvider) &&
         (!generateModel || plan.configuration.model === generateModel) &&
         row.error?.code !== "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE" &&
+        !isStorytellingGenerationOutputPolicyBlocked({ error: row.error, configuration: plan.configuration }) &&
         (["pending", "running"].includes(row.rowStatus) ||
           (retryFailed && ["error", "unavailable"].includes(row.rowStatus)));
     }).sort((a, b) => digest(`${run.generation.orderSeed}:${rowKey(a)}`).localeCompare(digest(`${run.generation.orderSeed}:${rowKey(b)}`)));

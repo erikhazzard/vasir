@@ -200,7 +200,8 @@
         "evals/fixtures/water-ripples/report/report.json",
         "evals/references/moonlit-flooded-observatory-generation-prompt.md",
         "evals/suite.json",
-        "references/render-topology-guard.md"
+        "references/render-topology-guard.md",
+        "references/shader-execution.md"
       ],
       "path": ".agents/skills/code__threejs-rapier-performance",
       "entry": "SKILL.md"

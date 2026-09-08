@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { createStorytellingSkillInstruction, isStorytellingRequiredSkillReadReceiptCompatible, validateStorytellingSkillSnapshot } from "./storytelling-agent-runtime.js";
+import { DM_EXPANSION_EDITION, DM_ORIGINAL_RUN_SHA256, DM_ORIGINAL_JUDGES_SHA256, validateDungeonMasterExpansion } from "./dungeon-master-expansion-manifest.js";
 
 export const DUNGEON_MASTER_BENCHMARK_ID = "dungeon-master-adventure-outline";
 export const DUNGEON_MASTER_SELECTION_PATH = `benchmarks/${DUNGEON_MASTER_BENCHMARK_ID}/publication.json`;
@@ -54,14 +55,15 @@ function adherence(cells) {
   return { expectedTreatmentAnswers: treatment.length, returnedTreatmentAnswers: treatment.filter(cell => cell.coverage.completedResponses).length, verifiedTreatmentAnswers: treatment.filter(cell => cell.requiredSkillReadStatus === "complete").length, unverifiedTreatmentAnswers: treatment.filter(cell => cell.requiredSkillReadStatus === "incomplete").length, requiredChunkCount: treatment.reduce((sum, cell) => sum + (cell.requiredSkillReadChunks?.required ?? 0), 0), observedChunkCount: treatment.reduce((sum, cell) => sum + (cell.requiredSkillReadChunks?.observed ?? 0), 0) };
 }
 function summary(cells, cases) {
-  const pairs = cases.map(story => ({ story, baseline: cells.find(cell => cell.caseId === story.id && cell.condition === "baseline"), skill: cells.find(cell => cell.caseId === story.id && cell.condition === "skill") })).filter(pair => finite(pair.baseline?.exactScore) && finite(pair.skill?.exactScore));
+  const settingIds = [...new Set(cells.map(cell => cell.settingId))];
+  const pairs = settingIds.flatMap(settingId => cases.map(story => ({ story, baseline: cells.find(cell => cell.settingId === settingId && cell.caseId === story.id && cell.condition === "baseline"), skill: cells.find(cell => cell.settingId === settingId && cell.caseId === story.id && cell.condition === "skill") }))).filter(pair => finite(pair.baseline?.exactScore) && finite(pair.skill?.exactScore));
   const members = cells.filter(cell => cases.some(story => story.id === cell.caseId));
   const promptGroups = [...new Set(pairs.map(pair => pair.story.sourceCaseId))].map(id => pairs.filter(pair => pair.story.sourceCaseId === id));
   const promptMeans = promptGroups.map(group => ({ baseline: mean(group.map(pair => pair.baseline.exactScore)), treatment: mean(group.map(pair => pair.skill.exactScore)), delta: mean(group.map(pair => pair.skill.exactScore - pair.baseline.exactScore)) }));
-  return { baseline: round(mean(promptMeans.map(prompt => prompt.baseline))), treatment: round(mean(promptMeans.map(prompt => prompt.treatment))), delta: round(mean(promptMeans.map(prompt => prompt.delta))), aggregation: "equal-source-prompt-means-of-available-matched-repetitions", wins: pairs.filter(pair => pair.skill.exactScore > pair.baseline.exactScore).length, ties: pairs.filter(pair => pair.skill.exactScore === pair.baseline.exactScore).length, losses: pairs.filter(pair => pair.skill.exactScore < pair.baseline.exactScore).length, usablePairs: pairs.length, expectedPairs: cases.length, complete: pairs.length === cases.length, sourcePromptCount: new Set(cases.map(story => story.sourceCaseId)).size, scoredSourcePromptCount: promptGroups.length, pairCount: pairs.length, responseCount: members.filter(cell => cell.coverage.completedResponses).length, judgmentCount: members.reduce((sum, cell) => sum + cell.coverage.completedJudgments, 0), adherenceCoverage: adherence(members) };
+  return { baseline: round(mean(promptMeans.map(prompt => prompt.baseline))), treatment: round(mean(promptMeans.map(prompt => prompt.treatment))), delta: round(mean(promptMeans.map(prompt => prompt.delta))), aggregation: "equal-source-prompt-means-of-available-matched-repetitions", wins: pairs.filter(pair => pair.skill.exactScore > pair.baseline.exactScore).length, ties: pairs.filter(pair => pair.skill.exactScore === pair.baseline.exactScore).length, losses: pairs.filter(pair => pair.skill.exactScore < pair.baseline.exactScore).length, usablePairs: pairs.length, expectedPairs: cases.length * settingIds.length, complete: pairs.length === cases.length * settingIds.length, sourcePromptCount: new Set(cases.map(story => story.sourceCaseId)).size, scoredSourcePromptCount: promptGroups.length, pairCount: pairs.length, responseCount: members.filter(cell => cell.coverage.completedResponses).length, judgmentCount: members.reduce((sum, cell) => sum + cell.coverage.completedJudgments, 0), adherenceCoverage: adherence(members) };
 }
 function validRuntime(receipt, prompt, output, configuration, skillHash) {
-  requireEvidence(receipt?.freshSession === true && receipt.cli === "codex" && receipt.requestedModel === "gpt-6-astra" && receipt.requestedReasoning === "ultra" && equal(receipt.requestedConfiguration, configuration) && receipt.userPromptSha256 === hash(prompt) && receipt.outputSha256 === hash(output) && receipt.skillHash === skillHash, "fresh runtime identity, input, output, or treatment changed.");
+  requireEvidence(receipt?.freshSession === true && receipt.cli === configuration.provider && receipt.requestedModel === configuration.model && receipt.requestedReasoning === configuration.reasoning && equal(receipt.requestedConfiguration, configuration) && receipt.userPromptSha256 === hash(prompt) && receipt.outputSha256 === hash(output) && receipt.skillHash === skillHash, "fresh runtime identity, input, output, or treatment changed.");
 }
 function preferences(cases, responses) {
   return cases.flatMap(story => responses.find(response => response.caseId === story.id && response.condition === "baseline").judgments.map(judge => ({ caseId: story.id, reviewerId: judge.reviewerId, ...judge.preference })));
@@ -115,7 +117,8 @@ function sourceJudgments(run, row, dimensions) {
   });
 }
 
-export function projectDungeonMasterRun({ run, snapshot, sourceSha256 }) {
+function projectDungeonMasterSingle({ run, snapshot, sourceSha256, expanded = false }) {
+  const CONFIGURATION_ID = run.configurations?.[0]?.id;
   const definition = run?.benchmark?.definition;
   requireEvidence(run?.kind === "dungeon-master-benchmark" && definition?.id === DUNGEON_MASTER_BENCHMARK_ID && HASH.test(sourceSha256 ?? "") && run.benchmark.hash === hash(JSON.stringify(definition)), "unsupported or changed frozen benchmark.");
   requireEvidence(!String(definition.status).includes("draft"), "draft diagnostic runs cannot be selected.");
@@ -126,29 +129,31 @@ export function projectDungeonMasterRun({ run, snapshot, sourceSha256 }) {
   const rawDimensions = definition.scoring?.dimensions;
   requireEvidence(rawDimensions?.length === 6 && new Set(rawDimensions.map(d => d.id)).size === 6 && rawDimensions.every(d => d.weight === 1) && definition.scoring.ratingScale?.min === 0 && definition.scoring.ratingScale?.max === 5, "six equal 0–5 dimensions are required.");
   const dimensions = rawDimensions.map(d => ({ id: d.id, title: d.title, label: d.title, description: d.criterion, weight: 100 / 6, anchors: { 1: "Severe deficiencies; substantial invention or repair required.", 2: "Partially effective, with an important identifiable weakness.", 4: "Strong, with only minor limitations between competent and exceptional.", ...d.anchors } }));
-  requireEvidence(run.configurations?.length === 1 && run.configurations[0].id === CONFIGURATION_ID, "generator inventory changed.");
+  requireEvidence(run.configurations?.length === 1 && (expanded || run.configurations[0].id === 'codex:gpt-6-astra@ultra'), "generator inventory changed.");
   const configuration = run.configurations[0];
-  requireEvidence(configuration.provider === "codex" && configuration.model === "gpt-6-astra" && configuration.reasoning === "ultra", "generator identity changed.");
+  requireEvidence(expanded || configuration.provider === "codex" && configuration.model === "gpt-6-astra" && configuration.reasoning === "ultra", "generator identity changed.");
   if (run.judging?.pairs) requireEvidence(run.judging.schemaVersion === 1 && run.judging.panel?.length === 2 && equal(run.judging.panel.map(judge => judge.id).sort(), [...REVIEWERS].sort()), "independent judge inventory changed.");
-  const setting = { id: "codex-gpt-6-astra-ultra", configurationId: CONFIGURATION_ID, modelId: "codex:gpt-6-astra", provider: "codex", family: "GPT-6 Astra", reasoning: "ultra", label: "GPT-6 Astra · ultra" };
+  const family = ({ 'gpt-6-astra': 'GPT-6 Astra', 'gpt-5.6-sol': 'GPT-5.6 Sol', 'gpt-5.6-terra': 'GPT-5.6 Terra', 'gpt-5.6-luna': 'GPT-5.6 Luna', 'claude-fable-5-1': 'Claude Fable 5.1', 'claude-opus-5': 'Claude Opus 5' })[configuration.model] || configuration.model;
+  const setting = { id: configuration.id.toLowerCase().replace(/[^a-z0-9]+/gu, '-'), configurationId: configuration.id, modelId: `${configuration.provider}:${configuration.model}`, provider: configuration.provider, family, reasoning: configuration.reasoning, label: `${family} · ${configuration.reasoning}` };
   const cases = definition.cases.flatMap(c => Array.from({ length: c.repetitions }, (_, index) => ({ id: `${c.id}-repeat-${index + 1}`, sourceCaseId: c.id, benchmarkId: DUNGEON_MASTER_BENCHMARK_ID, title: `${c.title} · Repetition ${index + 1}`, prompt: c.task, trialNumber: index + 1, cohort: c.cohort, genre: c.genre, medium: "adventure outline", version: null, creator: null })));
   requireEvidence(new Set(cases.map(c => c.id)).size === 16 && run.rows?.length === 32 && new Set(run.rows.map(row => row.rowKey)).size === 32, "generation inventory is incomplete or duplicated.");
   const requiredSkillFiles = run.treatment.requiredSkillFiles ?? [];
   requireEvidence(equal(requiredSkillFiles, ["references/adventure-design.md"]), "required treatment reference policy changed.");
-  const instruction = createStorytellingSkillInstruction({ skillSnapshot: snapshot, skillDirectoryPath: "<frozen-skill-directory>", requiredSkillFiles });
+  const instruction = createStorytellingSkillInstruction({ skillSnapshot: snapshot, skillDirectoryPath: "<frozen-skill-directory>", requiredSkillFiles,
+    ...(expanded && configuration.provider === 'claude' ? { requiredSkillReadTransport: 'read-tool' } : {}) });
   const rubricText = definition.scoring.judgeInstructions;
   requireEvidence(typeof rubricText === "string" && rubricText.trim(), "frozen judging instructions missing.");
   if (run.judging?.pairs?.some(pair => pair.judges.some(judge => judge.status === "completed"))) requireEvidence(run.judging.rubricHash === hash(rubricText), "judging instructions differ from the frozen rubric.");
   const promptFiles = [{ id: "frozen-skill-root", title: "Frozen Dungeon Master skill provider instruction (directory normalized)", content: instruction, sha256: hash(instruction) }, { id: "frozen-judge-rubric", title: "Frozen adventure-outline judging rubric and interpretation rules", content: rubricText, sha256: hash(rubricText) }, ...snapshot.files.filter(file => file.relativePath !== "SKILL.md").map(file => ({ id: `frozen-library-${hash(file.relativePath).slice(0, 16)}`, title: file.relativePath, content: file.contents, sha256: file.sha256 }))];
   const cells = [], responses = [], messageSets = new Map();
   for (const story of cases) for (const condition of CONDITIONS) {
-    const matches = run.rows.filter(row => row.caseId === story.sourceCaseId && row.trialNumber === story.trialNumber && row.configurationId === CONFIGURATION_ID && row.conditionId === condition.sourceId);
+    const matches = run.rows.filter(row => row.caseId === story.sourceCaseId && row.trialNumber === story.trialNumber && row.configurationId === configuration.id && row.conditionId === condition.sourceId);
     requireEvidence(matches.length === 1, "a repeated generation cell is missing or duplicated.");
     const row = matches[0];
     requireEvidence(row.promptText === story.prompt && ["complete", "pending", "running", "error", "failed", "unavailable", "interrupted"].includes(row.rowStatus), "generation prompt or status changed.");
     const complete = row.rowStatus === "complete";
     if (complete) {
-      requireEvidence(typeof row.outputText === "string" && row.outputText.trim() && hash(row.outputText) === row.outputHash && row.provider === "codex" && row.model === "gpt-6-astra" && row.reasoning === "ultra", "generation output or identity changed.");
+      requireEvidence(typeof row.outputText === "string" && row.outputText.trim() && hash(row.outputText) === row.outputHash && row.provider === configuration.provider && row.model === configuration.model && row.reasoning === configuration.reasoning, "generation output or identity changed.");
       validRuntime(row.runtimeReceipt, story.prompt, row.outputText, configuration, condition.id === "skill" ? snapshot.hash : null);
       requireEvidence(row.runtimeReceipt.instructionHash === (condition.id === "skill" ? hash(instruction) : null), "generation instruction changed.");
       if (condition.id === "skill") requireEvidence(isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot, requiredSkillFiles, receipt: row.runtimeReceipt.requiredSkillReads, requireComplete: false }), "required frozen reference read receipt is incompatible.");
@@ -215,36 +220,125 @@ export function projectDungeonMasterRun({ run, snapshot, sourceSha256 }) {
     methodology.generationContract += ` Actual execution was resumed after an account-quota interruption. Every previously successful answer and review was preserved; recovery filled missing units. The saved history contains ${writerAttempts.length} writer invocations (${failed(writerAttempts)} failed attempts) and ${reviewerAttempts.length} reviewer invocations (${failed(reviewerAttempts)} failed attempts), excluding infrastructure probes. The original adapter misclassified quota failures as missing-answer errors; ${retriedSeats} reviewer seats were automatically retried contrary to the frozen quota-retry rule. The explicit recovery controller allowed no automatic retries. These operational attempts are not additional writing samples.`;
   }
   const stub = { benchmarkId: DUNGEON_MASTER_BENCHMARK_ID, benchmarkTitle: "Adventure outline", subcategory: "dungeon-master", title: "DUNGEON MASTER", coverage, treatmentLabel: "Dungeon Master skill", scoreBasisLabel: scoreBasis.label, detailHref, status: coverage.scoredResponseCount ? "measured" : "unscored" };
-  validateDungeonMasterPublication(projection, responseBundle);
+  // A model slice is validated as part of the declared combined edition. Its
+  // fixed judge identities must never be inferred from the contestant identity.
+  if (expanded) {
+    scoreBasis.judges = REVIEWERS.map(() => 'codex:gpt-6-astra@ultra');
+    scoreBasis.reviewers = REVIEWERS.map(id => ({ id, configurationId: 'codex:gpt-6-astra@ultra' }));
+    scoreBasis.judgeConfigurations = REVIEWERS.map(id => ({ reviewerId: id, configurationId: 'codex:gpt-6-astra@ultra' }));
+  } else validateDungeonMasterPublication(projection, responseBundle);
   return { projection, responseBundle, stub, basisSha256: hash(JSON.stringify({ sourceSha256, skillSha256: snapshot.hash, corpusSha256: run.benchmark.hash })) };
+}
+
+export function projectDungeonMasterRun({ run, snapshot, sourceSha256 }) {
+  if (!run.cohortExtension) return projectDungeonMasterSingle({ run, snapshot, sourceSha256 });
+  validateDungeonMasterExpansion(run);
+  const parts = run.configurations.map(configuration => projectDungeonMasterSingle({ run: { ...run, configurations: [configuration],
+    rows: run.rows.filter(row => row.configurationId === configuration.id),
+    judging: { ...run.judging, pairs: run.judging.pairs.filter(pair => pair.configurationId === configuration.id) } }, snapshot, sourceSha256, expanded: true }));
+  const result = structuredClone(parts[0]), projection = result.projection, bundle = result.responseBundle;
+  for (const field of ['settings', 'entries', 'benchmarkResults', 'caseResults']) projection[field] = parts.flatMap(part => part.projection[field]);
+  const cells = projection.caseResults, cases = projection.cases;
+  projection.pairwisePreferences = parts.flatMap(part => part.projection.pairwisePreferences.map(preference => ({ settingId: part.projection.settings[0].id, configurationId: part.projection.settings[0].configurationId, ...preference })));
+  bundle.responses = parts.flatMap(part => part.responseBundle.responses);
+  // Provider instructions differ only in their verified reference transport.
+  // Preserve both exact instructions with distinct archive IDs.
+  bundle.promptFiles = [];
+  bundle.messageSets = [];
+  const fileMap = new Map(), messageMap = new Map();
+  for (const part of parts) {
+    const provider = part.projection.settings[0].provider;
+    for (const file of part.responseBundle.promptFiles) {
+      const id = file.id === 'frozen-skill-root' && provider === 'claude' ? 'frozen-skill-root-claude-read-tool' : file.id;
+      if (fileMap.has(id)) requireEvidence(fileMap.get(id).sha256 === file.sha256, 'Conflicting frozen provider instruction.');
+      else fileMap.set(id, { ...file, id });
+    }
+    for (const set of part.responseBundle.messageSets) {
+      const messages = set.messages.map(message => ({ ...message, ...(provider === 'claude' && message.fileId === 'frozen-skill-root' ? { fileId: 'frozen-skill-root-claude-read-tool' } : {}) }));
+      const id = hash(JSON.stringify(messages));
+      messageMap.set(id, { id, messages });
+      for (const response of part.responseBundle.responses) if (response.messageSetId === set.id) response.messageSetId = id;
+    }
+  }
+  bundle.promptFiles = [...fileMap.values()]; bundle.messageSets = [...messageMap.values()];
+  const completeIds = new Set(projection.entries.filter(entry => entry.condition === 'skill' && finite(entry.exactScore)).map(entry => entry.settingId));
+  for (const entry of projection.entries) entry.rank = finite(entry.exactScore) ? 1 + projection.entries.filter(other => other.condition === entry.condition && finite(other.exactScore) && other.exactScore > entry.exactScore).length : null;
+  const primaryCases = cases.filter(story => story.cohort === 'primary');
+  const headline = summary(cells.filter(cell => completeIds.has(cell.settingId)), primaryCases);
+  projection.cohortSummaries = Object.fromEntries(Object.entries({ primary: story => story.cohort === 'primary', transfer: story => story.cohort === 'transfer', fantasyTransfer: story => story.cohort === 'transfer' && story.genre === 'fantasy', otherGenreTransfer: story => story.cohort === 'transfer' && story.genre !== 'fantasy' }).map(([id, predicate]) => [id, summary(cells, cases.filter(predicate))]));
+  projection.settingCohortSummaries = parts.map(part => ({ settingId: part.projection.settings[0].id, configurationId: part.projection.settings[0].configurationId, cohorts: part.projection.cohortSummaries }));
+  const coverage = { ...projection.coverage, settingCount: run.configurations.length, completedSettingCount: completeIds.size,
+    responseCount: cells.filter(cell => cell.coverage.completedResponses).length, expectedResponseCount: run.rows.length,
+    scoredResponseCount: cells.filter(cell => finite(cell.exactScore)).length, usablePairs: summary(cells, cases).usablePairs,
+    expectedPairs: run.generation.expectedPairs, judgmentCount: bundle.responses.reduce((sum, response) => sum + response.judgments.length, 0), expectedJudgmentCount: run.rows.length * 2 };
+  projection.coverage = coverage;
+  projection.scoreBasis = { ...projection.scoreBasis, id: `${DM_EXPANSION_EDITION}:${run.cohortExtension.manifestHash}`,
+    edition: DM_EXPANSION_EDITION, label: 'Dungeon Master · Adventure outline · declared model extension', coverage,
+    uncertainty: { status: 'descriptive-repeated-trials', reason: 'Fixed curated prompts across a predeclared model roster; no population-level confidence or cross-provider calibration claim.' } };
+  projection.methodology.cohortExtension = { edition: DM_EXPANSION_EDITION, manifestHash: run.cohortExtension.manifestHash,
+    parentRunSha256: DM_ORIGINAL_RUN_SHA256, parentJudgesSha256: DM_ORIGINAL_JUDGES_SHA256,
+    configurationIds: run.configurations.map(configuration => configuration.id), originalConfigurationId: CONFIGURATION_ID,
+    originalAnswersPreserved: 32, originalPairedReviewsPreserved: 32, primaryRepetitions: 6, transferRepetitions: 2,
+    runtimeTransport: { codex: 'Original frozen restricted DM runtime', claude: 'Declared Read-only isolated frozen-chunk transport' } };
+  projection.methodology.generationContract = 'Separately declared model-cohort extension, not a rerun of the original Astra Ultra study. Every model receives the same frozen six prompts, repetition counts, skill and rubric. Original Astra answers, reviews and failed/recovery evidence are retained unchanged. Codex uses the original frozen restricted transport; Claude uses the separately pinned Read-only transport with exact frozen chunk verification. The leaderboard requires all six primary repetitions and both review seats in both conditions for each model. Transfer prompts remain separate. Required-read adherence remains intention-to-invoke; no valid answer or unfavorable judgment is rerolled.';
+  projection.methodology.originalCohortExecution = { sourceSha256: DM_ORIGINAL_RUN_SHA256, judgingSha256: DM_ORIGINAL_JUDGES_SHA256,
+    disclosure: parts.find(part => part.projection.settings[0].configurationId === CONFIGURATION_ID).projection.methodology.generationContract };
+  projection.methodology.limitations = [...run.benchmark.definition.limitations.filter(text => !/same model family and ultra runtime as contestants/u.test(text)),
+    'The original Astra-only study is preserved as a source cohort. Additional models were executed later with a declared provider-specific transport; execution time and provider integration can confound comparisons.',
+    'Both independent reviewer seats still use Astra Ultra; adding contestant models is not judge calibration.',
+    ...parts.find(part => part.projection.settings[0].configurationId === CONFIGURATION_ID).projection.methodology.limitations.filter(text => /repetitions|invocation|fresh CLI/u.test(text))];
+  projection.benchmarks[0] = { ...projection.benchmarks[0], limitations: projection.methodology.limitations,
+    measured: { ...headline, complete: coverage.scoredResponseCount, total: coverage.expectedResponseCount, treatmentLabel: 'Dungeon Master skill', calibration: 'Human calibration pending' } };
+  projection.results = [{ ...projection.results[0], baselineScore: headline.baseline, treatmentScore: headline.treatment, delta: headline.delta, responseCount: coverage.responseCount, matchedConfigurationCount: completeIds.size, coverage }];
+  projection.benchmarkSummaries = [{ ...projection.benchmarkSummaries[0], ...headline, complete: coverage.scoredResponseCount, total: coverage.expectedResponseCount }];
+  projection.caseSummaries = cases.map(story => ({ ...projection.caseSummaries.find(item => item.caseId === story.id), ...summary(cells, [story]), total: run.configurations.length * 2, complete: cells.filter(cell => cell.caseId === story.id && finite(cell.exactScore)).length }));
+  projection.trialSummaries = projection.caseSummaries;
+  projection.flagRates = failureRates(bundle.responses);
+  projection.adherenceCoverage = adherence(cells);
+  projection.categoryLeaders = projection.entries.filter(entry => entry.condition === 'skill' && entry.rank === 1).map(entry => ({ category: 'writing', entry: { ...entry, categoryScore: entry.score } }));
+  projection.regressions = projection.entries.filter(entry => entry.condition === 'skill' && finite(entry.delta) && entry.delta < 0);
+  projection.meta = { ...projection.meta, settings: run.configurations.length, aggregateCells: cells.length, runs: 2 };
+  projection.counts = { ...projection.counts, settings: run.configurations.length, resultEntries: projection.entries.length, responses: coverage.responseCount };
+  bundle.counts = { ...coverage, responses: bundle.responses.length, messageSets: bundle.messageSets.length, judgments: coverage.judgmentCount };
+  result.stub = { ...result.stub, coverage, scoreBasisLabel: projection.scoreBasis.label };
+  validateDungeonMasterPublication(projection, bundle);
+  return result;
 }
 
 export function validateDungeonMasterPublication(projection, responseBundle) {
   requireEvidence(projection?.kind === "vasirbenchmark-writing-projection" && projection.schemaVersion === 1 && projection.benchmarks?.length === 1 && projection.benchmarks[0].id === DUNGEON_MASTER_BENCHMARK_ID && projection.subcategory === "dungeon-master" && projection.scoreBasis?.dimensions?.length === 6 && projection.scoreBasis.ratingMinimum === 0 && projection.scoreBasis.ratingMaximum === 5 && equal(projection.scoreBasis.judges, REVIEWERS.map(() => CONFIGURATION_ID)), "invalid public benchmark projection.");
   const dimensions = projection.scoreBasis.dimensions;
+  const extension = projection.methodology?.cohortExtension;
+  const settingCount = extension ? 33 : 1;
+  const settingMap = new Map((projection.settings || []).map(setting => [setting.id, setting]));
+  requireEvidence(settingMap.size === settingCount && projection.settings.length === settingCount, 'Public model roster changed.');
+  if (extension) requireEvidence(extension.edition === DM_EXPANSION_EDITION && extension.parentRunSha256 === DM_ORIGINAL_RUN_SHA256 && extension.parentJudgesSha256 === DM_ORIGINAL_JUDGES_SHA256 && extension.primaryRepetitions === 6 && extension.transferRepetitions === 2 && extension.originalAnswersPreserved === 32 && extension.originalPairedReviewsPreserved === 32 && equal(extension.configurationIds, projection.settings.map(setting => setting.configurationId)), 'Public cohort extension lineage changed.');
   requireEvidence(new Set(dimensions.map(d => d.id)).size === 6 && dimensions.every(d => d.weight === 100 / 6), "public dimension weights changed.");
   const cells = projection.caseResults;
-  requireEvidence(cells?.length === 32 && new Set(cells.map(cellKey)).size === 32 && projection.cases?.length === 16 && new Set(projection.cases.map(story => story.id)).size === 16, "public repetition coverage changed.");
+  requireEvidence(cells?.length === 32 * settingCount && new Set(cells.map(cellKey)).size === 32 * settingCount && projection.cases?.length === 16 && new Set(projection.cases.map(story => story.id)).size === 16, "public repetition coverage changed.");
   for (const cell of cells) {
     const story = projection.cases.find(candidate => candidate.id === cell.caseId);
-    requireEvidence(story && cell.benchmarkId === DUNGEON_MASTER_BENCHMARK_ID && cell.configurationId === CONFIGURATION_ID && story.trialNumber === cell.trialNumber && story.sourceCaseId === cell.sourceCaseId && story.cohort === cell.cohort && ["baseline", "skill"].includes(cell.condition), "public cell identity changed.");
+    requireEvidence(story && cell.benchmarkId === DUNGEON_MASTER_BENCHMARK_ID && cell.configurationId === (extension ? settingMap.get(cell.settingId)?.configurationId : CONFIGURATION_ID) && story.trialNumber === cell.trialNumber && story.sourceCaseId === cell.sourceCaseId && story.cohort === cell.cohort && ["baseline", "skill"].includes(cell.condition), "public cell identity changed.");
     const score = cell.coverage.completedJudgments === 2 ? mean(dimensions.map(d => cell.dimensions[d.id])) * 20 : null;
     requireEvidence(sameScore(cell.exactScore, score) && cell.score === round(score), "public score differs from independent dimensions.");
   }
   for (const [cohort, predicate] of Object.entries({ primary: story => story.cohort === "primary", transfer: story => story.cohort === "transfer", fantasyTransfer: story => story.cohort === "transfer" && story.genre === "fantasy", otherGenreTransfer: story => story.cohort === "transfer" && story.genre !== "fantasy" })) requireEvidence(equal(projection.cohortSummaries[cohort], summary(cells, projection.cases.filter(predicate))), "cohort summary differs from paired repetitions.");
   const primary = projection.cohortSummaries.primary;
   requireEvidence(equal(projection.adherenceCoverage, adherence(cells)), "public adherence coverage changed.");
-  requireEvidence(projection.settings?.length === 1 && projection.entries?.length === 2 && projection.benchmarkResults?.length === 2, "public model inventory changed.");
+  requireEvidence(projection.entries?.length === 2 * settingCount && projection.benchmarkResults?.length === 2 * settingCount, "public model inventory changed.");
   for (const aggregate of projection.benchmarkResults) {
-    const members = cells.filter(cell => cell.cohort === "primary" && cell.condition === aggregate.condition);
-    const exactScore = primary.complete ? mean(members.map(cell => cell.exactScore)) : null;
+    const modelCells = cells.filter(cell => cell.settingId === aggregate.settingId);
+    const modelPrimary = summary(modelCells, projection.cases.filter(story => story.cohort === 'primary'));
+    const members = modelCells.filter(cell => cell.cohort === "primary" && cell.condition === aggregate.condition);
+    const exactScore = modelPrimary.complete ? mean(members.map(cell => cell.exactScore)) : null;
     requireEvidence(aggregate.exactScore === exactScore && aggregate.score === round(exactScore), "ranking mixed primary and transfer evidence.");
-    const entry = projection.entries.find(candidate => candidate.condition === aggregate.condition);
-    requireEvidence(entry?.exactScore === exactScore && entry.score === aggregate.score && entry.rank === (primary.complete ? 1 : null) && projection.settings[0].scores[aggregate.condition] === aggregate.score, "public ranking changed.");
+    const entry = projection.entries.find(candidate => candidate.settingId === aggregate.settingId && candidate.condition === aggregate.condition);
+    const rank = finite(exactScore) ? 1 + projection.entries.filter(candidate => candidate.condition === aggregate.condition && finite(candidate.exactScore) && candidate.exactScore > exactScore).length : null;
+    requireEvidence(entry?.exactScore === exactScore && entry.score === aggregate.score && entry.rank === rank && settingMap.get(aggregate.settingId)?.scores[aggregate.condition] === aggregate.score, "public ranking changed.");
   }
   requirePublic(projection);
   if (responseBundle) {
-    requireEvidence(responseBundle.kind === "vasirbenchmark-writing-responses" && responseBundle.responses?.length === 32 && new Set(responseBundle.responses.map(cellKey)).size === 32, "public answer coverage changed.");
+    requireEvidence(responseBundle.kind === "vasirbenchmark-writing-responses" && responseBundle.responses?.length === 32 * settingCount && new Set(responseBundle.responses.map(cellKey)).size === 32 * settingCount, "public answer coverage changed.");
     requirePublic(responseBundle);
     const sets = new Map(responseBundle.messageSets.map(set => [set.id, set]));
     requireEvidence(sets.size === responseBundle.messageSets.length && [...sets.values()].every(set => hash(JSON.stringify(set.messages)) === set.id) && new Set(responseBundle.promptFiles.map(file => file.id)).size === responseBundle.promptFiles.length && responseBundle.promptFiles.every(file => hash(file.content) === file.sha256), "public prompt archive changed.");
@@ -254,7 +348,7 @@ export function validateDungeonMasterPublication(projection, responseBundle) {
       const messages = sets.get(response.messageSetId)?.messages;
       requireEvidence(cell && response.score === cell.score && response.judgments.length === cell.coverage.completedJudgments && response.wordCount === (response.outputText ? wordCount(response.outputText) : null) && response.characterCount === (response.outputText ? Array.from(response.outputText).length : null) && response.provenance.outputSha256 === (response.outputText ? hash(response.outputText) : null), "public answer, length or score changed.");
       requireEvidence(messages?.length === (response.condition === "skill" ? 2 : 1) && messages.at(-1).content === story.prompt && messages.at(-1).role === "user" && response.provenance.questionSha256 === hash(story.prompt) && response.provenance.sourceSha256 === projection.scoreBasis.sourceSha256 && response.provenance.skillSha256 === (response.condition === "skill" ? projection.methodology.skillSha256 : null), "public task or provenance changed.");
-      if (response.condition === "skill") requireEvidence(messages[0].role === "developer" && messages[0].fileId === "frozen-skill-root" && responseBundle.promptFiles.some(file => file.id === messages[0].fileId), "public treatment instruction reference changed.");
+      if (response.condition === "skill") requireEvidence(messages[0].role === "developer" && messages[0].fileId === (extension && settingMap.get(response.settingId)?.provider === 'claude' ? 'frozen-skill-root-claude-read-tool' : 'frozen-skill-root') && responseBundle.promptFiles.some(file => file.id === messages[0].fileId), "public treatment instruction reference changed.");
       requireEvidence(new Set(response.judgments.map(judge => judge.reviewerId)).size === response.judgments.length, "public reviewer seat repeated.");
       for (const judge of response.judgments) {
         requireEvidence(REVIEWERS.includes(judge.reviewerId) && judge.judgeConfigurationId === CONFIGURATION_ID && dimensions.every(d => Number.isInteger(judge.dimensions[d.id]?.rating) && judge.dimensions[d.id].rating >= 0 && judge.dimensions[d.id].rating <= 5) && judge.score === mean(dimensions.map(d => judge.dimensions[d.id].rating)) * 20, "public judge rating changed.");
@@ -263,7 +357,8 @@ export function validateDungeonMasterPublication(projection, responseBundle) {
       const reads = response.runtime?.requiredSkillReads;
       requireEvidence(cell.requiredSkillReadStatus === (reads?.status ?? null) && equal(cell.requiredSkillReadChunks, reads ? { required: reads.requiredChunkCount, observed: reads.observedChunkCount } : null), "public reference adherence differs from its answer receipt.");
     }
-    requireEvidence(equal(projection.pairwisePreferences, preferences(projection.cases, responseBundle.responses)) && equal(projection.flagRates, failureRates(responseBundle.responses)), "public preferences or failure rates differ from retained judgments.");
+    const expectedPreferences = extension ? projection.settings.flatMap(setting => preferences(projection.cases, responseBundle.responses.filter(response => response.settingId === setting.id)).map(preference => ({ settingId: setting.id, configurationId: setting.configurationId, ...preference }))) : preferences(projection.cases, responseBundle.responses);
+    requireEvidence(equal(projection.pairwisePreferences, expectedPreferences) && equal(projection.flagRates, failureRates(responseBundle.responses)), "public preferences or failure rates differ from retained judgments.");
   }
   return projection;
 }

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "kind": "vasirbenchmark-execution-history-audit",
+  "createdAt": "2026-09-08T02:24:24.537Z",
+  "runId": "dm-outline-v1-2026-09-08",
+  "scope": "Benchmark generation/judging attempts only; setup, isolation preflights, readiness probes and underlying provider agents are excluded.",
+  "ratingsAndJudgeProseInspected": false,
+  "attemptCounts": {
+    "initial": {
+      "writers": {
+        "complete": 29,
+        "error": 3
+      },
+      "judges": {
+        "completed": 16,
+        "failed": 20
+      },
+      "total": 68
+    },
+    "operatorRecovery": {
+      "writers": 3,
+      "judges": 16,
+      "total": 19,
+      "failedAttempts": 0,
+      "automaticRetries": 0
+    },
+    "final": {
+      "writers": {
+        "complete": 32,
+        "error": 3
+      },
+      "judges": {
+        "completed": 32,
+        "failed": 20
+      },
+      "writerAttempts": 35,
+      "judgeAttempts": 52,
+      "total": 87,
+      "successfulUnits": 64,
+      "quotaFailures": 23,
+      "pairedReviews": 32,
+      "candidateAssessments": 64
+    }
+  },
+  "frozenPolicyDeviation": {
+    "frozenRule": "Authentication and quota failures are not automatically retried.",
+    "actual": "Quota failures were normalized as missing final answers. Ten failed judge seats each received one automatic technical retry, contrary to the frozen quota-retry rule.",
+    "automaticallyRetriedJudgeSeats": 10,
+    "rawQuotaFailureStreams": {
+      "writer": 3,
+      "judge": 20,
+      "streamsWithFinalAnswer": 0
+    },
+    "normalizedErrorCode": "EVAL_AGENT_RUNTIME_FAILED",
+    "frozenProtocolChanged": false
+  },
+  "recovery": {
+    "policy": "one-explicit-recovery-attempt-per-missing-unit-no-automatic-retries",
+    "separatelyAuthorized": true,
+    "preservedSuccessfulWriters": 29,
+    "preservedSuccessfulJudges": 16,
+    "preservedRecordHashesIndependentlyVerified": true,
+    "noValidAnswerOrReviewRerolls": true,
+    "maximumConcurrentRecoveryCalls": 4
+  },
+  "receipts": {
+    "successfulFreshSessions": 64,
+    "distinctSuccessfulSessionIdentifiers": 64,
+    "persistedSessions": 0,
+    "workingDirectoryIsolation": "fresh-temporary-directory",
+    "modelVerificationCounts": {
+      "explicit-cli-request-only": 64
+    },
+    "reasoningVerificationCounts": {
+      "explicit-cli-request-only": 64
+    },
+    "promptAndOutputHashesVerified": true,
+    "counterbalancedPairsVerified": 16,
+    "underlyingProviderAgentCount": "not established"
+  },
+  "sourceLineage": {
+    "finalRunSha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a",
+    "finalJudgesSha256": "44fc6639a4afcb2963621a07dc3d24444cfce0d0b9bfe09bc9dabbf5781455ce",
+    "manifestHash": "48b30d2e935b2ca22d346940281f27012db9b1029c6fd32d4b6e3d9658b1aaa9",
+    "frozenRuntimeDependencyCount": 12,
+    "frozenRuntimeDependencyHashesVerified": true,
+    "frozenRuntimeTreeHash": "bf835491fcc2b6432b49d395952e87dc51dea718f2d924af9b650727a4ac40a0",
+    "originalJudgeRunnerSourceBytes": 13326,
+    "originalJudgeRunnerRawSha256": "08445a51276fd99eb99333e09da8454dfd0dc4ede93f0330dc0944c82b43b6ba",
+    "originalRecordedRunnerHash": "84acf9a5f24d9e89be12fa1e8a9c1df62b177e798e8d7a26c0b74ffd6b273f39",
+    "originalRecordedRunnerHashEncoding": "SHA256 of JSON.stringify(Buffer(source)), retained exactly; sourceSha256 is the raw file-byte hash.",
+    "recoveryControllerRawSha256": "dc7a26a1e2cc333185bb8c3a7ea18068486fc1dc6c0d438b75c85dbef8a6f5ea",
+    "metadataCorrectionHelperRawSha256": "d529af6d2606993a3b491bfdc97a81178fde3695d3db5e9ab176720523b53bcb",
+    "metadataCorrection": {
+      "recordedAt": "2026-09-08T02:21:41.279Z",
+      "reason": "The final controller checkpoint refreshed judges.updatedAt immediately after attaching its completed data to run.judging. Align only that timestamp; all judgments and successful records are unchanged.",
+      "sourceSha256": "d529af6d2606993a3b491bfdc97a81178fde3695d3db5e9ab176720523b53bcb",
+      "beforeRunSha256": "03bd4ded90a0fffe34dab96e9580b221f24eaa9bba2f83f938d09ed508c95b3e",
+      "afterRunSha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a",
+      "priorUpdatedAt": "2026-09-08T02:21:31.337Z",
+      "finalUpdatedAt": "2026-09-08T02:21:31.368Z",
+      "judgmentsUnchanged": true
+    }
+  },
+  "runtimeAudit": {
+    "sourceSha256": "e8c9c09128fb48ea285242ce9c30b8579a4fd9c3903cdd4b1159aa189928017a",
+    "archivedRawAndAnswerFilesPreserved": 181,
+    "originalFailedWriterAttemptsPreserved": 3,
+    "originalFailedJudgeAttemptsPreserved": 20,
+    "exactProviderMessages": 64,
+    "frozenInputBytesMatchArchive": true,
+    "finalRunJudgingMatchesCheckpoint": true
+  },
+  "publicDisclosure": "The frozen protocol prohibited automatic quota retries. In the initial execution, quota failures were normalized as missing final answers, and ten judge seats were each retried once contrary to that rule. After credits resumed, a separately recorded operator recovery completed only the three missing writers and sixteen missing judge jobs, with no automatic retries. The original 29 valid answers and 16 valid reviews remained unchanged. The completed study contains 32 answers and 32 paired reviews (64 candidate assessments), from 87 benchmark generation/judging attempts: 64 successful units and 23 retained quota failures. Setup and readiness probes are excluded, and the count of underlying provider agents is not established."
+}

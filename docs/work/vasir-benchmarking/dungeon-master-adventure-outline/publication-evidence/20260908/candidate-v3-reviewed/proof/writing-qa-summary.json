@@ -1,0 +1,1618 @@
+{
+  "status": "passed",
+  "releaseId": "dbbc02fa92ccc613b11d77083f93eeecf43612d456db3e4a1e8f02654ebb6fda",
+  "url": "http://127.0.0.1:65326",
+  "selectionSnapshot": {
+    "path": "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/selection-snapshot.json",
+    "sha256": "d616c8805de672fa0ed5687f9c64b46da06c38a30949d9ede4aaf75add288b2e",
+    "snapshotId": "6ecb87e0c799f4953e95178e80a41241d39521fc5dc233a158c2bd4f1c5d79d6",
+    "selectionCount": 5
+  },
+  "runs": [
+    {
+      "directory": "dm-desktop",
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "width": 1440,
+      "height": 1000,
+      "checks": 138,
+      "receiptSha256": "c4c271f1819deadd847649ca5ad71b7dfc7341e51119e996a59a2066f7b3922a",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 154647,
+          "sha256": "9a9982dde84729ddff1bffff9519f2b7d110c2a630b9dd04f5b59e329b7d99a2",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 146790,
+          "sha256": "72b1baf94dbf5396e713c5ef3ff598dcc658b179adb2ae4954ee76ef864499c7",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 179024,
+          "sha256": "833392390eda83e76868892f813be63cb91d04fe2c25360c5a9f00d89ba617d4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 145078,
+          "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14",
+          "width": 1440,
+          "height": 1000,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 11.59375,
+            "bottom": 3288.9375,
+            "width": 1176,
+            "viewportHeight": 1000,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 136719,
+          "sha256": "f13a4a05a46752685c75d133ae04eb03a4eac435e1af50d61f5d6278e0dc5868",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 136559,
+          "sha256": "b850ad2279139f88e4297c0b0d2c3ed853533e77665d048cf607011988fb30c2",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-models.png",
+          "bytes": 148147,
+          "sha256": "27e984bbe0de0d25ca3f4646afbda290c559bd67798aad7eb6fd8333c57f5707",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-benchmarks.png",
+          "bytes": 178478,
+          "sha256": "0e2b6383ac0bb63c8e0a04b8c1691022d85b84ccff280c8a87e0331e4dc570f4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-efficiency.png",
+          "bytes": 135769,
+          "sha256": "b97b489199aa332b235087ec1b3102268fc140f9eb6f98237e9ae77e3c4ca38b",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-cohorts.png",
+          "bytes": 162543,
+          "sha256": "55be9254f5edc7cd4f6fd7409120fbfeb44306b5edc5b835298091d80fbab940",
+          "width": 1440,
+          "height": 1000,
+          "target": {
+            "selector": "[data-writing-cohorts]",
+            "top": 11.53125,
+            "bottom": 417.21875,
+            "width": 1440,
+            "viewportHeight": 1000,
+            "text": "Primary and secondary resultscreate an outline for TTRPG adventure6 distinct prompts \u00b7 16 matched pairs. The primary prompt has 6 repetitions; each of 5 secondary prompts has 2 repetitions.The headline uses the primary prompt only. Each mean uses com"
+          }
+        },
+        {
+          "path": "dungeon-master-reference.png",
+          "bytes": 197416,
+          "sha256": "e1253353e334fba89104f1eaf7c1859cd8ccf3d4590c06098d03a423bd3d6441",
+          "width": 1440,
+          "height": 1000,
+          "target": {
+            "selector": "[data-prompt-file=\"frozen-library-d250b7ea51df1d61\"]",
+            "top": 12.015625,
+            "bottom": 5011.453125,
+            "width": 1296,
+            "viewportHeight": 1000,
+            "text": "references/adventure-design.mdCopy# Adventure design\n\nUse this reference to turn a premise, patron request, published outline, or improvised discovery into a playable situation. The useful result is a small set of connected decisions with enough fact"
+          }
+        },
+        {
+          "path": "dungeon-master-answer.png",
+          "bytes": 218066,
+          "sha256": "1f88a79b0211bdaaf4783ba469bf63322764275522f8ad9fba18488b827db98a",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "primary-repeat-1",
+          "condition": "skill",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"]",
+            "top": 11.953125,
+            "bottom": 1963.125,
+            "width": 648,
+            "viewportHeight": 1000,
+            "text": "GPT-6 Astra \u00b7 ultra \u00b7 Repetition 1 \u00b7 saved question and final answer\n            Dungeon Master skill\n          \n          93.3/100\n        \n        \n        561 words \u00b7 exact final answer \u00b7 scored\n        \n        \n          \n            Question & "
+          }
+        },
+        {
+          "path": "dungeon-master-judgments.png",
+          "bytes": 298563,
+          "sha256": "88691b16420e99c2e976ed30238bc4b000cea0d131c6c12c12ed320fea0c4731",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "primary-repeat-1",
+          "condition": "skill",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"] .model-run__judging",
+            "top": 11.75,
+            "bottom": 3450.03125,
+            "width": 647,
+            "viewportHeight": 1000,
+            "text": "Saved judge reviews\n          2/2 judges \u00b7 93.3\u201393.3\n          \u2193\n        \n        \n          Each independent reviewer scores six equal dimensions from 0 to 5. Their mean \u00d7 20 gives a 0\u2013100 score; the answer requires both reviews and averages those s"
+          }
+        },
+        {
+          "path": "dungeon-master-adherence.png",
+          "bytes": 246059,
+          "sha256": "7eac39b664df5489c2382042d50a271af4d28378bab3e80b31218fc3c86a6ede",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "primary-repeat-3",
+          "status": "incomplete",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"] [data-writing-required-reads]",
+            "top": 11.75,
+            "bottom": 409.75,
+            "width": 623,
+            "viewportHeight": 1000,
+            "text": "Required reference-read evidence \u00b7 incomplete2/3 required chunks have recorded byte evidence. The required-read proof is incomplete; this valid answer remains in the invocation comparison. Missing proof does not establish refusal.Read policysuccessfu"
+          }
+        },
+        {
+          "path": "dungeon-master-report.png",
+          "bytes": 140490,
+          "sha256": "9c23fd23009cadc0cbd629a5b973e9a27c1feb540251117c0a71b4173ee30de4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-method.png",
+          "bytes": 152270,
+          "sha256": "01a3e16193b3f1186e4bded8f71b70439604966b89735b92a523b2bd33aa090f",
+          "width": 1440,
+          "height": 1000
+        }
+      ],
+      "retainedFailureStateCaptures": [],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "dm-mobile",
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "width": 390,
+      "height": 844,
+      "checks": 138,
+      "receiptSha256": "bddcc75cc3e8ac765dc1748559b622b74d1fd528094bf64cf03fd1d3f9f67e84",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 68917,
+          "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 63391,
+          "sha256": "61f7c0efb74aac9625bf34a3d901ff663ce48110bbc8f535b6a2115f5430571e",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 73939,
+          "sha256": "3d6b6ae9d8b3bda07c5720eeb2b3eaf636150ba4222c38634bb96aa13fe7ed74",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 69083,
+          "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f",
+          "width": 390,
+          "height": 844,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 12.453125,
+            "bottom": 5719.65625,
+            "width": 390,
+            "viewportHeight": 844,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 65514,
+          "sha256": "9e0045d645a3d0061f9152d2bdff206bc1fff14eba5d6764b2cb4bd65292ada4",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 65379,
+          "sha256": "b39f9c380404a1e4fb5404cd03ab3300d3da3d548e489387d95d5bb52a856450",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "dungeon-master-models.png",
+          "bytes": 73022,
+          "sha256": "c2833598ffdd4133473d092707597174e8b571566f06a8cda9139b7e2434000c",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "dungeon-master-benchmarks.png",
+          "bytes": 73884,
+          "sha256": "14859f52f0ec1f5f2d51a5fc4e610951ead4cb16d2b8102ce37344c8999ab34b",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "dungeon-master-efficiency.png",
+          "bytes": 65379,
+          "sha256": "b39f9c380404a1e4fb5404cd03ab3300d3da3d548e489387d95d5bb52a856450",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "dungeon-master-cohorts.png",
+          "bytes": 75891,
+          "sha256": "8f163c8c219ae19b395b5b02073f58537bc4bcafe8c53436b253528391b23608",
+          "width": 390,
+          "height": 844,
+          "target": {
+            "selector": "[data-writing-cohorts]",
+            "top": 11.84375,
+            "bottom": 736.671875,
+            "width": 390,
+            "viewportHeight": 844,
+            "text": "Primary and secondary resultscreate an outline for TTRPG adventure6 distinct prompts \u00b7 16 matched pairs. The primary prompt has 6 repetitions; each of 5 secondary prompts has 2 repetitions.The headline uses the primary prompt only. Each mean uses com"
+          }
+        },
+        {
+          "path": "dungeon-master-reference.png",
+          "bytes": 73793,
+          "sha256": "31aa0f9be95b17b7390c229e7a2de33cf79e011b1dc13827391feb432e0747cf",
+          "width": 390,
+          "height": 844,
+          "target": {
+            "selector": "[data-prompt-file=\"frozen-library-d250b7ea51df1d61\"]",
+            "top": 12.171875,
+            "bottom": 13166.296875,
+            "width": 358,
+            "viewportHeight": 844,
+            "text": "references/adventure-design.mdCopy# Adventure design\n\nUse this reference to turn a premise, patron request, published outline, or improvised discovery into a playable situation. The useful result is a small set of connected decisions with enough fact"
+          }
+        },
+        {
+          "path": "dungeon-master-answer.png",
+          "bytes": 70301,
+          "sha256": "b176b4c639499002349a957fd8e643bd37834225be68c4bf3aa39de28aed4e8b",
+          "width": 390,
+          "height": 844,
+          "caseId": "primary-repeat-1",
+          "condition": "skill",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"]",
+            "top": 11.515625,
+            "bottom": 2792.546875,
+            "width": 358,
+            "viewportHeight": 844,
+            "text": "GPT-6 Astra \u00b7 ultra \u00b7 Repetition 1 \u00b7 saved question and final answer\n            Dungeon Master skill\n          \n          93.3/100\n        \n        \n        561 words \u00b7 exact final answer \u00b7 scored\n        \n        \n          \n            Question & "
+          }
+        },
+        {
+          "path": "dungeon-master-judgments.png",
+          "bytes": 80532,
+          "sha256": "ea525b741f13a9606af47aadc5f378d68c8c447dba66b3f5a3ccdccda55ca56f",
+          "width": 390,
+          "height": 844,
+          "caseId": "primary-repeat-1",
+          "condition": "skill",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"] .model-run__judging",
+            "top": 11.671875,
+            "bottom": 4824.453125,
+            "width": 358,
+            "viewportHeight": 844,
+            "text": "Saved judge reviews\n          2/2 judges \u00b7 93.3\u201393.3\n          \u2193\n        \n        \n          Each independent reviewer scores six equal dimensions from 0 to 5. Their mean \u00d7 20 gives a 0\u2013100 score; the answer requires both reviews and averages those s"
+          }
+        },
+        {
+          "path": "dungeon-master-adherence.png",
+          "bytes": 57064,
+          "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5",
+          "width": 390,
+          "height": 844,
+          "caseId": "primary-repeat-3",
+          "status": "incomplete",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"] [data-writing-required-reads]",
+            "top": 11.609375,
+            "bottom": 583.609375,
+            "width": 334,
+            "viewportHeight": 844,
+            "text": "Required reference-read evidence \u00b7 incomplete2/3 required chunks have recorded byte evidence. The required-read proof is incomplete; this valid answer remains in the invocation comparison. Missing proof does not establish refusal.Read policysuccessfu"
+          }
+        },
+        {
+          "path": "dungeon-master-report.png",
+          "bytes": 64688,
+          "sha256": "53d6e1aa1cf3ffb23cd211db23176dbd58c7593e26535a19ebb802618dde7628",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "dungeon-master-method.png",
+          "bytes": 78217,
+          "sha256": "b00a8c53c5e63f6990bca8871d2334bf8893742bacb9d6b1636d77680e31a790",
+          "width": 390,
+          "height": 844
+        }
+      ],
+      "retainedFailureStateCaptures": [],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "dm-tablet",
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "width": 820,
+      "height": 1000,
+      "checks": 138,
+      "receiptSha256": "65bd2c9da5857ce4a888c0165982f5ad6264011138b756d73ed8c1767f55b72a",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 113973,
+          "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 99874,
+          "sha256": "0fee5e2657f3defeac4aa3efa6eb6fcc8bb144f87e80842b236866ae0ccb9385",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 107997,
+          "sha256": "72070d42876d85a5de7b4d1e78d470d1ce99ac2a59d02b5ba00aadf85a265ee6",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 132816,
+          "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900",
+          "width": 820,
+          "height": 1000,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 11.671875,
+            "bottom": 3289.015625,
+            "width": 820,
+            "viewportHeight": 1000,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 102576,
+          "sha256": "ccb512d294ffb4bd9e788140e7652ff7554f302fc66c338b06249b5808cc37eb",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 102442,
+          "sha256": "b510e34b27de2631d4943a7f7eb14786a725ec10436bb6b89b2defb3355d4a26",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-models.png",
+          "bytes": 107601,
+          "sha256": "4a842b45158ce0f7def9ac93654d3dace683c21ec0adffbd816208402a422ebf",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-benchmarks.png",
+          "bytes": 107997,
+          "sha256": "72070d42876d85a5de7b4d1e78d470d1ce99ac2a59d02b5ba00aadf85a265ee6",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-efficiency.png",
+          "bytes": 102442,
+          "sha256": "b510e34b27de2631d4943a7f7eb14786a725ec10436bb6b89b2defb3355d4a26",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-cohorts.png",
+          "bytes": 145908,
+          "sha256": "95466980f691320f598a8654fafdc69476bbe6f8feca115103d537d9b1cf2d78",
+          "width": 820,
+          "height": 1000,
+          "target": {
+            "selector": "[data-writing-cohorts]",
+            "top": 11.640625,
+            "bottom": 467.71875,
+            "width": 820,
+            "viewportHeight": 1000,
+            "text": "Primary and secondary resultscreate an outline for TTRPG adventure6 distinct prompts \u00b7 16 matched pairs. The primary prompt has 6 repetitions; each of 5 secondary prompts has 2 repetitions.The headline uses the primary prompt only. Each mean uses com"
+          }
+        },
+        {
+          "path": "dungeon-master-reference.png",
+          "bytes": 168045,
+          "sha256": "3999cc888e39c948e813dbf560b9eb092cba27064575c167ad7310a1574e6677",
+          "width": 820,
+          "height": 1000,
+          "target": {
+            "selector": "[data-prompt-file=\"frozen-library-d250b7ea51df1d61\"]",
+            "top": 12.359375,
+            "bottom": 6968.921875,
+            "width": 756,
+            "viewportHeight": 1000,
+            "text": "references/adventure-design.mdCopy# Adventure design\n\nUse this reference to turn a premise, patron request, published outline, or improvised discovery into a playable situation. The useful result is a small set of connected decisions with enough fact"
+          }
+        },
+        {
+          "path": "dungeon-master-answer.png",
+          "bytes": 190249,
+          "sha256": "808b3a4bd203c9516aee03ee6178e7a7c575550cc22c54ab3f94e539267f7c1c",
+          "width": 820,
+          "height": 1000,
+          "caseId": "primary-repeat-1",
+          "condition": "skill",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"]",
+            "top": 11.734375,
+            "bottom": 2711.203125,
+            "width": 378,
+            "viewportHeight": 1000,
+            "text": "GPT-6 Astra \u00b7 ultra \u00b7 Repetition 1 \u00b7 saved question and final answer\n            Dungeon Master skill\n          \n          93.3/100\n        \n        \n        561 words \u00b7 exact final answer \u00b7 scored\n        \n        \n          \n            Question & "
+          }
+        },
+        {
+          "path": "dungeon-master-judgments.png",
+          "bytes": 209823,
+          "sha256": "0b3cf6a62592139390df387de943fe1576db54a022d3a1d79b3336520f2e5ed6",
+          "width": 820,
+          "height": 1000,
+          "caseId": "primary-repeat-1",
+          "condition": "skill",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"] .model-run__judging",
+            "top": 11.703125,
+            "bottom": 6626.109375,
+            "width": 377,
+            "viewportHeight": 1000,
+            "text": "Saved judge reviews\n          2/2 judges \u00b7 93.3\u201393.3\n          \u2193\n        \n        \n          Each independent reviewer scores six equal dimensions from 0 to 5. Their mean \u00d7 20 gives a 0\u2013100 score; the answer requires both reviews and averages those s"
+          }
+        },
+        {
+          "path": "dungeon-master-adherence.png",
+          "bytes": 214419,
+          "sha256": "5557889aed195b4d588a44d73ec38a1d0f45b0a6cd3d15e8f35f2129d0039337",
+          "width": 820,
+          "height": 1000,
+          "caseId": "primary-repeat-3",
+          "status": "incomplete",
+          "target": {
+            "selector": "[data-report-setting-id=\"codex-gpt-6-astra-ultra\"] [data-condition=\"skill\"] [data-writing-required-reads]",
+            "top": 11.703125,
+            "bottom": 515.703125,
+            "width": 353,
+            "viewportHeight": 1000,
+            "text": "Required reference-read evidence \u00b7 incomplete2/3 required chunks have recorded byte evidence. The required-read proof is incomplete; this valid answer remains in the invocation comparison. Missing proof does not establish refusal.Read policysuccessfu"
+          }
+        },
+        {
+          "path": "dungeon-master-report.png",
+          "bytes": 109752,
+          "sha256": "4a73378d22f188cce23b9b892cdbc82ca5514a8a5c67d816d0f8a11797a9413b",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "dungeon-master-method.png",
+          "bytes": 145518,
+          "sha256": "02f0e5080b036b4ad8387bbcbee372752b2b5ed04a523554b8f536f76b1c5953",
+          "width": 820,
+          "height": 1000
+        }
+      ],
+      "retainedFailureStateCaptures": [],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "story-desktop",
+      "benchmarkId": "storytelling-core-idea",
+      "width": 1440,
+      "height": 1000,
+      "checks": 129,
+      "receiptSha256": "857429f8fd7fe72b5a57dc7faadc55f995698db591d61a2d0056c352f786cc26",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 154647,
+          "sha256": "9a9982dde84729ddff1bffff9519f2b7d110c2a630b9dd04f5b59e329b7d99a2",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 146790,
+          "sha256": "72b1baf94dbf5396e713c5ef3ff598dcc658b179adb2ae4954ee76ef864499c7",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 179024,
+          "sha256": "833392390eda83e76868892f813be63cb91d04fe2c25360c5a9f00d89ba617d4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 145078,
+          "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14",
+          "width": 1440,
+          "height": 1000,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 11.59375,
+            "bottom": 3288.9375,
+            "width": 1176,
+            "viewportHeight": 1000,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 136719,
+          "sha256": "f13a4a05a46752685c75d133ae04eb03a4eac435e1af50d61f5d6278e0dc5868",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 136559,
+          "sha256": "b850ad2279139f88e4297c0b0d2c3ed853533e77665d048cf607011988fb30c2",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 155938,
+          "sha256": "744400947911553b4c986f4474abac0c7cdda9f7a538b8261c79eaf0c0e0bed4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 181273,
+          "sha256": "77433ec997d99288c9cd81ba99b026b181e1c9b0a1822c1b1cbf7f9fb5f43828",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 177441,
+          "sha256": "862ae1ff84af1d7968f6dade8fec005361c06f0b52f83728373a028d08a50cbd",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 167125,
+          "sha256": "460e2eaa55ec93128ddc80e87063356f1c179edf6afccbe4e4f2856327ecd376",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 181756,
+          "sha256": "5ac6dee6bafe188eb4052b775e12fd032ac7ee264c4f25675916740c7d4a8aba",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 181471,
+          "sha256": "b168fcf3e2642be3a1b6e2624b132fefc3ad3e9021e0efbb346817e58eb52b8a",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 182952,
+          "sha256": "143c6c723a126d49129ffbf6d95bc6aa7f7d1032a39dd8544095a5c7be7db149",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 101758,
+          "sha256": "1dd73bc945d99164aeb32ac0a26cce4a182705f12a19a48b50f6d3790bdc3cee",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 172374,
+          "sha256": "0207f6c9b3feff46e7688b67c6400d617d4c7d20674cbfe67418e4d348bf6d79",
+          "width": 1440,
+          "height": 1000
+        }
+      ],
+      "retainedFailureStateCaptures": [
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+          "bytes": 190953,
+          "sha256": "130154ebfa66a7618f8fef97b7919dc1f24477a7bc7c995640b2251a88dc6ff6",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-max",
+          "configurationId": "claude:claude-opus-5@max",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+          "bytes": 190953,
+          "sha256": "130154ebfa66a7618f8fef97b7919dc1f24477a7bc7c995640b2251a88dc6ff6",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-max",
+          "configurationId": "claude:claude-opus-5@max",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+          "bytes": 191897,
+          "sha256": "8da6843e660a3944f8f1965feb354d0a51602cc3464de5572713d8907965d543",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-xhigh",
+          "configurationId": "claude:claude-opus-5@xhigh",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+          "bytes": 191897,
+          "sha256": "8da6843e660a3944f8f1965feb354d0a51602cc3464de5572713d8907965d543",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-xhigh",
+          "configurationId": "claude:claude-opus-5@xhigh",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        }
+      ],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "story-mobile",
+      "benchmarkId": "storytelling-core-idea",
+      "width": 390,
+      "height": 844,
+      "checks": 129,
+      "receiptSha256": "2b79b3bb35321570c52b6bf01e201ae15a00de6d3eedf57c09bbd98a75f4ece4",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 68917,
+          "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 63391,
+          "sha256": "61f7c0efb74aac9625bf34a3d901ff663ce48110bbc8f535b6a2115f5430571e",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 73938,
+          "sha256": "e2d1398d8fc53e161dd600ae174984d53c6f98db66689b3bcba4abe359d59692",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 69083,
+          "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f",
+          "width": 390,
+          "height": 844,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 12.453125,
+            "bottom": 5719.65625,
+            "width": 390,
+            "viewportHeight": 844,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 65514,
+          "sha256": "9e0045d645a3d0061f9152d2bdff206bc1fff14eba5d6764b2cb4bd65292ada4",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 65379,
+          "sha256": "b39f9c380404a1e4fb5404cd03ab3300d3da3d548e489387d95d5bb52a856450",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 62943,
+          "sha256": "1fcef03c57456d48eb9d8e3315afb6ce9d8e66e26eb0352ed8a2921ec6dbc944",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 76895,
+          "sha256": "dbfa1b0ca8c0f8fe613fbd4a09994949a2fd70fa95df7d414fd561f0311fe201",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 75670,
+          "sha256": "035c4f21dfb043b2d17fc5cd1c48358a3b4ccc3ab6807c679eaccfd241398f14",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 83972,
+          "sha256": "cd8a75dce2680a17e161f0778e2fc35ef1a76075033008bc11223e88c50f7ca1",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 77231,
+          "sha256": "68f2fb3d742e5d14066111925e072cc1403edfca2e061af76b8b4f88db7963a9",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 76033,
+          "sha256": "4f609e27110444f0848ff7b572e7b182359b1cca56c83f8cbe1d1808a763b205",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 64094,
+          "sha256": "92f1649e397124d6276db8c74aff2474c5c96ea4e7d98245e4a32a16fae625d9",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 61373,
+          "sha256": "88c9ce4f420e5029912d675903ad5affa91300d5a0a7fcba34221fde0ae575a0",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 63637,
+          "sha256": "c161a151efbaf62dffa246805fa38e37cae37c94c39e6260a580bcc72cd41941",
+          "width": 390,
+          "height": 844
+        }
+      ],
+      "retainedFailureStateCaptures": [
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+          "bytes": 56454,
+          "sha256": "db2a5b25f023d2dc918c94cf1ede60a533378fcbab61428f200bd1f37026b63f",
+          "width": 390,
+          "height": 844,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-max",
+          "configurationId": "claude:claude-opus-5@max",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+          "bytes": 71439,
+          "sha256": "08c98e8705bc08b75820dcc5d96ac427e0f1685d51649d82f9572d83e1eae000",
+          "width": 390,
+          "height": 844,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-max",
+          "configurationId": "claude:claude-opus-5@max",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+          "bytes": 55375,
+          "sha256": "ec5715a6a563e8cf30e5559262c68897ad94d4a5d00b24496212185b6adec8b6",
+          "width": 390,
+          "height": 844,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-xhigh",
+          "configurationId": "claude:claude-opus-5@xhigh",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+          "bytes": 75780,
+          "sha256": "fe2b6ae2c57535c7ea59762c8e2408b312cff5a0db90be425a086a2e5ce4189b",
+          "width": 390,
+          "height": 844,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-xhigh",
+          "configurationId": "claude:claude-opus-5@xhigh",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        }
+      ],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "story-tablet",
+      "benchmarkId": "storytelling-core-idea",
+      "width": 820,
+      "height": 1000,
+      "checks": 129,
+      "receiptSha256": "83a27ebfe7bceef5fbe6ed4d7430841eac391d94c0d6d587772f4cd4c5ce81e0",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 113973,
+          "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 99874,
+          "sha256": "0fee5e2657f3defeac4aa3efa6eb6fcc8bb144f87e80842b236866ae0ccb9385",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 107997,
+          "sha256": "72070d42876d85a5de7b4d1e78d470d1ce99ac2a59d02b5ba00aadf85a265ee6",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 132816,
+          "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900",
+          "width": 820,
+          "height": 1000,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 11.671875,
+            "bottom": 3289.015625,
+            "width": 820,
+            "viewportHeight": 1000,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 102576,
+          "sha256": "ccb512d294ffb4bd9e788140e7652ff7554f302fc66c338b06249b5808cc37eb",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 102442,
+          "sha256": "b510e34b27de2631d4943a7f7eb14786a725ec10436bb6b89b2defb3355d4a26",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 108403,
+          "sha256": "5f6a5d8f2b3da74f52020764a8e9fb0065dc5b5cdbe86c4489e69d489e1b96ea",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 156265,
+          "sha256": "b66b163c6af66f4b00a2bd9f516d3c350011fe90dcf2e92e8698f4c151b91c72",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 142251,
+          "sha256": "9efcec1a9b63e0d584de5ca729419f208dd72d553dc38bc531bc0db7cc1b20c9",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 157770,
+          "sha256": "1f29e083a11ceb7fc5236a5483c8e95199d05c21b3a50b5dd51c7a7cdb059c9b",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 152628,
+          "sha256": "d67ab841b5519a570ba9a8b8cbce92c2dcdf500cce06c59c63635e32251501f9",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 163540,
+          "sha256": "297955990c4e4eecbbd57f38ed2d321a427febb7ef65e098cb0eb5633deb6a08",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 169458,
+          "sha256": "b11ecc803890317688d4d45fe1aa871c3b704af214076d80e5731ed4dc9c6979",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 92956,
+          "sha256": "00a9eb553dc0da2a751a73bdeb71892fd7f87acc3444e5c976f8bad7aa4a24f5",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 161362,
+          "sha256": "ce79ac6e75bca17164d84d2b9e06bffb64360762f3aeb3bd043d3549cee5f29b",
+          "width": 820,
+          "height": 1000
+        }
+      ],
+      "retainedFailureStateCaptures": [
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+          "bytes": 146840,
+          "sha256": "554be4a08eccc8899eacdc264d08afcb890bb01be0282b50cf2a43cfde2c245d",
+          "width": 820,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-max",
+          "configurationId": "claude:claude-opus-5@max",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+          "bytes": 146840,
+          "sha256": "554be4a08eccc8899eacdc264d08afcb890bb01be0282b50cf2a43cfde2c245d",
+          "width": 820,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-max",
+          "configurationId": "claude:claude-opus-5@max",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+          "bytes": 148925,
+          "sha256": "dbb1097d51ccca4215da1e4ec1ef40709624a83a15f1406a35ad4eeb83e32ad3",
+          "width": 820,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-xhigh",
+          "configurationId": "claude:claude-opus-5@xhigh",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+          "bytes": 148925,
+          "sha256": "dbb1097d51ccca4215da1e4ec1ef40709624a83a15f1406a35ad4eeb83e32ad3",
+          "width": 820,
+          "height": 1000,
+          "caseId": "the-matrix",
+          "settingId": "claude-claude-opus-5-xhigh",
+          "configurationId": "claude:claude-opus-5@xhigh",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        }
+      ],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "twists-desktop",
+      "benchmarkId": "storytelling-plot-twists",
+      "width": 1440,
+      "height": 1000,
+      "checks": 125,
+      "receiptSha256": "142c145b56a930e3accd4fade7cc24e228b83b8983e30a39e1c389511f533296",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 154647,
+          "sha256": "9a9982dde84729ddff1bffff9519f2b7d110c2a630b9dd04f5b59e329b7d99a2",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 146790,
+          "sha256": "72b1baf94dbf5396e713c5ef3ff598dcc658b179adb2ae4954ee76ef864499c7",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 179024,
+          "sha256": "833392390eda83e76868892f813be63cb91d04fe2c25360c5a9f00d89ba617d4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 145078,
+          "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14",
+          "width": 1440,
+          "height": 1000,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 11.59375,
+            "bottom": 3288.9375,
+            "width": 1176,
+            "viewportHeight": 1000,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 136719,
+          "sha256": "f13a4a05a46752685c75d133ae04eb03a4eac435e1af50d61f5d6278e0dc5868",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 136559,
+          "sha256": "b850ad2279139f88e4297c0b0d2c3ed853533e77665d048cf607011988fb30c2",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 153527,
+          "sha256": "7da80bda72dbb9dc2da69681e06cc599ab4e16a2cb6303e71255d839eca93b2f",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 165761,
+          "sha256": "c3d4843cbd4dcb2c4838c4ac007e1040dbec94b26876689b3207ab5fac6ae2c4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 167746,
+          "sha256": "2198d21e2ab87d69ed3183fac2cd7cea0e6edae42af6bf62359dbaaed09350a4",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 152426,
+          "sha256": "59a2f3e44a6a28036bfb6ac8b3836ff1a2e0c4a1611f8983ee2aba2f3ef70a39",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 165596,
+          "sha256": "f7e2a5d628a5c827d0bb45eecdfb59892dfaea043e72d788b2cda71e86205df0",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 165518,
+          "sha256": "d3e26cec8d4f6f00cd14a31e7d417e59aab8a0cd1c60337c8460ce34e8689c95",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 239626,
+          "sha256": "87659a1b2a7353ff1f99fa083996363558a52315f27003df68d73fe4d8e07b46",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 187970,
+          "sha256": "be30c4ffbb170c30e6e8af74029a711e14ca540e2d026b064868bff85cb274f0",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 204049,
+          "sha256": "792ae2331728b64962eb248fa9dcfb01c2865622d4a9a4ef201cb7326c1351ca",
+          "width": 1440,
+          "height": 1000
+        }
+      ],
+      "retainedFailureStateCaptures": [
+        {
+          "path": "writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+          "bytes": 212397,
+          "sha256": "b4fc49bc2af24b9f86fa1b9eb6ed83a5f30278e4d6a727e8d68daed38265eb85",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-5-6-terra-ultra",
+          "configurationId": "codex:gpt-5.6-terra@ultra",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+          "bytes": 212397,
+          "sha256": "b4fc49bc2af24b9f86fa1b9eb6ed83a5f30278e4d6a727e8d68daed38265eb85",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-5-6-terra-ultra",
+          "configurationId": "codex:gpt-5.6-terra@ultra",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+          "bytes": 226101,
+          "sha256": "24d8c02b24738df763606a96973e1247dd473a57f222c118beeb44dbcabaac6d",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+          "bytes": 226101,
+          "sha256": "24d8c02b24738df763606a96973e1247dd473a57f222c118beeb44dbcabaac6d",
+          "width": 1440,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        }
+      ],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "twists-mobile",
+      "benchmarkId": "storytelling-plot-twists",
+      "width": 390,
+      "height": 844,
+      "checks": 125,
+      "receiptSha256": "fab0e92e5ffe9e813c8f15ffd381eb775662e9d2682231295d0cc6890d52ad75",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 68917,
+          "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 63391,
+          "sha256": "61f7c0efb74aac9625bf34a3d901ff663ce48110bbc8f535b6a2115f5430571e",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 73938,
+          "sha256": "e2d1398d8fc53e161dd600ae174984d53c6f98db66689b3bcba4abe359d59692",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 69083,
+          "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f",
+          "width": 390,
+          "height": 844,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 12.453125,
+            "bottom": 5719.65625,
+            "width": 390,
+            "viewportHeight": 844,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 65514,
+          "sha256": "9e0045d645a3d0061f9152d2bdff206bc1fff14eba5d6764b2cb4bd65292ada4",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 65379,
+          "sha256": "b39f9c380404a1e4fb5404cd03ab3300d3da3d548e489387d95d5bb52a856450",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 62984,
+          "sha256": "bda0decfefb36b26977a293c807577419b60bb1132a3a3453070953e66b51dfd",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 81380,
+          "sha256": "77838831bddadb87c856c957042b591b207d64497fd7a4b7d99e65579c6a27c2",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 75002,
+          "sha256": "9ef93a0d027de72bfdaa829d7e2870cb3b21c05508006bf8ac61f239c04dd1ae",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 78629,
+          "sha256": "30c660fa5381cbb873a4f11df8a1988688bc194853d64de36e50af506bc647a7",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 76815,
+          "sha256": "a802ad2d3cf35ebdd79625da5f1dde8e7ac3d8a10fd63e80394b2e121f981bb1",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 81379,
+          "sha256": "165cf9b622d005704e69ee1f25d4f60b419bb001922366e46464f5ee18372f45",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 64885,
+          "sha256": "bf6d8abdfe5b96360cd6cc668bd3f33f6fe48fcde49af434738ec61f9893d62e",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 64292,
+          "sha256": "c014247e36d28d459d535cf0d07a56406e3fc7cac3d9619f282ef8da95350b1f",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 62423,
+          "sha256": "421ed1d6be0a9707cbce926c714a89a84c1227906adcf087b9bd1f2f16ac188a",
+          "width": 390,
+          "height": 844
+        }
+      ],
+      "retainedFailureStateCaptures": [
+        {
+          "path": "writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+          "bytes": 81381,
+          "sha256": "79cab07a103d6db959c5156fca1557090ddf5e041e122d918d38953f8662b65b",
+          "width": 390,
+          "height": 844,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-5-6-terra-ultra",
+          "configurationId": "codex:gpt-5.6-terra@ultra",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+          "bytes": 74597,
+          "sha256": "af41d18321c0eb709e135ae13db8ded691e46b1cb5e686379dc99a73016cb18d",
+          "width": 390,
+          "height": 844,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-5-6-terra-ultra",
+          "configurationId": "codex:gpt-5.6-terra@ultra",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+          "bytes": 75452,
+          "sha256": "e7c9d10f69d9ce785d8d7a07d409a924039f36f53efdc7edabd51bf909ea56a8",
+          "width": 390,
+          "height": 844,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+          "bytes": 74304,
+          "sha256": "da639cd808428921b201ddb7b5348e98adc1a66aab5af0736f7ababeacd49bd5",
+          "width": 390,
+          "height": 844,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        }
+      ],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "directory": "twists-tablet",
+      "benchmarkId": "storytelling-plot-twists",
+      "width": 820,
+      "height": 1000,
+      "checks": 125,
+      "receiptSha256": "37dfbf74668da27c2a1293792b7faadb9dd7a5db14a5cb4402eb5f7455bf0866",
+      "screenshots": [
+        {
+          "path": "writing-models.png",
+          "bytes": 113973,
+          "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 99874,
+          "sha256": "0fee5e2657f3defeac4aa3efa6eb6fcc8bb144f87e80842b236866ae0ccb9385",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 107997,
+          "sha256": "72070d42876d85a5de7b4d1e78d470d1ce99ac2a59d02b5ba00aadf85a265ee6",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 132816,
+          "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900",
+          "width": 820,
+          "height": 1000,
+          "target": {
+            "selector": "#capability-benchmarks [data-writing-provisional-benchmark=\"storytelling-core-idea\"]",
+            "top": 11.671875,
+            "bottom": 3289.015625,
+            "width": 820,
+            "viewportHeight": 1000,
+            "text": "Core idea \u2014 Astra-only provisional results31 complete settings \u00b7 12 stories \u00b7 1 judge \u00b7 expand comparisonPlain 78.3\u2192Skill 84.0+5.7 pts\n      GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results ar"
+          }
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 102576,
+          "sha256": "ccb512d294ffb4bd9e788140e7652ff7554f302fc66c338b06249b5808cc37eb",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 102442,
+          "sha256": "b510e34b27de2631d4943a7f7eb14786a725ec10436bb6b89b2defb3355d4a26",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 114512,
+          "sha256": "3af843ab05c19927c8f148bc7500e29716d4391fbe04379e5b7c5afb9c8c2599",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 154331,
+          "sha256": "18b3cda2d6d27d2d2d01aa724b627c23864bf7ebb03a121d525066ebd1a6754e",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 142622,
+          "sha256": "45bf52be42c09f9d4e937e1264ed630ab4dde429fe129bb640378f9344c3a4ba",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 146513,
+          "sha256": "9648ad6813c42c23b188bf708c1c83d77e8899dd4734e6330bf4fa3452d2e95b",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 158138,
+          "sha256": "08fce70c80f22c0add12e9fc24f4f80aa64287e2c7966fd0b2caa54ac1e547f5",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 154142,
+          "sha256": "676bd7ca83cb983a301288b1c0cecd046dc58658e7f60b8d8f05c1eeddfd4a00",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 211747,
+          "sha256": "2f2860f12aa31bec0acf1221bc814cc89ed59aecbeda5665e4f87eb58a89fad1",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 168434,
+          "sha256": "807841929f45d06a23c48bfa43b92dc29e85a6e722b3865a7effb8c839096b1b",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 171848,
+          "sha256": "1f34b88789b5a9edd2a4d8afdd3fa2c4c2edd7b20f2f60772bf9997ab21ababf",
+          "width": 820,
+          "height": 1000
+        }
+      ],
+      "retainedFailureStateCaptures": [
+        {
+          "path": "writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+          "bytes": 179004,
+          "sha256": "bdf0bcbc27e6d077cd5a47c8a91c222aa9b4481910543e0917905afe3dadcbea",
+          "width": 820,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-5-6-terra-ultra",
+          "configurationId": "codex:gpt-5.6-terra@ultra",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+          "bytes": 179004,
+          "sha256": "bdf0bcbc27e6d077cd5a47c8a91c222aa9b4481910543e0917905afe3dadcbea",
+          "width": 820,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-5-6-terra-ultra",
+          "configurationId": "codex:gpt-5.6-terra@ultra",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+          "bytes": 194752,
+          "sha256": "427cb2772371e08e6ae38fa4d1ca32018e3091117f84b539b2d52091fce57861",
+          "width": 820,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "condition": "skill",
+          "view": "failed-response"
+        },
+        {
+          "path": "writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+          "bytes": 194752,
+          "sha256": "427cb2772371e08e6ae38fa4d1ca32018e3091117f84b539b2d52091fce57861",
+          "width": 820,
+          "height": 1000,
+          "caseId": "scifi-outline",
+          "settingId": "codex-gpt-6-astra-ultra",
+          "configurationId": "codex:gpt-6-astra@ultra",
+          "condition": "baseline",
+          "view": "retained-paired-response"
+        }
+      ],
+      "harnessSha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    }
+  ],
+  "totalChecks": 1176,
+  "normalScreenshotCount": 138,
+  "retainedFailureStateScreenshotCount": 24,
+  "visualReview": {
+    "status": "passed",
+    "notes": [
+      "Previously clipped Adventure outline link wraps inside its card on mobile and desktop.",
+      "Primary and secondary table displays all five columns on mobile and tablet.",
+      "Primary repetition 3 read receipt visibly records incomplete 2/3 proof and inclusion in the invocation comparison.",
+      "Answer, judge rationale/evidence and archived reference captures land on the intended content.",
+      "Newly published single-judge provisional Storytelling comparison remains separate and explicitly excluded from Writing index and Overall."
+    ],
+    "reviewedPaths": [
+      "story-desktop/writing-models.png",
+      "diagnostic-dm-mobile/writing-stacked-rows.png",
+      "diagnostic-dm-mobile/writing-provisional.png",
+      "diagnostic-dm-mobile/dungeon-master-cohorts.png",
+      "diagnostic-dm-mobile/dungeon-master-adherence.png",
+      "dm-desktop/dungeon-master-answer.png",
+      "dm-tablet/dungeon-master-answer.png",
+      "dm-tablet/dungeon-master-reference.png",
+      "dm-mobile/dungeon-master-reference.png",
+      "dm-mobile/dungeon-master-judgments.png",
+      "dm-tablet/dungeon-master-cohorts.png"
+    ]
+  },
+  "createdAt": "2026-09-08T03:00:23.797658+00:00"
+}

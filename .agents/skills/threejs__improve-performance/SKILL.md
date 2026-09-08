@@ -62,6 +62,7 @@ Then read only the relevant specialist references for `hotspot_fix`; read every 
 | Trigger | Reference |
 |---|---|
 | draw calls, GPU, DPR, passes, materials, shaders, shadows, transparency, VRAM, batching, WebGL/WebGPU | `references/three-rendering-gpu.md` |
+| shader branches, loop tails, indexing, register pressure, specialization, compute work organization | [Shared shader-execution reference](../code__threejs-rapier-performance/references/shader-execution.md), owned by `$code__threejs-rapier-performance`; reading it for diagnosis does not invoke the remediation guard |
 | Rapier step, contacts, colliders, sleeping, CCD, solver, events, queries, fixed timestep | `references/rapier-physics.md` |
 | worker migration, postMessage, transfer buffers, SharedArrayBuffer, backlog, interpolation | `references/worker-handoff.md` |
 | GC, heap growth, resource leaks, teardown, pooling, long-session degradation | `references/memory-lifecycle.md` |
@@ -269,7 +270,7 @@ Prefer the smallest reversible test that makes competing explanations diverge.
 
 Examples:
 
-- Halve DPR at fixed scene state. A large GPU-time and budget-miss reduction supports fill/bandwidth pressure; unchanged GPU time weakens it.
+- Halve DPR at fixed scene state. A large GPU-time and budget-miss reduction supports fragment-scaled work, but does not distinguish shader execution, texture access, blending, or attachment bandwidth. Unchanged GPU time does not by itself establish a CPU bottleneck.
 - Replace the render pass with a trivial clear while continuing simulation. Improvement isolates render-side cost; no improvement shifts suspicion to update, physics, handoff, UI, or presentation.
 - Pause Rapier while replaying render transforms. Improvement supports physics/handoff pressure; unchanged frame pacing weakens it.
 - Keep Rapier running but suppress transform transfer. Improvement supports handoff; unchanged physics timing with better main-thread pacing separates transfer from simulation.
@@ -288,6 +289,7 @@ Classify each bottleneck:
 Bottleneck classes:
 
 - `gpu_fill_bandwidth_overdraw`
+- `gpu_shader_execution` (arithmetic, texture latency, divergence, or resource limits; may overlap bandwidth and other classes)
 - `gpu_draw_state_submission`
 - `main_update_traversal_animation_ui`
 - `physics_broadphase_narrowphase_solver_ccd`

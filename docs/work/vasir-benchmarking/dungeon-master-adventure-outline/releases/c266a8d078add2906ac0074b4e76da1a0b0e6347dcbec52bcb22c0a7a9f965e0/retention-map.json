@@ -1,0 +1,1867 @@
+{
+  "retainedAt": "2026-09-08T03:07:49.899812+00:00",
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "originalReceiptBytesPreserved": true,
+  "files": [
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/candidate.json",
+      "path": "combined-publication/candidate.json",
+      "bytes": 361604,
+      "sha256": "2aa13eef5f9e035f9979658bae41720c088ca0cefa930a0eadbdc28f29905d82"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/publish-result.json",
+      "path": "combined-publication/publish-result.json",
+      "bytes": 186490,
+      "sha256": "932f622064123a2c068d63f9e1b089f7ead7743165891f6c75c29081fe51cd2e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/template-lock.json",
+      "path": "combined-publication/template-lock.json",
+      "bytes": 3930743,
+      "sha256": "ff45dcc2061d2af52853f05b95ed438a4417cf20c31e38cd50e3f1b06a990989"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/app.js",
+      "path": "published-site/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/assets/d3.v7.min.js",
+      "path": "published-site/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/assets/kanit-latin-900-normal.woff2",
+      "path": "published-site/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/benchmark-report.css",
+      "path": "published-site/benchmark-report.css",
+      "bytes": 33336,
+      "sha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/benchmark-report.html",
+      "path": "published-site/benchmark-report.html",
+      "bytes": 2480,
+      "sha256": "eda467ff1129b08ac4c82dfc97d7795c22d7952b6182b2697125c8e3084458b6"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/benchmark-report.js",
+      "path": "published-site/benchmark-report.js",
+      "bytes": 86001,
+      "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/data.js",
+      "path": "published-site/data.js",
+      "bytes": 874810,
+      "sha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/games.css",
+      "path": "published-site/games.css",
+      "bytes": 19893,
+      "sha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/games.html",
+      "path": "published-site/games.html",
+      "bytes": 3450,
+      "sha256": "f7da4585ba40f4db40cfe64fcacd46ef60b94d3a98d6101441eceff36da27045"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/games.js",
+      "path": "published-site/games.js",
+      "bytes": 31995,
+      "sha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/index.html",
+      "path": "published-site/index.html",
+      "bytes": 2649,
+      "sha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/responses.js",
+      "path": "published-site/responses.js",
+      "bytes": 6484506,
+      "sha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/style.css",
+      "path": "published-site/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/writing-data.js",
+      "path": "published-site/writing-data.js",
+      "bytes": 1363147,
+      "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec"
+    },
+    {
+      "originalPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.enXbYq/writing-responses.js",
+      "path": "published-site/writing-responses.js",
+      "bytes": 6126683,
+      "sha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/app.js",
+      "path": "presentation-source/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/assets/d3.v7.min.js",
+      "path": "presentation-source/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/assets/kanit-latin-900-normal.woff2",
+      "path": "presentation-source/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.css",
+      "path": "presentation-source/benchmark-report.css",
+      "bytes": 33336,
+      "sha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+      "path": "presentation-source/benchmark-report.html",
+      "bytes": 2115,
+      "sha256": "915c3ce28a71cdff6fc974a7dcaa5f8b65c813991706603aa36114c7843a1eec"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.js",
+      "path": "presentation-source/benchmark-report.js",
+      "bytes": 86001,
+      "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/games.css",
+      "path": "presentation-source/games.css",
+      "bytes": 19893,
+      "sha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/games.html",
+      "path": "presentation-source/games.html",
+      "bytes": 3085,
+      "sha256": "eed02c026dc2cf1aa63f1a3433bf38926ae33cef6b3bbc6c3171dee80cf7f5b0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/games.js",
+      "path": "presentation-source/games.js",
+      "bytes": 31995,
+      "sha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+      "path": "presentation-source/index.html",
+      "bytes": 2284,
+      "sha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/style.css",
+      "path": "presentation-source/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/deployment.json",
+      "path": "presentation-source/deployment.json",
+      "bytes": 2871,
+      "sha256": "6ada4ea619bc407ffece980fcc998377b9da8366f8bbe4171715528e49234a38"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/infra/production.yml",
+      "path": "presentation-source/infra/production.yml",
+      "bytes": 13251,
+      "sha256": "50b4edc63ebbe218cba88abb7021721c2ac3b428088d5413695d3c9fea25bea4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-reference.png",
+      "path": "combined-publication/live-writing-core-1440/writing-reference.png",
+      "bytes": 181756,
+      "sha256": "5ac6dee6bafe188eb4052b775e12fd032ac7ee264c4f25675916740c7d4a8aba"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-rubric-anchors.png",
+      "path": "combined-publication/live-writing-core-1440/writing-rubric-anchors.png",
+      "bytes": 177441,
+      "sha256": "862ae1ff84af1d7968f6dade8fec005361c06f0b52f83728373a028d08a50cbd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+      "bytes": 190953,
+      "sha256": "130154ebfa66a7618f8fef97b7919dc1f24477a7bc7c995640b2251a88dc6ff6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-execution.png",
+      "path": "combined-publication/live-writing-core-1440/writing-execution.png",
+      "bytes": 172374,
+      "sha256": "0207f6c9b3feff46e7688b67c6400d617d4c7d20674cbfe67418e4d348bf6d79"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-method-execution.png",
+      "path": "combined-publication/live-writing-core-1440/writing-method-execution.png",
+      "bytes": 167125,
+      "sha256": "460e2eaa55ec93128ddc80e87063356f1c179edf6afccbe4e4f2856327ecd376"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-judge-resources.png",
+      "path": "combined-publication/live-writing-core-1440/writing-judge-resources.png",
+      "bytes": 101758,
+      "sha256": "1dd73bc945d99164aeb32ac0a26cce4a182705f12a19a48b50f6d3790bdc3cee"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-report.png",
+      "path": "combined-publication/live-writing-core-1440/writing-report.png",
+      "bytes": 155938,
+      "sha256": "744400947911553b4c986f4474abac0c7cdda9f7a538b8261c79eaf0c0e0bed4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-efficiency.png",
+      "path": "combined-publication/live-writing-core-1440/writing-efficiency.png",
+      "bytes": 139463,
+      "sha256": "b1081094e1883d5dacbcab539aa8c7b76bea57f5222dd86aff4448d949701e0a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-answer.png",
+      "path": "combined-publication/live-writing-core-1440/writing-answer.png",
+      "bytes": 181471,
+      "sha256": "ea79618d4ceda77c31219368ee0a8d0c4da25b52d6abde0c4070b132be5b2df6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-core-1440/writing-efficiency-tokens.png",
+      "bytes": 139319,
+      "sha256": "b6cab32bbc3d29bce42e19805ead7edc5b69913000accefc9b67d6a51e782ea4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-core-1440/writing-stacked-rows.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-core-1440/writing-browsercheck.json",
+      "bytes": 447454,
+      "sha256": "08e0164f8abcc4ea460c1ffe85d14d6657adccab4983420101345917d878daf0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+      "path": "combined-publication/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+      "bytes": 191897,
+      "sha256": "8da6843e660a3944f8f1965feb354d0a51602cc3464de5572713d8907965d543"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-models.png",
+      "path": "combined-publication/live-writing-core-1440/writing-models.png",
+      "bytes": 167004,
+      "sha256": "bc639d9986ff474f59308adcc640c07216fa392d8e3ebcc9312061a37aff0d3c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+      "path": "combined-publication/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+      "bytes": 190953,
+      "sha256": "130154ebfa66a7618f8fef97b7919dc1f24477a7bc7c995640b2251a88dc6ff6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-judgments.png",
+      "path": "combined-publication/live-writing-core-1440/writing-judgments.png",
+      "bytes": 182952,
+      "sha256": "143c6c723a126d49129ffbf6d95bc6aa7f7d1032a39dd8544095a5c7be7db149"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-core-1440/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+      "bytes": 191897,
+      "sha256": "8da6843e660a3944f8f1965feb354d0a51602cc3464de5572713d8907965d543"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-method.png",
+      "path": "combined-publication/live-writing-core-1440/writing-method.png",
+      "bytes": 181273,
+      "sha256": "77433ec997d99288c9cd81ba99b026b181e1c9b0a1822c1b1cbf7f9fb5f43828"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-core-1440/writing-benchmarks.png",
+      "bytes": 167381,
+      "sha256": "de9bd9816ac4e7abafc352cafd700121547014a458cdec96682671944b73e1c6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-partial.png",
+      "path": "combined-publication/live-writing-core-1440/writing-partial.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-provisional.png",
+      "path": "combined-publication/live-writing-core-1440/writing-provisional.png",
+      "bytes": 145078,
+      "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-reference.png",
+      "path": "combined-publication/live-writing-core-390/writing-reference.png",
+      "bytes": 77231,
+      "sha256": "68f2fb3d742e5d14066111925e072cc1403edfca2e061af76b8b4f88db7963a9"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-rubric-anchors.png",
+      "path": "combined-publication/live-writing-core-390/writing-rubric-anchors.png",
+      "bytes": 75670,
+      "sha256": "035c4f21dfb043b2d17fc5cd1c48358a3b4ccc3ab6807c679eaccfd241398f14"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+      "bytes": 71439,
+      "sha256": "08c98e8705bc08b75820dcc5d96ac427e0f1685d51649d82f9572d83e1eae000"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-execution.png",
+      "path": "combined-publication/live-writing-core-390/writing-execution.png",
+      "bytes": 63637,
+      "sha256": "c161a151efbaf62dffa246805fa38e37cae37c94c39e6260a580bcc72cd41941"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-method-execution.png",
+      "path": "combined-publication/live-writing-core-390/writing-method-execution.png",
+      "bytes": 83972,
+      "sha256": "cd8a75dce2680a17e161f0778e2fc35ef1a76075033008bc11223e88c50f7ca1"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-judge-resources.png",
+      "path": "combined-publication/live-writing-core-390/writing-judge-resources.png",
+      "bytes": 61373,
+      "sha256": "88c9ce4f420e5029912d675903ad5affa91300d5a0a7fcba34221fde0ae575a0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-report.png",
+      "path": "combined-publication/live-writing-core-390/writing-report.png",
+      "bytes": 62943,
+      "sha256": "1fcef03c57456d48eb9d8e3315afb6ce9d8e66e26eb0352ed8a2921ec6dbc944"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-efficiency.png",
+      "path": "combined-publication/live-writing-core-390/writing-efficiency.png",
+      "bytes": 64901,
+      "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-answer.png",
+      "path": "combined-publication/live-writing-core-390/writing-answer.png",
+      "bytes": 76033,
+      "sha256": "4f609e27110444f0848ff7b572e7b182359b1cca56c83f8cbe1d1808a763b205"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-core-390/writing-efficiency-tokens.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-core-390/writing-stacked-rows.png",
+      "bytes": 74201,
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-core-390/writing-browsercheck.json",
+      "bytes": 447392,
+      "sha256": "cc970586f675ab838b9f76441a948f2762767a3ee6ef139709ca136bd1f796a4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+      "path": "combined-publication/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+      "bytes": 55375,
+      "sha256": "ec5715a6a563e8cf30e5559262c68897ad94d4a5d00b24496212185b6adec8b6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-models.png",
+      "path": "combined-publication/live-writing-core-390/writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+      "path": "combined-publication/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+      "bytes": 76889,
+      "sha256": "7484eee092ff2a24badc10a76a89f3134625b81b89b22aea40681dbc7d456042"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-judgments.png",
+      "path": "combined-publication/live-writing-core-390/writing-judgments.png",
+      "bytes": 64094,
+      "sha256": "92f1649e397124d6276db8c74aff2474c5c96ea4e7d98245e4a32a16fae625d9"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-core-390/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+      "bytes": 75780,
+      "sha256": "fe2b6ae2c57535c7ea59762c8e2408b312cff5a0db90be425a086a2e5ce4189b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-method.png",
+      "path": "combined-publication/live-writing-core-390/writing-method.png",
+      "bytes": 76895,
+      "sha256": "dbfa1b0ca8c0f8fe613fbd4a09994949a2fd70fa95df7d414fd561f0311fe201"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-core-390/writing-benchmarks.png",
+      "bytes": 75417,
+      "sha256": "6f35293f23f5990e40d166bce86509f9703fce676c58d2295051f1e30354290b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-partial.png",
+      "path": "combined-publication/live-writing-core-390/writing-partial.png",
+      "bytes": 72601,
+      "sha256": "75fc15d8b970db717e74d2f1953b7723e7e23e6747d5e62492e417a9d4fd7b68"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-provisional.png",
+      "path": "combined-publication/live-writing-core-390/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-reference.png",
+      "path": "combined-publication/live-writing-core-820/writing-reference.png",
+      "bytes": 152628,
+      "sha256": "d67ab841b5519a570ba9a8b8cbce92c2dcdf500cce06c59c63635e32251501f9"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-rubric-anchors.png",
+      "path": "combined-publication/live-writing-core-820/writing-rubric-anchors.png",
+      "bytes": 142251,
+      "sha256": "9efcec1a9b63e0d584de5ca729419f208dd72d553dc38bc531bc0db7cc1b20c9"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-baseline-retained-paired-response.png",
+      "bytes": 146840,
+      "sha256": "554be4a08eccc8899eacdc264d08afcb890bb01be0282b50cf2a43cfde2c245d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-execution.png",
+      "path": "combined-publication/live-writing-core-820/writing-execution.png",
+      "bytes": 161362,
+      "sha256": "ce79ac6e75bca17164d84d2b9e06bffb64360762f3aeb3bd043d3549cee5f29b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-method-execution.png",
+      "path": "combined-publication/live-writing-core-820/writing-method-execution.png",
+      "bytes": 157770,
+      "sha256": "1f29e083a11ceb7fc5236a5483c8e95199d05c21b3a50b5dd51c7a7cdb059c9b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-judge-resources.png",
+      "path": "combined-publication/live-writing-core-820/writing-judge-resources.png",
+      "bytes": 92956,
+      "sha256": "00a9eb553dc0da2a751a73bdeb71892fd7f87acc3444e5c976f8bad7aa4a24f5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-report.png",
+      "path": "combined-publication/live-writing-core-820/writing-report.png",
+      "bytes": 108403,
+      "sha256": "5f6a5d8f2b3da74f52020764a8e9fb0065dc5b5cdbe86c4489e69d489e1b96ea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-efficiency.png",
+      "path": "combined-publication/live-writing-core-820/writing-efficiency.png",
+      "bytes": 105431,
+      "sha256": "665fda510a711ea57e3a5fb9b3095acb7c5f2a8d9ed4c40c712dbf67f59b1fa5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-answer.png",
+      "path": "combined-publication/live-writing-core-820/writing-answer.png",
+      "bytes": 163540,
+      "sha256": "991b14c9bfb0cd44165351727549928508a5c754cc79070510de981841a132e1"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-core-820/writing-efficiency-tokens.png",
+      "bytes": 105201,
+      "sha256": "a568dcf37faa18d10d0a9466f8ae29726c074a2a08dc55c66d8958cf1d47d117"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-core-820/writing-stacked-rows.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-core-820/writing-browsercheck.json",
+      "bytes": 447432,
+      "sha256": "efa2cfcf30cdef6dec39558f470f7a30a72f9fa97cea5380ac4747b3a4e1331d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+      "path": "combined-publication/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-skill-failed-response.png",
+      "bytes": 148925,
+      "sha256": "dbb1097d51ccca4215da1e4ec1ef40709624a83a15f1406a35ad4eeb83e32ad3"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-models.png",
+      "path": "combined-publication/live-writing-core-820/writing-models.png",
+      "bytes": 113973,
+      "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+      "path": "combined-publication/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-max-skill-failed-response.png",
+      "bytes": 146840,
+      "sha256": "554be4a08eccc8899eacdc264d08afcb890bb01be0282b50cf2a43cfde2c245d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-judgments.png",
+      "path": "combined-publication/live-writing-core-820/writing-judgments.png",
+      "bytes": 169458,
+      "sha256": "b11ecc803890317688d4d45fe1aa871c3b704af214076d80e5731ed4dc9c6979"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-core-820/writing-failure-the-matrix-trial-1-claude-claude-opus-5-xhigh-baseline-retained-paired-response.png",
+      "bytes": 148925,
+      "sha256": "dbb1097d51ccca4215da1e4ec1ef40709624a83a15f1406a35ad4eeb83e32ad3"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-method.png",
+      "path": "combined-publication/live-writing-core-820/writing-method.png",
+      "bytes": 156265,
+      "sha256": "b66b163c6af66f4b00a2bd9f516d3c350011fe90dcf2e92e8698f4c151b91c72"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-core-820/writing-benchmarks.png",
+      "bytes": 117910,
+      "sha256": "41c509a497263877cf81f03547f8948992f7080a45a5566045e37b2a08367815"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-partial.png",
+      "path": "combined-publication/live-writing-core-820/writing-partial.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-provisional.png",
+      "path": "combined-publication/live-writing-core-820/writing-provisional.png",
+      "bytes": 132816,
+      "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-answer.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-answer.png",
+      "bytes": 218066,
+      "sha256": "1f88a79b0211bdaaf4783ba469bf63322764275522f8ad9fba18488b827db98a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-reference.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-reference.png",
+      "bytes": 132529,
+      "sha256": "9c3bca9ef655b0b7318404354362befddebea11d22820eaf1c63e9b66f2fe2cb"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-report.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-report.png",
+      "bytes": 140490,
+      "sha256": "9c23fd23009cadc0cbd629a5b973e9a27c1feb540251117c0a71b4173ee30de4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-efficiency.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-efficiency.png",
+      "bytes": 139463,
+      "sha256": "b1081094e1883d5dacbcab539aa8c7b76bea57f5222dd86aff4448d949701e0a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-adherence.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-adherence.png",
+      "bytes": 246059,
+      "sha256": "7eac39b664df5489c2382042d50a271af4d28378bab3e80b31218fc3c86a6ede"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-benchmarks.png",
+      "bytes": 178478,
+      "sha256": "0e2b6383ac0bb63c8e0a04b8c1691022d85b84ccff280c8a87e0331e4dc570f4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-efficiency-tokens.png",
+      "bytes": 139319,
+      "sha256": "b6cab32bbc3d29bce42e19805ead7edc5b69913000accefc9b67d6a51e782ea4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-stacked-rows.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-dm-1440/writing-browsercheck.json",
+      "bytes": 436491,
+      "sha256": "842738e6d96782443a41b569ad269b82cd28d0fb98a1d076d6d6f030d319fd0e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-models.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-models.png",
+      "bytes": 167004,
+      "sha256": "bc639d9986ff474f59308adcc640c07216fa392d8e3ebcc9312061a37aff0d3c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-method.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-method.png",
+      "bytes": 152270,
+      "sha256": "01a3e16193b3f1186e4bded8f71b70439604966b89735b92a523b2bd33aa090f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-judgments.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-judgments.png",
+      "bytes": 298563,
+      "sha256": "88691b16420e99c2e976ed30238bc4b000cea0d131c6c12c12ed320fea0c4731"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-efficiency.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-efficiency.png",
+      "bytes": 138727,
+      "sha256": "fd74c35851e440fa0fa2d5c2fcd67286e57eebca43e344a05ce30a9a22627e5e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/dungeon-master-models.png",
+      "path": "combined-publication/live-writing-dm-1440/dungeon-master-models.png",
+      "bytes": 160607,
+      "sha256": "0e0232374856ab8a587096563362946a1acda23e038bb419581e14f08dd68c70"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-benchmarks.png",
+      "bytes": 167381,
+      "sha256": "de9bd9816ac4e7abafc352cafd700121547014a458cdec96682671944b73e1c6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-partial.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-partial.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-provisional.png",
+      "path": "combined-publication/live-writing-dm-1440/writing-provisional.png",
+      "bytes": 145078,
+      "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-answer.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-answer.png",
+      "bytes": 139331,
+      "sha256": "741cd9ea70046f4b91689f6b1eb6d8a548a277b50716504943122a64eba444d8"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-reference.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-reference.png",
+      "bytes": 132529,
+      "sha256": "9c3bca9ef655b0b7318404354362befddebea11d22820eaf1c63e9b66f2fe2cb"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-report.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-report.png",
+      "bytes": 140490,
+      "sha256": "9c23fd23009cadc0cbd629a5b973e9a27c1feb540251117c0a71b4173ee30de4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-efficiency.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-efficiency.png",
+      "bytes": 139463,
+      "sha256": "b1081094e1883d5dacbcab539aa8c7b76bea57f5222dd86aff4448d949701e0a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-adherence.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-adherence.png",
+      "bytes": 140490,
+      "sha256": "9c23fd23009cadc0cbd629a5b973e9a27c1feb540251117c0a71b4173ee30de4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-benchmarks.png",
+      "bytes": 178478,
+      "sha256": "0e2b6383ac0bb63c8e0a04b8c1691022d85b84ccff280c8a87e0331e4dc570f4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-efficiency-tokens.png",
+      "bytes": 139319,
+      "sha256": "b6cab32bbc3d29bce42e19805ead7edc5b69913000accefc9b67d6a51e782ea4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-stacked-rows.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-browsercheck.json",
+      "bytes": 436436,
+      "sha256": "1724434e194f8f65d6e11ac7090b0a8897a7a2307a9d531dd2fb63191c7e6df0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-models.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-models.png",
+      "bytes": 167004,
+      "sha256": "bc639d9986ff474f59308adcc640c07216fa392d8e3ebcc9312061a37aff0d3c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-method.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-method.png",
+      "bytes": 152270,
+      "sha256": "01a3e16193b3f1186e4bded8f71b70439604966b89735b92a523b2bd33aa090f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-judgments.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-judgments.png",
+      "bytes": 298563,
+      "sha256": "88691b16420e99c2e976ed30238bc4b000cea0d131c6c12c12ed320fea0c4731"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-efficiency.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-efficiency.png",
+      "bytes": 138727,
+      "sha256": "fd74c35851e440fa0fa2d5c2fcd67286e57eebca43e344a05ce30a9a22627e5e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/dungeon-master-models.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/dungeon-master-models.png",
+      "bytes": 160615,
+      "sha256": "fe418415d0b33acbd71216e3b3919a08c898ab4e039555f4d7eb83837cfcb7dd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-benchmarks.png",
+      "bytes": 167381,
+      "sha256": "de9bd9816ac4e7abafc352cafd700121547014a458cdec96682671944b73e1c6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-partial.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-partial.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440-pre-scored/writing-provisional.png",
+      "path": "combined-publication/live-writing-dm-1440-pre-scored/writing-provisional.png",
+      "bytes": 145078,
+      "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-answer.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-answer.png",
+      "bytes": 70301,
+      "sha256": "b176b4c639499002349a957fd8e643bd37834225be68c4bf3aa39de28aed4e8b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-reference.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-reference.png",
+      "bytes": 60767,
+      "sha256": "1920af9538dbbaddbc50deed319b9e919fbc1a90dcaf4819df70d4cfcb28d701"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-report.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-report.png",
+      "bytes": 64688,
+      "sha256": "53d6e1aa1cf3ffb23cd211db23176dbd58c7593e26535a19ebb802618dde7628"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-efficiency.png",
+      "path": "combined-publication/live-writing-dm-390/writing-efficiency.png",
+      "bytes": 64901,
+      "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-adherence.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-adherence.png",
+      "bytes": 57064,
+      "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-benchmarks.png",
+      "bytes": 73884,
+      "sha256": "14859f52f0ec1f5f2d51a5fc4e610951ead4cb16d2b8102ce37344c8999ab34b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-dm-390/writing-efficiency-tokens.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-dm-390/writing-stacked-rows.png",
+      "bytes": 74201,
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-dm-390/writing-browsercheck.json",
+      "bytes": 436441,
+      "sha256": "2a702755b3f21905d77a9baaaec687d4acddac68b9af53825dedb334f20e4a24"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-models.png",
+      "path": "combined-publication/live-writing-dm-390/writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-method.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-method.png",
+      "bytes": 78217,
+      "sha256": "b00a8c53c5e63f6990bca8871d2334bf8893742bacb9d6b1636d77680e31a790"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-judgments.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-judgments.png",
+      "bytes": 80532,
+      "sha256": "ea525b741f13a9606af47aadc5f378d68c8c447dba66b3f5a3ccdccda55ca56f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-efficiency.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-efficiency.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/dungeon-master-models.png",
+      "path": "combined-publication/live-writing-dm-390/dungeon-master-models.png",
+      "bytes": 73022,
+      "sha256": "c2833598ffdd4133473d092707597174e8b571566f06a8cda9139b7e2434000c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-390/writing-benchmarks.png",
+      "bytes": 75417,
+      "sha256": "6f35293f23f5990e40d166bce86509f9703fce676c58d2295051f1e30354290b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-partial.png",
+      "path": "combined-publication/live-writing-dm-390/writing-partial.png",
+      "bytes": 72601,
+      "sha256": "75fc15d8b970db717e74d2f1953b7723e7e23e6747d5e62492e417a9d4fd7b68"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-provisional.png",
+      "path": "combined-publication/live-writing-dm-390/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-answer.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-answer.png",
+      "bytes": 110056,
+      "sha256": "3fa5d1dee2261100f75893ac2f76e6eed516ae0672292a3297173e2c07f020c0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-reference.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-reference.png",
+      "bytes": 118193,
+      "sha256": "bb668e92919216f22bc76f0c9fa1302ba726a8eb8b645811d607a32d03a66e42"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-report.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-report.png",
+      "bytes": 109752,
+      "sha256": "4a73378d22f188cce23b9b892cdbc82ca5514a8a5c67d816d0f8a11797a9413b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-efficiency.png",
+      "path": "combined-publication/live-writing-dm-820/writing-efficiency.png",
+      "bytes": 105431,
+      "sha256": "665fda510a711ea57e3a5fb9b3095acb7c5f2a8d9ed4c40c712dbf67f59b1fa5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-adherence.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-adherence.png",
+      "bytes": 109752,
+      "sha256": "4a73378d22f188cce23b9b892cdbc82ca5514a8a5c67d816d0f8a11797a9413b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-benchmarks.png",
+      "bytes": 107997,
+      "sha256": "72070d42876d85a5de7b4d1e78d470d1ce99ac2a59d02b5ba00aadf85a265ee6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-dm-820/writing-efficiency-tokens.png",
+      "bytes": 105201,
+      "sha256": "a568dcf37faa18d10d0a9466f8ae29726c074a2a08dc55c66d8958cf1d47d117"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-dm-820/writing-stacked-rows.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-dm-820/writing-browsercheck.json",
+      "bytes": 436474,
+      "sha256": "accb90095b1afd05afb8ef9479fc0f1036bc684656f22c94aa21893659ac8dd2"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-models.png",
+      "path": "combined-publication/live-writing-dm-820/writing-models.png",
+      "bytes": 113973,
+      "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-method.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-method.png",
+      "bytes": 145518,
+      "sha256": "02f0e5080b036b4ad8387bbcbee372752b2b5ed04a523554b8f536f76b1c5953"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-judgments.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-judgments.png",
+      "bytes": 209823,
+      "sha256": "0b3cf6a62592139390df387de943fe1576db54a022d3a1d79b3336520f2e5ed6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-efficiency.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-efficiency.png",
+      "bytes": 105201,
+      "sha256": "a568dcf37faa18d10d0a9466f8ae29726c074a2a08dc55c66d8958cf1d47d117"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/dungeon-master-models.png",
+      "path": "combined-publication/live-writing-dm-820/dungeon-master-models.png",
+      "bytes": 107381,
+      "sha256": "eaaf7b80f47d16316ec8eb0cd012cc807d7c70c1ee58b2e2100e10a1a22c1b76"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-dm-820/writing-benchmarks.png",
+      "bytes": 117910,
+      "sha256": "41c509a497263877cf81f03547f8948992f7080a45a5566045e37b2a08367815"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-partial.png",
+      "path": "combined-publication/live-writing-dm-820/writing-partial.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-provisional.png",
+      "path": "combined-publication/live-writing-dm-820/writing-provisional.png",
+      "bytes": 132816,
+      "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-reference.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-reference.png",
+      "bytes": 165596,
+      "sha256": "f7e2a5d628a5c827d0bb45eecdfb59892dfaea043e72d788b2cda71e86205df0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+      "bytes": 226101,
+      "sha256": "24d8c02b24738df763606a96973e1247dd473a57f222c118beeb44dbcabaac6d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+      "bytes": 212397,
+      "sha256": "b4fc49bc2af24b9f86fa1b9eb6ed83a5f30278e4d6a727e8d68daed38265eb85"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-rubric-anchors.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-rubric-anchors.png",
+      "bytes": 167746,
+      "sha256": "2198d21e2ab87d69ed3183fac2cd7cea0e6edae42af6bf62359dbaaed09350a4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-execution.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-execution.png",
+      "bytes": 204049,
+      "sha256": "792ae2331728b64962eb248fa9dcfb01c2865622d4a9a4ef201cb7326c1351ca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-method-execution.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-method-execution.png",
+      "bytes": 152426,
+      "sha256": "59a2f3e44a6a28036bfb6ac8b3836ff1a2e0c4a1611f8983ee2aba2f3ef70a39"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-judge-resources.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-judge-resources.png",
+      "bytes": 187970,
+      "sha256": "be30c4ffbb170c30e6e8af74029a711e14ca540e2d026b064868bff85cb274f0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-report.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-report.png",
+      "bytes": 153527,
+      "sha256": "7da80bda72dbb9dc2da69681e06cc599ab4e16a2cb6303e71255d839eca93b2f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+      "bytes": 212397,
+      "sha256": "b4fc49bc2af24b9f86fa1b9eb6ed83a5f30278e4d6a727e8d68daed38265eb85"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-efficiency.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-efficiency.png",
+      "bytes": 139463,
+      "sha256": "b1081094e1883d5dacbcab539aa8c7b76bea57f5222dd86aff4448d949701e0a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-answer.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-answer.png",
+      "bytes": 211739,
+      "sha256": "8c5169b4ee27464402de15c228a16d8a6cbe629c1ba38f28a8539837a3274a33"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-efficiency-tokens.png",
+      "bytes": 139319,
+      "sha256": "b6cab32bbc3d29bce42e19805ead7edc5b69913000accefc9b67d6a51e782ea4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-stacked-rows.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-twists-1440/writing-browsercheck.json",
+      "bytes": 450477,
+      "sha256": "c80d85ada05cea0c0fdbe2b805c3c5c60325242fe86da73327710f33adf215b2"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-models.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-models.png",
+      "bytes": 167004,
+      "sha256": "bc639d9986ff474f59308adcc640c07216fa392d8e3ebcc9312061a37aff0d3c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-judgments.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-judgments.png",
+      "bytes": 239626,
+      "sha256": "87659a1b2a7353ff1f99fa083996363558a52315f27003df68d73fe4d8e07b46"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-method.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-method.png",
+      "bytes": 165761,
+      "sha256": "c3d4843cbd4dcb2c4838c4ac007e1040dbec94b26876689b3207ab5fac6ae2c4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+      "bytes": 226101,
+      "sha256": "24d8c02b24738df763606a96973e1247dd473a57f222c118beeb44dbcabaac6d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-benchmarks.png",
+      "bytes": 167381,
+      "sha256": "de9bd9816ac4e7abafc352cafd700121547014a458cdec96682671944b73e1c6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-partial.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-partial.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-provisional.png",
+      "path": "combined-publication/live-writing-twists-1440/writing-provisional.png",
+      "bytes": 145078,
+      "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-reference.png",
+      "path": "combined-publication/live-writing-twists-390/writing-reference.png",
+      "bytes": 76815,
+      "sha256": "a802ad2d3cf35ebdd79625da5f1dde8e7ac3d8a10fd63e80394b2e121f981bb1"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-twists-390/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+      "bytes": 74304,
+      "sha256": "da639cd808428921b201ddb7b5348e98adc1a66aab5af0736f7ababeacd49bd5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+      "path": "combined-publication/live-writing-twists-390/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+      "bytes": 75520,
+      "sha256": "be4a3ca0fd322c54e1653a58cdb44de04722869ad4b1ef4500cc8531e2605237"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-rubric-anchors.png",
+      "path": "combined-publication/live-writing-twists-390/writing-rubric-anchors.png",
+      "bytes": 75002,
+      "sha256": "9ef93a0d027de72bfdaa829d7e2870cb3b21c05508006bf8ac61f239c04dd1ae"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-execution.png",
+      "path": "combined-publication/live-writing-twists-390/writing-execution.png",
+      "bytes": 62423,
+      "sha256": "421ed1d6be0a9707cbce926c714a89a84c1227906adcf087b9bd1f2f16ac188a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-method-execution.png",
+      "path": "combined-publication/live-writing-twists-390/writing-method-execution.png",
+      "bytes": 78629,
+      "sha256": "30c660fa5381cbb873a4f11df8a1988688bc194853d64de36e50af506bc647a7"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-judge-resources.png",
+      "path": "combined-publication/live-writing-twists-390/writing-judge-resources.png",
+      "bytes": 64292,
+      "sha256": "c014247e36d28d459d535cf0d07a56406e3fc7cac3d9619f282ef8da95350b1f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-report.png",
+      "path": "combined-publication/live-writing-twists-390/writing-report.png",
+      "bytes": 62984,
+      "sha256": "bda0decfefb36b26977a293c807577419b60bb1132a3a3453070953e66b51dfd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-twists-390/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+      "bytes": 74597,
+      "sha256": "af41d18321c0eb709e135ae13db8ded691e46b1cb5e686379dc99a73016cb18d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-efficiency.png",
+      "path": "combined-publication/live-writing-twists-390/writing-efficiency.png",
+      "bytes": 64901,
+      "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-answer.png",
+      "path": "combined-publication/live-writing-twists-390/writing-answer.png",
+      "bytes": 81379,
+      "sha256": "165cf9b622d005704e69ee1f25d4f60b419bb001922366e46464f5ee18372f45"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-twists-390/writing-efficiency-tokens.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-twists-390/writing-stacked-rows.png",
+      "bytes": 74201,
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-twists-390/writing-browsercheck.json",
+      "bytes": 450415,
+      "sha256": "cbdfba9da25c9ffea96c561473472460276e9d2088a9a5c3fb14ed4de6c8367d"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-models.png",
+      "path": "combined-publication/live-writing-twists-390/writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-judgments.png",
+      "path": "combined-publication/live-writing-twists-390/writing-judgments.png",
+      "bytes": 64885,
+      "sha256": "bf6d8abdfe5b96360cd6cc668bd3f33f6fe48fcde49af434738ec61f9893d62e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-method.png",
+      "path": "combined-publication/live-writing-twists-390/writing-method.png",
+      "bytes": 81380,
+      "sha256": "77838831bddadb87c856c957042b591b207d64497fd7a4b7d99e65579c6a27c2"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+      "path": "combined-publication/live-writing-twists-390/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+      "bytes": 75452,
+      "sha256": "e7c9d10f69d9ce785d8d7a07d409a924039f36f53efdc7edabd51bf909ea56a8"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-twists-390/writing-benchmarks.png",
+      "bytes": 75417,
+      "sha256": "6f35293f23f5990e40d166bce86509f9703fce676c58d2295051f1e30354290b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-partial.png",
+      "path": "combined-publication/live-writing-twists-390/writing-partial.png",
+      "bytes": 72601,
+      "sha256": "75fc15d8b970db717e74d2f1953b7723e7e23e6747d5e62492e417a9d4fd7b68"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-provisional.png",
+      "path": "combined-publication/live-writing-twists-390/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-efficiency.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-efficiency.png",
+      "bytes": 64901,
+      "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-efficiency-tokens.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-stacked-rows.png",
+      "bytes": 74201,
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-browsercheck.json",
+      "bytes": 5117,
+      "sha256": "6f77192b6f59e680cfa016194e0fbda7bc01c99a4390165e22f495b87e0d060e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-models.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-benchmarks.png",
+      "bytes": 75417,
+      "sha256": "6f35293f23f5990e40d166bce86509f9703fce676c58d2295051f1e30354290b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-partial.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-partial.png",
+      "bytes": 72601,
+      "sha256": "75fc15d8b970db717e74d2f1953b7723e7e23e6747d5e62492e417a9d4fd7b68"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390-navigation-timeout/writing-provisional.png",
+      "path": "combined-publication/live-writing-twists-390-navigation-timeout/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-reference.png",
+      "path": "combined-publication/live-writing-twists-820/writing-reference.png",
+      "bytes": 158138,
+      "sha256": "08fce70c80f22c0add12e9fc24f4f80aa64287e2c7966fd0b2caa54ac1e547f5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-twists-820/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-baseline-retained-paired-response.png",
+      "bytes": 194752,
+      "sha256": "427cb2772371e08e6ae38fa4d1ca32018e3091117f84b539b2d52091fce57861"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+      "path": "combined-publication/live-writing-twists-820/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-skill-failed-response.png",
+      "bytes": 179004,
+      "sha256": "bdf0bcbc27e6d077cd5a47c8a91c222aa9b4481910543e0917905afe3dadcbea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-rubric-anchors.png",
+      "path": "combined-publication/live-writing-twists-820/writing-rubric-anchors.png",
+      "bytes": 142622,
+      "sha256": "45bf52be42c09f9d4e937e1264ed630ab4dde429fe129bb640378f9344c3a4ba"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-execution.png",
+      "path": "combined-publication/live-writing-twists-820/writing-execution.png",
+      "bytes": 171848,
+      "sha256": "1f34b88789b5a9edd2a4d8afdd3fa2c4c2edd7b20f2f60772bf9997ab21ababf"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-method-execution.png",
+      "path": "combined-publication/live-writing-twists-820/writing-method-execution.png",
+      "bytes": 146513,
+      "sha256": "9648ad6813c42c23b188bf708c1c83d77e8899dd4734e6330bf4fa3452d2e95b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-judge-resources.png",
+      "path": "combined-publication/live-writing-twists-820/writing-judge-resources.png",
+      "bytes": 168434,
+      "sha256": "807841929f45d06a23c48bfa43b92dc29e85a6e722b3865a7effb8c839096b1b"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-report.png",
+      "path": "combined-publication/live-writing-twists-820/writing-report.png",
+      "bytes": 114512,
+      "sha256": "3af843ab05c19927c8f148bc7500e29716d4391fbe04379e5b7c5afb9c8c2599"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+      "path": "combined-publication/live-writing-twists-820/writing-failure-scifi-outline-trial-3-codex-gpt-5-6-terra-ultra-baseline-retained-paired-response.png",
+      "bytes": 179004,
+      "sha256": "bdf0bcbc27e6d077cd5a47c8a91c222aa9b4481910543e0917905afe3dadcbea"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-efficiency.png",
+      "path": "combined-publication/live-writing-twists-820/writing-efficiency.png",
+      "bytes": 105431,
+      "sha256": "665fda510a711ea57e3a5fb9b3095acb7c5f2a8d9ed4c40c712dbf67f59b1fa5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-answer.png",
+      "path": "combined-publication/live-writing-twists-820/writing-answer.png",
+      "bytes": 187056,
+      "sha256": "05a4ca3464e6c27513e053d650bdf1877fccf595c3db2195b7d46bdaf3e75fcd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-efficiency-tokens.png",
+      "path": "combined-publication/live-writing-twists-820/writing-efficiency-tokens.png",
+      "bytes": 105201,
+      "sha256": "a568dcf37faa18d10d0a9466f8ae29726c074a2a08dc55c66d8958cf1d47d117"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-stacked-rows.png",
+      "path": "combined-publication/live-writing-twists-820/writing-stacked-rows.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-browsercheck.json",
+      "path": "combined-publication/live-writing-twists-820/writing-browsercheck.json",
+      "bytes": 450456,
+      "sha256": "bc45b183d548481410a21f56e077769cd0abcce118fac4ab2f2c15d9966bdc62"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-models.png",
+      "path": "combined-publication/live-writing-twists-820/writing-models.png",
+      "bytes": 113973,
+      "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-judgments.png",
+      "path": "combined-publication/live-writing-twists-820/writing-judgments.png",
+      "bytes": 211747,
+      "sha256": "2f2860f12aa31bec0acf1221bc814cc89ed59aecbeda5665e4f87eb58a89fad1"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-method.png",
+      "path": "combined-publication/live-writing-twists-820/writing-method.png",
+      "bytes": 154331,
+      "sha256": "18b3cda2d6d27d2d2d01aa724b627c23864bf7ebb03a121d525066ebd1a6754e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+      "path": "combined-publication/live-writing-twists-820/writing-failure-scifi-outline-trial-9-codex-gpt-6-astra-ultra-skill-failed-response.png",
+      "bytes": 154178,
+      "sha256": "872632b96553f76ebbf862114ab39ecc5127c206b4588370b707cb2cbc96c977"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-benchmarks.png",
+      "path": "combined-publication/live-writing-twists-820/writing-benchmarks.png",
+      "bytes": 117910,
+      "sha256": "41c509a497263877cf81f03547f8948992f7080a45a5566045e37b2a08367815"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-partial.png",
+      "path": "combined-publication/live-writing-twists-820/writing-partial.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-provisional.png",
+      "path": "combined-publication/live-writing-twists-820/writing-provisional.png",
+      "bytes": 132816,
+      "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/canonical/canonical-receipt.json",
+      "path": "combined-publication/canonical/canonical-receipt.json",
+      "bytes": 18537,
+      "sha256": "ce409f313e608177c0b6e966ad5c3f1a3f623d8a698037d25a814b8539e29b52"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/writing-browsercheck.mjs",
+      "path": "presentation-source/writing-browsercheck.mjs",
+      "bytes": 105782,
+      "sha256": "7d622c32c4fb1103bcc1a5a1b1108a6b395db66848a3fbf07854dfe52662adaa"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/capture.mjs",
+      "path": "presentation-source/capture.mjs",
+      "bytes": 161981,
+      "sha256": "157dd520a925ceb272d628a78b624c8f918cf10cb930d95647fbc4f154ac9bd9"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/games-browsercheck.mjs",
+      "path": "presentation-source/games-browsercheck.mjs",
+      "bytes": 51241,
+      "sha256": "dab6036e0032b374cf46104f08552ef29a220857ccff1ba1b1122e5465cc3c0a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/template-lock.json",
+      "path": "presentation-source/template-lock.json",
+      "bytes": 3930743,
+      "sha256": "ff45dcc2061d2af52853f05b95ed438a4417cf20c31e38cd50e3f1b06a990989"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-5-before-input.png",
+      "path": "combined-publication/games-390/390-5-before-input.png",
+      "bytes": 61095,
+      "sha256": "0deb4cd91c5d80d9a369b29439d3f2a3d13e80c0beeb1000a8254e504eb1e734"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-9-playback.png",
+      "path": "combined-publication/games-390/390-9-playback.png",
+      "bytes": 132362,
+      "sha256": "2fae3a397b0f65e56c270956d80afafd73ca4e576915e041a789b04d7f2ecc4f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-6-after-input.png",
+      "path": "combined-publication/games-390/390-6-after-input.png",
+      "bytes": 92966,
+      "sha256": "152d06c33def68bc39adb34140b44446fe15198ca32f1c953e337635a99758ca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/mobile-games-fullscreen.png",
+      "path": "combined-publication/games-390/mobile-games-fullscreen.png",
+      "bytes": 380182,
+      "sha256": "17c5251cfeb39fc0b86cdb1364742e087dc7f7a0596cb4ec6514af693d528d8f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-9-after-input.png",
+      "path": "combined-publication/games-390/390-9-after-input.png",
+      "bytes": 150397,
+      "sha256": "55d59713a2f740e48ce2d14d6d98ae0022fbf95ef401e41684888e40b05a179c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-8-playback.png",
+      "path": "combined-publication/games-390/390-8-playback.png",
+      "bytes": 136945,
+      "sha256": "728baa77e6711f2b6cc8d51b6bfeb31cddf173b3ee54b57b0afa84e74f5f9965"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-1-after-input.png",
+      "path": "combined-publication/games-390/390-1-after-input.png",
+      "bytes": 147141,
+      "sha256": "e852b8fd21faeb85fed44d10f4f935ecfc5938d31a0b04adf8068da70a3de0ba"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-1-before-input.png",
+      "path": "combined-publication/games-390/390-1-before-input.png",
+      "bytes": 179360,
+      "sha256": "ed50b711e996185edd2e1a516af40535fd8d6d028a3ca321b7186502e552de52"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-10-playback.png",
+      "path": "combined-publication/games-390/390-10-playback.png",
+      "bytes": 117606,
+      "sha256": "b97bc4336a670786a820a5370773bd859a805861f9c0a570f96590bbd2862274"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/mobile-games.png",
+      "path": "combined-publication/games-390/mobile-games.png",
+      "bytes": 59055,
+      "sha256": "25b60638b31319777f008a7b54087614dd660b1ddd2b4896d8482302a2c4da69"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-4-before-input.png",
+      "path": "combined-publication/games-390/390-4-before-input.png",
+      "bytes": 66077,
+      "sha256": "8abd74c73f797fd33cf2c6e726e299e92ce3908a660111d452da075269c5b525"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-5-playback.png",
+      "path": "combined-publication/games-390/390-5-playback.png",
+      "bytes": 125342,
+      "sha256": "bf8347278458901b5d941d8e8bec3d1f3bccffa9f8012f9ea0c53350c6ce7d3c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-2-playback.png",
+      "path": "combined-publication/games-390/390-2-playback.png",
+      "bytes": 182188,
+      "sha256": "e6d1dbeb00f1bca0d41a238824db89a2440023c6ce7ba79351ce7a2363d8bde3"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/games-browsercheck-390.json",
+      "path": "combined-publication/games-390/games-browsercheck-390.json",
+      "bytes": 137022,
+      "sha256": "eea591d0985a2d101e1d27c7b9cca41258d25676bff19dfbeda474bf65686a11"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-7-after-input.png",
+      "path": "combined-publication/games-390/390-7-after-input.png",
+      "bytes": 72107,
+      "sha256": "bf1c43185ea1acce1ae6f7426f402bbe8d98ba89865a93316132ded6fd935780"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-8-after-input.png",
+      "path": "combined-publication/games-390/390-8-after-input.png",
+      "bytes": 105618,
+      "sha256": "9918dcdcc32ed4553b32b85a5a849c77d90e08aa0d5752de14d6f6cb87b44751"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-3-playback.png",
+      "path": "combined-publication/games-390/390-3-playback.png",
+      "bytes": 145567,
+      "sha256": "b9eda17dbf0f241e7fc27cfc120c785902c6e7332c32ed6b2fd6d69d6f8cc0a4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-4-playback.png",
+      "path": "combined-publication/games-390/390-4-playback.png",
+      "bytes": 80933,
+      "sha256": "b1eb589b43ae8500a64a8b23504bfd7e59518ac1b1a8491ab0a2d81bdc533b28"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-10-after-input.png",
+      "path": "combined-publication/games-390/390-10-after-input.png",
+      "bytes": 175479,
+      "sha256": "9e68a851a66487f732949dfad6a69e301b19b5bcac9379d8e45eb5ac9b4bc1c2"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-2-after-input.png",
+      "path": "combined-publication/games-390/390-2-after-input.png",
+      "bytes": 173059,
+      "sha256": "7775f46f9036623077a749e9a0fae389a738a5505a28071619d927c7daf10e31"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/mobile-games-play.png",
+      "path": "combined-publication/games-390/mobile-games-play.png",
+      "bytes": 166847,
+      "sha256": "f3b6248151043ea8d7e8160980985802f46e9997371e222de7aa5ba6765ab33e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-6-playback.png",
+      "path": "combined-publication/games-390/390-6-playback.png",
+      "bytes": 123400,
+      "sha256": "2dfa2eaa71d73b7f322bac2157446a7db5544d46a4d31b2775aa2877c09c81e6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-1-playback.png",
+      "path": "combined-publication/games-390/390-1-playback.png",
+      "bytes": 163641,
+      "sha256": "a2af3b30767810825941b00c02a127677c80304b344c86fd4de3257e926cee7f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-7-before-input.png",
+      "path": "combined-publication/games-390/390-7-before-input.png",
+      "bytes": 72084,
+      "sha256": "6da1b4a22650b7a2de0b371ed639b22d1add0f29f864e5718f8bf6ea9448f2fb"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-3-before-input.png",
+      "path": "combined-publication/games-390/390-3-before-input.png",
+      "bytes": 141772,
+      "sha256": "13ef472eca7db6025ed1eec8ff7d39f3ae24525cf58f3f15ffb7338ddbea845e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-5-after-input.png",
+      "path": "combined-publication/games-390/390-5-after-input.png",
+      "bytes": 65929,
+      "sha256": "1f3295193aa7be403357d4173601ce5de549d8187b30a8d59c65a91b52f312b1"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/mobile-games-ratings.png",
+      "path": "combined-publication/games-390/mobile-games-ratings.png",
+      "bytes": 52735,
+      "sha256": "db68939b314be08d272f36180a8d5472a5fc651ac1bab61e167c00958639f1d6"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-7-playback.png",
+      "path": "combined-publication/games-390/390-7-playback.png",
+      "bytes": 115653,
+      "sha256": "f152b2c720433844ad4bf5e6e24011989b5ce13a0dcab1b957c8668ae7f465a3"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-8-before-input.png",
+      "path": "combined-publication/games-390/390-8-before-input.png",
+      "bytes": 113178,
+      "sha256": "ea6f6aa315792ca6bc71be98edb71923c00d4a4ca7be7ab3d420a679fad5f6fd"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-4-after-input.png",
+      "path": "combined-publication/games-390/390-4-after-input.png",
+      "bytes": 112677,
+      "sha256": "0ebe31e1888f895591a8ba41e91056df6e8e42171af0e9df5055c3426da52db4"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/mobile-games-playback.png",
+      "path": "combined-publication/games-390/mobile-games-playback.png",
+      "bytes": 164831,
+      "sha256": "65197c1957d168e5f6db7e489a72797b9abffad1d6fe189e878c725e55f94704"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-6-before-input.png",
+      "path": "combined-publication/games-390/390-6-before-input.png",
+      "bytes": 107291,
+      "sha256": "d2406705a3047c7a46622020c38f5ee4c7bda1a5af4eae827096530fc4112f44"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-10-before-input.png",
+      "path": "combined-publication/games-390/390-10-before-input.png",
+      "bytes": 162868,
+      "sha256": "02121ecdda9ccff133d317d8cf9ed726104845c4ebe49ca5eae6546fc8305a4e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-2-before-input.png",
+      "path": "combined-publication/games-390/390-2-before-input.png",
+      "bytes": 170982,
+      "sha256": "4512434f3ec2d1ae1181bd2cc6bfe7968932e40817b3bf674765f6f89f83590a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-9-before-input.png",
+      "path": "combined-publication/games-390/390-9-before-input.png",
+      "bytes": 157609,
+      "sha256": "7bf05987374c0c6910f67bca9e4c00e68b0e4b3164042ca547975b809ea3d081"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-390/390-3-after-input.png",
+      "path": "combined-publication/games-390/390-3-after-input.png",
+      "bytes": 127321,
+      "sha256": "fe7c0eaf562b5e0cbca62b686b69577fe0b2e947246617d233cafefd511038be"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-6-after-input.png",
+      "path": "combined-publication/games-1440/1440-6-after-input.png",
+      "bytes": 443410,
+      "sha256": "6c74812bb7edb1c049414731cbc4a46e1472fda416364e56e14e48a4628d821c"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-9-playback.png",
+      "path": "combined-publication/games-1440/1440-9-playback.png",
+      "bytes": 452050,
+      "sha256": "c4df159750ed14402db6342b39868be6d618fa9538ce236f5347be2ebf71f3f2"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-9-before-input.png",
+      "path": "combined-publication/games-1440/1440-9-before-input.png",
+      "bytes": 637177,
+      "sha256": "a809fc7de55b4bb8fc587d8bbf39afc15ec985d4925da8d3dddda367ae5558ae"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/desktop-games-playback.png",
+      "path": "combined-publication/games-1440/desktop-games-playback.png",
+      "bytes": 476821,
+      "sha256": "24251a8d73e60efc4395c8f65835c6d9f946ff365e12c24742175ec8bcb28a55"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-10-before-input.png",
+      "path": "combined-publication/games-1440/1440-10-before-input.png",
+      "bytes": 549990,
+      "sha256": "0b454a1ab86025db1e432a3b7e1c3363cc2af472ccdbb557c9cd1a5a6644dae5"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-9-after-input.png",
+      "path": "combined-publication/games-1440/1440-9-after-input.png",
+      "bytes": 624853,
+      "sha256": "6974a762fbcf4ab5c4986b3937703776ddb9f1ceb76f8c87c5de4211a87fb923"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-2-before-input.png",
+      "path": "combined-publication/games-1440/1440-2-before-input.png",
+      "bytes": 593199,
+      "sha256": "f32bd8d5b88b1084db90a736734350aaceaac1ea90809c334b459063b536366f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-6-before-input.png",
+      "path": "combined-publication/games-1440/1440-6-before-input.png",
+      "bytes": 456768,
+      "sha256": "e14086e518e915abad12924bd497a35d1254cfd503d96d2b5ad2900096a80810"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-8-playback.png",
+      "path": "combined-publication/games-1440/1440-8-playback.png",
+      "bytes": 386162,
+      "sha256": "5a177c70ccdcfe21bc0f18371bcac14c122a71d5063be8edd958cee904459a1a"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/games-browsercheck-1440.json",
+      "path": "combined-publication/games-1440/games-browsercheck-1440.json",
+      "bytes": 137907,
+      "sha256": "8ca4bcd168cfcbd01c53d9f42954cd225865d43fa0fef1f71826954362b9c682"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-1-after-input.png",
+      "path": "combined-publication/games-1440/1440-1-after-input.png",
+      "bytes": 643633,
+      "sha256": "a795e97d9740b4c2ef7cdebab2e8dec766bcc1ce66853c9f9384a55d068ce979"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-8-before-input.png",
+      "path": "combined-publication/games-1440/1440-8-before-input.png",
+      "bytes": 421706,
+      "sha256": "b32683a7dbaaffcac59c9fe9b2c52131064e4e12913e8634dfede275ee4472bf"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-5-playback.png",
+      "path": "combined-publication/games-1440/1440-5-playback.png",
+      "bytes": 377505,
+      "sha256": "1fadef49cb9ba26bac059c7a55d62cff503157a754c264c2d778608072802495"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-3-before-input.png",
+      "path": "combined-publication/games-1440/1440-3-before-input.png",
+      "bytes": 475521,
+      "sha256": "492d0d91c5d98a11af6e8d1ebfbd3c563eb1cbfc323d2cc6ff418bfaaa56cfd0"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-2-playback.png",
+      "path": "combined-publication/games-1440/1440-2-playback.png",
+      "bytes": 472293,
+      "sha256": "2b002c754a7831e96da57fc4fe6cc12ce811b8ebde97809065fcd032a53ee5c7"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-10-playback.png",
+      "path": "combined-publication/games-1440/1440-10-playback.png",
+      "bytes": 376397,
+      "sha256": "f03564ecbb61088fdd733009172c303507967b6e5f08cb15ec89e11f3750d92f"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-7-after-input.png",
+      "path": "combined-publication/games-1440/1440-7-after-input.png",
+      "bytes": 408821,
+      "sha256": "d3c918ab07392b00e42123c039e1d961f86ff5bb7fba43242cf242cccf67f675"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-7-before-input.png",
+      "path": "combined-publication/games-1440/1440-7-before-input.png",
+      "bytes": 410841,
+      "sha256": "defdab2a82e4497039d1247bdef20a256a6c1ceeff63cb2b8575dabaf086c2ce"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/desktop-games.png",
+      "path": "combined-publication/games-1440/desktop-games.png",
+      "bytes": 133607,
+      "sha256": "1909ff4a5e29d6f08827d8ad3707c0ea70ffcacaf697f8579cbe36ae789f7672"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-10-after-input.png",
+      "path": "combined-publication/games-1440/1440-10-after-input.png",
+      "bytes": 593065,
+      "sha256": "ebc7fb2213fedca5d7d742b0cba6b80707a95a9286fffc726cf94b5aa4c62135"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-3-playback.png",
+      "path": "combined-publication/games-1440/1440-3-playback.png",
+      "bytes": 394632,
+      "sha256": "0b5c683b913e50e3533fe586f0b5af48874fe696d069f351085f211f9147c512"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-4-playback.png",
+      "path": "combined-publication/games-1440/1440-4-playback.png",
+      "bytes": 307765,
+      "sha256": "c8556e604cc8bf1d62e3212cd471ef9bd88960c55f010586b34200b8699c7241"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-8-after-input.png",
+      "path": "combined-publication/games-1440/1440-8-after-input.png",
+      "bytes": 407027,
+      "sha256": "5ce885028e688fca752c6c590cc93e2c7ea2a2da7afd6f7d9208fc6c39c2c59e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/desktop-games-play.png",
+      "path": "combined-publication/games-1440/desktop-games-play.png",
+      "bytes": 481014,
+      "sha256": "d8f57237650c8299f8fd0c084979de163293f4139c539acef392f5a5902b99d3"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-2-after-input.png",
+      "path": "combined-publication/games-1440/1440-2-after-input.png",
+      "bytes": 594981,
+      "sha256": "4cd6f9eb6baf7ea652e772597c186476432ee37736542fb650b027bc5cdbd034"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-6-playback.png",
+      "path": "combined-publication/games-1440/1440-6-playback.png",
+      "bytes": 426823,
+      "sha256": "b33633a33a0ca3df0baa61654a8b71812a614d9446b988ee01a20e1aced18653"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-1-playback.png",
+      "path": "combined-publication/games-1440/1440-1-playback.png",
+      "bytes": 475199,
+      "sha256": "c24c059ad3e7879730070c70c4b79c6783488d9db7c52fde8761d139031ef27e"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-5-after-input.png",
+      "path": "combined-publication/games-1440/1440-5-after-input.png",
+      "bytes": 325122,
+      "sha256": "39550f5964c8b2b5fdb58cf47844d50c4ff1184e4b709a647df7ebecd8951765"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-7-playback.png",
+      "path": "combined-publication/games-1440/1440-7-playback.png",
+      "bytes": 391982,
+      "sha256": "fee65264a5300d054402a6d1d2f2f50dade8aca7a7f13de599a855e9b1ec5077"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-4-before-input.png",
+      "path": "combined-publication/games-1440/1440-4-before-input.png",
+      "bytes": 320224,
+      "sha256": "21efb017db9f6a04bfced6f40108b2d991a3a8d18ab3ab58eb59ac88aa0e9646"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-4-after-input.png",
+      "path": "combined-publication/games-1440/1440-4-after-input.png",
+      "bytes": 419252,
+      "sha256": "0188fdafca3fa104e0c3b794b07a97f5f59ead4b89da5b1c8813d45800c972ca"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-1-before-input.png",
+      "path": "combined-publication/games-1440/1440-1-before-input.png",
+      "bytes": 652142,
+      "sha256": "57d9425c52fb083a409613a2cb028a69787f3b5619c60375172a211248f21301"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/desktop-games-ratings.png",
+      "path": "combined-publication/games-1440/desktop-games-ratings.png",
+      "bytes": 117971,
+      "sha256": "27a47111a49d9e8927c7b743f905b863db8adb157d003ee79c411202ff757911"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-3-after-input.png",
+      "path": "combined-publication/games-1440/1440-3-after-input.png",
+      "bytes": 456887,
+      "sha256": "f12a4273f02fb18c7036be5a310b09c644f1991830a6600707b9dbabbe5eef53"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/1440-5-before-input.png",
+      "path": "combined-publication/games-1440/1440-5-before-input.png",
+      "bytes": 322790,
+      "sha256": "05c03f6e14aee2aa3ff2b7e521179a5f59f34763c5bb611dbc4722df3aada834"
+    },
+    {
+      "originalPath": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/games-1440/desktop-games-fullscreen.png",
+      "path": "combined-publication/games-1440/desktop-games-fullscreen.png",
+      "bytes": 467720,
+      "sha256": "019c55ee2ece325722ad79f0779491919f12074c75bf194b5ed00e5cedcfd03f"
+    }
+  ]
+}

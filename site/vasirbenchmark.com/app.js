@@ -1,6 +1,6 @@
 // A display index over published benchmark totals, never a replacement for a
 // benchmark's own rubric, declared cohort, exclusions, or report archive.
-function buildWritingCategoryCollection(collection) {
+function buildWritingCategoryCollection(collection, selectionId = 'storytelling') {
   if (!collection) return null;
   const clone = value => JSON.parse(JSON.stringify(value));
   const finite = Number.isFinite;
@@ -22,19 +22,60 @@ function buildWritingCategoryCollection(collection) {
   visit(collection);
   if (!publications.length) return null;
   const identityFor = (entry, publication) => entry.configurationId
-    || publication.settings.find(setting => setting.id === (entry.settingId || entry.id))?.configurationId
+    || publication.settings?.find(setting => setting.id === (entry.settingId || entry.id))?.configurationId
     || entry.settingId || entry.id;
-  const pairs = new Map(publications.map(publication => {
+  const pairsFor = (entries, publication) => {
     const rows = new Map();
-    for (const entry of publication.entries || []) {
+    for (const entry of entries || []) {
       const identity = identityFor(entry, publication);
       if (!rows.has(identity)) rows.set(identity, {});
       rows.get(identity)[entry.condition] = entry;
     }
-    return [publication.benchmarks[0].id, rows];
-  }));
-  const pairComplete = pair => conditionIds.every(condition => finite(pair?.[condition]?.exactScore));
-  const activeBenchmarkIds = publications.filter(publication => [...pairs.get(publication.benchmarks[0].id).values()].some(pairComplete)).map(publication => publication.benchmarks[0].id);
+    return rows;
+  };
+  const countsComplete = (object, expected, completed) => !finite(object?.[expected])
+    || finite(object?.[completed]) && object[completed] === object[expected];
+  const entryComplete = entry => finite(entry?.exactScore) && entry.eligibleForRank !== false
+    && countsComplete(entry, 'expectedPairCount', 'completedPairCount')
+    && countsComplete(entry.coverage, 'expectedCases', 'scoredCases')
+    && countsComplete(entry.coverage, 'expectedResponses', 'completedResponses')
+    && countsComplete(entry.coverage, 'expectedJudgments', 'completedJudgments');
+  const pairComplete = pair => conditionIds.every(condition => entryComplete(pair?.[condition]));
+  // Choose one published score basis for a whole benchmark. A setting cannot
+  // fall back to a different judge panel when its chosen-basis pair is missing.
+  const readinessPolicy = 'complete-published-pairs-uniform-benchmark-basis';
+  const executionComplete = publication => {
+    const coverage = publication.coverage || {};
+    if (typeof coverage.executionComplete === 'boolean') return coverage.executionComplete;
+    if (typeof coverage.executionStatus === 'string') return ['complete', 'complete-with-exclusions'].includes(coverage.executionStatus);
+    const generationComplete = finite(coverage.expectedResponseCount) && (
+      coverage.responseCount === coverage.expectedResponseCount
+      || finite(coverage.validResponseCount) && finite(coverage.terminalGenerationFailureCount)
+        && coverage.validResponseCount + coverage.terminalGenerationFailureCount === coverage.expectedResponseCount);
+    return generationComplete && finite(coverage.judgmentCount) && finite(coverage.expectedJudgmentCount)
+      && coverage.judgmentCount + (coverage.terminallyExcludedJudgmentCount || 0) === coverage.expectedJudgmentCount;
+  };
+  const sources = publications.map(publication => {
+    const benchmark = publication.benchmarks[0];
+    const configurationIds = [...new Set((publication.settings || []).map(setting => identityFor(setting, publication)))].sort();
+    const officialPairs = pairsFor(publication.entries, publication);
+    const provisionalPairs = pairsFor(publication.provisionalLeaderboard?.status === 'provisional' ? publication.provisionalLeaderboard.entries : [], publication);
+    const officialSettingCount = configurationIds.filter(identity => pairComplete(officialPairs.get(identity))).length;
+    const provisionalSettingCount = configurationIds.filter(identity => pairComplete(provisionalPairs.get(identity))).length;
+    const type = officialSettingCount ? 'official' : provisionalSettingCount ? 'provisional' : 'unavailable';
+    const provisional = type === 'provisional';
+    const sourceBasis = provisional ? publication.provisionalLeaderboard : publication.scoreBasis;
+    const judgeCount = sourceBasis?.judgeCount ?? null;
+    const label = type === 'unavailable' ? 'Complete published scores unavailable'
+      : `${provisional ? 'Provisional' : 'Official'}${judgeCount ? ` · ${judgeCount} ${provisional ? judgeCount === 1 ? 'judge' : 'judges' : 'reviews per answer'}` : ''}${provisional && sourceBasis?.label ? ` · ${sourceBasis.label}` : ''}`;
+    const basis = { id: sourceBasis?.id || `${benchmark.id}:${sourceBasis?.method || type}`, type, label, method: sourceBasis?.method || null, judgeCount, provisional, sourceLabel: sourceBasis?.label || null };
+    return { benchmarkId: benchmark.id, name: benchmark.name || benchmark.title || benchmark.id, configurationIds, basis,
+      pairs: provisional ? provisionalPairs : officialPairs, officialSettingCount, provisionalSettingCount,
+      completedSettingCount: provisional ? provisionalSettingCount : officialSettingCount, executionComplete: executionComplete(publication) };
+  });
+  const sourceMap = new Map(sources.map(source => [source.benchmarkId, source]));
+  const pairs = new Map(sources.map(source => [source.benchmarkId, source.pairs]));
+  const availableOfficialBenchmarkIds = sources.filter(source => source.officialSettingCount > 0).map(source => source.benchmarkId);
   const groupMap = new Map();
   const palette = ['var(--category-writing)', '#7445ff', '#00839a', '#08703d'];
   for (const publication of publications) {
@@ -46,76 +87,144 @@ function buildWritingCategoryCollection(collection) {
     }
     const group = groupMap.get(id);
     group.benchmarkIds.push(benchmark.id);
-    if (activeBenchmarkIds.includes(benchmark.id)) group.activeBenchmarkIds.push(benchmark.id);
   }
   const groups = [...groupMap.values()];
+  const allSelections = groups.flatMap(group => [
+    { id: group.id, type: 'track', title: group.title, benchmarkIds: [...group.benchmarkIds] },
+    ...group.benchmarkIds.map(id => ({ id, type: 'benchmark', title: sourceMap.get(id).name, benchmarkIds: [id] }))
+  ]).map(option => {
+    const selectedSources = option.benchmarkIds.map(id => sourceMap.get(id));
+    const declaredIds = [...new Set(selectedSources.flatMap(source => source.configurationIds))].sort();
+    const provisional = selectedSources.some(source => source.basis.provisional);
+    const completedSettingCount = declaredIds.filter(identity => selectedSources.every(source => pairComplete(source.pairs.get(identity)))).length;
+    const rankedSettingCount = completedSettingCount;
+    const partialSettingCount = declaredIds.filter(identity => selectedSources.some(source => pairComplete(source.pairs.get(identity)))).length - completedSettingCount;
+    return { ...option, provisional, declaredSettingCount: declaredIds.length, completedSettingCount, rankedSettingCount,
+      partialSettingCount, hasPartialScores: partialSettingCount > 0, partial: partialSettingCount > 0,
+      scoreBasisLabel: option.type === 'track'
+        ? `${option.title} · equal-weight benchmark mean${provisional ? ' · provisional' : ''}`
+        : `${option.title} · ${selectedSources[0].basis.label}` };
+  });
+  const selections = allSelections.filter(option => option.type === 'track'
+    || groups.find(group => group.benchmarkIds.includes(option.id)).benchmarkIds.length > 1);
+  const requestedSelection = allSelections.find(option => option.id === selectionId)
+    || allSelections.find(option => option.id === 'storytelling') || allSelections[0];
+  const selection = selections.find(option => option.id === requestedSelection.id)
+    || selections.find(option => option.type === 'track' && option.benchmarkIds.length === 1 && option.benchmarkIds[0] === requestedSelection.id);
+  const activeBenchmarkIds = [...selection.benchmarkIds];
+  const comparisonBenchmarkNames = activeBenchmarkIds.map(id => sourceMap.get(id).name);
+  const comparisonLabel = comparisonBenchmarkNames.join(' + ');
+  const declaredConfigurationIds = [...new Set(activeBenchmarkIds.flatMap(id => sourceMap.get(id).configurationIds))].sort();
+  const declaredRosterBenchmarkId = selection.type === 'benchmark' ? selection.id : null;
+  const declaredRosterSelection = 'selected-benchmark-union';
+  const sourceCoverage = sources.map(source => ({ benchmarkId: source.benchmarkId,
+    plannedSettingCount: source.configurationIds.length, completedSettingCount: source.completedSettingCount,
+    officialSettingCount: source.officialSettingCount, provisionalSettingCount: source.provisionalSettingCount,
+    matchesDeclaredRoster: declaredConfigurationIds.every(identity => source.configurationIds.includes(identity)),
+    executionComplete: source.executionComplete, readyForComparison: source.completedSettingCount > 0,
+    selected: activeBenchmarkIds.includes(source.benchmarkId), included: activeBenchmarkIds.includes(source.benchmarkId), basis: source.basis,
+    exclusionReason: !activeBenchmarkIds.includes(source.benchmarkId) ? 'outside-selected-score' : source.completedSettingCount ? null : 'complete-published-scores-unavailable' }));
+  for (const group of groups) group.activeBenchmarkIds = group.benchmarkIds.filter(id => activeBenchmarkIds.includes(id));
   const activeGroups = groups.filter(group => group.activeBenchmarkIds.length);
-  const benchmarkWeights = {};
+  const benchmarkWeights = Object.fromEntries(activeBenchmarkIds.map(id => [id, 1 / activeBenchmarkIds.length]));
   for (const group of activeGroups) {
     group.active = true;
-    group.weight = 1 / activeGroups.length;
-    for (const id of group.activeBenchmarkIds) benchmarkWeights[id] = group.weight / group.activeBenchmarkIds.length;
+    group.weight = group.activeBenchmarkIds.length / activeBenchmarkIds.length;
   }
   const identityMap = new Map();
   for (const publication of publications) for (const setting of publication.settings || []) {
     const identity = identityFor(setting, publication);
     if (!identityMap.has(identity)) identityMap.set(identity, setting);
   }
-  const metricNames = [...new Set(publications.flatMap(publication => (publication.entries || []).flatMap(entry => Object.keys(entry.metrics || {}).filter(name => name !== 'costCoverage'))))];
+  const metricNames = [...new Set(publications.flatMap(publication => [...(publication.entries || []), ...(publication.provisionalLeaderboard?.entries || [])].flatMap(entry => Object.keys(entry.metrics || {}).filter(name => name !== 'costCoverage'))))];
   const weighted = values => values.length && values.every(item => finite(item.value)) ? values.reduce((sum, item) => sum + item.value * item.weight, 0) : null;
   const entries = [];
   const coverageRecords = [];
   const settings = [...identityMap].map(([identity, source]) => {
     const missingBenchmarkIds = activeBenchmarkIds.filter(id => !pairComplete(pairs.get(id).get(identity)));
-    const unavailableBenchmarkIds = activeBenchmarkIds.filter(id => !pairs.get(id).has(identity));
+    const availableBenchmarkIds = activeBenchmarkIds.filter(id => !missingBenchmarkIds.includes(id));
+    const unavailableBenchmarkIds = activeBenchmarkIds.filter(id => !sourceMap.get(id).configurationIds.includes(identity));
     const complete = activeBenchmarkIds.length > 0 && missingBenchmarkIds.length === 0;
-    const coverageRecord = { settingId: source.id, configurationId: identity, complete, missingBenchmarkIds, unavailableBenchmarkIds, expectedBenchmarks: activeBenchmarkIds.length, completedBenchmarks: activeBenchmarkIds.length - missingBenchmarkIds.length };
+    const sourceCount = availableBenchmarkIds.length;
+    const eligibleForRank = complete;
+    const partial = sourceCount > 0 && !complete;
+    const provisional = availableBenchmarkIds.some(id => sourceMap.get(id).basis.provisional);
+    const settingBenchmarkWeights = Object.fromEntries(activeBenchmarkIds.map(id => [id, availableBenchmarkIds.includes(id) ? 1 / sourceCount : 0]));
+    const coverageRecord = { settingId: source.id, configurationId: identity, complete, eligibleForRank, partial, sourceCount,
+      availableBenchmarkIds, missingBenchmarkIds, unavailableBenchmarkIds, benchmarkWeights: settingBenchmarkWeights,
+      expectedBenchmarks: activeBenchmarkIds.length, completedBenchmarks: sourceCount };
     coverageRecords.push(coverageRecord);
-    const readings = Object.fromEntries(conditionIds.map(condition => [condition, groups.map(group => {
-      const groupComplete = group.active && group.activeBenchmarkIds.every(id => pairComplete(pairs.get(id).get(identity)));
-      const exactScore = groupComplete ? weighted(group.activeBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].exactScore, weight: 1 / group.activeBenchmarkIds.length }))) : null;
-      return { category: group.id, score: round(exactScore), exactScore, exactContribution: finite(exactScore) ? exactScore * group.weight : null, weight: group.weight, benchmarkIds: [...group.activeBenchmarkIds] };
+    const benchmarkComponents = Object.fromEntries(conditionIds.map(condition => [condition, activeBenchmarkIds.map(id => {
+      const benchmarkSource = sourceMap.get(id);
+      const pair = pairs.get(id).get(identity);
+      const complete = pairComplete(pair);
+      const exactScore = complete ? pair[condition].exactScore : null;
+      return { benchmarkId: id, name: benchmarkSource.name, condition, complete, exactScore, score: round(exactScore),
+        weight: settingBenchmarkWeights[id], exactContribution: finite(exactScore) ? exactScore * settingBenchmarkWeights[id] : null,
+        basis: benchmarkSource.basis, provisional: benchmarkSource.basis.provisional };
     })]));
-    const scores = Object.fromEntries(conditionIds.map(condition => [condition, complete ? weighted(activeBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].exactScore, weight: benchmarkWeights[id] }))) : null]));
+    const readings = Object.fromEntries(conditionIds.map(condition => [condition, groups.map(group => {
+      const groupAvailableIds = group.activeBenchmarkIds.filter(id => availableBenchmarkIds.includes(id));
+      const weight = sourceCount > 0 ? groupAvailableIds.length / sourceCount : 0;
+      const exactScore = weighted(groupAvailableIds.map(id => ({ value: pairs.get(id).get(identity)[condition].exactScore, weight: 1 / groupAvailableIds.length })));
+      return { category: group.id, score: round(exactScore), exactScore, exactContribution: finite(exactScore) ? exactScore * weight : null, weight,
+        benchmarkIds: [...group.activeBenchmarkIds], availableBenchmarkIds: groupAvailableIds, partial: groupAvailableIds.length > 0 && groupAvailableIds.length < group.activeBenchmarkIds.length };
+    })]));
+    const scores = Object.fromEntries(conditionIds.map(condition => [condition, weighted(availableBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].exactScore, weight: settingBenchmarkWeights[id] })))]));
     const metrics = Object.fromEntries(conditionIds.map(condition => [condition, {
-      ...Object.fromEntries(metricNames.map(name => [name, complete ? weighted(activeBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].metrics?.[name], weight: benchmarkWeights[id] }))) : null])),
+      ...Object.fromEntries(metricNames.map(name => [name, weighted(availableBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].metrics?.[name], weight: settingBenchmarkWeights[id] })))])),
       costCoverage: 'not-comparable'
     }]));
-    const exactDelta = complete ? scores.skill - scores.baseline : null;
-    const setting = { ...clone(source), configurationId: identity, scores: { baseline: round(scores.baseline), skill: round(scores.skill) }, deltas: { skill: round(exactDelta) }, metrics, categories: readings, coverage: Object.fromEntries(conditionIds.map(condition => [condition, { ...coverageRecord }])) };
+    const exactDelta = sourceCount > 0 ? scores.skill - scores.baseline : null;
+    const setting = { ...clone(source), configurationId: identity, scores: { baseline: round(scores.baseline), skill: round(scores.skill) }, exactScores: scores, deltas: { skill: round(exactDelta) }, exactDelta,
+      eligibleForRank, complete, partial, provisional, sourceCount, availableBenchmarkIds, missingBenchmarkIds,
+      benchmarkWeights: settingBenchmarkWeights, benchmarkComponents, metrics, categories: readings, coverage: Object.fromEntries(conditionIds.map(condition => [condition, { ...coverageRecord }])) };
     for (const condition of conditionIds) {
-      entries.push({ id: `${source.id}-${condition}`, settingId: source.id, configurationId: identity, modelId: source.modelId, provider: source.provider, family: source.family, reasoning: source.reasoning, label: source.label, condition, conditionLabel: condition === 'skill' ? 'Task-specific skill' : 'Plain answer', score: round(scores[condition]), exactScore: scores[condition], baselineScore: round(scores.baseline), exactBaselineScore: scores.baseline, delta: complete ? condition === 'baseline' ? 0 : round(exactDelta) : null, exactDelta: complete ? condition === 'baseline' ? 0 : exactDelta : null, categories: readings[condition], baselineCategories: readings.baseline, metrics: metrics[condition], cost: metrics[condition].meanCostUsd ?? null, latency: finite(metrics[condition].meanLatencyMs) ? metrics[condition].meanLatencyMs / 1000 : null, tokens: metrics[condition].meanOutputTokens ?? null, coverage: { ...coverageRecord }, rank: null });
+      entries.push({ id: `${source.id}-${condition}`, settingId: source.id, configurationId: identity, modelId: source.modelId, provider: source.provider, family: source.family, reasoning: source.reasoning, label: source.label, condition, conditionLabel: condition === 'skill' ? 'Task-specific skill' : 'Plain answer', score: round(scores[condition]), exactScore: scores[condition], baselineScore: round(scores.baseline), exactBaselineScore: scores.baseline, delta: eligibleForRank ? condition === 'baseline' ? 0 : round(exactDelta) : null, exactDelta: eligibleForRank ? condition === 'baseline' ? 0 : exactDelta : null,
+        eligibleForRank, complete, partial, provisional, sourceCount, availableBenchmarkIds, missingBenchmarkIds, benchmarkWeights: settingBenchmarkWeights,
+        benchmarkComponents: benchmarkComponents[condition], baselineBenchmarkComponents: benchmarkComponents.baseline, categories: readings[condition], baselineCategories: readings.baseline, metrics: metrics[condition], cost: metrics[condition].meanCostUsd ?? null, latency: finite(metrics[condition].meanLatencyMs) ? metrics[condition].meanLatencyMs / 1000 : null, tokens: metrics[condition].meanOutputTokens ?? null, coverage: { ...coverageRecord }, rank: null });
     }
     return setting;
   });
-  for (const entry of entries) if (finite(entry.exactScore)) entry.rank = 1 + entries.filter(other => other.condition === entry.condition && finite(other.exactScore) && other.exactScore > entry.exactScore).length;
+  for (const entry of entries) {
+    if (entry.sourceCount > 0) {
+      entry.exactDelta = entry.condition === 'baseline' ? 0 : settings.find(setting => setting.id === entry.settingId).exactDelta;
+      entry.delta = round(entry.exactDelta);
+    }
+    if (entry.eligibleForRank && finite(entry.exactScore)) entry.rank = 1 + entries.filter(other => other.eligibleForRank && other.condition === entry.condition && finite(other.exactScore) && other.exactScore > entry.exactScore).length;
+  }
   const benchmarks = publications.flatMap(publication => publication.benchmarks);
   const flatten = key => publications.flatMap(publication => (publication[key] || []).map(item => ({ ...item, benchmarkId: item.benchmarkId || publication.benchmarks[0].id })));
-  const coverage = { benchmarkCount: benchmarks.length, activeBenchmarkCount: activeBenchmarkIds.length, groupCount: groups.length, activeGroupCount: activeGroups.length, settingCount: settings.length, completedSettingCount: coverageRecords.filter(record => record.complete).length, benchmarkSettingCount: publications.reduce((sum, publication) => sum + (publication.coverage?.settingCount || 0), 0) };
+  const coverage = { benchmarkCount: benchmarks.length, activeBenchmarkCount: activeBenchmarkIds.length, availableOfficialBenchmarkCount: availableOfficialBenchmarkIds.length, declaredSettingCount: declaredConfigurationIds.length, groupCount: groups.length, activeGroupCount: activeGroups.length, settingCount: settings.length, completedSettingCount: coverageRecords.filter(record => record.complete).length, benchmarkSettingCount: publications.reduce((sum, publication) => sum + (publication.coverage?.settingCount || 0), 0) };
+  coverage.rankedSettingCount = coverageRecords.filter(record => record.eligibleForRank).length;
+  coverage.partialSettingCount = coverageRecords.filter(record => record.partial).length;
+  coverage.unrankedSettingCount = settings.length - coverage.rankedSettingCount;
   for (const field of ['caseCount', 'responseCount', 'expectedResponseCount', 'scoredResponseCount', 'usablePairs', 'expectedPairs', 'judgmentCount', 'expectedJudgmentCount', 'terminalGenerationFailureCount', 'terminallyExcludedPairCount', 'terminallyExcludedJudgmentCount']) coverage[field] = publications.reduce((sum, publication) => sum + (publication.coverage?.[field] || 0), 0);
-  coverage.executionComplete = publications.every(publication => typeof publication.coverage?.executionComplete === 'boolean' ? publication.coverage.executionComplete : publication.coverage?.judgmentCount === publication.coverage?.expectedJudgmentCount && publication.coverage?.responseCount === publication.coverage?.expectedResponseCount);
+  coverage.executionComplete = publications.every(executionComplete);
   coverage.executionStatus = coverage.executionComplete ? coverage.terminallyExcludedPairCount ? 'complete-with-exclusions' : 'complete' : 'in-progress';
   coverage.pendingJudgmentCount = Math.max(0, coverage.expectedJudgmentCount - coverage.judgmentCount - coverage.terminallyExcludedJudgmentCount);
-  const method = 'equal-active-subcategory-equal-active-benchmark-complete-paired-index-v1';
+  const method = 'common-benchmark-ranking-with-visible-partials-v5';
+  const sourceBases = activeBenchmarkIds.map(id => ({ benchmarkId: id, name: sourceMap.get(id).name, weight: benchmarkWeights[id], ...sourceMap.get(id).basis }));
+  const panelMethod = 'Ranked settings require complete paired totals for every selected benchmark: the same tests, equal weights and one published basis per benchmark. Incomplete available-score means remain visible but have no rank and cannot determine leaders, headline statistics or efficiency comparisons. Missing scores are never zero. Both conditions use the same available tests; resources use those weights, with missing resource values unknown. Each benchmark uses official pairs when available, otherwise its published provisional basis. Individual models never switch judge panels. Scores inherit provisional status from contributing sources. Original rubrics, trials, exclusions and evidence are unchanged. Different rubrics and panels remain uncalibrated.';
   const conditions = [{ id: 'baseline', label: 'Plain answer', short: 'Plain' }, { id: 'skill', label: 'Task-specific skill', short: 'Skill' }];
   const categoryLeaders = activeGroups.flatMap(group => {
-    const eligible = entries.filter(entry => entry.condition === 'skill' && finite(entry.exactScore)).sort((a, b) => b.categories.find(item => item.category === group.id).exactScore - a.categories.find(item => item.category === group.id).exactScore);
+    const eligible = entries.filter(entry => entry.eligibleForRank && entry.condition === 'skill' && finite(entry.exactScore)).sort((a, b) => b.categories.find(item => item.category === group.id).exactScore - a.categories.find(item => item.category === group.id).exactScore);
     return eligible.length ? [{ category: group.id, entry: { ...eligible[0], categoryScore: eligible[0].categories.find(item => item.category === group.id).score } }] : [];
   });
   return {
     kind: 'vasirbenchmark-writing-category-display', schemaVersion: 1,
     program: clone(publications[0].program || {}),
     conditions, categories: activeGroups.length ? activeGroups : groups,
-    families: [{ id: 'writing', title: 'Writing', description: 'A developmental index over published writing benchmarks.', trackIds: groups.map(group => group.id) }],
+    families: [{ id: 'writing', title: 'Writing', description: 'Track aggregates and individual published writing benchmarks.', trackIds: groups.map(group => group.id) }],
     tracks: groups.map(group => ({ id: group.id, familyId: 'writing', title: group.title, benchmarkIds: group.benchmarkIds })),
     benchmarks, benchmarkSummaries: flatten('benchmarkSummaries'), benchmarkResults: flatten('benchmarkResults'), results: flatten('results'),
     settings, entries, cases: flatten('cases'), caseResults: flatten('caseResults'), caseSummaries: flatten('caseSummaries'), trialSummaries: flatten('trialSummaries'),
-    meta: { release: publications[0].meta?.release, status: 'Uncalibrated development index', categories: groups.length, benchmarks: benchmarks.length, settings: settings.length, conditions: 2, aggregateCells: entries.length, runs: publications.length, calibration: 0 },
-    scoreBasis: { id: method, label: 'Writing development index', edition: 'Writing development index', method, unit: 'rubric-points', range: { minimum: 0, maximum: 100 }, taskCount: activeBenchmarkIds.length, benchmarkIds: activeBenchmarkIds, benchmarkWeighting: 'equal-within-active-subcategory', subgroupWeighting: 'equal-active-subcategories', calibrationStatus: 'development-uncalibrated', coverage, panelMethod: 'Published benchmark totals retain their own declared cohorts and scoring methods. The display index weights active subcategories equally and active benchmarks equally within each subcategory. A ranked setting must have complete published totals in both conditions for every active benchmark. No missing values are imputed; all ranked settings use the same benchmark cohort. Different rubrics and panels are not calibrated to one another.' },
-    coverage, categoryLeaders, efficientFrontier: [], regressions: entries.filter(entry => entry.condition === 'skill' && finite(entry.exactDelta) && entry.exactDelta < 0),
-    callouts: { overall: 'Writing is reported separately and does not change Overall.', value: 'Quality and resources use the same active benchmark weights; missing resources are not imputed.' },
-    methodology: { method, limitations: ['A display index over heterogeneous developmental rubrics, not a calibrated measure of general writing ability.', 'The active benchmark cohort and current weights change when new complete results are published.'] },
-    writingCategory: { method, publications, groups, activeBenchmarkIds, benchmarkWeights, coverageRecords, completeSettingCount: coverage.completedSettingCount, totalSettingCount: settings.length }
+    meta: { release: publications[0].meta?.release, status: selection.provisional ? 'Provisional · uncalibrated development index' : 'Uncalibrated development index', categories: groups.length, benchmarks: benchmarks.length, settings: settings.length, conditions: 2, aggregateCells: entries.length, runs: publications.length, calibration: 0 },
+    scoreBasis: { id: `${method}:${selection.id}`, label: selection.scoreBasisLabel, edition: 'Writing common-benchmark ranking v5', method, unit: 'rubric-points', range: { minimum: 0, maximum: 100 }, taskCount: activeBenchmarkIds.length, benchmarkIds: activeBenchmarkIds, comparisonBenchmarkNames, declaredConfigurationIds, declaredRosterBenchmarkId, declaredRosterSelection, readinessPolicy, benchmarkWeighting: 'equal-fixed-benchmarks-for-ranked-settings', subgroupWeighting: 'selected-track-only', calibrationStatus: 'development-uncalibrated', provisional: selection.provisional, partial: selection.partial, selection, sources: sourceBases, coverage, panelMethod, sourceMethods: sourceBases.map(source => ({ benchmarkId: source.benchmarkId, label: source.label, method: source.method })) },
+    coverage, categoryLeaders, efficientFrontier: [], regressions: entries.filter(entry => entry.eligibleForRank && entry.condition === 'skill' && finite(entry.exactDelta) && entry.exactDelta < 0),
+    callouts: { overall: 'Writing is reported separately and does not change Overall.', value: 'Quality and resources use the same available benchmark weights for each setting; missing resources are not imputed.' },
+    methodology: { method, panelMethod, limitations: ['Scores describe the selected benchmarks, not a calibrated measure of general writing ability.', 'An asterisk marks an unranked available-score mean, not a comparable aggregate. Only settings covering every selected benchmark receive ranks.', 'A score inherits provisional status from its included benchmark totals. When official pairs become available, that entire benchmark switches basis; unavailable official totals are omitted from each model’s mean.'] },
+    writingCategory: { method, publications, groups, selection, selections, activeBenchmarkIds, availableOfficialBenchmarkIds, comparisonBenchmarkIds: activeBenchmarkIds, comparisonBenchmarkNames, comparisonLabel, declaredConfigurationIds, declaredRosterBenchmarkId, declaredRosterSelection, readinessPolicy, sourceCoverage, benchmarkWeights, coverageRecords, completeSettingCount: coverage.completedSettingCount, rankedSettingCount: coverage.rankedSettingCount, partialSettingCount: coverage.partialSettingCount, totalSettingCount: settings.length }
   };
 }
 
@@ -129,6 +238,8 @@ function buildWritingCategoryCollection(collection) {
   const hasWriting = Boolean(writingSummary?.coverage?.caseCount && writingSummary?.benchmarkId);
   const publishedWritingBenchmarkCount = new Set([writingSummary?.benchmarkId, ...(writingSummary?.benchmarks || []).map(benchmark => benchmark.id), ...Object.keys(writingSummary?.additionalBenchmarks || {})].filter(Boolean)).size;
   const requestedWritingBenchmark = new URLSearchParams(window.location.search).get('writing');
+  const writingScoreRequest = new URLSearchParams(window.location.search).get('score')
+    || (initialFragment.split('/')[2] === 'dungeon-master' ? 'dungeon-master' : 'storytelling');
   let writingData = window.VASIR_WRITING;
   if (hasWriting && initialFragment.split('/')[1] === 'writing' && !writingData) {
     try {
@@ -165,7 +276,9 @@ function buildWritingCategoryCollection(collection) {
   const isWorkSpec = activeContext === 'workflows';
   const isOverall = activeContext === 'overall';
   const isWriting = activeContext === 'writing';
-  const writingCategoryData = isWriting ? buildWritingCategoryCollection(writingData) : null;
+  const writingCategoryData = isWriting ? buildWritingCategoryCollection(writingData, writingScoreRequest) : null;
+  const writingAggregateLeader = isWriting ? (writingCategoryData.writingCategory.selection.id === 'storytelling' ? writingCategoryData : buildWritingCategoryCollection(writingData, 'storytelling')).entries
+    .filter(entry => entry.eligibleForRank && entry.condition === 'skill' && Number.isFinite(entry.exactScore)).sort((left, right) => right.exactScore - left.exactScore)[0] : null;
   if (isWriting) {
     window.VASIR_WRITING_COLLECTION = writingData;
     window.VASIR_WRITING_CATEGORY = writingCategoryData;
@@ -207,7 +320,7 @@ function buildWritingCategoryCollection(collection) {
         <section class="development-unavailable" role="alert">
           <p class="ui-eyebrow">Benchmark data unavailable</p>
           <h2>RESULTS COULD NOT BE VERIFIED</h2>
-          <p>The public dataset must provide one complete Minimal baseline and skill result for every matched setting and frozen task. No partial comparison is shown.</p>
+          <p>${isWriting ? 'The published dataset must provide paired score records and source evidence for this comparison.' : 'The public dataset must provide one complete Minimal baseline and skill result for every matched setting and frozen task. No partial comparison is shown.'}</p>
         </section>
       `;
     }
@@ -218,7 +331,8 @@ function buildWritingCategoryCollection(collection) {
   const BASELINE_CONDITION_ID = 'baseline';
   const TREATMENT_CONDITION_ID = 'skill';
   const SETTING_COUNT = data.settings.length;
-  const ENTRY_COUNT = data.entries.length;
+  const RANKED_SETTING_COUNT = isWriting ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.eligibleForRank && Number.isFinite(entry.score)).length : SETTING_COUNT;
+  const ENTRY_COUNT = isWriting ? data.entries.filter(entry => entry.eligibleForRank && Number.isFinite(entry.score)).length : data.entries.length;
   const BENCHMARK_COUNT = data.benchmarks.length;
   const scoreBasis = data.scoreBasis && typeof data.scoreBasis === 'object' ? data.scoreBasis : {};
   const TASK_COUNT = Number.isFinite(Number(scoreBasis.taskCount)) && Number(scoreBasis.taskCount) > 0
@@ -241,8 +355,8 @@ function buildWritingCategoryCollection(collection) {
     ? 'Equal-weight mean of frozen task rubric scores'
     : `${SCORE_EDITION_LABEL} score`;
   const QUALITY_DOMAIN = [SCORE_MINIMUM, SCORE_MAXIMUM];
-  const taskCoverageLabel = isWriting ? `${data.writingCategory.activeBenchmarkIds.length} scored of ${BENCHMARK_COUNT} published benchmarks` : `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
-  const developmentDisclosure = isWriting ? `Writing development index · ${taskCoverageLabel} · Uncalibrated` : `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isOverall ? ' · Uncalibrated development' : ''}`;
+  const taskCoverageLabel = isWriting ? data.writingCategory.comparisonLabel : `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
+  const developmentDisclosure = isWriting ? `${taskCoverageLabel} · ${scoreBasis.provisional ? 'Provisional' : 'Development'} comparison` : `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isOverall ? ' · Uncalibrated development' : ''}`;
   const COMPOSITE_SCORE_SCALE = d3.scaleLinear()
     .domain(QUALITY_DOMAIN)
     .range([0, 100])
@@ -384,9 +498,12 @@ function buildWritingCategoryCollection(collection) {
   };
 
   const initialRoute = routeFromHash();
+  const requestedWritingSetting = isWriting ? new URLSearchParams(window.location.search).get('setting') : null;
+  const requestedWritingEntry = isWriting ? data.entries.find(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score) && (entry.settingId === requestedWritingSetting || entry.configurationId === requestedWritingSetting)) : null;
+  const restoredEntry = entryById.get(window.history.state?.selectedEntryId);
 
   const state = {
-    selectedId: entryById.has(window.history.state?.selectedEntryId) ? window.history.state.selectedEntryId : (isWriting ? [...data.entries].filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).sort((a, b) => (b.exactScore ?? b.score) - (a.exactScore ?? a.score))[0]?.id : null) || data.entries.find(entry => entry.condition === TREATMENT_CONDITION_ID)?.id || data.entries[0].id,
+    selectedId: requestedWritingEntry?.id || (restoredEntry && (!isWriting || Number.isFinite(restoredEntry.score)) ? restoredEntry.id : null) || (isWriting ? [...data.entries].filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.eligibleForRank && Number.isFinite(entry.score)).sort((a, b) => (b.exactScore ?? b.score) - (a.exactScore ?? a.score))[0]?.id : null) || data.entries.find(entry => entry.condition === TREATMENT_CONDITION_ID)?.id || data.entries[0].id,
     capabilityCategory: initialRoute.category || COMBINED_CAPABILITY.id,
     capabilityMode: CAPABILITY_MODES.includes(initialRoute.mode) ? initialRoute.mode : 'models',
     metric: 'latency',
@@ -419,6 +536,8 @@ function buildWritingCategoryCollection(collection) {
     if (field === 'overall' || (isWriting && field === 'writing')) return entry.score;
     return entry.categories.find((reading) => reading.category === field)?.score ?? null;
   };
+
+  const formatEntryScore = (entry, field = 'overall') => `${formatScore(scoreFor(entry, field))}${isWriting && entry?.partial ? '*' : ''}`;
 
   const workflowExactScores = new Map((workflowData?.benchmarkResults || []).map((result) => [
     `${result.settingId}:${result.condition}`, result.exactScore
@@ -459,7 +578,7 @@ function buildWritingCategoryCollection(collection) {
   };
 
   const rankedField = (field = 'overall') => {
-    const entries = [...data.entries].sort((left, right) => (
+    const entries = data.entries.filter(entry => !isWriting || entry.eligibleForRank).sort((left, right) => (
       (rankingScoreFor(right, field) ?? -1) - (rankingScoreFor(left, field) ?? -1) ||
       right.score - left.score ||
       left.latency - right.latency ||
@@ -478,7 +597,7 @@ function buildWritingCategoryCollection(collection) {
 
   const rankedCondition = (conditionId, field = 'overall') => {
     const entries = data.entries
-      .filter((entry) => entry.condition === conditionId)
+      .filter((entry) => entry.condition === conditionId && (!isWriting || entry.eligibleForRank))
       .sort((left, right) => (
         (rankingScoreFor(right, field) ?? -1) - (rankingScoreFor(left, field) ?? -1) ||
         right.score - left.score ||
@@ -539,70 +658,66 @@ function buildWritingCategoryCollection(collection) {
     `${category.name} score ${formatScore(displayScore)} of ${SCORE_MAXIMUM}, ${formatWeight(weight)} weight, ${contribution.toFixed(2)} weighted points`
   )).join('; ');
 
+  const pairedProfileMarkup = ({ condition, conditionLabel, rank, score, attributes = '', description, segments, toolbarLabel = '' }) => `
+    <span class="capability-composition capability-composition--${escapeHtml(conditionVisualClass(condition))}" ${attributes} role="group" aria-label="${escapeHtml(description)}">
+      <span class="capability-composition__meta">
+        <span class="capability-composition__label">${escapeHtml(conditionLabel)}</span>
+        ${Number.isFinite(rank) ? `<span class="capability-composition__rank">Rank #${String(rank).padStart(2, '0')}</span>` : ''}
+      </span>
+      <span class="capability-composition__track">
+        <span class="capability-composition__stack"${toolbarLabel ? ` role="toolbar" aria-label="${escapeHtml(toolbarLabel)}"` : ''}>${segments}</span>
+      </span>
+      <strong class="capability-composition__total">${formatScore(score)}</strong>
+    </span>
+  `;
+
   const capabilityCompositionMarkup = (entry, conditionRank, fullEntryId) => {
     const score = entry.score;
     const segments = weightedComposition(entry);
     const profileLabel = weightedCompositionDescription(segments);
     const conditionLabel = conditionById.get(entry.condition).label;
     const baselineEntry = baselineBySetting.get(entry.settingId);
-
-    return `
-      <span
-        class="capability-composition capability-composition--${escapeHtml(conditionVisualClass(entry.condition))}"
-        data-entry-id="${escapeHtml(entry.id)}"
-        data-condition="${escapeHtml(entry.condition)}"
-        data-composite-score="${score.toFixed(1)}"
-        ${isOverall || isWriting ? `data-composite-exact-score="${entry.exactScore}"` : ''}
-        data-condition-rank="${conditionRank}"
-        role="group"
-        aria-label="${escapeHtml(conditionLabel)}, ${SCORE_EDITION_LABEL} score ${formatScore(score)} of ${SCORE_MAXIMUM}. ${escapeHtml(conditionLabel)} rank ${conditionRank} of ${SETTING_COUNT}, shown as secondary context. ${escapeHtml(profileLabel)}."
-      >
-        <span class="capability-composition__meta">
-          <span class="capability-composition__label">${escapeHtml(conditionLabel)}</span>
-          <span class="capability-composition__rank">Rank #${String(conditionRank).padStart(2, '0')}</span>
-        </span>
-        <span class="capability-composition__track">
-          <span class="capability-composition__stack" role="toolbar" aria-label="${isWriting ? 'Open subcategory benchmark tests' : 'Open a capability leaderboard'} from ${escapeHtml(conditionLabel)} scores">
-            ${segments.map(({ category, rawScore, displayScore, contribution, weight }, index) => {
-              const baselineReading = baselineEntry.categories.find((reading) => reading.category === category.id);
-              const baselineScore = isOverall || isWriting ? baselineReading.exactScore : baselineReading.score;
-              const categoryDelta = Math.round((rawScore - baselineScore) * 10) / 10;
-              const insight = `${category.name}: score ${formatScore(displayScore)} of ${SCORE_MAXIMUM}, weight ${formatWeight(weight)}, weighted contribution ${contribution.toFixed(2)} points`;
-              return `
-                <button
-                  class="capability-composition__segment capability-composition__segment--${escapeHtml(category.id)}"
-                  type="button"
-                  ${isWriting ? 'data-writing-group-id' : 'data-category-id'}="${escapeHtml(category.id)}"
-                  data-entry-id="${escapeHtml(fullEntryId)}"
-                  data-source-condition="${escapeHtml(entry.condition)}"
-                  data-category-label="${escapeHtml(category.name)}"
-                  data-category-short="${escapeHtml(category.short)}"
-                  data-raw-score="${displayScore.toFixed(1)}"
-                  ${isOverall || isWriting ? `data-raw-exact-score="${rawScore}"` : ''}
-                  data-weight="${weight}"
-                  data-contribution="${isOverall || isWriting ? contribution : contribution.toFixed(6)}"
-                  data-delta="${categoryDelta.toFixed(1)}"
-                  style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%${isWriting ? `; background:${escapeHtml(category.color)}` : ''}"
-                  tabindex="${index === 0 ? '0' : '-1'}"
-                  aria-label="Open ${escapeHtml(category.name)} results for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with ${escapeHtml(TREATMENT_LABEL)} selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
-                  title="${escapeHtml(insight)}"
-                >
-                  <span class="capability-composition__abbr" aria-hidden="true">${escapeHtml(category.short)}</span>
-                  <strong class="capability-composition__score" aria-hidden="true">${formatScore(displayScore)}</strong>
-                </button>
-              `;
-            }).join('')}
-          </span>
-        </span>
-        <strong class="capability-composition__total">${formatScore(score)}</strong>
-      </span>
-    `;
+    const segmentMarkup = segments.map(({ category, rawScore, displayScore, contribution, weight }, index) => {
+      const baselineReading = baselineEntry.categories.find((reading) => reading.category === category.id);
+      const baselineScore = isOverall || isWriting ? baselineReading.exactScore : baselineReading.score;
+      const categoryDelta = Math.round((rawScore - baselineScore) * 10) / 10;
+      const insight = `${category.name}: score ${formatScore(displayScore)} of ${SCORE_MAXIMUM}, weight ${formatWeight(weight)}, weighted contribution ${contribution.toFixed(2)} points`;
+      return `
+        <button
+          class="capability-composition__segment capability-composition__segment--${escapeHtml(category.id)}"
+          type="button"
+          ${isWriting ? 'data-writing-group-id' : 'data-category-id'}="${escapeHtml(category.id)}"
+          data-entry-id="${escapeHtml(fullEntryId)}"
+          data-source-condition="${escapeHtml(entry.condition)}"
+          data-category-label="${escapeHtml(category.name)}"
+          data-category-short="${escapeHtml(category.short)}"
+          data-raw-score="${displayScore.toFixed(1)}"
+          ${isOverall || isWriting ? `data-raw-exact-score="${rawScore}"` : ''}
+          data-weight="${weight}"
+          data-contribution="${isOverall || isWriting ? contribution : contribution.toFixed(6)}"
+          data-delta="${categoryDelta.toFixed(1)}"
+          style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%${isWriting ? `; background:${escapeHtml(category.color)}` : ''}"
+          tabindex="${index === 0 ? '0' : '-1'}"
+          aria-label="Open ${escapeHtml(category.name)} results for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with ${escapeHtml(TREATMENT_LABEL)} selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
+          title="${escapeHtml(insight)}"
+        >
+          <span class="capability-composition__abbr" aria-hidden="true">${escapeHtml(category.short)}</span>
+          <strong class="capability-composition__score" aria-hidden="true">${formatScore(displayScore)}</strong>
+        </button>
+      `;
+    }).join('');
+    return pairedProfileMarkup({
+      condition: entry.condition, conditionLabel, rank: conditionRank, score, segments: segmentMarkup,
+      attributes: `data-entry-id="${escapeHtml(entry.id)}" data-condition="${escapeHtml(entry.condition)}" data-composite-score="${score.toFixed(1)}" ${isOverall || isWriting ? `data-composite-exact-score="${entry.exactScore}"` : ''} data-condition-rank="${conditionRank}"`,
+      description: `${conditionLabel}, ${SCORE_EDITION_LABEL} score ${formatScore(score)} of ${SCORE_MAXIMUM}. ${conditionLabel} rank ${conditionRank} of ${RANKED_SETTING_COUNT}, shown as secondary context. ${profileLabel}.`,
+      toolbarLabel: `${isWriting ? 'Open subcategory benchmark tests' : 'Open a capability leaderboard'} from ${conditionLabel} scores`
+    });
   };
 
   const resourceComparison = (entry, key) => {
-    const baseline = Number(baselineBySetting.get(entry.settingId)?.[key]);
-    const value = Number(entry[key]);
-    if (!Number.isFinite(baseline) || baseline <= 0 || !Number.isFinite(value) || value <= 0) return 'Not available';
+    const baseline = baselineBySetting.get(entry.settingId)?.[key];
+    const value = entry[key];
+    if (!Number.isFinite(baseline) || baseline <= 0 || !Number.isFinite(value) || value < 0) return '';
     const difference = Math.round(((value / baseline) - 1) * 100);
     if (difference === 0) return `${BASELINE_SHORT} reference`;
     return `${difference > 0 ? '+' : '−'}${Math.abs(difference)}% vs ${BASELINE_SHORT}`;
@@ -635,10 +750,10 @@ function buildWritingCategoryCollection(collection) {
           type="button"
           data-entry-id="${escapeHtml(candidate.id)}"
           aria-pressed="${selected}"
-          aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(candidate, field))} of ${SCORE_MAXIMUM}, ${escapeHtml(condition.label)} rank ${ranking.ranks.get(candidate.id)} of ${SETTING_COUNT}"
+          aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(candidate, field))} of ${SCORE_MAXIMUM}, ${escapeHtml(condition.label)} rank ${ranking.ranks.get(candidate.id)} of ${RANKED_SETTING_COUNT}"
         >
           ${conditionMarkup(candidate.condition, true)}
-          <strong>${formatScore(scoreFor(candidate, field))}</strong>
+          <strong>${formatEntryScore(candidate, field)}</strong>
           <span>#${String(ranking.ranks.get(candidate.id)).padStart(2, '0')} · ${signed(deltaFor(candidate, field))} vs ${escapeHtml(BASELINE_SHORT)}</span>
         </button>
       `;
@@ -651,7 +766,7 @@ function buildWritingCategoryCollection(collection) {
       : data.benchmarks.filter((benchmark) => benchmark.category === categoryId)
   );
   const benchmarkIsMeasured = benchmark => benchmark.evidenceKind === 'development' && (!isWriting || (
-    Number.isFinite(benchmarkSummaryById.get(benchmark.id)?.baseline) && Number.isFinite(benchmarkSummaryById.get(benchmark.id)?.treatment)
+    Number.isFinite(writingBenchmarkDisplay(benchmark).summary.baseline) && Number.isFinite(writingBenchmarkDisplay(benchmark).summary.treatment)
   ));
 
   const combinedOutcomeSummary = () => {
@@ -675,11 +790,12 @@ function buildWritingCategoryCollection(collection) {
   const workflowLeadersMarkup = (conditionId, field) => {
     const ranking = rankedCondition(conditionId, field);
     const leaders = ranking.entries.filter((entry) => ranking.ranks.get(entry.id) === 1);
+    if (!leaders.length) return '';
     const label = conditionById.get(conditionId).label;
     return `
-      <div class="capability-canvas__reading capability-canvas__reading--${conditionVisualClass(conditionId)}" data-leader-condition="${conditionId}" data-leader-count="${leaders.length}" data-entry-id="${escapeHtml(leaders[0]?.id)}" data-score="${formatScore(scoreFor(leaders[0], field))}">
+      <div class="capability-canvas__reading capability-canvas__reading--${conditionVisualClass(conditionId)}" data-leader-condition="${conditionId}" data-leader-count="${leaders.length}" data-entry-id="${escapeHtml(leaders[0]?.id)}" data-score="${formatScore(scoreFor(leaders[0], field))}"${isWriting ? ` data-writing-partial-indicator="${leaders.some(entry => entry.partial)}"` : ''}>
         <dt>${escapeHtml(label)} ${leaders.length > 1 ? `${leaders.length} co-leaders` : 'leader'} /${SCORE_MAXIMUM}</dt>
-        <dd>${formatScore(scoreFor(leaders[0], field))}${leaders.length ? leaders.map((entry) => `
+        <dd>${formatEntryScore(leaders[0], field)}${leaders.length ? leaders.map((entry) => `
           <small data-leader-entry-id="${escapeHtml(entry.id)}">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</small>
         `).join('') : '<small>No assessable panel total</small>'}</dd>
       </div>
@@ -699,65 +815,130 @@ function buildWritingCategoryCollection(collection) {
   `;
 
   const writingMethodMarkup = () => {
-    const active = data.writingCategory.activeBenchmarkIds;
-    const adventure = data.writingCategory.publications.find(publication => publication.benchmarks[0].id === 'dungeon-master-adventure-outline');
-    const pending = data.benchmarks.filter(benchmark => !active.includes(benchmark.id));
-    const unmeasured = (writingSummary.subsections || []).filter(subsection => !data.categories.some(group => group.id === subsection.id));
+    const comparison = data.writingCategory;
+    const otherTests = data.benchmarks.filter(benchmark => !comparison.activeBenchmarkIds.includes(benchmark.id));
+    const hasContextBalancedReviews = comparison.activeBenchmarkIds.some(id => comparison.publications.find(publication => publication.benchmarks.some(benchmark => benchmark.id === id))?.scoreBasis?.reviewers?.length === 4);
     return `
-      <details class="overall-weights writing-index-method" data-writing-index-method>
+      <details class="overall-weights" data-writing-index-method>
         <summary>Coverage &amp; scoring method</summary>
-        <p>Equal weight across measured subcategories; equal weight across scored benchmarks within each subcategory. A benchmark enters this development index once it has a complete paired configuration. Every ranked setting must complete the same ${active.length} active benchmarks under both conditions; missing evidence is never a zero.</p>
-        <p>Each benchmark retains its own prompts, trials, rubric, judges, and completion rules. This is an uncalibrated index of the currently measured work, not a comprehensive writing score. The comparison cohort can change as coverage grows.</p>
-        ${pending.length ? `<p>Not yet in the index: ${pending.map(benchmark => `<a href="${escapeHtml(benchmarkSummaryById.get(benchmark.id).detailHref)}">${escapeHtml(benchmark.name)}</a>`).join(' · ')}. Available answers and reviews remain published.</p>` : ''}
-        ${unmeasured.length ? `<p>Unmeasured subcategories: ${unmeasured.map(group => escapeHtml(group.title)).join(' · ')}.</p>` : ''}
-        ${adventure ? `<p data-writing-adventure-scope><a href="${escapeHtml(adventure.benchmarkSummaries[0].detailHref)}">Dungeon Master / Adventure outline</a> contributes the ${adventure.cohortSummaries.primary.expectedPairs} repetitions of its primary prompt. Its ${adventure.cohortSummaries.transfer.sourcePromptCount} secondary prompts are reported separately in the adventure report.</p>` : ''}
-        <p>Writing is excluded from Overall. Benchmark-specific exclusions and uncertainty are documented in each report.</p>
+        <p>${escapeHtml(comparison.selection.title)} uses ${comparison.activeBenchmarkIds.length === 1 ? 'one benchmark' : 'an equal-weight average of all selected benchmark scores'}. Every ranked model uses the same tests and weights in both conditions. Incomplete means remain visible but unranked. Each benchmark retains its published scoring basis.</p>
+        <p>${scoreBasis.provisional ? 'Core idea uses the same published Astra-only single-judge basis for every model. Scores that include Core idea inherit its provisional status. ' : ''}Different task rubrics remain uncalibrated. Scores describe these named tests.</p>
+        ${hasContextBalancedReviews ? '<p>First discovery of magic averages four reviews per answer: two judge models, each with a naive and informed context. The result averages all three predeclared trials in both conditions.</p>' : ''}
+        ${otherTests.length ? `<p>Additional published tests: ${otherTests.map(benchmark => `<a href="${escapeHtml(benchmarkSummaryById.get(benchmark.id).detailHref)}">${escapeHtml(benchmark.name)}</a>`).join(' · ')}. Their own cohorts and scoring sources are shown under Benchmark tests.</p>` : ''}
+        <p>Writing is excluded from Overall. Each report retains the original answers, reviews, exclusions, and trial details.</p>
       </details>`;
+  };
+
+  const writingBenchmarkDisplay = (benchmark) => {
+    const publication = data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id));
+    const original = publication.benchmarkSummaries.find(summary => summary.benchmarkId === benchmark.id);
+    const hasOfficialMeans = Number.isFinite(original.baseline) && Number.isFinite(original.treatment);
+    const availableProvisional = publication.provisionalLeaderboard?.status === 'provisional' && publication.provisionalLeaderboard.rankedSettingCount
+      ? publication.provisionalLeaderboard : null;
+    const provisional = hasOfficialMeans ? null : availableProvisional;
+    const trials = publication.trialCount || publication.scoreBasis?.trialsPerTask || 1;
+    const caseLabel = publication.caseLabel || 'story';
+    const cohort = publication.cohortSummaries
+      ? `${publication.cohortSummaries.primary.expectedPairs} primary repetitions`
+      : `${publication.cases.length} ${caseLabel}${publication.cases.length === 1 ? '' : 's'}${trials > 1 ? ` × ${trials} trials` : ''}`;
+    const settingCount = provisional ? provisional.rankedSettingCount : publication.coverage.completedSettingCount;
+    const judgeCount = publication.scoreBasis?.judgeCount || publication.scoreBasis?.judges?.length;
+    const provisionalSourceLabel = availableProvisional ? `${availableProvisional.label.replace(/ provisional results$/i, '')} · ${availableProvisional.rankedSettingCount} settings · ${availableProvisional.expectedCaseCount} stories` : '';
+    const sourceLabel = provisional
+      ? provisionalSourceLabel
+      : `${judgeCount ? `${judgeCount}-review panel · ` : ''}${settingCount} ${settingCount === 1 ? 'setting' : 'settings'} · ${cohort}`;
+    return {
+      publication, provisional, availableProvisional, provisionalSourceLabel, settingCount, sourceLabel,
+      sourceKind: provisional ? 'provisional-single-judge' : hasOfficialMeans ? 'official-panel' : 'answers',
+      summary: provisional ? { ...original, ...provisional.summary } : original
+    };
   };
 
   const writingSelectionMarkup = () => {
     if (!isWriting) return '';
     const entry = selectedEntry();
+    const baselineEntry = baselineBySetting.get(entry.settingId);
+    const skillEntry = data.entries.find(item => item.settingId === entry.settingId && item.condition === TREATMENT_CONDITION_ID);
+    const components = (skillEntry?.benchmarkComponents || []).filter(component => component.weight > 0 && Number.isFinite(component.exactScore));
+    const baselineComponents = baselineEntry?.benchmarkComponents || [];
+    const exact = value => Number.isFinite(value) ? String(Number(value.toFixed(6))) : 'Incomplete';
+    const links = components.map(component => {
+      const benchmark = benchmarkById.get(component.benchmarkId);
+      const display = writingBenchmarkDisplay(benchmark);
+      const { publication } = display;
+      const sourceSetting = publication.settings.find(setting => setting.configurationId === entry.configurationId || setting.id === entry.settingId);
+      const story = publication.cases[0];
+      const trials = publication.trialCount || publication.scoreBasis?.trialsPerTask || 1;
+      const baseline = baselineComponents.find(item => item.benchmarkId === component.benchmarkId);
+      const paired = Number.isFinite(baseline?.exactScore) && Number.isFinite(component.exactScore);
+      const reading = paired ? `Plain ${formatScore(baseline.score)} → Skill ${formatScore(component.score)}` : 'Paired score incomplete';
+      const weight = components.length === 3 && component.weight === 1 / 3 ? '⅓ weight' : `${formatWeight(component.weight)} weight`;
+      return `<li data-writing-component="${escapeHtml(benchmark.id)}" data-exact-baseline="${baseline?.exactScore ?? ''}" data-exact-skill="${component.exactScore ?? ''}" data-weight="${component.weight}" data-provisional="${component.provisional}"><a data-writing-case-link="${escapeHtml(story.id)}" data-writing-answer-benchmark="${escapeHtml(benchmark.id)}" href="./benchmark-report.html${sourceSetting ? `?setting=${encodeURIComponent(sourceSetting.id)}` : ''}#${encodeURIComponent(benchmark.id)}/${encodeURIComponent(story.id)}${trials > 1 ? '/trial-1' : ''}"><strong>${escapeHtml(benchmark.name)} <small>${weight}</small></strong><span>${escapeHtml(reading)}<small>${escapeHtml(component.basis.label)} · Answers &amp; reviews ↗</small></span></a></li>`;
+    }).join('');
+    const calculation = (result, precise = false) => {
+      if (!Number.isFinite(result?.exactScore)) return 'No paired benchmark score available.';
+      const values = (result.benchmarkComponents || []).filter(component => component.weight > 0 && Number.isFinite(component.exactScore)).map(component => precise ? exact(component.exactScore) : formatScore(component.score));
+      return precise ? `${values.length > 1 ? `(${values.join(' + ')}) ÷ ${values.length} = ` : ''}${exact(result.exactScore)} → ${formatEntryScore(result)}`
+        : `${values.length > 1 ? `(${values.join(' + ')}) ÷ ${values.length} ≈ ` : ''}${formatEntryScore(result)}`;
+    };
+    const otherLinks = data.benchmarks.filter(benchmark => !components.some(component => component.benchmarkId === benchmark.id)).map(benchmark => {
+      const { publication } = writingBenchmarkDisplay(benchmark);
+      const setting = publication.settings.find(setting => setting.configurationId === entry.configurationId || setting.id === entry.settingId);
+      if (!setting) return '';
+      const story = publication.cases[0];
+      const trials = publication.trialCount || publication.scoreBasis?.trialsPerTask || 1;
+      const unavailable = skillEntry?.benchmarkComponents.some(component => component.benchmarkId === benchmark.id && !Number.isFinite(component.exactScore));
+      return `<li><a data-writing-case-link="${escapeHtml(story.id)}" data-writing-answer-benchmark="${escapeHtml(benchmark.id)}" href="./benchmark-report.html?setting=${encodeURIComponent(setting.id)}#${encodeURIComponent(benchmark.id)}/${encodeURIComponent(story.id)}${trials > 1 ? '/trial-1' : ''}">${escapeHtml(benchmark.name)} · ${unavailable ? 'Score unavailable · ' : ''}Answers &amp; reviews ↗</a></li>`;
+    }).join('');
     return `<section class="writing-selection" data-writing-selected-setting="${escapeHtml(entry.settingId)}" aria-labelledby="writing-selection-title">
-      <header><div><p class="ui-eyebrow">Read the answers</p><h4 id="writing-selection-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4></div><p>Original answers and reviews, by benchmark</p></header>
-      <ul>${data.benchmarks.filter(benchmark => data.benchmarkResults.some(result => result.benchmarkId === benchmark.id && result.settingId === entry.settingId)).map(benchmark => {
-        const publication = data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id));
-        const story = publication.cases[0];
-        const trials = publication.scoreBasis?.trialsPerTask || 1;
-        const results = publication.entries.filter(result => result.settingId === entry.settingId);
-        const baseline = results.find(result => result.condition === BASELINE_CONDITION_ID);
-        const treatment = results.find(result => result.condition === TREATMENT_CONDITION_ID);
-        return `<li><a data-writing-case-link="${escapeHtml(story.id)}" data-writing-answer-benchmark="${escapeHtml(benchmark.id)}" href="./benchmark-report.html?setting=${encodeURIComponent(entry.settingId)}#${encodeURIComponent(benchmark.id)}/${encodeURIComponent(story.id)}${trials > 1 ? '/trial-1' : ''}"><strong>${escapeHtml(benchmark.name)}</strong><span>${formatScore(baseline?.score)} → ${formatScore(treatment?.score)} · ${publication.cohortSummaries ? `${publication.coverage.promptCount} prompts · ${publication.cases.length} matched pairs` : `${publication.cases.length} ${publication.cases.length === 1 ? 'prompt' : 'prompts'}${trials > 1 ? ` × ${trials} trials` : ''}`} <i aria-hidden="true">↗</i></span></a></li>`;
-      }).join('')}</ul>
+      <header><div><p class="ui-eyebrow">Selected model · ${skillEntry?.partial ? 'unranked available-score mean · ' : ''}${skillEntry?.provisional ? 'provisional ' : ''}score breakdown</p><h4 id="writing-selection-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4></div><p>Model scores below; Benchmark tests shows field means.</p></header>
+      ${skillEntry?.partial ? `<p class="writing-selection__missing">Missing: ${skillEntry.missingBenchmarkIds.map(id => escapeHtml(benchmarkById.get(id)?.name || id)).join(' · ')}. Not included in the aggregate ranking.</p>` : ''}
+      <ul>${links}</ul>
+      <div class="writing-selection__calculation" data-writing-exact-aggregate data-partial="${Boolean(skillEntry?.partial)}" data-exact-baseline="${baselineEntry?.exactScore ?? ''}" data-exact-skill="${skillEntry?.exactScore ?? ''}"><p><strong>Plain</strong> ${escapeHtml(calculation(baselineEntry))}</p><p><strong>Skill</strong> ${escapeHtml(calculation(skillEntry))}</p><details><summary>Exact calculation</summary><p><strong>Plain</strong> ${escapeHtml(calculation(baselineEntry, true))}</p><p><strong>Skill</strong> ${escapeHtml(calculation(skillEntry, true))}</p><small>Calculated from unrounded source scores; decimals shown to six places.</small></details></div>
+      ${otherLinks ? `<details class="writing-selection__other"><summary>Other results (not part of this score)</summary><ul>${otherLinks}</ul></details>` : ''}
     </section>`;
   };
 
-  const writingHeaderMarkup = () => {
-    const complete = data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).length;
-    const groups = data.categories.filter(group => group.weight > 0);
-    const outcome = combinedOutcomeSummary();
-    const viewLabel = state.capabilityMode === 'benchmarks' ? 'Benchmark tests' : state.capabilityMode === 'efficiency' ? 'Efficiency' : 'Paired leaderboard';
-    return `<header class="capability-canvas__header capability-canvas__header--overall">
-      <div class="capability-canvas__identity capability-canvas__identity--overall">
-        <p class="ui-eyebrow">Capabilities / Writing / ${viewLabel}</p>
-        <p class="capability-canvas__status capability-canvas__status--work-spec"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
-        <h3 id="capability-question" tabindex="-1">Writing</h3>
-        <p class="overall-summary">${state.capabilityMode === 'benchmarks' ? `${data.writingCategory.groups.length} ${data.writingCategory.groups.length === 1 ? 'track' : 'tracks'} · ${BENCHMARK_COUNT} benchmark tests` : `${complete} ranked settings · ${SETTING_COUNT - complete} coverage gaps`}
-          <span class="overall-summary__coverage" data-writing-coverage>${data.writingCategory.activeBenchmarkIds.length}/${BENCHMARK_COUNT} benchmarks scored in index · ${groups.map(group => escapeHtml(group.name)).join(' + ') || 'No measured subcategories'}. Excluded from Overall.</span>
-          <span class="overall-method" data-writing-method-weights>Current weights: ${groups.map(group => `${escapeHtml(group.name)} ${formatWeight(group.weight)}`).join(' · ') || 'not yet assessable'}</span>
-        </p>
-        ${writingMethodMarkup()}
-      </div>
-      <dl class="capability-canvas__readings capability-canvas__readings--combined" aria-label="Writing summary">
-        ${workflowLeadersMarkup(TREATMENT_CONDITION_ID, 'writing')}
-        <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${formatScore(outcome.median)}"><dt>Median paired uplift</dt><dd>${signed(outcome.median)}<small>points across ${outcome.total} matched settings</small></dd></div>
-        <div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}"><dt>Improved settings</dt><dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd></div>
-      </dl>
-    </header>`;
+  const writingScoreHref = selectionId => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('score', selectionId);
+    url.searchParams.set('setting', selectedEntry().settingId);
+    return url.href;
   };
 
+  const writingLeaderboardControlsMarkup = () => {
+    if (!isWriting) return '';
+    const comparison = data.writingCategory;
+    const selection = comparison.selection;
+    return `<div class="writing-leaderboard-controls" data-writing-score-selection="${escapeHtml(selection.id)}">
+      <label class="field-control" for="writing-score-selection"><span>Leaderboard score</span><select id="writing-score-selection" name="score" aria-describedby="writing-score-basis">${comparison.selections.map(option => `<option value="${escapeHtml(option.id)}"${option.id === selection.id ? ' selected' : ''}>${escapeHtml(option.title)}${option.type === 'track' && option.id === 'storytelling' ? ' aggregate' : ''}</option>`).join('')}</select></label>
+      <p id="writing-score-basis">${scoreBasis.provisional ? '<strong>Provisional</strong> · ' : ''}${RANKED_SETTING_COUNT} ranked · ${comparison.activeBenchmarkIds.length} ${comparison.activeBenchmarkIds.length === 1 ? 'test' : 'equally weighted tests'}${comparison.partialSettingCount ? ` · ${comparison.partialSettingCount} incomplete settings shown below, unranked` : ''}</p>
+    </div>`;
+  };
+
+  const capabilityHeaderFrameMarkup = ({ name, identityLabel, disclosure, summary, method = '', readings, combined = false, headerModifier = '', identityModifier = '', development = false, summaryClass = '' }) => `
+    <header class="capability-canvas__header${headerModifier}">
+      <div class="capability-canvas__identity${identityModifier}">
+        <p class="ui-eyebrow">${escapeHtml(identityLabel)}</p>
+        <p class="capability-canvas__status${development ? ' capability-canvas__status--work-spec' : ''}"><strong>${escapeHtml(disclosure)}</strong></p>
+        <h3 id="capability-question" tabindex="-1">${escapeHtml(name)}</h3>
+        <p${summaryClass ? ` class="${summaryClass}"` : ''}>${summary}</p>
+        ${method}
+      </div>
+      <dl class="capability-canvas__readings${combined ? ' capability-canvas__readings--combined' : ''}" aria-label="${escapeHtml(name)} summary">${readings}</dl>
+    </header>
+  `;
+
+  const capabilityTabsMarkup = (name, tabs) => `
+    <nav class="capability-mode" aria-label="Choose ${escapeHtml(name)} view">
+      <span class="capability-mode__label" aria-hidden="true">View</span>
+      <div class="capability-mode__tabs" role="tablist" aria-label="Choose ${escapeHtml(name)} evidence view">
+        ${tabs.map(([id, label, note, panel]) => `<button class="capability-mode__tab${state.capabilityMode === id ? ' is-selected' : ''}" id="capability-mode-${id}" type="button" role="tab" data-capability-mode="${id}" aria-selected="${state.capabilityMode === id}" aria-controls="${panel}" tabindex="${state.capabilityMode === id ? '0' : '-1'}"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(note)}</span></button>`).join('')}
+      </div>
+    </nav>
+  `;
+
   const capabilityHeaderMarkup = (category) => {
-    if (isWriting) return writingHeaderMarkup();
     const benchmarks = categoryBenchmarks(category.id);
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
     const measuredCount = benchmarks.filter(benchmarkIsMeasured).length;
@@ -765,107 +946,55 @@ function buildWritingCategoryCollection(collection) {
     const baselineWinner = rankedCondition(BASELINE_CONDITION_ID, category.id).entries[0];
     const showingBenchmarks = state.capabilityMode === 'benchmarks';
     const showingEfficiency = state.capabilityMode === 'efficiency';
-    const outcome = category.isCombined && state.capabilityMode === 'models' ? combinedOutcomeSummary() : null;
-    const modelViewLabel = category.isCombined ? 'Paired leaderboard' : 'Model leaderboard';
+    const combined = category.isCombined || isWriting;
+    const outcome = combined && state.capabilityMode === 'models' ? combinedOutcomeSummary() : null;
+    const modelViewLabel = combined ? 'Paired leaderboard' : 'Model leaderboard';
     const identityLabel = `Capabilities / ${category.name} / ${showingBenchmarks ? 'Benchmark tests' : showingEfficiency ? 'Efficiency' : modelViewLabel}`;
-    const modelSummary = category.isCombined
-      ? isOverall ? `${SETTING_COUNT} ranked settings · ${data.coverage.incompleteSettings} coverage gaps` : `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
-      : `${SETTING_COUNT} matched settings · ${isWorkSpec ? 'one authored chat task · spec quality' : SCORE_EDITION_LABEL + ' rubric score'} /${SCORE_MAXIMUM}`;
-    return `
-      <header class="capability-canvas__header${isWorkSpec || isWriting ? ' capability-canvas__header--work-spec' : ''}${isOverall ? ' capability-canvas__header--overall' : ''}">
-        <div class="capability-canvas__identity${isOverall ? ' capability-canvas__identity--overall' : ''}">
-          <p class="ui-eyebrow">${escapeHtml(identityLabel)}</p>
-          <p class="capability-canvas__status${isWorkSpec || isOverall || isWriting ? ' capability-canvas__status--work-spec' : ''}"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
-          <h3 id="capability-question" tabindex="-1">${escapeHtml(category.name)}</h3>
-          <p${isOverall ? ' class="overall-summary"' : ''}>${showingBenchmarks
-            ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests`
-            : showingEfficiency
-              ? `${ENTRY_COUNT} setting × condition results · fixed ${escapeHtml(category.name)} rubric score × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
-              : escapeHtml(modelSummary)}${isOverall ? `<span class="overall-summary__coverage" data-portfolio-coverage>${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered</span><span class="overall-method" data-overall-method>Current weights: ${data.categories.map(category => `${escapeHtml(category.name)} ${formatWeight(category.weight)}`).join(' · ')}</span>` : ''}</p>
-          ${isOverall ? overallWeightsMarkup() : ''}
-        </div>
-        <dl class="capability-canvas__readings${outcome ? ' capability-canvas__readings--combined' : ''}" aria-label="${escapeHtml(category.name)} summary">
-          ${showingBenchmarks ? `
-            <div class="capability-canvas__reading capability-canvas__reading--measured" data-count="${measuredCount}">
-              <dt>Tests</dt>
-              <dd>${measuredCount}<small> scored tasks</small></dd>
-            </div>
-            <div class="capability-canvas__reading capability-canvas__reading--audit">
-              <dt>Field</dt>
-              <dd>${SETTING_COUNT}<small>${isOverall ? ' complete settings' : ' matched settings'}</small></dd>
-            </div>
-          ` : outcome ? `
-            ${isOverall ? workflowLeadersMarkup(TREATMENT_CONDITION_ID, category.id) : `<div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${formatScore(scoreFor(fullWinner, category.id))}">
-              <dt>Best ${escapeHtml(TREATMENT_LABEL)} /${SCORE_MAXIMUM}</dt>
-              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(fullWinner.readinessLabel)}</small>` : ''}</dd>
-            </div>`}
-            <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${outcome.median.toFixed(1)}">
-              <dt>Median paired uplift</dt>
-              <dd>${signed(outcome.median)}<small>points across ${outcome.total} matched settings</small></dd>
-            </div>
-            <div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}">
-              <dt>Improved settings</dt>
-              <dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd>
-            </div>
-          ` : isWorkSpec || isWriting ? `
-            ${workflowLeadersMarkup(TREATMENT_CONDITION_ID, category.id)}
-            ${workflowLeadersMarkup(BASELINE_CONDITION_ID, category.id)}
-          ` : `
-            <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${formatScore(scoreFor(fullWinner, category.id))}">
-              <dt>${escapeHtml(TREATMENT_LABEL)} leader /${SCORE_MAXIMUM}</dt>
-              <dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(fullWinner.readinessLabel)}</small>` : ''}</dd>
-            </div>
-            <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${formatScore(scoreFor(baselineWinner, category.id))}">
-              <dt>${escapeHtml(BASELINE_LABEL)} leader /${SCORE_MAXIMUM}</dt>
-              <dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(baselineWinner.readinessLabel)}</small>` : ''}</dd>
-            </div>
-          `}
-        </dl>
-      </header>
+    const rankedCount = isWriting ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.eligibleForRank && Number.isFinite(entry.score)).length : SETTING_COUNT;
+    const modelSummary = isWriting ? `${rankedCount} ranked settings · ${taskCoverageLabel}`
+      : category.isCombined
+        ? isOverall ? `${SETTING_COUNT} ranked settings · ${data.coverage.incompleteSettings} coverage gaps` : `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
+        : `${SETTING_COUNT} matched settings · ${isWorkSpec ? 'one authored chat task · spec quality' : SCORE_EDITION_LABEL + ' rubric score'} /${SCORE_MAXIMUM}`;
+    const summary = (showingBenchmarks
+      ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests`
+      : showingEfficiency
+        ? `${ENTRY_COUNT} setting × condition results · fixed ${escapeHtml(isWriting ? taskCoverageLabel : category.name)} rubric score × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
+        : escapeHtml(modelSummary))
+      + (isWriting ? `<span class="overall-summary__coverage" data-writing-coverage>Excluded from Overall</span><span class="overall-method" data-writing-method-weights>${data.writingCategory.activeBenchmarkIds.length > 1 ? 'Ranked on all selected benchmarks · equal weights' : escapeHtml(data.writingCategory.selection.title)}</span>`
+        : isOverall ? `<span class="overall-summary__coverage" data-portfolio-coverage>${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered</span><span class="overall-method" data-overall-method>Current weights: ${data.categories.map(category => `${escapeHtml(category.name)} ${formatWeight(category.weight)}`).join(' · ')}</span>` : '');
+    const readings = showingBenchmarks ? `
+      <div class="capability-canvas__reading capability-canvas__reading--measured" data-count="${measuredCount}"><dt>Tests</dt><dd>${measuredCount}<small> scored tasks</small></dd></div>
+      <div class="capability-canvas__reading capability-canvas__reading--audit"><dt>Field</dt><dd>${isWriting ? rankedCount : SETTING_COUNT}<small>${isWriting ? ' ranked settings' : isOverall ? ' complete settings' : ' matched settings'}</small></dd></div>
+    ` : outcome ? `
+      ${isOverall || isWriting ? workflowLeadersMarkup(TREATMENT_CONDITION_ID, category.id) : `<div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${formatScore(scoreFor(fullWinner, category.id))}"><dt>Best ${escapeHtml(TREATMENT_LABEL)} /${SCORE_MAXIMUM}</dt><dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small>${isWorkSpec ? `<small>${escapeHtml(fullWinner.readinessLabel)}</small>` : ''}</dd></div>`}
+      ${Number.isFinite(outcome.median) ? `<div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${formatScore(outcome.median)}"><dt>Median paired uplift</dt><dd>${signed(outcome.median)}<small>points across ${outcome.total} matched settings</small></dd></div>` : ''}
+      ${outcome.total ? `<div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}"><dt>Improved settings</dt><dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd></div>` : ''}
+    ` : isWorkSpec || isWriting ? `
+      ${workflowLeadersMarkup(TREATMENT_CONDITION_ID, category.id)}
+      ${workflowLeadersMarkup(BASELINE_CONDITION_ID, category.id)}
+    ` : `
+      <div class="capability-canvas__reading capability-canvas__reading--full" data-entry-id="${escapeHtml(fullWinner.id)}" data-score="${formatScore(scoreFor(fullWinner, category.id))}"><dt>${escapeHtml(TREATMENT_LABEL)} leader /${SCORE_MAXIMUM}</dt><dd>${formatScore(scoreFor(fullWinner, category.id))}<small>${escapeHtml(fullWinner.family)} · ${escapeHtml(fullWinner.reasoning)}</small></dd></div>
+      <div class="capability-canvas__reading capability-canvas__reading--baseline" data-entry-id="${escapeHtml(baselineWinner.id)}" data-score="${formatScore(scoreFor(baselineWinner, category.id))}"><dt>${escapeHtml(BASELINE_LABEL)} leader /${SCORE_MAXIMUM}</dt><dd>${formatScore(scoreFor(baselineWinner, category.id))}<small>${escapeHtml(baselineWinner.family)} · ${escapeHtml(baselineWinner.reasoning)}</small></dd></div>
     `;
+    return capabilityHeaderFrameMarkup({
+      name: category.name, identityLabel, disclosure: developmentDisclosure, summary, readings,
+      method: isWriting ? writingMethodMarkup() : isOverall ? overallWeightsMarkup() : '',
+      combined: Boolean(outcome), development: isWorkSpec || isOverall || isWriting,
+      headerModifier: `${isWorkSpec ? ' capability-canvas__header--work-spec' : ''}${isOverall || isWriting ? ' capability-canvas__header--overall' : ''}`,
+      identityModifier: isOverall || isWriting ? ' capability-canvas__identity--overall' : '',
+      summaryClass: isOverall || isWriting ? 'overall-summary' : ''
+    });
   };
 
   const capabilityModeMarkup = (category) => {
     const benchmarks = categoryBenchmarks(category.id);
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
-    return `
-      ${capabilityHeaderMarkup(category)}
-      <nav class="capability-mode" aria-label="Choose ${escapeHtml(category.name)} view">
-          <span class="capability-mode__label" aria-hidden="true">View</span>
-          <div class="capability-mode__tabs" role="tablist" aria-label="Choose ${escapeHtml(category.name)} evidence view">
-            <button
-              class="capability-mode__tab${state.capabilityMode === 'models' ? ' is-selected' : ''}"
-              id="capability-mode-models"
-              type="button"
-              role="tab"
-              data-capability-mode="models"
-              aria-selected="${state.capabilityMode === 'models'}"
-              aria-controls="capability-ranking"
-              tabindex="${state.capabilityMode === 'models' ? '0' : '-1'}"
-            ><strong>Leaderboard</strong><span>${isWriting ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).length : SETTING_COUNT} ${isWorkSpec ? 'matched' : 'ranked'} settings</span></button>
-            <button
-              class="capability-mode__tab${state.capabilityMode === 'benchmarks' ? ' is-selected' : ''}"
-              id="capability-mode-benchmarks"
-              type="button"
-              role="tab"
-              data-capability-mode="benchmarks"
-              aria-selected="${state.capabilityMode === 'benchmarks'}"
-              aria-controls="capability-benchmarks"
-              tabindex="${state.capabilityMode === 'benchmarks' ? '0' : '-1'}"
-            ><strong>Benchmark tests</strong><span>${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} ${benchmarks.length === 1 ? 'test' : 'tests'}</span></button>
-            <button
-              class="capability-mode__tab${state.capabilityMode === 'efficiency' ? ' is-selected' : ''}"
-              id="capability-mode-efficiency"
-              type="button"
-              role="tab"
-              data-capability-mode="efficiency"
-              aria-selected="${state.capabilityMode === 'efficiency'}"
-              aria-controls="capability-efficiency"
-              tabindex="${state.capabilityMode === 'efficiency' ? '0' : '-1'}"
-            ><strong>Efficiency</strong><span>Rubric score × resource</span></button>
-          </div>
-      </nav>
-    `;
+    const rankedCount = isWriting ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.eligibleForRank && Number.isFinite(entry.score)).length : SETTING_COUNT;
+    return `${capabilityHeaderMarkup(category)}${capabilityTabsMarkup(category.name, [
+      ['models', 'Leaderboard', `${rankedCount} ${isWorkSpec ? 'matched' : 'ranked'} settings`, 'capability-ranking'],
+      ['benchmarks', 'Benchmark tests', `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} ${benchmarks.length === 1 ? 'test' : 'tests'}`, 'capability-benchmarks'],
+      ['efficiency', 'Efficiency', 'Rubric score × resource', 'capability-efficiency']
+    ])}`;
   };
 
   const efficiencyPanelMarkup = () => `
@@ -888,7 +1017,7 @@ function buildWritingCategoryCollection(collection) {
         <label class="field-control" for="resource-axis">
           <span>Resource axis</span>
           <select id="resource-axis" name="resource-axis">
-            ${Object.entries(metricConfig).map(([key, metric]) => (
+            ${Object.entries(metricConfig).filter(([key]) => data.entries.some(entry => Number.isFinite(entry[key]) && entry[key] > 0)).map(([key, metric]) => (
               `<option value="${escapeHtml(key)}"${state.metric === key ? ' selected' : ''}>${escapeHtml(metric.label)}</option>`
             )).join('')}
           </select>
@@ -899,8 +1028,9 @@ function buildWritingCategoryCollection(collection) {
   `;
 
   const benchmarkLedgerRowMarkup = (benchmark, categoryIndex, sourceCategoryId) => {
-    const summary = benchmarkSummaryById.get(benchmark.id);
-    const publication = isWriting ? data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id)) : null;
+    const display = isWriting ? writingBenchmarkDisplay(benchmark) : null;
+    const summary = display?.summary || benchmarkSummaryById.get(benchmark.id);
+    const publication = display?.publication;
     const coverage = publication?.coverage;
     const indexActive = isWriting && data.writingCategory.activeBenchmarkIds.includes(benchmark.id);
     const publishedSettingCount = new Set(data.benchmarkResults.filter(result => result.benchmarkId === benchmark.id).map(result => result.settingId)).size;
@@ -911,31 +1041,33 @@ function buildWritingCategoryCollection(collection) {
       : summary.detailHref;
     return `
       <a
-        class="benchmark-ledger__row benchmark-ledger__row--measured${regression ? ' benchmark-ledger__row--regression' : ''}${isWriting && !indexActive ? ' benchmark-ledger__row--pending' : ''}"
+        class="benchmark-ledger__row benchmark-ledger__row--measured${regression ? ' benchmark-ledger__row--regression' : ''}"
         href="${escapeHtml(reportHref)}"
         data-benchmark-id="${escapeHtml(benchmark.id)}"
+        ${isWriting ? `data-writing-score-weight="${data.writingCategory.benchmarkWeights[benchmark.id] || 0}"` : ''}
         data-evidence-kind="development"
+        ${display ? `data-score-source="${display.sourceKind}"` : ''}
         data-baseline-score="${formatScore(summary.baseline)}"
         data-treatment-score="${formatScore(summary.treatment)}"
         data-report-href="${escapeHtml(reportHref)}"
-        aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. Across ${publishedSettingCount} ${isOverall ? 'published' : 'matched'} settings, ${escapeHtml(summary.baselineLabel)} field mean ${formatScore(summary.baseline)} of ${SCORE_MAXIMUM}, ${escapeHtml(summary.treatmentLabel)} field mean ${formatScore(summary.treatment)} of ${SCORE_MAXIMUM}, paired uplift ${signed(summary.delta)} points."
+        aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. Across ${display?.settingCount ?? publishedSettingCount} ${isOverall ? 'published' : 'matched'} settings, ${escapeHtml(summary.baselineLabel)} field mean ${formatScore(summary.baseline)} of ${SCORE_MAXIMUM}, ${escapeHtml(summary.treatmentLabel)} field mean ${formatScore(summary.treatment)} of ${SCORE_MAXIMUM}, paired uplift ${signed(summary.delta)} points.${display ? ` ${display.provisional ? 'Provisional. ' : ''}${escapeHtml(display.sourceLabel)}.` : ''}"
       >
         <span class="benchmark-ledger__identity">
           <span>${String(categoryIndex + 1).padStart(2, '0')} / ${escapeHtml(isWriting ? benchmark.suite : categoryById.get(benchmark.category)?.name || 'Benchmark')}</span>
           <strong>${escapeHtml(benchmark.name)}</strong>
           <small>${escapeHtml(benchmark.description)}</small>
         </span>
-        <span class="benchmark-ledger__comparison">
+        ${Number.isFinite(summary.baseline) && Number.isFinite(summary.treatment) ? `<span class="benchmark-ledger__comparison">
           <span><small>${escapeHtml(BASELINE_SHORT)} field mean</small><strong>${formatScore(summary.baseline)}</strong></span>
           <i aria-hidden="true">→</i>
           <span><small title="${escapeHtml(summary.treatmentLabel)}">Skill field mean</small><strong>${formatScore(summary.treatment)}</strong></span>
           <b>${signed(summary.delta)}<small> pts</small></b>
-        </span>
+        </span>` : '<span class="benchmark-ledger__comparison">Answers &amp; reviews</span>'}
         <span class="benchmark-ledger__evidence">
           ${isOverall ? `<span data-published-setting-count="${publishedSettingCount}">Published cohort · ${publishedSettingCount} settings</span>` : ''}
-          <strong>${summary.complete}/${summary.total} ${escapeHtml(summary.completionLabel)}</strong>
-          <span>${summary.wins}W · ${summary.ties}T · ${summary.losses}L</span>
-          ${isWriting ? `<span>${coverage.judgmentCount}/${coverage.expectedJudgmentCount} reviews${coverage.terminallyExcludedJudgmentCount ? ` · ${coverage.terminallyExcludedJudgmentCount} terminal exclusions` : ''}</span><span>${indexActive ? 'Scored in Writing index' : 'Index awaits complete configurations'}</span>` : `<span title="${escapeHtml(summary.runId || '')}">Run ${escapeHtml((summary.runId || 'not published').split('__')[0])}</span>`}
+          <strong>${display ? escapeHtml(display.sourceLabel) : `${summary.complete}/${summary.total} ${escapeHtml(summary.completionLabel)}`}</strong>
+          ${display?.provisional ? '<span>Provisional single-judge scores</span>' : `<span>${summary.wins}W · ${summary.ties}T · ${summary.losses}L</span>`}
+          ${isWriting ? `<span>${coverage.judgmentCount}/${coverage.expectedJudgmentCount} reviews${coverage.terminallyExcludedJudgmentCount ? ` · ${coverage.terminallyExcludedJudgmentCount} terminal exclusions` : ''}</span><span>${indexActive ? `${data.writingCategory.activeBenchmarkIds.length > 1 ? 'Equal weight' : '100% weight'} in ${escapeHtml(data.writingCategory.selection.title)}${display.provisional ? ' · provisional basis' : ''}` : 'Outside selected leaderboard score'}</span>` : `<span title="${escapeHtml(summary.runId || '')}">Run ${escapeHtml((summary.runId || 'not published').split('__')[0])}</span>`}
         </span>
         <span class="benchmark-ledger__action">${escapeHtml(action)} <span aria-hidden="true">→</span></span>
       </a>
@@ -944,24 +1076,22 @@ function buildWritingCategoryCollection(collection) {
 
   const writingProvisionalMarkup = benchmark => {
     if (!isWriting) return '';
-    const publication = data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id));
-    const provisional = publication?.provisionalLeaderboard;
-    if (provisional?.status !== 'provisional' || !provisional.rankedSettingCount) return '';
-    const plain = new Map(provisional.entries.filter(entry => entry.condition === 'baseline').map(entry => [entry.settingId, entry]));
-    const ranked = provisional.entries.filter(entry => entry.condition === 'skill' && entry.eligibleForRank).sort((a, b) => b.exactScore - a.exactScore || a.id.localeCompare(b.id));
+    const { publication, availableProvisional: provisional, provisionalSourceLabel: sourceLabel } = writingBenchmarkDisplay(benchmark);
+    if (!provisional) return '';
     const linkFor = settingId => `./benchmark-report.html?setting=${encodeURIComponent(settingId)}#${encodeURIComponent(benchmark.id)}/${encodeURIComponent(publication.cases[0].id)}`;
-    const bar = entry => `<span class="capability-composition capability-composition--${conditionVisualClass(entry.condition)}" role="group" aria-label="${escapeHtml(entry.conditionLabel)}, provisional score ${formatScore(entry.score)} out of 100, provisional rank ${entry.rank}"><span class="capability-composition__meta"><span class="capability-composition__label">${escapeHtml(entry.conditionLabel)}</span><span class="capability-composition__rank">Rank #${String(entry.rank).padStart(2, '0')}</span></span><span class="capability-composition__track"><span class="capability-composition__stack"><span class="capability-composition__segment writing-provisional__segment" style="--segment-width:${COMPOSITE_SCORE_SCALE(entry.exactScore).toFixed(4)}%"><span>${formatScore(entry.score)}</span></span></span></span><strong class="capability-composition__total">${formatScore(entry.score)}</strong></span>`;
-    return `<details class="writing-provisional" data-writing-provisional-benchmark="${escapeHtml(benchmark.id)}">
-      <summary><span><strong>${escapeHtml(benchmark.name)} — ${escapeHtml(provisional.label)}</strong><small>${provisional.rankedSettingCount} complete settings · ${provisional.expectedCaseCount} stories · ${provisional.judgeCount} judge · expand comparison</small></span><span class="writing-provisional__summary-scores" data-provisional-summary><span>Plain <strong>${formatScore(provisional.summary.baseline)}</strong></span><i aria-hidden="true">→</i><span>Skill <strong>${formatScore(provisional.summary.treatment)}</strong></span><b>${signed(provisional.summary.delta)} pts</b></span></summary>
-      <div class="writing-provisional__method"><p>${escapeHtml(provisional.detail)}</p><p>Provisional benchmark results only. Not included in the Writing development index or Overall. Each rank compares both conditions on the same ${provisional.expectedCaseCount}-story corpus, using only ${escapeHtml(provisional.judgeConfigurationIds.join(' + '))}. Select a model to inspect its original answers and reviews.</p></div>
-      <ol class="result-list" aria-label="${escapeHtml(benchmark.name)} provisional single-judge paired comparison">${ranked.map(entry => {
-        const baseline = plain.get(entry.settingId);
-        return `<li class="setting-row" data-writing-provisional-setting="${escapeHtml(entry.settingId)}" data-baseline-score="${formatScore(baseline.score)}" data-full-score="${formatScore(entry.score)}" data-delta="${formatScore(entry.delta)}" data-baseline-rank="${baseline.rank}" data-full-rank="${entry.rank}"><div class="setting-row__layout"><a class="setting-row__select writing-provisional__link" href="${escapeHtml(linkFor(entry.settingId))}"><span class="setting-row__identity"><span class="setting-row__rank">${String(entry.rank).padStart(2, '0')}</span><span class="setting-row__model"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Provisional · ${provisional.expectedCaseCount}/${provisional.expectedCaseCount} stories · 1 judge</small></span></span><span class="setting-row__disclosure">Answers ↗</span></a><span class="setting-row__pair">${bar(entry)}${bar(baseline)}</span><span class="setting-row__delta${entry.delta < 0 ? ' setting-row__delta--negative' : ''}"><strong>${signed(entry.delta)}</strong><span>pts</span></span></div></li>`;
-      }).join('')}</ol>
-      ${provisional.incompleteSettings.length ? `<section class="writing-provisional__method"><h5>Incomplete cohorts — diagnostics, not ranks</h5><ul class="writing-provisional__incomplete">${provisional.incompleteSettings.map(item => {
+    const baselineEntries = new Map(provisional.entries.filter(entry => entry.condition === 'baseline').map(entry => [entry.settingId, entry]));
+    const ranked = provisional.entries.filter(entry => entry.condition === 'skill' && entry.eligibleForRank).sort((left, right) => right.exactScore - left.exactScore || left.id.localeCompare(right.id));
+    const baselineRanking = { ranks: new Map([...baselineEntries.values()].map(entry => [entry.id, entry.rank])) };
+    const fullRanking = { ranks: new Map(ranked.map(entry => [entry.id, entry.rank])) };
+    return `<details class="benchmark-comparison" data-writing-provisional-benchmark="${escapeHtml(benchmark.id)}">
+      <summary>Provisional scoring &amp; coverage <small>${escapeHtml(sourceLabel)}</small></summary>
+      <div class="benchmark-comparison__method"><p>${escapeHtml(provisional.detail)}</p><p>This single-judge comparison uses the same ${provisional.expectedCaseCount}-story corpus and ${escapeHtml(provisional.judgeConfigurationIds.join(' + '))} reviews in both conditions. This uniform provisional basis contributes to the Storytelling aggregate while complete official model pairs are unavailable. Writing is excluded from Overall.</p><p><a data-writing-single-benchmark="${escapeHtml(benchmark.id)}" href="./index.html?score=${encodeURIComponent(benchmark.id)}#capabilities/writing">Compare ${provisional.rankedSettingCount} model settings in the leaderboard ↗</a></p></div>
+      <ol class="capability-ranking__rows" aria-label="${escapeHtml(benchmark.name)} provisional single-judge paired comparison">${ranked.map(entry => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, { id: 'writing', name: benchmark.name, color: 'var(--category-writing)' }, { baselineEntries, linkFor, provisional: true, rankCount: provisional.rankedSettingCount, scoreLabel: sourceLabel })).join('')}</ol>
+      ${provisional.incompleteSettings.length ? `<details class="benchmark-comparison__partial"><summary>${provisional.incompleteSettings.length} partial results</summary><ul>${provisional.incompleteSettings.map(item => {
         const setting = publication.settings.find(setting => setting.id === item.settingId);
-        return `<li data-writing-provisional-incomplete="${escapeHtml(item.settingId)}" data-baseline-score="${formatScore(item.scores.baseline)}" data-full-score="${formatScore(item.scores.skill)}" data-delta="${formatScore(item.delta)}" data-baseline-rank="" data-full-rank=""><a href="${escapeHtml(linkFor(item.settingId))}">${escapeHtml(setting?.label || item.configurationId)} ↗</a><span>${item.completedPairCount}/${item.expectedPairCount} stories · plain ${formatScore(item.scores.baseline)} → skill ${formatScore(item.scores.skill)} · ${signed(item.delta)} pts · rank —</span></li>`;
-      }).join('')}</ul></section>` : ''}
+        const paired = Number.isFinite(item.scores.baseline) && Number.isFinite(item.scores.skill);
+        return `<li data-writing-provisional-incomplete="${escapeHtml(item.settingId)}" data-baseline-score="${Number.isFinite(item.scores.baseline) ? formatScore(item.scores.baseline) : ''}" data-full-score="${Number.isFinite(item.scores.skill) ? formatScore(item.scores.skill) : ''}" data-delta="${Number.isFinite(item.delta) ? formatScore(item.delta) : ''}" data-baseline-rank="" data-full-rank=""><a href="${escapeHtml(linkFor(item.settingId))}">${escapeHtml(setting?.label || item.configurationId)} ↗</a><span>${item.completedPairCount}/${item.expectedPairCount} stories${paired ? ` · plain ${formatScore(item.scores.baseline)} → skill ${formatScore(item.scores.skill)}${Number.isFinite(item.delta) ? ` · ${signed(item.delta)} pts` : ''}` : ''} · partial cohort, unranked</span></li>`;
+      }).join('')}</ul></details>` : ''}
     </details>`;
   };
 
@@ -979,7 +1109,7 @@ function buildWritingCategoryCollection(collection) {
       >
         <h4 class="visually-hidden">${escapeHtml(category.name)} benchmark tests</h4>
         ${isOverall ? '<p class="overall-ledger-note">Task means retain each benchmark’s published cohort. Overall ranks use settings with every task completed under both conditions.</p>' : ''}
-        ${isWriting ? `<p class="overall-ledger-note" data-writing-ledger-coverage>${data.coverage.responseCount}/${data.coverage.expectedResponseCount} answers · ${data.coverage.judgmentCount}/${data.coverage.expectedJudgmentCount} reviews. Each test retains its own published cohort and scoring rules; these field means are not category ranks. Open a report for prompts, trials, exclusions, answers, and judgments.</p>` : ''}
+        ${isWriting ? `<p class="overall-ledger-note" data-writing-ledger-coverage>${data.coverage.responseCount}/${data.coverage.expectedResponseCount} answers · ${data.coverage.judgmentCount}/${data.coverage.expectedJudgmentCount} reviews. Field means average each test’s complete model settings. The leaderboard averages each model’s available benchmark scores; its selected-model breakdown shows the contributing tests. Open a report for prompts, trials, exclusions, answers, and judgments.</p>` : ''}
         <div class="benchmark-ledger__tracks">
           ${suiteNames.map((suite, suiteIndex) => {
             const suiteBenchmarks = benchmarks.filter((benchmark) => benchmark.suite === suite);
@@ -1036,14 +1166,14 @@ function buildWritingCategoryCollection(collection) {
             data-entry-id="${escapeHtml(fullEntry.id)}"
             aria-pressed="${selected}"
             aria-describedby="${escapeHtml(compositionDescriptionId)}"
-            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${SETTING_COUNT}. ${escapeHtml(BASELINE_LABEL)} score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
+            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${RANKED_SETTING_COUNT}. ${escapeHtml(BASELINE_LABEL)} score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${RANKED_SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
           >
             <span class="setting-row__identity">
               <span class="setting-row__rank" aria-hidden="true">${String(fullRank).padStart(2, '0')}</span>
               <span class="setting-row__model">
                 <strong>${escapeHtml(fullEntry.family)}</strong>
                 <span>${escapeHtml(fullEntry.reasoning)}</span>
-                <small>Skill rank #${String(fullRank).padStart(2, '0')} · baseline rank #${String(baselineRank).padStart(2, '0')}</small>
+                <small>${isWriting ? `Skill #${String(fullRank).padStart(2, '0')} · Plain #${String(baselineRank).padStart(2, '0')}` : `Skill rank #${String(fullRank).padStart(2, '0')} · baseline rank #${String(baselineRank).padStart(2, '0')}`}</small>
               </span>
             </span>
             <span class="setting-row__disclosure">${selected ? 'Selected' : 'Select'} <span aria-hidden="true">${selected ? '●' : '→'}</span></span>
@@ -1095,63 +1225,6 @@ function buildWritingCategoryCollection(collection) {
     `;
   };
 
-  const writingPartialCoverageMarkup = () => {
-    if (!isWriting) return '';
-    const groups = data.categories.filter(group => group.weight > 0);
-    const partial = data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID
-      && !Number.isFinite(entry.exactScore)
-      && entry.categories.some(reading => Number.isFinite(reading.exactScore) && reading.weight > 0))
-      .sort((left, right) => left.label.localeCompare(right.label) || left.id.localeCompare(right.id));
-    if (!partial.length) return '';
-    const profile = (entry, fullEntryId) => `<span class="capability-composition capability-composition--${conditionVisualClass(entry.condition)}" data-condition="${escapeHtml(entry.condition)}" data-writing-partial-condition="${escapeHtml(entry.condition)}" role="group" aria-label="${escapeHtml(conditionById.get(entry.condition).label)}: partial subgroup evidence, category total and rank unavailable">
-      <span class="capability-composition__meta"><span class="capability-composition__label">${escapeHtml(conditionById.get(entry.condition).label)}</span><span class="capability-composition__rank">Rank —</span></span>
-      <span class="capability-composition__track"><span class="capability-composition__stack" role="toolbar" aria-label="Open subgroup benchmark tests, including unavailable groups">
-        ${groups.map((group, index) => {
-          const reading = entry.categories.find(item => item.category === group.id);
-          const known = Number.isFinite(reading?.exactScore);
-          const insight = known ? `${group.name}: ${formatScore(reading.score)} of ${SCORE_MAXIMUM}; fixed weight ${formatWeight(group.weight)}; ${reading.exactContribution.toFixed(2)} known weighted points. The category total remains unavailable.` : `${group.name}: unavailable evidence, not zero; fixed ${formatWeight(group.weight)} capacity. The category total remains unavailable.`;
-          return `<button class="capability-composition__segment writing-partial__slot${known ? '' : ' writing-partial__slot--unavailable'}" type="button" data-writing-group-id="${escapeHtml(group.id)}" data-entry-id="${escapeHtml(fullEntryId)}" data-writing-partial-availability="${known ? 'known' : 'unavailable'}" data-weight="${group.weight}" data-raw-score="${known ? formatScore(reading.score) : ''}" data-raw-exact-score="${known ? reading.exactScore : ''}" data-contribution="${known ? reading.exactContribution : ''}" style="--segment-width:${(group.weight * 100).toFixed(6)}%;--partial-color:${escapeHtml(group.color)}" tabindex="${index === 0 ? '0' : '-1'}" aria-label="${escapeHtml(insight)} Open ${escapeHtml(group.name)} benchmark tests." title="${escapeHtml(insight)}">
-            ${known ? `<span class="writing-partial__fill" aria-hidden="true" style="width:${COMPOSITE_SCORE_SCALE(reading.exactScore).toFixed(6)}%"></span>` : ''}
-            <span class="writing-partial__slot-label"><strong>${escapeHtml(group.short)} ${known ? formatScore(reading.score) : 'unavailable'}</strong><small>${known ? `${reading.exactContribution.toFixed(2)} pts · ` : ''}${formatWeight(group.weight)}${known ? '' : ' capacity'}</small></span>
-          </button>`;
-        }).join('')}
-      </span></span><strong class="capability-composition__total" data-writing-partial-total>—</strong>
-    </span>`;
-    return `<section class="writing-partial" data-writing-partial-coverage aria-labelledby="writing-partial-title">
-      <header class="writing-partial__heading"><h4 id="writing-partial-title">Partial coverage — not ranked</h4><p>Fixed subgroup weights. Solid fills show known contributions; hatched slots are unavailable—not zero. No category total, rank, or uplift is inferred. Settings are ordered alphabetically.</p></header>
-      <ol class="result-list" data-writing-partial-list aria-label="Unranked partial subgroup evidence, ordered by model label">${partial.map(entry => {
-        const baseline = baselineBySetting.get(entry.settingId), selected = selectedEntry().settingId === entry.settingId;
-        return `<li class="setting-row writing-partial__row${selected ? ' is-selected' : ''}" data-writing-partial-setting="${escapeHtml(entry.settingId)}" data-baseline-score="" data-full-score="" data-baseline-rank="" data-full-rank="" data-delta=""><div class="setting-row__layout">
-          <button class="setting-row__select" type="button" data-entry-id="${escapeHtml(entry.id)}" aria-pressed="${selected}" aria-label="Inspect ${escapeHtml(entry.label)}. Partial coverage, no category score or rank."><span class="setting-row__identity"><span class="setting-row__rank">—</span><span class="setting-row__model"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Partial coverage · not ranked</small></span></span><span class="setting-row__disclosure">${selected ? 'Selected' : 'Inspect'} ↗</span></button>
-          <span class="setting-row__pair">${profile(entry, entry.id)}${profile(baseline, entry.id)}</span><span class="setting-row__delta" data-writing-partial-uplift><strong>—</strong><span>pts</span></span>
-        </div></li>`;
-      }).join('')}</ol>
-    </section>`;
-  };
-
-  const writingCoverageMarkup = () => {
-    const missing = rankedCondition(TREATMENT_CONDITION_ID).entries.filter(entry => !Number.isFinite(entry.score));
-    if (!missing.length) return '';
-    return `<details class="writing-index-gaps" data-writing-coverage-gaps><summary>${missing.length} settings without complete index coverage</summary><p>These settings have published Writing evidence, but not complete paired scores on every active benchmark. Their category score and rank are withheld—not scored as zero.</p><ul>${missing.map(entry => `<li data-incomplete-setting-id="${escapeHtml(entry.settingId)}"><button class="setting-row__select" data-entry-id="${escapeHtml(entry.id)}" type="button" aria-pressed="${selectedEntry().settingId === entry.settingId}"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Score — · rank — · inspect available answers ↗</small></button></li>`).join('')}</ul></details>`;
-  };
-
-  const writingProvisionalSummaryMarkup = () => {
-    if (!isWriting) return '';
-    const publication = data.writingCategory.publications.find(item => item.benchmarks.some(benchmark => benchmark.id === 'storytelling-core-idea'));
-    const provisional = publication?.provisionalLeaderboard;
-    if (provisional?.status !== 'provisional' || !provisional.rankedSettingCount) return '';
-    const benchmark = publication.benchmarks.find(item => item.id === 'storytelling-core-idea');
-    return `<section class="writing-provisional" data-writing-provisional-overview aria-labelledby="writing-provisional-overview-title">
-      <div class="writing-provisional__method">
-        <h4 id="writing-provisional-overview-title">${escapeHtml(benchmark.name)} — ${escapeHtml(provisional.label)}</h4>
-        <p>${provisional.rankedSettingCount} settings · ${provisional.expectedCaseCount} stories · ${provisional.judgeCount} judge</p>
-        <p class="writing-provisional__summary-scores"><span>Plain <strong>${formatScore(provisional.summary.baseline)}</strong></span><i aria-hidden="true">→</i><span>Skill <strong>${formatScore(provisional.summary.treatment)}</strong></span><b>${signed(provisional.summary.delta)} pts</b></p>
-        <p>Both conditions use the same complete story corpus and Astra xhigh judge. These provisional scores are excluded from the Writing development index below and from Overall.</p>
-        <p><a href="?writing=${encodeURIComponent(benchmark.id)}#capabilities/writing/benchmarks">Compare all ${provisional.rankedSettingCount} settings and read original answers →</a></p>
-      </div>
-    </section>`;
-  };
-
   const combinedLeaderboardMarkup = () => {
     const baselineRanking = rankedCondition(BASELINE_CONDITION_ID);
     const fullRanking = rankedCondition(TREATMENT_CONDITION_ID);
@@ -1171,7 +1244,6 @@ function buildWritingCategoryCollection(collection) {
         aria-labelledby="capability-mode-models"
         ${state.capabilityMode === 'models' ? '' : 'hidden'}
       >
-        ${writingProvisionalSummaryMarkup()}
         <section class="score-field score-field--combined" aria-labelledby="score-field-title">
           <h3 class="visually-hidden" id="score-field-title">${isWriting ? 'Writing' : 'Overall'} model leaderboard</h3>
 
@@ -1179,7 +1251,7 @@ function buildWritingCategoryCollection(collection) {
             <span class="score-axis-header__identity">Model setting / skill rank</span>
             <div class="score-axis-header__profile">
               <div class="score-axis-header__profile-title">
-                <strong>${escapeHtml(SCORE_EDITION_LABEL)} score <span>${escapeHtml(TREATMENT_LABEL)} vs ${escapeHtml(BASELINE_LABEL)} · ${escapeHtml(taskCoverageLabel)}</span></strong>
+                <strong>${escapeHtml(isWriting ? 'Writing' : SCORE_EDITION_LABEL)} score <span>${escapeHtml(TREATMENT_LABEL)} vs ${escapeHtml(BASELINE_LABEL)} · ${escapeHtml(taskCoverageLabel)}</span></strong>
                 <span>${isWriting ? 'Writing' : 'Overall'} /${SCORE_MAXIMUM}</span>
               </div>
               <div class="capability-legend" aria-label="Weighted capability categories">
@@ -1199,10 +1271,9 @@ function buildWritingCategoryCollection(collection) {
             <span class="capability-score-guide__readout"><strong>0.0</strong><small>/${SCORE_MAXIMUM}</small></span>
           </div>
           ${!isWriting || rankedEntries.length > INITIAL_RESULT_COUNT ? `<button class="show-all" id="show-all" type="button" aria-expanded="${state.showAll}">${escapeHtml(disclosureLabel)}</button>` : ''}
-          ${isWriting && !rankedEntries.length ? '<p class="overall-ledger-note">No setting has complete paired coverage of the active benchmarks yet. Available results are under Benchmark tests.</p>' : ''}
         </section>
         ${isOverall ? overallCoverageMarkup() : ''}
-        ${isWriting ? writingPartialCoverageMarkup() + writingSelectionMarkup() + writingCoverageMarkup() : ''}
+        ${writingSelectionMarkup()}
       </section>
     `;
   };
@@ -1252,13 +1323,18 @@ function buildWritingCategoryCollection(collection) {
       const configuration = report.configurations.find(item => item.id === leader?.configurationId);
       return `<div class="capability-canvas__reading capability-canvas__reading--${index ? 'baseline':'full'}" data-game-leader-condition="${escapeHtml(condition.id)}" data-game-leader-run="${escapeHtml(leader?.id || '')}" data-game-leader-score="${gameScore(leader) ?? ''}"><dt>${escapeHtml(condition.label)} leader /100</dt><dd>${formatScore(gameScore(leader))}<small>${configuration ? `${escapeHtml(configuration.label)} · ${escapeHtml(configuration.reasoning)}` : 'No eligible complete panel'}</small></dd></div>`;
     }).join('') : `<div class="capability-canvas__reading capability-canvas__reading--measured"><dt>Benchmark tests</dt><dd>${gameBenchmarks.length}<small>published tasks</small></dd></div><div class="capability-canvas__reading capability-canvas__reading--audit"><dt>Complete review panels</dt><dd>${gameRuns.filter(run => gameScore(run) !== null).length}<small>of ${gameRuns.length} outputs</small></dd></div>`;
-    return `<header class="capability-canvas__header capability-canvas__header--games"><div class="capability-canvas__identity capability-canvas__identity--games"><p class="ui-eyebrow">Capabilities / Games / ${state.capabilityMode === 'benchmarks' ? 'Benchmark tests' : state.capabilityMode === 'efficiency' ? 'Efficiency' : 'Leaderboard'}</p><p class="capability-canvas__status capability-canvas__status--work-spec"><strong>Games v1 pilot · Artifact quality · 2 judges</strong></p><h3 id="capability-question" tabindex="-1">Games</h3><p>${gameSettingCount} model settings · ${gameRuns.length} outputs · ${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'}</p></div><dl class="capability-canvas__readings" aria-label="Games summary">${readings}</dl></header>`;
+    return capabilityHeaderFrameMarkup({
+      name: 'Games', identityLabel: `Capabilities / Games / ${state.capabilityMode === 'benchmarks' ? 'Benchmark tests' : state.capabilityMode === 'efficiency' ? 'Efficiency' : 'Leaderboard'}`,
+      disclosure: 'Games v1 pilot · Artifact quality · 2 judges',
+      summary: `${gameSettingCount} model settings · ${gameRuns.length} outputs · ${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'}`,
+      readings, headerModifier: ' capability-canvas__header--games', identityModifier: ' capability-canvas__identity--games', development: true
+    });
   };
-  const gameModeMarkup = () => `${gameHeaderMarkup()}<nav class="capability-mode" aria-label="Choose Games view"><span class="capability-mode__label" aria-hidden="true">View</span><div class="capability-mode__tabs" role="tablist" aria-label="Choose Games evidence view">${[
+  const gameModeMarkup = () => `${gameHeaderMarkup()}${capabilityTabsMarkup('Games', [
     ['models', 'Leaderboard', `${gameSettingCount} model settings`, 'capability-ranking'],
     ['benchmarks', 'Benchmark tests', `${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'test' : 'tests'}`, 'capability-benchmarks'],
     ...(hasGameEffort ? [['efficiency', 'Efficiency', 'Ratings × generation time', 'capability-efficiency']] : [])
-  ].map(([id, label, note, panel]) => `<button class="capability-mode__tab${state.capabilityMode === id ? ' is-selected' : ''}" id="capability-mode-${id}" type="button" role="tab" data-capability-mode="${id}" aria-selected="${state.capabilityMode === id}" aria-controls="${panel}" tabindex="${state.capabilityMode === id ? '0' : '-1'}"><strong>${label}</strong><span>${note}</span></button>`).join('')}</div></nav>`;
+  ])}`;
   const gameModelsMarkup = () => `<section class="capability-ranking" id="capability-ranking" role="tabpanel" aria-labelledby="capability-mode-models" ${state.capabilityMode === 'models' ? '' : 'hidden'}>${gameBenchmarks.map(report => {
     const configuration = report.configurations.find(item => item.id === gameSelectedRun(report)?.configurationId);
     return `<section data-game-benchmark-id="${escapeHtml(report.benchmark.id)}" aria-label="${escapeHtml(report.benchmark.title)} leaderboard"><header class="game-capability__task-header"><h4>${escapeHtml(report.benchmark.title)}</h4><a class="game-capability__report" data-game-selected-report href="${gameReportHref(report,configuration?.id,'game-comparison')}">Watch ${escapeHtml(configuration?.label || 'selected game')} →</a></header>
@@ -1318,13 +1394,13 @@ function buildWritingCategoryCollection(collection) {
           }
           if (category.id === 'writing' && hasWriting) {
             const selected = category.id === state.capabilityCategory;
-            const leader = selected ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).sort((a, b) => b.exactScore - a.exactScore)[0] : writingSummary.categoryIndex?.leader;
+            const leader = isWriting ? writingAggregateLeader : writingSummary.categoryIndex?.leader;
             const score = leader?.score;
-            return `<button class="capability-selector__tab${selected ? ' is-selected' : ''}" id="capability-category-writing" type="button" role="tab" aria-selected="${selected}" aria-controls="capability-field-panel" tabindex="${selected ? '0' : '-1'}" data-category-id="writing" data-category-status="development-index" style="--category-color:${category.color}" aria-label="Writing development index. ${publishedWritingBenchmarkCount} published benchmarks. ${Number.isFinite(score) ? `Best task-specific skill result ${formatScore(score)} of ${SCORE_MAXIMUM}.` : 'Open Writing to inspect measured benchmarks and coverage.'} Excluded from Overall.">
+            return `<button class="capability-selector__tab${selected ? ' is-selected' : ''}" id="capability-category-writing" type="button" role="tab" aria-selected="${selected}" aria-controls="capability-field-panel" tabindex="${selected ? '0' : '-1'}" data-category-id="writing" data-category-status="development-index"${isWriting ? ` data-writing-summary-partial="${Boolean(leader?.partial)}"` : ''} style="--category-color:${category.color}" aria-label="Writing development comparison. ${publishedWritingBenchmarkCount} published benchmarks. ${Number.isFinite(score) ? `${isWriting ? 'Storytelling aggregate leader' : 'Best task-specific skill result'} ${formatScore(score)} of ${SCORE_MAXIMUM}${isWriting && leader?.partial ? ', average of available benchmark scores' : ''}.` : 'Open Writing to inspect measured benchmarks and coverage.'} Excluded from Overall.">
               <span class="capability-selector__index" aria-hidden="true">${String(categoryIndex).padStart(2, '0')}</span>
               <span class="capability-selector__name"><span class="capability-selector__long">Writing</span><span class="capability-selector__short">Writing</span></span>
               <span class="capability-selector__state" data-writing-category-progress>${selected ? 'Selected' : 'Development'}</span>
-              <strong>${formatScore(score)}${Number.isFinite(score) ? `<small>/${SCORE_MAXIMUM}</small>` : ''}</strong>
+              <strong${isWriting ? ` title="Storytelling aggregate leader${writingAggregateLeader?.provisional ? ' · provisional' : ''}"` : ''}>${Number.isFinite(score) ? `${formatScore(score)}${isWriting && leader?.partial ? '*' : ''}<small>/${SCORE_MAXIMUM}</small>` : 'Results'}</strong>
             </button>`;
           }
           if (category.status === 'coming-soon') return `
@@ -1383,21 +1459,24 @@ function buildWritingCategoryCollection(collection) {
     </nav>
   `;
 
-  const capabilityRankRowMarkup = (fullEntry, baselineRanking, fullRanking, category) => {
-    const baselineEntry = baselineBySetting.get(fullEntry.settingId);
+  const capabilityRankRowMarkup = (fullEntry, baselineRanking, fullRanking, category, options = {}) => {
+    const baselineEntry = (options.baselineEntries || baselineBySetting).get(fullEntry.settingId);
     const baselineScore = scoreFor(baselineEntry, category.id);
     const fullScore = scoreFor(fullEntry, category.id);
-    const baselineRank = baselineRanking.ranks.get(baselineEntry.id);
-    const fullRank = fullRanking.ranks.get(fullEntry.id);
+    const baselineRank = isWriting && fullEntry.partial ? null : baselineRanking.ranks.get(baselineEntry.id) ?? null;
+    const fullRank = isWriting && fullEntry.partial ? null : fullRanking.ranks.get(fullEntry.id) ?? null;
     const comparable = Number.isFinite(fullScore) && Number.isFinite(baselineScore);
     const delta = comparable ? (isWorkSpec || isWriting ? fullEntry.delta : Math.round((fullScore - baselineScore) * 10) / 10) : null;
     const start = Math.min(baselineScore, fullScore);
     const connectorWidth = Math.max(Math.abs(fullScore - baselineScore), 0.25);
-    const selected = selectedEntry().settingId === fullEntry.settingId;
+    const selected = !options.linkFor && selectedEntry().settingId === fullEntry.settingId;
+    const rowTag = options.linkFor ? 'a' : 'button';
+    const rankCount = options.rankCount ?? RANKED_SETTING_COUNT;
     return `
       <li
         class="capability-rank-row${selected ? ' is-selected' : ''}${delta < 0 ? ' is-regression' : ''}"
         data-setting-id="${escapeHtml(fullEntry.settingId)}"
+        ${options.provisional ? `data-writing-provisional-setting="${escapeHtml(fullEntry.settingId)}"` : ''}
         data-baseline-entry-id="${escapeHtml(baselineEntry.id)}"
         data-full-entry-id="${escapeHtml(fullEntry.id)}"
         data-baseline-score="${formatScore(baselineScore)}"
@@ -1405,20 +1484,19 @@ function buildWritingCategoryCollection(collection) {
         data-baseline-rank="${baselineRank}"
         data-full-rank="${fullRank}"
         data-delta="${formatScore(delta)}"
+        ${isWriting ? `data-partial="${Boolean(fullEntry.partial)}" data-exact-baseline="${baselineEntry.exactScore}" data-exact-skill="${fullEntry.exactScore}" data-exact-delta="${fullEntry.exactDelta}"` : ''}
         style="--category-color:${category.color};--baseline-score:${baselineScore}%;--full-score:${fullScore}%;--connector-start:${start}%;--connector-width:${connectorWidth}%"
       >
-        <button
+        <${rowTag}
           class="capability-rank-row__select"
-          type="button"
-          data-entry-id="${escapeHtml(fullEntry.id)}"
-          aria-pressed="${selected}"
-          aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank || 'unscored'} of ${SETTING_COUNT}; ${escapeHtml(BASELINE_LABEL)} score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank || 'unscored'} of ${SETTING_COUNT}; paired uplift ${signed(delta)} points. Rank is secondary and condition-specific."
+          ${options.linkFor ? `href="${escapeHtml(options.linkFor(fullEntry.settingId))}"` : `type="button" data-entry-id="${escapeHtml(fullEntry.id)}" aria-pressed="${selected}"`}
+          aria-label="${options.linkFor ? 'Read answers for' : 'Select'} ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(category.name)} ${escapeHtml(TREATMENT_LABEL)} ${escapeHtml(options.scoreLabel || SCORE_EDITION_LABEL)} score ${formatScore(fullScore)} of ${SCORE_MAXIMUM}, skill rank ${fullRank || 'unranked'} of ${rankCount}; ${escapeHtml(BASELINE_LABEL)} score ${formatScore(baselineScore)} of ${SCORE_MAXIMUM}, baseline rank ${baselineRank || 'unranked'} of ${rankCount}; paired uplift ${signed(delta)} points.${isWriting && fullEntry.partial ? ' Unranked. Asterisk: available-score mean; some tests are missing. Not comparable to the ranked aggregate.' : ''} Rank is secondary and condition-specific."
         >
           <span class="capability-rank-row__identity">
             <span class="capability-rank-row__position">${fullRank ? `#${String(fullRank).padStart(2, '0')}` : '—'}</span>
             <span class="capability-rank-row__model">
               <strong>${escapeHtml(fullEntry.family)}</strong>
-              <small>${escapeHtml(fullEntry.reasoning)}</small>
+              <small>${escapeHtml(fullEntry.reasoning)}</small>${isWriting && fullEntry.partial ? `<small class="writing-coverage-label">${fullEntry.sourceCount}/${TASK_COUNT} tests · unranked</small>` : ''}
             </span>
           </span>
           ${comparable ? `<span
@@ -1432,19 +1510,30 @@ function buildWritingCategoryCollection(collection) {
             <span class="capability-rank-row__marker capability-rank-row__marker--full" aria-hidden="true"></span>
           </span>` : '<span class="work-spec-unassessable">Panel total not assessable</span>'}
           <span class="capability-rank-row__reading capability-rank-row__reading--baseline">
-            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Baseline</span></span>
-            <strong>${formatScore(baselineScore)}</strong>
-            <small>${baselineRank ? `#${baselineRank}` : 'Unscored'}</small>
+            <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>${isWriting ? 'Plain' : 'Baseline'}</span></span>
+            <strong>${formatEntryScore(baselineEntry, category.id)}</strong>
+            <small>${baselineRank ? `#${baselineRank}` : comparable ? 'Unranked' : 'Unscored'}</small>
           </span>
           <span class="capability-rank-row__reading capability-rank-row__reading--full">
             <span class="capability-rank-row__condition-label"><i aria-hidden="true"></i><span>Skill</span></span>
-            <strong>${formatScore(fullScore)}</strong>
-            <small>${fullRank ? `#${fullRank}` : 'Unscored'}</small>
+            <strong>${formatEntryScore(fullEntry, category.id)}</strong>
+            <small>${fullRank ? `#${fullRank}` : comparable ? 'Unranked' : 'Unscored'}</small>
           </span>
-          <strong class="capability-rank-row__delta">${signed(delta)}<small>pts</small></strong>
-        </button>
+          <strong class="capability-rank-row__delta">${signed(delta)}${isWriting && fullEntry.partial ? '*' : ''}<small>pts</small></strong>
+        </${rowTag}>
       </li>
     `;
+  };
+
+  const writingIncompleteResultsMarkup = category => {
+    const entries = data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.partial)
+      .sort((a, b) => a.family.localeCompare(b.family) || a.reasoning.localeCompare(b.reasoning));
+    if (!entries.length) return '';
+    const unranked = { ranks: new Map() };
+    return `<section class="writing-incomplete-results" data-writing-incomplete-results aria-labelledby="writing-incomplete-title">
+      <header class="writing-incomplete-results__header"><h4 id="writing-incomplete-title">Available scores · not ranked</h4><p>These models have missing tests. Their available-score means are shown for reference, not compared with the full aggregate above. Alphabetical order; select a model to see its scores and missing tests.</p></header>
+      <ul class="capability-ranking__rows" aria-label="Incomplete model results, alphabetical and unranked">${entries.map(entry => capabilityRankRowMarkup(entry, unranked, unranked, category)).join('')}</ul>
+    </section>`;
   };
 
   const animateCapabilityHandoff = (skipMotion = false) => {
@@ -1597,6 +1686,26 @@ function buildWritingCategoryCollection(collection) {
     });
   };
 
+  const capabilityFrameMarkup = ({ category, heading, ranking, benchmarks, efficiency, footnote = '' }) => `
+      <section class="capability-browser" style="--category-color:${category.color}">
+        <aside class="capability-browser__index">
+          ${capabilitySelectorMarkup()}
+        </aside>
+        <div
+          class="capability-browser__canvas"
+          id="capability-field-panel"
+          role="tabpanel"
+          aria-labelledby="capability-category-${escapeHtml(category.id)}"
+        >
+          ${heading}
+          ${ranking}
+          ${benchmarks}
+          ${efficiency}
+          ${footnote}
+        </div>
+      </section>
+    `;
+
   const renderCapabilities = ({ animate = false, skipMotion = false } = {}) => {
     const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
     state.capabilityCategory = category.id;
@@ -1604,7 +1713,7 @@ function buildWritingCategoryCollection(collection) {
     const baselineRanking = games ? null : rankedCondition(BASELINE_CONDITION_ID, category.id);
     const fullRanking = games ? null : rankedCondition(TREATMENT_CONDITION_ID, category.id);
 
-    const rankingContent = games ? gameModelsMarkup() : category.isCombined || isWriting ? combinedLeaderboardMarkup() : `
+    const rankingContent = games ? gameModelsMarkup() : category.isCombined ? combinedLeaderboardMarkup() : `
         <section
           class="capability-ranking"
           id="capability-ranking"
@@ -1613,6 +1722,7 @@ function buildWritingCategoryCollection(collection) {
           ${state.capabilityMode === 'models' ? '' : 'hidden'}
         >
           <h4 class="visually-hidden">${escapeHtml(category.name)} model leaderboard</h4>
+          ${writingLeaderboardControlsMarkup()}
           <div class="capability-ranking__axis" aria-hidden="true">
             <span>Model / skill rank</span>
             <span class="capability-ranking__ticks">
@@ -1624,32 +1734,20 @@ function buildWritingCategoryCollection(collection) {
             <span>Uplift</span>
           </div>
           <ol class="capability-ranking__rows" aria-label="${escapeHtml(category.name)} settings ordered by ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score. Ranks are secondary and condition-specific.">
-            ${fullRanking.entries.map((entry) => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, category)).join('')}
+            ${fullRanking.entries.filter(entry => !isWriting || Number.isFinite(entry.score)).map((entry) => capabilityRankRowMarkup(entry, baselineRanking, fullRanking, category)).join('')}
           </ol>
+          ${isWriting ? writingIncompleteResultsMarkup(category) : ''}
           ${writingSelectionMarkup()}
         </section>
       `;
     const benchmarkContent = games ? gameBenchmarksMarkup() : benchmarkLedgerMarkup(category, state.capabilityMode !== 'benchmarks');
 
-    elements.capabilityView.innerHTML = `
-      <section class="capability-browser" style="--category-color:${category.color}">
-        <aside class="capability-browser__index">
-          ${capabilitySelectorMarkup()}
-        </aside>
-        <div
-          class="capability-browser__canvas"
-          id="capability-field-panel"
-          role="tabpanel"
-          aria-labelledby="capability-category-${escapeHtml(category.id)}"
-        >
-          ${games ? gameModeMarkup() : capabilityModeMarkup(category)}
-          ${rankingContent}
-          ${benchmarkContent}
-          ${games ? gameEfficiencyMarkup() : efficiencyPanelMarkup()}
-        </div>
-      </section>
-    `;
-
+    elements.capabilityView.innerHTML = capabilityFrameMarkup({
+      category, heading: games ? gameModeMarkup() : capabilityModeMarkup(category),
+      ranking: rankingContent, benchmarks: benchmarkContent,
+      efficiency: games ? gameEfficiencyMarkup() : efficiencyPanelMarkup(),
+      footnote: isWriting ? '<p class="writing-score-footnote" id="writing-partial-footnote" data-writing-partial-footnote>* Unranked mean of available scores, not a comparable aggregate. Missing tests are not zero. Only models with every selected test receive a rank.</p>' : ''
+    });
     bindCombinedScoreGuide();
     if (!games && state.capabilityMode === 'efficiency') renderEfficiency();
 
@@ -1699,9 +1797,9 @@ function buildWritingCategoryCollection(collection) {
 
   const resourceDeltaPercent = (entry, metric = state.metric) => {
     const baseline = baselineBySetting.get(entry.settingId);
-    const baselineValue = Number(baseline?.[metric]);
-    const value = Number(entry[metric]);
-    if (!Number.isFinite(baselineValue) || baselineValue <= 0 || !Number.isFinite(value) || value <= 0) return 0;
+    const baselineValue = baseline?.[metric];
+    const value = entry[metric];
+    if (!Number.isFinite(baselineValue) || baselineValue <= 0 || !Number.isFinite(value) || value < 0) return null;
     return Math.round(((value / baselineValue) - 1) * 100);
   };
 
@@ -1717,8 +1815,8 @@ function buildWritingCategoryCollection(collection) {
     const resourceDelta = resourceDeltaPercent(entry);
     const reference = entry.condition === BASELINE_CONDITION_ID
       ? `${escapeHtml(BASELINE_SHORT)} reference`
-      : `${signed(delta)} rubric points · ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}`;
-    const rankLabel = `${conditionById.get(entry.condition).short} rank #${ranks.get(entry.id)} of ${SETTING_COUNT}`;
+      : `${signed(delta)} rubric points${Number.isFinite(resourceDelta) ? ` · ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}` : ''}`;
+    const rankLabel = `${conditionById.get(entry.condition).short} rank #${ranks.get(entry.id)} of ${RANKED_SETTING_COUNT}`;
     return `
       <span class="efficiency-plane__annotation-meta">
         ${conditionMarkup(entry.condition, true)}
@@ -1726,7 +1824,7 @@ function buildWritingCategoryCollection(collection) {
       </span>
       <strong>${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</strong>
       <span class="efficiency-plane__annotation-values">
-        <b>${formatScore(scoreFor(entry, field))}</b>
+        <b>${formatEntryScore(entry, field)}</b>
         <i aria-hidden="true">×</i>
         <b>${escapeHtml(metric.format(entry[state.metric]))}</b>
       </span>
@@ -1743,11 +1841,13 @@ function buildWritingCategoryCollection(collection) {
     const scoreDelta = isWorkSpec || isOverall || isWriting ? entry.delta : Math.round((score - baselineScore) * 10) / 10;
     const resourceDelta = resourceDeltaPercent(entry, metricKey);
     const comparisonScore = plotScoreFor(entry, field);
-    const bestScore = Math.max(...data.entries.map((candidate) => plotScoreFor(candidate, field)));
+    const bestScore = Math.max(...data.entries.filter(candidate => candidate.eligibleForRank !== false).map((candidate) => plotScoreFor(candidate, field)));
     const highestScore = isOverall ? comparisonScore === bestScore : Math.abs(score - bestScore) < 0.05;
     const isFrontier = frontierIds.has(entry.id);
-    const dominators = data.entries.filter((candidate) => (
+    const dominators = data.entries.filter((candidate) => (candidate.eligibleForRank !== false &&
       candidate.id !== entry.id &&
+      Number.isFinite(plotScoreFor(candidate, field)) &&
+      Number.isFinite(candidate[metricKey]) && candidate[metricKey] > 0 &&
       plotScoreFor(candidate, field) >= comparisonScore &&
       candidate[metricKey] <= entry[metricKey] &&
       (plotScoreFor(candidate, field) > comparisonScore || candidate[metricKey] < entry[metricKey])
@@ -1767,7 +1867,7 @@ function buildWritingCategoryCollection(collection) {
 
     const treatmentSentence = entry.condition === BASELINE_CONDITION_ID
       ? `${escapeHtml(BASELINE_LABEL)} is the matched reference for this model setting.`
-      : `${escapeHtml(TREATMENT_LABEL)} changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()} versus ${escapeHtml(BASELINE_LABEL)}.`;
+      : `${escapeHtml(TREATMENT_LABEL)} changes the ${SCORE_EDITION_LABEL} score by ${signed(scoreDelta)} points${Number.isFinite(resourceDelta) ? ` for ${resourceDelta > 0 ? '+' : resourceDelta < 0 ? '−' : '±'}${Math.abs(resourceDelta)}% ${metric.label.toLowerCase()}` : ''} versus ${escapeHtml(BASELINE_LABEL)}.`;
 
     let tradeoffSentence = `No result has both a higher ${SCORE_EDITION_LABEL} score and lower resource use.`;
     if (!isFrontier) {
@@ -1792,7 +1892,7 @@ function buildWritingCategoryCollection(collection) {
     };
   };
 
-  const efficiencyTrajectoryMarkup = (entry, field, metricKey, ranks, frontierIds) => matchedEntries(entry).map((candidate, index) => {
+  const efficiencyTrajectoryMarkup = (entry, field, metricKey, ranks, frontierIds) => matchedEntries(entry).filter(candidate => Number.isFinite(scoreFor(candidate, field)) && Number.isFinite(candidate[metricKey]) && candidate[metricKey] >= 0).map((candidate, index) => {
     const selected = candidate.id === entry.id;
     const condition = conditionById.get(candidate.condition);
     return `
@@ -1801,11 +1901,11 @@ function buildWritingCategoryCollection(collection) {
         type="button"
         data-entry-id="${escapeHtml(candidate.id)}"
         aria-pressed="${selected}"
-        aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(candidate, field))} of ${SCORE_MAXIMUM}, ${metricConfig[metricKey].spoken(candidate[metricKey])}, ${escapeHtml(condition.label)} rank ${ranks.get(candidate.id)} of ${SETTING_COUNT}${frontierIds.has(candidate.id) ? ', on the efficient frontier' : ''}"
+        aria-label="Select matched ${escapeHtml(condition.label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(candidate, field))} of ${SCORE_MAXIMUM}, ${metricConfig[metricKey].spoken(candidate[metricKey])}, ${escapeHtml(condition.label)} rank ${ranks.get(candidate.id)} of ${RANKED_SETTING_COUNT}${frontierIds.has(candidate.id) ? ', on the efficient frontier' : ''}"
       >
         <span class="efficiency-summary__step">${String(index + 1).padStart(2, '0')}</span>
         ${conditionMarkup(candidate.condition, true)}
-        <strong>${formatScore(scoreFor(candidate, field))}</strong>
+        <strong>${formatEntryScore(candidate, field)}</strong>
         <span class="efficiency-summary__resource">${escapeHtml(metricConfig[metricKey].format(candidate[metricKey]))}</span>
         <small>#${String(ranks.get(candidate.id)).padStart(2, '0')}${frontierIds.has(candidate.id) ? ' · frontier' : ''}</small>
       </button>
@@ -1842,7 +1942,7 @@ function buildWritingCategoryCollection(collection) {
         style="left:${x.toFixed(3)}%;top:${y.toFixed(3)}%"
         tabindex="${isSelected ? '0' : '-1'}"
         aria-pressed="${isSelected}"
-        aria-label="Select ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, ${escapeHtml(conditionById.get(entry.condition).label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(entry, field))} of ${SCORE_MAXIMUM}, condition rank ${ranks.get(entry.id)} of ${SETTING_COUNT}, ${metric.spoken(entry[state.metric])}${isFrontier ? ', on the efficient frontier' : ''}"
+        aria-label="Select ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, ${escapeHtml(conditionById.get(entry.condition).label)}, ${fieldConfig[field].label} ${SCORE_EDITION_LABEL} score ${formatScore(scoreFor(entry, field))} of ${SCORE_MAXIMUM}, condition rank ${ranks.get(entry.id)} of ${RANKED_SETTING_COUNT}, ${metric.spoken(entry[state.metric])}${isFrontier ? ', on the efficient frontier' : ''}"
       ></button>
     `;
   };
@@ -1851,7 +1951,7 @@ function buildWritingCategoryCollection(collection) {
     const metric = metricConfig[state.metric];
     const field = state.capabilityCategory;
     const current = plotCoordinates(entry, field, state.metric);
-    const trajectory = matchedEntries(entry).filter(candidate => Number.isFinite(scoreFor(candidate, field)));
+    const trajectory = matchedEntries(entry).filter(candidate => Number.isFinite(scoreFor(candidate, field)) && Number.isFinite(candidate[state.metric]) && candidate[state.metric] > 0);
     const trajectoryPoints = trajectory.map((candidate) => {
       const { x, y } = plotCoordinates(candidate, field, state.metric);
       return `${x.toFixed(3)},${y.toFixed(3)}`;
@@ -1910,7 +2010,7 @@ function buildWritingCategoryCollection(collection) {
             aria-hidden="true"
           >Efficient frontier</span>
           <div class="efficiency-plane__points" role="group" aria-label="${ENTRY_COUNT} model, reasoning, and condition results">
-            ${data.entries.filter(candidate => Number.isFinite(scoreFor(candidate, field)) && (!isWriting || (Number.isFinite(candidate[state.metric]) && candidate[state.metric] > 0))).map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
+            ${data.entries.filter(candidate => candidate.eligibleForRank !== false && Number.isFinite(scoreFor(candidate, field)) && (!isWriting || (Number.isFinite(candidate[state.metric]) && candidate[state.metric] > 0))).map((candidate) => plotPointMarkup(candidate, entry, ranks, decision.frontierIds)).join('')}
           </div>
           <div class="efficiency-plane__pointer-layer" aria-hidden="true"></div>
           <div
@@ -1931,10 +2031,11 @@ function buildWritingCategoryCollection(collection) {
   };
 
   const efficientFrontier = (field, metric) => data.entries
-    .filter((entry) => Number.isFinite(scoreFor(entry, field)))
-    .filter((entry) => Number.isFinite(Number(entry[metric])) && Number(entry[metric]) > 0)
+    .filter((entry) => entry.eligibleForRank !== false && Number.isFinite(scoreFor(entry, field)))
+    .filter((entry) => Number.isFinite(entry[metric]) && entry[metric] > 0)
     .filter((entry) => !data.entries.some((other) => (
-      Number.isFinite(plotScoreFor(other, field)) &&
+      other.eligibleForRank !== false && Number.isFinite(plotScoreFor(other, field)) &&
+      Number.isFinite(other[metric]) && other[metric] > 0 &&
       plotScoreFor(other, field) >= plotScoreFor(entry, field) &&
       other[metric] <= entry[metric] &&
       (plotScoreFor(other, field) > plotScoreFor(entry, field) || other[metric] < entry[metric])
@@ -1969,8 +2070,9 @@ function buildWritingCategoryCollection(collection) {
     `).join('');
     entrySelect.value = entry.id;
     resourceAxis.value = state.metric;
-    if (!Number.isFinite(scoreFor(entry, field)) || (isWriting && !(Number.isFinite(entry[state.metric]) && entry[state.metric] > 0))) {
-      efficiencyView.innerHTML = `<section class="efficiency-story"><h4>Efficiency is not assessable for this result</h4><p>The selected condition needs a comparable panel total and recorded resource use. Choose an assessable result above, or inspect this run’s available judgments in its <a href="${escapeHtml(data.benchmarkSummaries[0].detailHref)}">benchmark report</a>.</p>${writingSelectionMarkup()}</section>`;
+    if (!Number.isFinite(scoreFor(entry, field)) || (isWriting && (!entry.eligibleForRank || !(Number.isFinite(entry[state.metric]) && entry[state.metric] > 0)))) {
+      const report = isWriting ? benchmarkSummaryById.get(data.writingCategory.activeBenchmarkIds[0]) : data.benchmarkSummaries[0];
+      efficiencyView.innerHTML = `<section class="efficiency-story"><h4>Recorded results</h4><p><a href="${escapeHtml(report.detailHref)}">Read the benchmark report</a> for this comparison's answers, reviews, and recorded resources.</p>${writingSelectionMarkup()}</section>`;
       return;
     }
     const frontier = efficientFrontier(field, state.metric);
@@ -1991,7 +2093,7 @@ function buildWritingCategoryCollection(collection) {
           <header class="efficiency-field__heading">
             <div>
               <p class="ui-eyebrow">${SCORE_EDITION_LABEL} score × ${escapeHtml(metric.label)} · ${ENTRY_COUNT} matched results</p>
-              <h4 id="efficiency-field-title">${escapeHtml(fieldConfig[field].label)}: ${escapeHtml(decision.finding)} <strong>${formatScore(scoreFor(entry, field))}</strong> at <strong>${escapeHtml(metric.format(entry[state.metric]))}</strong></h4>
+              <h4 id="efficiency-field-title">${escapeHtml(fieldConfig[field].label)}: ${escapeHtml(decision.finding)} <strong>${formatEntryScore(entry, field)}</strong> at <strong>${escapeHtml(metric.format(entry[state.metric]))}</strong></h4>
               <p>${escapeHtml(decision.treatmentSentence)} ${decision.tradeoffSentence}</p>
             </div>
             <div class="efficiency-legend" aria-label="Chart legend">
@@ -2014,7 +2116,7 @@ function buildWritingCategoryCollection(collection) {
             </div>
             <span class="efficiency-summary__score">
               <small>${escapeHtml(conditionById.get(entry.condition).short)} rank #${ranking.ranks.get(entry.id)}</small>
-              <strong>${formatScore(scoreFor(entry, field))}</strong>
+              <strong>${formatEntryScore(entry, field)}</strong>
               <small>${escapeHtml(fieldConfig[field].short)}</small>
             </span>
           </header>
@@ -2022,11 +2124,11 @@ function buildWritingCategoryCollection(collection) {
             ${efficiencyTrajectoryMarkup(entry, field, state.metric, ranking.ranks, decision.frontierIds)}
           </div>
           <dl class="efficiency-summary__resources">
-            ${Object.entries(metricConfig).map(([key, resourceMetric]) => `
+            ${Object.entries(metricConfig).filter(([key]) => Number.isFinite(entry[key]) && entry[key] >= 0).map(([key, resourceMetric]) => `
               <div class="${state.metric === key ? 'is-axis' : ''}">
                 <dt>${escapeHtml(resourceMetric.label)}</dt>
                 <dd>${escapeHtml(resourceMetric.format(entry[key]))}</dd>
-                <span>${escapeHtml(resourceComparison(entry, key))}</span>
+                ${resourceComparison(entry, key) ? `<span>${escapeHtml(resourceComparison(entry, key))}</span>` : ''}
               </div>
             `).join('')}
           </dl>
@@ -2043,7 +2145,7 @@ function buildWritingCategoryCollection(collection) {
                 ${conditionMarkup(comparison.condition, true)}
               </span>
               <span class="efficiency-summary__alternative-values">
-                <b>${formatScore(scoreFor(comparison, field))}</b><small>rubric /${SCORE_MAXIMUM}</small>
+                <b>${formatEntryScore(comparison, field)}</b><small>rubric /${SCORE_MAXIMUM}</small>
                 <b>${escapeHtml(metric.format(comparison[state.metric]))}</b><small>${escapeHtml(metric.label)}</small>
               </span>
               <span>${comparisonSaving > 0 ? `Save ${comparisonSaving}% for ${comparisonQualityDifference.toFixed(1)} points less` : `Gain ${Math.abs(comparisonQualityDifference).toFixed(1)} points for no more ${escapeHtml(metric.label.toLowerCase())}`}</span>
@@ -2083,7 +2185,7 @@ function buildWritingCategoryCollection(collection) {
                   <small>${escapeHtml(candidate.reasoning)} · ${escapeHtml(conditionById.get(candidate.condition).short)}</small>
                 </span>
                 <span class="frontier-row__condition">${conditionMarkup(candidate.condition, true)}</span>
-                <strong class="frontier-row__score">${formatScore(scoreFor(candidate, field))}</strong>
+                <strong class="frontier-row__score">${formatEntryScore(candidate, field)}</strong>
                 <strong class="frontier-row__resource">${escapeHtml(metric.format(candidate[state.metric]))}</strong>
               </button>
             `;
@@ -2135,7 +2237,7 @@ function buildWritingCategoryCollection(collection) {
     const canvas = layer.closest('.efficiency-plane__canvas');
     const points = canvas.querySelector('.efficiency-plane__points');
     const bounds = points.getBoundingClientRect();
-    return data.entries.filter(entry => !isWriting || (Number.isFinite(scoreFor(entry, state.capabilityCategory)) && Number.isFinite(entry[state.metric]) && entry[state.metric] > 0)).reduce((best, entry) => {
+    return data.entries.filter(entry => !isWriting || (entry.eligibleForRank && Number.isFinite(scoreFor(entry, state.capabilityCategory)) && Number.isFinite(entry[state.metric]) && entry[state.metric] > 0)).reduce((best, entry) => {
       const x = bounds.left + (resourcePosition(entry[state.metric]) / 100) * bounds.width;
       const y = bounds.top + ((100 - normalizedQuality(plotScoreFor(entry, state.capabilityCategory))) / 100) * bounds.height;
       const distance = Math.hypot(event.clientX - x, event.clientY - y);
@@ -2517,6 +2619,10 @@ function buildWritingCategoryCollection(collection) {
   });
 
   document.addEventListener('change', (event) => {
+    if (isWriting && event.target.matches('#writing-score-selection')) {
+      if (data.writingCategory.selections.some(selection => selection.id === event.target.value)) window.location.assign(writingScoreHref(event.target.value));
+      return;
+    }
     if (event.target.matches('[data-game-efficiency-entry]')) {
       const id = event.target.dataset.gameReportId;
       const report = gameBenchmarks.find(item => item.benchmark.id === id);
@@ -2576,7 +2682,7 @@ function buildWritingCategoryCollection(collection) {
     document.querySelector('.benchmark-mast__scope').innerHTML = `Games <span aria-hidden="true">·</span> ${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${gameRuns.length} outputs <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Games v1 pilot</span>`;
     document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Games · Exploratory pilot</span><span>${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'} · ${gameRuns.length} outputs</span>`;
   } else if (isWriting) {
-    document.querySelector('.benchmark-mast__scope').innerHTML = `Writing <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} ${BENCHMARK_COUNT === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${SETTING_COUNT} model settings <span aria-hidden="true">·</span> ${data.coverage.responseCount} published responses <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Development index</span>`;
+    document.querySelector('.benchmark-mast__scope').innerHTML = `Writing <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} ${BENCHMARK_COUNT === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${SETTING_COUNT} model settings <span aria-hidden="true">·</span> ${data.coverage.responseCount} published responses <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Development comparison</span>`;
     document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Writing · Excluded from Overall</span><span>${BENCHMARK_COUNT} benchmarks · ${SETTING_COUNT} settings · ${data.coverage.responseCount} recorded outputs</span>`;
   } else if (isOverall) {
     document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Overall · Uncalibrated development</span><span>${BENCHMARK_COUNT} benchmarks · ${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered · ${SETTING_COUNT}/${data.coverage.totalSettings} complete settings</span>`;
@@ -2586,7 +2692,12 @@ function buildWritingCategoryCollection(collection) {
 
   renderDynamic();
   const initialHash = capabilityHash();
-  if (window.location.hash !== initialHash) {
+  if (isWriting) {
+    const canonicalUrl = new URL(window.location.href);
+    canonicalUrl.searchParams.set('score', data.writingCategory.selection.id);
+    canonicalUrl.hash = initialHash;
+    if (canonicalUrl.href !== window.location.href) window.history.replaceState(window.history.state, '', canonicalUrl.href);
+  } else if (window.location.hash !== initialHash) {
     window.history.replaceState(null, '', initialHash);
   }
   if (isWriting && state.capabilityMode === 'benchmarks' && requestedWritingBenchmark && benchmarkById.has(requestedWritingBenchmark)) {

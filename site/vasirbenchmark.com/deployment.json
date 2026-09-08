@@ -95,12 +95,26 @@
       "contentType": "text/javascript; charset=utf-8",
       "cacheClass": "immutable",
       "kind": "response-archive"
+    },
+    {
+      "path": "writing-twists-responses.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable",
+      "kind": "response-archive"
+    },
+    {
+      "path": "writing-dungeon-master-responses.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable",
+      "kind": "response-archive"
     }
   ],
   "limits": {
     "maxFileBytes": 2097152,
     "maxResponseFileBytes": 8388608,
-    "maxArtifactBytes": 25165824,
+    "maxWritingDataFileBytes": 8388608,
+    "maxDungeonMasterResponseFileBytes": 33554432,
+    "maxArtifactBytes": 67108864,
     "maxCompressedLandingBytes": 300000,
     "maxPhysicalStorageBytes": 1073741824,
     "releaseRetentionDays": 30,

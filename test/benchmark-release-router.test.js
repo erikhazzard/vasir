@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import test from "node:test";
+import { validateBenchmarkReleaseRouter } from '../cli/benchmark-publication-artifact.js';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const site = path.join(repo, "site/vasirbenchmark.com");
@@ -18,11 +19,18 @@ vm.runInContext(source.replaceAll("${ActiveReleaseId}", releaseId), context);
 const route = uri => context.handler({ request: { uri } });
 
 test("production release router serves every declared public file, including lazy Writing evidence", () => {
-  assert.equal(config.publicFiles.length, 16);
+  assert.equal(config.publicFiles.length, 18);
   for (const file of config.publicFiles) {
     const uri = `/releases/${releaseId}/${file.path}`;
     assert.equal(route(uri).uri, uri, `The CDN would reject ${file.path}`);
   }
+});
+
+test('artifact preflight rejects an obsolete CDN archive allowlist before publication', () => {
+  assert.doesNotThrow(() => validateBenchmarkReleaseRouter({ templateSource: template, publicFiles: config.publicFiles }));
+  const oldRouter = template.replace('|twists-responses|dungeon-master-responses', '');
+  assert.notEqual(oldRouter, template);
+  assert.throws(() => validateBenchmarkReleaseRouter({ templateSource: oldRouter, publicFiles: config.publicFiles }), /CDN rejects declared public file/);
 });
 
 test("stable HTML entrypoints route to the active immutable release", () => {
@@ -33,7 +41,7 @@ test("stable HTML entrypoints route to the active immutable release", () => {
 
 test("production release router rejects unlisted files, apex script aliases, and traversal", () => {
   for (const uri of [
-    "/writing-data.js", "/writing-responses.js", "/writing-creation-responses.js", "/app.js",
+    "/writing-data.js", "/writing-responses.js", "/writing-creation-responses.js", "/writing-twists-responses.js", "/writing-dungeon-master-responses.js", "/app.js",
     `/releases/${releaseId}/writing-private.js`, `/releases/${releaseId}/run.json`,
     `/releases/${releaseId}/../data.js`, `/releases/${releaseId}/%2e%2e/data.js`,
     `/releases/${releaseId}/writing-data.js/extra`, `/releases/${releaseId}/writing-data.js.map`,

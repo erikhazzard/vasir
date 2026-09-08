@@ -1,0 +1,64 @@
+{
+  "stage": "before",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "2649",
+        "Connection": "close",
+        "Date": "Tue, 08 Sep 2026 03:07:43 GMT",
+        "Last-Modified": "Tue, 08 Sep 2026 02:51:14 GMT",
+        "ETag": "\"d0e70250216081b1a30330fdbc958f6e\"",
+        "x-amz-server-side-encryption": "AES256",
+        "Cache-Control": "public, max-age=0, s-maxage=31536000, must-revalidate",
+        "x-amz-version-id": "tNAkx4lvERYvw2sW6cCRi5anNIoi.ODH",
+        "x-amz-meta-release-id": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+        "Accept-Ranges": "bytes",
+        "Server": "AmazonS3",
+        "X-Cache": "Miss from cloudfront",
+        "Via": "1.1 b4011ac432e4f034161d5cccc8a4ac80.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Pop": "IAD61-P10",
+        "Alt-Svc": "h3=\":443\"; ma=86400",
+        "X-Amz-Cf-Id": "CnY7ubrl2brrdUWgKQm4z_vpkuzCZfaadhiZ6-HnLO6dhaSmh9aVww==",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "no-referrer",
+        "Content-Security-Policy": "default-src 'none'; base-uri 'none'; connect-src 'none'; font-src 'self'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data: https://d7us0tudou7ya.cloudfront.net; object-src 'none'; script-src 'self'; frame-src https://d7us0tudou7ya.cloudfront.net; media-src https://d7us0tudou7ya.cloudfront.net; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests",
+        "X-Content-Type-Options": "nosniff",
+        "Strict-Transport-Security": "max-age=31536000",
+        "Permissions-Policy": "accelerometer=(), autoplay=(self \"https://d7us0tudou7ya.cloudfront.net\"), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self \"https://d7us0tudou7ya.cloudfront.net\"), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), screen-wake-lock=(), usb=()"
+      }
+    },
+    {
+      "path": "benchmark-report.html",
+      "sha256": "eda467ff1129b08ac4c82dfc97d7795c22d7952b6182b2697125c8e3084458b6",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "2480",
+        "Connection": "close",
+        "Date": "Tue, 08 Sep 2026 03:07:43 GMT",
+        "Last-Modified": "Tue, 08 Sep 2026 02:51:05 GMT",
+        "ETag": "\"22fd977bda6fce6d27f3a9d245a229d6\"",
+        "x-amz-server-side-encryption": "AES256",
+        "Cache-Control": "public, max-age=0, s-maxage=31536000, must-revalidate",
+        "x-amz-version-id": "QbZ6qoOfbKorubaPWKc1sXbM6GwTZIEa",
+        "x-amz-meta-release-id": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+        "Accept-Ranges": "bytes",
+        "Server": "AmazonS3",
+        "X-Cache": "Miss from cloudfront",
+        "Via": "1.1 a71dc86d67780d7478c72e1b147b8a32.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Pop": "IAD61-P10",
+        "Alt-Svc": "h3=\":443\"; ma=86400",
+        "X-Amz-Cf-Id": "wLaGbm6Mhn5zeemVHsETdMDopCjFGxIFL9Ta3JA2AaIhpkYWG9VJuw==",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "no-referrer",
+        "Content-Security-Policy": "default-src 'none'; base-uri 'none'; connect-src 'none'; font-src 'self'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data: https://d7us0tudou7ya.cloudfront.net; object-src 'none'; script-src 'self'; frame-src https://d7us0tudou7ya.cloudfront.net; media-src https://d7us0tudou7ya.cloudfront.net; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests",
+        "X-Content-Type-Options": "nosniff",
+        "Strict-Transport-Security": "max-age=31536000",
+        "Permissions-Policy": "accelerometer=(), autoplay=(self \"https://d7us0tudou7ya.cloudfront.net\"), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self \"https://d7us0tudou7ya.cloudfront.net\"), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), screen-wake-lock=(), usb=()"
+      }
+    }
+  ],
+  "at": "2026-09-08T03:07:42.849861+00:00"
+}

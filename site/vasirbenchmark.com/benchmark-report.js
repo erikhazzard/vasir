@@ -16,7 +16,13 @@
     if (writingArchive) {
       const archiveUrl = new URL(writingArchive.href, runtimeBase);
       const releaseDirectory = new URL('./', runtimeBase);
-      if (writingArchiveGlobal !== 'VASIR_WRITING_CREATION_RESPONSES' || archiveUrl.origin !== releaseDirectory.origin || !archiveUrl.pathname.startsWith(releaseDirectory.pathname)) throw new Error('Invalid release archive descriptor.');
+      const expectedArchives = {
+        'storytelling-magic-discovery': ['VASIR_WRITING_CREATION_RESPONSES', 'writing-creation-responses.js'],
+        'storytelling-plot-twists': ['VASIR_WRITING_TWISTS_RESPONSES', 'writing-twists-responses.js'],
+        'dungeon-master-adventure-outline': ['VASIR_WRITING_DUNGEON_MASTER_RESPONSES', 'writing-dungeon-master-responses.js']
+      };
+      const expectedArchive = expectedArchives[initialBenchmarkId];
+      if (!expectedArchive || writingArchiveGlobal !== expectedArchive[0] || archiveUrl.href !== new URL(expectedArchive[1], releaseDirectory).href) throw new Error('Invalid release archive descriptor.');
     }
     await Promise.all((isWriting
       ? [['VASIR_WRITING', './writing-data.js'], [writingArchiveGlobal, writingArchive?.href || './writing-responses.js']]
@@ -275,11 +281,11 @@
   const UNCERTAINTY_REASON = typeof scoreBasis.uncertainty?.reason === 'string' && scoreBasis.uncertainty.reason.trim()
     ? scoreBasis.uncertainty.reason.trim()
     : 'Only one trial per task and condition is published.';
-  const taskCoverageLabel = isWriting && data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.cases.length} matched pairs` : `${isWriting ? data.cases.length : TASK_COUNT} ${isWriting ? writingCasePlural : TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
+  const taskCoverageLabel = isWriting && data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.coverage.expectedPairs} matched pairs` : `${isWriting ? data.cases.length : TASK_COUNT} ${isWriting ? writingCasePlural : TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
   const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isWriting ? ' · Uncalibrated development' : ''}`;
   const writingInProgress = isWriting && (typeof data.coverage.executionComplete === 'boolean' ? !data.coverage.executionComplete : data.coverage.judgmentCount < data.coverage.expectedJudgmentCount || data.coverage.completedSettingCount < data.coverage.settingCount);
   const writingFinalExclusions = isWriting && data.coverage.executionStatus === 'complete-with-exclusions';
-  const writingProgressStatus = writingFinalExclusions ? isCreation ? 'FINAL SNAPSHOT · INCOMPLETE PANELS RETAINED' : `FINAL SNAPSHOT · ${data.coverage.terminallyExcludedPairCount} EXCLUDED ${data.coverage.terminallyExcludedPairCount === 1 ? 'PAIR' : 'PAIRS'}` : writingInProgress ? 'IN PROGRESS' : 'COMPLETE SNAPSHOT';
+  const writingProgressStatus = writingFinalExclusions ? isCreation ? 'FINAL SNAPSHOT · INCOMPLETE PANELS RETAINED' : `FINAL SNAPSHOT · ${data.coverage.terminallyExcludedPairCount} EXCLUDED ${data.coverage.terminallyExcludedPairCount === 1 ? 'PAIR' : 'PAIRS'}` : writingInProgress ? 'INCOMPLETE SNAPSHOT' : 'COMPLETE SNAPSHOT';
   const usesConsensusScoring = scoreBasis.aggregation === 'unanimity-gates-mean-dimensions-v1';
   const panelMethod = isWriting ? data.scoreBasis.panelMethod || 'Each answer is scored on the published rubric. Inspect the independent ratings and reasons below.' : isWorkSpec
     ? 'Each judge rates value (25%), grounding (15%), acceptance (20%), delivery (15%), scope (15%), and coherence (10%) from 0 to 4. Their weighted totals are averaged only when both assessments and all dimensions are assessable. Readiness is a separate verdict; judge disagreement remains unresolved.'
@@ -434,12 +440,12 @@
 
   const writingCohortsMarkup = () => {
     if (!isWriting || !data.cohortSummaries) return '';
-    const labels = { primary: 'Primary prompt · headline result', transfer: 'Secondary prompts · all', fantasyTransfer: 'Secondary · fantasy', otherGenreTransfer: 'Secondary · other genres' };
+    const labels = { primary: 'Primary prompt · available pairs', transfer: 'Secondary prompts · all', fantasyTransfer: 'Secondary · fantasy', otherGenreTransfer: 'Secondary · other genres' };
     const primaryPrompt = data.cases.find(story => story.cohort === 'primary')?.prompt || '';
-    return `<section class="writing-cohorts" data-writing-cohorts aria-labelledby="writing-cohorts-title"><h3 id="writing-cohorts-title">Primary and secondary results</h3><p data-primary-question>${escapeHTML(primaryPrompt)}</p><p data-writing-design>${data.coverage.promptCount} distinct prompts · ${data.cases.length} matched pairs. The primary prompt has ${data.cohortSummaries.primary.expectedPairs} repetitions; each of ${data.cohortSummaries.transfer.sourcePromptCount} secondary prompts has ${data.cohortSummaries.transfer.expectedPairs / data.cohortSummaries.transfer.sourcePromptCount} repetitions.</p><p>The headline uses the primary prompt only. Each mean uses complete paired repetitions, with equal weight per available source prompt. The two secondary subgroups partition the secondary results.</p><div class="writing-cohorts__table" role="region" aria-label="Primary and secondary score comparison" tabindex="0"><table><thead><tr><th scope="col">Prompt group</th><th scope="col">${escapeHTML(BASELINE_LABEL)} /100</th><th scope="col">${escapeHTML(TREATMENT_LABEL)} /100</th><th scope="col">Paired difference</th><th scope="col">Complete pairs</th></tr></thead><tbody>${Object.entries(labels).filter(([id]) => data.cohortSummaries[id]).map(([id, label]) => {
+    return `<section class="writing-cohorts" data-writing-cohorts aria-labelledby="writing-cohorts-title"><h3 id="writing-cohorts-title">Primary and secondary results</h3><p data-primary-question>${escapeHTML(primaryPrompt)}</p><p data-writing-design>${data.coverage.promptCount} distinct prompts · ${data.cases.length} matched pairs per model · ${SETTING_COUNT} model settings. The primary prompt has ${data.cases.filter(story => story.cohort === 'primary').length} repetitions; each of ${data.cohortSummaries.transfer.sourcePromptCount} secondary prompts has ${data.cases.filter(story => story.cohort === 'transfer').length / data.cohortSummaries.transfer.sourcePromptCount} repetitions.</p><p>The headline uses the primary prompt only. Each mean uses complete paired repetitions, with equal weight per available source prompt. The two secondary subgroups partition the secondary results.</p><div class="writing-cohorts__table" role="region" aria-label="Primary and secondary score comparison" tabindex="0"><table><thead><tr><th scope="col">Prompt group</th><th scope="col">${escapeHTML(BASELINE_LABEL)} /100</th><th scope="col">${escapeHTML(TREATMENT_LABEL)} /100</th><th scope="col">Paired difference</th><th scope="col">Complete pairs</th></tr></thead><tbody>${Object.entries(labels).filter(([id]) => data.cohortSummaries[id]).map(([id, label]) => {
       const cohort = data.cohortSummaries[id];
       return `<tr data-writing-cohort="${id}"><th scope="row">${escapeHTML(label)}</th><td data-cohort-baseline>${formatScore(cohort.baseline)}</td><td data-cohort-treatment>${formatScore(cohort.treatment)}</td><td data-cohort-delta>${signed(cohort.delta)}</td><td data-cohort-coverage>${cohort.usablePairs}/${cohort.expectedPairs}${cohort.complete ? '' : ' · incomplete'}</td></tr>`;
-    }).join('')}</tbody></table></div>${data.adherenceCoverage ? `<p data-writing-adherence>Reference-read proof: ${data.adherenceCoverage.verifiedTreatmentAnswers}/${data.adherenceCoverage.returnedTreatmentAnswers} returned treatment answers have complete recorded proof; ${data.adherenceCoverage.observedChunkCount}/${data.adherenceCoverage.requiredChunkCount} required chunks have recorded byte evidence. Answers with incomplete proof remain in the invocation comparison. Missing proof does not establish refusal.</p>` : ''}<p>Repetitions are the writing samples; judge votes are repeated assessments of those samples. These results describe this prompt set and model setting.</p></section>`;
+    }).join('')}</tbody></table></div>${data.adherenceCoverage ? `<p data-writing-adherence>Reference-read proof: ${data.adherenceCoverage.verifiedTreatmentAnswers}/${data.adherenceCoverage.returnedTreatmentAnswers} returned treatment answers have complete recorded proof; ${data.adherenceCoverage.observedChunkCount}/${data.adherenceCoverage.requiredChunkCount} required chunks have recorded byte evidence. Answers with incomplete proof remain in the invocation comparison. Missing proof does not establish refusal.</p>` : ''}<p>Repetitions are the writing samples; judge votes are repeated assessments of those samples. These results describe this prompt set and the declared model settings.</p></section>`;
   };
 
   const writingProgressMarkup = () => {
@@ -451,7 +457,7 @@
       : `${coverage.validResponseCount} valid final answers; ${coverage.terminalGenerationFailureCount} failed full-read verifications are retained. ${coverage.judgmentCount} completed judge reviews and ${coverage.terminallyExcludedJudgmentCount} terminally excluded reviews account for all ${coverage.expectedJudgmentCount} planned reviews. No judge reviews are pending. ` : '';
     return `<aside class="writing-progress" data-writing-progress aria-label="Writing benchmark progress">
       <div class="writing-progress__heading"><strong class="writing-progress__status" data-writing-progress-status>${escapeHTML(writingProgressStatus)}</strong><a class="writing-progress__link" data-writing-browse-answers href="#ranking" data-report-section="ranking">Browse answers &amp; reviews ↓</a></div>
-      <p class="writing-progress__counts"><span data-writing-progress-count="answers">${coverage.responseCount}/${coverage.expectedResponseCount} final answers</span><span data-writing-progress-count="reviews">${coverage.judgmentCount}/${coverage.expectedJudgmentCount} ${data.cohortSummaries ? 'planned answer assessments' : 'planned judge reviews'}</span>${data.cohortSummaries ? `<span data-writing-progress-count="pair-reviews">${data.pairwisePreferences.length}/${data.cases.length * JUDGE_COUNT} blind pair reviews</span>` : ''}<span data-writing-progress-count="panels">${coverage.scoredResponseCount}/${coverage.expectedResponseCount} complete ${JUDGE_COUNT}-judge answer panels</span></p>
+      <p class="writing-progress__counts"><span data-writing-progress-count="answers">${coverage.responseCount}/${coverage.expectedResponseCount} final answers</span><span data-writing-progress-count="reviews">${coverage.judgmentCount}/${coverage.expectedJudgmentCount} ${data.cohortSummaries ? 'planned answer assessments' : 'planned judge reviews'}</span>${data.cohortSummaries ? `<span data-writing-progress-count="pair-reviews">${data.pairwisePreferences.length}/${data.coverage.expectedPairs * JUDGE_COUNT} blind pair reviews</span>` : ''}<span data-writing-progress-count="panels">${coverage.scoredResponseCount}/${coverage.expectedResponseCount} complete ${JUDGE_COUNT}-judge answer panels</span></p>
       <p data-writing-progress-disclosure>${exclusionDisclosure}${writingInProgress ? 'Judging incomplete; available answers and reviews are published. ' : ''}Case scores require the full judge panel. Incomplete configurations are not ranked.${failures && !writingFinalExclusions ? ` ${failures} failed generations are retained; planned totals include unavailable slots.` : ''}</p>
     </aside>`;
   };
@@ -588,7 +594,7 @@
 
   const writingRequiredReadsMarkup = receipt => !receipt ? '' : `<section data-required-skill-reads>
     <h4>Required frozen-file read verification</h4>
-    <p>Saved verification status: <strong data-required-read-status>${escapeHTML(receipt.status)}</strong>. Only successful command output matching every required frozen chunk establishes a complete read.</p>
+    <p>Saved verification status: <strong data-required-read-status>${escapeHTML(receipt.status)}</strong>. Only successful tool output matching every required frozen chunk establishes a complete read.</p>
     <dl class="writing-evidence-fields">${writingEvidenceFieldsMarkup(receipt, [['policyVersion', 'Verification policy'], ['evidence', 'Evidence method']], 'data-required-read-field')}</dl>
     ${(receipt.files || []).map(file => `<details class="work-spec-assessment" data-required-read-file="${escapeHTML(file.relativePath)}"><summary class="work-spec-assessment__summary">${escapeHTML(file.relativePath)} · ${file.observedChunks.length}/${file.requiredChunkCount} required chunks · ${file.complete ? 'complete' : 'incomplete'}</summary><div class="work-spec-assessment__body"><dl class="writing-evidence-fields">${writingEvidenceFieldsMarkup(file, [['bytes', 'Frozen file bytes'], ['sha256', 'Frozen file SHA-256'], ['requiredChunkCount', 'Required chunks']], 'data-required-read-file-field')}<div><dt>Verified chunks</dt><dd data-required-read-observed-count>${file.observedChunks.length}</dd></div></dl><h4>Recorded matching chunks</h4><dl class="writing-evidence-fields">${file.observedChunks.map(chunk => `<div data-required-read-chunk="${chunk.index}"><dt>Chunk ${chunk.index} · ${chunk.bytes} bytes</dt><dd><code>${escapeHTML(chunk.sha256)}</code></dd></div>`).join('')}</dl></div></details>`).join('')}
   </section>`;
@@ -610,7 +616,7 @@
         ${writingUsageMarkup(runtime.usage)}
         ${data.cohortSummaries ? writingInvocationReadProofMarkup(runtime.requiredSkillReads) : writingRequiredReadsMarkup(runtime.requiredSkillReads)}
         ${Array.isArray(runtime.referenceFilesRead) ? `<h4>Recorded reference-file reads</h4>${runtime.referenceFilesRead.length ? `<ul class="writing-reference-reads" data-reference-files-read>${runtime.referenceFilesRead.map(reference => {
-          const file = reference === 'SKILL.md' ? promptFileById.get('frozen-skill-root') : [...promptFileById.values()].find(file => file.title === reference || file.title?.startsWith(`${reference} · `));
+          const file = reference === 'SKILL.md' ? promptFileById.get(response.provenance?.completion?.instructionFileId || 'frozen-skill-root') : [...promptFileById.values()].find(file => file.title === reference || file.title?.startsWith(`${reference} · `));
           return `<li>${file ? `<button class="writing-prompt-reference" type="button" data-open-prompt-file="${escapeHTML(file.id)}" aria-label="Read archived ${escapeHTML(reference)}"><code data-reference-path>${escapeHTML(reference)}</code> <span aria-hidden="true">↗</span></button>` : `<code data-reference-path>${escapeHTML(reference)}</code>`}</li>`;
         }).join('')}</ul>` : '<p data-reference-files-read>No reference-file reads recorded.</p>'}` : ''}
       </div>
@@ -618,6 +624,28 @@
   };
 
   const writingJudgeResourcesMarkup = judgment => judgment.resources ? `<details class="work-spec-assessment writing-judge-resources" data-judge-resources><summary class="work-spec-assessment__summary">Shared judge-batch resources</summary><div class="work-spec-assessment__body"><p>These resources cover the entire matched-pair batch, not this answer alone. The same batch is recorded on both answers; count each judge and prompt SHA-256 once when totaling resources.</p><dl class="writing-evidence-fields">${writingEvidenceFieldsMarkup(judgment.resources, [['scope', 'Resource scope'], ['candidateCount', 'Candidates in batch'], ['durationMs', 'Batch duration (ms)']], 'data-judge-resource')}${writingEvidenceFieldsMarkup(judgment, [['promptSha256', 'Judge prompt SHA-256']], 'data-judge-resource')}</dl>${writingUsageMarkup(judgment.resources.usage)}</div></details>` : '';
+
+  const writingPredecessorArchiveMarkup = () => {
+    if (!isWriting || data.benchmarks[0]?.id !== 'storytelling-plot-twists') return '';
+    const predecessors = responseData.supersededResponses || [];
+    if (!predecessors.length) return '';
+    return `<details class="work-spec-assessment" data-writing-predecessor-archive>
+      <summary class="work-spec-assessment__summary">Earlier failed attempts · ${predecessors.length} retained, not scored</summary>
+      <div class="work-spec-assessment__body"><p>The completion edition keeps these original failed-read answers separately from the current trial answers. They remain unscored and do not count as additional trials. Their valid paired plain answers were not regenerated.</p>
+      ${predecessors.map(response => {
+        const label = settingById.get(response.settingId)?.label || response.configurationId;
+        return `<details class="work-spec-assessment" data-writing-predecessor="${escapeHTML(response.configurationId)}" data-predecessor-trial="${response.trialNumber}" data-predecessor-output-sha256="${escapeHTML(response.provenance.outputSha256)}">
+          <summary class="work-spec-assessment__summary">${escapeHTML(label)} · Trial ${response.trialNumber} · skill · not scored</summary>
+          <div class="work-spec-assessment__body"><p data-writing-predecessor-reason>${escapeHTML(response.failureReason || 'The required frozen-file reads were not fully verified.')}</p>
+            <dl class="writing-evidence-fields">${writingEvidenceFieldsMarkup(response.provenance, [['sourceSha256', 'Original source SHA-256'], ['outputSha256', 'Original answer SHA-256']], 'data-predecessor-provenance')}</dl>
+            ${writingExecutionMarkup(response)}
+            ${copyButtonMarkup(response.outputText, `Copy original failed attempt for ${label}, trial ${response.trialNumber}`)}
+            <pre class="model-run__text model-run__text--output" data-writing-predecessor-output><code>${escapeHTML(response.outputText)}</code></pre>
+          </div>
+        </details>`;
+      }).join('')}</div>
+    </details>`;
+  };
 
   const creationEvidenceMarkup = requestId => !isCreation || !creationRequestById.has(requestId) ? '' : `<details class="work-spec-assessment" data-creation-judge-evidence="${escapeHTML(requestId)}"><summary class="work-spec-assessment__summary">Original final review and exact judge prompt</summary><div class="work-spec-assessment__body" data-creation-evidence-body></div></details>`;
 
@@ -658,7 +686,7 @@
     if (!isWriting || !Array.isArray(data.pairwisePreferences)) return '';
     const preferences = data.pairwisePreferences.filter(preference => preference.caseId === activeCaseId);
     const label = condition => data.conditions.find(item => item.id === condition)?.label || condition;
-    return `<section class="report-section" data-writing-pairwise><h3>Direct pairwise preferences</h3><p>These preferences are separate from the rubric totals. Both anonymous candidates were visible while each judge scored them; the judges received opposite candidate orders.</p>${preferences.length ? preferences.map(preference => `<details class="work-spec-assessment" data-pairwise-review="${escapeHTML(preference.reviewerId)}"><summary class="work-spec-assessment__summary">${escapeHTML(preference.reviewerId)} · ${preference.winner === 'tie' ? 'Tie' : escapeHTML(label(preference.winner))} · ${escapeHTML(preference.confidence)} confidence</summary><div class="work-spec-assessment__body">${preference.candidateACondition && preference.candidateBCondition ? `<p data-candidate-order>A: ${escapeHTML(label(preference.candidateACondition))} · B: ${escapeHTML(label(preference.candidateBCondition))}</p>` : ''}<p data-preference-reason>${escapeHTML(preference.reason)}</p></div></details>`).join('') : '<p>Pairwise reviews are not available for this repetition.</p>'}</section>`;
+    return `<section class="report-section" data-writing-pairwise><h3>Direct pairwise preferences</h3><p>These preferences are separate from the rubric totals. Both anonymous candidates were visible while each judge scored them; the judges received opposite candidate orders.</p>${preferences.length ? preferences.map(preference => `<details class="work-spec-assessment" data-pairwise-review="${escapeHTML(preference.reviewerId)}" data-pairwise-setting="${escapeHTML(preference.settingId || '')}"><summary class="work-spec-assessment__summary">${preference.configurationId ? escapeHTML(preference.configurationId) + ' · ' : ''}${escapeHTML(preference.reviewerId)} · ${preference.winner === 'tie' ? 'Tie' : escapeHTML(label(preference.winner))} · ${escapeHTML(preference.confidence)} confidence</summary><div class="work-spec-assessment__body">${preference.candidateACondition && preference.candidateBCondition ? `<p data-candidate-order>A: ${escapeHTML(label(preference.candidateACondition))} · B: ${escapeHTML(label(preference.candidateBCondition))}</p>` : ''}<p data-preference-reason>${escapeHTML(preference.reason)}</p></div></details>`).join('') : '<p>Pairwise reviews are not available for this repetition.</p>'}</section>`;
   };
 
   const writingFlagRatesMarkup = () => !isWriting || !Array.isArray(data.flagRates) ? '' : `<details class="work-spec-assessment" data-writing-flag-rates><summary class="work-spec-assessment__summary">Completion and repair flags across reviewed answers</summary><div class="work-spec-assessment__body"><p>An answer is counted when either judge raises the flag. Counts use answers with both reviews; flags do not impose score caps.</p><dl>${data.flagRates.map(row => `<div><dt>${escapeHTML(data.conditions.find(condition => condition.id === row.condition)?.label || row.condition)}</dt><dd>${['fundamentalRepairRequired', 'taskNoncompletion'].map(id => `${escapeHTML(writingFlagLabel(id))}: ${row[id]}/${row.reviewedAnswers}`).join(' · ')}</dd></div>`).join('')}</dl></div></details>`;
@@ -999,7 +1027,7 @@
     }
     document.title = `${benchmark.name} · VasirBench`;
     if (isWriting) document.title = `${caseById.get(activeCaseId).title}${hasWritingTrialPicker ? ` · Trial ${activeTrialNumber}` : ''} · ${benchmark.name} · VasirBench`;
-    if (isWriting) document.querySelector('.benchmark-mast__issue').textContent = `Writing · ${writingFinalExclusions ? 'Final snapshot with exclusions' : writingInProgress ? 'In progress' : 'Complete snapshot'}`;
+    if (isWriting) document.querySelector('.benchmark-mast__issue').textContent = `Writing · ${writingFinalExclusions ? 'Final snapshot with exclusions' : writingInProgress ? 'Incomplete snapshot' : 'Complete snapshot'}`;
 
     reportView.innerHTML = `
       <div class="report-shell">
@@ -1018,7 +1046,7 @@
             <span class="report-context__back-short">← ${escapeHTML(benchmark.suite)}</span>
           </a>
         </div>
-        ${isWriting ? `<section class="writing-case-picker" aria-label="${escapeHTML(writingCaseLabel)}"><label class="field-control field-control--wide"><span>${escapeHTML(writingCaseLabel.charAt(0).toUpperCase() + writingCaseLabel.slice(1))}</span><select data-writing-case aria-label="Choose a ${escapeHTML(writingCaseLabel)}">${data.cases.filter(story => story.benchmarkId === benchmark.id).map(story => `<option value="${escapeHTML(story.id)}"${story.id === activeCaseId ? ' selected' : ''}>${escapeHTML(story.title)}</option>`).join('')}</select></label>${hasWritingTrialPicker ? `<label class="field-control"><span>${escapeHTML(data.trialLabel || 'Trial')}</span><select data-writing-trial aria-label="Choose a trial">${Array.from({ length: writingTrialCount }, (_, index) => index + 1).map(trial => `<option value="${trial}"${trial === activeTrialNumber ? ' selected' : ''}>Trial ${trial} of ${writingTrialCount}</option>`).join('')}</select></label>` : ''}<p>One ${escapeHTML(benchmark.name)} benchmark · ${data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.cases.length} matched pairs` : `${data.cases.length} ${escapeHTML(data.cases.length === 1 ? writingCaseLabel : writingCasePlural)}`}${hasWritingTrialPicker ? ` · ${writingTrialCount} trials per condition` : ''} · ${SETTING_COUNT} model settings. Choose a ${escapeHTML(writingCaseLabel)}${hasWritingTrialPicker ? ' and trial' : ''} to inspect its paired answers and judgments.</p></section>` : ''}
+        ${isWriting ? `<section class="writing-case-picker" aria-label="${escapeHTML(writingCaseLabel)}"><label class="field-control field-control--wide"><span>${escapeHTML(writingCaseLabel.charAt(0).toUpperCase() + writingCaseLabel.slice(1))}</span><select data-writing-case aria-label="Choose a ${escapeHTML(writingCaseLabel)}">${data.cases.filter(story => story.benchmarkId === benchmark.id).map(story => `<option value="${escapeHTML(story.id)}"${story.id === activeCaseId ? ' selected' : ''}>${escapeHTML(story.title)}</option>`).join('')}</select></label>${hasWritingTrialPicker ? `<label class="field-control"><span>${escapeHTML(data.trialLabel || 'Trial')}</span><select data-writing-trial aria-label="Choose a trial">${Array.from({ length: writingTrialCount }, (_, index) => index + 1).map(trial => `<option value="${trial}"${trial === activeTrialNumber ? ' selected' : ''}>Trial ${trial} of ${writingTrialCount}</option>`).join('')}</select></label>` : ''}<p>One ${escapeHTML(benchmark.name)} benchmark · ${data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.coverage.expectedPairs} matched pairs` : `${data.cases.length} ${escapeHTML(data.cases.length === 1 ? writingCaseLabel : writingCasePlural)}`}${hasWritingTrialPicker ? ` · ${writingTrialCount} trials per condition` : ''} · ${SETTING_COUNT} model settings. Choose a ${escapeHTML(writingCaseLabel)}${hasWritingTrialPicker ? ' and trial' : ''} to inspect its paired answers and judgments.</p></section>` : ''}
         ${truthMarkup()}
         ${writingProgressMarkup()}
         ${heroMarkup(benchmark, summary)}
@@ -1026,6 +1054,7 @@
         ${creationContextComparisonMarkup()}
         ${overviewMarkup(benchmark)}
         ${rankingMarkup(benchmark)}
+        ${writingPredecessorArchiveMarkup()}
         ${writingPairwiseMarkup()}
         ${writingFlagRatesMarkup()}
         ${methodMarkup(benchmark, summary)}

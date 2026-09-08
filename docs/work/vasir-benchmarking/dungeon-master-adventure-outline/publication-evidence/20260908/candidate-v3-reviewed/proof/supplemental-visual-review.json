@@ -1,0 +1,40 @@
+{
+  "releaseId": "dbbc02fa92ccc613b11d77083f93eeecf43612d456db3e4a1e8f02654ebb6fda",
+  "status": "passed",
+  "reviewedAt": "2026-09-08T03:02:25.852374+00:00",
+  "notes": [
+    "Final DM mobile adherence capture visibly shows incomplete 2/3 reference proof and retained valid answer.",
+    "Games mobile ratings preserve condition scores, judge scores, negative deltas and incomplete status labels with readable spacing.",
+    "Games desktop ratings/playback and 820px category leaderboard fit their viewports and preserve condition/navigation context."
+  ],
+  "screenshots": [
+    {
+      "path": "dm-mobile/dungeon-master-adherence.png",
+      "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5"
+    },
+    {
+      "path": "games-mobile/mobile-games.png",
+      "sha256": "25b60638b31319777f008a7b54087614dd660b1ddd2b4896d8482302a2c4da69"
+    },
+    {
+      "path": "games-mobile/mobile-games-play.png",
+      "sha256": "4cfe76bc053e1dd385d25b33b4cc8c46085209a8983da5c8a34125daebb8254d"
+    },
+    {
+      "path": "games-mobile/mobile-games-ratings.png",
+      "sha256": "db68939b314be08d272f36180a8d5472a5fc651ac1bab61e167c00958639f1d6"
+    },
+    {
+      "path": "games-desktop/desktop-games.png",
+      "sha256": "1909ff4a5e29d6f08827d8ad3707c0ea70ffcacaf697f8579cbe36ae789f7672"
+    },
+    {
+      "path": "games-desktop/desktop-games-playback.png",
+      "sha256": "2221a051dc0a1be36000e5977607f9936f11ff2dc9aa8f0c2564b3d5a49b8213"
+    },
+    {
+      "path": "canonical/midwidth-games.png",
+      "sha256": "f7f8d2c030de872e67e3acef50a32f307037b3362ba8b5af649778e5175f880f"
+    }
+  ]
+}

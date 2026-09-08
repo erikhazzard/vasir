@@ -11,7 +11,7 @@ import test from "node:test";
 import { createBenchmarkGenerationHash, createBenchmarkScoringHash, resolveBenchmarkSource } from "../cli/eval/benchmark-source.js";
 import { resolveBenchmarkConfigurations } from "../cli/eval/benchmark-models.js";
 import { judgeBenchmarkRows } from "../cli/eval/benchmark-judge.js";
-import { identifyStorytellingJudgeQuotaExhaustion, runStorytellingBenchmark, STORYTELLING_DEFAULT_MODELS } from "../cli/eval/run-storytelling-benchmark.js";
+import { identifyStorytellingJudgeQuotaExhaustion, isStorytellingGenerationOutputPolicyBlocked, runStorytellingBenchmark, STORYTELLING_DEFAULT_MODELS } from "../cli/eval/run-storytelling-benchmark.js";
 import { runBenchmarkEval } from "../cli/eval/run-benchmark-eval.js";
 import { probeStorytellingJudge } from "../cli/eval/probe-storytelling-judge.js";
 import { createStorytellingSkillInstruction, freezeStorytellingSkill, isStorytellingRequiredSkillReadReceiptCompatible, runStorytellingAgent, STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION, STORYTELLING_RUNTIME_VERSION, validateStorytellingSkillSnapshot } from "../cli/eval/storytelling-agent-runtime.js";
@@ -286,6 +286,85 @@ test("required-read protocol failures preserve output and receipts and cannot be
   assert.deepEqual(after.rows, before.rows);
   assert.deepEqual(after.treatment, before.treatment);
   assert.equal(after.executionHistory.at(-1).selectedGenerationRowCount, 0);
+});
+
+test("output-policy retry guard requires explicit terminal provider evidence, not generic errors or candidate text", () => {
+  const configuration = { id: "claude:claude-opus-5@max", provider: "claude", model: "claude-opus-5", reasoning: "max" };
+  const terminal = { type: "result", is_error: true, result: "API Error: 400 Output blocked by content filtering policy" };
+  const error = { code: "EVAL_AGENT_RUNTIME_FAILED", context: {
+    apiErrorStatus: 400, requestedConfiguration: configuration,
+    stdout: `truncated-prefix\",${JSON.stringify(terminal).slice(1)}`
+  } };
+  assert.equal(isStorytellingGenerationOutputPolicyBlocked({ error, configuration }), true);
+  for (const change of [
+    candidate => { candidate.code = "EVAL_AGENT_RUNTIME_TIMEOUT"; },
+    candidate => { candidate.context.apiErrorStatus = 429; },
+    candidate => { candidate.context.requestedConfiguration = { ...configuration, reasoning: "low" }; },
+    candidate => { candidate.context.stdout = JSON.stringify({ ...terminal, is_error: false }); },
+    candidate => { candidate.context.stdout = JSON.stringify({ ...terminal, type: "assistant" }); },
+    candidate => { candidate.context.stdout = JSON.stringify({ ...terminal, result: "API Error: 400 Invalid request" }); },
+    candidate => { candidate.context.stdout = JSON.stringify({ type: "result", is_error: true, result: "API Error: 400 Invalid request", promptText: terminal.result, outputText: JSON.stringify(terminal) }); },
+    candidate => { candidate.context.stdout = ""; candidate.message = terminal.result; }
+  ]) {
+    const candidate = structuredClone(error);
+    change(candidate);
+    assert.equal(isStorytellingGenerationOutputPolicyBlocked({ error: candidate, configuration }), false);
+  }
+  assert.equal(isStorytellingGenerationOutputPolicyBlocked({ error, configuration: { ...configuration, provider: "codex" } }), false);
+});
+
+test("retry-failed preserves explicit output-policy blocks and valid answers while retrying operational failures", async (t) => {
+  const f = fixture(t);
+  extendFixtureCases(f, 2);
+  let calls = 0;
+  const result = await runStorytellingBenchmark({
+    projectRootDirectory: f.directory, currentWorkingDirectory: f.directory,
+    requestedModelArguments: ["claude:claude-opus-5@max"], runId: "policy-retry-guard", generationOnly: true,
+    agentRunnerImplementation: async (args) => {
+      calls++;
+      if (args.skillSnapshot) {
+        const blocked = args.promptText.includes("Story 1");
+        const status = blocked ? 400 : 503;
+        const terminal = { type: "result", is_error: true,
+          result: `API Error: ${status} ${blocked ? "Output blocked by content filtering policy" : "Service unavailable"}` };
+        throw Object.assign(new Error("The session did not return a final answer."), {
+          code: "EVAL_AGENT_RUNTIME_FAILED", context: { apiErrorStatus: status,
+            stdout: JSON.stringify(terminal), requestedConfiguration: args.configuration }
+        });
+      }
+      return fakeResponse(args);
+    }
+  });
+  const runPath = path.join(result.outputDirectory, "run.json");
+  const before = JSON.parse(fs.readFileSync(runPath, "utf8"));
+  const blocked = before.rows.find(row => row.caseId === "story-1" && row.conditionId !== "clean");
+  const operational = before.rows.find(row => row.caseId === "story-2" && row.conditionId !== "clean");
+  assert.equal(calls, 4);
+  assert.equal(blocked.rowStatus, "error");
+  assert.equal(blocked.attempts.length, 1);
+  assert.equal(operational.rowStatus, "error");
+  await runStorytellingBenchmark({
+    projectRootDirectory: f.directory, currentWorkingDirectory: f.directory,
+    resumeRunId: result.runId, generationOnly: true, retryFailed: true,
+    agentRunnerImplementation: async (args) => {
+      calls++;
+      assert.ok(args.skillSnapshot);
+      assert.match(args.promptText, /Story 2/u);
+      return fakeResponse(args);
+    }
+  });
+  const after = JSON.parse(fs.readFileSync(runPath, "utf8"));
+  assert.equal(calls, 5);
+  assert.equal(after.executionHistory.at(-1).selectedGenerationRowCount, 1);
+  assert.deepEqual(after.rows.find(row => row.rowKey === blocked.rowKey), blocked);
+  for (const row of before.rows.filter(row => row.rowStatus === "complete")) {
+    assert.deepEqual(after.rows.find(candidate => candidate.rowKey === row.rowKey), row);
+  }
+  const recovered = after.rows.find(row => row.rowKey === operational.rowKey);
+  assert.equal(recovered.rowStatus, "complete");
+  assert.equal(recovered.attempts.length, 2);
+  assert.equal(after.summary.rowCounts.complete, 3);
+  assert.equal(after.summary.rowCounts.failed, 1);
 });
 
 test("required files are frozen in condition identity and resume rejects removed or changed policy", async (t) => {

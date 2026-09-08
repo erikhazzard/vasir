@@ -6,6 +6,8 @@ The core contract is structural, not timing-dependent. For a batching-only chang
 
 The cases also exercise positive, negative, and borderline routing; the diagnosis → guard → verification boundary for an observed symptom; draw-invariant shader work requested again by each covered fragment invocation; `WebGLRenderer.info` aggregation across multiple render calls; and attention drift under a long otherwise-correct mobile-performance brief. Hard substring checks are only a semantic floor. The suite-level judge rejects keyword cosplay, advice that waits for FPS before recognizing a deterministic architecture violation, and blanket rules that treat every additional pass as invalid.
 
+Four contrasting shader cases cover identical loop work grouped or scattered across supplied execution groups, uniform branching versus eager selection and compile specialization, opposing measured outcomes of loop unrolling, and evidenced AMD waterfall lowering versus ordinary texture-array-layer indexing and unsupported browser subgroup assumptions. They test mechanisms and evidence, not GPU vocabulary or blanket optimization rules.
+
 Run the structural smoke test locally:
 
 ```bash
@@ -14,7 +16,7 @@ npm run eval -- code__threejs-rapier-performance mock --trials 1
 
 A live-model run is required for the behavioral verdict. Mock mode proves suite discovery, baseline/treatment wiring, and result persistence only.
 
-Current limit: the suite supplies deterministic source facts and evaluates static architecture, shader-cardinality, and instrumentation judgment. It does not capture a browser frame, execute the proposed counters, measure GPU cost, or prove visual equivalence.
+Current limit: the suite supplies source facts and hypothetical compiler/profile reports to evaluate architecture, shader-execution, and instrumentation judgment. Neither mock nor live-model results capture a browser frame, execute the proposed counters, measure GPU cost, or prove visual equivalence; runtime claims still need target-device evidence.
 
 For realistic defect-discovery A/Bs rather than inline topology cases, use one of the manual static-audit fixtures:
 

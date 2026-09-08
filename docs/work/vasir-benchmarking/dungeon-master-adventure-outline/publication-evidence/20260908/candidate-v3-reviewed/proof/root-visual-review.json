@@ -1,0 +1,61 @@
+{
+  "reviewedAt": "2026-09-08T03:03:46.795273+00:00",
+  "reviewer": "root agent",
+  "humanScreenshotApproval": false,
+  "releaseId": "dbbc02fa92ccc613b11d77083f93eeecf43612d456db3e4a1e8f02654ebb6fda",
+  "verdict": "passed",
+  "findings": [
+    "Mobile answer link wraps inside its card.",
+    "Primary and secondary cohort values and complete pair counts are legible.",
+    "Incomplete 2/3 required reference proof is visible and retained in the analysis.",
+    "Original answer and judgment text, frozen reference, and provisional Storytelling results remain readable.",
+    "Existing Games views and activation controls remain readable."
+  ],
+  "screenshots": [
+    {
+      "path": "dm-mobile/writing-stacked-rows.png",
+      "bytes": 63391,
+      "sha256": "61f7c0efb74aac9625bf34a3d901ff663ce48110bbc8f535b6a2115f5430571e"
+    },
+    {
+      "path": "dm-mobile/dungeon-master-adherence.png",
+      "bytes": 57064,
+      "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5"
+    },
+    {
+      "path": "dm-mobile/dungeon-master-cohorts.png",
+      "bytes": 75891,
+      "sha256": "8f163c8c219ae19b395b5b02073f58537bc4bcafe8c53436b253528391b23608"
+    },
+    {
+      "path": "dm-desktop/dungeon-master-answer.png",
+      "bytes": 218066,
+      "sha256": "1f88a79b0211bdaaf4783ba469bf63322764275522f8ad9fba18488b827db98a"
+    },
+    {
+      "path": "dm-tablet/dungeon-master-reference.png",
+      "bytes": 168045,
+      "sha256": "3999cc888e39c948e813dbf560b9eb092cba27064575c167ad7310a1574e6677"
+    },
+    {
+      "path": "dm-desktop/dungeon-master-judgments.png",
+      "bytes": 298563,
+      "sha256": "88691b16420e99c2e976ed30238bc4b000cea0d131c6c12c12ed320fea0c4731"
+    },
+    {
+      "path": "story-mobile/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f"
+    },
+    {
+      "path": "games-mobile/mobile-games-play.png",
+      "bytes": 168510,
+      "sha256": "4cfe76bc053e1dd385d25b33b4cc8c46085209a8983da5c8a34125daebb8254d"
+    },
+    {
+      "path": "games-desktop/desktop-games-ratings.png",
+      "bytes": 117971,
+      "sha256": "27a47111a49d9e8927c7b743f905b863db8adb157d003ee79c411202ff757911"
+    }
+  ]
+}

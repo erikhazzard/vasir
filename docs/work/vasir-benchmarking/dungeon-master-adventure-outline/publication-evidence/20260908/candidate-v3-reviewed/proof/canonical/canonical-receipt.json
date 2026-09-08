@@ -1,0 +1,812 @@
+{
+  "kind": "vasirbenchmark-canonical-capture-run",
+  "startedAt": "2026-09-08T02:56:12.613Z",
+  "completedAt": "2026-09-08T03:00:58.871Z",
+  "status": "passed",
+  "concurrency": 2,
+  "count": 32,
+  "source": "Same 24 persisted and 8 midwidth capture.mjs commands as capture.sh, run in bounded independent processes.",
+  "candidate": {
+    "path": "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/candidate.json",
+    "releaseId": "dbbc02fa92ccc613b11d77083f93eeecf43612d456db3e4a1e8f02654ebb6fda",
+    "bytes": 362141,
+    "sha256": "a0eec2375f820cdc560546fcb14087a339fed5c5f015127da74c14cdc9ab04f1"
+  },
+  "harnessSha256": "2ee9cb17e726b782f8e4e5c8048dde4511e70488df4b42c7deca438cc1247ec6",
+  "log": {
+    "path": "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/canonical.log",
+    "bytes": 7901,
+    "sha256": "229ee1acc05c3f9064a41be001ae602353d76a15692d62c883929f05eb9d5d08"
+  },
+  "sourcePins": [
+    {
+      "path": "site/vasirbenchmark.com/capture.mjs",
+      "bytes": 165209,
+      "sha256": "2ee9cb17e726b782f8e4e5c8048dde4511e70488df4b42c7deca438cc1247ec6"
+    },
+    {
+      "path": "site/vasirbenchmark.com/capture.sh",
+      "bytes": 4994,
+      "sha256": "4cb2289a907a7d4fee4c541c4c8ae0268582b35797a2d3f1edd4e6201259eef0"
+    },
+    {
+      "path": "site/vasirbenchmark.com/index.html",
+      "bytes": 2284,
+      "sha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9"
+    },
+    {
+      "path": "site/vasirbenchmark.com/app.js",
+      "bytes": 183615,
+      "sha256": "fb2358f853fe25b78f2ad05e2e5de64aa88b1a1c1cbf7660965641fdf89b9be6"
+    },
+    {
+      "path": "site/vasirbenchmark.com/style.css",
+      "bytes": 149896,
+      "sha256": "4e5c6cf3ee645d65d1c6b6c1c676e16585be2a1f06aab65737a7196f75e9aa14"
+    },
+    {
+      "path": "site/vasirbenchmark.com/data.js",
+      "bytes": 874810,
+      "sha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69"
+    },
+    {
+      "path": "site/vasirbenchmark.com/responses.js",
+      "bytes": 6484506,
+      "sha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.html",
+      "bytes": 2115,
+      "sha256": "915c3ce28a71cdff6fc974a7dcaa5f8b65c813991706603aa36114c7843a1eec"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.js",
+      "bytes": 86001,
+      "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.css",
+      "bytes": 33336,
+      "sha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084"
+    }
+  ],
+  "sourceUnchanged": true,
+  "results": [
+    {
+      "target": "leaderboard",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop.png",
+        "1440",
+        "1000",
+        "leaderboard"
+      ],
+      "exitCode": 0,
+      "durationMs": 19209,
+      "stdout": "desktop.png · #capabilities/overall · 1440×1000 · 2 categories / 4 benchmarks / 26 settings / 52 condition entries / 268 result cells · D3 7.9.0 · Claude release identities fit · guide pointer@63.2-spans-10-rows · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop.png",
+        "bytes": 175643,
+        "sha256": "b98f6894013e9baea1ba77144ebd5974e73b294a9f92f5d1f459285141757611"
+      }
+    },
+    {
+      "target": "leaderboard",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile.png",
+        "390",
+        "844",
+        "leaderboard"
+      ],
+      "exitCode": 0,
+      "durationMs": 19208,
+      "stdout": "mobile.png · #capabilities/overall · 390×844 · 2 categories / 4 benchmarks / 26 settings / 52 condition entries / 268 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile.png",
+        "bytes": 71136,
+        "sha256": "ca16c43b0d250359804eddd49c04cb0f4e2ac08dd565750ee8522fb1798293e3"
+      }
+    },
+    {
+      "target": "capabilities",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-capabilities.png",
+        "1440",
+        "1000",
+        "capabilities"
+      ],
+      "exitCode": 0,
+      "durationMs": 16034,
+      "stdout": "desktop-capabilities.png · #capabilities/engineering · 1440×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-capabilities.png",
+        "bytes": 150014,
+        "sha256": "980347af38ef5f578ce49461174ce7625b7e20e83e541faaa9b82ca5ce42f6bb"
+      }
+    },
+    {
+      "target": "capabilities",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-capabilities.png",
+        "390",
+        "844",
+        "capabilities"
+      ],
+      "exitCode": 0,
+      "durationMs": 16044,
+      "stdout": "mobile-capabilities.png · #capabilities/engineering · 390×844 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-capabilities.png",
+        "bytes": 68067,
+        "sha256": "12d43695946bbe1260e2b5167bfce8968378652dc507043bbd5764c0df76a06f"
+      }
+    },
+    {
+      "target": "capability-benchmarks",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-capability-benchmarks.png",
+        "390",
+        "844",
+        "capability-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 17862,
+      "stdout": "mobile-capability-benchmarks.png · #capabilities/engineering/benchmarks · 390×844 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-capability-benchmarks.png",
+        "bytes": 68782,
+        "sha256": "1e6f34d13599b586f7cd9fd2728fee2637acf4a6496a3bdddc702e253f7832a6"
+      }
+    },
+    {
+      "target": "capability-benchmarks",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-capability-benchmarks.png",
+        "1440",
+        "1000",
+        "capability-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 17891,
+      "stdout": "desktop-capability-benchmarks.png · #capabilities/engineering/benchmarks · 1440×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-capability-benchmarks.png",
+        "bytes": 200106,
+        "sha256": "ce308d12e1e22ab72126d63d5c75e36e59d073c73fdfad752f1a23b114f71c3e"
+      }
+    },
+    {
+      "target": "efficiency",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-efficiency.png",
+        "1440",
+        "1000",
+        "efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 18888,
+      "stdout": "desktop-efficiency.png · #capabilities/overall/efficiency · 1440×1000 · 2 categories / 4 benchmarks / 26 settings / 52 condition entries / 268 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-efficiency.png",
+        "bytes": 188169,
+        "sha256": "337eb4755c5b646c5a811be0911866c9fef4295901369eccb834b9efb027bf6f"
+      }
+    },
+    {
+      "target": "efficiency",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-efficiency.png",
+        "390",
+        "844",
+        "efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 19044,
+      "stdout": "mobile-efficiency.png · #capabilities/overall/efficiency · 390×844 · 2 categories / 4 benchmarks / 26 settings / 52 condition entries / 268 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-efficiency.png",
+        "bytes": 62923,
+        "sha256": "ab83fe57473cf3f79ad3bcca6b4ab9b27774ce9cdcd782ae0373ddf9b83fd01b"
+      }
+    },
+    {
+      "target": "report",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-benchmark-report.png",
+        "390",
+        "844",
+        "report"
+      ],
+      "exitCode": 0,
+      "durationMs": 21831,
+      "stdout": "mobile-benchmark-report.png · #hyper-scale-chat · 390×844 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-benchmark-report.png",
+        "bytes": 61998,
+        "sha256": "b6ac310949a41fa188762f971101a2f1ca8b46b1f9848e819538da7419f8d45d"
+      }
+    },
+    {
+      "target": "report",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-benchmark-report.png",
+        "1440",
+        "1000",
+        "report"
+      ],
+      "exitCode": 0,
+      "durationMs": 22335,
+      "stdout": "desktop-benchmark-report.png · #hyper-scale-chat · 1440×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-benchmark-report.png",
+        "bytes": 157056,
+        "sha256": "19ea1c3d24f6fde831635b67336adc0375189e0338020a61151fa1bb6b5fb616"
+      }
+    },
+    {
+      "target": "workflows",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflows.png",
+        "1440",
+        "1000",
+        "workflows"
+      ],
+      "exitCode": 0,
+      "durationMs": 16098,
+      "stdout": "desktop-workflows.png · #capabilities/ai-workflows · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-workflows.png",
+        "bytes": 149967,
+        "sha256": "4c82dcbb30fba087d08062b680cff95c24666c7df630daadb00fc90580482322"
+      }
+    },
+    {
+      "target": "workflows",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflows.png",
+        "390",
+        "844",
+        "workflows"
+      ],
+      "exitCode": 0,
+      "durationMs": 17546,
+      "stdout": "mobile-workflows.png · #capabilities/ai-workflows · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-workflows.png",
+        "bytes": 63467,
+        "sha256": "71578c595fd0ec68c22436a84bf82d70943238982b47f948f558715a7737f394"
+      }
+    },
+    {
+      "target": "workflow-benchmarks",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflow-benchmarks.png",
+        "1440",
+        "1000",
+        "workflow-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 16118,
+      "stdout": "desktop-workflow-benchmarks.png · #capabilities/ai-workflows/benchmarks · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-workflow-benchmarks.png",
+        "bytes": 123797,
+        "sha256": "4abb1f04e24d1aa616b0f733b8b259e20d41a5be2c16a8770b30ddc781ac79c4"
+      }
+    },
+    {
+      "target": "workflow-benchmarks",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflow-benchmarks.png",
+        "390",
+        "844",
+        "workflow-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 19018,
+      "stdout": "mobile-workflow-benchmarks.png · #capabilities/ai-workflows/benchmarks · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-workflow-benchmarks.png",
+        "bytes": 65480,
+        "sha256": "96fb65c3f88f06fb6540709fa96a14ee5a992bf54044c4964dd9ecc82bd0ba58"
+      }
+    },
+    {
+      "target": "workflow-efficiency",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflow-efficiency.png",
+        "1440",
+        "1000",
+        "workflow-efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 18080,
+      "stdout": "desktop-workflow-efficiency.png · #capabilities/ai-workflows/efficiency · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-workflow-efficiency.png",
+        "bytes": 196752,
+        "sha256": "fe54ffa98d4172bba50b852cf4f795de797c5729bf1bb574c143c8dc3eea2959"
+      }
+    },
+    {
+      "target": "workflow-efficiency",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflow-efficiency.png",
+        "390",
+        "844",
+        "workflow-efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 16396,
+      "stdout": "mobile-workflow-efficiency.png · #capabilities/ai-workflows/efficiency · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-workflow-efficiency.png",
+        "bytes": 59505,
+        "sha256": "7c7524d804f56cb055f5503a7600be0e6810a516644a14951513d9c72e847fc2"
+      }
+    },
+    {
+      "target": "workflow-report",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflow-report.png",
+        "1440",
+        "1000",
+        "workflow-report"
+      ],
+      "exitCode": 0,
+      "durationMs": 17307,
+      "stdout": "desktop-workflow-report.png · #work-spec-chat · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-workflow-report.png",
+        "bytes": 200324,
+        "sha256": "3fcb485331e7c32c00d2534d47fe2a474db6fcb1a4e49ecc3c610795cb0ea8df"
+      }
+    },
+    {
+      "target": "workflow-report",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflow-report.png",
+        "390",
+        "844",
+        "workflow-report"
+      ],
+      "exitCode": 0,
+      "durationMs": 19863,
+      "stdout": "mobile-workflow-report.png · #work-spec-chat · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-workflow-report.png",
+        "bytes": 74637,
+        "sha256": "76253333ef3a621ca4b071e878cba07d03f15d4a952dcaf6af42db380164d9ce"
+      }
+    },
+    {
+      "target": "games",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-game-models.png",
+        "1440",
+        "1000",
+        "games"
+      ],
+      "exitCode": 0,
+      "durationMs": 15914,
+      "stdout": "desktop-game-models.png · #capabilities/games · 1440×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-game-models.png",
+        "bytes": 126193,
+        "sha256": "4b4830da3d1b415474e8848df4177a7417b6b1273954f5ede479fb6c3d34f579"
+      }
+    },
+    {
+      "target": "game-benchmarks",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-game-benchmarks.png",
+        "1440",
+        "1000",
+        "game-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 17381,
+      "stdout": "desktop-game-benchmarks.png · #capabilities/games/benchmarks · 1440×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-game-benchmarks.png",
+        "bytes": 120485,
+        "sha256": "a23cafa41be656b038243e0ed1fa369f1c0645c754a8aa49b14638a84f4213b1"
+      }
+    },
+    {
+      "target": "game-efficiency",
+      "width": 1440,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-game-efficiency.png",
+        "1440",
+        "1000",
+        "game-efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 17823,
+      "stdout": "desktop-game-efficiency.png · #capabilities/games/efficiency · 1440×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/desktop-game-efficiency.png",
+        "bytes": 132206,
+        "sha256": "937e12ad8829a5f6434208f882bded5ed052fc7357a8f648fba2e0f4ff9dcaab"
+      }
+    },
+    {
+      "target": "games",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-game-models.png",
+        "390",
+        "844",
+        "games"
+      ],
+      "exitCode": 0,
+      "durationMs": 17782,
+      "stdout": "mobile-game-models.png · #capabilities/games · 390×844 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-game-models.png",
+        "bytes": 66620,
+        "sha256": "7fd00fd74caf6695692f6d913fd3800d4afe5b3c7ea1c51160cac1e19079a4ef"
+      }
+    },
+    {
+      "target": "game-benchmarks",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-game-benchmarks.png",
+        "390",
+        "844",
+        "game-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 18987,
+      "stdout": "mobile-game-benchmarks.png · #capabilities/games/benchmarks · 390×844 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-game-benchmarks.png",
+        "bytes": 68871,
+        "sha256": "22f93c6716b2bc43d3af21cdfe47a8548fc5cd89596ce1dd98a0e4fcd2f9d065"
+      }
+    },
+    {
+      "target": "game-efficiency",
+      "width": 390,
+      "height": 844,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-game-efficiency.png",
+        "390",
+        "844",
+        "game-efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 16160,
+      "stdout": "mobile-game-efficiency.png · #capabilities/games/efficiency · 390×844 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "site/vasirbenchmark.com/mobile-game-efficiency.png",
+        "bytes": 61937,
+        "sha256": "cb586e53ffa0d34b1d43ade0472b9a3dd6b4eddcf76d2349518027d4fece5abe"
+      }
+    },
+    {
+      "target": "leaderboard",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-leaderboard.png",
+        "820",
+        "1000",
+        "leaderboard"
+      ],
+      "exitCode": 0,
+      "durationMs": 17087,
+      "stdout": "midwidth-leaderboard.png · #capabilities/overall · 820×1000 · 2 categories / 4 benchmarks / 26 settings / 52 condition entries / 268 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-leaderboard.png",
+        "bytes": 123641,
+        "sha256": "38ae2cff3cbdbcbe25d9951acde22b3207b15fe753d04c77901cec1bb72ed260"
+      }
+    },
+    {
+      "target": "capabilities",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-capabilities.png",
+        "820",
+        "1000",
+        "capabilities"
+      ],
+      "exitCode": 0,
+      "durationMs": 16863,
+      "stdout": "midwidth-capabilities.png · #capabilities/engineering · 820×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-capabilities.png",
+        "bytes": 100260,
+        "sha256": "7e6cf67ff20f581a7075d253112bbb938d7944ed69ea236103509d74c038a3a9"
+      }
+    },
+    {
+      "target": "report",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-report.png",
+        "820",
+        "1000",
+        "report"
+      ],
+      "exitCode": 0,
+      "durationMs": 20482,
+      "stdout": "midwidth-report.png · #hyper-scale-chat · 820×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-report.png",
+        "bytes": 97708,
+        "sha256": "5a4d7e448643a3938444fb2eba07c6ec30a97b9d76d35813d4878851149b86c9"
+      }
+    },
+    {
+      "target": "workflows",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-workflows.png",
+        "820",
+        "1000",
+        "workflows"
+      ],
+      "exitCode": 0,
+      "durationMs": 17817,
+      "stdout": "midwidth-workflows.png · #capabilities/ai-workflows · 820×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-workflows.png",
+        "bytes": 100115,
+        "sha256": "ebba9e081ea110c73afea57efc8d8bc47daf14d95935cc5f9bed1b93f7539abe"
+      }
+    },
+    {
+      "target": "games",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-games.png",
+        "820",
+        "1000",
+        "games"
+      ],
+      "exitCode": 0,
+      "durationMs": 16050,
+      "stdout": "midwidth-games.png · #capabilities/games · 820×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-games.png",
+        "bytes": 91137,
+        "sha256": "f7f8d2c030de872e67e3acef50a32f307037b3362ba8b5af649778e5175f880f"
+      }
+    },
+    {
+      "target": "workflow-report",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-workflow-report.png",
+        "820",
+        "1000",
+        "workflow-report"
+      ],
+      "exitCode": 0,
+      "durationMs": 18160,
+      "stdout": "midwidth-workflow-report.png · #work-spec-chat · 820×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-workflow-report.png",
+        "bytes": 193038,
+        "sha256": "9a778ec06f6ceda78afd7d0b0477937d10f595602cde0a339b878070b82de60e"
+      }
+    },
+    {
+      "target": "game-benchmarks",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-game-benchmarks.png",
+        "820",
+        "1000",
+        "game-benchmarks"
+      ],
+      "exitCode": 0,
+      "durationMs": 16443,
+      "stdout": "midwidth-game-benchmarks.png · #capabilities/games/benchmarks · 820×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-game-benchmarks.png",
+        "bytes": 102042,
+        "sha256": "1ffe33cda7d8532432258084429be7f6e4c6fd81a5d25b8fe4864203af820e4b"
+      }
+    },
+    {
+      "target": "game-efficiency",
+      "width": 820,
+      "height": 1000,
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+        "/private/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+        "/private/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/canonical/midwidth-game-efficiency.png",
+        "820",
+        "1000",
+        "game-efficiency"
+      ],
+      "exitCode": 0,
+      "durationMs": 16182,
+      "stdout": "midwidth-game-efficiency.png · #capabilities/games/efficiency · 820×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "screenshot": {
+        "path": "tmp/dm-final-release-20260908-v3/canonical/midwidth-game-efficiency.png",
+        "bytes": 87284,
+        "sha256": "bfedf7690491be96f292edc7a38d4923010d51dd5b42446c2d6fc4dbac7f828f"
+      }
+    }
+  ]
+}

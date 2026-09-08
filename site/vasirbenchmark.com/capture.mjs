@@ -1909,7 +1909,7 @@ async function auditCategoryNavigation() {
     if (id === 'writing' && window.VASIR_DATA.writing?.coverage?.caseCount) {
       const writing = window.VASIR_DATA.writing;
       if (tab?.tagName !== 'BUTTON' || tab.disabled || tab.getAttribute('aria-disabled') === 'true' || tab.dataset.categoryStatus !== 'development-index' || tab.hasAttribute('href') || tab.getAttribute('aria-controls') !== 'capability-field-panel') failures.push('Published Writing is not an enabled native homepage category.');
-      const expectedScore = Number.isFinite(writing.categoryIndex?.leader?.score) ? writing.categoryIndex.leader.score.toFixed(1) + '/100' : '—';
+      const expectedScore = Number.isFinite(writing.categoryIndex?.leader?.score) ? writing.categoryIndex.leader.score.toFixed(1) + '/100' : 'Results';
       if (!visible(tab?.querySelector(':scope > strong')) || text(tab?.querySelector(':scope > strong')) !== expectedScore) failures.push('Writing category invents a score or omits its source-derived leader.');
       const writingBenchmarkCount = new Set(writing.benchmarkIds || [writing.benchmarkId]).size;
       if (!tab?.getAttribute('aria-label')?.includes(writingBenchmarkCount + ' published benchmarks') || !tab?.getAttribute('aria-label')?.includes('Excluded from Overall')) failures.push('Writing category does not disclose published benchmark coverage and Overall exclusion.');
@@ -2648,7 +2648,6 @@ try {
     // Every published category participates in the same keyboard navigation.
     const hasGames = await evaluate('Boolean(window.VASIR_DATA.games)');
     const hasWriting = await evaluate('Boolean(window.VASIR_DATA.writing?.coverage?.caseCount)');
-    if (hasWriting) editions.writing = 'Writing development index';
     const navigationSteps = [
       {category: 'engineering'}, ...(hasGames ? [{category: 'games', move: 'next'}] : []),
       ...(hasWriting ? [{category: 'writing', move: 'next'}] : []), {category: 'ai-workflows', move: 'next'},
@@ -2658,6 +2657,9 @@ try {
     ];
     for (const step of navigationSteps) {
       const {category} = step;
+      const editionMatches = category === 'writing'
+        ? 'window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id === "storytelling" && document.querySelector(".capability-canvas__status")?.textContent.includes(window.VASIR_WRITING_CATEGORY.writingCategory.comparisonLabel) && /provisional/i.test(document.querySelector(".capability-canvas__status").textContent) === window.VASIR_WRITING_CATEGORY.scoreBasis.provisional'
+        : 'document.querySelector(".capability-canvas__status")?.textContent.includes(' + JSON.stringify(editions[category]) + ')';
       let key = step.key;
       if (step.move) {
         const vertical = await evaluate('document.querySelector(".capability-selector__tabs")?.getAttribute("aria-orientation") === "vertical"');
@@ -2673,8 +2675,7 @@ try {
         try {
           return await evaluate('document.readyState === "complete" && document.querySelector('
             + JSON.stringify('#capability-category-' + category)
-            + ')?.getAttribute("aria-selected") === "true" && document.querySelector(".capability-canvas__status")?.textContent.includes('
-            + JSON.stringify(editions[category])
+            + ')?.getAttribute("aria-selected") === "true" && (' + editionMatches
             + ') && document.activeElement?.id === '
             + JSON.stringify('capability-category-' + category));
         } catch { return false; }

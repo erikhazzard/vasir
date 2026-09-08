@@ -13,7 +13,7 @@ import { buildWorkSpecPublication, validateWorkSpecPublication, validateWorkSpec
 import { buildOverallPublication, validateOverallPublication } from "./overall-publication.js";
 import { buildGamesPublication, validateGamesPublication } from "./games-publication.js";
 import { buildWritingPublication, validateWritingSummary, serializeWritingModule } from "./writing-publication.js";
-import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE } from "./writing-response-archives.js";
+import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE, WRITING_RESPONSE_ARCHIVES } from "./writing-response-archives.js";
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -2537,13 +2537,11 @@ export function buildBenchmarkPublicationProjection({
   }
 
   const writing = buildWritingPublication({ repoRootDirectory, readFileSyncImplementation });
-  const writingArchives = splitWritingResponseArchives(writing?.responseBundle ?? null);
+  const writingArchives = splitWritingResponseArchives(writing?.responseBundle ?? null, { separateBenchmarks: true });
   if (writing) {
     projection.schemaVersion = 6;
     projection.writing = writing.stub;
-    if (writingArchives.creation) projection.writing.responseArchives = {
-      [WRITING_CREATION_ARCHIVE.benchmarkId]: { href: WRITING_CREATION_ARCHIVE.href, globalName: WRITING_CREATION_ARCHIVE.globalName }
-    };
+    projection.writing.responseArchives = Object.fromEntries(WRITING_RESPONSE_ARCHIVES.filter(item => item === WRITING_CREATION_ARCHIVE ? writingArchives.creation : writingArchives.additional?.[item.benchmarkId]).map(item => [item.benchmarkId, { href: item.href, globalName: item.globalName }]));
   }
 
   const basisSha256 = sha256(stableSerialize({
@@ -2565,6 +2563,7 @@ export function buildBenchmarkPublicationProjection({
     writingDataSource: serializeWritingModule(writing?.projection ?? null, "VASIR_WRITING"),
     writingResponsesSource: serializeWritingModule(writingArchives.primary, "VASIR_WRITING_RESPONSES"),
     writingCreationResponsesSource: serializeWritingModule(writingArchives.creation, WRITING_CREATION_ARCHIVE.globalName),
+    writingAdditionalResponseSources: Object.fromEntries(WRITING_RESPONSE_ARCHIVES.filter(item => item !== WRITING_CREATION_ARCHIVE).map(item => [item.path, serializeWritingModule(writingArchives.additional?.[item.benchmarkId] ?? null, item.globalName)])),
     basisSha256,
     routes: buildBenchmarkPublicationRoutes(projection),
     counts: workflows ? {

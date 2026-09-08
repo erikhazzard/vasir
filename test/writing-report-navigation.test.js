@@ -111,6 +111,48 @@ test('Writing report selects every trial without collapsing the eighty response 
   assert.doesNotMatch(page.reportView.innerHTML, /core-idea analysis|Corpus stratum/);
 });
 
+test('Plot twists retains a separate inspectable failed-predecessor archive on every trial without adding score rows', async () => {
+  const source = collections({ exclusions: false });
+  const originals = publication(TWISTS, { trials: 10, exclusions: true }).responseBundle.responses.filter(response => response.status === 'error');
+  originals.forEach((response, index) => {
+    response.outputText = `Original failed attempt ${index}.\n\nUnabridged <outline> Ω.\nFinal line.`;
+    response.provenance = { sourceSha256: 'a'.repeat(64), outputSha256: 'b'.repeat(64) };
+  });
+  source.twists.responseBundle.supersededResponses = originals;
+  const before = JSON.stringify(source);
+  const page = await renderReport(source, `#${TWISTS}/case-1/trial-1`);
+  for (const trial of [1, 3, 9, 10]) {
+    page.navigate(`#${TWISTS}/case-1/trial-${trial}`);
+    const html = page.reportView.innerHTML;
+    assert.equal((html.match(/data-writing-predecessor-archive/g) || []).length, 1);
+    assert.equal((html.match(/data-writing-predecessor-output/g) || []).length, 2);
+    assert.equal((html.match(/data-report-setting-id=/g) || []).length, 4);
+    assert.match(html, /Earlier failed attempts · 2 retained, not scored/);
+    assert.match(html, /do not count as additional trials/);
+    assert.match(html, /Their valid paired plain answers were not regenerated/);
+    assert.ok(html.includes('Unabridged &lt;outline&gt; Ω.\nFinal line.'));
+    assert.doesNotMatch(html, /Unabridged <outline>/);
+    assert.match(html, /Copy original failed attempt for Model 0, trial 9/);
+    assert.match(html, /data-predecessor-provenance="sourceSha256"/);
+    assert.equal(source.twists.responseBundle.responses.length, 80);
+  }
+  assert.equal(JSON.stringify(source), before, 'Viewing predecessor evidence must not change any response or score.');
+  const core = await renderReport(source, `#${CORE}/case-1`);
+  assert.doesNotMatch(core.reportView.innerHTML, /data-writing-predecessor-archive/);
+});
+
+test('completion creator root-reference links open the declared transport instruction, not the inherited scaffold', async () => {
+  const source = collections({ exclusions: false });
+  const response = source.twists.responseBundle.responses.find(response => response.condition === 'skill' && response.trialNumber === 1);
+  response.provenance = { completion: { origin: 'new', transport: 'mcp-chunks', instructionFileId: 'frozen-skill-root-mcp-chunks' } };
+  response.runtime = { referenceFilesRead: ['SKILL.md'] };
+  source.twists.responseBundle.promptFiles.push({ id: 'frozen-skill-root', title: 'Inherited provider instruction', content: 'Original command scaffold.' },
+    { id: 'frozen-skill-root-mcp-chunks', title: 'Completion provider instruction', content: 'Declared local read-only MCP scaffold.' });
+  const page = await renderReport(source, `#${TWISTS}/case-1/trial-1`);
+  assert.match(page.reportView.innerHTML, /data-open-prompt-file="frozen-skill-root-mcp-chunks" aria-label="Read archived SKILL.md"/);
+  assert.doesNotMatch(page.reportView.innerHTML, /data-open-prompt-file="frozen-skill-root" aria-label="Read archived SKILL.md"/);
+});
+
 test('Writing trial and case changes preserve sections; omitted and invalid trial routes canonicalize safely', async () => {
   const page = await renderReport(collections({ caseCount: 2 }), `#${TWISTS}/case-1/trial-7/method`);
   page.choose('[data-writing-trial]', '10');

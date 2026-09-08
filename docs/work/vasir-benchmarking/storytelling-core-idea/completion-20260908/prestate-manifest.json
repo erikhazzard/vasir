@@ -1,0 +1,225 @@
+{
+  "runId": "storytelling-core-idea-v1-2026-09-07",
+  "manifestHash": "edcbeb0931921d8047321ca3c4e6a4751ab466958c32fd3b6bda0b5e97775373",
+  "benchmarkHash": "3441eb41d6babb53b7a757ae0cd99407f80e2f6aa31957e0c529893e5bed3f09",
+  "skillHash": "7802d73207dc64b44cd547ec752c7ea1a5198234c155d43e9934b08f6d73e2f0",
+  "configurations": [
+    {
+      "id": "codex:gpt-6-astra@low",
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "reasoning": "low"
+    },
+    {
+      "id": "codex:gpt-6-astra@medium",
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "reasoning": "medium"
+    },
+    {
+      "id": "codex:gpt-6-astra@high",
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "reasoning": "high"
+    },
+    {
+      "id": "codex:gpt-6-astra@xhigh",
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "reasoning": "xhigh"
+    },
+    {
+      "id": "codex:gpt-6-astra@max",
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "reasoning": "max"
+    },
+    {
+      "id": "codex:gpt-6-astra@ultra",
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "reasoning": "ultra"
+    },
+    {
+      "id": "codex:gpt-5.6-sol@low",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning": "low"
+    },
+    {
+      "id": "codex:gpt-5.6-sol@medium",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning": "medium"
+    },
+    {
+      "id": "codex:gpt-5.6-sol@high",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning": "high"
+    },
+    {
+      "id": "codex:gpt-5.6-sol@xhigh",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning": "xhigh"
+    },
+    {
+      "id": "codex:gpt-5.6-sol@max",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning": "max"
+    },
+    {
+      "id": "codex:gpt-5.6-sol@ultra",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning": "ultra"
+    },
+    {
+      "id": "codex:gpt-5.6-terra@low",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning": "low"
+    },
+    {
+      "id": "codex:gpt-5.6-terra@medium",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning": "medium"
+    },
+    {
+      "id": "codex:gpt-5.6-terra@high",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning": "high"
+    },
+    {
+      "id": "codex:gpt-5.6-terra@xhigh",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning": "xhigh"
+    },
+    {
+      "id": "codex:gpt-5.6-terra@max",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning": "max"
+    },
+    {
+      "id": "codex:gpt-5.6-terra@ultra",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning": "ultra"
+    },
+    {
+      "id": "codex:gpt-5.6-luna@low",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning": "low"
+    },
+    {
+      "id": "codex:gpt-5.6-luna@medium",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium"
+    },
+    {
+      "id": "codex:gpt-5.6-luna@high",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning": "high"
+    },
+    {
+      "id": "codex:gpt-5.6-luna@xhigh",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning": "xhigh"
+    },
+    {
+      "id": "codex:gpt-5.6-luna@max",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning": "max"
+    },
+    {
+      "id": "claude:claude-fable-5-1@low",
+      "provider": "claude",
+      "model": "claude-fable-5-1",
+      "reasoning": "low"
+    },
+    {
+      "id": "claude:claude-fable-5-1@medium",
+      "provider": "claude",
+      "model": "claude-fable-5-1",
+      "reasoning": "medium"
+    },
+    {
+      "id": "claude:claude-fable-5-1@high",
+      "provider": "claude",
+      "model": "claude-fable-5-1",
+      "reasoning": "high"
+    },
+    {
+      "id": "claude:claude-fable-5-1@xhigh",
+      "provider": "claude",
+      "model": "claude-fable-5-1",
+      "reasoning": "xhigh"
+    },
+    {
+      "id": "claude:claude-fable-5-1@max",
+      "provider": "claude",
+      "model": "claude-fable-5-1",
+      "reasoning": "max"
+    },
+    {
+      "id": "claude:claude-opus-5@low",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning": "low"
+    },
+    {
+      "id": "claude:claude-opus-5@medium",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning": "medium"
+    },
+    {
+      "id": "claude:claude-opus-5@high",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning": "high"
+    },
+    {
+      "id": "claude:claude-opus-5@xhigh",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning": "xhigh"
+    },
+    {
+      "id": "claude:claude-opus-5@max",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning": "max"
+    }
+  ],
+  "caseIds": [
+    "breaking-bad",
+    "the-matrix",
+    "parasite",
+    "frankenstein-1818",
+    "things-fall-apart",
+    "a-dolls-house",
+    "a-separation",
+    "close-up",
+    "convenience-store-woman",
+    "the-memory-police",
+    "death-and-the-kings-horseman",
+    "my-mister"
+  ],
+  "trialCount": 1,
+  "expectedRows": 792,
+  "frozenAt": "2026-09-07T21:58:40.791Z",
+  "runnerVersion": "storytelling-core-idea-v1",
+  "runtimeVersion": "progressive-frozen-skill-v2"
+}

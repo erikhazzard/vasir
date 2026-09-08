@@ -28,6 +28,47 @@ Please preserve all evidence and do not publish while this release is being
 coordinated. This file is coordination only, not a publish lock or authorization
 to discard another task's changes.
 
+## Update: newer shared release already live
+
+Core's receipt confirms `70a2d255…ed8b` was activated at 02:32 UTC. We are not
+rolling it back or isolating an older selection. Its source and provisional
+overview card remain preserved. The hierarchy owner is completing an additive
+partial-coverage display: known subgroup scores remain visible as unranked
+paired stacks, missing subgroup capacity is explicitly unavailable, and combined
+score/rank/uplift remain withheld. Existing helper arithmetic already preserves
+the needed subgroup readings; no scoring change is required.
+
+Please hold presentation/source changes and further publication until this
+follow-up candidate is reviewed and published. The final receipt will be added
+here. Semantic messages to Core were accepted; messages to DM remain unavailable.
+
+## Follow-up publication completed
+
+The guarded fast publisher successfully activated
+`c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0`, advancing
+from the verified `70a2d255…ed8b` release without rollback. Receipt:
+`tmp/writing-hierarchy/rehearsal-07/publish-result.json`.
+
+All fifteen site files plus the retained game isolation probe passed live byte
+verification; 526 unchanged assets were reused, origin privacy passed, and the
+publication lease was released. The publisher's fast mode does not run browser
+audits; nine separate live Writing browser checks are being retained under
+`tmp/writing-hierarchy/rehearsal-07/live-writing-*` and will be summarized in the
+work spec after all finish.
+
+This release preserves the selected Core/DM/Twists data and Core's provisional
+overview, adds unranked partial profiles with explicit missing subgroup slots,
+and fixes responsive answer-card clipping. It does not change benchmark scores,
+excluded trials, judge evidence, or the Storytelling skill. The shared source
+now has a refreshed 15-file/60-capture acceptance receipt. Further source changes
+must receive their own review; do not reuse this receipt for changed bytes.
+
+All nine separate live Writing checks have now passed: 1,206 assertions and
+sixty exact candidate-bound loaded-module records. All 195 selected tests pass.
+The hierarchy release is complete; the temporary coordination hold is finished.
+Future publications should build on this release and preserve its hierarchy,
+provisional/partial distinctions, and original benchmark evidence.
+
 ## Core score owner — 02:34 UTC, published
 
 The user explicitly renewed deployment/commit permission after the prior
@@ -69,3 +110,20 @@ the real score link and verified all31 numeric pairs and both diagnostics.
 The hierarchy owner's subsequent benchmark-count deduplication in `app.js` is
 preserved; it was not in the frozen deployment candidate. The shared acceptance
 lock has intentionally not been replaced.
+
+## New magic-discovery creation benchmark — root writing owner, 03:05 UTC
+
+The user requested a new completed creation benchmark and deployment. Work is
+additive: `storytelling-magic-discovery`, 33 exact settings × 3 trials × plain/skill
+(198 creator slots), with four blind crossed model/context judge seats. The
+frozen run is `storytelling-magic-discovery-v1-2026-09-08`; Codex generation is
+running. The current Core/Twists/DM selections, hierarchy, partial coverage, and
+provisional scores will be preserved. No scoring or layout rollback is intended.
+
+Owned new modules: `run-storytelling-creation.js`, `storytelling-creation-runtime.js`,
+`judge-storytelling-creation.js`, `storytelling-creation-publication.js`, their tests,
+and `benchmarks/storytelling-magic-discovery/`. Root will integrate the additive
+projection/report and a lazy archive path so new answers do not overload existing
+bundles. Any shared renderer changes will be narrowly scoped and reviewed from
+the then-current shared candidate before guarded fast publication. Existing
+acceptance receipts will not be reused for changed bytes.

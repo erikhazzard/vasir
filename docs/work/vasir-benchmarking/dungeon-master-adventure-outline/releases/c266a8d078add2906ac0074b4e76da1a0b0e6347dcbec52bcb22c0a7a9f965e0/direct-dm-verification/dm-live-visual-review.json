@@ -1,0 +1,49 @@
+{
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "status": "passed",
+  "notes": [
+    "Adventure outline links are wholly visible and wrap within their cards at 1440, 390 and 820 px.",
+    "Primary and secondary cohort table is readable with all columns visible at all three widths.",
+    "Primary repetition 3 incomplete 2/3 reference proof is visible on mobile and tablet, including retention in the invocation comparison.",
+    "New unranked partial coverage display remains present alongside the DM link; no category score or rank is inferred."
+  ],
+  "screenshots": [
+    {
+      "path": "live-dm-links-desktop.png",
+      "sha256": "d16e303bae687f13274f42b872c4cfb1d2b0a8a9ec6e0b1495a2dc4317995e48"
+    },
+    {
+      "path": "live-dm-links-mobile.png",
+      "sha256": "0d292bf97569cd3aba7be370b270b0ef9fbb002877703e57eec159183b264198"
+    },
+    {
+      "path": "live-dm-links-tablet.png",
+      "sha256": "ebe836e8262867ca7a690f5cf8942d877c1737571b870be48d72644e9a3779b6"
+    },
+    {
+      "path": "dm-desktop/dungeon-master-cohorts.png",
+      "sha256": "55be9254f5edc7cd4f6fd7409120fbfeb44306b5edc5b835298091d80fbab940"
+    },
+    {
+      "path": "dm-mobile/dungeon-master-cohorts.png",
+      "sha256": "9245ae879156776cd1808cd30823fa53a98448d03eb8c12edd769e2cf922b516"
+    },
+    {
+      "path": "dm-tablet/dungeon-master-cohorts.png",
+      "sha256": "95466980f691320f598a8654fafdc69476bbe6f8feca115103d537d9b1cf2d78"
+    },
+    {
+      "path": "dm-mobile/dungeon-master-adherence.png",
+      "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5"
+    },
+    {
+      "path": "dm-tablet/dungeon-master-adherence.png",
+      "sha256": "5557889aed195b4d588a44d73ec38a1d0f45b0a6cd3d15e8f35f2129d0039337"
+    },
+    {
+      "path": "dm-mobile/writing-stacked-rows.png",
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788"
+    }
+  ],
+  "completedAt": "2026-09-08T03:15:01.407285+00:00"
+}

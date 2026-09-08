@@ -1,0 +1,9 @@
+{
+  "kind": "vasirbenchmark-games-selection",
+  "schemaVersion": 1,
+  "source": {
+    "path": ".agents/vasir-evals/2d-jumping-demo/2026-09-07T12-26-15-439Z-402aeb/publication/source-75e88a6988a0ceb299cc02ef39110742003dc6a359ea70060ee7742376b7b9f2.json",
+    "bytes": 221054,
+    "sha256": "75e88a6988a0ceb299cc02ef39110742003dc6a359ea70060ee7742376b7b9f2"
+  }
+}

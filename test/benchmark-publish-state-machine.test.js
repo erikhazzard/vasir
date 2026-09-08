@@ -71,7 +71,7 @@ function createPublicationRepoFixture() {
   const lockPath = path.join(siteRoot, "template-lock.json");
   const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
   const acceptedPaths = [
-    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js", "writing-creation-responses.js"].includes(filePath)),
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js", "writing-creation-responses.js", "writing-twists-responses.js", "writing-dungeon-master-responses.js"].includes(filePath)),
     "capture.mjs",
     "capture.sh",
     "games-browsercheck.mjs",

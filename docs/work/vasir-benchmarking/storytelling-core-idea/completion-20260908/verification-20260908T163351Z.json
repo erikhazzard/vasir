@@ -1,0 +1,49 @@
+{
+  "verifiedAt": "2026-09-08T16:33:51.002Z",
+  "runId": "storytelling-core-idea-v1-2026-09-07",
+  "prestateRunSha256": "0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5",
+  "currentRunSha256": "0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac",
+  "preservedGenerationRows": 792,
+  "preservedCompletedBatches": 473,
+  "frozenManifestUnchanged": true,
+  "frozenSkillUnchanged": true,
+  "publicSelectionUnchanged": true,
+  "newCompletedBatches": 99,
+  "judges": [
+    {
+      "configurationId": "codex:gpt-6-astra@xhigh",
+      "completeBatches": 394,
+      "errorBatches": 0,
+      "deferredBatches": 0,
+      "individualAssessments": 788
+    },
+    {
+      "configurationId": "claude:claude-fable-5-1@max",
+      "completeBatches": 178,
+      "errorBatches": 3,
+      "deferredBatches": 213,
+      "individualAssessments": 356
+    }
+  ],
+  "coverage": {
+    "benchmarkCount": 1,
+    "caseCount": 12,
+    "settingCount": 33,
+    "completedSettingCount": 0,
+    "responseCount": 790,
+    "expectedResponseCount": 792,
+    "scoredResponseCount": 356,
+    "usablePairs": 178,
+    "expectedPairs": 396,
+    "judgmentCount": 1144,
+    "expectedJudgmentCount": 1584
+  },
+  "quotaCauses": [
+    {
+      "provider": "claude",
+      "model": "claude-fable-5-1",
+      "reason": "session-usage-limit-reached",
+      "apiErrorStatus": 429
+    }
+  ]
+}

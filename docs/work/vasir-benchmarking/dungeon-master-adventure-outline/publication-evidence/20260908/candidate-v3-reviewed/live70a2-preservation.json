@@ -1,0 +1,309 @@
+{
+  "kind": "dungeon-master-live-release-preservation-audit",
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T02:54:22.850Z",
+  "liveReleaseId": "70a2d25557481e7dad63fab72d891c9629843e76d834f1ffe670a260d928ed8b",
+  "publicationReceipt": {
+    "path": "/Users/erikhazzard/code/vasir/tmp/writing-score-release/publication.json",
+    "sha256": "ce77593e08a3edc0ce648a06f2409fd287b05be0a15550e92e272b524c7b1994"
+  },
+  "artifactState": {
+    "path": "/Users/erikhazzard/code/vasir/tmp/writing-score-release/state.json",
+    "sha256": "9c9907f80bfd189929579df316e4e98b4f2fbe017b5baeee8982f28dbe0a503c"
+  },
+  "exactPublishedArtifactRoot": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd",
+  "presentationSourceRoot": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasir-score-presentation-iPdFKy",
+  "warning": "state.frozenRoot contains pre-build generated data; use the manifest-verified outputPath artifacts for the exact published generated bundles.",
+  "httpVerification": {
+    "method": "Read-only public HTTPS GET",
+    "matched": [
+      "index.html",
+      "benchmark-report.html",
+      "games.html"
+    ],
+    "javascriptCssFontAssets": "Unversioned asset GETs returned HTTP403 with empty bodies in this tool environment; no claim of independent HTTP byte verification for those files. Artifact bytes match the successful publication receipt, whose release identity root verified as active."
+  },
+  "files": [
+    {
+      "path": "app.js",
+      "bytes": 183551,
+      "publishedSha256": "45a82c9571df1892db9240d3426803b8fd2231449817bb2b4ffc5c74212db9fd",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/app.js",
+      "artifactSha256": "45a82c9571df1892db9240d3426803b8fd2231449817bb2b4ffc5c74212db9fd",
+      "artifactMatchesPublished": true,
+      "originalSha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d",
+      "mirrorSha256": "fb2358f853fe25b78f2ad05e2e5de64aa88b1a1c1cbf7660965641fdf89b9be6"
+    },
+    {
+      "path": "assets/d3.v7.min.js",
+      "bytes": 279706,
+      "publishedSha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/assets/d3.v7.min.js",
+      "artifactSha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+      "artifactMatchesPublished": true,
+      "originalSha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539",
+      "mirrorSha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "path": "assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "publishedSha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/assets/kanit-latin-900-normal.woff2",
+      "artifactSha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
+      "artifactMatchesPublished": true,
+      "originalSha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3",
+      "mirrorSha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "path": "benchmark-report.css",
+      "bytes": 33336,
+      "publishedSha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/benchmark-report.css",
+      "artifactSha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084",
+      "artifactMatchesPublished": true,
+      "originalSha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084",
+      "mirrorSha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084"
+    },
+    {
+      "path": "benchmark-report.html",
+      "bytes": 2480,
+      "publishedSha256": "c7de96134ceef1e61dfbe345a4733c5f921f4100c504ba4f9fdf1cce0f474ab5",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/benchmark-report.html",
+      "artifactSha256": "c7de96134ceef1e61dfbe345a4733c5f921f4100c504ba4f9fdf1cce0f474ab5",
+      "artifactMatchesPublished": true,
+      "originalSha256": "915c3ce28a71cdff6fc974a7dcaa5f8b65c813991706603aa36114c7843a1eec",
+      "mirrorSha256": "915c3ce28a71cdff6fc974a7dcaa5f8b65c813991706603aa36114c7843a1eec"
+    },
+    {
+      "path": "benchmark-report.js",
+      "bytes": 86001,
+      "publishedSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/benchmark-report.js",
+      "artifactSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351",
+      "artifactMatchesPublished": true,
+      "originalSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351",
+      "mirrorSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+    },
+    {
+      "path": "data.js",
+      "bytes": 874810,
+      "publishedSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/data.js",
+      "artifactSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+      "artifactMatchesPublished": true,
+      "originalSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+      "mirrorSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69"
+    },
+    {
+      "path": "games.css",
+      "bytes": 19893,
+      "publishedSha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/games.css",
+      "artifactSha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8",
+      "artifactMatchesPublished": true,
+      "originalSha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8",
+      "mirrorSha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
+    },
+    {
+      "path": "games.html",
+      "bytes": 3463,
+      "publishedSha256": "ef4426fe1b2ee42761fdc2592e4d7109764a540db3a8bece72af7ab7a40e677d",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/games.html",
+      "artifactSha256": "ef4426fe1b2ee42761fdc2592e4d7109764a540db3a8bece72af7ab7a40e677d",
+      "artifactMatchesPublished": true,
+      "originalSha256": "eed02c026dc2cf1aa63f1a3433bf38926ae33cef6b3bbc6c3171dee80cf7f5b0",
+      "mirrorSha256": "0194d6af2b9318d8fd5a8d396abd8b9e219e006a685a91792118fcf01a0ccd81"
+    },
+    {
+      "path": "games.js",
+      "bytes": 31995,
+      "publishedSha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/games.js",
+      "artifactSha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2",
+      "artifactMatchesPublished": true,
+      "originalSha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2",
+      "mirrorSha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
+    },
+    {
+      "path": "index.html",
+      "bytes": 2649,
+      "publishedSha256": "42ef7bb1e37fbdefae90438b2ca368e77bdd934a4d84fc524423f39bbd343e87",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/index.html",
+      "artifactSha256": "42ef7bb1e37fbdefae90438b2ca368e77bdd934a4d84fc524423f39bbd343e87",
+      "artifactMatchesPublished": true,
+      "originalSha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9",
+      "mirrorSha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9"
+    },
+    {
+      "path": "responses.js",
+      "bytes": 6484506,
+      "publishedSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/responses.js",
+      "artifactSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+      "artifactMatchesPublished": true,
+      "originalSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+      "mirrorSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46"
+    },
+    {
+      "path": "style.css",
+      "bytes": 149718,
+      "publishedSha256": "4b6315112ff8ea2b6f30afe5eb14012372b98c1a65e1388a42afd89135bc4489",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/style.css",
+      "artifactSha256": "4b6315112ff8ea2b6f30afe5eb14012372b98c1a65e1388a42afd89135bc4489",
+      "artifactMatchesPublished": true,
+      "originalSha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a",
+      "mirrorSha256": "4e5c6cf3ee645d65d1c6b6c1c676e16585be2a1f06aab65737a7196f75e9aa14"
+    },
+    {
+      "path": "writing-data.js",
+      "bytes": 1363147,
+      "publishedSha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/writing-data.js",
+      "artifactSha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+      "artifactMatchesPublished": true,
+      "originalSha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+      "mirrorSha256": "bc65d319f520878218ec788829c39d7b30b0fe773f085e59b508db46d097fb96"
+    },
+    {
+      "path": "writing-responses.js",
+      "bytes": 6126683,
+      "publishedSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+      "exactArtifactPath": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasirbenchmark-release.asx7rd/writing-responses.js",
+      "artifactSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+      "artifactMatchesPublished": true,
+      "originalSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+      "mirrorSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158"
+    }
+  ],
+  "benchmarkComparisons": [
+    {
+      "benchmarkId": "storytelling-core-idea",
+      "liveProjectionSha256": "05d7a12624112a6bc8c05a8ecabb8e697389da0a660f934f5fb4afd0684c218a",
+      "reviewedProjectionSha256": "b633519862fea8b299650f38f0476742b5f61752802d0370d21761b41b51f610",
+      "wholeProjectionEqual": false,
+      "fieldDifferencesExcludingCollectionContainers": [
+        "provisionalLeaderboard"
+      ],
+      "officialFieldsEqualExcludingProvisional": true,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 12,
+        "settingCount": 33,
+        "completedSettingCount": 0,
+        "responseCount": 790,
+        "expectedResponseCount": 792,
+        "scoredResponseCount": 158,
+        "usablePairs": 79,
+        "expectedPairs": 396,
+        "judgmentCount": 946,
+        "expectedJudgmentCount": 1584
+      },
+      "provisionalLeaderboard": {
+        "sha256": "ab7c8bcdaada4753ddd65b47c5f27c34e2f1e243f08c73d6da0c43c51a6d7844",
+        "sourceSha256": "0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5",
+        "corpusSha256": "3441eb41d6babb53b7a757ae0cd99407f80e2f6aa31957e0c529893e5bed3f09",
+        "skillSha256": "7802d73207dc64b44cd547ec752c7ea1a5198234c155d43e9934b08f6d73e2f0",
+        "rankedSettingCount": 31,
+        "entryCount": 66,
+        "caseIds": [
+          "breaking-bad",
+          "the-matrix",
+          "parasite",
+          "frankenstein-1818",
+          "things-fall-apart",
+          "a-dolls-house",
+          "a-separation",
+          "close-up",
+          "convenience-store-woman",
+          "the-memory-police",
+          "death-and-the-kings-horseman",
+          "my-mister"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "storytelling-plot-twists",
+      "liveProjectionSha256": "50e91a9f2b80a06ca481dcec2ccf37224ac6f42b0b6db94058f0d0c28e3122ac",
+      "reviewedProjectionSha256": "50e91a9f2b80a06ca481dcec2ccf37224ac6f42b0b6db94058f0d0c28e3122ac",
+      "wholeProjectionEqual": true,
+      "fieldDifferencesExcludingCollectionContainers": [],
+      "officialFieldsEqualExcludingProvisional": true,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "settingCount": 4,
+        "completedSettingCount": 2,
+        "responseCount": 80,
+        "expectedResponseCount": 80,
+        "scoredResponseCount": 76,
+        "usablePairs": 38,
+        "expectedPairs": 40,
+        "judgmentCount": 152,
+        "expectedJudgmentCount": 160,
+        "validResponseCount": 78,
+        "terminalGenerationFailureCount": 2,
+        "terminallyExcludedPairCount": 2,
+        "terminallyExcludedJudgmentCount": 8,
+        "pendingGenerationCount": 0,
+        "pendingJudgmentCount": 0,
+        "executionComplete": true,
+        "executionStatus": "complete-with-exclusions"
+      }
+    },
+    {
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "liveProjectionSha256": "f1e2a5334299ebdf91b0a723224ff6b4ede0c04e5d7721e693395457b3d500a0",
+      "reviewedProjectionSha256": "f1e2a5334299ebdf91b0a723224ff6b4ede0c04e5d7721e693395457b3d500a0",
+      "wholeProjectionEqual": true,
+      "fieldDifferencesExcludingCollectionContainers": [],
+      "officialFieldsEqualExcludingProvisional": true,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 16,
+        "promptCount": 6,
+        "settingCount": 1,
+        "completedSettingCount": 1,
+        "responseCount": 32,
+        "expectedResponseCount": 32,
+        "scoredResponseCount": 32,
+        "usablePairs": 16,
+        "expectedPairs": 16,
+        "judgmentCount": 64,
+        "expectedJudgmentCount": 64
+      }
+    }
+  ],
+  "selectors": [
+    {
+      "path": "benchmarks/public-results.json",
+      "currentOriginalSha256": "e38dee13048ef18bb5db6ea027f3a308a43167cdeddfc9b072dbf0a1d7b2d979",
+      "v2FrozenSha256": "e38dee13048ef18bb5db6ea027f3a308a43167cdeddfc9b072dbf0a1d7b2d979",
+      "identical": true
+    },
+    {
+      "path": "benchmarks/storytelling-core-idea/publication.json",
+      "currentOriginalSha256": "dfbdb501233d5838452f95e41088b4c2112e12cb5b5f5f711e94b0fad4a83af9",
+      "v2FrozenSha256": "dfbdb501233d5838452f95e41088b4c2112e12cb5b5f5f711e94b0fad4a83af9",
+      "identical": true
+    },
+    {
+      "path": "benchmarks/storytelling-plot-twists/publication.json",
+      "currentOriginalSha256": "8d3e1c0b6e44e7abbe2536671fc09d70e8eba9ae395913c0c8dd7779c43ffc6d",
+      "v2FrozenSha256": "8d3e1c0b6e44e7abbe2536671fc09d70e8eba9ae395913c0c8dd7779c43ffc6d",
+      "identical": true
+    },
+    {
+      "path": "benchmarks/dungeon-master-adventure-outline/publication.json",
+      "currentOriginalSha256": "e92adbedd7ff43bf6eaf34272267a5b10558f257b9d2ebda71707ad5c18007d6",
+      "v2FrozenSha256": "e92adbedd7ff43bf6eaf34272267a5b10558f257b9d2ebda71707ad5c18007d6",
+      "identical": true
+    },
+    {
+      "path": "benchmarks/2d-jumping-demo/publication.json",
+      "currentOriginalSha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321",
+      "v2FrozenSha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321",
+      "identical": true
+    }
+  ],
+  "conclusion": "Preserve the new Core idea provisionalLeaderboard and exact live presentation additions; DM and Plot twists projections already equal the reviewed final result. All five original selectors equal the v2 snapshot. No source selection regression is required."
+}

@@ -34,11 +34,11 @@ Audit version-sensitive settings and flags only when present in the project, inc
 
 No flag is a universal free win.
 
-## 2. Separate four rendering cost families
+## 2. Separate rendering cost families
 
 ### A. Pixel/fill/bandwidth
 
-Driven by physical drawing-buffer size across every pass, overdraw, blending, samples, texture bandwidth, shader complexity, transmission/refraction, volumetrics, and large intermediate targets.
+Driven by physical drawing-buffer size across every pass, overdraw, blending, samples, texture/attachment bandwidth, and large intermediate targets. Shader execution can overlap these costs; resolution sensitivity alone does not distinguish them.
 
 Measure:
 
@@ -82,6 +82,10 @@ Measure active/change ratios:
 ### D. Cold pipeline/resource work
 
 Driven by shader/program/pipeline compilation, texture upload, target allocation, first shadow allocation, lazy material variants, and decoder/loader initialization. Route detailed load work to `load-first-use-assets.md`.
+
+### E. Shader execution
+
+Arithmetic, texture latency, divergent branches/loop tails, and register or instruction-cache pressure can constrain execution. Read `$code__threejs-rapier-performance`'s [shader-execution reference](../../code__threejs-rapier-performance/references/shader-execution.md) when implicated. Compare one shader change at fixed coverage, geometry, resolution, and pass topology; use compiled-resource evidence where available and repeated GPU timings. These mechanisms can overlap bandwidth pressure; they are not mutually exclusive diagnoses.
 
 ## 3. `renderer.info` is context, not causal proof
 
@@ -139,7 +143,7 @@ Look for:
 - lazy variants first encountered during interaction
 - shader compilation triggered by scene transitions
 
-Do not merge materials when independent render state is semantically required. Prefer shared programs plus per-object/instance data when the installed renderer path supports it and the upload cost is lower than the eliminated state churn.
+Do not merge materials when independent render state is semantically required. Compare shared programs plus per-object/instance data against compatible specialized groups in the existing passes. Include upload and submission costs, conditional shader coherence, indexing, compiled register demand, and specialization's compilation/warmup/state-switching costs. Fewer draws or variants alone do not establish a win.
 
 ## 5. Batching and instancing eligibility
 
@@ -390,4 +394,3 @@ render_acceptance:
 ```
 
 Re-profile after each accepted patch. A call-count win can expose fill pressure; a DPR win can expose CPU submission; a material merge can expose culling or upload costs.
-

@@ -8,6 +8,7 @@ import { buildDungeonMasterPublication, DUNGEON_MASTER_BENCHMARK_ID, validateDun
 import { buildStorytellingCreationPublication, prepareStorytellingCreationPublicationSource, STORYTELLING_CREATION_BENCHMARK_ID, validateStorytellingCreationPublication } from "./storytelling-creation-publication.js";
 import { createStorytellingSkillInstruction, isStorytellingRequiredSkillReadReceiptCompatible, validateStorytellingSkillSnapshot } from "./storytelling-agent-runtime.js";
 import { serializeWritingCreationResponseArchive } from "./writing-response-archives.js";
+import { TWISTS_COMPLETION_VERSION, TWISTS_PARENT_SHA256, validateTwistsCompletion } from "./plot-twists-completion.js";
 
 export const WRITING_BENCHMARK_ID = "storytelling-core-idea";
 export const WRITING_SELECTION_PATH = "benchmarks/storytelling-core-idea/publication.json";
@@ -222,9 +223,11 @@ function publicJudgments(run, row, dimensions, panel = PANEL) {
 export function projectWritingRun({ run, snapshot, sourceSha256 }) {
   const benchmarkId = run?.benchmark?.definition?.id;
   const isTwists = benchmarkId === PLOT_TWISTS_BENCHMARK_ID;
+  const isTwistsCompletion = isTwists && run.storytelling?.runnerVersion === TWISTS_COMPLETION_VERSION;
   const panel = isTwists ? TWISTS_PANEL : PANEL;
   const trialCount = run?.generation?.trialCount;
-  requireEvidence(run?.kind === "benchmark" && BENCHMARK_IDS.includes(benchmarkId) && benchmarkId !== STORYTELLING_CREATION_BENCHMARK_ID && ["storytelling-core-idea-v1", "storytelling-response-v2"].includes(run.storytelling?.runnerVersion), "unsupported source run.");
+  requireEvidence(run?.kind === "benchmark" && BENCHMARK_IDS.includes(benchmarkId) && benchmarkId !== STORYTELLING_CREATION_BENCHMARK_ID && (["storytelling-core-idea-v1", "storytelling-response-v2"].includes(run.storytelling?.runnerVersion) || isTwistsCompletion), "unsupported source run.");
+  const completionEvidence = isTwistsCompletion ? validateTwistsCompletion({ run, snapshot }) : null;
   requireEvidence(run.benchmark.hash === createBenchmarkHash(run.benchmark.definition), "frozen benchmark hash changed.");
   validateStorytellingSkillSnapshot(snapshot);
   requireEvidence(snapshot.hash === run.treatment?.hash && run.treatment?.id === "skill:writing-storytelling" && Number.isInteger(trialCount) && trialCount >= 1 && (isTwists || trialCount === 1), "treatment or trial contract changed.");
@@ -254,10 +257,17 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
       content: file.contents, sha256: file.sha256
     }))
   ];
+  if (isTwistsCompletion) for (const transport of ["mcp-chunks", "read-tool"]) {
+    const content = createStorytellingSkillInstruction({ skillSnapshot: snapshot, skillDirectoryPath: "<frozen-skill-directory>", requiredSkillFiles, requiredSkillReadTransport: transport });
+    promptFiles.push({ id: `frozen-skill-root-${transport}`, title: `Completion-edition frozen skill provider instruction · ${transport} (temporary directory normalized)`, content, sha256: digest(content) });
+  }
   for (const setting of identities) for (const story of cases) for (let trialNumber = 1; trialNumber <= trialCount; trialNumber += 1) for (const condition of CONDITIONS) {
     const row = run.rows.find(candidate => candidate.configurationId === setting.configurationId && candidate.caseId === story.id && candidate.conditionId === condition.sourceId && candidate.trialNumber === trialNumber);
     requireEvidence(row && row.promptText === story.prompt && same(row.exactMessages, [{ role: "user", content: story.prompt }]), "a cell is missing or the minimal user question changed.");
     const configuration = run.configurations.find(candidate => candidate.id === setting.configurationId);
+    const origin = isTwistsCompletion ? run.completion.manifest.origins.find(candidate => candidate.rowKey === row.rowKey) : null;
+    const instructionFileId = origin && origin.transport !== "legacy" ? `frozen-skill-root-${origin.transport}` : "frozen-skill-root";
+    const instructionFile = promptFiles.find(file => file.id === instructionFileId);
     const complete = row.rowStatus === "complete";
     const protocolFailure = row.error?.code === "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE";
     const hasOutput = complete || (protocolFailure && typeof row.outputText === "string" && Boolean(row.outputText.trim()));
@@ -266,7 +276,7 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
       requireEvidence(row.provider === configuration.provider && row.model === configuration.model && row.reasoning === configuration.reasoning && row.runtimeReceipt.requestedModel === configuration.model && row.runtimeReceipt.requestedReasoning === configuration.reasoning && same(row.runtimeReceipt.requestedConfiguration, configuration), "requested generation identity or reasoning differs from its declared cell.");
       if (condition.id === "skill" && requiredSkillFiles.length) requireEvidence(isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot, requiredSkillFiles, receipt: row.runtimeReceipt.requiredSkillReads, requireComplete: complete }), "required frozen skill read evidence is incompatible.");
       requireEvidence(row.runtimeReceipt.outputSha256 === row.outputHash, "response output differs from its runtime receipt.");
-      requireEvidence(row.runtimeReceipt.instructionHash === (condition.id === "skill" ? digest(rootInstruction) : null), "frozen skill instruction differs from its runtime receipt.");
+      requireEvidence(row.runtimeReceipt.instructionHash === (condition.id === "skill" ? instructionFile.sha256 : null), "frozen skill instruction differs from its runtime receipt.");
       requireEvidence((row.runtimeReceipt.referenceAccess?.observedPaths ?? []).every(file => snapshot.files.some(source => source.relativePath === file)), "a public reference path is not in the frozen skill manifest.");
     }
     const judgments = complete ? publicJudgments(run, row, dimensions, panel) : [];
@@ -288,16 +298,17 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
     };
     if (isTwists) cell.generationDisposition = complete ? "complete" : protocolFailure ? "terminal-protocol-failure" : "unresolved";
     cell.metrics = metrics([cell]); cells.push(cell);
-    const messages = [...(condition.id === "skill" ? [{ role: configuration.provider === "codex" ? "developer" : "system", content: "Frozen storytelling skill provider instruction; see shared Method source. Temporary directory is normalized for privacy.", fileId: "frozen-skill-root" }] : []), { role: "user", content: story.prompt }];
+    const messages = [...(condition.id === "skill" ? [{ role: configuration.provider === "codex" ? "developer" : "system", content: "Frozen storytelling skill provider instruction; see shared Method source. Temporary directory is normalized for privacy.", fileId: instructionFileId }] : []), { role: "user", content: story.prompt }];
     const messageSetId = digest(JSON.stringify(messages)); messageSets.set(messageSetId, { id: messageSetId, messages });
     responses.push({ benchmarkId, caseId: story.id, settingId: setting.id, configurationId: setting.configurationId, condition: condition.id, trialNumber, messageSetId, outputText, wordCount: cell.wordCount, status, failureReason: cell.failureReason, judgments, disagreement, score: cell.score, provenance: { sourceSha256, outputSha256: hasOutput ? row.outputHash : null, questionSha256: digest(story.prompt), skillSha256: condition.id === "skill" ? snapshot.hash : null }, runtime: hasOutput ? { freshSession: true, modelVerification: row.runtimeReceipt.modelVerification, reasoningVerification: row.runtimeReceipt.reasoningVerification, executionMode: row.runtimeReceipt.executionMode, referenceFilesRead: row.runtimeReceipt.referenceAccess?.observedPaths ?? [] } : null });
+    if (origin) responses.at(-1).provenance.completion = { origin: origin.kind, transport: origin.transport, instructionFileId: condition.id === "skill" ? instructionFileId : null, parentSourceSha256: origin.kind === "new" ? null : TWISTS_PARENT_SHA256 };
   }
   for (const response of responses) {
     response.characterCount = response.outputText ? characters(response.outputText) : null;
     if (response.runtime) {
       const row = run.rows.find(candidate => candidate.configurationId === response.configurationId && candidate.caseId === response.caseId && candidate.conditionId === (response.condition === "skill" ? "skill:writing-storytelling" : "clean") && candidate.trialNumber === response.trialNumber);
       response.runtime.observedCollaborationEvents = row.runtimeReceipt.itemTypeCounts?.collab_tool_call ?? 0;
-      response.runtime.rawProviderStreamRetained = false;
+      response.runtime.rawProviderStreamRetained = Boolean(isTwistsCompletion && row.runtimeReceipt.rawStreams);
       response.runtime.durationMs = row.durationMs;
       response.runtime.usage = publicUsage(row.usage);
       if (row.runtimeReceipt.requiredSkillReads) {
@@ -390,6 +401,20 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
     projection.tracks[0].description = "Understanding and creating narrative; this benchmark tests a brief science-fiction outline with major plot twists.";
     projection.callouts.category = "One exact outline prompt with repeated trials; not a score for all writing.";
     for (const aggregate of aggregates) aggregate.trials = trialCount;
+    if (isTwistsCompletion) {
+      methodology.completion = { version: TWISTS_COMPLETION_VERSION, parentSourceSha256: TWISTS_PARENT_SHA256,
+        manifestSha256: run.storytelling.manifestHash, declaredAt: run.completion.manifest.frozenAt,
+        originalSettingCount: 4, expandedSettingCount: 33, inheritedValidAnswerCount: 78,
+        inheritedCompletedJudgeBatchCount: 76, retainedOriginalFailedAttemptCount: 2,
+        recoveryPolicy: "Only the two original invalid required-read answers are operationally retried. No valid answer is regenerated or selected by score.",
+        transports: run.completion.manifest.transport, newCreatorIsolation: run.completion.manifest.newCreatorIsolation, runtimeSources: run.completion.manifest.runtimeSources };
+      methodology.requiredSkillReadPolicyVersion = "per-answer-versioned";
+      methodology.requiredSkillReadPolicyVersions = [run.treatment.requiredSkillReadPolicyVersion, ...Object.values(run.completion.manifest.transport)];
+      const parentPublication = projectWritingRun({ run: completionEvidence.parent, snapshot, sourceSha256: TWISTS_PARENT_SHA256 });
+      responseBundle.supersededResponses = parentPublication.responseBundle.responses.filter(response => response.generationDisposition === "terminal-protocol-failure");
+      responseBundle.supersededResponsePolicy = "Original failed mandatory-read attempts retained without scores. These are predecessors, not additional trials or candidates in the completion edition.";
+      methodology.generationContract += " This completion edition expands the original four settings to 33 after the original run. Original valid responses and reviews remain byte-identical; two failed mandatory-read predecessors remain in the superseded-response archive. New Codex answers use a local read-only MCP chunk tool and new Claude answers use Read-tool frames, with separately frozen instructions and identical skill bytes. Both new arms explicitly disable host skill discovery, project instructions and external resources; inherited calls retain their original isolation evidence. Raw streams are retained for new calls only; inherited calls retain their original receipts and stream hashes.";
+    }
   }
   if (!isTwists) projection.provisionalLeaderboard = coreIdeaProvisionalLeaderboard(projection, responses);
   validateWritingPublication(projection, responseBundle);
@@ -404,7 +429,8 @@ export function validateWritingSummary(stub) {
     const existingBenchmarks = existing.benchmarks.filter(benchmark => benchmark.id !== DUNGEON_MASTER_BENCHMARK_ID);
     const defaultStub = { ...existing, benchmarks: existingBenchmarks, benchmarkIds: existingBenchmarks.map(benchmark => benchmark.id), collectionCoverage: writingCollectionCoverage(existingBenchmarks) };
     validateWritingSummary(defaultStub);
-    requireEvidence(descriptor.benchmarkId === DUNGEON_MASTER_BENCHMARK_ID && descriptor.subcategory === "dungeon-master" && descriptor.coverage?.expectedResponseCount === 32 && descriptor.coverage?.expectedJudgmentCount === 64 && stub.benchmarkIds.includes(DUNGEON_MASTER_BENCHMARK_ID), "invalid additional Writing descriptor.");
+    const settings = descriptor.coverage?.settingCount;
+    requireEvidence(descriptor.benchmarkId === DUNGEON_MASTER_BENCHMARK_ID && descriptor.subcategory === "dungeon-master" && Number.isSafeInteger(settings) && settings > 0 && descriptor.coverage.expectedResponseCount === 32 * settings && descriptor.coverage.expectedJudgmentCount === 64 * settings && stub.benchmarkIds.includes(DUNGEON_MASTER_BENCHMARK_ID), "invalid additional Writing descriptor.");
     requireEvidence(same(allWritingCoverage, writingCollectionCoverage([...existingBenchmarks, descriptor])), "additional Writing summary coverage differs.");
     return stub;
   }
@@ -522,7 +548,9 @@ export function validateWritingPublication(projection, responseBundle) {
       requireEvidence(response.configurationId === cell.configurationId && response.benchmarkId === benchmarkId && Number.isInteger(response.trialNumber) && response.trialNumber >= 1 && response.trialNumber <= trialCount && messageSets.has(response.messageSetId), "public response identity or input reference changed.");
       const story = projection.cases.find(candidate => candidate.id === response.caseId);
       const messages = messageSets.get(response.messageSetId).messages;
-      requireEvidence(messages.length === (response.condition === "skill" ? 2 : 1) && messages.at(-1).role === "user" && messages.at(-1).content === story.prompt && response.provenance.questionSha256 === digest(story.prompt) && (response.condition !== "skill" || messages[0].fileId === "frozen-skill-root" && promptFiles.has(messages[0].fileId) && messages[0].role === (response.configurationId.startsWith("codex:") ? "developer" : "system")), "a public response does not preserve its exact question or treatment instruction reference.");
+      const completionInstruction = benchmarkId === PLOT_TWISTS_BENCHMARK_ID && projection.methodology.completion?.version === TWISTS_COMPLETION_VERSION && response.provenance.completion?.origin !== "inherited";
+      const expectedInstructionId = completionInstruction ? `frozen-skill-root-${response.configurationId.startsWith("codex:") ? "mcp-chunks" : "read-tool"}` : "frozen-skill-root";
+      requireEvidence(messages.length === (response.condition === "skill" ? 2 : 1) && messages.at(-1).role === "user" && messages.at(-1).content === story.prompt && response.provenance.questionSha256 === digest(story.prompt) && (response.condition !== "skill" || messages[0].fileId === expectedInstructionId && promptFiles.has(messages[0].fileId) && messages[0].role === (response.configurationId.startsWith("codex:") ? "developer" : "system")), "a public response does not preserve its exact question or treatment instruction reference.");
       requireEvidence(response.provenance.skillSha256 === (response.condition === "skill" ? projection.methodology.skillSha256 : null) && response.provenance.sourceSha256 === projection.scoreBasis.sourceSha256, "public treatment or source fingerprint changed.");
       requireEvidence(response.provenance.outputSha256 === (response.outputText ? digest(response.outputText) : null), "public answer differs from its source hash.");
       requireEvidence(new Set(response.judgments.map(judge => judge.judgeConfigurationId)).size === response.judgments.length, "public panel repeats a judge.");
@@ -535,6 +563,10 @@ export function validateWritingPublication(projection, responseBundle) {
       requireEvidence(projection.scoreBasis.dimensions.every(dimension => cell.dimensions[dimension.id] === (response.judgments.length === 2 ? mean(response.judgments.map(judge => judge.dimensions[dimension.id].rating)) : null)), "displayed dimensions differ from their corresponding independent panel ratings.");
     }
     if (Object.hasOwn(projection, "provisionalLeaderboard")) requireEvidence(same(projection.provisionalLeaderboard, coreIdeaProvisionalLeaderboard(projection, responseBundle.responses)), "provisional results differ from the original fixed-judge matched pairs.");
+    if (projection.methodology.completion?.version === TWISTS_COMPLETION_VERSION) {
+      requireEvidence(benchmarkId === PLOT_TWISTS_BENCHMARK_ID && responseBundle.supersededResponses?.length === 2, "completion archive lost the original failed attempts.");
+      for (const response of responseBundle.supersededResponses) requireEvidence(response.condition === "skill" && response.status === "error" && response.generationDisposition === "terminal-protocol-failure" && response.judgments.length === 0 && response.score === null && response.provenance.sourceSha256 === TWISTS_PARENT_SHA256 && digest(response.outputText) === response.provenance.outputSha256, "an original failed attempt was changed or scored.");
+    }
   }
   return projection;
 }
@@ -613,6 +645,7 @@ export function prepareWritingPublicationSource({ repoRootDirectory, runDirector
   const directory = path.resolve(runDirectory);
   requireEvidence(directory.startsWith(`${path.join(root, ".agents", "vasir-evals", benchmarkId)}${path.sep}`), "checkpoint source is outside the benchmark artifact directory.");
   requireEvidence(!fs.existsSync(path.join(directory, "run.lock")), "wait for the active run writer before archiving.");
+  if (benchmarkId === PLOT_TWISTS_BENCHMARK_ID) requireEvidence(!fs.existsSync(path.join(directory, "completion.lock")), "wait for the active completion writer before archiving.");
   writingSelectionPath(benchmarkId);
   const runText = fs.readFileSync(path.join(directory, "run.json"), "utf8");
   requireEvidence(JSON.parse(runText).benchmark?.definition?.id === benchmarkId, "checkpoint benchmark differs from selected benchmark.");
@@ -630,7 +663,7 @@ export function prepareWritingPublicationSource({ repoRootDirectory, runDirector
 }
 
 export function serializeWritingModule(value, globalName) {
-  requireEvidence(["VASIR_WRITING", "VASIR_WRITING_RESPONSES", "VASIR_WRITING_CREATION_RESPONSES"].includes(globalName), "invalid public module name.");
+  requireEvidence(["VASIR_WRITING", "VASIR_WRITING_RESPONSES", "VASIR_WRITING_CREATION_RESPONSES", "VASIR_WRITING_TWISTS_RESPONSES", "VASIR_WRITING_DUNGEON_MASTER_RESPONSES"].includes(globalName), "invalid public module name.");
   if (globalName === "VASIR_WRITING_CREATION_RESPONSES") return serializeWritingCreationResponseArchive(value);
   const serialized = JSON.stringify(value).replaceAll("<", "\\u003c").replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
   return `(function () { 'use strict'; window.${globalName} = Object.freeze(${serialized}); }());\n`;

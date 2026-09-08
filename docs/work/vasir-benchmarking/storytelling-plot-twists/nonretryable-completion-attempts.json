@@ -1,0 +1,38 @@
+{
+  "kind": "plot-twists-completion-terminal-policy-attempts",
+  "schemaVersion": 1,
+  "runId": "storytelling-plot-twists-v1-completion-2026-09-08",
+  "policy": "These exact attempts are terminal provider safety refusals and must never be included in generic operational retries, rephrased requests, model/account substitutions, or read-protocol retries.",
+  "attempts": [
+    {
+      "rowKey": "claude:claude-opus-5@xhigh::scifi-outline::trial-1::skill:writing-storytelling",
+      "callId": "db9148df-66ff-4484-9422-ac57a565fe16",
+      "stdoutSha256": "4bc6521bee0b2d46b75ae04348093ffec8e136caa60ff9a64b277a5e17ac7060",
+      "stdoutBytes": 5492,
+      "terminalEvidence": {
+        "type": "result",
+        "is_error": true,
+        "stop_reason": "refusal",
+        "terminal_reason": "api_error",
+        "api_error_status": null,
+        "output_tokens": 0,
+        "reason": "Opus 5 safeguards flagged the message: reasoning_extraction"
+      }
+    },
+    {
+      "rowKey": "claude:claude-opus-5@xhigh::scifi-outline::trial-6::skill:writing-storytelling",
+      "callId": "45805685-d25b-4781-97b9-63353c9d696b",
+      "stdoutSha256": "c6348c87810880645fe226af544da68829cf0d981cfcac0d287383145b060d2c",
+      "stdoutBytes": 5492,
+      "terminalEvidence": {
+        "type": "result",
+        "is_error": true,
+        "stop_reason": "refusal",
+        "terminal_reason": "api_error",
+        "api_error_status": null,
+        "output_tokens": 0,
+        "reason": "Opus 5 safeguards flagged the message: reasoning_extraction"
+      }
+    }
+  ]
+}

@@ -1,0 +1,427 @@
+{
+  "retainedAt": "2026-09-08T03:16:19.661146+00:00",
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "originalReceiptBytesPreserved": true,
+  "files": [
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/adopted-candidate.json",
+      "path": "direct-dm-verification/adopted-candidate.json",
+      "bytes": 361604,
+      "sha256": "2aa13eef5f9e035f9979658bae41720c088ca0cefa930a0eadbdc28f29905d82"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/adopted-publication.json",
+      "path": "direct-dm-verification/adopted-publication.json",
+      "bytes": 186490,
+      "sha256": "932f622064123a2c068d63f9e1b089f7ead7743165891f6c75c29081fe51cd2e"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/after-benchmark-report.html",
+      "path": "direct-dm-verification/after-benchmark-report.html",
+      "bytes": 2480,
+      "sha256": "eda467ff1129b08ac4c82dfc97d7795c22d7952b6182b2697125c8e3084458b6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/after-index.html",
+      "path": "direct-dm-verification/after-index.html",
+      "bytes": 2649,
+      "sha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/before-benchmark-report.html",
+      "path": "direct-dm-verification/before-benchmark-report.html",
+      "bytes": 2480,
+      "sha256": "eda467ff1129b08ac4c82dfc97d7795c22d7952b6182b2697125c8e3084458b6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/before-index.html",
+      "path": "direct-dm-verification/before-index.html",
+      "bytes": 2649,
+      "sha256": "48d66fe84ee634cb220ad0b81d0613d0d1f41eea4b37ef7431c504042a5d3bd0"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-adherence.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-adherence.png",
+      "bytes": 246059,
+      "sha256": "7eac39b664df5489c2382042d50a271af4d28378bab3e80b31218fc3c86a6ede"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-answer.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-answer.png",
+      "bytes": 218066,
+      "sha256": "1f88a79b0211bdaaf4783ba469bf63322764275522f8ad9fba18488b827db98a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-benchmarks.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-benchmarks.png",
+      "bytes": 178478,
+      "sha256": "0e2b6383ac0bb63c8e0a04b8c1691022d85b84ccff280c8a87e0331e4dc570f4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-cohorts.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-cohorts.png",
+      "bytes": 162543,
+      "sha256": "55be9254f5edc7cd4f6fd7409120fbfeb44306b5edc5b835298091d80fbab940"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-efficiency.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-efficiency.png",
+      "bytes": 138727,
+      "sha256": "fd74c35851e440fa0fa2d5c2fcd67286e57eebca43e344a05ce30a9a22627e5e"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-judgments.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-judgments.png",
+      "bytes": 298563,
+      "sha256": "88691b16420e99c2e976ed30238bc4b000cea0d131c6c12c12ed320fea0c4731"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-method.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-method.png",
+      "bytes": 152270,
+      "sha256": "01a3e16193b3f1186e4bded8f71b70439604966b89735b92a523b2bd33aa090f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-models.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-models.png",
+      "bytes": 161385,
+      "sha256": "157d7b23bb7c909de22365da869d87f5c2d4eeffca6833217a6ecdfb97e4758a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-reference.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-reference.png",
+      "bytes": 197416,
+      "sha256": "e1253353e334fba89104f1eaf7c1859cd8ccf3d4590c06098d03a423bd3d6441"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/dungeon-master-report.png",
+      "path": "direct-dm-verification/dm-desktop/dungeon-master-report.png",
+      "bytes": 140490,
+      "sha256": "9c23fd23009cadc0cbd629a5b973e9a27c1feb540251117c0a71b4173ee30de4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-benchmarks.png",
+      "path": "direct-dm-verification/dm-desktop/writing-benchmarks.png",
+      "bytes": 167381,
+      "sha256": "de9bd9816ac4e7abafc352cafd700121547014a458cdec96682671944b73e1c6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-browsercheck.json",
+      "path": "direct-dm-verification/dm-desktop/writing-browsercheck.json",
+      "bytes": 436487,
+      "sha256": "312771bbaf4fa0712895e404edb4520dd77909678225bd27a17833009e988ac5"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-efficiency-tokens.png",
+      "path": "direct-dm-verification/dm-desktop/writing-efficiency-tokens.png",
+      "bytes": 139319,
+      "sha256": "b6cab32bbc3d29bce42e19805ead7edc5b69913000accefc9b67d6a51e782ea4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-efficiency.png",
+      "path": "direct-dm-verification/dm-desktop/writing-efficiency.png",
+      "bytes": 139463,
+      "sha256": "b1081094e1883d5dacbcab539aa8c7b76bea57f5222dd86aff4448d949701e0a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-models.png",
+      "path": "direct-dm-verification/dm-desktop/writing-models.png",
+      "bytes": 167004,
+      "sha256": "bc639d9986ff474f59308adcc640c07216fa392d8e3ebcc9312061a37aff0d3c"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-provisional.png",
+      "path": "direct-dm-verification/dm-desktop/writing-provisional.png",
+      "bytes": 145078,
+      "sha256": "6540e3025888a453eb1fd24d9ec87e1add855f5dda9b729757a93992bf63ea14"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop/writing-stacked-rows.png",
+      "path": "direct-dm-verification/dm-desktop/writing-stacked-rows.png",
+      "bytes": 148447,
+      "sha256": "ef4df746f1ea8a186150a3b68f4cb8aa0159bf2129647c2cc7d13e0a8871d57a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-desktop.log",
+      "path": "direct-dm-verification/dm-desktop.log",
+      "bytes": 228,
+      "sha256": "048096f282feba111cce89e5dd6290411a36cf8ecbd8e514c7e416f7393d07cf"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-live-visual-review.json",
+      "path": "direct-dm-verification/dm-live-visual-review.json",
+      "bytes": 1987,
+      "sha256": "5bf4ded3db663d7f3a8897c92d35413ff418352d3cbf8fdc56ee655708b614a1"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-adherence.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-adherence.png",
+      "bytes": 57064,
+      "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-answer.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-answer.png",
+      "bytes": 70301,
+      "sha256": "b176b4c639499002349a957fd8e643bd37834225be68c4bf3aa39de28aed4e8b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-benchmarks.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-benchmarks.png",
+      "bytes": 73884,
+      "sha256": "14859f52f0ec1f5f2d51a5fc4e610951ead4cb16d2b8102ce37344c8999ab34b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-cohorts.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-cohorts.png",
+      "bytes": 75859,
+      "sha256": "9245ae879156776cd1808cd30823fa53a98448d03eb8c12edd769e2cf922b516"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-efficiency.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-efficiency.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-judgments.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-judgments.png",
+      "bytes": 80532,
+      "sha256": "ea525b741f13a9606af47aadc5f378d68c8c447dba66b3f5a3ccdccda55ca56f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-method.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-method.png",
+      "bytes": 78217,
+      "sha256": "b00a8c53c5e63f6990bca8871d2334bf8893742bacb9d6b1636d77680e31a790"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-models.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-models.png",
+      "bytes": 73022,
+      "sha256": "c2833598ffdd4133473d092707597174e8b571566f06a8cda9139b7e2434000c"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-reference.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-reference.png",
+      "bytes": 73793,
+      "sha256": "31aa0f9be95b17b7390c229e7a2de33cf79e011b1dc13827391feb432e0747cf"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/dungeon-master-report.png",
+      "path": "direct-dm-verification/dm-mobile/dungeon-master-report.png",
+      "bytes": 64688,
+      "sha256": "53d6e1aa1cf3ffb23cd211db23176dbd58c7593e26535a19ebb802618dde7628"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-benchmarks.png",
+      "path": "direct-dm-verification/dm-mobile/writing-benchmarks.png",
+      "bytes": 75491,
+      "sha256": "9496a9884d0028bf4b6f6277ce9281e5576a293fc9117cff2051aa9e909010e7"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-browsercheck.json",
+      "path": "direct-dm-verification/dm-mobile/writing-browsercheck.json",
+      "bytes": 436448,
+      "sha256": "09c87756bfa51d732a4ba4af8585d5f3c93cb53c0f4a9bd6ac6427901ff679ad"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-efficiency-tokens.png",
+      "path": "direct-dm-verification/dm-mobile/writing-efficiency-tokens.png",
+      "bytes": 64772,
+      "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-efficiency.png",
+      "path": "direct-dm-verification/dm-mobile/writing-efficiency.png",
+      "bytes": 64901,
+      "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-models.png",
+      "path": "direct-dm-verification/dm-mobile/writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-provisional.png",
+      "path": "direct-dm-verification/dm-mobile/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile/writing-stacked-rows.png",
+      "path": "direct-dm-verification/dm-mobile/writing-stacked-rows.png",
+      "bytes": 74201,
+      "sha256": "171ab45e7dd2d8c25968149f864f1b4a8beaa8c7dac5e72df1b674dc42482788"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-mobile.log",
+      "path": "direct-dm-verification/dm-mobile.log",
+      "bytes": 225,
+      "sha256": "4016d55616bfb0bbbd5f7eafa802e11671874463be259b9dcacbd98996777f43"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-adherence.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-adherence.png",
+      "bytes": 214419,
+      "sha256": "5557889aed195b4d588a44d73ec38a1d0f45b0a6cd3d15e8f35f2129d0039337"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-answer.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-answer.png",
+      "bytes": 190249,
+      "sha256": "808b3a4bd203c9516aee03ee6178e7a7c575550cc22c54ab3f94e539267f7c1c"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-benchmarks.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-benchmarks.png",
+      "bytes": 107997,
+      "sha256": "72070d42876d85a5de7b4d1e78d470d1ce99ac2a59d02b5ba00aadf85a265ee6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-cohorts.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-cohorts.png",
+      "bytes": 145908,
+      "sha256": "95466980f691320f598a8654fafdc69476bbe6f8feca115103d537d9b1cf2d78"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-efficiency.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-efficiency.png",
+      "bytes": 105201,
+      "sha256": "a568dcf37faa18d10d0a9466f8ae29726c074a2a08dc55c66d8958cf1d47d117"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-judgments.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-judgments.png",
+      "bytes": 209823,
+      "sha256": "0b3cf6a62592139390df387de943fe1576db54a022d3a1d79b3336520f2e5ed6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-method.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-method.png",
+      "bytes": 145518,
+      "sha256": "02f0e5080b036b4ad8387bbcbee372752b2b5ed04a523554b8f536f76b1c5953"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-models.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-models.png",
+      "bytes": 107381,
+      "sha256": "eaaf7b80f47d16316ec8eb0cd012cc807d7c70c1ee58b2e2100e10a1a22c1b76"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-reference.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-reference.png",
+      "bytes": 168045,
+      "sha256": "3999cc888e39c948e813dbf560b9eb092cba27064575c167ad7310a1574e6677"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/dungeon-master-report.png",
+      "path": "direct-dm-verification/dm-tablet/dungeon-master-report.png",
+      "bytes": 109752,
+      "sha256": "4a73378d22f188cce23b9b892cdbc82ca5514a8a5c67d816d0f8a11797a9413b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-benchmarks.png",
+      "path": "direct-dm-verification/dm-tablet/writing-benchmarks.png",
+      "bytes": 117910,
+      "sha256": "41c509a497263877cf81f03547f8948992f7080a45a5566045e37b2a08367815"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-browsercheck.json",
+      "path": "direct-dm-verification/dm-tablet/writing-browsercheck.json",
+      "bytes": 436487,
+      "sha256": "adc2f6323b3933b2090fb644038ce53163179f956b7c94e463c96d5795736a05"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-efficiency-tokens.png",
+      "path": "direct-dm-verification/dm-tablet/writing-efficiency-tokens.png",
+      "bytes": 105201,
+      "sha256": "a568dcf37faa18d10d0a9466f8ae29726c074a2a08dc55c66d8958cf1d47d117"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-efficiency.png",
+      "path": "direct-dm-verification/dm-tablet/writing-efficiency.png",
+      "bytes": 105431,
+      "sha256": "665fda510a711ea57e3a5fb9b3095acb7c5f2a8d9ed4c40c712dbf67f59b1fa5"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-models.png",
+      "path": "direct-dm-verification/dm-tablet/writing-models.png",
+      "bytes": 113973,
+      "sha256": "839d87888eb08e4ae7302d49ab8217f9bbd8037024a9759e4d2f7255050f7dfd"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-provisional.png",
+      "path": "direct-dm-verification/dm-tablet/writing-provisional.png",
+      "bytes": 132816,
+      "sha256": "9c3450132ae28ee006de8b3f4a9dc735fbf5e3a1decc57272c12e448fd127900"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet/writing-stacked-rows.png",
+      "path": "direct-dm-verification/dm-tablet/writing-stacked-rows.png",
+      "bytes": 121943,
+      "sha256": "d241dd5318310e213b0bdbe4238684eb6a02b4335c5fa98b5993ec446039adca"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/dm-tablet.log",
+      "path": "direct-dm-verification/dm-tablet.log",
+      "bytes": 226,
+      "sha256": "cf7f9dbcbc7594cf6d64dc59d77b4f295d6b9a645f9e6fb191ec3811060be0e1"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/independent-publication-audit.json",
+      "path": "direct-dm-verification/independent-publication-audit.json",
+      "bytes": 16729,
+      "sha256": "4b78fba6658c70628893cfafa29e75b9574b14614d7a5dbf6927dca4a4161b06"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/independent-publication-audit.md",
+      "path": "direct-dm-verification/independent-publication-audit.md",
+      "bytes": 1619,
+      "sha256": "09597be153bd9fc076a0bd37164f22cdf01a48879ce5d8dfd70a296efd35d481"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-adoption-qa.json",
+      "path": "direct-dm-verification/live-adoption-qa.json",
+      "bytes": 13287,
+      "sha256": "ff46b357eb3070aed12e4cf394ee9555c6630d34cd3cd611618740ab193425c5"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-dm-links-desktop.png",
+      "path": "direct-dm-verification/live-dm-links-desktop.png",
+      "bytes": 147860,
+      "sha256": "d16e303bae687f13274f42b872c4cfb1d2b0a8a9ec6e0b1495a2dc4317995e48"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-dm-links-mobile.png",
+      "path": "direct-dm-verification/live-dm-links-mobile.png",
+      "bytes": 65441,
+      "sha256": "0d292bf97569cd3aba7be370b270b0ef9fbb002877703e57eec159183b264198"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-dm-links-tablet.png",
+      "path": "direct-dm-verification/live-dm-links-tablet.png",
+      "bytes": 121233,
+      "sha256": "ebe836e8262867ca7a690f5cf8942d877c1737571b870be48d72644e9a3779b6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-link-captures.json",
+      "path": "direct-dm-verification/live-link-captures.json",
+      "bytes": 3676,
+      "sha256": "88667b304fb448fd38e5a7c32c7157861936f03a96d14e4942814b8e0091200f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-preflight.json",
+      "path": "direct-dm-verification/live-preflight.json",
+      "bytes": 4158,
+      "sha256": "431e4e5bb4a8b62408ee30073b312cf5d461dc23643cba34eef237c3eac505ab"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-live-adoption-c266/live-source-verification.json",
+      "path": "direct-dm-verification/live-source-verification.json",
+      "bytes": 18556,
+      "sha256": "87ebf8d0f1c12cf25e4825ea9e84bc7516cedd389f89e52ea67c2d23a50f34e3"
+    }
+  ]
+}

@@ -9,6 +9,9 @@ export const WRITING_CREATION_ARCHIVE = Object.freeze({
   href: "./writing-creation-responses.js",
   globalName: "VASIR_WRITING_CREATION_RESPONSES"
 });
+export const WRITING_TWISTS_ARCHIVE = Object.freeze({ benchmarkId: 'storytelling-plot-twists', path: 'writing-twists-responses.js', href: './writing-twists-responses.js', globalName: 'VASIR_WRITING_TWISTS_RESPONSES' });
+export const WRITING_DM_ARCHIVE = Object.freeze({ benchmarkId: 'dungeon-master-adventure-outline', path: 'writing-dungeon-master-responses.js', href: './writing-dungeon-master-responses.js', globalName: 'VASIR_WRITING_DUNGEON_MASTER_RESPONSES' });
+export const WRITING_RESPONSE_ARCHIVES = Object.freeze([WRITING_CREATION_ARCHIVE, WRITING_TWISTS_ARCHIVE, WRITING_DM_ARCHIVE]);
 
 /** Pure, synchronous browser hydrator. Its source is included in the creation
  * archive, so it must not depend on imports, eval, network access, or globals. */
@@ -93,7 +96,7 @@ export function serializeWritingCreationResponseArchive(archive) {
   return `(function () { 'use strict'; window.VASIR_WRITING_CREATION_RESPONSES = Object.freeze(${value}); }());\n`;
 }
 
-export function splitWritingResponseArchives(responseBundle) {
+export function splitWritingResponseArchives(responseBundle, { separateBenchmarks = false } = {}) {
   if (!responseBundle) return { primary: null, creation: null };
   const primary = structuredClone(responseBundle);
   let creation = null;
@@ -104,18 +107,45 @@ export function splitWritingResponseArchives(responseBundle) {
     delete child.responseBundle;
     child.archive = { href: WRITING_CREATION_ARCHIVE.href, globalName: WRITING_CREATION_ARCHIVE.globalName };
   }
-  return { primary, creation };
+  if (!separateBenchmarks) return { primary, creation };
+  const additional = {};
+  const twists = primary.benchmarkResponses?.find(child => child.benchmarkId === WRITING_TWISTS_ARCHIVE.benchmarkId);
+  if (twists) {
+    if (!twists.responseBundle) throw new Error('Missing Plot twists response archive.');
+    additional[WRITING_TWISTS_ARCHIVE.benchmarkId] = twists.responseBundle;
+    delete twists.responseBundle;
+    twists.archive = { href: WRITING_TWISTS_ARCHIVE.href, globalName: WRITING_TWISTS_ARCHIVE.globalName };
+  }
+  const dm = primary.additionalBenchmarks?.[WRITING_DM_ARCHIVE.benchmarkId];
+  if (dm) {
+    additional[WRITING_DM_ARCHIVE.benchmarkId] = dm;
+    primary.additionalBenchmarks[WRITING_DM_ARCHIVE.benchmarkId] = { archive: { href: WRITING_DM_ARCHIVE.href, globalName: WRITING_DM_ARCHIVE.globalName } };
+  }
+  return { primary, creation, additional };
 }
 
-export function hydrateWritingResponseArchives(primary, creation) {
+export function hydrateWritingResponseArchives(primary, creation, additional = {}) {
   if (!primary) {
-    if (creation) throw new Error("Unselected creation archive.");
+    if (creation || Object.keys(additional).length) throw new Error("Unselected creation archive.");
     return null;
   }
   const complete = structuredClone(primary);
+  const used = new Set();
+  const hydrateAdditional = (benchmarkId, descriptor) => {
+    const registry = WRITING_RESPONSE_ARCHIVES.find(item => item.benchmarkId === benchmarkId);
+    if (!registry || !additional[benchmarkId] || used.has(benchmarkId) || descriptor.href !== registry.href || descriptor.globalName !== registry.globalName) throw new Error('Writing archive descriptor changed or evidence is missing.');
+    used.add(benchmarkId);
+    return structuredClone(additional[benchmarkId]);
+  };
   let count = 0;
   for (const child of complete.benchmarkResponses ?? []) {
     if (!child.archive) continue;
+    if (child.benchmarkId === WRITING_TWISTS_ARCHIVE.benchmarkId) {
+      if (child.responseBundle) throw new Error('Duplicated Plot twists evidence.');
+      child.responseBundle = hydrateAdditional(child.benchmarkId, child.archive);
+      delete child.archive;
+      continue;
+    }
     if (child.benchmarkId !== WRITING_CREATION_ARCHIVE.benchmarkId ||
       child.archive.href !== WRITING_CREATION_ARCHIVE.href || child.archive.globalName !== WRITING_CREATION_ARCHIVE.globalName ||
       !creation || child.responseBundle || ++count !== 1) throw new Error("Writing archive descriptor changed or evidence is missing.");
@@ -123,5 +153,10 @@ export function hydrateWritingResponseArchives(primary, creation) {
     child.responseBundle = structuredClone(creation);
   }
   if (Boolean(creation) !== Boolean(count)) throw new Error("Unselected creation archive.");
+  for (const [id, child] of Object.entries(complete.additionalBenchmarks || {})) if (child.archive) {
+    if (id !== WRITING_DM_ARCHIVE.benchmarkId || Object.keys(child).length !== 1) throw new Error('Writing archive descriptor changed.');
+    complete.additionalBenchmarks[id] = hydrateAdditional(id, child.archive);
+  }
+  if (Object.keys(additional).some(id => !used.has(id))) throw new Error('Unselected Writing response archive.');
   return complete;
 }

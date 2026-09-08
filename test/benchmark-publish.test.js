@@ -143,7 +143,7 @@ function createPublicationRepoCopy(prefix) {
   const lockPath = path.join(copiedSiteRoot, "template-lock.json");
   const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
   const acceptedPaths = [
-    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js", "writing-creation-responses.js"].includes(filePath)),
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js", "writing-creation-responses.js", "writing-twists-responses.js", "writing-dungeon-master-responses.js"].includes(filePath)),
     "capture.mjs",
     "capture.sh",
     "games-browsercheck.mjs",
@@ -199,7 +199,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
   try {
     assert.match(first.releaseId, /^[a-f0-9]{64}$/);
     assert.equal(first.releaseId, second.releaseId);
-    assert.equal(first.fileCount, 16);
+    assert.equal(first.fileCount, 18);
     assert.deepEqual(first.sourceManifest, second.sourceManifest);
     assert.deepEqual(first.publicManifest, second.publicManifest);
     assert.deepEqual(first.routes.entrypoints, ["/", "/index.html", "/benchmark-report.html"]);
@@ -237,7 +237,10 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     assert.ok(first.compressedLandingBytes <= first.config.limits.maxCompressedLandingBytes);
     assert.equal(first.config.limits.maxFileBytes, 2 * 1024 * 1024);
     assert.equal(first.config.limits.maxResponseFileBytes, 8 * 1024 * 1024);
-    assert.equal(first.config.limits.maxArtifactBytes, 24 * 1024 * 1024);
+    assert.equal(first.config.limits.maxWritingDataFileBytes, 8 * 1024 * 1024);
+    assert.equal(first.config.limits.maxDungeonMasterResponseFileBytes, 32 * 1024 * 1024);
+    assert.equal(first.config.limits.maxArtifactBytes, 64 * 1024 * 1024);
+    assert.equal(first.config.limits.maxCompressedLandingBytes, 300000);
     const landingDependencyPaths = new Set([
       "index.html",
       "style.css",
@@ -387,7 +390,7 @@ test("benchmark deployment config cannot substitute accepted QA files into the p
       () => readBenchmarkDeploymentConfig({ repoRootDirectory: temporaryRoot }),
       (error) => {
         assert.equal(error.code, "BENCHMARK_PUBLISH_CONFIG_INVALID");
-        assert.match(error.message, /canonical sixteen-file publication contract/);
+        assert.match(error.message, /canonical eighteen-file publication contract/);
         return true;
       }
     );

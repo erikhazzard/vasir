@@ -1,0 +1,639 @@
+{
+  "createdAt": "2026-09-08T03:07:30.117046+00:00",
+  "releaseId": "dbbc02fa92ccc613b11d77083f93eeecf43612d456db3e4a1e8f02654ebb6fda",
+  "status": "reviewed-not-deployed",
+  "reason": "Dry-run found a newer combined live release c266 containing this task; no stale deployment was attempted.",
+  "originalReceiptBytesPreserved": true,
+  "files": [
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/app.js",
+      "retainedPath": "reviewed-site/app.js",
+      "bytes": 183615,
+      "sha256": "fb2358f853fe25b78f2ad05e2e5de64aa88b1a1c1cbf7660965641fdf89b9be6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/assets/d3.v7.min.js",
+      "retainedPath": "reviewed-site/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/assets/kanit-latin-900-normal.woff2",
+      "retainedPath": "reviewed-site/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.css",
+      "retainedPath": "reviewed-site/benchmark-report.css",
+      "bytes": 33336,
+      "sha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.html",
+      "retainedPath": "reviewed-site/benchmark-report.html",
+      "bytes": 2115,
+      "sha256": "915c3ce28a71cdff6fc974a7dcaa5f8b65c813991706603aa36114c7843a1eec"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/benchmark-report.js",
+      "retainedPath": "reviewed-site/benchmark-report.js",
+      "bytes": 86001,
+      "sha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.mjs",
+      "retainedPath": "reviewed-site/capture.mjs",
+      "bytes": 165209,
+      "sha256": "2ee9cb17e726b782f8e4e5c8048dde4511e70488df4b42c7deca438cc1247ec6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/capture.sh",
+      "retainedPath": "reviewed-site/capture.sh",
+      "bytes": 4994,
+      "sha256": "4cb2289a907a7d4fee4c541c4c8ae0268582b35797a2d3f1edd4e6201259eef0"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/games-browsercheck.mjs",
+      "retainedPath": "reviewed-site/games-browsercheck.mjs",
+      "bytes": 51241,
+      "sha256": "dab6036e0032b374cf46104f08552ef29a220857ccff1ba1b1122e5465cc3c0a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/games.css",
+      "retainedPath": "reviewed-site/games.css",
+      "bytes": 19893,
+      "sha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/games.html",
+      "retainedPath": "reviewed-site/games.html",
+      "bytes": 3098,
+      "sha256": "0194d6af2b9318d8fd5a8d396abd8b9e219e006a685a91792118fcf01a0ccd81"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/games.js",
+      "retainedPath": "reviewed-site/games.js",
+      "bytes": 31995,
+      "sha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/index.html",
+      "retainedPath": "reviewed-site/index.html",
+      "bytes": 2284,
+      "sha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/style.css",
+      "retainedPath": "reviewed-site/style.css",
+      "bytes": 149896,
+      "sha256": "4e5c6cf3ee645d65d1c6b6c1c676e16585be2a1f06aab65737a7196f75e9aa14"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/writing-browsercheck.mjs",
+      "retainedPath": "reviewed-site/writing-browsercheck.mjs",
+      "bytes": 100305,
+      "sha256": "6e95e7995a4b7eca9d0222464124d9c1ea99dfe8168a5acc28340d1954e2864f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop.png",
+      "retainedPath": "reviewed-site/desktop.png",
+      "bytes": 175643,
+      "sha256": "b98f6894013e9baea1ba77144ebd5974e73b294a9f92f5d1f459285141757611"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile.png",
+      "retainedPath": "reviewed-site/mobile.png",
+      "bytes": 71136,
+      "sha256": "ca16c43b0d250359804eddd49c04cb0f4e2ac08dd565750ee8522fb1798293e3"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-capabilities.png",
+      "retainedPath": "reviewed-site/desktop-capabilities.png",
+      "bytes": 150014,
+      "sha256": "980347af38ef5f578ce49461174ce7625b7e20e83e541faaa9b82ca5ce42f6bb"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-capabilities.png",
+      "retainedPath": "reviewed-site/mobile-capabilities.png",
+      "bytes": 68067,
+      "sha256": "12d43695946bbe1260e2b5167bfce8968378652dc507043bbd5764c0df76a06f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-capability-benchmarks.png",
+      "retainedPath": "reviewed-site/desktop-capability-benchmarks.png",
+      "bytes": 200106,
+      "sha256": "ce308d12e1e22ab72126d63d5c75e36e59d073c73fdfad752f1a23b114f71c3e"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-capability-benchmarks.png",
+      "retainedPath": "reviewed-site/mobile-capability-benchmarks.png",
+      "bytes": 68782,
+      "sha256": "1e6f34d13599b586f7cd9fd2728fee2637acf4a6496a3bdddc702e253f7832a6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-efficiency.png",
+      "retainedPath": "reviewed-site/desktop-efficiency.png",
+      "bytes": 188169,
+      "sha256": "337eb4755c5b646c5a811be0911866c9fef4295901369eccb834b9efb027bf6f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-efficiency.png",
+      "retainedPath": "reviewed-site/mobile-efficiency.png",
+      "bytes": 62923,
+      "sha256": "ab83fe57473cf3f79ad3bcca6b4ab9b27774ce9cdcd782ae0373ddf9b83fd01b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-benchmark-report.png",
+      "retainedPath": "reviewed-site/desktop-benchmark-report.png",
+      "bytes": 157056,
+      "sha256": "19ea1c3d24f6fde831635b67336adc0375189e0338020a61151fa1bb6b5fb616"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-benchmark-report.png",
+      "retainedPath": "reviewed-site/mobile-benchmark-report.png",
+      "bytes": 61998,
+      "sha256": "b6ac310949a41fa188762f971101a2f1ca8b46b1f9848e819538da7419f8d45d"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflows.png",
+      "retainedPath": "reviewed-site/desktop-workflows.png",
+      "bytes": 149967,
+      "sha256": "4c82dcbb30fba087d08062b680cff95c24666c7df630daadb00fc90580482322"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflows.png",
+      "retainedPath": "reviewed-site/mobile-workflows.png",
+      "bytes": 63467,
+      "sha256": "71578c595fd0ec68c22436a84bf82d70943238982b47f948f558715a7737f394"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflow-benchmarks.png",
+      "retainedPath": "reviewed-site/desktop-workflow-benchmarks.png",
+      "bytes": 123797,
+      "sha256": "4abb1f04e24d1aa616b0f733b8b259e20d41a5be2c16a8770b30ddc781ac79c4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflow-benchmarks.png",
+      "retainedPath": "reviewed-site/mobile-workflow-benchmarks.png",
+      "bytes": 65480,
+      "sha256": "96fb65c3f88f06fb6540709fa96a14ee5a992bf54044c4964dd9ecc82bd0ba58"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflow-efficiency.png",
+      "retainedPath": "reviewed-site/desktop-workflow-efficiency.png",
+      "bytes": 196752,
+      "sha256": "fe54ffa98d4172bba50b852cf4f795de797c5729bf1bb574c143c8dc3eea2959"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflow-efficiency.png",
+      "retainedPath": "reviewed-site/mobile-workflow-efficiency.png",
+      "bytes": 59505,
+      "sha256": "7c7524d804f56cb055f5503a7600be0e6810a516644a14951513d9c72e847fc2"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-workflow-report.png",
+      "retainedPath": "reviewed-site/desktop-workflow-report.png",
+      "bytes": 200324,
+      "sha256": "3fcb485331e7c32c00d2534d47fe2a474db6fcb1a4e49ecc3c610795cb0ea8df"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-workflow-report.png",
+      "retainedPath": "reviewed-site/mobile-workflow-report.png",
+      "bytes": 74637,
+      "sha256": "76253333ef3a621ca4b071e878cba07d03f15d4a952dcaf6af42db380164d9ce"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-game-models.png",
+      "retainedPath": "reviewed-site/desktop-game-models.png",
+      "bytes": 126193,
+      "sha256": "4b4830da3d1b415474e8848df4177a7417b6b1273954f5ede479fb6c3d34f579"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-game-benchmarks.png",
+      "retainedPath": "reviewed-site/desktop-game-benchmarks.png",
+      "bytes": 120485,
+      "sha256": "a23cafa41be656b038243e0ed1fa369f1c0645c754a8aa49b14638a84f4213b1"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-game-efficiency.png",
+      "retainedPath": "reviewed-site/desktop-game-efficiency.png",
+      "bytes": 132206,
+      "sha256": "937e12ad8829a5f6434208f882bded5ed052fc7357a8f648fba2e0f4ff9dcaab"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-game-models.png",
+      "retainedPath": "reviewed-site/mobile-game-models.png",
+      "bytes": 66620,
+      "sha256": "7fd00fd74caf6695692f6d913fd3800d4afe5b3c7ea1c51160cac1e19079a4ef"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-game-benchmarks.png",
+      "retainedPath": "reviewed-site/mobile-game-benchmarks.png",
+      "bytes": 68871,
+      "sha256": "22f93c6716b2bc43d3af21cdfe47a8548fc5cd89596ce1dd98a0e4fcd2f9d065"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-game-efficiency.png",
+      "retainedPath": "reviewed-site/mobile-game-efficiency.png",
+      "bytes": 61937,
+      "sha256": "cb586e53ffa0d34b1d43ade0472b9a3dd6b4eddcf76d2349518027d4fece5abe"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-games.png",
+      "retainedPath": "reviewed-site/desktop-games.png",
+      "bytes": 133607,
+      "sha256": "1909ff4a5e29d6f08827d8ad3707c0ea70ffcacaf697f8579cbe36ae789f7672"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-games.png",
+      "retainedPath": "reviewed-site/mobile-games.png",
+      "bytes": 59055,
+      "sha256": "25b60638b31319777f008a7b54087614dd660b1ddd2b4896d8482302a2c4da69"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-games-ratings.png",
+      "retainedPath": "reviewed-site/desktop-games-ratings.png",
+      "bytes": 117971,
+      "sha256": "27a47111a49d9e8927c7b743f905b863db8adb157d003ee79c411202ff757911"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-games-ratings.png",
+      "retainedPath": "reviewed-site/mobile-games-ratings.png",
+      "bytes": 52735,
+      "sha256": "db68939b314be08d272f36180a8d5472a5fc651ac1bab61e167c00958639f1d6"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-games-playback.png",
+      "retainedPath": "reviewed-site/desktop-games-playback.png",
+      "bytes": 476835,
+      "sha256": "2221a051dc0a1be36000e5977607f9936f11ff2dc9aa8f0c2564b3d5a49b8213"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-games-playback.png",
+      "retainedPath": "reviewed-site/mobile-games-playback.png",
+      "bytes": 164928,
+      "sha256": "93a50e929549c8d60e2468a0b05efbee69065fe98ffd2d8dbfafc826ee9b5534"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-games-play.png",
+      "retainedPath": "reviewed-site/desktop-games-play.png",
+      "bytes": 484525,
+      "sha256": "159dacc0d3a205da97725e97aa8e1709dab67555cc913a51e9d64246df0d3316"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-games-play.png",
+      "retainedPath": "reviewed-site/mobile-games-play.png",
+      "bytes": 168510,
+      "sha256": "4cfe76bc053e1dd385d25b33b4cc8c46085209a8983da5c8a34125daebb8254d"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-games-fullscreen.png",
+      "retainedPath": "reviewed-site/desktop-games-fullscreen.png",
+      "bytes": 468825,
+      "sha256": "ddb7ef6b401bbc0a099eda1011bea1a7684d922f98f30626eec9d10c46b553ca"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-games-fullscreen.png",
+      "retainedPath": "reviewed-site/mobile-games-fullscreen.png",
+      "bytes": 379831,
+      "sha256": "f58b48a730ff0fc4e90d4a208cbfadaae07c0c76753b8c305df14c404e567399"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-models.png",
+      "retainedPath": "reviewed-site/desktop-writing-models.png",
+      "bytes": 154647,
+      "sha256": "9a9982dde84729ddff1bffff9519f2b7d110c2a630b9dd04f5b59e329b7d99a2"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-benchmarks.png",
+      "retainedPath": "reviewed-site/desktop-writing-benchmarks.png",
+      "bytes": 179024,
+      "sha256": "833392390eda83e76868892f813be63cb91d04fe2c25360c5a9f00d89ba617d4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-efficiency.png",
+      "retainedPath": "reviewed-site/desktop-writing-efficiency.png",
+      "bytes": 136719,
+      "sha256": "f13a4a05a46752685c75d133ae04eb03a4eac435e1af50d61f5d6278e0dc5868"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-efficiency-tokens.png",
+      "retainedPath": "reviewed-site/desktop-writing-efficiency-tokens.png",
+      "bytes": 136559,
+      "sha256": "b850ad2279139f88e4297c0b0d2c3ed853533e77665d048cf607011988fb30c2"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-report.png",
+      "retainedPath": "reviewed-site/desktop-writing-report.png",
+      "bytes": 155938,
+      "sha256": "744400947911553b4c986f4474abac0c7cdda9f7a538b8261c79eaf0c0e0bed4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-method.png",
+      "retainedPath": "reviewed-site/desktop-writing-method.png",
+      "bytes": 181273,
+      "sha256": "77433ec997d99288c9cd81ba99b026b181e1c9b0a1822c1b1cbf7f9fb5f43828"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-rubric-anchors.png",
+      "retainedPath": "reviewed-site/desktop-writing-rubric-anchors.png",
+      "bytes": 177441,
+      "sha256": "862ae1ff84af1d7968f6dade8fec005361c06f0b52f83728373a028d08a50cbd"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-method-execution.png",
+      "retainedPath": "reviewed-site/desktop-writing-method-execution.png",
+      "bytes": 167125,
+      "sha256": "460e2eaa55ec93128ddc80e87063356f1c179edf6afccbe4e4f2856327ecd376"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-reference.png",
+      "retainedPath": "reviewed-site/desktop-writing-reference.png",
+      "bytes": 181756,
+      "sha256": "5ac6dee6bafe188eb4052b775e12fd032ac7ee264c4f25675916740c7d4a8aba"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-answer.png",
+      "retainedPath": "reviewed-site/desktop-writing-answer.png",
+      "bytes": 181471,
+      "sha256": "b168fcf3e2642be3a1b6e2624b132fefc3ad3e9021e0efbb346817e58eb52b8a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-judgments.png",
+      "retainedPath": "reviewed-site/desktop-writing-judgments.png",
+      "bytes": 182952,
+      "sha256": "143c6c723a126d49129ffbf6d95bc6aa7f7d1032a39dd8544095a5c7be7db149"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-judge-resources.png",
+      "retainedPath": "reviewed-site/desktop-writing-judge-resources.png",
+      "bytes": 101758,
+      "sha256": "1dd73bc945d99164aeb32ac0a26cce4a182705f12a19a48b50f6d3790bdc3cee"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-execution.png",
+      "retainedPath": "reviewed-site/desktop-writing-execution.png",
+      "bytes": 172374,
+      "sha256": "0207f6c9b3feff46e7688b67c6400d617d4c7d20674cbfe67418e4d348bf6d79"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-models.png",
+      "retainedPath": "reviewed-site/mobile-writing-models.png",
+      "bytes": 68917,
+      "sha256": "a7d51f69bd2058fc5ea148cb5ac2277e898ca169a8b26cc1aa1ac12e563ba0ec"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-benchmarks.png",
+      "retainedPath": "reviewed-site/mobile-writing-benchmarks.png",
+      "bytes": 73938,
+      "sha256": "e2d1398d8fc53e161dd600ae174984d53c6f98db66689b3bcba4abe359d59692"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-efficiency.png",
+      "retainedPath": "reviewed-site/mobile-writing-efficiency.png",
+      "bytes": 65514,
+      "sha256": "9e0045d645a3d0061f9152d2bdff206bc1fff14eba5d6764b2cb4bd65292ada4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-efficiency-tokens.png",
+      "retainedPath": "reviewed-site/mobile-writing-efficiency-tokens.png",
+      "bytes": 65379,
+      "sha256": "b39f9c380404a1e4fb5404cd03ab3300d3da3d548e489387d95d5bb52a856450"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-report.png",
+      "retainedPath": "reviewed-site/mobile-writing-report.png",
+      "bytes": 62943,
+      "sha256": "1fcef03c57456d48eb9d8e3315afb6ce9d8e66e26eb0352ed8a2921ec6dbc944"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-method.png",
+      "retainedPath": "reviewed-site/mobile-writing-method.png",
+      "bytes": 76895,
+      "sha256": "dbfa1b0ca8c0f8fe613fbd4a09994949a2fd70fa95df7d414fd561f0311fe201"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-rubric-anchors.png",
+      "retainedPath": "reviewed-site/mobile-writing-rubric-anchors.png",
+      "bytes": 75670,
+      "sha256": "035c4f21dfb043b2d17fc5cd1c48358a3b4ccc3ab6807c679eaccfd241398f14"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-method-execution.png",
+      "retainedPath": "reviewed-site/mobile-writing-method-execution.png",
+      "bytes": 83972,
+      "sha256": "cd8a75dce2680a17e161f0778e2fc35ef1a76075033008bc11223e88c50f7ca1"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-reference.png",
+      "retainedPath": "reviewed-site/mobile-writing-reference.png",
+      "bytes": 77231,
+      "sha256": "68f2fb3d742e5d14066111925e072cc1403edfca2e061af76b8b4f88db7963a9"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-answer.png",
+      "retainedPath": "reviewed-site/mobile-writing-answer.png",
+      "bytes": 76033,
+      "sha256": "4f609e27110444f0848ff7b572e7b182359b1cca56c83f8cbe1d1808a763b205"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-judgments.png",
+      "retainedPath": "reviewed-site/mobile-writing-judgments.png",
+      "bytes": 64094,
+      "sha256": "92f1649e397124d6276db8c74aff2474c5c96ea4e7d98245e4a32a16fae625d9"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-judge-resources.png",
+      "retainedPath": "reviewed-site/mobile-writing-judge-resources.png",
+      "bytes": 61373,
+      "sha256": "88c9ce4f420e5029912d675903ad5affa91300d5a0a7fcba34221fde0ae575a0"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-execution.png",
+      "retainedPath": "reviewed-site/mobile-writing-execution.png",
+      "bytes": 63637,
+      "sha256": "c161a151efbaf62dffa246805fa38e37cae37c94c39e6260a580bcc72cd41941"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-writing-stacked-rows.png",
+      "retainedPath": "reviewed-site/desktop-writing-stacked-rows.png",
+      "bytes": 146790,
+      "sha256": "72b1baf94dbf5396e713c5ef3ff598dcc658b179adb2ae4954ee76ef864499c7"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-writing-stacked-rows.png",
+      "retainedPath": "reviewed-site/mobile-writing-stacked-rows.png",
+      "bytes": 63391,
+      "sha256": "61f7c0efb74aac9625bf34a3d901ff663ce48110bbc8f535b6a2115f5430571e"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-models.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-models.png",
+      "bytes": 148147,
+      "sha256": "27e984bbe0de0d25ca3f4646afbda290c559bd67798aad7eb6fd8333c57f5707"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-benchmarks.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-benchmarks.png",
+      "bytes": 178478,
+      "sha256": "0e2b6383ac0bb63c8e0a04b8c1691022d85b84ccff280c8a87e0331e4dc570f4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-efficiency.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-efficiency.png",
+      "bytes": 135769,
+      "sha256": "b97b489199aa332b235087ec1b3102268fc140f9eb6f98237e9ae77e3c4ca38b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-report.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-report.png",
+      "bytes": 140490,
+      "sha256": "9c23fd23009cadc0cbd629a5b973e9a27c1feb540251117c0a71b4173ee30de4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-method.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-method.png",
+      "bytes": 152270,
+      "sha256": "01a3e16193b3f1186e4bded8f71b70439604966b89735b92a523b2bd33aa090f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-answer.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-answer.png",
+      "bytes": 218066,
+      "sha256": "1f88a79b0211bdaaf4783ba469bf63322764275522f8ad9fba18488b827db98a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-judgments.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-judgments.png",
+      "bytes": 298563,
+      "sha256": "88691b16420e99c2e976ed30238bc4b000cea0d131c6c12c12ed320fea0c4731"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-reference.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-reference.png",
+      "bytes": 197416,
+      "sha256": "e1253353e334fba89104f1eaf7c1859cd8ccf3d4590c06098d03a423bd3d6441"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/desktop-dungeon-master-adherence.png",
+      "retainedPath": "reviewed-site/desktop-dungeon-master-adherence.png",
+      "bytes": 246059,
+      "sha256": "7eac39b664df5489c2382042d50a271af4d28378bab3e80b31218fc3c86a6ede"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-models.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-models.png",
+      "bytes": 73022,
+      "sha256": "c2833598ffdd4133473d092707597174e8b571566f06a8cda9139b7e2434000c"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-benchmarks.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-benchmarks.png",
+      "bytes": 73884,
+      "sha256": "14859f52f0ec1f5f2d51a5fc4e610951ead4cb16d2b8102ce37344c8999ab34b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-efficiency.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-efficiency.png",
+      "bytes": 65379,
+      "sha256": "b39f9c380404a1e4fb5404cd03ab3300d3da3d548e489387d95d5bb52a856450"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-report.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-report.png",
+      "bytes": 64688,
+      "sha256": "53d6e1aa1cf3ffb23cd211db23176dbd58c7593e26535a19ebb802618dde7628"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-method.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-method.png",
+      "bytes": 78217,
+      "sha256": "b00a8c53c5e63f6990bca8871d2334bf8893742bacb9d6b1636d77680e31a790"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-answer.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-answer.png",
+      "bytes": 70301,
+      "sha256": "b176b4c639499002349a957fd8e643bd37834225be68c4bf3aa39de28aed4e8b"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-judgments.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-judgments.png",
+      "bytes": 80532,
+      "sha256": "ea525b741f13a9606af47aadc5f378d68c8c447dba66b3f5a3ccdccda55ca56f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-reference.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-reference.png",
+      "bytes": 73793,
+      "sha256": "31aa0f9be95b17b7390c229e7a2de33cf79e011b1dc13827391feb432e0747cf"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/mobile-dungeon-master-adherence.png",
+      "retainedPath": "reviewed-site/mobile-dungeon-master-adherence.png",
+      "bytes": 57064,
+      "sha256": "bd0576c13054922bf43293d3821c10ef372ae900de859d7facbfc538f475bff5"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/template-lock.json",
+      "retainedPath": "reviewed-site/template-lock.json",
+      "bytes": 177993,
+      "sha256": "64ab1549e621abb5c24cc3be20eb564bace915c4e746e9b7dc94086e8e7efb6d"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/deployment.json",
+      "retainedPath": "reviewed-site/deployment.json",
+      "bytes": 2871,
+      "sha256": "6ada4ea619bc407ffece980fcc998377b9da8366f8bbe4171715528e49234a38"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/site/vasirbenchmark.com/infra/production.yml",
+      "retainedPath": "reviewed-site/infra/production.yml",
+      "bytes": 13251,
+      "sha256": "50b4edc63ebbe218cba88abb7021721c2ac3b428088d5413695d3c9fea25bea4"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/docs/work/vasir-benchmarking/dungeon-master-adventure-outline/accept-release.mjs",
+      "retainedPath": "reviewed-helpers/dungeon-master-adventure-outline/accept-release.mjs",
+      "bytes": 13367,
+      "sha256": "1e70a880548a7852dd4acabe8d14169edd503d6a0305478fefa06958a482b04f"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/docs/work/vasir-benchmarking/dungeon-master-adventure-outline/rehearse-release.mjs",
+      "retainedPath": "reviewed-helpers/dungeon-master-adventure-outline/rehearse-release.mjs",
+      "bytes": 13157,
+      "sha256": "e98911a51819e5d6c28228f8c80386c277f185a43cdfdd626062d1778f4e24f1"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/docs/work/vasir-benchmarking/dungeon-master-adventure-outline/publish-release.mjs",
+      "retainedPath": "reviewed-helpers/dungeon-master-adventure-outline/publish-release.mjs",
+      "bytes": 12134,
+      "sha256": "86a138a311da1426b9e29d79405ef50725abd9f6e40a61c71dae1cb02ef9b91a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/docs/work/vasir-benchmarking/dungeon-master-adventure-outline/run-canonical.mjs",
+      "retainedPath": "reviewed-helpers/dungeon-master-adventure-outline/run-canonical.mjs",
+      "bytes": 5155,
+      "sha256": "8b14384fa807e35949e882f2c269fbd0e5898b9aa866e2bf3f941373ac4dd943"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/docs/work/vasir-benchmarking/dungeon-master-adventure-outline/summarize-run.mjs",
+      "retainedPath": "reviewed-helpers/dungeon-master-adventure-outline/summarize-run.mjs",
+      "bytes": 8535,
+      "sha256": "38696ec77c8cc8e09f063e32423cfe22f75d8f25e856ee25730b1b09b268e00a"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs",
+      "retainedPath": "reviewed-helpers/writing-category/acceptance-evidence.mjs",
+      "bytes": 20616,
+      "sha256": "7ee4dc200c446105d565eb6df940c431630a6d8da2642ab027b3119a816acc2c"
+    },
+    {
+      "originalPath": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-v3-integration-backups/live-preservation.json",
+      "retainedPath": "live70a2-preservation.json",
+      "bytes": 15818,
+      "sha256": "99ac07791cb634df794328e92994c997bf4abebdef06d4bb5f62a1648094237c"
+    }
+  ]
+}

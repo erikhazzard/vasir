@@ -20,8 +20,10 @@ child.stderr.on('data', bytes => { stderr += bytes.toString(); });
 const code = await new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', resolve); });
 fs.writeFileSync(resultPath, stdout, { flag: 'wx' });
 fs.writeFileSync(stderrPath, stderr, { flag: 'wx' });
-const result = JSON.parse(stdout);
+let result;
+try { result = JSON.parse(stdout.trim() || stderr.trim()); }
+catch { throw new Error(`Publisher exited ${code} without a JSON receipt. Inspect retained stdout and stderr in ${directory}.`); }
 process.stdout.write(JSON.stringify({ status: result.status, dryRun: result.dryRun, target: result.target,
   artifact: result.artifact && { releaseId: result.artifact.releaseId, fileCount: result.artifact.fileCount, totalBytes: result.artifact.totalBytes },
-  deployment: result.deployment, verification: result.verification, actions: result.actions, error: result.error, resultPath }, null, 2) + '\n');
+  deployment: result.deployment, verification: result.verification, actions: result.actions, error: result.error ?? (result.status === 'error' ? { code: result.code, message: result.message, context: result.context } : undefined), resultPath }, null, 2) + '\n');
 if (code !== 0 || result.status !== 'success' || result.dryRun || result.artifact?.releaseId !== candidate.releaseId || result.deployment?.activeReleaseId !== candidate.releaseId || result.verification?.status !== 'passed') process.exitCode = 1;

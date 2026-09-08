@@ -1,0 +1,27 @@
+{
+  "copiedAt": "2026-09-08T02:55:08.927541+00:00",
+  "files": [
+    {
+      "path": "docs/work/vasir-benchmarking/dungeon-master-adventure-outline/rehearse-release.mjs",
+      "previousSha256": "4c32cf83eb26d65ca2a4d1499f878f5f309caa20205eea9ff14616e7e5335664",
+      "sha256": "e98911a51819e5d6c28228f8c80386c277f185a43cdfdd626062d1778f4e24f1"
+    },
+    {
+      "path": "docs/work/vasir-benchmarking/dungeon-master-adventure-outline/publish-release.mjs",
+      "previousSha256": "aea4127ac24987bb645e2c0a18216dddb16823a826a802cc77094df6f663be31",
+      "sha256": "86a138a311da1426b9e29d79405ef50725abd9f6e40a61c71dae1cb02ef9b91a",
+      "finalRefinement": "Bind both infrastructure inputs before AWS; 17 focused tests passed"
+    },
+    {
+      "path": "test/dungeon-master-release-freeze.test.js",
+      "previousSha256": null,
+      "sha256": "ba8c51f6e82f60e24e9e3f46759a56b975cb58684e402363db7c601d7b2ef434",
+      "finalRefinement": "Bind both infrastructure inputs before AWS; 17 focused tests passed"
+    },
+    {
+      "path": "cli/benchmark-publish.js",
+      "scope": "Two-line optional convergence hook; original default behavior retained",
+      "sha256": "49ba8d61ac9abcd80de94c7bf40bb4aab766599183613adfed37f8571e5a0a5f"
+    }
+  ]
+}

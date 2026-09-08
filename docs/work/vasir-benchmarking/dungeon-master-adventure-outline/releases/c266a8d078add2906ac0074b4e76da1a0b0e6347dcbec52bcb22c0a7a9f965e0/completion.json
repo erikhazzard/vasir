@@ -1,0 +1,376 @@
+{
+  "completedAt": "2026-09-08T03:14:43.320527+00:00",
+  "status": "complete-published-and-verified",
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "url": "https://vasirbenchmark.com/benchmark-report.html#dungeon-master-adventure-outline",
+  "publication": "Final DM source included in an independently verified concurrent combined publication. No redundant stale deployment performed.",
+  "successfulFreshGenerationSessions": 32,
+  "successfulFreshJudgeSessions": 32,
+  "pairedRepetitions": 16,
+  "answerAssessments": 64,
+  "directLiveDmChecks": 417,
+  "directLiveWidths": [
+    1440,
+    390,
+    820
+  ],
+  "results": [
+    {
+      "caseId": "primary",
+      "title": "Open adventure outline",
+      "prompt": "create an outline for TTRPG adventure",
+      "expectedPairs": 6,
+      "completePairs": 6,
+      "plain": 91.94444444444444,
+      "skill": 95.27777777777777,
+      "delta": 3.333333333333331,
+      "preferenceVotes": {
+        "skill": 6,
+        "tie": 6,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 2,
+        "tie": 2,
+        "plain": 0,
+        "disagreement": 2
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 490.8333333333333,
+          "meanLatencyMs": 167387
+        },
+        "skill:dungeon-master": {
+          "meanWords": 555,
+          "meanLatencyMs": 185350
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.333333333333333,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 4.666666666666667,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 5,
+          "skill": 4.166666666666667
+        },
+        "active-forces": {
+          "plain": 4.25,
+          "skill": 4.416666666666667
+        },
+        "setup-information": {
+          "plain": 4.333333333333333,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "caravan",
+      "title": "Mountain caravan",
+      "prompt": "Create an outline for a fantasy TTRPG adventure for four new players and one three-hour session. The party has already agreed to escort a caravan across a dangerous mountain pass. Include the possibility of a straightforward combat encounter.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 89.16666666666667,
+      "skill": 85,
+      "delta": -4.166666666666671,
+      "preferenceVotes": {
+        "skill": 0,
+        "tie": 1,
+        "plain": 3
+      },
+      "agreement": {
+        "skill": 0,
+        "tie": 0,
+        "plain": 1,
+        "disagreement": 1
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 713.5,
+          "meanLatencyMs": 131576
+        },
+        "skill:dungeon-master": {
+          "meanWords": 710.5,
+          "meanLatencyMs": 166286.5
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.5,
+          "skill": 4
+        },
+        "play-and-consequence": {
+          "plain": 4.5,
+          "skill": 4
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 4,
+          "skill": 3.5
+        },
+        "active-forces": {
+          "plain": 4,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 4.75,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "salvage",
+      "title": "Orbital salvage",
+      "prompt": "Create an outline for a science-fiction TTRPG adventure lasting two sessions. The characters are a salvage crew investigating an apparently abandoned orbital facility. Keep it system-neutral.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 91.66666666666667,
+      "skill": 94.16666666666667,
+      "delta": 2.5,
+      "preferenceVotes": {
+        "skill": 4,
+        "tie": 0,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 2,
+        "tie": 0,
+        "plain": 0,
+        "disagreement": 0
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 693.5,
+          "meanLatencyMs": 161609.5
+        },
+        "skill:dungeon-master": {
+          "meanWords": 1001,
+          "meanLatencyMs": 237182
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.25,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 4.25,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 4.75,
+          "skill": 4.25
+        },
+        "active-forces": {
+          "plain": 5,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 4.25,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "celebration",
+      "title": "Neighborhood celebration",
+      "prompt": "Create an outline for a contemporary TTRPG adventure for one evening of quiet, nonviolent play. The characters are preparing a neighborhood celebration while a disagreement threatens the event.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 95,
+      "skill": 95,
+      "delta": 0,
+      "preferenceVotes": {
+        "skill": 0,
+        "tie": 4,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 0,
+        "tie": 2,
+        "plain": 0,
+        "disagreement": 0
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 677.5,
+          "meanLatencyMs": 123668
+        },
+        "skill:dungeon-master": {
+          "meanWords": 739.5,
+          "meanLatencyMs": 163796
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 4,
+          "skill": 4
+        },
+        "active-forces": {
+          "plain": 4.5,
+          "skill": 4.5
+        },
+        "setup-information": {
+          "plain": 5,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "horror",
+      "title": "Weather station horror",
+      "prompt": "Create an outline for a one-session horror TTRPG adventure at an isolated weather station. A tragic ending is acceptable. Use no established fictional setting.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 97.5,
+      "skill": 99.16666666666666,
+      "delta": 1.6666666666666643,
+      "preferenceVotes": {
+        "skill": 2,
+        "tie": 2,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 1,
+        "tie": 1,
+        "plain": 0,
+        "disagreement": 0
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 799,
+          "meanLatencyMs": 219899
+        },
+        "skill:dungeon-master": {
+          "meanWords": 865,
+          "meanLatencyMs": 257664.5
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.5,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 5,
+          "skill": 5
+        },
+        "active-forces": {
+          "plain": 4.75,
+          "skill": 4.75
+        },
+        "setup-information": {
+          "plain": 5,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "exploration",
+      "title": "Mechanical structure",
+      "prompt": "Create an outline for a system-neutral exploration and puzzle TTRPG adventure for one session. It takes place inside an ancient mechanical structure and requires no combat.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 92.5,
+      "skill": 93.33333333333334,
+      "delta": 0.8333333333333428,
+      "preferenceVotes": {
+        "skill": 2,
+        "tie": 1,
+        "plain": 1
+      },
+      "agreement": {
+        "skill": 1,
+        "tie": 0,
+        "plain": 0,
+        "disagreement": 1
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 860,
+          "meanLatencyMs": 191400
+        },
+        "skill:dungeon-master": {
+          "meanWords": 908.5,
+          "meanLatencyMs": 281376
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.25,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 5,
+          "skill": 4
+        },
+        "active-forces": {
+          "plain": 4,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 4.5,
+          "skill": 5
+        }
+      }
+    }
+  ],
+  "transferMean": {
+    "plain": 93.16666666666667,
+    "skill": 93.33333333333334,
+    "delta": 0.16666666666666713,
+    "weighting": "equal-transfer-prompt-means",
+    "promptCount": 5
+  },
+  "evidence": {
+    "successfulPublication": "combined-publication/publish-result.json",
+    "liveSourceVerification": "direct-dm-verification/live-source-verification.json",
+    "directLiveQa": "direct-dm-verification/live-adoption-qa.json",
+    "independentAudit": "direct-dm-verification/independent-publication-audit.json"
+  },
+  "skillChangedDuringExperiment": false,
+  "originalAnswersRerolled": false
+}

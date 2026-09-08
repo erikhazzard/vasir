@@ -8,7 +8,7 @@ import zlib from "node:zlib";
 import { VasirCliError } from "./cli-error.js";
 import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
 import { validateWritingPublication } from "./eval/writing-publication.js";
-import { WRITING_CREATION_ARCHIVE, hydrateWritingResponseArchives } from "./eval/writing-response-archives.js";
+import { WRITING_CREATION_ARCHIVE, WRITING_DM_ARCHIVE, WRITING_RESPONSE_ARCHIVES, hydrateWritingResponseArchives } from "./eval/writing-response-archives.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 import {
   buildBenchmarkPublicationProjection,
@@ -19,7 +19,7 @@ import {
 
 const DEPLOYMENT_CONFIG_PATH = path.join("site", "vasirbenchmark.com", "deployment.json");
 const TEMPLATE_LOCK_FILE_NAME = "template-lock.json";
-const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js", "writing-data.js", "writing-responses.js", WRITING_CREATION_ARCHIVE.path]);
+const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js", "writing-data.js", "writing-responses.js", ...WRITING_RESPONSE_ARCHIVES.map(item => item.path)]);
 const RELEASE_ID_PATTERN = /^[a-f0-9]{64}$/;
 const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
 const PRIVATE_PARENT_PATH_PATTERN = /(?:^|[^.])\.\.[/\\]/i;
@@ -53,16 +53,47 @@ const CANONICAL_PUBLIC_FILES = Object.freeze([
   { path: "games.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "writing-data.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "writing-responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable", kind: "response-archive" },
-  { path: WRITING_CREATION_ARCHIVE.path, contentType: "text/javascript; charset=utf-8", cacheClass: "immutable", kind: "response-archive" }
+  ...WRITING_RESPONSE_ARCHIVES.map(item => ({ path: item.path, contentType: "text/javascript; charset=utf-8", cacheClass: "immutable", kind: "response-archive" }))
 ]);
 function sha256(contents) {
   return crypto.createHash("sha256").update(contents).digest("hex");
 }
 
 export function getBenchmarkPublicationFileByteLimit(config, relativePath) {
+  if (relativePath === 'writing-data.js') return config.limits.maxWritingDataFileBytes ?? config.limits.maxFileBytes;
+  if (relativePath === WRITING_DM_ARCHIVE.path) return config.limits.maxDungeonMasterResponseFileBytes ?? config.limits.maxResponseFileBytes ?? config.limits.maxFileBytes;
   return config.publicFiles.find(file => file.path === relativePath)?.kind === "response-archive"
     ? (config.limits.maxResponseFileBytes ?? config.limits.maxFileBytes)
     : config.limits.maxFileBytes;
+}
+
+// Exercise the deployed router source before staging anything. Serving files in
+// a local HTTP rehearsal does not prove the CDN's explicit allowlist admits them.
+export function validateBenchmarkReleaseRouter({ templateSource, publicFiles }) {
+  const source = templateSource.split('  ReleaseRouterFunction:\n')[1]?.split('      FunctionConfig:')[0]?.split('      FunctionCode: !Sub |\n')[1];
+  const release = 'a'.repeat(64);
+  const context = vm.createContext({});
+  try {
+    if (!source) throw new Error('Missing declared release router.');
+    vm.runInContext(source.replaceAll('${ActiveReleaseId}', release), context, { timeout: 1000 });
+    const route = uri => {
+      context.requestUri = uri;
+      return vm.runInContext('handler({request: {uri: requestUri}})', context, { timeout: 1000 });
+    };
+    for (const file of publicFiles) {
+      const uri = `/releases/${release}/${file.path}`;
+      if (route(uri)?.uri !== uri) throw new Error(`CDN rejects declared public file: ${file.path}`);
+    }
+    for (const [uri, file] of [['/', 'index.html'], ['/index.html', 'index.html'], ['/benchmark-report.html', 'benchmark-report.html'], ['/games.html', 'games.html']]) {
+      if (route(uri)?.uri !== `/releases/${release}/${file}`) throw new Error(`Incorrect stable entrypoint: ${uri}`);
+    }
+    for (const uri of ['/_deploy/control/publication-state.json', `/artifacts/${release}/index.html`, `/releases/${release}/run.json`, `/releases/${release}/../data.js`, ...publicFiles.filter(file => !file.path.endsWith('.html')).map(file => '/' + file.path)]) {
+      if (route(uri)?.statusCode !== 403) throw new Error(`Router exposes undeclared path: ${uri}`);
+    }
+  } catch (error) {
+    throw artifactError({ code: 'BENCHMARK_PUBLISH_CONFIG_INVALID', message: error.message,
+      suggestion: 'Keep the CDN router aligned with the exact public-file allowlist; do not broaden it to arbitrary files.', stage: 'acceptance', cause: error });
+  }
 }
 
 // This affects only the parent-path privacy scan, never archived/public bytes.
@@ -320,8 +351,8 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (!Array.isArray(config.publicFiles) || config.publicFiles.length !== CANONICAL_PUBLIC_FILES.length) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist must contain exactly sixteen files.",
-      suggestion: "Restore the reviewed sixteen-file allowlist in deployment.json.",
+      message: "The production allowlist must contain exactly eighteen files.",
+      suggestion: "Restore the reviewed eighteen-file allowlist in deployment.json.",
       stage: "acceptance"
     });
   }
@@ -340,7 +371,7 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (publicContractDrift.length > 0) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist drifted from the canonical sixteen-file publication contract.",
+      message: "The production allowlist drifted from the canonical eighteen-file publication contract.",
       suggestion: "Restore the reviewed paths, content types, cache classes, archive classifications, and ordering in deployment.json.",
       stage: "acceptance",
       context: { expectedPaths: CANONICAL_PUBLIC_FILES.map(({ path: filePath }) => filePath) }
@@ -582,6 +613,8 @@ export function buildBenchmarkPublicationArtifact({
     });
   }
 
+  validateBenchmarkReleaseRouter({ templateSource: fs.readFileSync(templatePath, 'utf8'), publicFiles: config.publicFiles });
+
   // A reviewed presentation checkout may use the original immutable evidence
   // root. In particular, historical Games receipts retain absolute build paths.
   // Source pins and all artifact validators still run against that source root.
@@ -594,7 +627,8 @@ export function buildBenchmarkPublicationArtifact({
     ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")],
     ["writing-data.js", Buffer.from(publicationProjection.writingDataSource, "utf8")],
     ["writing-responses.js", Buffer.from(publicationProjection.writingResponsesSource, "utf8")],
-    [WRITING_CREATION_ARCHIVE.path, Buffer.from(publicationProjection.writingCreationResponsesSource, "utf8")]
+    [WRITING_CREATION_ARCHIVE.path, Buffer.from(publicationProjection.writingCreationResponsesSource, "utf8")],
+    ...Object.entries(publicationProjection.writingAdditionalResponseSources).map(([file, source]) => [file, Buffer.from(source, 'utf8')])
   ]);
   const fileByteLimit = relativePath => getBenchmarkPublicationFileByteLimit(config, relativePath);
   const sourceFiles = config.publicFiles.map((fileConfig) => {
@@ -763,12 +797,14 @@ export function buildBenchmarkPublicationArtifact({
     const primaryWritingResponses = evaluateSiteModule({ source: writingResponsesFile.body.toString("utf8"), filePath: writingResponsesFile.outputPath, globalName: "VASIR_WRITING_RESPONSES", publicPath: "writing-responses.js", allowNull: true });
     const writingCreationFile = filesByPath.get(WRITING_CREATION_ARCHIVE.path);
     const writingCreationResponses = evaluateSiteModule({ source: writingCreationFile.body.toString("utf8"), filePath: writingCreationFile.outputPath, globalName: WRITING_CREATION_ARCHIVE.globalName, publicPath: WRITING_CREATION_ARCHIVE.path, allowNull: true });
-    const writingResponses = hydrateWritingResponseArchives(primaryWritingResponses, writingCreationResponses);
+    const additionalWritingResponses = Object.fromEntries(WRITING_RESPONSE_ARCHIVES.filter(item => item !== WRITING_CREATION_ARCHIVE).map(item => {
+      const file = filesByPath.get(item.path);
+      return [item.benchmarkId, evaluateSiteModule({ source: file.body.toString('utf8'), filePath: file.outputPath, globalName: item.globalName, publicPath: item.path, allowNull: true })];
+    }).filter(([, value]) => value !== null));
+    const writingResponses = hydrateWritingResponseArchives(primaryWritingResponses, writingCreationResponses, additionalWritingResponses);
     if (data.writing) {
       validateWritingPublication(writing, writingResponses);
-      const expectedResponseArchives = writingCreationResponses ? {
-        [WRITING_CREATION_ARCHIVE.benchmarkId]: { href: WRITING_CREATION_ARCHIVE.href, globalName: WRITING_CREATION_ARCHIVE.globalName }
-      } : {};
+      const expectedResponseArchives = Object.fromEntries(WRITING_RESPONSE_ARCHIVES.filter(item => item === WRITING_CREATION_ARCHIVE ? writingCreationResponses : additionalWritingResponses[item.benchmarkId]).map(item => [item.benchmarkId, { href: item.href, globalName: item.globalName }]));
       if (JSON.stringify(data.writing.responseArchives ?? {}) !== JSON.stringify(expectedResponseArchives)) throw artifactError({ message: "Writing response archive descriptors differ from the generated evidence.", suggestion: "Regenerate the landing descriptor and all Writing archives from the same selected sources." });
       if (JSON.stringify(writing.coverage) !== JSON.stringify(data.writing.coverage)) throw artifactError({ message: "Writing lazy evidence and landing coverage differ.", suggestion: "Regenerate both bundles from the same pinned source." });
       if (JSON.stringify(Object.keys(writing.additionalBenchmarks ?? {})) !== JSON.stringify(Object.keys(data.writing.additionalBenchmarks ?? {})) || JSON.stringify(writing.allWritingCoverage) !== JSON.stringify(data.writing.allWritingCoverage)) throw artifactError({ message: "Additional Writing selections differ between landing and lazy evidence.", suggestion: "Regenerate the entire Writing collection from the same pinned sources." });
@@ -778,7 +814,7 @@ export function buildBenchmarkPublicationArtifact({
       if (JSON.stringify(writing.collectionCoverage) !== JSON.stringify(data.writing.collectionCoverage)) throw artifactError({ message: "Writing benchmark collection coverage differs from the landing summary.", suggestion: "Regenerate the collection and summary from the same selected sources." });
       const writingBenchmarkIds = [writing.benchmarks[0].id, ...(writing.benchmarkPublications ?? []).map(child => child.benchmarkId), ...Object.keys(writing.additionalBenchmarks ?? {})];
       if (JSON.stringify(writingBenchmarkIds) !== JSON.stringify(data.writing.benchmarkIds ?? [data.writing.benchmarkId])) throw artifactError({ message: "Writing report identities differ from the selected benchmark collection.", suggestion: "Preserve each selected Writing benchmark and its own report route." });
-    } else if (writing !== null || writingResponses !== null || writingCreationResponses !== null) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
+    } else if (writing !== null || writingResponses !== null || writingCreationResponses !== null || Object.keys(additionalWritingResponses).length) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
     const benchmarkRoutes = buildBenchmarkPublicationRoutes(data);
     if (JSON.stringify(benchmarkRoutes) !== JSON.stringify(publicationProjection.routes)) {
       throw artifactError({
@@ -800,6 +836,7 @@ export function buildBenchmarkPublicationArtifact({
         const authoredResponseText = file.path === "responses.js" && publicationProjection.projection.aiWorkflows;
         // Preserve authored /users/ API routes while rejecting the literal Mac /Users/ home prefix.
         const parentPathSource = file.path === "writing-responses.js" ? writingParentPathScanSource(writing, primaryWritingResponses)
+          : file.path === WRITING_DM_ARCHIVE.path ? writingParentPathScanSource(writing, { additionalBenchmarks: { [WRITING_DM_ARCHIVE.benchmarkId]: additionalWritingResponses[WRITING_DM_ARCHIVE.benchmarkId] } })
           : file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationParentPathScanSource(writing, writingCreationResponses) : source;
         const localPathSource = file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationLocalPathScanSource(source, writingCreationResponses) : source;
         return PRIVATE_LOCAL_PATH_PATTERN.test(localPathSource) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(parentPathSource));
@@ -819,7 +856,7 @@ export function buildBenchmarkPublicationArtifact({
       // Story fact packets can describe a simulated world (The Matrix) or a
       // simulated relationship. Their pinned source is validated structurally;
       // retired-demo vocabulary is not a valid test of that literary evidence.
-      .filter((file) => !["responses.js", "writing-responses.js", "writing-data.js", WRITING_CREATION_ARCHIVE.path].includes(file.path))
+      .filter((file) => !["responses.js", "writing-responses.js", "writing-data.js", ...WRITING_RESPONSE_ARCHIVES.map(item => item.path)].includes(file.path))
       .filter((file) => FIXTURE_TOKEN_PATTERN.test(file.body.toString("utf8")))
       .map((file) => file.path);
     if (fixtureTokenPaths.length > 0) {

@@ -110,15 +110,21 @@ Never upgrade confidence merely because a familiar optimization exists.
 
 Use the smallest reversible perturbation that causes competing hypotheses to predict different outcomes. Maintain the same command tape and fixed quality unless quality itself is the tested variable.
 
-### GPU fill/bandwidth/overdraw probe
+### GPU fragment-work probe
 
 **Perturbation:** reduce drawing-buffer pixel count materially while preserving scene, update, physics, and pass topology.
 
-**Supports:** GPU time, p95, and budget misses improve strongly.
+**Supports:** GPU time, p95, and budget misses improve strongly, supporting work that scales with fragment count.
 
 **Weakens:** GPU time is unchanged or CPU submission remains dominant.
 
-**Caveat:** lowering DPR may also change LOD, post-processing branches, or UI behavior; freeze those if possible.
+**Caveat:** this does not distinguish shader arithmetic, texture access, divergence, blending, or attachment bandwidth. Lowering DPR may also change LOD, post-processing branches, or UI behavior; freeze those if possible. Little improvement does not establish a CPU bottleneck.
+
+### Shader-execution probe
+
+**Perturbation:** simplify one implicated shader block at fixed coverage, geometry, resolution, and pass topology. For control-flow or resource hypotheses, compare coherent/scattered workloads, runtime-disabled/specialized-away features, or retained/unrolled loops as appropriate; keep other work fixed.
+
+**Supports:** repeated GPU timings move as predicted, with matching compiler/resource evidence when available. **Weakens:** timings remain within variance or move oppositely. A faster simplified shader implicates that block, not automatically divergence, registers, or bandwidth; use the shared shader-execution reference for the next discriminating test. A diagnostic substitution still needs semantic proof before production use.
 
 ### Draw/state/submission probe
 
@@ -217,7 +223,7 @@ Avoid synchronous GPU readbacks or compile-status polling in the measurement pat
 
 ## 8. Heuristics are starting hypotheses
 
-- DPR sensitivity suggests pixel/fill/bandwidth pressure.
+- DPR sensitivity suggests fragment-scaled work; shader execution and fill/bandwidth need further discrimination.
 - Object-count sensitivity with low DPR sensitivity suggests CPU traversal/submission or state pressure.
 - Spikes correlated with contacts/wakeups suggest Rapier broadphase/narrowphase/solver/CCD pressure.
 - Spikes correlated with result count or bytes suggest handoff pressure.

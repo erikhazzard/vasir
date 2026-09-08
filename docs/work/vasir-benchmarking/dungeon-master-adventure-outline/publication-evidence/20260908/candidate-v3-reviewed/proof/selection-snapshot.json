@@ -1,0 +1,41 @@
+{
+  "kind": "vasirbenchmark-selection-snapshot",
+  "schemaVersion": 1,
+  "createdAt": "2026-09-08T02:54:54.802Z",
+  "publicationSourceRootDirectory": "/Users/erikhazzard/code/vasir",
+  "preview": false,
+  "previewSourceRootDirectory": null,
+  "files": [
+    {
+      "path": "benchmarks/public-results.json",
+      "present": true,
+      "bytes": 1089,
+      "sha256": "e38dee13048ef18bb5db6ea027f3a308a43167cdeddfc9b072dbf0a1d7b2d979"
+    },
+    {
+      "path": "benchmarks/storytelling-core-idea/publication.json",
+      "present": true,
+      "bytes": 583,
+      "sha256": "dfbdb501233d5838452f95e41088b4c2112e12cb5b5f5f711e94b0fad4a83af9"
+    },
+    {
+      "path": "benchmarks/storytelling-plot-twists/publication.json",
+      "present": true,
+      "bytes": 587,
+      "sha256": "8d3e1c0b6e44e7abbe2536671fc09d70e8eba9ae395913c0c8dd7779c43ffc6d"
+    },
+    {
+      "path": "benchmarks/dungeon-master-adventure-outline/publication.json",
+      "present": true,
+      "bytes": 610,
+      "sha256": "e92adbedd7ff43bf6eaf34272267a5b10558f257b9d2ebda71707ad5c18007d6"
+    },
+    {
+      "path": "benchmarks/2d-jumping-demo/publication.json",
+      "present": true,
+      "bytes": 362,
+      "sha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321"
+    }
+  ],
+  "snapshotId": "6ecb87e0c799f4953e95178e80a41241d39521fc5dc233a158c2bd4f1c5d79d6"
+}

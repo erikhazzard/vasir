@@ -15,7 +15,7 @@ Also use it for planned renderer, physics, asset-pipeline, quality-tier, loading
 
 ### `local_change_guard`
 
-Use for one concrete hot-path implementation or static review. Apply only the rules for the touched domains; do not demand a whole-game asset, physics, tier, and threading plan for a local instancing or render-loop change. For rendering changes, always read `references/render-topology-guard.md` before accepting or writing the change.
+Use for one concrete hot-path implementation or static review. Apply only the rules for the touched domains; do not demand a whole-game asset, physics, tier, and threading plan for a local instancing or render-loop change. For rendering changes, always read `references/render-topology-guard.md` before accepting or writing the change. When shader control flow, loops, sampling/indexing, live state, material specialization, stage placement, or compute work organization changes, also read `references/shader-execution.md`; include generated shaders from built-in materials and TSL.
 
 Return one domain disposition. When embedded in `$code__auditing`, this is evidence for that skill's canonical release verdict, not a competing audit verdict:
 
@@ -138,8 +138,8 @@ Never use FPS alone as proof.
 
 Use this bottleneck cheat sheet:
 
-- **Fill-rate / overdraw bound:** FPS improves when internal resolution drops; draw calls stay similar.
-- **CPU draw-call / scene traversal bound:** FPS barely changes with internal resolution; draw calls, state changes, or traversal cost are high.
+- **Fragment-work hypothesis:** GPU time improves when internal resolution drops; this does not distinguish shader arithmetic, texture access, divergence, blending, or attachment bandwidth.
+- **CPU draw-call / scene traversal hypothesis:** submission or traversal timings support it; low resolution sensitivity alone does not establish a CPU bottleneck.
 - **Shader/material/post bound:** a few full-screen or expensive materials dominate; simplifying materials or passes helps more than geometry changes.
 - **Physics bound:** physics step time grows with active bodies, contacts, joints, CCD, or queries; render simplification barely moves the needle.
 - **Main-thread bound:** long tasks, input lag, or GC spikes dominate; worker moves or allocation cleanup help.
@@ -155,7 +155,7 @@ Required asset principles:
 - Use geometry compression / quantization where the pipeline supports them.
 - Instance repeated props whenever material and geometry allow it.
 - Batch repeated geometry sharing a material when instancing is not enough.
-- Reduce unique materials; material diversity becomes draw-call diversity.
+- Share compatible materials, but weigh submission savings against conditional shader work, indexing, register demand, and lost specialization; fewer programs or draws alone do not prove a win.
 - Use LODs for repeated or distant content.
 - Treat transparency as a budgeted exception, not a default art style.
 - Texture dimensions are chosen by on-screen need, not by source art size.
@@ -586,3 +586,4 @@ Excellent changes are boring in the best way:
 # 7) References
 
 - `references/render-topology-guard.md` — always read for local render implementation or static review, and for architecture changes affecting frame loops, render owners, passes, targets, views, UI composition, or final output.
+- `references/shader-execution.md` — read for changes to shader execution or material specialization, and shader-execution hypotheses; owns GPU coherence and resource tradeoffs shared with `$threejs__improve-performance`.

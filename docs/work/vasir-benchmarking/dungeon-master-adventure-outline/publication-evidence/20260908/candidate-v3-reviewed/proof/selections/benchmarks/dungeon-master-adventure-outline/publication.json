@@ -1,0 +1,12 @@
+{
+  "kind": "vasirbenchmark-dungeon-master-source",
+  "schemaVersion": 1,
+  "run": {
+    "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a/run.json",
+    "sha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a"
+  },
+  "skill": {
+    "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a/skill-snapshot.json",
+    "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+  }
+}

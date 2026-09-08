@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "kind": "dungeon-master-independent-publication-adoption-audit",
+  "recordedAt": "2026-09-08T03:10:00.956Z",
+  "status": "passed",
+  "reviewer": "dm_benchmark_publication_arch",
+  "mode": "read-only retained evidence audit; no AWS operations or public-source mutations",
+  "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+  "reviewedSupersededReleaseId": "dbbc02fa92ccc613b11d77083f93eeecf43612d456db3e4a1e8f02654ebb6fda",
+  "scope": "Exact retained candidate comparison, publication and acceptance receipts, and nine completed live Writing browser receipts. Present-tense live availability is separately verified by the root/reference agent; this audit did not issue fresh network requests.",
+  "inputs": {
+    "candidate": {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/candidate.json",
+      "bytes": 361604,
+      "sha256": "2aa13eef5f9e035f9979658bae41720c088ca0cefa930a0eadbdc28f29905d82"
+    },
+    "reviewedCandidate": {
+      "path": "/tmp/vasir-dm-benchmark-20260908/tmp/dm-final-release-20260908-v3/candidate.json",
+      "bytes": 362141,
+      "sha256": "a0eec2375f820cdc560546fcb14087a339fed5c5f015127da74c14cdc9ab04f1"
+    },
+    "publication": {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/publish-result.json",
+      "bytes": 186490,
+      "sha256": "932f622064123a2c068d63f9e1b089f7ead7743165891f6c75c29081fe51cd2e"
+    },
+    "acceptedTemplate": {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/template-lock.json",
+      "bytes": 3930743,
+      "sha256": "ff45dcc2061d2af52853f05b95ed438a4417cf20c31e38cd50e3f1b06a990989"
+    },
+    "currentOriginalTemplate": {
+      "path": "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/template-lock.json",
+      "bytes": 3930743,
+      "sha256": "ff45dcc2061d2af52853f05b95ed438a4417cf20c31e38cd50e3f1b06a990989"
+    }
+  },
+  "publication": {
+    "status": "success",
+    "dryRun": false,
+    "previousVerifiedReleaseId": "70a2d25557481e7dad63fab72d891c9629843e76d834f1ffe670a260d928ed8b",
+    "activeReleaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+    "verificationStatus": "passed",
+    "verificationMode": "fast",
+    "verifiedFiles": 16,
+    "browserAuditPerformedByPublisher": false
+  },
+  "acceptance": {
+    "status": "accepted",
+    "version": "2026-09-08-writing-category-hierarchy-c266a8d078ad",
+    "acceptedAt": "2026-09-08T02:50:21.206Z",
+    "releaseId": "c266a8d078add2906ac0074b4e76da1a0b0e6347dcbec52bcb22c0a7a9f965e0",
+    "checkedSourcePins": 15,
+    "checkedCapturePins": 60,
+    "currentOriginalMatchesRecordedVersion": true,
+    "allSourceBytesAndHashesMatch": true,
+    "allCaptureBytesAndHashesMatch": true
+  },
+  "candidateComparison": {
+    "sameProjectionSha256": true,
+    "projectionSha256": "bd9e1342a4883d73c942aa8f2cb0e63fa073806946f9e2280bf8419ce9a7d71e",
+    "generatedBundles": [
+      {
+        "path": "data.js",
+        "bytes": 874810,
+        "sha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+        "reviewedBytes": 874810,
+        "reviewedSha256": "a0258fea27526dff783a4c6c45d7e300bbf615f81b0925b54f4f1defca898c69",
+        "byteForByteEqual": true
+      },
+      {
+        "path": "responses.js",
+        "bytes": 6484506,
+        "sha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+        "reviewedBytes": 6484506,
+        "reviewedSha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46",
+        "byteForByteEqual": true
+      },
+      {
+        "path": "writing-data.js",
+        "bytes": 1363147,
+        "sha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+        "reviewedBytes": 1363147,
+        "reviewedSha256": "ce623e94eaa0b7f9bcee0f92bd9918c4bce93acbfb8a29352a5fdabb9ebe71ec",
+        "byteForByteEqual": true
+      },
+      {
+        "path": "writing-responses.js",
+        "bytes": 6126683,
+        "sha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+        "reviewedBytes": 6126683,
+        "reviewedSha256": "f68ee3558795ab8eb1368ac429778ed65403e23bd666f080e51502e37e143158",
+        "byteForByteEqual": true
+      }
+    ],
+    "gameArtifacts": {
+      "count": 527,
+      "comparison": "Exact equality of every public key, byte length, and SHA-256 in the two candidate artifact inventories.",
+      "allPinsEqual": true,
+      "sortedPinInventorySha256": "8df0e8a561a3aca8ff1ed1c067e4a9990eff4bd9bcc96bbd4bb24543bd551851",
+      "reviewedSortedPinInventorySha256": "8df0e8a561a3aca8ff1ed1c067e4a9990eff4bd9bcc96bbd4bb24543bd551851"
+    },
+    "unchangedReportFiles": [
+      "benchmark-report.js",
+      "benchmark-report.css"
+    ],
+    "substantivePresentationDifferences": [
+      "app.js adds explicitly unranked partial-coverage rows with fixed subgroup weights.",
+      "style.css adds styles for those partial-coverage rows.",
+      "games.html links Writing to the common Writing category route."
+    ],
+    "otherHtmlChanges": "index.html and benchmark-report.html differ only in release-qualified resource URLs; games.html also has the Writing navigation correction.",
+    "dungeonMasterCountFixRetained": true,
+    "dungeonMasterMobileAnswerWrapFixRetained": true
+  },
+  "liveBrowserReceipts": [
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-1440/writing-browsercheck.json",
+      "bytes": 447454,
+      "sha256": "08e0164f8abcc4ea460c1ffe85d14d6657adccab4983420101345917d878daf0",
+      "benchmarkId": "storytelling-core-idea",
+      "width": 1440,
+      "height": 1000,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 134,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 6,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 12,
+        "settingCount": 33,
+        "completedSettingCount": 0,
+        "responseCount": 790,
+        "expectedResponseCount": 792,
+        "scoredResponseCount": 158,
+        "usablePairs": 79,
+        "expectedPairs": 396,
+        "judgmentCount": 946,
+        "expectedJudgmentCount": 1584
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-390/writing-browsercheck.json",
+      "bytes": 447392,
+      "sha256": "cc970586f675ab838b9f76441a948f2762767a3ee6ef139709ca136bd1f796a4",
+      "benchmarkId": "storytelling-core-idea",
+      "width": 390,
+      "height": 844,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 134,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 6,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 12,
+        "settingCount": 33,
+        "completedSettingCount": 0,
+        "responseCount": 790,
+        "expectedResponseCount": 792,
+        "scoredResponseCount": 158,
+        "usablePairs": 79,
+        "expectedPairs": 396,
+        "judgmentCount": 946,
+        "expectedJudgmentCount": 1584
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-core-820/writing-browsercheck.json",
+      "bytes": 447432,
+      "sha256": "efa2cfcf30cdef6dec39558f470f7a30a72f9fa97cea5380ac4747b3a4e1331d",
+      "benchmarkId": "storytelling-core-idea",
+      "width": 820,
+      "height": 1000,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 134,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 6,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 12,
+        "settingCount": 33,
+        "completedSettingCount": 0,
+        "responseCount": 790,
+        "expectedResponseCount": 792,
+        "scoredResponseCount": 158,
+        "usablePairs": 79,
+        "expectedPairs": 396,
+        "judgmentCount": 946,
+        "expectedJudgmentCount": 1584
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-1440/writing-browsercheck.json",
+      "bytes": 450477,
+      "sha256": "c80d85ada05cea0c0fdbe2b805c3c5c60325242fe86da73327710f33adf215b2",
+      "benchmarkId": "storytelling-plot-twists",
+      "width": 1440,
+      "height": 1000,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 130,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 6,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "settingCount": 4,
+        "completedSettingCount": 2,
+        "responseCount": 80,
+        "expectedResponseCount": 80,
+        "scoredResponseCount": 76,
+        "usablePairs": 38,
+        "expectedPairs": 40,
+        "judgmentCount": 152,
+        "expectedJudgmentCount": 160,
+        "validResponseCount": 78,
+        "terminalGenerationFailureCount": 2,
+        "terminallyExcludedPairCount": 2,
+        "terminallyExcludedJudgmentCount": 8,
+        "pendingGenerationCount": 0,
+        "pendingJudgmentCount": 0,
+        "executionComplete": true,
+        "executionStatus": "complete-with-exclusions"
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-390/writing-browsercheck.json",
+      "bytes": 450415,
+      "sha256": "cbdfba9da25c9ffea96c561473472460276e9d2088a9a5c3fb14ed4de6c8367d",
+      "benchmarkId": "storytelling-plot-twists",
+      "width": 390,
+      "height": 844,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 130,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 6,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "settingCount": 4,
+        "completedSettingCount": 2,
+        "responseCount": 80,
+        "expectedResponseCount": 80,
+        "scoredResponseCount": 76,
+        "usablePairs": 38,
+        "expectedPairs": 40,
+        "judgmentCount": 152,
+        "expectedJudgmentCount": 160,
+        "validResponseCount": 78,
+        "terminalGenerationFailureCount": 2,
+        "terminallyExcludedPairCount": 2,
+        "terminallyExcludedJudgmentCount": 8,
+        "pendingGenerationCount": 0,
+        "pendingJudgmentCount": 0,
+        "executionComplete": true,
+        "executionStatus": "complete-with-exclusions"
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-twists-820/writing-browsercheck.json",
+      "bytes": 450456,
+      "sha256": "bc45b183d548481410a21f56e077769cd0abcce118fac4ab2f2c15d9966bdc62",
+      "benchmarkId": "storytelling-plot-twists",
+      "width": 820,
+      "height": 1000,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 130,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 6,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "settingCount": 4,
+        "completedSettingCount": 2,
+        "responseCount": 80,
+        "expectedResponseCount": 80,
+        "scoredResponseCount": 76,
+        "usablePairs": 38,
+        "expectedPairs": 40,
+        "judgmentCount": 152,
+        "expectedJudgmentCount": 160,
+        "validResponseCount": 78,
+        "terminalGenerationFailureCount": 2,
+        "terminallyExcludedPairCount": 2,
+        "terminallyExcludedJudgmentCount": 8,
+        "pendingGenerationCount": 0,
+        "pendingJudgmentCount": 0,
+        "executionComplete": true,
+        "executionStatus": "complete-with-exclusions"
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-1440/writing-browsercheck.json",
+      "bytes": 436491,
+      "sha256": "842738e6d96782443a41b569ad269b82cd28d0fb98a1d076d6d6f030d319fd0e",
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "width": 1440,
+      "height": 1000,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 138,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 8,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 16,
+        "promptCount": 6,
+        "settingCount": 1,
+        "completedSettingCount": 1,
+        "responseCount": 32,
+        "expectedResponseCount": 32,
+        "scoredResponseCount": 32,
+        "usablePairs": 16,
+        "expectedPairs": 16,
+        "judgmentCount": 64,
+        "expectedJudgmentCount": 64
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-390/writing-browsercheck.json",
+      "bytes": 436441,
+      "sha256": "2a702755b3f21905d77a9baaaec687d4acddac68b9af53825dedb334f20e4a24",
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "width": 390,
+      "height": 844,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 138,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 8,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 16,
+        "promptCount": 6,
+        "settingCount": 1,
+        "completedSettingCount": 1,
+        "responseCount": 32,
+        "expectedResponseCount": 32,
+        "scoredResponseCount": 32,
+        "usablePairs": 16,
+        "expectedPairs": 16,
+        "judgmentCount": 64,
+        "expectedJudgmentCount": 64
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    },
+    {
+      "path": "/Users/erikhazzard/code/vasir/tmp/writing-hierarchy/rehearsal-07/live-writing-dm-820/writing-browsercheck.json",
+      "bytes": 436474,
+      "sha256": "accb90095b1afd05afb8ef9479fc0f1036bc684656f22c94aa21893659ac8dd2",
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "width": 820,
+      "height": 1000,
+      "status": "passed",
+      "errorCount": 0,
+      "checkCount": 138,
+      "screenshotCount": 16,
+      "loadedModuleRecords": 8,
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 16,
+        "promptCount": 6,
+        "settingCount": 1,
+        "completedSettingCount": 1,
+        "responseCount": 32,
+        "expectedResponseCount": 32,
+        "scoredResponseCount": 32,
+        "usablePairs": 16,
+        "expectedPairs": 16,
+        "judgmentCount": 64,
+        "expectedJudgmentCount": 64
+      },
+      "verified": {
+        "loadedModuleUrlsUseAdoptedRelease": true,
+        "loadedModuleBytesAndHashesMatchCandidate": true,
+        "allScreenshotBytesAndHashesMatch": true,
+        "allScreenshotDimensionsMatch": true
+      }
+    }
+  ],
+  "totals": {
+    "liveBrowserReceipts": 9,
+    "retainedScreenshots": 144,
+    "checkedLoadedModuleRecords": 60,
+    "dungeonMasterSourceResponses": 32,
+    "dungeonMasterScoredResponses": 32,
+    "dungeonMasterCandidateAssessments": 64,
+    "dungeonMasterUsablePairs": 16
+  },
+  "conclusion": "No publication blocker found. The adopted c266 release preserves the complete reviewed Dungeon Master benchmark and all generated scores, answers, reviews, and game artifact pins. Retain v3 as the reviewed superseded candidate; do not overwrite the newer combined release."
+}

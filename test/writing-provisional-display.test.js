@@ -6,116 +6,142 @@ import vm from 'node:vm';
 const app = fs.readFileSync(new URL('../site/vasirbenchmark.com/app.js', import.meta.url), 'utf8');
 const globals = { window: {} };
 vm.runInNewContext(fs.readFileSync(new URL('../site/vasirbenchmark.com/writing-data.js', import.meta.url), 'utf8'), globals);
-const source = globals.window.VASIR_WRITING;
+const source = JSON.parse(JSON.stringify(globals.window.VASIR_WRITING));
 const clone = value => JSON.parse(JSON.stringify(value));
-const freeze = value => {
-  if (value && typeof value === 'object') {
-    Object.freeze(value);
-    Object.values(value).forEach(freeze);
-  }
-  return value;
-};
 const declaration = name => {
   const start = app.indexOf(`  const ${name} = `);
   assert.ok(start >= 0, `${name} must be present.`);
-  return app.slice(start, app.indexOf('\n  };', start) + '\n  };'.length);
+  return app.slice(start, app.indexOf('\n  const ', start + 1));
 };
 const formatters = app.slice(app.indexOf('  const escapeHtml = '), app.indexOf('  const scoreFor = '));
-function render(publication = source, isWriting = true) {
+const attribute = (markup, name) => markup.match(new RegExp(`${name}="([^"]*)"`))?.[1];
+
+function render(publication = source, isWriting = true, settingId = publication.settings[0].id, selectionId = publication.benchmarks[0].id) {
+  const benchmark = publication.benchmarks[0];
+  const projectionContext = vm.createContext({ publication, benchmarkId: selectionId });
+  vm.runInContext(app.slice(0, app.indexOf('(async function () {')), projectionContext);
+  const data = vm.runInContext('buildWritingCategoryCollection(publication, benchmarkId)', projectionContext);
   const context = vm.createContext({
-    data: { writingCategory: { publications: [publication] } }, isWriting,
+    data, scoreBasis: data.scoreBasis,
+    isWriting, isOverall: false, isWorkSpec: false, benchmark, categoryById: new Map(), BASELINE_SHORT: 'Plain', BASELINE_CONDITION_ID: 'baseline', TREATMENT_CONDITION_ID: 'skill',
+    TREATMENT_LABEL: 'Task-specific skill', BASELINE_LABEL: 'Plain answer', scoreFor: entry => entry.score,
+    benchmarkSummaryById: new Map([[benchmark.id, publication.benchmarkSummaries[0]]]),
+    COMBINED_CAPABILITY: { id: 'overall' }, SCORE_MAXIMUM: 100,
+    selectedEntry: () => data.entries.find(entry => entry.settingId === settingId && entry.condition === 'skill'),
+    baselineBySetting: new Map(data.entries.filter(entry => entry.condition === 'baseline').map(entry => [entry.settingId, entry])),
+    benchmarkById: new Map(data.benchmarks.map(benchmark => [benchmark.id, benchmark])),
     conditionVisualClass: condition => condition === 'baseline' ? 'baseline' : 'full',
     COMPOSITE_SCORE_SCALE: value => value,
   });
-  vm.runInContext(`${formatters}\n${declaration('writingProvisionalSummaryMarkup')}\n${declaration('writingProvisionalMarkup')}
-    globalThis.summary = writingProvisionalSummaryMarkup();
-    globalThis.table = writingProvisionalMarkup(data.writingCategory.publications[0].benchmarks[0]);`, context);
-  return { summary: context.summary, table: context.table };
+  const names = ['formatEntryScore', 'writingBenchmarkDisplay', 'capabilityRankRowMarkup', 'writingProvisionalMarkup', 'benchmarkLedgerRowMarkup', 'writingSelectionMarkup'];
+  vm.runInContext(`${formatters}\n${names.map(declaration).join('\n')}
+    globalThis.display = writingBenchmarkDisplay(benchmark);
+    globalThis.table = writingProvisionalMarkup(benchmark);
+    globalThis.ledger = benchmarkLedgerRowMarkup(benchmark, 0, 'writing');
+    globalThis.selection = writingSelectionMarkup();`, context);
+  return { display: context.display, table: context.table, ledger: context.ledger, selection: context.selection, data };
 }
-const attribute = (markup, name) => markup.match(new RegExp(`${name}="([^"]*)"`))?.[1];
 
-test('Writing leaderboard shows the provisional summary before its separate category index', () => {
-  const { summary } = render();
-  assert.match(summary, /Core idea — Astra-only provisional results/);
-  assert.match(summary, /31 settings · 12 stories · 1 judge/);
-  assert.match(summary, /Plain <strong>78\.3<\/strong>/);
-  assert.match(summary, /Skill <strong>84\.0<\/strong>/);
-  assert.match(summary, /\+5\.7 pts/);
-  assert.match(summary, /excluded from the Writing development index below and from Overall/);
-  assert.match(summary, /href="\?writing=storytelling-core-idea#capabilities\/writing\/benchmarks"/);
-  assert.doesNotMatch(summary, /<details|<[^>]*\shidden(?:[ =>])|data-writing-provisional-setting=/);
-  const combined = declaration('combinedLeaderboardMarkup');
-  assert.ok(combined.indexOf('${writingProvisionalSummaryMarkup()}') < combined.indexOf('<section class="score-field'));
-  assert.doesNotMatch(combined, /writingProvisionalMarkup\(/, 'The full table must remain a single benchmark comparison.');
+test('Core field means appear in the benchmark ledger with their exact provisional source', () => {
+  const before = JSON.stringify(source);
+  const { display, ledger, table } = render();
+  assert.equal(display.sourceKind, 'provisional-single-judge');
+  assert.equal(display.sourceLabel, 'Astra-only · 31 settings · 12 stories');
+  assert.equal(attribute(ledger, 'data-baseline-score'), source.provisionalLeaderboard.summary.baseline.toFixed(1));
+  assert.equal(attribute(ledger, 'data-treatment-score'), source.provisionalLeaderboard.summary.treatment.toFixed(1));
+  assert.match(ledger, /Astra-only · 31 settings · 12 stories/);
+  assert.match(ledger, /Provisional single-judge scores/);
+  assert.match(table, /class="benchmark-comparison"/);
+  assert.match(table, /single-judge/);
+  assert.match(table, /uniform provisional basis contributes to the Storytelling aggregate/);
+  assert.match(table, /Writing is excluded from Overall/);
+  assert.match(ledger, /100% weight in Core idea · provisional basis/);
+  assert.doesNotMatch(declaration('combinedLeaderboardMarkup'), /writingProvisional|writingPartial|writingCoverage/);
+  assert.equal(JSON.stringify(source), before, 'Presentation must not rewrite the official null totals or source evidence.');
 });
 
-test('the shared comparison renders 31 numeric pairs and two unranked diagnostics without changing official results', () => {
-  const publication = freeze(clone(source));
-  const before = JSON.stringify(publication);
-  const { table } = render(publication);
-  assert.equal(JSON.stringify(publication), before);
-  const rows = [...table.matchAll(/<li class="setting-row"[\s\S]*?<\/li>/g)].map(match => match[0]);
-  const ranked = publication.provisionalLeaderboard.entries.filter(entry => entry.condition === 'skill' && entry.eligibleForRank)
-    .sort((a, b) => b.exactScore - a.exactScore || a.id.localeCompare(b.id));
-  assert.equal(rows.length, 31);
-  assert.deepEqual(rows.map(row => attribute(row, 'data-writing-provisional-setting')), ranked.map(entry => entry.settingId));
-  rows.forEach((row, index) => {
-    const entry = ranked[index];
-    const baseline = publication.provisionalLeaderboard.entries.find(item => item.settingId === entry.settingId && item.condition === 'baseline');
-    for (const [key, value] of [['data-baseline-score', baseline.score], ['data-full-score', entry.score], ['data-delta', entry.delta]]) {
-      assert.equal(attribute(row, key), value.toFixed(1));
-      assert.ok(Number.isFinite(Number(attribute(row, key))));
-    }
-    assert.equal(attribute(row, 'data-baseline-rank'), String(baseline.rank));
-    assert.equal(attribute(row, 'data-full-rank'), String(entry.rank));
-    assert.match(row, new RegExp(`benchmark-report\\.html\\?setting=${entry.settingId}#storytelling-core-idea/`));
-  });
-  assert.equal(ranked[0].configurationId, 'codex:gpt-6-astra@max');
-  const incomplete = [...table.matchAll(/<li data-writing-provisional-incomplete="[\s\S]*?<\/li>/g)].map(match => match[0]);
-  assert.equal(incomplete.length, 2);
-  incomplete.forEach(row => {
-    assert.equal(attribute(row, 'data-full-rank'), '');
-    assert.equal(attribute(row, 'data-baseline-rank'), '');
+test('Core opens the shared benchmark leaderboard and retains partial evidence in a small disclosure', () => {
+  const { table } = render();
+  assert.match(table, /Compare 31 model settings in the leaderboard/);
+  assert.match(table, /href="\.\/index.html\?score=storytelling-core-idea#capabilities\/writing"/);
+  assert.doesNotMatch(table, /capability-composition|setting-row__pair/);
+  assert.equal((table.match(/data-writing-provisional-setting=/g) || []).length, 31);
+  assert.equal((table.match(/capability-rank-row__marker--baseline/g) || []).length, 31);
+  assert.match(declaration('writingProvisionalMarkup'), /capabilityRankRowMarkup\(/);
+  assert.match(table, /<details class="benchmark-comparison__partial"><summary>2 partial results/);
+  const partial = [...table.matchAll(/<li data-writing-provisional-incomplete="[\s\S]*?<\/li>/g)].map(match => match[0]);
+  assert.equal(partial.length, 2);
+  for (const row of partial) {
     assert.match(row, /11\/12 stories/);
-    assert.match(row, /rank —/);
-  });
-  assert.ok(publication.entries.every(entry => entry.exactScore === null && entry.rank === null));
+    assert.match(row, /partial cohort, unranked/);
+    assert.doesNotMatch(row, /—|unavailable/);
+  }
 });
 
-test('comparison uses exact scores for ordering, retains ties, escapes labels, and leaves missing scores unavailable', () => {
+test('source selection prefers official means, including a real zero, as soon as they are published', () => {
+  const publication = clone(source);
+  Object.assign(publication.benchmarkSummaries[0], { baseline: 0, treatment: 0, delta: 0 });
+  const { display, ledger, table } = render(publication);
+  assert.equal(display.sourceKind, 'official-panel');
+  assert.equal(display.provisional, null);
+  assert.equal(attribute(ledger, 'data-baseline-score'), '0.0');
+  assert.equal(attribute(ledger, 'data-treatment-score'), '0.0');
+  assert.match(table, /data-writing-provisional-benchmark=/, 'The separately declared provisional comparison remains inspectable when official means become available.');
+  assert.doesNotMatch(ledger, /Provisional single-judge/);
+});
+
+test('selected model components retain exact source scores and escaped source-qualified answer links', () => {
   const publication = clone(source);
   const entries = publication.provisionalLeaderboard.entries.slice(0, 6);
   const skill = entries.filter(entry => entry.condition === 'skill');
   skill.forEach((entry, index) => Object.assign(entry, { exactScore: index ? 85.041 : 85.04, score: 85, rank: index ? 1 : 3 }));
+  publication.benchmarks[0].name = '<script>alert("answer")</script>';
   publication.provisionalLeaderboard.entries = entries;
   publication.provisionalLeaderboard.rankedSettingCount = 3;
-  const escaped = skill[1];
-  escaped.family = '<script>alert("answer")</script>';
-  publication.provisionalLeaderboard.incompleteSettings[0].scores.baseline = null;
-  const { table } = render(publication);
-  const ordered = [...table.matchAll(/<li class="setting-row"[\s\S]*?<\/li>/g)].map(match => match[0]);
-  assert.equal(attribute(ordered.at(-1), 'data-writing-provisional-setting'), skill[0].settingId);
-  assert.deepEqual(ordered.map(row => attribute(row, 'data-full-rank')), ['1', '1', '3']);
-  assert.doesNotMatch(table, /<script>/);
-  assert.match(table, /&lt;script&gt;alert\(&quot;answer&quot;\)&lt;\/script&gt;/);
-  const incomplete = table.match(/<li data-writing-provisional-incomplete="[\s\S]*?<\/li>/)[0];
-  assert.equal(attribute(incomplete, 'data-baseline-score'), '—');
+  const { selection } = render(publication, true, skill[0].settingId);
+  assert.doesNotMatch(selection, /<script>/);
+  assert.match(selection, /&lt;script&gt;alert\(&quot;answer&quot;\)&lt;\/script&gt;/);
+  assert.match(selection, /Provisional · 1 judge · Astra-only/);
+  assert.match(selection, /data-writing-component="storytelling-core-idea"/);
+  assert.match(selection, /data-exact-skill="85.04"/);
+  assert.match(selection, /data-weight="1"/);
+  assert.match(selection, new RegExp(`benchmark-report\\.html\\?setting=${skill[0].settingId}#storytelling-core-idea/`));
+  assert.doesNotMatch(selection, /—/);
 });
 
-test('the summary disappears when provisional evidence ends or Writing is not selected', () => {
+test('missing means and incomplete answer cohorts expose evidence without invented numeric pairs', () => {
   const publication = clone(source);
   publication.provisionalLeaderboard = null;
-  assert.deepEqual(render(publication), { summary: '', table: '' });
-  assert.deepEqual(render(source, false), { summary: '', table: '' });
+  const { ledger, table, selection } = render(publication);
+  assert.equal(table, '');
+  assert.match(ledger, /Answers &amp; reviews/);
+  assert.doesNotMatch(ledger.match(/<span class="benchmark-ledger__comparison">[\s\S]*?<\/span>/)[0], /—|0\.0/);
+  assert.doesNotMatch(selection, /—|0\.0 → 0\.0/);
+  assert.equal(render(source, false).table, '');
 });
 
-test('the summary destination opens the existing full comparison directly', () => {
+test('available-score means show only contributing components with their actual weights and divisor', () => {
+  for (const [settingId, expectedCount] of [['codex-gpt-6-astra-high', 2], ['claude-claude-opus-5-max', 1], ['codex-gpt-5-6-sol-ultra', 3]]) {
+    const { selection, data } = render(source, true, settingId, 'storytelling');
+    const entry = data.entries.find(entry => entry.settingId === settingId && entry.condition === 'skill');
+    assert.ok(entry, settingId);
+    assert.equal((selection.match(/data-writing-component=/g) || []).length, expectedCount);
+    const weights = [...selection.matchAll(/data-weight="([^"]+)"/g)].map(match => Number(match[1]));
+    assert.ok(weights.every(weight => Math.abs(weight - 1 / expectedCount) < 1e-12));
+    assert.match(selection, new RegExp(`data-partial="${expectedCount < 3}"`));
+    assert.match(selection, new RegExp(`data-exact-skill="${entry.exactScore}"`));
+    if (expectedCount > 1) assert.match(selection, new RegExp(`÷ ${expectedCount} ≈`));
+    if (expectedCount < 3) assert.match(selection, /\d+\.\d\*/);
+    assert.doesNotMatch(selection, /Incomplete: a score is required|Paired score incomplete/);
+  }
+});
+
+test('benchmark deep links still open the corresponding provisional comparison', () => {
   const benchmarkId = 'storytelling-core-idea';
   const details = { open: false };
   const benchmark = { focus() {}, scrollIntoView() {} };
   const start = app.indexOf("  if (isWriting && state.capabilityMode === 'benchmarks' && requestedWritingBenchmark");
   const end = app.indexOf('  if (window.history.state?.focusCapability', start);
-  assert.ok(start > 0 && end > start);
   vm.runInNewContext(app.slice(start, end), {
     isWriting: true, state: { capabilityMode: 'benchmarks' }, requestedWritingBenchmark: benchmarkId,
     benchmarkById: new Map([[benchmarkId, {}]]), CSS: { escape: value => value },
