@@ -12,7 +12,7 @@ import { DEFAULT_PANEL_JUDGE_CONCURRENCY, judgeBenchmarkRows, resolveBenchmarkJu
 import { createBenchmarkHash, createBenchmarkGenerationHash, createBenchmarkScoringHash, resolveBenchmarkSource } from "./benchmark-source.js";
 import { buildRunDirectoryPath, writeEvalRunArtifacts } from "./history.js";
 import { createBenchmarkPairs, createBenchmarkSummary, generateBenchmarkRows } from "./run-benchmark-eval.js";
-import { freezeStorytellingSkill, runStorytellingAgent, STORYTELLING_RUNTIME_VERSION, validateStorytellingSkillSnapshot } from "./storytelling-agent-runtime.js";
+import { freezeStorytellingSkill, isStorytellingRequiredSkillReadReceiptCompatible, normalizeStorytellingRequiredSkillFiles, runStorytellingAgent, STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION, STORYTELLING_RUNTIME_VERSION, validateStorytellingSkillSnapshot } from "./storytelling-agent-runtime.js";
 
 export const STORYTELLING_RUNNER_VERSION = "storytelling-core-idea-v1";
 export const STORYTELLING_DEFAULT_MODELS = Object.freeze([
@@ -83,6 +83,9 @@ export function identifyStorytellingJudgeQuotaExhaustion({ error, configuration 
   if (/\byou['’]re out of usage credits\b/iu.test(diagnostic)) reason = "usage-credits-exhausted";
   else if (configuration.provider === "claude" && configuration.model === "claude-fable-5-1" &&
     /\byou['’]ve reached your Fable(?: 5(?:\.1)?)? limit\b/iu.test(diagnostic)) reason = "model-usage-limit-reached";
+  else if (configuration.provider === "claude" && /\byou['’]ve hit your session limit\b/iu.test(diagnostic)) {
+    reason = "session-usage-limit-reached";
+  }
   else if (configuration.provider === "codex" && /\byou['’]ve hit your usage limit\b/iu.test(diagnostic)) {
     reason = "usage-limit-reached";
   }
@@ -91,6 +94,11 @@ export function identifyStorytellingJudgeQuotaExhaustion({ error, configuration 
 
 function rowKey(plan) {
   return [plan.configuration.id, plan.caseDefinition.id, `trial-${plan.trialNumber}`, plan.condition.id].join("::");
+}
+
+function skillConditionHash(snapshot, requiredSkillFiles) {
+  return requiredSkillFiles.length ? digest({ skillHash: snapshot.hash, requiredSkillFiles,
+    requiredSkillReadPolicyVersion: STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION }) : snapshot.hash;
 }
 
 function validateGenerationExecutionFilters(configurations, { generateProvider, generateModel }) {
@@ -159,6 +167,15 @@ function executionIdentity(run) {
 }
 
 function validateResume(run, snapshot) {
+  const requiredSkillFiles = normalizeStorytellingRequiredSkillFiles(snapshot, run.treatment?.requiredSkillFiles ?? []);
+  if (run.conditions?.find((condition) => condition.type === "skill")?.hash !== skillConditionHash(snapshot, requiredSkillFiles) ||
+    (requiredSkillFiles.length && (
+    JSON.stringify(requiredSkillFiles) !== JSON.stringify(run.treatment.requiredSkillFiles) ||
+    run.treatment.requiredSkillReadPolicyVersion !== STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION)) ||
+    (!requiredSkillFiles.length && (Object.hasOwn(run.treatment ?? {}, "requiredSkillFiles") ||
+      Object.hasOwn(run.treatment ?? {}, "requiredSkillReadPolicyVersion")))) {
+    fail("Storytelling required skill-file policy differs from the frozen condition identity.");
+  }
   if (run.kind !== "benchmark" || run.storytelling?.runnerVersion !== STORYTELLING_RUNNER_VERSION ||
     run.storytelling?.runtimeVersion !== STORYTELLING_RUNTIME_VERSION || run.harnessVersion !== 3 ||
     executionIdentity(run) !== run.storytelling.manifestHash ||
@@ -180,7 +197,8 @@ function validateResume(run, snapshot) {
       row.trialNumber !== plan.trialNumber || row.conditionId !== plan.condition.id) {
       fail(`Storytelling checkpoint row does not match its frozen plan: ${rowKey(plan)}`);
     }
-    if (row.rowStatus === "complete" && (
+    const protocolFailure = row.error?.code === "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE";
+    if ((row.rowStatus === "complete" || protocolFailure) && (
       !row.outputText?.trim() || row.outputHash !== digest(row.outputText) ||
       !isBenchmarkAgentRuntimeReceiptCompatible({ configuration: plan.configuration, runtimeReceipt: row.runtimeReceipt }) ||
       row.runtimeReceipt?.freshSession !== true ||
@@ -188,7 +206,12 @@ function validateResume(run, snapshot) {
       ["id", "provider", "model", "reasoning"].some((key) =>
         row.runtimeReceipt?.requestedConfiguration?.[key] !== plan.configuration[key]) ||
       row.runtimeReceipt?.userPromptSha256 !== digest(plan.promptText) ||
-      row.runtimeReceipt?.skillHash !== (plan.condition.type === "skill" ? snapshot.hash : null)
+      row.runtimeReceipt?.skillHash !== (plan.condition.type === "skill" ? snapshot.hash : null) ||
+      (requiredSkillFiles.length && plan.condition.type === "skill" && !isStorytellingRequiredSkillReadReceiptCompatible({
+        skillSnapshot: snapshot, requiredSkillFiles, receipt: row.runtimeReceipt?.requiredSkillReads,
+        requireComplete: !protocolFailure
+      })) ||
+      (protocolFailure && (row.rowStatus !== "error" || row.runtimeReceipt?.requiredSkillReads?.status !== "incomplete"))
     )) {
       fail(`Storytelling completed response has changed or lacks a compatible receipt: ${row.rowKey}`);
     }
@@ -247,6 +270,7 @@ export async function runStorytellingBenchmark({
   benchmarkName = "storytelling-core-idea",
   currentWorkingDirectory = process.cwd(), projectRootDirectory = currentWorkingDirectory,
   requestedModelArguments = [], requestedCaseIds = [], trialCount = 1, generationConcurrency = 4,
+  requiredSkillFiles = [],
   judgeConcurrency = DEFAULT_PANEL_JUDGE_CONCURRENCY,
   generateProvider = null, generateModel = null, judgeProvider = null,
   runId = null, resumeRunId = null, prepareOnly = false, generationOnly = false, judgeOnly = false, retryFailed = false,
@@ -280,8 +304,8 @@ export async function runStorytellingBenchmark({
   let releaseLock;
   if (resumeRunId) {
     safeId(resumeRunId, "resume run id");
-    if (runId || requestedModelArguments.length || requestedCaseIds.length || seed !== null) {
-      fail("Resume uses the frozen run's model matrix, cases, seed, and run id.");
+    if (runId || requestedModelArguments.length || requestedCaseIds.length || requiredSkillFiles.length || seed !== null) {
+      fail("Resume uses the frozen run's model matrix, cases, required skill files, seed, and run id.");
     }
     outputDirectory = buildRunDirectoryPath({ currentWorkingDirectory, projectRootDirectory, skillName: benchmarkName, runId: resumeRunId });
     // Take ownership before reading: the previous process may publish its final
@@ -313,10 +337,14 @@ export async function runStorytellingBenchmark({
       definition.cases = definition.cases.filter((entry) => requestedCaseIds.includes(entry.id));
     }
     snapshot = freezeStorytellingSkill({ skillDirectoryPath: path.join(projectRootDirectory, ".agents", "skills", "writing-storytelling") });
+    requiredSkillFiles = normalizeStorytellingRequiredSkillFiles(snapshot, requiredSkillFiles);
     const configurations = resolveBenchmarkConfigurations({
       requestedModelArguments: requestedModelArguments.length ? requestedModelArguments : STORYTELLING_DEFAULT_MODELS
     }).filter((configuration) => configuration.reasoning !== "ultracode");
     if (!configurations.length) fail("No ordinary reasoning configurations were selected.");
+    if (requiredSkillFiles.length && configurations.some((configuration) => configuration.provider !== "codex")) {
+      fail("Required skill-file read verification currently supports Codex contestant configurations only.");
+    }
     if (requestedModelArguments.some((value) => value.endsWith("@ultracode"))) fail("Ultracode is a workflow mode and is excluded from this reasoning benchmark.");
     validateGenerationExecutionFilters(configurations, { generateProvider, generateModel });
     const startedAt = nowImplementation().toISOString();
@@ -329,6 +357,8 @@ export async function runStorytellingBenchmark({
       id: "skill:writing-storytelling", label: "Writing storytelling skill", type: "skill", skillName: "writing-storytelling",
       hash: snapshot.hash, sourceType: "frozen-local-corpus", injection: "root-instruction-progressive-file-access",
       snapshotFile: "skill-snapshot.json", rootFile: "SKILL.md",
+      ...(requiredSkillFiles.length ? { requiredSkillFiles,
+        requiredSkillReadPolicyVersion: STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION } : {}),
       promptFiles: snapshot.files.map(({ relativePath, sha256, bytes }) => ({ relativeFilePath: relativePath, sha256, bytes }))
     };
     run = {
@@ -341,7 +371,7 @@ export async function runStorytellingBenchmark({
       treatment,
       conditions: [
         { id: "clean", label: "Plain", type: "clean", hash: digest(`${STORYTELLING_RUNTIME_VERSION}:no-skill`) },
-        { id: treatment.id, label: treatment.label, type: "skill", hash: snapshot.hash }
+        { id: treatment.id, label: treatment.label, type: "skill", hash: skillConditionHash(snapshot, requiredSkillFiles) }
       ],
       configurations,
       generation: {
@@ -414,6 +444,7 @@ export async function runStorytellingBenchmark({
       const row = rowsByKey.get(rowKey(plan));
       return (!generateProvider || plan.configuration.provider === generateProvider) &&
         (!generateModel || plan.configuration.model === generateModel) &&
+        row.error?.code !== "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE" &&
         (["pending", "running"].includes(row.rowStatus) ||
           (retryFailed && ["error", "unavailable"].includes(row.rowStatus)));
     }).sort((a, b) => digest(`${run.generation.orderSeed}:${rowKey(a)}`).localeCompare(digest(`${run.generation.orderSeed}:${rowKey(b)}`)));
@@ -428,10 +459,25 @@ export async function runStorytellingBenchmark({
       await generateBenchmarkRows({
         rowPlans: [plan], concurrency: 1, environmentVariables,
         agentRunnerImplementation: (args) => agentRunnerImplementation({
-          ...args, skillSnapshot: plan.condition.type === "skill" ? snapshot : null
+          ...args, skillSnapshot: plan.condition.type === "skill" ? snapshot : null,
+          ...(plan.condition.type === "skill" && run.treatment.requiredSkillFiles?.length
+            ? { requiredSkillFiles: run.treatment.requiredSkillFiles } : {})
         }),
         onRowComplete: (row) => {
           if (row.error?.code === "AUTH_UNAVAILABLE") row.rowStatus = "unavailable";
+          if (row.rowStatus === "complete" && plan.condition.type === "skill" && run.treatment.requiredSkillFiles?.length &&
+            !isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot,
+              requiredSkillFiles: run.treatment.requiredSkillFiles, receipt: row.runtimeReceipt?.requiredSkillReads })) {
+            // Keep the final answer, usage, and original receipt. This is a
+            // measured protocol failure, never a reason to reroll a story.
+            row.rowStatus = "error";
+            row.error = { code: "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE",
+              message: "The contestant returned an answer without verified complete reads of every required skill file.",
+              suggestion: "Retain this attempt as a protocol failure; it is excluded from scoring and automatic retries.",
+              context: { requiredSkillFiles: run.treatment.requiredSkillFiles,
+                policyVersion: STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION,
+                observedStatus: row.runtimeReceipt?.requiredSkillReads?.status ?? "missing", outputRetained: true } };
+          }
           attempt.status = row.rowStatus;
           attempt.completedAt = nowImplementation().toISOString();
           attempt.error = row.error;
@@ -564,6 +610,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const { values } = parseArgs({ options: {
     benchmark: { type: "string" }, "project-root": { type: "string" },
     model: { type: "string", multiple: true }, case: { type: "string", multiple: true },
+    "required-skill-file": { type: "string", multiple: true },
     trials: { type: "string" }, concurrency: { type: "string" }, "judge-concurrency": { type: "string" }, "run-id": { type: "string" },
     resume: { type: "string" }, prepare: { type: "boolean" }, "generation-only": { type: "boolean" },
     "retry-failed": { type: "boolean" }, "judge-only": { type: "boolean" },
@@ -572,6 +619,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   runStorytellingBenchmark({
     benchmarkName: values.benchmark, projectRootDirectory: values["project-root"] ?? process.cwd(),
     requestedModelArguments: values.model ?? [], requestedCaseIds: values.case ?? [],
+    requiredSkillFiles: values["required-skill-file"] ?? [],
     trialCount: values.trials === undefined ? 1 : Number(values.trials),
     generationConcurrency: values.concurrency === undefined ? 4 : Number(values.concurrency),
     judgeConcurrency: values["judge-concurrency"] === undefined ? undefined : Number(values["judge-concurrency"]),

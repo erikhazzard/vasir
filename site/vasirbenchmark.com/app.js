@@ -1,3 +1,124 @@
+// A display index over published benchmark totals, never a replacement for a
+// benchmark's own rubric, declared cohort, exclusions, or report archive.
+function buildWritingCategoryCollection(collection) {
+  if (!collection) return null;
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const finite = Number.isFinite;
+  const round = value => finite(value) ? Math.round(value * 10) / 10 : null;
+  const conditionIds = ['baseline', 'skill'];
+  const publications = [];
+  const seen = new Set();
+  const visit = source => {
+    if (!source) return;
+    const id = source.benchmarks?.[0]?.id;
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      const { benchmarkPublications, additionalBenchmarks, collectionCoverage, allWritingCoverage, ...publication } = source;
+      publications.push(clone(publication));
+    }
+    for (const child of source.benchmarkPublications || []) visit(child.projection);
+    for (const child of Object.values(source.additionalBenchmarks || {})) visit(child);
+  };
+  visit(collection);
+  if (!publications.length) return null;
+  const identityFor = (entry, publication) => entry.configurationId
+    || publication.settings.find(setting => setting.id === (entry.settingId || entry.id))?.configurationId
+    || entry.settingId || entry.id;
+  const pairs = new Map(publications.map(publication => {
+    const rows = new Map();
+    for (const entry of publication.entries || []) {
+      const identity = identityFor(entry, publication);
+      if (!rows.has(identity)) rows.set(identity, {});
+      rows.get(identity)[entry.condition] = entry;
+    }
+    return [publication.benchmarks[0].id, rows];
+  }));
+  const pairComplete = pair => conditionIds.every(condition => finite(pair?.[condition]?.exactScore));
+  const activeBenchmarkIds = publications.filter(publication => [...pairs.get(publication.benchmarks[0].id).values()].some(pairComplete)).map(publication => publication.benchmarks[0].id);
+  const groupMap = new Map();
+  const palette = ['var(--category-writing)', '#7445ff', '#00839a', '#08703d'];
+  for (const publication of publications) {
+    const benchmark = publication.benchmarks[0];
+    const id = benchmark.trackId || publication.subcategory || 'storytelling';
+    if (!groupMap.has(id)) {
+      const title = publication.tracks?.find(track => track.id === id)?.title || benchmark.suite || id;
+      groupMap.set(id, { id, name: title, title, short: id === 'storytelling' ? 'STORY' : id === 'dungeon-master' ? 'DM' : title.slice(0, 5).toUpperCase(), color: palette[groupMap.size % palette.length], benchmarkIds: [], activeBenchmarkIds: [], weight: 0, active: false });
+    }
+    const group = groupMap.get(id);
+    group.benchmarkIds.push(benchmark.id);
+    if (activeBenchmarkIds.includes(benchmark.id)) group.activeBenchmarkIds.push(benchmark.id);
+  }
+  const groups = [...groupMap.values()];
+  const activeGroups = groups.filter(group => group.activeBenchmarkIds.length);
+  const benchmarkWeights = {};
+  for (const group of activeGroups) {
+    group.active = true;
+    group.weight = 1 / activeGroups.length;
+    for (const id of group.activeBenchmarkIds) benchmarkWeights[id] = group.weight / group.activeBenchmarkIds.length;
+  }
+  const identityMap = new Map();
+  for (const publication of publications) for (const setting of publication.settings || []) {
+    const identity = identityFor(setting, publication);
+    if (!identityMap.has(identity)) identityMap.set(identity, setting);
+  }
+  const metricNames = [...new Set(publications.flatMap(publication => (publication.entries || []).flatMap(entry => Object.keys(entry.metrics || {}).filter(name => name !== 'costCoverage'))))];
+  const weighted = values => values.length && values.every(item => finite(item.value)) ? values.reduce((sum, item) => sum + item.value * item.weight, 0) : null;
+  const entries = [];
+  const coverageRecords = [];
+  const settings = [...identityMap].map(([identity, source]) => {
+    const missingBenchmarkIds = activeBenchmarkIds.filter(id => !pairComplete(pairs.get(id).get(identity)));
+    const unavailableBenchmarkIds = activeBenchmarkIds.filter(id => !pairs.get(id).has(identity));
+    const complete = activeBenchmarkIds.length > 0 && missingBenchmarkIds.length === 0;
+    const coverageRecord = { settingId: source.id, configurationId: identity, complete, missingBenchmarkIds, unavailableBenchmarkIds, expectedBenchmarks: activeBenchmarkIds.length, completedBenchmarks: activeBenchmarkIds.length - missingBenchmarkIds.length };
+    coverageRecords.push(coverageRecord);
+    const readings = Object.fromEntries(conditionIds.map(condition => [condition, groups.map(group => {
+      const groupComplete = group.active && group.activeBenchmarkIds.every(id => pairComplete(pairs.get(id).get(identity)));
+      const exactScore = groupComplete ? weighted(group.activeBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].exactScore, weight: 1 / group.activeBenchmarkIds.length }))) : null;
+      return { category: group.id, score: round(exactScore), exactScore, exactContribution: finite(exactScore) ? exactScore * group.weight : null, weight: group.weight, benchmarkIds: [...group.activeBenchmarkIds] };
+    })]));
+    const scores = Object.fromEntries(conditionIds.map(condition => [condition, complete ? weighted(activeBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].exactScore, weight: benchmarkWeights[id] }))) : null]));
+    const metrics = Object.fromEntries(conditionIds.map(condition => [condition, {
+      ...Object.fromEntries(metricNames.map(name => [name, complete ? weighted(activeBenchmarkIds.map(id => ({ value: pairs.get(id).get(identity)[condition].metrics?.[name], weight: benchmarkWeights[id] }))) : null])),
+      costCoverage: 'not-comparable'
+    }]));
+    const exactDelta = complete ? scores.skill - scores.baseline : null;
+    const setting = { ...clone(source), configurationId: identity, scores: { baseline: round(scores.baseline), skill: round(scores.skill) }, deltas: { skill: round(exactDelta) }, metrics, categories: readings, coverage: Object.fromEntries(conditionIds.map(condition => [condition, { ...coverageRecord }])) };
+    for (const condition of conditionIds) {
+      entries.push({ id: `${source.id}-${condition}`, settingId: source.id, configurationId: identity, modelId: source.modelId, provider: source.provider, family: source.family, reasoning: source.reasoning, label: source.label, condition, conditionLabel: condition === 'skill' ? 'Task-specific skill' : 'Plain answer', score: round(scores[condition]), exactScore: scores[condition], baselineScore: round(scores.baseline), exactBaselineScore: scores.baseline, delta: complete ? condition === 'baseline' ? 0 : round(exactDelta) : null, exactDelta: complete ? condition === 'baseline' ? 0 : exactDelta : null, categories: readings[condition], baselineCategories: readings.baseline, metrics: metrics[condition], cost: metrics[condition].meanCostUsd ?? null, latency: finite(metrics[condition].meanLatencyMs) ? metrics[condition].meanLatencyMs / 1000 : null, tokens: metrics[condition].meanOutputTokens ?? null, coverage: { ...coverageRecord }, rank: null });
+    }
+    return setting;
+  });
+  for (const entry of entries) if (finite(entry.exactScore)) entry.rank = 1 + entries.filter(other => other.condition === entry.condition && finite(other.exactScore) && other.exactScore > entry.exactScore).length;
+  const benchmarks = publications.flatMap(publication => publication.benchmarks);
+  const flatten = key => publications.flatMap(publication => (publication[key] || []).map(item => ({ ...item, benchmarkId: item.benchmarkId || publication.benchmarks[0].id })));
+  const coverage = { benchmarkCount: benchmarks.length, activeBenchmarkCount: activeBenchmarkIds.length, groupCount: groups.length, activeGroupCount: activeGroups.length, settingCount: settings.length, completedSettingCount: coverageRecords.filter(record => record.complete).length, benchmarkSettingCount: publications.reduce((sum, publication) => sum + (publication.coverage?.settingCount || 0), 0) };
+  for (const field of ['caseCount', 'responseCount', 'expectedResponseCount', 'scoredResponseCount', 'usablePairs', 'expectedPairs', 'judgmentCount', 'expectedJudgmentCount', 'terminalGenerationFailureCount', 'terminallyExcludedPairCount', 'terminallyExcludedJudgmentCount']) coverage[field] = publications.reduce((sum, publication) => sum + (publication.coverage?.[field] || 0), 0);
+  coverage.executionComplete = publications.every(publication => typeof publication.coverage?.executionComplete === 'boolean' ? publication.coverage.executionComplete : publication.coverage?.judgmentCount === publication.coverage?.expectedJudgmentCount && publication.coverage?.responseCount === publication.coverage?.expectedResponseCount);
+  coverage.executionStatus = coverage.executionComplete ? coverage.terminallyExcludedPairCount ? 'complete-with-exclusions' : 'complete' : 'in-progress';
+  coverage.pendingJudgmentCount = Math.max(0, coverage.expectedJudgmentCount - coverage.judgmentCount - coverage.terminallyExcludedJudgmentCount);
+  const method = 'equal-active-subcategory-equal-active-benchmark-complete-paired-index-v1';
+  const conditions = [{ id: 'baseline', label: 'Plain answer', short: 'Plain' }, { id: 'skill', label: 'Task-specific skill', short: 'Skill' }];
+  const categoryLeaders = activeGroups.flatMap(group => {
+    const eligible = entries.filter(entry => entry.condition === 'skill' && finite(entry.exactScore)).sort((a, b) => b.categories.find(item => item.category === group.id).exactScore - a.categories.find(item => item.category === group.id).exactScore);
+    return eligible.length ? [{ category: group.id, entry: { ...eligible[0], categoryScore: eligible[0].categories.find(item => item.category === group.id).score } }] : [];
+  });
+  return {
+    kind: 'vasirbenchmark-writing-category-display', schemaVersion: 1,
+    program: clone(publications[0].program || {}),
+    conditions, categories: activeGroups.length ? activeGroups : groups,
+    families: [{ id: 'writing', title: 'Writing', description: 'A developmental index over published writing benchmarks.', trackIds: groups.map(group => group.id) }],
+    tracks: groups.map(group => ({ id: group.id, familyId: 'writing', title: group.title, benchmarkIds: group.benchmarkIds })),
+    benchmarks, benchmarkSummaries: flatten('benchmarkSummaries'), benchmarkResults: flatten('benchmarkResults'), results: flatten('results'),
+    settings, entries, cases: flatten('cases'), caseResults: flatten('caseResults'), caseSummaries: flatten('caseSummaries'), trialSummaries: flatten('trialSummaries'),
+    meta: { release: publications[0].meta?.release, status: 'Uncalibrated development index', categories: groups.length, benchmarks: benchmarks.length, settings: settings.length, conditions: 2, aggregateCells: entries.length, runs: publications.length, calibration: 0 },
+    scoreBasis: { id: method, label: 'Writing development index', edition: 'Writing development index', method, unit: 'rubric-points', range: { minimum: 0, maximum: 100 }, taskCount: activeBenchmarkIds.length, benchmarkIds: activeBenchmarkIds, benchmarkWeighting: 'equal-within-active-subcategory', subgroupWeighting: 'equal-active-subcategories', calibrationStatus: 'development-uncalibrated', coverage, panelMethod: 'Published benchmark totals retain their own declared cohorts and scoring methods. The display index weights active subcategories equally and active benchmarks equally within each subcategory. A ranked setting must have complete published totals in both conditions for every active benchmark. No missing values are imputed; all ranked settings use the same benchmark cohort. Different rubrics and panels are not calibrated to one another.' },
+    coverage, categoryLeaders, efficientFrontier: [], regressions: entries.filter(entry => entry.condition === 'skill' && finite(entry.exactDelta) && entry.exactDelta < 0),
+    callouts: { overall: 'Writing is reported separately and does not change Overall.', value: 'Quality and resources use the same active benchmark weights; missing resources are not imputed.' },
+    methodology: { method, limitations: ['A display index over heterogeneous developmental rubrics, not a calibrated measure of general writing ability.', 'The active benchmark cohort and current weights change when new complete results are published.'] },
+    writingCategory: { method, publications, groups, activeBenchmarkIds, benchmarkWeights, coverageRecords, completeSettingCount: coverage.completedSettingCount, totalSettingCount: settings.length }
+  };
+}
+
 (async function () {
   'use strict';
 
@@ -6,7 +127,8 @@
   const initialFragment = decodeURIComponent(window.location.hash.replace(/^#/, ''));
   const writingSummary = rootData?.writing;
   const hasWriting = Boolean(writingSummary?.coverage?.caseCount && writingSummary?.benchmarkId);
-  const writingInProgress = hasWriting && (writingSummary.coverage.judgmentCount < writingSummary.coverage.expectedJudgmentCount || writingSummary.coverage.completedSettingCount < writingSummary.coverage.settingCount);
+  const publishedWritingBenchmarkCount = (writingSummary?.benchmarks?.length || (hasWriting ? 1 : 0)) + Object.keys(writingSummary?.additionalBenchmarks || {}).length;
+  const requestedWritingBenchmark = new URLSearchParams(window.location.search).get('writing');
   let writingData = window.VASIR_WRITING;
   if (hasWriting && initialFragment.split('/')[1] === 'writing' && !writingData) {
     try {
@@ -43,7 +165,14 @@
   const isWorkSpec = activeContext === 'workflows';
   const isOverall = activeContext === 'overall';
   const isWriting = activeContext === 'writing';
-  const data = isWriting ? writingData : isOverall ? overallData : isWorkSpec ? workflowData : rootData;
+  const writingCategoryData = isWriting ? buildWritingCategoryCollection(writingData) : null;
+  if (isWriting) {
+    window.VASIR_WRITING_COLLECTION = writingData;
+    window.VASIR_WRITING_CATEGORY = writingCategoryData;
+  }
+  const data = isWriting ? writingCategoryData : isOverall ? overallData : isWorkSpec ? workflowData : rootData;
+  const writingCaseLabel = data?.caseLabel || 'story case';
+  const writingCasePlural = `${writingCaseLabel}s`;
   const TREATMENT_LABEL = data?.conditions?.find((condition) => condition.id === 'skill')?.label || 'Architecture skill';
   const BASELINE_LABEL = data?.conditions?.find(condition => condition.id === 'baseline')?.label || 'Minimal baseline';
   const BASELINE_SHORT = data?.conditions?.find(condition => condition.id === 'baseline')?.short || 'Minimal';
@@ -69,7 +198,7 @@
     || data.settings.length === 0
     || data.benchmarkSummaries.length !== data.benchmarks.length
     || data.entries.length !== expectedEntryCount
-    || data.benchmarkResults.length !== expectedResponseCount
+    || (!isWriting && data.benchmarkResults.length !== expectedResponseCount)
     || (isOverall && (data.coverage?.eligibleSettings !== data.settings.length || !Array.isArray(data.coverage?.records) || data.coverage.records.length !== data.coverage.totalSettings))
     || (isWriting && (!Array.isArray(data.cases) || !data.cases.length || !Array.isArray(data.caseResults) || !Array.isArray(data.caseSummaries)))
   ) {
@@ -112,8 +241,8 @@
     ? 'Equal-weight mean of frozen task rubric scores'
     : `${SCORE_EDITION_LABEL} score`;
   const QUALITY_DOMAIN = [SCORE_MINIMUM, SCORE_MAXIMUM];
-  const taskCoverageLabel = `${isWriting ? data.cases.length : TASK_COUNT} ${isWriting ? 'stories' : TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
-  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isOverall || isWriting ? ' · Uncalibrated development' : ''}`;
+  const taskCoverageLabel = isWriting ? `${data.writingCategory.activeBenchmarkIds.length} scored of ${BENCHMARK_COUNT} published benchmarks` : `${TASK_COUNT} ${TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
+  const developmentDisclosure = isWriting ? `Writing development index · ${taskCoverageLabel} · Uncalibrated` : `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isOverall ? ' · Uncalibrated development' : ''}`;
   const COMPOSITE_SCORE_SCALE = d3.scaleLinear()
     .domain(QUALITY_DOMAIN)
     .range([0, 100])
@@ -193,6 +322,7 @@
 
   const fieldConfig = {
     overall: { label: COMBINED_CAPABILITY.name, short: COMBINED_CAPABILITY.name },
+    ...(isWriting ? { writing: { label: 'Writing', short: 'Writing' } } : {}),
     ...Object.fromEntries(data.categories.map((category) => [
       category.id,
       { label: category.name, short: category.short }
@@ -209,7 +339,8 @@
   const suiteDescriptions = {
     'Backend Architecture': 'Complete, low-rent systems whose day-one topology reaches real scale without a later rewrite.',
     'Work Specification': 'Plans that preserve the requested user value and give an implementer a grounded route to delivering it.',
-    Storytelling: 'Core-idea analysis across a fixed story corpus. Each story is a case within this benchmark.'
+    Storytelling: 'How stories work, and how to create them: core ideas, causal structure, character choices, and consequential revelations.',
+    'Dungeon Master': 'Playable adventure design: situations, choices, discoveries, and consequences at the table.'
   };
 
   const elements = {
@@ -233,7 +364,8 @@
     }
     if (route.startsWith('capabilities/')) {
       const [, category, scopeOrMode, subsectionMode] = route.split('/');
-      const requestedMode = category === 'writing' && scopeOrMode === 'storytelling' ? subsectionMode : scopeOrMode;
+      const legacyWritingScope = category === 'writing' && ['storytelling', 'dungeon-master', 'prose', 'poetry'].includes(scopeOrMode);
+      const requestedMode = legacyWritingScope ? subsectionMode : scopeOrMode;
       const categoryIsValid = categoryById.has(category);
       const mode = CAPABILITY_MODES.includes(requestedMode)
         ? requestedMode
@@ -241,7 +373,7 @@
       return {
         category: categoryIsValid ? category : COMBINED_CAPABILITY.id,
         mode,
-        canonical: categoryIsValid && (!requestedMode || requestedMode === 'benchmarks' || requestedMode === 'efficiency')
+        canonical: categoryIsValid && !legacyWritingScope && (!requestedMode || requestedMode === 'benchmarks' || requestedMode === 'efficiency')
       };
     }
     return {
@@ -254,7 +386,7 @@
   const initialRoute = routeFromHash();
 
   const state = {
-    selectedId: entryById.has(window.history.state?.selectedEntryId) ? window.history.state.selectedEntryId : data.entries.find((entry) => entry.condition === TREATMENT_CONDITION_ID)?.id || data.entries[0].id,
+    selectedId: entryById.has(window.history.state?.selectedEntryId) ? window.history.state.selectedEntryId : (isWriting ? [...data.entries].filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).sort((a, b) => (b.exactScore ?? b.score) - (a.exactScore ?? a.score))[0]?.id : null) || data.entries.find(entry => entry.condition === TREATMENT_CONDITION_ID)?.id || data.entries[0].id,
     capabilityCategory: initialRoute.category || COMBINED_CAPABILITY.id,
     capabilityMode: CAPABILITY_MODES.includes(initialRoute.mode) ? initialRoute.mode : 'models',
     metric: 'latency',
@@ -262,7 +394,7 @@
   };
 
   const capabilityHash = () => (
-    `#capabilities/${state.capabilityCategory}${state.capabilityCategory === 'writing' ? '/storytelling' : ''}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`
+    `#capabilities/${state.capabilityCategory}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`
   );
 
   const escapeHtml = (value) => String(value ?? '')
@@ -284,7 +416,7 @@
 
   const scoreFor = (entry, field = 'overall') => {
     if (!entry) return null;
-    if (field === 'overall') return entry.score;
+    if (field === 'overall' || (isWriting && field === 'writing')) return entry.score;
     return entry.categories.find((reading) => reading.category === field)?.score ?? null;
   };
 
@@ -293,7 +425,7 @@
   ]));
   const rankingScoreFor = (entry, field = 'overall') => {
     if (Number.isFinite(entry.exactScore)) {
-      return field === 'overall' ? entry.exactScore : entry.categories.find(reading => reading.category === field)?.exactScore ?? scoreFor(entry, field);
+      return field === 'overall' || (isWriting && field === 'writing') ? entry.exactScore : entry.categories.find(reading => reading.category === field)?.exactScore ?? scoreFor(entry, field);
     }
     if (isWorkflowCategory(field) || (isWorkSpec && field === 'overall')) {
       const exactScore = workflowExactScores.get(`${entry.settingId}:${entry.condition}`);
@@ -301,7 +433,7 @@
     }
     return scoreFor(entry, field);
   };
-  const plotScoreFor = (entry, field) => isOverall ? rankingScoreFor(entry, field) : scoreFor(entry, field);
+  const plotScoreFor = (entry, field) => isOverall || isWriting ? rankingScoreFor(entry, field) : scoreFor(entry, field);
   const conditionRanks = (entries, field) => {
     const ranks = new Map();
     entries.forEach((entry, index) => {
@@ -313,7 +445,7 @@
   };
 
   const baselineScoreFor = (entry, field = 'overall') => {
-    if (field === 'overall') return entry.baselineScore;
+    if (field === 'overall' || (isWriting && field === 'writing')) return entry.baselineScore;
     return entry.baselineCategories.find((reading) => reading.category === field).score;
   };
 
@@ -379,17 +511,17 @@
   const weightedComposition = (entry) => {
     const weighted = data.categories.map((category) => {
       const reading = entry.categories.find((reading) => reading.category === category.id);
-      const rawScore = isOverall ? reading.exactScore : reading.score;
+      const rawScore = isOverall || isWriting ? reading.exactScore : reading.score;
       const weight = Number.isFinite(category.weight) ? category.weight : 1;
       return {
         category,
         rawScore,
         displayScore: reading.score,
         weight,
-        unscaledContribution: isOverall ? reading.exactContribution : rawScore * weight
+        unscaledContribution: isOverall || isWriting ? reading.exactContribution : rawScore * weight
       };
     });
-    if (isOverall) return weighted.map(item => ({ ...item, contribution: item.unscaledContribution }));
+    if (isOverall || isWriting) return weighted.map(item => ({ ...item, contribution: item.unscaledContribution }));
     const weightedTotal = weighted.reduce((sum, item) => sum + item.unscaledContribution, 0);
     const scale = weightedTotal > 0 ? entry.score / weightedTotal : 0;
     let allocated = 0;
@@ -420,7 +552,7 @@
         data-entry-id="${escapeHtml(entry.id)}"
         data-condition="${escapeHtml(entry.condition)}"
         data-composite-score="${score.toFixed(1)}"
-        ${isOverall ? `data-composite-exact-score="${entry.exactScore}"` : ''}
+        ${isOverall || isWriting ? `data-composite-exact-score="${entry.exactScore}"` : ''}
         data-condition-rank="${conditionRank}"
         role="group"
         aria-label="${escapeHtml(conditionLabel)}, ${SCORE_EDITION_LABEL} score ${formatScore(score)} of ${SCORE_MAXIMUM}. ${escapeHtml(conditionLabel)} rank ${conditionRank} of ${SETTING_COUNT}, shown as secondary context. ${escapeHtml(profileLabel)}."
@@ -430,27 +562,27 @@
           <span class="capability-composition__rank">Rank #${String(conditionRank).padStart(2, '0')}</span>
         </span>
         <span class="capability-composition__track">
-          <span class="capability-composition__stack" role="toolbar" aria-label="Open a capability leaderboard from ${escapeHtml(conditionLabel)} scores">
+          <span class="capability-composition__stack" role="toolbar" aria-label="${isWriting ? 'Open subcategory benchmark tests' : 'Open a capability leaderboard'} from ${escapeHtml(conditionLabel)} scores">
             ${segments.map(({ category, rawScore, displayScore, contribution, weight }, index) => {
               const baselineReading = baselineEntry.categories.find((reading) => reading.category === category.id);
-              const baselineScore = isOverall ? baselineReading.exactScore : baselineReading.score;
+              const baselineScore = isOverall || isWriting ? baselineReading.exactScore : baselineReading.score;
               const categoryDelta = Math.round((rawScore - baselineScore) * 10) / 10;
               const insight = `${category.name}: score ${formatScore(displayScore)} of ${SCORE_MAXIMUM}, weight ${formatWeight(weight)}, weighted contribution ${contribution.toFixed(2)} points`;
               return `
                 <button
                   class="capability-composition__segment capability-composition__segment--${escapeHtml(category.id)}"
                   type="button"
-                  data-category-id="${escapeHtml(category.id)}"
+                  ${isWriting ? 'data-writing-group-id' : 'data-category-id'}="${escapeHtml(category.id)}"
                   data-entry-id="${escapeHtml(fullEntryId)}"
                   data-source-condition="${escapeHtml(entry.condition)}"
                   data-category-label="${escapeHtml(category.name)}"
                   data-category-short="${escapeHtml(category.short)}"
                   data-raw-score="${displayScore.toFixed(1)}"
-                  ${isOverall ? `data-raw-exact-score="${rawScore}"` : ''}
+                  ${isOverall || isWriting ? `data-raw-exact-score="${rawScore}"` : ''}
                   data-weight="${weight}"
-                  data-contribution="${isOverall ? contribution : contribution.toFixed(6)}"
+                  data-contribution="${isOverall || isWriting ? contribution : contribution.toFixed(6)}"
                   data-delta="${categoryDelta.toFixed(1)}"
-                  style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%"
+                  style="--segment-width: ${COMPOSITE_SCORE_SCALE(contribution).toFixed(4)}%${isWriting ? `; background:${escapeHtml(category.color)}` : ''}"
                   tabindex="${index === 0 ? '0' : '-1'}"
                   aria-label="Open ${escapeHtml(category.name)} results for ${escapeHtml(entry.family)}, ${escapeHtml(entry.reasoning)} reasoning, with ${escapeHtml(TREATMENT_LABEL)} selected. ${escapeHtml(conditionLabel)} ${escapeHtml(insight)}."
                   title="${escapeHtml(insight)}"
@@ -514,7 +646,7 @@
   };
 
   const categoryBenchmarks = (categoryId) => (
-    categoryId === COMBINED_CAPABILITY.id
+    categoryId === COMBINED_CAPABILITY.id || (isWriting && categoryId === 'writing')
       ? data.benchmarks
       : data.benchmarks.filter((benchmark) => benchmark.category === categoryId)
   );
@@ -523,12 +655,12 @@
   ));
 
   const combinedOutcomeSummary = () => {
-    const fullEntries = rankedCondition(TREATMENT_CONDITION_ID, COMBINED_CAPABILITY.id).entries;
+    const fullEntries = rankedCondition(TREATMENT_CONDITION_ID, COMBINED_CAPABILITY.id).entries.filter(entry => Number.isFinite(entry.score) && Number.isFinite(baselineBySetting.get(entry.settingId)?.score));
     const deltas = fullEntries
-      .map((entry) => isOverall ? entry.exactDelta : Math.round((entry.score - baselineBySetting.get(entry.settingId).score) * 10) / 10)
+      .map((entry) => isOverall || isWriting ? entry.exactDelta ?? entry.delta : Math.round((entry.score - baselineBySetting.get(entry.settingId).score) * 10) / 10)
       .sort((left, right) => left - right);
     const midpoint = Math.floor(deltas.length / 2);
-    const median = deltas.length % 2
+    const median = !deltas.length ? null : deltas.length % 2
       ? deltas[midpoint]
       : Math.round(((deltas[midpoint - 1] + deltas[midpoint]) / 2) * 10) / 10;
     return {
@@ -562,45 +694,70 @@
       </dl>
       <p>Current weights normalize the measured categories’ targets. Tasks share equal weight within each category; scores and resource means use the same weights. Both conditions require ${TASK_COUNT}/${TASK_COUNT} assessable tasks.</p>
       ${rootData.games ? '<p>The <a href="#capabilities/games">Games pilot</a> is available separately and excluded from this index.</p>' : ''}
-      ${hasWriting ? '<p><a href="#capabilities/writing/storytelling">Writing / Storytelling</a> is available separately. Core-idea analysis is excluded from this index until comparable coverage and scoring are established.</p>' : ''}
+      ${hasWriting ? '<p><a href="#capabilities/writing/storytelling">Writing / Storytelling</a> is available separately. Writing benchmarks are excluded from this index until comparable coverage and scoring are established.</p>' : ''}
     </details>
   `;
 
-  const writingSubsectionsMarkup = () => !isWriting ? '' : `
-    <nav class="writing-subsections" aria-label="Writing subsections">
-      ${(writingSummary.subsections || []).map(subsection => subsection.id === 'storytelling'
-        ? `<a class="writing-subsections__item is-selected" href="#capabilities/writing/${escapeHtml(subsection.id)}" aria-current="page" data-writing-subsection="${escapeHtml(subsection.id)}"><strong>${escapeHtml(subsection.title)}</strong><span>${escapeHtml(writingSummary.benchmarkTitle)} · ${writingInProgress ? 'IN PROGRESS' : subsection.status === 'measured' ? 'measured' : 'unscored'}</span></a>`
-        : `<span class="writing-subsections__item" aria-disabled="true" data-writing-subsection="${escapeHtml(subsection.id)}"><strong>${escapeHtml(subsection.title)}</strong><span>Unscored · future subsection</span></span>`
-      ).join('')}
-    </nav>
-  `;
-
-  const writingProgressMarkup = () => {
-    if (!isWriting) return '';
-    const coverage = data.coverage;
-    const failures = data.caseResults.filter(cell => ['error', 'unavailable'].includes(cell.status)).length;
-    return `<aside class="writing-progress" data-writing-progress aria-label="Writing benchmark progress">
-      <div class="writing-progress__heading"><strong class="writing-progress__status" data-writing-progress-status>${writingInProgress ? 'IN PROGRESS' : 'COMPLETE SNAPSHOT'}</strong><a class="writing-progress__link" data-writing-browse-answers href="${escapeHtml(data.benchmarkSummaries[0].detailHref)}">Browse answers &amp; reviews ↗</a></div>
-      <p class="writing-progress__counts"><span data-writing-progress-count="answers">${coverage.responseCount}/${coverage.expectedResponseCount} final answers</span><span data-writing-progress-count="reviews">${coverage.judgmentCount}/${coverage.expectedJudgmentCount} planned judge reviews</span><span data-writing-progress-count="panels">${coverage.scoredResponseCount}/${coverage.expectedResponseCount} complete ${JUDGE_COUNT}-judge answer panels</span></p>
-      <p data-writing-progress-disclosure>${writingInProgress ? 'Judging incomplete; available answers and reviews are published. ' : ''}Case scores require the full judge panel. Incomplete configurations are not ranked.${failures ? ` ${failures} failed generations are retained; planned totals include unavailable slots.` : ''}</p>
-    </aside>`;
+  const writingMethodMarkup = () => {
+    const active = data.writingCategory.activeBenchmarkIds;
+    const adventure = data.writingCategory.publications.find(publication => publication.benchmarks[0].id === 'dungeon-master-adventure-outline');
+    const pending = data.benchmarks.filter(benchmark => !active.includes(benchmark.id));
+    const unmeasured = (writingSummary.subsections || []).filter(subsection => !data.categories.some(group => group.id === subsection.id));
+    return `
+      <details class="overall-weights writing-index-method" data-writing-index-method>
+        <summary>Coverage &amp; scoring method</summary>
+        <p>Equal weight across measured subcategories; equal weight across scored benchmarks within each subcategory. A benchmark enters this development index once it has a complete paired configuration. Every ranked setting must complete the same ${active.length} active benchmarks under both conditions; missing evidence is never a zero.</p>
+        <p>Each benchmark retains its own prompts, trials, rubric, judges, and completion rules. This is an uncalibrated index of the currently measured work, not a comprehensive writing score. The comparison cohort can change as coverage grows.</p>
+        ${pending.length ? `<p>Not yet in the index: ${pending.map(benchmark => `<a href="${escapeHtml(benchmarkSummaryById.get(benchmark.id).detailHref)}">${escapeHtml(benchmark.name)}</a>`).join(' · ')}. Available answers and reviews remain published.</p>` : ''}
+        ${unmeasured.length ? `<p>Unmeasured subcategories: ${unmeasured.map(group => escapeHtml(group.title)).join(' · ')}.</p>` : ''}
+        ${adventure ? `<p data-writing-adventure-scope><a href="${escapeHtml(adventure.benchmarkSummaries[0].detailHref)}">Dungeon Master / Adventure outline</a> contributes the ${adventure.cohortSummaries.primary.expectedPairs} repetitions of its primary prompt. Its ${adventure.cohortSummaries.transfer.sourcePromptCount} secondary prompts are reported separately in the adventure report.</p>` : ''}
+        <p>Writing is excluded from Overall. Benchmark-specific exclusions and uncertainty are documented in each report.</p>
+      </details>`;
   };
 
   const writingSelectionMarkup = () => {
     if (!isWriting) return '';
     const entry = selectedEntry();
     return `<section class="writing-selection" data-writing-selected-setting="${escapeHtml(entry.settingId)}" aria-labelledby="writing-selection-title">
-      <header><div><p class="ui-eyebrow">Read the answers</p><h4 id="writing-selection-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4></div><p>${data.cases.length} story cases · ${escapeHtml(BASELINE_LABEL)} → ${escapeHtml(TREATMENT_LABEL)} · /${SCORE_MAXIMUM}</p></header>
-      <ul>${data.cases.map(story => {
-        const results = data.caseResults.filter(result => result.caseId === story.id && result.settingId === entry.settingId);
+      <header><div><p class="ui-eyebrow">Read the answers</p><h4 id="writing-selection-title">${escapeHtml(entry.family)} · ${escapeHtml(entry.reasoning)}</h4></div><p>Original answers and reviews, by benchmark</p></header>
+      <ul>${data.benchmarks.filter(benchmark => data.benchmarkResults.some(result => result.benchmarkId === benchmark.id && result.settingId === entry.settingId)).map(benchmark => {
+        const publication = data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id));
+        const story = publication.cases[0];
+        const trials = publication.scoreBasis?.trialsPerTask || 1;
+        const results = publication.entries.filter(result => result.settingId === entry.settingId);
         const baseline = results.find(result => result.condition === BASELINE_CONDITION_ID);
         const treatment = results.find(result => result.condition === TREATMENT_CONDITION_ID);
-        return `<li><a data-writing-case-link="${escapeHtml(story.id)}" href="./benchmark-report.html?setting=${encodeURIComponent(entry.settingId)}#${encodeURIComponent(story.benchmarkId)}/${encodeURIComponent(story.id)}"><strong>${escapeHtml(story.title)}</strong><span>${formatScore(baseline?.score)} → ${formatScore(treatment?.score)} <i aria-hidden="true">↗</i></span></a></li>`;
+        return `<li><a data-writing-case-link="${escapeHtml(story.id)}" data-writing-answer-benchmark="${escapeHtml(benchmark.id)}" href="./benchmark-report.html?setting=${encodeURIComponent(entry.settingId)}#${encodeURIComponent(benchmark.id)}/${encodeURIComponent(story.id)}${trials > 1 ? '/trial-1' : ''}"><strong>${escapeHtml(benchmark.name)}</strong><span>${formatScore(baseline?.score)} → ${formatScore(treatment?.score)} · ${publication.cohortSummaries ? `${publication.coverage.promptCount} prompts · ${publication.cases.length} matched pairs` : `${publication.cases.length} ${publication.cases.length === 1 ? 'prompt' : 'prompts'}${trials > 1 ? ` × ${trials} trials` : ''}`} <i aria-hidden="true">↗</i></span></a></li>`;
       }).join('')}</ul>
     </section>`;
   };
 
+  const writingHeaderMarkup = () => {
+    const complete = data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).length;
+    const groups = data.categories.filter(group => group.weight > 0);
+    const outcome = combinedOutcomeSummary();
+    const viewLabel = state.capabilityMode === 'benchmarks' ? 'Benchmark tests' : state.capabilityMode === 'efficiency' ? 'Efficiency' : 'Paired leaderboard';
+    return `<header class="capability-canvas__header capability-canvas__header--overall">
+      <div class="capability-canvas__identity capability-canvas__identity--overall">
+        <p class="ui-eyebrow">Capabilities / Writing / ${viewLabel}</p>
+        <p class="capability-canvas__status capability-canvas__status--work-spec"><strong>${escapeHtml(developmentDisclosure)}</strong></p>
+        <h3 id="capability-question" tabindex="-1">Writing</h3>
+        <p class="overall-summary">${state.capabilityMode === 'benchmarks' ? `${data.writingCategory.groups.length} ${data.writingCategory.groups.length === 1 ? 'track' : 'tracks'} · ${BENCHMARK_COUNT} benchmark tests` : `${complete} ranked settings · ${SETTING_COUNT - complete} coverage gaps`}
+          <span class="overall-summary__coverage" data-writing-coverage>${data.writingCategory.activeBenchmarkIds.length}/${BENCHMARK_COUNT} benchmarks scored in index · ${groups.map(group => escapeHtml(group.name)).join(' + ') || 'No measured subcategories'}. Excluded from Overall.</span>
+          <span class="overall-method" data-writing-method-weights>Current weights: ${groups.map(group => `${escapeHtml(group.name)} ${formatWeight(group.weight)}`).join(' · ') || 'not yet assessable'}</span>
+        </p>
+        ${writingMethodMarkup()}
+      </div>
+      <dl class="capability-canvas__readings capability-canvas__readings--combined" aria-label="Writing summary">
+        ${workflowLeadersMarkup(TREATMENT_CONDITION_ID, 'writing')}
+        <div class="capability-canvas__reading capability-canvas__reading--effect" data-median="${formatScore(outcome.median)}"><dt>Median paired uplift</dt><dd>${signed(outcome.median)}<small>points across ${outcome.total} matched settings</small></dd></div>
+        <div class="capability-canvas__reading capability-canvas__reading--outcomes" data-improved="${outcome.improved}" data-regressed="${outcome.regressed}"><dt>Improved settings</dt><dd>${outcome.improved} of ${outcome.total}<small>${outcome.regressed} regressed${outcome.unchanged ? ` · ${outcome.unchanged} unchanged` : ''}</small></dd></div>
+      </dl>
+    </header>`;
+  };
+
   const capabilityHeaderMarkup = (category) => {
+    if (isWriting) return writingHeaderMarkup();
     const benchmarks = categoryBenchmarks(category.id);
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
     const measuredCount = benchmarks.filter(benchmarkIsMeasured).length;
@@ -613,7 +770,6 @@
     const identityLabel = `Capabilities / ${category.name} / ${showingBenchmarks ? 'Benchmark tests' : showingEfficiency ? 'Efficiency' : modelViewLabel}`;
     const modelSummary = category.isCombined
       ? isOverall ? `${SETTING_COUNT} ranked settings · ${data.coverage.incompleteSettings} coverage gaps` : `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
-      : isWriting ? `${SETTING_COUNT} model settings · ${data.cases.length} story cases · core-idea analysis /${SCORE_MAXIMUM}`
       : `${SETTING_COUNT} matched settings · ${isWorkSpec ? 'one authored chat task · spec quality' : SCORE_EDITION_LABEL + ' rubric score'} /${SCORE_MAXIMUM}`;
     return `
       <header class="capability-canvas__header${isWorkSpec || isWriting ? ' capability-canvas__header--work-spec' : ''}${isOverall ? ' capability-canvas__header--overall' : ''}">
@@ -627,7 +783,6 @@
               ? `${ENTRY_COUNT} setting × condition results · fixed ${escapeHtml(category.name)} rubric score × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
               : escapeHtml(modelSummary)}${isOverall ? `<span class="overall-summary__coverage" data-portfolio-coverage>${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered</span><span class="overall-method" data-overall-method>Current weights: ${data.categories.map(category => `${escapeHtml(category.name)} ${formatWeight(category.weight)}`).join(' · ')}</span>` : ''}</p>
           ${isOverall ? overallWeightsMarkup() : ''}
-          ${isWriting ? `<p class="writing-coverage" data-writing-coverage>Storytelling / ${escapeHtml(writingSummary.benchmarkTitle)} · ${data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score) && Number.isFinite(baselineBySetting.get(entry.settingId)?.score)).length}/${SETTING_COUNT} fully scored pairs across all ${data.cases.length} stories. Excluded from Overall.</p>` : ''}
         </div>
         <dl class="capability-canvas__readings${outcome ? ' capability-canvas__readings--combined' : ''}" aria-label="${escapeHtml(category.name)} summary">
           ${showingBenchmarks ? `
@@ -675,8 +830,6 @@
     const trackCount = new Set(benchmarks.map((benchmark) => benchmark.suite)).size;
     return `
       ${capabilityHeaderMarkup(category)}
-      ${writingSubsectionsMarkup()}
-      ${writingProgressMarkup()}
       <nav class="capability-mode" aria-label="Choose ${escapeHtml(category.name)} view">
           <span class="capability-mode__label" aria-hidden="true">View</span>
           <div class="capability-mode__tabs" role="tablist" aria-label="Choose ${escapeHtml(category.name)} evidence view">
@@ -689,7 +842,7 @@
               aria-selected="${state.capabilityMode === 'models'}"
               aria-controls="capability-ranking"
               tabindex="${state.capabilityMode === 'models' ? '0' : '-1'}"
-            ><strong>Leaderboard</strong><span>${SETTING_COUNT} ${isWorkSpec || isWriting ? 'matched' : 'ranked'} settings</span></button>
+            ><strong>Leaderboard</strong><span>${isWriting ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).length : SETTING_COUNT} ${isWorkSpec ? 'matched' : 'ranked'} settings</span></button>
             <button
               class="capability-mode__tab${state.capabilityMode === 'benchmarks' ? ' is-selected' : ''}"
               id="capability-mode-benchmarks"
@@ -747,6 +900,9 @@
 
   const benchmarkLedgerRowMarkup = (benchmark, categoryIndex, sourceCategoryId) => {
     const summary = benchmarkSummaryById.get(benchmark.id);
+    const publication = isWriting ? data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id)) : null;
+    const coverage = publication?.coverage;
+    const indexActive = isWriting && data.writingCategory.activeBenchmarkIds.includes(benchmark.id);
     const publishedSettingCount = new Set(data.benchmarkResults.filter(result => result.benchmarkId === benchmark.id).map(result => result.settingId)).size;
     const regression = summary.delta < 0;
     const action = 'Open benchmark report';
@@ -755,7 +911,7 @@
       : summary.detailHref;
     return `
       <a
-        class="benchmark-ledger__row benchmark-ledger__row--measured${regression ? ' benchmark-ledger__row--regression' : ''}"
+        class="benchmark-ledger__row benchmark-ledger__row--measured${regression ? ' benchmark-ledger__row--regression' : ''}${isWriting && !indexActive ? ' benchmark-ledger__row--pending' : ''}"
         href="${escapeHtml(reportHref)}"
         data-benchmark-id="${escapeHtml(benchmark.id)}"
         data-evidence-kind="development"
@@ -765,7 +921,7 @@
         aria-label="${escapeHtml(action)} for ${escapeHtml(benchmark.name)}. Across ${publishedSettingCount} ${isOverall ? 'published' : 'matched'} settings, ${escapeHtml(summary.baselineLabel)} field mean ${formatScore(summary.baseline)} of ${SCORE_MAXIMUM}, ${escapeHtml(summary.treatmentLabel)} field mean ${formatScore(summary.treatment)} of ${SCORE_MAXIMUM}, paired uplift ${signed(summary.delta)} points."
       >
         <span class="benchmark-ledger__identity">
-          <span>${String(categoryIndex + 1).padStart(2, '0')} / ${escapeHtml(categoryById.get(benchmark.category)?.name || 'Benchmark')}</span>
+          <span>${String(categoryIndex + 1).padStart(2, '0')} / ${escapeHtml(isWriting ? benchmark.suite : categoryById.get(benchmark.category)?.name || 'Benchmark')}</span>
           <strong>${escapeHtml(benchmark.name)}</strong>
           <small>${escapeHtml(benchmark.description)}</small>
         </span>
@@ -779,7 +935,7 @@
           ${isOverall ? `<span data-published-setting-count="${publishedSettingCount}">Published cohort · ${publishedSettingCount} settings</span>` : ''}
           <strong>${summary.complete}/${summary.total} ${escapeHtml(summary.completionLabel)}</strong>
           <span>${summary.wins}W · ${summary.ties}T · ${summary.losses}L</span>
-          <span title="${escapeHtml(summary.runId || '')}">Run ${escapeHtml((summary.runId || 'not published').split('__')[0])}</span>
+          ${isWriting ? `<span>${coverage.judgmentCount}/${coverage.expectedJudgmentCount} reviews${coverage.terminallyExcludedJudgmentCount ? ` · ${coverage.terminallyExcludedJudgmentCount} terminal exclusions` : ''}</span><span>${indexActive ? 'Scored in Writing index' : 'Index awaits complete configurations'}</span>` : `<span title="${escapeHtml(summary.runId || '')}">Run ${escapeHtml((summary.runId || 'not published').split('__')[0])}</span>`}
         </span>
         <span class="benchmark-ledger__action">${escapeHtml(action)} <span aria-hidden="true">→</span></span>
       </a>
@@ -800,16 +956,17 @@
       >
         <h4 class="visually-hidden">${escapeHtml(category.name)} benchmark tests</h4>
         ${isOverall ? '<p class="overall-ledger-note">Task means retain each benchmark’s published cohort. Overall ranks use settings with every task completed under both conditions.</p>' : ''}
+        ${isWriting ? `<p class="overall-ledger-note" data-writing-ledger-coverage>${data.coverage.responseCount}/${data.coverage.expectedResponseCount} answers · ${data.coverage.judgmentCount}/${data.coverage.expectedJudgmentCount} reviews. Each test retains its own published cohort and scoring rules; these field means are not category ranks. Open a report for prompts, trials, exclusions, answers, and judgments.</p>` : ''}
         <div class="benchmark-ledger__tracks">
           ${suiteNames.map((suite, suiteIndex) => {
             const suiteBenchmarks = benchmarks.filter((benchmark) => benchmark.suite === suite);
             const suiteMeasured = suiteBenchmarks.filter(benchmarkIsMeasured).length;
             return `
-              <section class="benchmark-ledger__track" aria-labelledby="benchmark-track-${category.id}-${suiteIndex}">
+              <section class="benchmark-ledger__track" ${isWriting ? `data-writing-track="${escapeHtml(data.writingCategory.groups.find(group => group.name === suite)?.id || suite)}"` : ''} aria-labelledby="benchmark-track-${category.id}-${suiteIndex}">
                 <header class="benchmark-ledger__track-header">
                   <span>${String(suiteIndex + 1).padStart(2, '0')} / TRACK</span>
                   <div>
-                    <h4 id="benchmark-track-${category.id}-${suiteIndex}">${escapeHtml(suite)}</h4>
+                    <h4 id="benchmark-track-${category.id}-${suiteIndex}"${isWriting ? ' tabindex="-1"' : ''}>${escapeHtml(suite)}</h4>
                     <p>${escapeHtml(suiteDescriptions[suite] || '')}</p>
                   </div>
                   <strong>${suiteBenchmarks.length} tests · ${suiteMeasured} scored</strong>
@@ -829,7 +986,7 @@
     const baselineEntry = baselineBySetting.get(fullEntry.settingId);
     const baselineRank = baselineRanks.get(baselineEntry.id);
     const fullRank = fullRanks.get(fullEntry.id);
-    const delta = isOverall ? fullEntry.delta : Math.round((fullEntry.score - baselineEntry.score) * 10) / 10;
+    const delta = isOverall || isWriting ? fullEntry.delta : Math.round((fullEntry.score - baselineEntry.score) * 10) / 10;
     const selected = selectedEntry().settingId === fullEntry.settingId;
     const compositionDescriptionId = `paired-composition-description-${fullEntry.settingId}`;
     const baselineDescription = weightedCompositionDescription(weightedComposition(baselineEntry));
@@ -856,7 +1013,7 @@
             data-entry-id="${escapeHtml(fullEntry.id)}"
             aria-pressed="${selected}"
             aria-describedby="${escapeHtml(compositionDescriptionId)}"
-            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${SETTING_COUNT}. Minimal baseline score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
+            aria-label="Select ${escapeHtml(fullEntry.family)}, ${escapeHtml(fullEntry.reasoning)} reasoning. ${escapeHtml(TREATMENT_LABEL)} ${SCORE_EDITION_LABEL} score ${formatScore(fullEntry.score)} of ${SCORE_MAXIMUM}; skill rank ${fullRank} of ${SETTING_COUNT}. ${escapeHtml(BASELINE_LABEL)} score ${formatScore(baselineEntry.score)} of ${SCORE_MAXIMUM}; baseline rank ${baselineRank} of ${SETTING_COUNT}. Paired uplift ${signed(delta)} points. ${escapeHtml(taskCoverageLabel)}."
           >
             <span class="setting-row__identity">
               <span class="setting-row__rank" aria-hidden="true">${String(fullRank).padStart(2, '0')}</span>
@@ -874,7 +1031,7 @@
           </span>
           <span class="setting-row__delta${deltaClass}"><strong>${signed(delta)}</strong><span>pts</span></span>
         </div>
-        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both profiles use the ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM} to ${SCORE_MAXIMUM} scale. ${escapeHtml(TREATMENT_LABEL)} profile: ${escapeHtml(fullDescription)}. Minimal baseline profile: ${escapeHtml(baselineDescription)}. Rank is secondary and condition-specific. Each colored segment opens its category leaderboard.</span>
+        <span class="visually-hidden" id="${escapeHtml(compositionDescriptionId)}">Both profiles use the ${SCORE_EDITION_LABEL} ${SCORE_MINIMUM} to ${SCORE_MAXIMUM} scale. ${escapeHtml(TREATMENT_LABEL)} profile: ${escapeHtml(fullDescription)}. ${escapeHtml(BASELINE_LABEL)} profile: ${escapeHtml(baselineDescription)}. Rank is secondary and condition-specific. Each colored segment opens its ${isWriting ? 'subcategory benchmark tests' : 'category leaderboard'}.</span>
       </li>
     `;
   };
@@ -915,15 +1072,22 @@
     `;
   };
 
+  const writingCoverageMarkup = () => {
+    const missing = rankedCondition(TREATMENT_CONDITION_ID).entries.filter(entry => !Number.isFinite(entry.score));
+    if (!missing.length) return '';
+    return `<details class="writing-index-gaps" data-writing-coverage-gaps><summary>${missing.length} settings without complete index coverage</summary><p>These settings have published Writing evidence, but not complete paired scores on every active benchmark. Their category score and rank are withheld—not scored as zero.</p><ul>${missing.map(entry => `<li data-incomplete-setting-id="${escapeHtml(entry.settingId)}"><button class="setting-row__select" data-entry-id="${escapeHtml(entry.id)}" type="button" aria-pressed="${selectedEntry().settingId === entry.settingId}"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Score — · rank — · inspect available answers ↗</small></button></li>`).join('')}</ul></details>`;
+  };
+
   const combinedLeaderboardMarkup = () => {
     const baselineRanking = rankedCondition(BASELINE_CONDITION_ID);
     const fullRanking = rankedCondition(TREATMENT_CONDITION_ID);
+    const rankedEntries = isWriting ? fullRanking.entries.filter(entry => Number.isFinite(entry.score)) : fullRanking.entries;
     const visible = state.showAll
-      ? fullRanking.entries
-      : fullRanking.entries.slice(0, INITIAL_RESULT_COUNT);
+      ? rankedEntries
+      : rankedEntries.slice(0, INITIAL_RESULT_COUNT);
     const disclosureLabel = state.showAll
       ? `Show top ${INITIAL_RESULT_COUNT} settings ↑`
-      : `Show all ${SETTING_COUNT} settings ↓`;
+      : `Show all ${rankedEntries.length} settings ↓`;
 
     return `
       <section
@@ -934,18 +1098,18 @@
         ${state.capabilityMode === 'models' ? '' : 'hidden'}
       >
         <section class="score-field score-field--combined" aria-labelledby="score-field-title">
-          <h3 class="visually-hidden" id="score-field-title">Overall model leaderboard</h3>
+          <h3 class="visually-hidden" id="score-field-title">${isWriting ? 'Writing' : 'Overall'} model leaderboard</h3>
 
           <div class="score-axis-header">
             <span class="score-axis-header__identity">Model setting / skill rank</span>
             <div class="score-axis-header__profile">
               <div class="score-axis-header__profile-title">
-                <strong>${escapeHtml(SCORE_EDITION_LABEL)} score <span>${escapeHtml(TREATMENT_LABEL)} vs Minimal baseline · ${escapeHtml(taskCoverageLabel)}</span></strong>
-                <span>Overall /${SCORE_MAXIMUM}</span>
+                <strong>${escapeHtml(SCORE_EDITION_LABEL)} score <span>${escapeHtml(TREATMENT_LABEL)} vs ${escapeHtml(BASELINE_LABEL)} · ${escapeHtml(taskCoverageLabel)}</span></strong>
+                <span>${isWriting ? 'Writing' : 'Overall'} /${SCORE_MAXIMUM}</span>
               </div>
               <div class="capability-legend" aria-label="Weighted capability categories">
                 ${data.categories.map((category) => `
-                  <span class="capability-legend__item capability-legend__item--${escapeHtml(category.id)}" data-category-weight="${category.weight}"><i aria-hidden="true"></i><span class="capability-legend__long">${escapeHtml(category.name)}${isOverall ? ` ${formatWeight(category.weight)}` : ''}</span><span class="capability-legend__short">${escapeHtml(category.short)}${isOverall ? ` ${formatWeight(category.weight)}` : ''}</span></span>
+                  <span class="capability-legend__item capability-legend__item--${escapeHtml(category.id)}" data-category-weight="${category.weight}"><i aria-hidden="true"${isWriting ? ` style="background:${escapeHtml(category.color)}"` : ''}></i><span class="capability-legend__long">${escapeHtml(category.name)}${isOverall || isWriting ? ` ${formatWeight(category.weight)}` : ''}</span><span class="capability-legend__short">${escapeHtml(category.short)}${isOverall || isWriting ? ` ${formatWeight(category.weight)}` : ''}</span></span>
                 `).join('')}
               </div>
             </div>
@@ -959,9 +1123,11 @@
             <span class="capability-score-guide__line"></span>
             <span class="capability-score-guide__readout"><strong>0.0</strong><small>/${SCORE_MAXIMUM}</small></span>
           </div>
-          <button class="show-all" id="show-all" type="button" aria-expanded="${state.showAll}">${escapeHtml(disclosureLabel)}</button>
+          ${!isWriting || rankedEntries.length > INITIAL_RESULT_COUNT ? `<button class="show-all" id="show-all" type="button" aria-expanded="${state.showAll}">${escapeHtml(disclosureLabel)}</button>` : ''}
+          ${isWriting && !rankedEntries.length ? '<p class="overall-ledger-note">No setting has complete paired coverage of the active benchmarks yet. Available results are under Benchmark tests.</p>' : ''}
         </section>
         ${isOverall ? overallCoverageMarkup() : ''}
+        ${isWriting ? writingSelectionMarkup() + writingCoverageMarkup() : ''}
       </section>
     `;
   };
@@ -1077,12 +1243,12 @@
           }
           if (category.id === 'writing' && hasWriting) {
             const selected = category.id === state.capabilityCategory;
-            const leader = writingSummary.leader;
+            const leader = selected ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && Number.isFinite(entry.score)).sort((a, b) => b.exactScore - a.exactScore)[0] : writingSummary.categoryIndex?.leader;
             const score = leader?.score;
-            return `<button class="capability-selector__tab${selected ? ' is-selected' : ''}" id="capability-category-writing" type="button" role="tab" aria-selected="${selected}" aria-controls="capability-field-panel" tabindex="${selected ? '0' : '-1'}" data-category-id="writing" data-category-status="${escapeHtml(writingSummary.status)}" style="--category-color:${category.color}" aria-label="Writing. ${writingInProgress ? 'In progress. ' : ''}Storytelling, ${escapeHtml(writingSummary.benchmarkTitle)}, ${writingSummary.coverage.caseCount} story cases. ${Number.isFinite(score) ? `Best ${escapeHtml(writingSummary.treatmentLabel)} result ${formatScore(score)} of ${SCORE_MAXIMUM}.` : 'No complete scored configuration.'} Excluded from Overall.">
+            return `<button class="capability-selector__tab${selected ? ' is-selected' : ''}" id="capability-category-writing" type="button" role="tab" aria-selected="${selected}" aria-controls="capability-field-panel" tabindex="${selected ? '0' : '-1'}" data-category-id="writing" data-category-status="development-index" style="--category-color:${category.color}" aria-label="Writing development index. ${publishedWritingBenchmarkCount} published benchmarks. ${Number.isFinite(score) ? `Best task-specific skill result ${formatScore(score)} of ${SCORE_MAXIMUM}.` : 'Open Writing to inspect measured benchmarks and coverage.'} Excluded from Overall.">
               <span class="capability-selector__index" aria-hidden="true">${String(categoryIndex).padStart(2, '0')}</span>
               <span class="capability-selector__name"><span class="capability-selector__long">Writing</span><span class="capability-selector__short">Writing</span></span>
-              <span class="capability-selector__state" data-writing-category-progress>${writingInProgress ? 'IN PROGRESS' : selected ? 'Selected' : 'Storytelling'}</span>
+              <span class="capability-selector__state" data-writing-category-progress>${selected ? 'Selected' : 'Development'}</span>
               <strong>${formatScore(score)}${Number.isFinite(score) ? `<small>/${SCORE_MAXIMUM}</small>` : ''}</strong>
             </button>`;
           }
@@ -1363,7 +1529,7 @@
     const baselineRanking = games ? null : rankedCondition(BASELINE_CONDITION_ID, category.id);
     const fullRanking = games ? null : rankedCondition(TREATMENT_CONDITION_ID, category.id);
 
-    const rankingContent = games ? gameModelsMarkup() : category.isCombined ? combinedLeaderboardMarkup() : `
+    const rankingContent = games ? gameModelsMarkup() : category.isCombined || isWriting ? combinedLeaderboardMarkup() : `
         <section
           class="capability-ranking"
           id="capability-ranking"
@@ -1428,6 +1594,11 @@
     const category = categoryById.get(state.capabilityCategory) || COMBINED_CAPABILITY;
     const header = elements.capabilityView.querySelector('.capability-canvas__header');
     if (header) header.outerHTML = capabilityHeaderMarkup(category);
+    elements.capabilityView.querySelectorAll('[data-writing-benchmark]').forEach(link => {
+      const target = new URL(link.href);
+      target.hash = `capabilities/writing/storytelling/${state.capabilityMode}`;
+      link.href = target.href;
+    });
 
     elements.capabilityView.querySelectorAll('.capability-mode__tab[data-capability-mode]').forEach((tab) => {
       const selected = tab.dataset.capabilityMode === state.capabilityMode;
@@ -2065,7 +2236,7 @@
   const selectCapabilityCategory = (categoryId, { focusSelector, writeHash = true, skipMotion = false } = {}) => {
     if (!categoryById.has(categoryId)) return;
     if (contextForCategory(categoryId) !== activeContext) {
-      window.location.hash = `capabilities/${categoryId}${categoryId === 'writing' ? '/storytelling' : ''}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`;
+      window.location.hash = `capabilities/${categoryId}${state.capabilityMode === 'models' ? '' : `/${state.capabilityMode}`}`;
       window.history.replaceState({ ...window.history.state, focusCapability: categoryId, focusCapabilitySelector: focusSelector, selectedEntryId: state.selectedId }, '');
       return;
     }
@@ -2114,6 +2285,16 @@
       const selector = `[data-game-report-id="${CSS.escape(report.benchmark.id)}"][data-game-select="${CSS.escape(id)}"]`;
       renderCapabilities();
       document.querySelector(selector)?.focus({ preventScroll: true });
+      return;
+    }
+    const writingSegment = event.target.closest('.capability-composition__segment[data-writing-group-id][data-entry-id]');
+    if (writingSegment && isWriting) {
+      if (!entryById.has(writingSegment.dataset.entryId)) return;
+      state.selectedId = writingSegment.dataset.entryId;
+      selectCapabilityMode('benchmarks');
+      const track = document.querySelector(`[data-writing-track="${CSS.escape(writingSegment.dataset.writingGroupId)}"]`);
+      track?.querySelector('h4')?.focus({ preventScroll: true });
+      track?.scrollIntoView({ block: 'start', behavior: 'instant' });
       return;
     }
     const capabilitySegment = event.target.closest('.capability-composition__segment[data-category-id][data-entry-id]');
@@ -2243,9 +2424,9 @@
       return;
     }
 
-    const segment = event.target.closest('.capability-composition__segment[data-category-id]');
+    const segment = event.target.closest('.capability-composition__segment[data-category-id], .capability-composition__segment[data-writing-group-id]');
     if (!segment) return;
-    const segments = [...segment.closest('.capability-composition__stack').querySelectorAll('.capability-composition__segment[data-category-id]')];
+    const segments = [...segment.closest('.capability-composition__stack').querySelectorAll('.capability-composition__segment')];
     const index = segments.indexOf(segment);
     let nextIndex = null;
     if (event.key === 'ArrowRight') nextIndex = (index + 1) % segments.length;
@@ -2320,8 +2501,8 @@
     document.querySelector('.benchmark-mast__scope').innerHTML = `Games <span aria-hidden="true">·</span> ${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${gameRuns.length} outputs <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Games v1 pilot</span>`;
     document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Games · Exploratory pilot</span><span>${gameBenchmarks.length} ${gameBenchmarks.length === 1 ? 'benchmark' : 'benchmarks'} · ${gameRuns.length} outputs</span>`;
   } else if (isWriting) {
-    document.querySelector('.benchmark-mast__scope').innerHTML = `Writing <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} benchmark <span aria-hidden="true">·</span> ${data.cases.length} story cases <span aria-hidden="true">·</span> ${SETTING_COUNT} model settings <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Storytelling</span>`;
-    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Writing / Storytelling · Excluded from Overall</span><span>${BENCHMARK_COUNT} benchmark · ${data.cases.length} stories · ${SETTING_COUNT} settings · ${data.coverage?.responseCount ?? writingSummary.coverage.responseCount} recorded outputs</span>`;
+    document.querySelector('.benchmark-mast__scope').innerHTML = `Writing <span aria-hidden="true">·</span> ${BENCHMARK_COUNT} ${BENCHMARK_COUNT === 1 ? 'benchmark' : 'benchmarks'} <span aria-hidden="true">·</span> ${SETTING_COUNT} model settings <span aria-hidden="true">·</span> ${data.coverage.responseCount} published responses <span class="benchmark-mast__evidence"><span aria-hidden="true">·</span> Development index</span>`;
+    document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Writing · Excluded from Overall</span><span>${BENCHMARK_COUNT} benchmarks · ${SETTING_COUNT} settings · ${data.coverage.responseCount} recorded outputs</span>`;
   } else if (isOverall) {
     document.querySelector('.benchmark-footer').innerHTML = `<span>VasirBench · Overall · Uncalibrated development</span><span>${BENCHMARK_COUNT} benchmarks · ${data.categories.length}/${portfolioCategories.length} categories measured${rootData.games ? ' in index' : ''} · ${formatWeight(scoreBasis.publishedTargetWeight)} target weight covered · ${SETTING_COUNT}/${data.coverage.totalSettings} complete settings</span>`;
   } else if (isWorkSpec) {
@@ -2332,6 +2513,13 @@
   const initialHash = capabilityHash();
   if (window.location.hash !== initialHash) {
     window.history.replaceState(null, '', initialHash);
+  }
+  if (isWriting && state.capabilityMode === 'benchmarks' && requestedWritingBenchmark && benchmarkById.has(requestedWritingBenchmark)) {
+    window.requestAnimationFrame(() => {
+      const benchmark = document.querySelector(`#capability-benchmarks [data-benchmark-id="${CSS.escape(requestedWritingBenchmark)}"]`);
+      benchmark?.focus({ preventScroll: true });
+      benchmark?.scrollIntoView({ block: 'center', behavior: 'instant' });
+    });
   }
   if (window.history.state?.focusCapability === state.capabilityCategory) {
     const focusSelector = window.history.state.focusCapabilitySelector || '.capability-selector__tab[aria-selected="true"]';

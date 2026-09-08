@@ -1,0 +1,32 @@
+{
+  "method": "Two fresh independent ephemeral Codex CLI contexts, full frozen local skill catalog; not a matched previous-workflow comparison.",
+  "model": "gpt-6-astra",
+  "reasoningEffort": "max",
+  "usageQualification": "Raw CLI-reported cumulative counters. Do not sum overlapping counters or infer monetary cost.",
+  "runs": {
+    "ceramic": {
+      "completed": true,
+      "usage": {
+        "input_tokens": 3529704,
+        "cached_input_tokens": 3421184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 50375,
+        "reasoning_output_tokens": 15841
+      },
+      "humanRepairCoachingDuringExecution": false,
+      "actualBrowserInputs": true
+    },
+    "racer": {
+      "completed": true,
+      "usage": {
+        "input_tokens": 5626764,
+        "cached_input_tokens": 5426560,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 78174,
+        "reasoning_output_tokens": 31941
+      },
+      "humanRepairCoachingDuringExecution": false,
+      "actualBrowserInputs": true
+    }
+  }
+}

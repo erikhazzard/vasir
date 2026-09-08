@@ -1,0 +1,31 @@
+{
+  "inventory": [
+    {
+      "name": "game__orchestrating-playable-build",
+      "files": 2,
+      "description": "Builds and polishes playable games through coordinated specialists and evidence-led play, critique, and repair. Use for game creation, broad quality upgrades, prototype rescue, or playable handoff across genres and engines. Excludes isolated bugs, UI edits, and performance diagnosis."
+    },
+    {
+      "name": "game__art-directing",
+      "files": 3,
+      "description": "Art-directs games into coherent visual systems for gameplay readability and identity. Use when defining or repairing composition, materials, shape language, visual hierarchy, animation grammar, spatial pacing, or art specs."
+    },
+    {
+      "name": "game__adding-juice",
+      "files": 3,
+      "description": "Designs and implements responsive game feel, expressive acting, and consequential feedback across genres and 2D or 3D games. Use when improving action timing, character or object performance, impacts, transformations, camera response, audiovisual feedback, or interaction satisfaction."
+    },
+    {
+      "name": "game__directing",
+      "files": 1,
+      "description": "Defines and revises coherent game design briefs around player intent, decisions, emotion, and scope. Use when establishing a game concept, changing its core mechanics, or reconciling design direction; use specialist skills for isolated art, juice, or implementation work."
+    },
+    {
+      "name": "game__genre-routing",
+      "files": 44,
+      "description": "Selects relevant game-design playbooks from the actual mechanics and handles mixed or uncovered genres without forcing a match. Use when genre knowledge would change a game design, implementation, tuning, or critique decision."
+    }
+  ],
+  "checkedLinks": 51,
+  "missing": []
+}

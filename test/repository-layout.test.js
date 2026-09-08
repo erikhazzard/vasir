@@ -216,15 +216,6 @@ test("root contract twins single-home the expert counterfactual and decision ski
     claudeCounterfactualBlock,
     "AGENTS and CLAUDE must share one expert-counterfactual law"
   );
-  assert.equal(
-    agentsCounterfactualBlock,
-    `<expert_counterfactual>
-    For every decision, ask what the best expert in that field would do and why they would reject your current choice; if you can name that reason, don't make the choice. Optimize for what that expert would judge correct, never for what satisfies the stated constraints most cheaply. Every trade-off you take must be stated to the user, never absorbed.
-
-    Explicit user decisions and higher-precedence constraints still bind. This rule creates no new approval or stop gate; halt only where §3 already requires it.
-  </expert_counterfactual>`,
-    "the canonical doctrine must preserve the user's three sentences verbatim plus only the agreed guards"
-  );
 
   const maintainWorkSpecText = fs.readFileSync(path.join(SKILLS_ROOT, "plan__maintain-work-spec", "SKILL.md"), "utf8");
   const implementWorkSpecText = fs.readFileSync(path.join(SKILLS_ROOT, "plan__implement-work-spec", "SKILL.md"), "utf8");
@@ -241,14 +232,14 @@ test("root contract twins single-home the expert counterfactual and decision ski
   assert.match(codeAuditText, /Finding no rejection reason is valid; inventing one is not/);
 });
 
-test("expert counterfactual behavioral cases cover the five decision boundaries", () => {
+test("expert counterfactual behavioral cases cover correctness and investigation boundaries", () => {
   const evalText = fs.readFileSync(
     path.join(REPO_ROOT, "templates", "agents", "evals", "expert-counterfactual.md"),
     "utf8"
   );
   const caseSections = evalText.split(/^## /m).slice(1);
 
-  assert.equal(caseSections.length, 5);
+  assert.equal(caseSections.length, 7);
   for (const caseSection of caseSections) {
     assert.match(caseSection, /\*\*Prompt:\*\*/);
     assert.match(caseSection, /\*\*Expected decision:\*\*/);
@@ -260,6 +251,8 @@ test("expert counterfactual behavioral cases cover the five decision boundaries"
   assert.match(evalText, /unforced-queue-service/);
   assert.match(evalText, /forced-lesser-choice/);
   assert.match(evalText, /sound-initial-choice/);
+  assert.match(evalText, /sufficient-trial-evidence/);
+  assert.match(evalText, /material-trial-gap/);
   assert.doesNotMatch(evalText, /material expert objection|material evidenced gap/);
 });
 

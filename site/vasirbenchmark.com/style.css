@@ -5797,6 +5797,57 @@ body {
   filter: grayscale(0.7);
 }
 
+.writing-index-gaps {
+  padding: 1.25rem;
+  border-top: 1px solid var(--sdk-line);
+  background: var(--sdk-canvas);
+}
+
+.writing-index-gaps > summary {
+  color: var(--sdk-ink);
+  font-size: 0.875rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.writing-index-gaps > p {
+  max-width: 76ch;
+  margin: 0.75rem 0;
+  color: var(--sdk-ink-soft);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.writing-index-gaps > ul {
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  list-style: none;
+  border-top: 1px solid var(--sdk-line);
+}
+
+.writing-index-gaps .setting-row__select {
+  width: 100%;
+  min-height: 4rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--sdk-line);
+  text-align: left;
+}
+
+.writing-index-gaps .setting-row__select strong { font-size: 0.8125rem; }
+.writing-index-gaps .setting-row__select span,
+.writing-index-gaps .setting-row__select small { color: var(--sdk-ink-soft); font: 0.625rem var(--font-data); }
+.writing-index-gaps .setting-row__select small { flex-basis: 100%; }
+.writing-index-gaps .setting-row__select[aria-pressed="true"] { background: var(--sdk-blue-pale); }
+.benchmark-ledger__row.benchmark-ledger__row--pending { box-shadow: inset 0.2rem 0 0 var(--sdk-ink-soft); }
+.writing-index-method { max-width: 76ch; }
+
 .capability-composition__total,
 .setting-row__delta strong {
   font-family: var(--font-callout);
@@ -6365,9 +6416,50 @@ body {
   min-width: 0;
 }
 
+.writing-cohorts {
+  min-width: 0;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--type-small);
+  line-height: var(--type-small-leading);
+}
+
+.writing-cohorts__table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.writing-cohorts table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.writing-cohorts th,
+.writing-cohorts td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.writing-cohorts td {
+  font-family: var(--font-data);
+  white-space: nowrap;
+}
+
 .writing-subsections {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  background: var(--field-soft);
+}
+
+.writing-subsections:has([data-writing-subsection="dungeon-master"]) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.writing-benchmark-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   border-bottom: 1px solid var(--line);
   background: var(--field-soft);
 }
@@ -6478,6 +6570,10 @@ body {
 }
 
 @media (max-width: 42rem) {
+  .writing-subsections:has([data-writing-subsection="dungeon-master"]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .writing-subsections__item {
     padding: var(--space-3) var(--space-2);
   }
@@ -6784,4 +6880,26 @@ body {
   .capability-canvas__identity--games { min-height: 0; padding: var(--space-3) var(--space-4); }
   .game-capability__task-header { gap: var(--space-3); }
   .game-capability__report { max-width: 45%; text-align: right; }
+}
+
+@media (min-width: 42.001rem) and (max-width: 62rem) {
+  .report-page[data-writing-subcategory="dungeon-master"] .evidence-truth { grid-template-columns: minmax(0, 1fr); }
+  .report-page[data-writing-subcategory="dungeon-master"] .evidence-truth > span:empty { display: none; }
+}
+
+@media (max-width: 42rem) {
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions thead { display: none; }
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions tbody th,
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions tbody td { border-bottom: 0; }
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions tbody td:first-of-type {
+    white-space: nowrap;
+    font-family: var(--font-data);
+  }
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions tbody td:first-of-type::after { content: " /5"; }
+  .report-page[data-writing-subcategory="dungeon-master"] .writing-dimensions tbody td:last-of-type { grid-column: 1 / -1; }
 }

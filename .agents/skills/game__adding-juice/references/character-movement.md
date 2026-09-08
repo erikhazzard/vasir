@@ -1,82 +1,48 @@
-# Character Movement Juice (Portable Recipe)
+# Elastic 2D Character Movement
 
-**Core Principles**
-- **Fast reaction, slow recovery** — snap to input; ease back to neutral.
-- **Guard against jitter** — never let near-zero velocity drive sign flips, bob, or rotation.
-- **Cap animation rates** — “too fast” reads as vibration, not energy.
-- **Keep sim and juice separate** — deterministic movement in the sim; juice is render-only and derived from sim velocity.
+Read for a 2D character whose art direction calls for elastic motion. These are implementation examples, not universal movement rules. Keep the existing controller: do not replace grid motion, vehicle steering, rigid armor or an authored 3D rig with squash and sinusoidal bob. General acting, causal response and material judgment live in the parent skill and `response-and-material.md`.
 
-**Movement Physics (Simulation)**
-- **Acceleration + friction model** — don’t set position directly; update velocity then integrate position.
-  - Fixed-tick form: `v = (v + input * a) * f; p += v`
-  - Variable-`dt` form: `v += input * accel * dt; v *= pow(fPerFrame, dt * fps); p += v * dt`
-- **Diagonal normalization** — multiply both axes by `0.707` so diagonal isn’t faster than cardinal.
-- **Fixed-tick terminal-speed derivation (handy)** — if you use `v_{t+1} = (v_t + a) * f` then steady-state is `v* = a*f/(1-f)`.
-  - Choose `a = maxSpeed * (1-f)/f` (optionally `* accelMultiplier`) so the cap is stable.
+## Drive the pose from intent and state
 
-**Squash & Stretch (Event Punctuation + Elastic Recovery)**
-- **Movement start** (still→moving): squash horizontally, stretch vertically `(0.85x, 1.2y)`.
-- **Movement stop** (moving→still): opposite squash `(1.2x, 0.85y)`.
-- **Direction change** (sign flip at speed): big horizontal stretch `(1.25x, 0.8y)`.
-- **Elastic recovery** (fast reaction, slow settle):
-  - Target drifts back: `target = lerp(target, 1, 0.08)`
-  - Actual follows target: `scale = lerp(scale, target, 0.18)`
-- **Anti-jitter rule (critical):**
-  - Detect flips using the **last non-zero sign** (don’t treat `0` as a sign).
-  - Require a speed threshold (e.g. `> 30px/s`) so friction/epsilon crossings don’t spam squash.
+Use the existing simulation velocity, contact and accepted-action events. Facing can respond to a committed reversal before momentum crosses zero; a crown, garment or soft rear mass can follow later. Keep a last committed direction and a speed deadzone so tiny friction crossings do not spam reversal poses. Waiting, braking and losing footing should not all reuse a generic idle wobble.
 
-**Bob / Footstep Cycle**
-- **Sine-wave vertical offset** — `offsetY = sin(phase) * 4px * intensity`.
-- **Intensity gate** — `intensity → 1 when moving, → 0 when not` (lerp), and lerp `offsetY` toward `0` on stop.
-- **Speed-reactive frequency (unit sanity):**
-  - If you think in **Hz** (cycles/sec): `radPerSec = 2π * Hz`.
-  - The reference “10–14” in the demo is **radians per second** (≈1.6–2.2Hz), not “10–14Hz”.
-- **Update correctly (avoid vibration):**
-  - Fixed-tick: `phase += radPerSec / tickRateHz`
-  - Variable-`dt`: `phase += radPerSec * dtSeconds`
-- **Footstep scale pulse (continuous, not discrete):**
-  - `pulse = abs(sin(phase))`
-  - Blend into the target scale so it “breathes” with steps.
-  - Emoji often need a slightly larger pulse (`~0.06–0.09`) to read.
+For a soft creature, an example punctuation might recover from a modest takeoff compression over roughly 100–180 ms and settle secondary mass over 200–300 ms. Tune the actual silhouette at game scale. Put compression into the load-bearing mass while keeping identity features readable; flattening both eyes to a slit can make a strong landing harder to track.
 
-**Lean / Rotation**
-- **Velocity-based tilt** — `rotTarget = vx * 0.0004` (small degrees at full speed).
-- **Deadzone** — if `|vx| < ~15px/s`, set target to `0` (prevents micro-lean jitter).
-- **Ease** — `rotation = lerp(rotation, rotTarget, 0.12)`.
+Use an exponential response for continuous following, with seconds throughout:
 
-**Particles (Dust Poofs)**
-- **Spawn moments:** start (3), stop (4), direction change (5).
-- **Simple physics:** friction `~0.96`, short life `~200ms`, shrink + fade over lifetime.
-- **Replay-friendly visuals:** if you care about consistent playback, seed VFX from `tickIndex` + stable ids (don’t use `Math.random()` in deterministic lanes).
+```js
+function follow(current, target, ratePerSecond, dtSeconds) {
+  return current + (target - current) * (1 - Math.exp(-ratePerSecond * dtSeconds));
+}
 
-**Afterimages / Trail**
-Two distinct design intents (pick one, don’t mix accidentally):
-- **“Fast movement” visualization** — spawn above an absolute threshold (e.g. `> 65% maxSpeed`).
-- **“Bonus speed” indicator** — *no trail at baseline*; trail ramps with move-speed buffs.
-  - Compute `speedRatio = speed / baseSpeed`.
-  - Gate: `speedRatio > 1 + eps` (`eps ~ 0.02–0.05`).
-  - Scale: `bonus01 = clamp((speedRatio - 1)/range, 0, 1)`.
-  - Spawn interval + alpha should scale from **0 at baseline** → stronger at high bonus.
-- **Performance:** use a small ring buffer/pool; decay alpha by multiplier (`≈0.88`) and kill at `~0.02`.
+// Illustrative rates: intent leads, soft secondary mass follows.
+gaze = follow(gaze, committedIntent, 30, dtSeconds);
+crown = follow(crown, gaze, 8, dtSeconds);
+```
 
-**Rendering / Transform Order**
-- Typical: `translate → rotate → mirror → scale → draw`.
-- Mirror **after** rotate if you don’t want facing flips to invert lean direction.
+This is a following filter, not a physical spring. Reuse an existing spring when overshoot and velocity continuity are part of the style. Advance it in the game's existing time domain, with its existing integration policy.
 
-**Timing Hierarchy (keeps it feeling alive)**
+## Locomotion rhythm without vibration
 
-| Layer | Speed | Purpose |
-|---|---|---|
-| Input → acceleration | Instant | Responsiveness |
-| Squash on event | ~120ms recovery | Punctuation on actions |
-| Scale elastic recovery | ~200–300ms | Springy settle |
-| Lean lerp | Continuous (`~0.12`) | Weight/momentum feel |
-| Bob cycle | ~450–650ms period | Locomotion rhythm |
-| Dust particles | ~200ms lifetime | Environmental feedback |
-| Afterimage fade | ~300ms | Speed visualization |
+If footfall/bob belongs to the body, drive phase from travel or a bounded gait cycle, gate amplitude by movement state, and settle the offset when stopping. A slipper, hovering ghost and running creature need different rhythms.
 
-**Common Failure Modes (what “feels bad”)**
-- **Bob too fast (unit mismatch):** treating `10–14` as rad/tick instead of rad/sec → vibration.
-- **Sign-flip spam near zero:** using `Math.sign(v)` without thresholds / last-nonzero tracking.
-- **Trail always-on:** gating only on speed, not on the “bonus speed” intent.
-- **Micro-lean jitter:** no deadzone, so tiny `vx` noise drives rotation.
+- Frequency in Hz means cycles per second: `phase += 2 * Math.PI * hz * dtSeconds`.
+- A value of 10–14 radians/second is about 1.6–2.2 Hz, not 10–14 Hz.
+- Prefer contact-distance gait where feet must stay planted; a free-running sine can visibly skate.
+- Velocity lean needs a deadzone and bounded angle; acceleration/braking may require a separate opposing pose. Do not let an incidental sign flip rotate the whole body.
+
+Keep rendering transforms explicit. A typical 2D order is translation → rotation → facing reflection → local deformation → draw. Mirror/rotation order changes the lean direction; check both sides rather than trusting the right-facing example. Preserve the canonical collision body unless changing it is part of the authorized mechanic.
+
+## Trails are matter, not a rigid appendage
+
+First choose the meaning: ordinary material shedding, absolute speed, a speed bonus, or an ability state. A bonus trail should not remain fully active at baseline speed; ordinary soot shedding should not disappear solely because the player has no speed buff.
+
+For detached matter, sample a real emission location and inherit a useful fraction of the source velocity once. Then let each piece age independently in the appropriate space, with unequal lifetimes, bounded drift/drag and material-specific breakup. Do not reattach old particles to the current character transform. A short coherent tear can lead into fragments; a long tail that keeps the same shape at every speed often reads as a body appendage.
+
+Use existing pools and seed cosmetic variation according to the game's replay contract. With exponential drag, `velocity *= Math.exp(-dragPerSecond * dtSeconds)`; a raw `*= 0.96` per render frame changes behavior with frame rate. Opacity fading alone can leave rigid paper shapes: change scale, porosity or breakup when that is how the material should disperse.
+
+## Contact and interruption
+
+Anchor early deformation/residue to the live support; released matter inherits support motion only at release. A rising support can overtake slow released particles, so inspect immediate rebound and contact occlusion. On a new accepted launch, clear incompatible grounded squash but preserve an appropriate short pressure strike and detached world aftermath. Include arrival with residual horizontal speed; an expression tested only from rest can cancel before it is ever seen.
+
+Check ordinary movement, both reversals, contact, immediate relaunch and the game's comfort mode in context. A body-only view can diagnose silhouette and mask defects, but the final full rendering owns legibility.

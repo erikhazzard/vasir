@@ -1,0 +1,21 @@
+{
+  "createdAt": "2026-09-08T00:55:07.866Z",
+  "records": [
+    {
+      "path": "benchmarks/public-results.json",
+      "sha256": "e38dee13048ef18bb5db6ea027f3a308a43167cdeddfc9b072dbf0a1d7b2d979"
+    },
+    {
+      "path": "benchmarks/storytelling-core-idea/publication.json",
+      "sha256": "20a28d169ae0122a92f2803b36099adc108c5aaf65f8637e1547da3ac292cc1c"
+    },
+    {
+      "path": "benchmarks/2d-jumping-demo/publication.json",
+      "sha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321"
+    },
+    {
+      "path": "site/vasirbenchmark.com/template-lock.json",
+      "sha256": "d52a8433e0abe8a86d02904586e20b5aca1a255000956b3f356b142d5a442b18"
+    }
+  ]
+}

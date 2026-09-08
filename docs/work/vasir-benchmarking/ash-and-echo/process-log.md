@@ -564,9 +564,23 @@ Quiet desktop Chrome at 390×844 DPR2 exercises 16 actual 650-unit falls through
 
 **Transfer check:** Give a fresh agent a different game brief with the resulting normally routed Vasir workflow and no access to this conversation. Review its real motion against the accepted reference's craft criteria while preserving the new game's own identity. Record human interventions, unresolved defects and work consumed. For a claim that the workflow improves results, add an otherwise matched comparison using the previous workflow; this heavily coached reference is development material, not the unseen test. Skill creation remains the next proposed task, not an action silently started by this status discussion.
 
-## Candidate lessons for later skill extraction
+## 30. Transfer the judgment across games (September 7)
 
-These are working interpretations of this one project, not validated universal prescriptions.
+**Authorization:** The creator enthusiastically approves the skill-transfer step and explicitly asks that it work for any game, not just a jumping platformer. This starts the previously deferred skill work. Revision 23 remains the accepted good reference; no new human grade or runtime change is implied.
+
+**Implementation:** Update the five existing owners: playable-build orchestration, art direction, game juice, game direction and genre routing. Orchestration owns real play → experienced failure → causal repair → comparison of aftermath and next action. Art owns relationships, composition, representation and shared material; juice owns state/consequence response, meaningful variation, material lifetime and recovery. Conditional references translate those instincts to cards, boards, vehicles, text, rhythm and management without requiring a character, fog, jumps, elastic motion, portrait layout or an effects quota. Remove directly conflicting legacy recipes and rebuild normal discovery. See the [implementation map](../../game-craft-workflow/references/implementation-map.md).
+
+**Fresh transfer work:** Independent Astra contexts receive the full local catalog and contrasting standalone briefs, without this conversation, Ash & Echo source or expected repairs. Porcelain Path is a quiet, untimed ceramic rotation puzzle; real pointer/keyboard solves expose and repair a detached source, displaced help and a poor medium-landscape breakpoint. Harbour Run is a landscape, real-time Three.js car slalom; ordinary driving exposes and repairs next-gate camera framing, message overlap, prop/contact disagreement, buried surface detail and a stale recovery hint. Both reach their terminal action and retry/recovery boundaries. Their material and response languages remain distinct.
+
+**Independent review and repair:** Eight static decision probes cover narrative, VR, rhythm, narrow bugs/menu motion, sports, real-time 3D and text investigation. The final audit catches a remaining instruction to hide information behind inspection even when reading/comparison constitutes play. Restrict that advice to peripheral detail; the reviewer closes the specific finding. The final art wording also explicitly preserves live 3D representation and actual reading cadence. These post-freeze wording changes are separately qualified; the fresh builds used the frozen input catalog.
+
+**Evidence and limits:** [Transfer checks](../../game-craft-workflow/references/transfer-checks.md) retain selected normal-time recordings, before/after images, proof receipts and source/check archives. The executors performed actual browser input and inspected captured play; root inspected their evidence. Static probes are not played games. No matched old-workflow control, blind human taste award, physical-device acceptance or universal S claim follows. Seven native registry/metadata checks pass. The accepted reference's 18 runtime source files remain identical. The full source history informed these skills; it is development evidence, not the fresh test.
+
+**Kept lesson:** Transfer the question and failure mechanism, not the successful effect. A tile needs readable connectivity and a stable board; a car needs visible steering decisions and contact consistent with its rigid body; a text investigation needs its evidence on the reading surface. Autonomous review is useful when it finds and repairs those specific experienced failures without replacing the game's identity.
+
+## Candidate lessons and their extraction history
+
+These began as working interpretations of this project. Entry 30 records their bounded extraction and cross-game checks; they remain conditional judgment, not validated universal prescriptions.
 
 - **Calibrate to the user's experienced failure.** Human grades repeatedly corrected optimistic model recommendations. Preserve the disagreement and the build identity instead of rewriting prior review history.
 - **Judge the requested artistic outcome independently of functional correctness.** The game could complete its route while looking assembled, flat or inconsistent. Finding closure answers whether a finding closed; it does not award a whole-game grade.
@@ -579,4 +593,4 @@ These are working interpretations of this one project, not validated universal p
 
 ## Append format
 
-For each material iteration, add a dated/ordered entry with: **feedback and source build → hypothesis → actual change → observed result → kept/rejected decision → evidence and limits → remaining gap**. Quote the user's grade with its scope. Link durable receipts where available; label scratch paths. Update the latest anchor only when new human feedback arrives. Keep proposed work and model opinions distinct from observed results, and defer creating or revising skills until the user starts that later task.
+For each material iteration, add a dated/ordered entry with: **feedback and source build → hypothesis → actual change → observed result → kept/rejected decision → evidence and limits → remaining gap**. Quote the user's grade with its scope. Link durable receipts where available; label scratch paths. Update the latest anchor only when new human feedback arrives. Keep proposed work and model opinions distinct from observed results. The original skill deferral ended with the explicit authorization recorded in entry 30.

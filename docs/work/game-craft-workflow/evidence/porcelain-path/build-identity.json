@@ -1,0 +1,11 @@
+{
+  "sourceSha256": {
+    "index.html": "43f26498869c09924b23b065b25eac7e96a0aa43fff271fc08f78d00cdb26666",
+    "style.css": "a9bc3d2a009073d698822a7390502eb8889ac6f78bcbca21f327616518c0dde5",
+    "puzzle.js": "9e45c3d97c2ee03acd0290e50adb6035ddf0476183f2d2a29dfb166d61760d81",
+    "game.js": "7ee148aa9793468e05360191a2d09880475ba7f1a09e5079aeb0e84e69b62f1d",
+    "assets/mark.svg": "b3c762fa51e7e6c2a50bb42213c7bddce5faa49cab6171f65d6b2d799e090334"
+  },
+  "fullPlayProof": "Chrome, after source/tray/desktop repairs",
+  "lastProductChange": "Orientation-aware responsive breakpoint; responsive-proof.mjs rerun afterward"
+}

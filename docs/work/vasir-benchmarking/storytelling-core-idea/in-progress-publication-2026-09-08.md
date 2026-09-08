@@ -135,3 +135,54 @@ lock and 60 capture files were carried forward into that restored worktree;
 the publication source snapshot remains retained privately. Missing Fable
 capacity continues to block final benchmark completion, not this explicitly
 approved and now live in-progress publication.
+
+## Score visibility follow-up, 02:08 UTC
+
+The user reported an empty leaderboard. The selected checkpoint did contain
+904 individual reviews, but no model setting had the complete two-judge panel
+for all twelve stories. The projection consequently withheld every official
+configuration total. This was a coverage gate, not missing model output.
+
+A fresh Fable capacity probe succeeded. An identical-input, Claude-only judge
+resume reused all 452 completed pair batches and completed 21 additional Fable
+pairs before the provider reported its session limit (reset: 11:50pm America/
+New_York). The run finished; no further requests were attempted afterward.
+The 315 remaining batches retained explicit session-limit failures; the guard
+had not recognized this wording and therefore did not stop their dispatch.
+The resulting checkpoint is archived at source SHA-256
+`0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5`.
+The prior `62a85ad2…da0916` archive and identical frozen skill remain retained.
+There are now 946 individual reviews, 158 complete answer panels, and still no
+complete official configuration totals. The two output-filtered generation
+failures were not retried.
+
+The quota guard recognized usage-credit/model limits but missed the provider's
+explicit session-limit wording. That exact diagnostic is now covered by the
+guard and focused regression tests, preserving the distinction from transient
+request-rate errors. This change is execution-only, not a scoring change.
+
+Score visibility is being implemented as an additive, explicitly provisional
+Astra-only comparison: the same twelve stories, same original Astra xhigh
+judge, and both conditions for 31 settings. The other two settings have
+eleven-story diagnostics and remain unranked. Uneven partial Fable coverage is
+not mixed into the provisional means. Original two-judge totals, corpus ranks,
+review evidence, and Overall remain unchanged. Provisional plain/skill means
+over the 31 complete settings are 78.34946236559139 / 84.02688172043011; the
+paired difference is 5.67741935483871 points. This section records local work,
+not a claim that the score-visibility release has been deployed.
+
+The additive projection and generated bundles are now implemented and selected
+from `0f29483f…c433e5`. Tests passed: all 29 Storytelling runner tests and 118
+combined Writing/publication projection checks. An independent source audit
+confirmed all 792 generation rows and all 452 previously completed review
+batches are unchanged apart from review reuse flags. A live-versus-local
+comparison confirmed exact preservation of Overall, Games, AI Workflows,
+Engineering score basis/settings/results, and the Plot twists projection.
+
+The renderer owner has a separate concurrent task. Semantic coordination calls
+returned `codex_message_unavailable` (conversation not loaded); no presentation
+files or acceptance locks were overwritten. The user was asked to open that
+session. The implemented data interface and remaining integration checks are
+documented in [provisional-score-contract.md](provisional-score-contract.md).
+No score-visibility deployment is claimed until the display is connected and
+the shared release has been verified live.

@@ -1,0 +1,13 @@
+{
+  "registryCheck": "pass",
+  "nativeMetadataAndRegistryTests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "explicitLocalLinks": {
+    "checked": 32,
+    "missing": []
+  },
+  "unchangedAshEchoRuntimeFiles": 18,
+  "genericValidator": "Not run successfully: system Python lacks PyYAML; Vasir native registry and metadata checks passed."
+}

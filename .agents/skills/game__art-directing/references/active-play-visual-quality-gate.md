@@ -1,188 +1,144 @@
-# Active-Play Visual Slap Review
+# Active-Play Visual Review
 
-Use this reference when judging whether a playable game actually looks, moves,
-and reads like a real authored game during play. This is not a post-match
-results, marketing, title-screen, still-screenshot, or asset-showroom rubric.
+Use this reference when judging whether a playable game looks, moves, and reads as one authored experience during play. It owns the art diagnosis; `$game__orchestrating-playable-build` owns the integrated critique, repair, and replay loop. For response timing, material motion, and interruption, use `$game__adding-juice`.
+
+## Contents
+
+- [Core principle](#core-principle)
+- [Material to inspect](#material-to-inspect)
+- [First read](#first-read-before-source-inspection)
+- [Judgment areas](#judgment-areas)
+- [Verdicts](#review-verdicts)
+- [Core-loop emphasis](#core-loop-emphasis)
+- [Report](#report)
 
 ## Core Principle
 
-Visual quality is judged in the decision moment and the response immediately
-after it. A beautiful still can fail if the input answer, motion, camera,
-feedback, or consequence feels dead. The human QA question is simple:
+Judge the decision, its visible consequence, and the return to the next decision. A beautiful still can conceal disconnected material, dead transitions, unreadable consequences, or monotonous ordinary play. A deliberately still board can be excellent. The question is:
 
 ```text
-Can I instantly tell what matters, what I can do, what changed when I acted, and
-why I would keep playing?
+Can I tell what matters, what I can do, what changed when I acted, and how this
+presentation supports the experience the game promises?
 ```
 
-If the answer is no, the visual pass does not slap yet. Notes explain the
-reason; they do not overrule the human read.
+Agent judgments are scoped recommendations. Human acceptance, functional correctness, perceptual improvement, and closure of one finding are different claims. No screenshot or local finding closure establishes a whole-game S grade.
 
-## What To Look At
+## Material To Inspect
 
-Use real active-play material:
+Use the actual supported viewports and normal interactions. Include:
 
-- one desktop active-play frame at actual game scale;
-- one mobile active-play frame when mobile is in scope;
-- one before/input/after sequence for the first meaningful act;
-- player, objective, and at least one threat, reward, or decision surface;
-- a short clip or frame sequence when motion, VFX, hit feedback, or camera movement matters;
-- a live run or runtime sanity check when visual density may hurt feel.
+- active play at native scale, where focal identity and meaningful state can be judged;
+- the presentation that exposed the complaint, including enlarged/Retina output if relevant;
+- a before → input/choice → consequence → next-action sequence;
+- ordinary repeated actions and relevant interruption/recovery, not only the rare showcase;
+- several representative compositions or decision states across the affected loop when claiming a broad visual improvement;
+- normal-speed motion when judging motion, VFX, camera, or changing material;
+- the changed runtime workload when visual density or rendering work may harm feel.
 
-Default mobile in scope for web/mobile games unless the user or game explicitly
-says desktop-only.
+Follow the project's platform contract. Test mobile when it is a target; desktop emulation does not establish physical-phone performance or comfort. A desktop-only, landscape, or XR brief is not required to pass an unrelated portrait composition.
 
-Stop the review if the material is:
+A dialogue choice, management view, puzzle board, card hand, or planning screen may be the active play surface. Neither an avatar nor a threat is mandatory. Title, results, marketing, and asset-showroom frames cannot substitute for the active loop. Route their own polish to the shell or end-screen skill.
 
-- title screen, start menu, result screen, death/result/share screen, or marketing hero
-- static scene before the player can act
-- debug overlay obscuring the play surface
-- isolated character/model render with no gameplay context
-- screenshot that hides controls, objective, threat/reward, or decision state
-- still-only material for a game whose feel depends on motion, impact, camera,
-  timing, or state-change feedback
-- claims based only on "generated assets", postprocessing, or asset count
+If evidence is insufficient for a motion claim, narrow the claim and obtain the missing sequence before judging it. A still can support a contour or palette finding; it cannot prove that a transformation feels alive. Enlarged body-only probes can diagnose a mask or material, but final character/actor claims need native full context. Record arranged setups or modified diagnostic rendering as such.
 
-## Active-Play Slap Test
+## First Read Before Source Inspection
 
-Before judging, inspect the active play sequence without reading code or a
-design doc:
+Inspect the play material before reading implementation intent. Use the game's actual actor or decision object; “I am” may mean a commander, puzzle solver, driver, or reader rather than a visible body.
 
 ```text
 Active-play read:
-- I am:
-- I should:
-- I should care because:
-- When I act, the game visually answers by:
-- What changed after the action:
-- The biggest visual confusion is:
-- Would I keep playing from this moment?: yes/no
+- My role / current focus:
+- The decision or action available:
+- What matters in this moment:
+- How the presentation answers my action:
+- What changed, and what I can do next:
+- The strongest intended feeling:
+- The biggest visible mismatch with the brief/reference:
+- What makes continuation appealing or obstructs it:
 ```
 
-If "I should", "I should care because", "When I act", or "What changed" is
-unclear, the verdict cannot be `SLAPS`. If "Would I keep playing" is no, the
-verdict cannot be `SLAPS`.
-
-## Slap Verdicts
-
-| Verdict | Meaning |
-|---|---|
-| `SLAPS` | The active sequence is readable, authored, and makes the next action more tempting. |
-| `CLOSE` | The game has a real visual direction, but one visible blocker hurts desire or clarity. |
-| `DOES NOT SLAP` | The moment feels confusing, generic, dead, unreadable, or not worth another try. |
-| `BLOCKED` | Valid active-play material is missing or stale. |
+A useful finding names a visible subject, relationship, and affected moment: “the card result fades before the next selection, losing which target changed,” or “the front pillar shares the rear fog's value and looks like a blurred patch.” “Needs more polish” and lists of missing shader features do not identify a repair.
 
 ## Judgment Areas
 
-1. Next-action readability
-   - Can a human tell what to do next without instructions?
-   - Are verb, objective, danger/reward, and pressure visible at actual scale?
+1. **Decision hierarchy**
+   - Are the focal piece/avatar, relevant choices, state, and consequence distinguishable at actual scale?
+   - Does priority adapt to the phase of play? A selected target or urgent cue may outrank the player.
+   - Does the hierarchy survive dense states, effects, occlusion, and the next input?
 
-2. Player/threat/reward hierarchy
-   - Do player, threat, reward, objective, and interactables separate by value,
-     shape, placement, motion, or scale?
-   - Does the hierarchy survive clutter, mobile scale, and effects?
+2. **Relational authorship**
+   - Do neighboring forms agree in scale, edge finish, material, light, and detail density?
+   - Do exposed contours and attachments make sense for the fiction, or reveal placed-image boundaries?
+   - In spatial games, do overlap, openings, and atmospheric order establish real separation? On boards, do grouping, ownership, and state layers do the corresponding job?
+   - Read `relational-game-craft.md` when these relationships fail or when deciding whether depth/ambient motion belongs at all.
 
-3. Authored visual identity
-   - Does the sequence look designed, not assembled from defaults?
-   - Are silhouettes, materials, colors, and props part of a reusable grammar?
-   - Intentional abstract geometry is valid; default primitives with no semantic
-     system are not.
+3. **Identity through change**
+   - Does the focal actor/piece remain trackable through the actual transition?
+   - Are ordinary and special states distinguishable without implementation labels?
+   - If transformation is requested, does the identity-bearing form change with detached effects hidden?
+   - Does released material retain its intended substance through the aftermath? Pass motion repairs to the juice specialist.
 
-4. Feedback and motion readability
-   - Does the sequence show that input, hit, collect, fail, combo, progress,
-     or danger feedback clarifies play?
-   - Do VFX and camera work make the next decision clearer instead of hiding it?
+4. **Life, quiet, and sequence**
+   - Does ambient life have independent timing and appropriate scale, rather than synchronized loops or accidental camera coupling?
+   - Is a response staged where the player can perceive it during the ordinary route or interaction?
+   - Are quiet inspection and recovery states deliberate? Does the affected loop have more than one repeated composition when variation is intended?
+   - Does a large effect settle or hand off without masking the next decision?
 
-5. HUD, mobile fit, and accessibility
-   - Is state visible without covering the play path?
-   - Are touch zones, safe areas, text, contrast, and reduced-motion posture
-     credible on the smallest target viewport?
+5. **Interface and platform fit**
+   - Are legal actions, state, controls, and meaningful text readable without covering what the player needs?
+   - Do target size, input mapping, safe areas, contrast, and reduced-motion treatment suit the actual platform?
+   - Does removing disruptive motion preserve the semantic distinctions?
 
-6. Runtime sustainability
-   - Does the visual density create visible jank, input lag, unreadable blur, or
-     thermal/perf risk that hurts feel?
-   - Is the look sustainable, or only pretty in a still?
+6. **Runtime support**
+   - Does the changed workload create visible jank, lag, or material instability?
+   - Is the claimed experience sustained in the tested environment, rather than only captured at a favorable instant?
+   - Keep frame pacing/resource evidence separate from visual taste and human feel.
 
-## Hard Blockers
+## Review Verdicts
 
-Any blocker prevents `SLAPS` no matter how polished the screenshot looks:
+Retain the orchestrator's verdict vocabulary, scoped to the reviewed experience:
 
-- no valid active-play material;
-- no clear next action in the active-play read;
-- no visible before/input/after read for the first meaningful act when motion or
-  feedback matters;
-- player, threat, reward, objective, or interactables blend together;
-- motion/VFX claims rely on a still screenshot for a motion-heavy game;
-- mobile is in scope but the mobile frame is missing, cropped, or unreadable;
-- render-cost changes create visible jank or have no sanity check when cost is
-  plausibly high;
-- the only attractive material is a menu, result, death, share, or showroom
-  screen.
-
-The point is not to grade missing material. The point is to avoid calling a
-game visually good when the active moment does not help play.
-
-- Results/death/share/menu screenshots may support a separate results-screen
-  review, but they cannot raise the active-play verdict.
-
-## Core-Loop Profiles
-
-Pick the closest profile before judging. Use it to weight the repair.
-
-| Loop | What must slap visually |
+| Verdict | Art recommendation |
 |---|---|
-| Action combat | Player location, enemy intent, safe/unsafe space, hit feedback, and VFX occlusion. |
-| Turn-based tactics | Board state, legal options, threat previews, consequences, and selected unit focus. |
-| Deckbuilder/card | Card affordances, resource math, target state, combo feedback, and hand/read area. |
-| Survivor/auto-battler | Player/swarm separation, pickup/reward visibility, density control, build feedback. |
-| Exploration/physics | Terrain affordances, hazards, material rules, route choices, and interaction cues. |
-| Hybrid | Name primary and secondary loop; primary loop wins conflicts. |
+| `SLAPS` | The reviewed sequence is coherent, readable, and delivers its intended visual feeling; no concrete repair is identified within this scope. |
+| `CLOSE` | Direction is coherent, but an observed visual mismatch still weakens the requested experience. |
+| `DOES NOT SLAP` | The active moment is materially confusing, generic, incoherent, or unresponsive relative to the brief. |
+| `BLOCKED` | The specific claim cannot be judged from the available or current material. |
 
-## Repair Order
+Do not award `SLAPS` when the next decision is unintentionally obscured, incompatible materials read as accidental assembly, a motion claim relies only on stills, or only the showcase improves while the claimed ordinary loop remains weak. Interpret ambiguity and stillness against the brief; mystery and contemplation are not automatically defects.
 
-Fix the single biggest "does not slap" reason first:
+A correct controller and a completed route cannot overrule a visible art failure. Conversely, a beautiful effect cannot overrule a broken action. Do not reduce accepted response strength merely because increased scale exposes a material defect; identify the failed relationship and preserve the successful part.
 
-1. Make the next player action obvious.
-2. Separate player, threat, reward, objective, and interactables.
-3. Make feedback event-driven and readable.
-4. Replace default-looking surfaces with authored visual grammar.
-5. Integrate HUD/state without covering play.
-6. Check mobile fit where relevant.
-7. Check runtime cost when visual density could hurt feel.
-8. Add style, lighting, particles, and detail only after the active moment reads.
+## Core-Loop Emphasis
 
-Do not add beauty around confusion. Do not praise a frame or clip that does not
-make a human want another attempt.
+| Loop | Prioritize in visual review |
+|---|---|
+| Action / platforming / physics | Actor location, action silhouette, meaningful surfaces, causal contact, hazards, material aftermath, next action. |
+| Turn-based tactics / strategy | Selection, legal options, ownership, intent, causal resolution, stable resulting state. |
+| Deckbuilder / card | Hand/read area, playability and targeting, resource changes, combo order, next choice. |
+| Placement / abstract puzzle | Preview versus commitment, spatial legality, scoring cause, undo clarity, quiet thinking state. |
+| Racing / sports | Course/field, participants, actionable trajectories, contact/recovery, anticipation of the next play. |
+| Rhythm | Timing reference, approach lanes, cue distinction, accurate visible acknowledgment, next cue clarity. |
+| Management / simulation | State density, ownership, causal change, inspection focus, ambient activity below decision data. |
+| Narrative / social | Choice, relationship, tone, pacing, readable text/expression, intentional ambiguity. |
+| Survivor / auto-battler | Actor/swarm separation, danger density, rewards, build expression, VFX occlusion. |
+| Other / hybrid | Derive from the actual decisions and identify which phase governs each visual judgment. |
 
-## Report Format
+## Report
+
+Keep only fields needed to support the recommendation; do not emit empty template sections.
 
 ```text
-Active-play visual slap review:
-- Verdict: SLAPS / CLOSE / DOES NOT SLAP / BLOCKED
-- Active-play read:
-  - I am:
-  - I should:
-  - I should care because:
-  - When I act, the game visually answers by:
-  - What changed after the action:
-  - Biggest visual confusion:
-  - Would I keep playing from this moment?:
-- Material:
-  - Desktop active-play frame:
-  - Mobile active-play frame:
-  - Before/input/after sequence:
-  - Motion/feedback clip:
-  - Runtime sanity check:
-- Core-loop profile:
-- Judgment:
-  - Next-action readability:
-  - Player/threat/reward hierarchy:
-  - Authored visual identity:
-  - Feedback and motion readability:
-  - HUD, mobile fit, and accessibility:
-  - Runtime sustainability:
-- Hard blockers:
-- Single biggest reason it does or does not slap:
-- Next repair pass:
+Active-play visual review:
+- Scope, brief/reference, and reviewed build/material identity:
+- Verdict and evidence limits:
+- First active-play read:
+- Biggest visible mismatch, with frame/sequence location:
+- Relationship causing it and proposed repair:
+- Successful qualities to preserve:
+- Native and requested display/motion evidence:
+- Relevant runtime support:
+- Remaining uncertainty:
 ```
+
+The orchestrator chooses and verifies the next integrated repair. This reference does not create a second approval workflow, require repeated human confirmation, or turn a local visual judgment into a release certification.

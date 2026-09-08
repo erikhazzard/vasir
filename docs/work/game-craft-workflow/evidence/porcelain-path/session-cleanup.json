@@ -1,0 +1,6 @@
+{
+  "browserObservationSession": "Browser closed through its own command loop; idle stdin host stopped through its original exec session",
+  "proofBrowsers": "Closed in finally blocks",
+  "localServer": "Stopped through the original exec session with Ctrl+C",
+  "unrelatedProcessesTouched": false
+}

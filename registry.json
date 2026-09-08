@@ -400,28 +400,30 @@
     },
     {
       "name": "game__adding-juice",
-      "description": "Adds responsive game feel and high-payoff polish to JavaScript 2D games. Use when tuning hits, screen shake, hit-stop, particles, camera motion, animation timing, UI motion, or interaction satisfaction.",
+      "description": "Designs and implements responsive game feel, expressive acting, and consequential feedback across genres and 2D or 3D games. Use when improving action timing, character or object performance, impacts, transformations, camera response, audiovisual feedback, or interaction satisfaction.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
-        "references/character-movement.md"
+        "references/character-movement.md",
+        "references/response-and-material.md"
       ],
       "path": ".agents/skills/game__adding-juice",
       "entry": "SKILL.md"
     },
     {
       "name": "game__art-directing",
-      "description": "Art-directs games into implementation-ready visual systems for gameplay readability and identity. Use when defining visual identity, palettes, shape language, animation grammar, spatial pacing, UI hierarchy, or art specs.",
+      "description": "Art-directs games into coherent visual systems for gameplay readability and identity. Use when defining or repairing composition, materials, shape language, visual hierarchy, animation grammar, spatial pacing, or art specs.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
-        "references/active-play-visual-quality-gate.md"
+        "references/active-play-visual-quality-gate.md",
+        "references/relational-game-craft.md"
       ],
       "path": ".agents/skills/game__art-directing",
       "entry": "SKILL.md"
@@ -493,7 +495,7 @@
     },
     {
       "name": "game__directing",
-      "description": "Game director - turns a game idea into a coherent Design Brief. Triggers on starting a game, any game design related work, defining core mechanics, tweaking game mechanics, aligning creative direction, checking generated game code against design intent.",
+      "description": "Defines and revises coherent game design briefs around player intent, decisions, emotion, and scope. Use when establishing a game concept, changing its core mechanics, or reconciling design direction; use specialist skills for isolated art, juice, or implementation work.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -519,7 +521,7 @@
     },
     {
       "name": "game__genre-routing",
-      "description": "Routes genre-specific game design / game development / building / tweaking work to the right genre playbook. Use when designing, creating, tuning platformers, runners, puzzles, roguelikes, idle/incremental games, tower defense, autobattler/tactics, or MMO systems.",
+      "description": "Selects relevant game-design playbooks from the actual mechanics and handles mixed or uncovered genres without forcing a match. Use when genre knowledge would change a game design, implementation, tuning, or critique decision.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -575,13 +577,14 @@
     },
     {
       "name": "game__orchestrating-playable-build",
-      "description": "Directs game work toward one coherent playable slice in the player's hand and coordinates specialist game skills. Use when building a game, making it playable, rescuing a prototype, polishing a vertical slice, or shipping a playable build.",
+      "description": "Builds and polishes playable games through coordinated specialists and evidence-led play, critique, and repair. Use for game creation, broad quality upgrades, prototype rescue, or playable handoff across genres and engines. Excludes isolated bugs, UI edits, and performance diagnosis.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "references/craft-loop.md"
       ],
       "path": ".agents/skills/game__orchestrating-playable-build",
       "entry": "SKILL.md"

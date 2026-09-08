@@ -1,0 +1,302 @@
+{
+  "browser": "152.0.7977.77",
+  "flows": [
+    {
+      "name": "Ready clock stays at zero; intro clears",
+      "passed": true
+    },
+    {
+      "name": "Arrow keys: acceleration, steering load, coast, Space braking",
+      "passed": true
+    },
+    {
+      "name": "Escape / P pause and resume; clock and position freeze; held input cleared",
+      "passed": true
+    },
+    {
+      "name": "Focus loss pauses and clears throttle",
+      "passed": true,
+      "method": "Synthetic blur dispatch because headless tab focus did not blur"
+    },
+    {
+      "name": "Missing a gate blocks progress; reverse returns behind it",
+      "passed": true
+    },
+    {
+      "name": "Restart resets the run and repeated restarts keep GPU resource counts flat",
+      "passed": true
+    },
+    {
+      "name": "Landscape 1280 × 720: no scroll; pause controls fit",
+      "passed": true
+    },
+    {
+      "name": "Landscape 1024 × 576: no scroll; pause controls fit",
+      "passed": true
+    }
+  ],
+  "run": {
+    "time": 22.65833333333269,
+    "hits": 0,
+    "gates": 6,
+    "performance": {
+      "samples": 2060,
+      "totalFrames": 2060,
+      "medianMs": 16.700000762939453,
+      "p95Ms": 16.700000762939453,
+      "over33Ms": 1
+    }
+  },
+  "retry": {
+    "phase": "ready",
+    "x": 0,
+    "z": 5,
+    "yaw": 0,
+    "speed": 0,
+    "steer": 0,
+    "time": 0,
+    "nextGate": 0,
+    "hits": 0,
+    "missed": false,
+    "slip": 0,
+    "accel": 0,
+    "load": 0,
+    "bodyPitch": 0,
+    "bodyRoll": 0,
+    "bump": 0,
+    "gateTimes": [],
+    "best": 22.65833333333269,
+    "target": {
+      "x": -5,
+      "z": -20,
+      "half": 4.2
+    },
+    "input": {
+      "throttle": false,
+      "brake": false,
+      "handbrake": false,
+      "steer": 0
+    },
+    "camera": [
+      0,
+      10.5,
+      19.5
+    ],
+    "events": [
+      {
+        "type": "resume",
+        "time": 2.61666666666666
+      },
+      {
+        "type": "restart",
+        "at": 3.0197666666666625
+      },
+      {
+        "type": "start",
+        "time": 0.0083,
+        "speed": 0.072,
+        "carX": 0,
+        "carZ": 4.999402777777778
+      },
+      {
+        "type": "pause",
+        "time": 0.6416666666666668
+      },
+      {
+        "type": "restart",
+        "at": 3.66536666666666
+      },
+      {
+        "type": "start",
+        "time": 0.0083,
+        "speed": 0.072,
+        "carX": 0,
+        "carZ": 4.999402777777778
+      },
+      {
+        "type": "contact",
+        "force": 7.411596268586011,
+        "nx": 0.753018252114936,
+        "nz": 0.6579996291653716,
+        "x": -0.647595696818845,
+        "z": -19.81658989608646,
+        "time": 3.1083,
+        "speed": 5.362,
+        "carX": 0.047595696818845096,
+        "carZ": -18.41912031891778
+      },
+      {
+        "type": "restart",
+        "at": 12.14836666666663
+      },
+      {
+        "type": "restart",
+        "at": 12.14836666666663
+      },
+      {
+        "type": "restart",
+        "at": 12.181666666666631
+      },
+      {
+        "type": "restart",
+        "at": 12.19836666666663
+      },
+      {
+        "type": "restart",
+        "at": 12.21506666666663
+      },
+      {
+        "type": "restart",
+        "at": 12.248366666666628
+      },
+      {
+        "type": "restart",
+        "at": 12.264966666666629
+      },
+      {
+        "type": "restart",
+        "at": 12.298366666666627
+      },
+      {
+        "type": "restart",
+        "at": 12.315066666666628
+      },
+      {
+        "type": "pause",
+        "time": 0
+      },
+      {
+        "type": "resume",
+        "time": 0
+      },
+      {
+        "type": "pause",
+        "time": 0
+      },
+      {
+        "type": "resume",
+        "time": 0
+      },
+      {
+        "type": "restart",
+        "at": 12.615066666666625
+      },
+      {
+        "type": "start",
+        "time": 0.0083,
+        "speed": 0.072,
+        "carX": 0,
+        "carZ": 4.999402777777778
+      },
+      {
+        "type": "gate",
+        "gate": 1,
+        "time": 3.5083,
+        "speed": 7.099,
+        "carX": -5.796529701384578,
+        "carZ": -20.021402613216875
+      },
+      {
+        "type": "gate",
+        "gate": 2,
+        "time": 6.5167,
+        "speed": 8.71,
+        "carX": 5.285093422487648,
+        "carZ": -45.040494396041986
+      },
+      {
+        "type": "gate",
+        "gate": 3,
+        "time": 9.65,
+        "speed": 9.384,
+        "carX": -5.10827538512422,
+        "carZ": -70.05165676711289
+      },
+      {
+        "type": "gate",
+        "gate": 4,
+        "time": 12.9833,
+        "speed": 8.834,
+        "carX": 6.064454715439798,
+        "carZ": -95.00527153972563
+      },
+      {
+        "type": "gate",
+        "gate": 5,
+        "time": 16.025,
+        "speed": 9.884,
+        "carX": -4.468602673342597,
+        "carZ": -120.06037605306608
+      },
+      {
+        "type": "gate",
+        "gate": 6,
+        "time": 19.3583,
+        "speed": 9.066,
+        "carX": 3.96673316595752,
+        "carZ": -145.06737910904525
+      },
+      {
+        "type": "finish",
+        "time": 22.6583,
+        "speed": 8.424,
+        "carX": -0.5367048275366244,
+        "carZ": -171.05313292746638
+      },
+      {
+        "type": "restart",
+        "at": 35.2974666666664
+      }
+    ],
+    "render": {
+      "calls": 149,
+      "triangles": 70050,
+      "geometries": 140,
+      "textures": 20
+    }
+  },
+  "reloaded": {
+    "phase": "menu",
+    "x": 0,
+    "z": 5,
+    "yaw": 0,
+    "speed": 0,
+    "steer": 0,
+    "time": 0,
+    "nextGate": 0,
+    "hits": 0,
+    "missed": false,
+    "slip": 0,
+    "accel": 0,
+    "load": 0,
+    "bodyPitch": 0,
+    "bodyRoll": 0,
+    "bump": 0,
+    "gateTimes": [],
+    "best": 22.65833333333269,
+    "target": {
+      "x": -5,
+      "z": -20,
+      "half": 4.2
+    },
+    "input": {
+      "throttle": false,
+      "brake": false,
+      "handbrake": false,
+      "steer": 0
+    },
+    "camera": [
+      13,
+      11,
+      23
+    ],
+    "events": [],
+    "render": {
+      "calls": 240,
+      "triangles": 82514,
+      "geometries": 132,
+      "textures": 20
+    }
+  },
+  "errors": []
+}

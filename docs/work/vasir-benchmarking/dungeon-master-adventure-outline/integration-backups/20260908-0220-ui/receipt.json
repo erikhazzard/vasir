@@ -1,0 +1,22 @@
+[
+  {
+    "path": "site/vasirbenchmark.com/app.js",
+    "priorSha256": "e45aa8c2761e5673baea619005ff4a0c90c925772d3578302aa8be6663f74022",
+    "mergedSha256": "9e8ccbdbb43f0756ae4371cd657c7f74fc71a0e28b4e0423d24d19830573f7ee"
+  },
+  {
+    "path": "site/vasirbenchmark.com/benchmark-report.js",
+    "priorSha256": "081cabddb234e42dc8626c05559f5ca594066b16acd33078e1683b5b0656f9bd",
+    "mergedSha256": "92de5b7c29856b29185a819f49a4e7eda6375b4f4576e045981a70ead1401351"
+  },
+  {
+    "path": "site/vasirbenchmark.com/writing-browsercheck.mjs",
+    "priorSha256": "8ca5e53702abe098846993d52654f13ef705bdd6c984fddd0e4fc2906a759bb9",
+    "mergedSha256": "fd113d5a3efb0c9684a20d223336bead12560d3bb50085df5a1cb33446721c85"
+  },
+  {
+    "path": "site/vasirbenchmark.com/style.css",
+    "priorSha256": "413ed7a915b1e9d030222b83c71a3e007271429c8553692273c9fe83a317ccb5",
+    "mergedSha256": "9c753fb38eb73c1c6788ef4cb175bdcf6ea82f7d8ff54661a1c56bfce251d16a"
+  }
+]

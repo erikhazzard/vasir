@@ -6,6 +6,9 @@ import childProcess from "node:child_process";
 import { runBenchmarkAgent } from "./agent-runtime.js";
 
 export const STORYTELLING_RUNTIME_VERSION = "progressive-frozen-skill-v2";
+export const STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION = "successful-frozen-chunk-reads-v1";
+const REQUIRED_READ_HELPER = ".required-skill-read.cjs";
+const REQUIRED_READ_CHUNK_BYTES = 8000;
 
 function digest(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
@@ -56,12 +59,139 @@ export function freezeStorytellingSkill({ skillDirectoryPath, skillName = "writi
   return validateStorytellingSkillSnapshot({ schemaVersion: 1, skillName, hash: snapshotIdentity(files), files });
 }
 
-function stageSnapshot(snapshot, directoryPath) {
+export function normalizeStorytellingRequiredSkillFiles(skillSnapshot, requiredSkillFiles = []) {
+  if (!Array.isArray(requiredSkillFiles) || new Set(requiredSkillFiles).size !== requiredSkillFiles.length ||
+    requiredSkillFiles.some((relativePath) => typeof relativePath !== "string" ||
+      !skillSnapshot?.files.some((file) => file.relativePath === relativePath))) {
+    throw new Error("Required skill files must be distinct paths in the frozen skill snapshot.");
+  }
+  return [...requiredSkillFiles].sort();
+}
+
+function createRequiredReadChunks(snapshot, requiredSkillFiles) {
+  const chunks = [];
+  for (const relativePath of requiredSkillFiles) {
+    const file = snapshot.files.find((entry) => entry.relativePath === relativePath);
+    let contents = "";
+    let bytes = 0;
+    let start = 0;
+    function flush() {
+      chunks.push({ index: chunks.length, relativePath, start, end: start + contents.length,
+        contents, bytes, sha256: digest(contents), fileSha256: file.sha256 });
+      start += contents.length;
+      contents = "";
+      bytes = 0;
+    }
+    // Iterate Unicode code points so a page never splits a UTF-8 character.
+    for (const character of file.contents) {
+      const size = Buffer.byteLength(character);
+      if (bytes + size > REQUIRED_READ_CHUNK_BYTES) flush();
+      contents += character;
+      bytes += size;
+    }
+    if (contents || start === 0) flush();
+  }
+  return chunks;
+}
+
+function requiredReadFrame(chunk) {
+  const metadata = JSON.stringify({ index: chunk.index, relativePath: chunk.relativePath,
+    bytes: chunk.bytes, sha256: chunk.sha256 });
+  return `<<<BENCHMARK_SKILL_READ ${metadata}>>>\n${chunk.contents}\n<<<END_BENCHMARK_SKILL_READ ${chunk.index}>>>\n`;
+}
+
+function requiredReadHelperSource(chunks) {
+  return `"use strict";
+const fs = require("node:fs");
+const path = require("node:path");
+const crypto = require("node:crypto");
+const chunks = ${JSON.stringify(chunks.map(({ contents, ...chunk }) => chunk))};
+const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
+if (process.argv.length !== 3 || !/^(0|[1-9][0-9]*)$/.test(process.argv[2])) throw new Error("Pass exactly one required chunk index.");
+const chunk = chunks[Number(process.argv[2])];
+if (!chunk) throw new Error("Unknown required chunk index.");
+const source = fs.readFileSync(path.join(__dirname, chunk.relativePath), "utf8");
+if (hash(source) !== chunk.fileSha256) throw new Error("Frozen skill file changed.");
+chunk.contents = source.slice(chunk.start, chunk.end);
+if (hash(chunk.contents) !== chunk.sha256 || Buffer.byteLength(chunk.contents) !== chunk.bytes) throw new Error("Frozen skill chunk changed.");
+process.stdout.write((${requiredReadFrame.toString()})(chunk));
+`;
+}
+
+export function createStorytellingSkillInstruction({ skillSnapshot, skillDirectoryPath, requiredSkillFiles = [] }) {
+  const required = normalizeStorytellingRequiredSkillFiles(skillSnapshot, requiredSkillFiles);
+  const root = skillSnapshot.files.find((file) => file.relativePath === "SKILL.md");
+  const introduction = `Use the ${skillSnapshot.skillName} skill for this request. Its frozen directory is ${skillDirectoryPath}. Resolve linked reference paths relative to that directory and read the references selected by the skill.`;
+  if (!required.length) return `${introduction}\n\n${root.contents}`;
+  const helperPath = path.posix.join(skillDirectoryPath, REQUIRED_READ_HELPER);
+  const quotedHelperPath = `'${helperPath.replaceAll("'", "'\\''")}'`;
+  const commands = createRequiredReadChunks(skillSnapshot, required)
+    .map((chunk) => `node ${quotedHelperPath} ${chunk.index} # ${chunk.relativePath}`).join("\n");
+  return `${introduction}\n\nRequired file-reading protocol (${STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION}): Before composing your answer, read every byte of ${required.map((file) => JSON.stringify(file)).join(" and ")}. Use the staged read-only helper below. Each command prints one bounded chunk, with no omissions. Execute every listed command separately and read its entire output. Request at least 6000 output tokens per command; if a result is truncated, repeat that chunk with a larger output limit. A path listing, search, summary, or hash alone is not a complete read. Other references remain available through ordinary read-only file access. Return the requested answer without describing this protocol.\n\n${commands}\n\n${root.contents}`;
+}
+
+function inspectRequiredSkillReads(events, snapshot, requiredSkillFiles) {
+  const chunks = createRequiredReadChunks(snapshot, requiredSkillFiles);
+  const observed = new Map();
+  for (const event of events) {
+    const item = event.type === "item.completed" ? event.item : null;
+    if (item?.type !== "command_execution" || item.status !== "completed" || item.exit_code !== 0 ||
+      typeof item.command !== "string" || !item.command.includes(REQUIRED_READ_HELPER) ||
+      typeof item.aggregated_output !== "string") continue;
+    for (const chunk of chunks) {
+      // Full framed bytes must appear in a successful tool result. A footer,
+      // claimed hash, failed read, or truncated body cannot establish access.
+      if (item.aggregated_output.includes(requiredReadFrame(chunk))) observed.set(chunk.index, item.id ?? null);
+    }
+  }
+  const files = requiredSkillFiles.map((relativePath) => {
+    const file = snapshot.files.find((entry) => entry.relativePath === relativePath);
+    const fileChunks = chunks.filter((chunk) => chunk.relativePath === relativePath);
+    const observedChunks = fileChunks.filter((chunk) => observed.has(chunk.index)).map((chunk) => ({
+      index: chunk.index, bytes: chunk.bytes, sha256: chunk.sha256, toolEventId: observed.get(chunk.index)
+    }));
+    return { relativePath, sha256: file.sha256, bytes: Buffer.byteLength(file.contents),
+      requiredChunkCount: fileChunks.length, observedChunks, complete: observedChunks.length === fileChunks.length };
+  });
+  return { policyVersion: STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION,
+    requiredFiles: requiredSkillFiles, evidence: "successful-command-output-frozen-byte-match",
+    status: files.every((file) => file.complete) ? "complete" : "incomplete", files };
+}
+
+export function isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot, requiredSkillFiles, receipt, requireComplete = true }) {
+  const required = normalizeStorytellingRequiredSkillFiles(skillSnapshot, requiredSkillFiles);
+  if (!required.length) return receipt === undefined;
+  if (receipt?.policyVersion !== STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION ||
+    receipt.evidence !== "successful-command-output-frozen-byte-match" ||
+    JSON.stringify(receipt.requiredFiles) !== JSON.stringify(required) ||
+    !Array.isArray(receipt.files) || receipt.files.length !== required.length) return false;
+  const chunks = createRequiredReadChunks(skillSnapshot, required);
+  for (let index = 0; index < required.length; index += 1) {
+    const file = skillSnapshot.files.find((entry) => entry.relativePath === required[index]);
+    const evidence = receipt.files[index];
+    const fileChunks = chunks.filter((chunk) => chunk.relativePath === file.relativePath);
+    if (evidence?.relativePath !== file.relativePath || evidence.sha256 !== file.sha256 ||
+      evidence.bytes !== Buffer.byteLength(file.contents) || evidence.requiredChunkCount !== fileChunks.length ||
+      !Array.isArray(evidence.observedChunks) ||
+      new Set(evidence.observedChunks.map((chunk) => chunk.index)).size !== evidence.observedChunks.length ||
+      evidence.observedChunks.some((chunk) => !fileChunks.some((expected) =>
+        chunk.index === expected.index && chunk.bytes === expected.bytes && chunk.sha256 === expected.sha256)) ||
+      evidence.complete !== (evidence.observedChunks.length === fileChunks.length)) return false;
+  }
+  const complete = receipt.files.every((file) => file.complete);
+  return receipt.status === (complete ? "complete" : "incomplete") && (!requireComplete || complete);
+}
+
+function stageSnapshot(snapshot, directoryPath, requiredSkillFiles = []) {
   const skillDirectoryPath = path.join(directoryPath, ".benchmark-skill", snapshot.skillName);
   for (const file of snapshot.files) {
     const target = path.join(skillDirectoryPath, file.relativePath);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, file.contents, { mode: 0o444, flag: "wx" });
+  }
+  if (requiredSkillFiles.length) {
+    fs.writeFileSync(path.join(skillDirectoryPath, REQUIRED_READ_HELPER),
+      requiredReadHelperSource(createRequiredReadChunks(snapshot, requiredSkillFiles)), { mode: 0o444, flag: "wx" });
   }
   return skillDirectoryPath;
 }
@@ -139,6 +269,7 @@ export async function runStorytellingAgent({
   configuration,
   promptText,
   skillSnapshot = null,
+  requiredSkillFiles = [],
   outputSchema = null,
   environmentVariables = process.env,
   timeoutMs,
@@ -148,6 +279,10 @@ export async function runStorytellingAgent({
     throw new Error("Ultracode changes workflow/agent count and is outside the storytelling reasoning matrix.");
   }
   if (skillSnapshot) validateStorytellingSkillSnapshot(skillSnapshot);
+  const required = normalizeStorytellingRequiredSkillFiles(skillSnapshot, requiredSkillFiles);
+  if (required.length && (configuration.provider !== "codex" || outputSchema)) {
+    throw new Error("Required skill-file read verification currently supports Codex contestants only.");
+  }
   let stdout = "";
   let actualArguments = [];
   let instructionHash = null;
@@ -157,9 +292,8 @@ export async function runStorytellingAgent({
     fixtureDirectoryPath = options.cwd;
     const args = commandArguments.slice();
     if (skillSnapshot) {
-      const stagedDirectory = stageSnapshot(skillSnapshot, options.cwd);
-      const root = skillSnapshot.files.find((file) => file.relativePath === "SKILL.md");
-      const instruction = `Use the ${skillSnapshot.skillName} skill for this request. Its frozen directory is ${stagedDirectory}. Resolve linked reference paths relative to that directory and read the references selected by the skill.\n\n${root.contents}`;
+      const stagedDirectory = stageSnapshot(skillSnapshot, options.cwd, required);
+      const instruction = createStorytellingSkillInstruction({ skillSnapshot, skillDirectoryPath: stagedDirectory, requiredSkillFiles: required });
       instructionHash = digest(instruction.replaceAll(stagedDirectory, "<frozen-skill-directory>"));
       // Codex exec owns these overrides: global-before-subcommand config can be
       // discarded by exec's isolated config loading. The sentinel live probe
@@ -211,6 +345,7 @@ export async function runStorytellingAgent({
       runtimeReceipt: {
         ...result.runtimeReceipt,
         ...evidence,
+        ...(required.length ? { requiredSkillReads: inspectRequiredSkillReads(parseEvents(stdout), skillSnapshot, required) } : {}),
         // The wrapper exposes Read to contestants; the generic receipt assumes tool-free calls.
         ...(configuration.provider === "claude" && !outputSchema ? { allowedTools: ["Read"] } : {}),
         runtimeVersion: STORYTELLING_RUNTIME_VERSION,
@@ -251,7 +386,8 @@ ${terminalDiagnostic}`;
       startedAt,
       completedAt: new Date().toISOString(),
       streamSha256: digest(stdout),
-      observed: inspectEvidence(events, configuration, skillSnapshot, fixtureDirectoryPath)
+      observed: inspectEvidence(events, configuration, skillSnapshot, fixtureDirectoryPath),
+      ...(required.length ? { requiredSkillReads: inspectRequiredSkillReads(events, skillSnapshot, required) } : {})
     };
     // Keep the exact local temporary path out of user-facing error receipts.
     if (fixtureDirectoryPath && typeof error.context.stderr === "string") {

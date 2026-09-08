@@ -27,3 +27,11 @@ Accepted reviews corrected the evidence and boarding sequence, the low escape ro
 - Source-work files remain outside the runtime skill. The existing parent route remains the selection authority; no self-routing preamble or spoiler warning was reintroduced.
 
 No literary scoring, benchmark, behavioral evaluation, global installation, publication, or commit was performed. Unrelated concurrent repository work was not reverted or included as part of this revision.
+
+## Subsequent helix revision
+
+Following the user's approval of the remaining improvements and their corkscrew/helix metaphor, the reference now distinguishes an inversion of interpretation from the accumulated consequences that prevent a reset. It explicitly connects the turning-point effects, scopes the mastermind method within a broader revelation procedure, adds a personally consequential Jar Jar help episode, and follows its meaning through later authority, choice, and unintended consequences. Separate tables track value changes over time and successive interpretive layers. The parent route now explicitly includes layered revelations.
+
+Root reread *Story* physical pages 238–242 for second, third, and fourth setup meanings and payoffs becoming new setups; three existing specialist agents provided bounded source, character, and scene contributions and editorial reviews. The helix is identified as a design metaphor developed here, not a named source formula. Earlier help remains real without establishing uncomplicated benevolence; a beneficiary's later independent action is not mislabeled another concealed identity.
+
+At this revision's completion, the reference is 16,650 words. The native package check passes with 318 local links/anchors and 22 reachable prompt files. Catalog regeneration retains 73 skills; registry and diff checks pass. A fresh 23-file skill snapshot confirms that only the reference and the parent route changed. The bundled Python validator could not run because PyYAML is absent; the repository's native metadata, packaging, reachability, and placeholder checks supplied the available fallback. No eval artifacts were created.

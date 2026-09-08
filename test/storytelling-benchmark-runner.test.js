@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { EventEmitter } from "node:events";
 import fs from "node:fs";
 import os from "node:os";
@@ -13,7 +14,7 @@ import { judgeBenchmarkRows } from "../cli/eval/benchmark-judge.js";
 import { identifyStorytellingJudgeQuotaExhaustion, runStorytellingBenchmark, STORYTELLING_DEFAULT_MODELS } from "../cli/eval/run-storytelling-benchmark.js";
 import { runBenchmarkEval } from "../cli/eval/run-benchmark-eval.js";
 import { probeStorytellingJudge } from "../cli/eval/probe-storytelling-judge.js";
-import { freezeStorytellingSkill, runStorytellingAgent, STORYTELLING_RUNTIME_VERSION, validateStorytellingSkillSnapshot } from "../cli/eval/storytelling-agent-runtime.js";
+import { createStorytellingSkillInstruction, freezeStorytellingSkill, isStorytellingRequiredSkillReadReceiptCompatible, runStorytellingAgent, STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION, STORYTELLING_RUNTIME_VERSION, validateStorytellingSkillSnapshot } from "../cli/eval/storytelling-agent-runtime.js";
 
 const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -112,6 +113,27 @@ function spawnStub(output, onSpawn = () => {}) {
   };
 }
 
+function requiredReadSpawn({ changeRead = (item) => item, onSpawn = () => {} } = {}) {
+  return spawnStub((_command, args, options) => {
+    const override = args.find((argument) => argument.startsWith("developer_instructions="));
+    const instruction = override ? JSON.parse(override.slice("developer_instructions=".length)) : "";
+    const reads = [...instruction.matchAll(/^node '([^']+)' ([0-9]+) # (.+)$/gmu)].map((match) => {
+      const [, helperPath, index] = match;
+      assert.equal(fs.statSync(helperPath).mode & 0o222, 0);
+      const item = { type: "command_execution", id: `read-${index}`,
+        command: `node '${helperPath}' ${index}`, status: "completed", exit_code: 0,
+        aggregated_output: execFileSync(process.execPath, [helperPath, index], { encoding: "utf8", cwd: options.cwd }) };
+      return changeRead(item, Number(index));
+    }).filter(Boolean);
+    return [
+      { type: "thread.started", thread_id: "required-read-fixture" },
+      ...reads.map((item) => ({ type: "item.completed", item })),
+      { type: "item.completed", item: { type: "agent_message", text: "The original story outline." } },
+      { type: "turn.completed", usage: { input_tokens: 400, output_tokens: 12 } }
+    ].map(JSON.stringify).join("\n");
+  }, onSpawn);
+}
+
 test("storytelling defaults contain 33 exact target configurations and no workflow mode", () => {
   const configs = resolveBenchmarkConfigurations({ requestedModelArguments: STORYTELLING_DEFAULT_MODELS }).filter((entry) => entry.reasoning !== "ultracode");
   assert.equal(configs.length, 33);
@@ -162,6 +184,153 @@ test("Codex gets an exact user question and a separate short skill root with fro
   assert.ok(capturedArguments.includes("--ignore-user-config"));
   assert.equal(fs.existsSync(cwd), false);
   assert.doesNotMatch(JSON.stringify(result.runtimeReceipt.cliArguments), /name: writing-storytelling/);
+  assert.equal(result.runtimeReceipt.requiredSkillReads, undefined);
+  assert.equal(createStorytellingSkillInstruction({ skillSnapshot: snapshot, skillDirectoryPath: "<frozen-skill-directory>" }),
+    `Use the writing-storytelling skill for this request. Its frozen directory is <frozen-skill-directory>. Resolve linked reference paths relative to that directory and read the references selected by the skill.\n\n${snapshot.files.find((file) => file.relativePath === "SKILL.md").contents}`);
+});
+
+test("required skill reads expose every frozen UTF-8 byte through bounded successful helper results", async (t) => {
+  const f = fixture(t);
+  fs.writeFileSync(path.join(f.skillDirectory, "references", "twists-and-revelations.md"), "A revelation changes meaning. 🌌\n".repeat(850));
+  const snapshot = freezeStorytellingSkill({ skillDirectoryPath: f.skillDirectory });
+  const requiredSkillFiles = ["SKILL.md", "references/twists-and-revelations.md"];
+  const delivered = new Map(requiredSkillFiles.map((relativePath) => [relativePath, ""]));
+  const result = await runStorytellingAgent({
+    configuration: { id: "codex:gpt-5.6-luna@max", provider: "codex", model: "gpt-5.6-luna", reasoning: "max" },
+    promptText: "Create a brief outline of a scifi story with one or more major plot twists",
+    skillSnapshot: snapshot, requiredSkillFiles: [...requiredSkillFiles].reverse(),
+    spawnImplementation: requiredReadSpawn({ changeRead: (item) => {
+      const match = item.aggregated_output.match(/^<<<BENCHMARK_SKILL_READ (.+)>>>\n([\s\S]*)\n<<<END_BENCHMARK_SKILL_READ [0-9]+>>>\n$/u);
+      assert.ok(match);
+      const metadata = JSON.parse(match[1]);
+      assert.equal(Buffer.byteLength(match[2]), metadata.bytes);
+      assert.ok(metadata.bytes <= 8000);
+      assert.equal(hash(match[2]), metadata.sha256);
+      delivered.set(metadata.relativePath, delivered.get(metadata.relativePath) + match[2]);
+      return item;
+    } })
+  });
+  for (const relativePath of requiredSkillFiles) {
+    assert.equal(delivered.get(relativePath), snapshot.files.find((file) => file.relativePath === relativePath).contents);
+  }
+  const receipt = result.runtimeReceipt.requiredSkillReads;
+  assert.equal(receipt.status, "complete");
+  assert.ok(receipt.files[1].requiredChunkCount > 1);
+  assert.ok(isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot, requiredSkillFiles, receipt }));
+  assert.equal(result.runtimeReceipt.instructionHash, hash(createStorytellingSkillInstruction({
+    skillSnapshot: snapshot, skillDirectoryPath: "<frozen-skill-directory>", requiredSkillFiles
+  })));
+  const tampered = structuredClone(receipt);
+  tampered.files[1].observedChunks[0].sha256 = "0".repeat(64);
+  assert.equal(isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot, requiredSkillFiles, receipt: tampered }), false);
+});
+
+test("required reads reject failed, partial, missing, and hash-only tool evidence while retaining the answer", async (t) => {
+  const f = fixture(t);
+  const snapshot = freezeStorytellingSkill({ skillDirectoryPath: f.skillDirectory });
+  const requiredSkillFiles = ["SKILL.md", "references/controlling-idea.md"];
+  const changes = [
+    (item) => ({ ...item, status: "failed", exit_code: 1 }),
+    (item) => ({ ...item, aggregated_output: item.aggregated_output.replace("Frozen specialist", "[truncated]") }),
+    (item) => ({ ...item, aggregated_output: item.aggregated_output.split("\n").filter((line) => line.startsWith("<<<")).join("\n") }),
+    (item) => ({ ...item, command: "echo references/controlling-idea.md" }),
+    () => null
+  ];
+  for (const change of changes) {
+    const result = await runStorytellingAgent({
+      configuration: { id: "codex:gpt-5.6-luna@low", provider: "codex", model: "gpt-5.6-luna", reasoning: "low" },
+      promptText: f.definition.cases[0].task, skillSnapshot: snapshot, requiredSkillFiles,
+      spawnImplementation: requiredReadSpawn({ changeRead: (item, index) => index === 1 ? change(item) : item })
+    });
+    assert.equal(result.text, "The original story outline.");
+    const receipt = result.runtimeReceipt.requiredSkillReads;
+    assert.equal(receipt.status, "incomplete");
+    assert.equal(receipt.files[0].complete, true);
+    assert.equal(receipt.files[1].complete, false);
+    assert.equal(isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot, requiredSkillFiles, receipt }), false);
+    assert.equal(isStorytellingRequiredSkillReadReceiptCompatible({ skillSnapshot: snapshot, requiredSkillFiles, receipt, requireComplete: false }), true);
+  }
+});
+
+test("required-read protocol failures preserve output and receipts and cannot be rerolled on retry", async (t) => {
+  const f = fixture(t);
+  const requiredSkillFiles = ["SKILL.md", "references/controlling-idea.md"];
+  const result = await runStorytellingBenchmark({
+    projectRootDirectory: f.directory, currentWorkingDirectory: f.directory,
+    requestedModelArguments: ["codex:gpt-5.6-luna@low"], requiredSkillFiles,
+    runId: "required-read-failure", generationOnly: true,
+    agentRunnerImplementation: (args) => runStorytellingAgent({ ...args,
+      spawnImplementation: requiredReadSpawn({ changeRead: (item, index) => index === 1 ? null : item }) })
+  });
+  const runPath = path.join(result.outputDirectory, "run.json");
+  const before = JSON.parse(fs.readFileSync(runPath, "utf8"));
+  const failure = before.rows.find((row) => row.conditionId !== "clean");
+  assert.equal(failure.rowStatus, "error");
+  assert.equal(failure.error.code, "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE");
+  assert.equal(failure.outputText, "The original story outline.");
+  assert.equal(failure.outputHash, hash(failure.outputText));
+  assert.ok(failure.usage.totalTokens > 0);
+  assert.equal(failure.runtimeReceipt.requiredSkillReads.status, "incomplete");
+  assert.equal(failure.attempts.length, 1);
+  fs.writeFileSync(path.join(f.skillDirectory, "SKILL.md"), "Mutable skill changed after the run.");
+  await runStorytellingBenchmark({
+    projectRootDirectory: f.directory, currentWorkingDirectory: f.directory,
+    resumeRunId: result.runId, retryFailed: true,
+    agentRunnerImplementation: () => assert.fail("Neither the completed plain output nor protocol failure may be rerolled."),
+    judgeRowsImplementation: async ({ rows }) => {
+      assert.deepEqual(rows, [], "The incomplete pair must never be scored.");
+      return { judging: { status: "incomplete" }, scoresByRowKey: new Map() };
+    }
+  });
+  const after = JSON.parse(fs.readFileSync(runPath, "utf8"));
+  assert.deepEqual(after.rows, before.rows);
+  assert.deepEqual(after.treatment, before.treatment);
+  assert.equal(after.executionHistory.at(-1).selectedGenerationRowCount, 0);
+});
+
+test("required files are frozen in condition identity and resume rejects removed or changed policy", async (t) => {
+  const f = fixture(t);
+  const options = { projectRootDirectory: f.directory, currentWorkingDirectory: f.directory,
+    requestedModelArguments: ["codex:gpt-5.6-luna@low"], prepareOnly: true };
+  const plain = await runStorytellingBenchmark({ ...options, runId: "legacy-policy" });
+  const enforced = await runStorytellingBenchmark({ ...options, runId: "frozen-policy",
+    requiredSkillFiles: ["references/controlling-idea.md", "SKILL.md"] });
+  const legacy = JSON.parse(fs.readFileSync(path.join(plain.outputDirectory, "run.json"), "utf8"));
+  const runPath = path.join(enforced.outputDirectory, "run.json");
+  const frozen = JSON.parse(fs.readFileSync(runPath, "utf8"));
+  assert.equal(legacy.treatment.requiredSkillFiles, undefined);
+  assert.equal(legacy.conditions[1].hash, legacy.treatment.hash);
+  assert.equal(frozen.treatment.hash, legacy.treatment.hash);
+  assert.notEqual(frozen.conditions[1].hash, legacy.conditions[1].hash);
+  assert.equal(frozen.conditions[0].hash, legacy.conditions[0].hash);
+  assert.notEqual(frozen.storytelling.manifestHash, legacy.storytelling.manifestHash);
+  assert.deepEqual(frozen.treatment.requiredSkillFiles, ["SKILL.md", "references/controlling-idea.md"]);
+  assert.equal(frozen.treatment.requiredSkillReadPolicyVersion, STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION);
+  for (const modify of [
+    (run) => { delete run.treatment.requiredSkillFiles; delete run.treatment.requiredSkillReadPolicyVersion; },
+    (run) => { run.treatment.requiredSkillFiles = ["SKILL.md"]; },
+    (run) => { run.treatment.requiredSkillReadPolicyVersion = "changed-policy"; }
+  ]) {
+    const changed = structuredClone(frozen);
+    modify(changed);
+    writeJson(runPath, changed);
+    await assert.rejects(() => runStorytellingBenchmark({ projectRootDirectory: f.directory,
+      currentWorkingDirectory: f.directory, resumeRunId: enforced.runId, generationOnly: true,
+      agentRunnerImplementation: () => assert.fail("Policy mutation must fail before invocation.") }), /required skill-file policy/);
+    assert.equal(fs.existsSync(path.join(enforced.outputDirectory, "run.lock")), false);
+  }
+});
+
+test("repeatable required-file CLI flags prepare the exact frozen file list without invoking a model", (t) => {
+  const f = fixture(t);
+  const runner = path.resolve(import.meta.dirname, "../cli/eval/run-storytelling-benchmark.js");
+  execFileSync(process.execPath, [runner, "--prepare", "--run-id", "required-cli",
+    "--model", "codex:gpt-5.6-luna@max", "--required-skill-file", "SKILL.md",
+    "--required-skill-file", "references/controlling-idea.md"], { cwd: f.directory, encoding: "utf8" });
+  const runPath = path.join(f.directory, ".agents", "vasir-evals", "storytelling-core-idea", "required-cli", "run.json");
+  const run = JSON.parse(fs.readFileSync(runPath, "utf8"));
+  assert.deepEqual(run.treatment.requiredSkillFiles, ["SKILL.md", "references/controlling-idea.md"]);
+  assert.ok(run.rows.every((row) => row.rowStatus === "pending" && row.attempts.length === 0));
 });
 
 test("Claude streams progressive Read evidence while retaining canonical-model validation", async (t) => {
@@ -660,6 +829,11 @@ test("judge quota recognition requires explicit provider exhaustion, not a gener
   assert.deepEqual(identifyStorytellingJudgeQuotaExhaustion({
     error: fakeJudgeRuntimeFailure(configuration, "You’ve reached your Fable limit."), configuration
   }), { reason: "model-usage-limit-reached", apiErrorStatus: 429 });
+  for (const message of ["You've hit your session limit · resets 11:50pm (America/New_York)", "You’ve hit your session limit."]) {
+    assert.deepEqual(identifyStorytellingJudgeQuotaExhaustion({
+      error: fakeJudgeRuntimeFailure(configuration, message), configuration
+    }), { reason: "session-usage-limit-reached", apiErrorStatus: 429 });
+  }
   for (const message of ["Too many requests; retry later.", "rate_limit_error", "Quota exceeded: requests per minute."]) {
     assert.equal(identifyStorytellingJudgeQuotaExhaustion({ error: fakeJudgeRuntimeFailure(configuration, message), configuration }), null);
   }

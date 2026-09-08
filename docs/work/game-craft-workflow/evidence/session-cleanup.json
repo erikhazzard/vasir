@@ -1,0 +1,16 @@
+{
+  "forwardCliSessions": "Both completed successfully.",
+  "temporaryTestPorts": {
+    "8761": {
+      "listening": false,
+      "check": "lsof TCP LISTEN"
+    },
+    "8762": {
+      "listening": false,
+      "check": "lsof TCP LISTEN"
+    }
+  },
+  "originalAshEchoServer": "HTTP 200 on port 8317; preserved.",
+  "rootTerminationActions": "None required; no temporary test listener remains.",
+  "browserScope": "Executor-owned browser sessions closed by their own observation/proof cleanup; unrelated browser processes were not touched."
+}

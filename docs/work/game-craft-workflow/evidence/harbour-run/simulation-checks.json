@@ -1,0 +1,43 @@
+{
+  "scope": "Fixed-step integration, not perceptual or browser proof",
+  "results": [
+    {
+      "name": "Repeatable complete route using the public driving inputs",
+      "passed": true,
+      "detail": {
+        "seconds": 21.09166666666611,
+        "gates": 6,
+        "heavyContacts": 0
+      }
+    },
+    {
+      "name": "A straight run cannot skip the first slalom gate or finish",
+      "passed": true,
+      "detail": {
+        "z": -185.20152914128496,
+        "nextGate": 0,
+        "phase": "running"
+      }
+    },
+    {
+      "name": "Ready and pause freeze the clock; resume preserves state",
+      "passed": true
+    },
+    {
+      "name": "Braking stops; S can reverse; Space does not drive backwards",
+      "passed": true,
+      "detail": {
+        "atSpeed": 9.607100212487184,
+        "stoppedSpeed": 0
+      }
+    },
+    {
+      "name": "Low and strong impacts are distinguished at the same wall",
+      "passed": true,
+      "detail": {
+        "lightClosingSpeed": 1.9230767269852551,
+        "strongClosingSpeed": 9.888134817867085
+      }
+    }
+  ]
+}

@@ -8,11 +8,11 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
 import { runStorytellingBenchmark } from "../cli/eval/run-storytelling-benchmark.js";
-import { STORYTELLING_RUNTIME_VERSION } from "../cli/eval/storytelling-agent-runtime.js";
+import { STORYTELLING_RUNTIME_VERSION, STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION, createStorytellingSkillInstruction } from "../cli/eval/storytelling-agent-runtime.js";
 import {
   buildWritingPublication, prepareWritingPublicationSource, projectWritingRun,
   serializeWritingModule, validateWritingPublication, validateWritingSummary,
-  WRITING_BENCHMARK_ID, WRITING_SELECTION_PATH
+  WRITING_BENCHMARK_ID, WRITING_SELECTION_PATH, PLOT_TWISTS_BENCHMARK_ID, writingSelectionPath
 } from "../cli/eval/writing-publication.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -41,18 +41,18 @@ function grades({ provider, caseIndex, treatment }, judgeIndex) {
 // Using the real runner retains its opaque candidate identities, independent
 // reviewer IDs, original batch/evaluation hashes, and pending-row inventory.
 async function fixture(t, { models = [CONFIG], fail = () => false, missingJudge = false,
-  prepareOnly = false, generationOnly = false, ratings = grades } = {}) {
+  prepareOnly = false, generationOnly = false, ratings = grades, definitionOverride = null, trials = 1, requiredSkillFiles = [], incompleteRead = false } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "vasir-writing-publication-"));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const definition = structuredClone(CORPUS);
-  definition.cases = definition.cases.slice(0, 2);
-  write(root, "benchmarks/storytelling-core-idea/benchmark.json", definition);
+  const definition = structuredClone(definitionOverride ?? CORPUS);
+  if (!definitionOverride) definition.cases = definition.cases.slice(0, 2);
+  write(root, `benchmarks/${definition.id}/benchmark.json`, definition);
   write(root, ".agents/skills/writing-storytelling/SKILL.md", "---\nname: writing-storytelling\n---\nRead [the reference](references/idea.md) when analyzing a story.\n");
   write(root, ".agents/skills/writing-storytelling/references/idea.md", "Test-only frozen reference. Explain the story's consequences without inventing events.\n");
   const answers = new Map();
   let agentCalls = 0;
   const result = await runStorytellingBenchmark({
-    projectRootDirectory: root, currentWorkingDirectory: root, requestedModelArguments: models,
+    projectRootDirectory: root, currentWorkingDirectory: root, requestedModelArguments: models, benchmarkName: definition.id, trialCount: trials, requiredSkillFiles,
     runId: "writing-publication-fixture", seed: "writing-publication-fixture-v1", prepareOnly, generationOnly,
     environmentVariables: {}, nowImplementation: () => new Date("2026-09-07T12:00:00Z"),
     agentRunnerImplementation: async args => {
@@ -60,12 +60,12 @@ async function fixture(t, { models = [CONFIG], fail = () => false, missingJudge 
       const { configuration, promptText, skillSnapshot, outputSchema } = args;
       let text;
       if (outputSchema) {
-        if (missingJudge && configuration.provider === "claude") throw Object.assign(new Error("Fixture judge unavailable"), { code: "AUTH_UNAVAILABLE" });
+        if (missingJudge && (configuration.provider === "claude" || configuration.model === "gpt-5.6-sol")) throw Object.assign(new Error("Fixture judge unavailable"), { code: "AUTH_UNAVAILABLE" });
         const candidateAnswers = new Map([...promptText.matchAll(/<candidate id="([^"]+)" case="[^"]+">[\s\S]*?<answer>([\s\S]*?)<\/answer>\n<\/candidate>/gu)].map(match => [match[1], match[2]]));
         text = JSON.stringify({ evaluations: outputSchema.properties.evaluations.items.properties.candidateId.enum.map(candidateId => {
           const answer = answers.get(candidateAnswers.get(candidateId));
           assert.ok(answer, "Every anonymous judge candidate must be one retained fixture answer.");
-          const scores = ratings(answer, configuration.provider === "codex" ? 0 : 1);
+          const scores = ratings(answer, configuration.provider === "codex" && configuration.model !== "gpt-5.6-sol" ? 0 : 1);
           return { candidateId, gates: [], dimensions: definition.scoring.dimensions.map((dimension, index) => ({ id: dimension.id, rating: scores[index] })), reason: "The retained answer connects the protagonist's choice to its consequence; this fixture keeps the original independent ratings and notes the missing counterexample." };
         }) });
       } else {
@@ -75,10 +75,12 @@ async function fixture(t, { models = [CONFIG], fail = () => false, missingJudge 
         if (fail(answer)) throw Object.assign(new Error("Fixture OAuth session expired; private diagnostic must not be published."), { code: "AUTH_UNAVAILABLE", context: { stderr: "fixture-private-diagnostic", session_id: "fixture-private-session" } });
         const marker = `${configuration.provider === "codex" ? "A" : "B"}${caseIndex}${skillSnapshot ? "T" : "C"}`;
         text = `Fixture ${marker}.\n\nChoice  and consequence—café, 世界, 🌍.\nA claim\tneeds evidence.`;
+        if (trials > 1) text += `\nIndependent retained answer ${agentCalls}.`;
         if (caseIndex === 0 && skillSnapshot) text += `\n\n${Array(1600).fill("unabridged").join(" ")}\nFinal sentence remains intact.`;
         answers.set(text, answer);
       }
-      const normalizedInstruction = skillSnapshot ? `Use the ${skillSnapshot.skillName} skill for this request. Its frozen directory is <frozen-skill-directory>. Resolve linked reference paths relative to that directory and read the references selected by the skill.\n\n${skillSnapshot.files.find(file => file.relativePath === "SKILL.md").contents}` : null;
+      const normalizedInstruction = skillSnapshot ? createStorytellingSkillInstruction({ skillSnapshot, skillDirectoryPath: "<frozen-skill-directory>", requiredSkillFiles }) : null;
+      const missingRequiredRead = skillSnapshot && (typeof incompleteRead === "function" ? incompleteRead({ configuration }) : incompleteRead);
       return {
         text, durationMs: 1250, costUsd: null, usage: { inputTokens: 300, outputTokens: 50, totalTokens: 350 },
         runtimeReceipt: {
@@ -92,6 +94,15 @@ async function fixture(t, { models = [CONFIG], fail = () => false, missingJudge 
           modelVerification: "explicit-cli-request-only", reasoningVerification: "explicit-cli-request-only",
           referenceAccess: { observedPaths: skillSnapshot ? ["references/idea.md"] : [], observation: "tool-event-paths" },
           nonMessageItemCount: 0, allowedTools: [],
+          ...(skillSnapshot && requiredSkillFiles.length ? { requiredSkillReads: {
+            policyVersion: STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION, requiredFiles: [...requiredSkillFiles].sort(), evidence: "successful-command-output-frozen-byte-match", status: missingRequiredRead ? "incomplete" : "complete",
+            files: [...requiredSkillFiles].sort().map((relativePath, index) => {
+              const file = skillSnapshot.files.find(file => file.relativePath === relativePath);
+              const bytes = Buffer.byteLength(file.contents);
+              return { relativePath, sha256: file.sha256, bytes, requiredChunkCount: 1, complete: !missingRequiredRead,
+                observedChunks: missingRequiredRead ? [] : [{ index, bytes, sha256: hash(file.contents), toolEventId: "private-tool-event" }] };
+            })
+          } } : {}),
           ...(configuration.provider === "claude" ? { canonicalModels: [configuration.model], targetCanonicalModel: configuration.model, targetCanonicalModelOutputTokens: 50 } : {})
         }
       };
@@ -157,6 +168,7 @@ test("Writing recomputes ten 1–10 dimensions from both original judges and equ
   assert.equal(projection.benchmarkSummaries[0].losses, 1);
   assert.equal(responseBundle.counts.judgments, 8);
   assert.equal(stub.status, "measured");
+  assert.equal(projection.provisionalLeaderboard, null, "A finished panel does not retain an alternative provisional leaderboard.");
   assert.equal(validateWritingSummary(stub), stub);
   const changed = structuredClone(f.run);
   changed.rows[0].score.total = 100;
@@ -309,6 +321,88 @@ test("a missing independent judge preserves the available judgment without inven
   assert.ok(projection.entries.every(entry => entry.rank === null && entry.score === null));
   assert.equal(stub.status, "unscored");
   assert.equal(stub.leader, undefined);
+  const provisional = projection.provisionalLeaderboard;
+  assert.deepEqual(provisional.judgeConfigurationIds, [PANEL[0]]);
+  assert.deepEqual(provisional.caseIds, projection.cases.map(story => story.id));
+  assert.equal(provisional.sourceSha256, projection.scoreBasis.sourceSha256);
+  assert.equal(provisional.corpusSha256, projection.methodology.corpusSha256);
+  assert.equal(provisional.skillSha256, projection.methodology.skillSha256);
+  assert.equal(provisional.rankedSettingCount, 1);
+  assert.deepEqual(provisional.entries.map(entry => [entry.condition, entry.exactScore, entry.delta, entry.rank]), [["baseline", 57.5, 0, 1], ["skill", 55, -2.5, 1]]);
+  assert.deepEqual(provisional.entries[0].metrics, projection.entries[0].metrics);
+  assert.equal(provisional.entries[0].family, projection.entries[0].family);
+  assert.equal(provisional.entries[0].cost, null);
+  assert.equal(validateWritingPublication(projection, responseBundle), projection);
+});
+
+test("provisional ranks share exact ties and keep incomplete story pairs in separate diagnostics", async t => {
+  const f = await fixture(t, { models: [CONFIG, SECOND_CONFIG, "claude:claude-opus-5@high"], missingJudge: true,
+    fail: answer => answer.provider === "codex" && answer.caseIndex === 1 && answer.treatment });
+  const original = JSON.stringify(f.run);
+  const { projection } = f.project();
+  assert.equal(JSON.stringify(f.run), original, "Projection never alters retained evidence.");
+  const provisional = projection.provisionalLeaderboard;
+  assert.equal(provisional.rankedSettingCount, 2);
+  assert.equal(provisional.expectedSettingCount, 3);
+  assert.ok(provisional.entries.filter(entry => entry.eligibleForRank).every(entry => entry.rank === 1));
+  assert.ok(provisional.entries.filter(entry => !entry.eligibleForRank).every(entry => entry.score === null && entry.exactScore === null && entry.rank === null && entry.delta === null && entry.metrics === null));
+  const diagnostic = provisional.incompleteSettings[0];
+  assert.equal(diagnostic.configurationId, CONFIG);
+  assert.equal(diagnostic.completedPairCount, 1);
+  assert.equal(diagnostic.expectedPairCount, 2);
+  assert.deepEqual(diagnostic.includedCaseIds, [projection.cases[0].id]);
+  assert.deepEqual(diagnostic.missingCaseIds, [projection.cases[1].id]);
+  assert.deepEqual(diagnostic.exactScores, { baseline: 55, skill: 80 });
+  assert.equal(diagnostic.exactDelta, 25);
+  assert.equal(diagnostic.eligibleForRank, false);
+  assert.equal(provisional.summary.exactBaseline, 80);
+  assert.equal(provisional.summary.exactTreatment, 90);
+  assert.equal(provisional.summary.usablePairs, 4);
+  assert.ok(projection.entries.every(entry => entry.score === null && entry.rank === null));
+});
+
+test("uneven Fable progress cannot change the fixed Astra provisional scores or ranks", async t => {
+  const f = await fixture(t, { models: [CONFIG, SECOND_CONFIG] });
+  const partial = structuredClone(f.run);
+  const first = partial.judging.judges[1].batches[0];
+  partial.judging.judges[1].batches = [first];
+  for (const row of partial.rows) row.score = null;
+  const withoutFable = structuredClone(partial);
+  withoutFable.judging.judges[1].batches = [];
+  const one = f.project(partial).projection;
+  const none = f.project(withoutFable).projection;
+  assert.deepEqual(one.provisionalLeaderboard.entries, none.provisionalLeaderboard.entries);
+  assert.deepEqual(one.provisionalLeaderboard.summary, none.provisionalLeaderboard.summary);
+  assert.equal(one.coverage.scoredResponseCount, 2);
+  assert.equal(none.coverage.scoredResponseCount, 0);
+  assert.ok(one.entries.every(entry => entry.score === null && entry.rank === null));
+});
+
+test("provisional validation rejects judge mixing, cohort changes, forged diagnostics and premature ranks", async t => {
+  const f = await fixture(t, { models: [CONFIG, SECOND_CONFIG], missingJudge: true,
+    fail: answer => answer.provider === "codex" && answer.caseIndex === 1 && answer.treatment });
+  const built = f.project();
+  const changes = [
+    ["judge substitution", provisional => { provisional.judgeConfigurationIds = [PANEL[1]]; }],
+    ["missing corpus story", provisional => { provisional.caseIds.pop(); }],
+    ["different source", provisional => { provisional.sourceSha256 = hash("other checkpoint"); }],
+    ["modified score", provisional => { provisional.entries.find(entry => entry.eligibleForRank).exactScore += 1; }],
+    ["modified delta", provisional => { provisional.entries.find(entry => entry.eligibleForRank).delta += 1; }],
+    ["incomplete rank", provisional => { provisional.entries.find(entry => !entry.eligibleForRank).rank = 1; }],
+    ["incomplete score", provisional => { provisional.entries.find(entry => !entry.eligibleForRank).score = 80; }],
+    ["modified diagnostic", provisional => { provisional.incompleteSettings[0].exactScores.skill += 1; }],
+    ["different diagnostic story", provisional => { provisional.incompleteSettings[0].includedCaseIds = provisional.caseIds; }],
+    ["modified summary", provisional => { provisional.summary.exactTreatment += 1; }],
+    ["false ranked count", provisional => { provisional.rankedSettingCount += 1; }]
+  ];
+  for (const [name, change] of changes) await t.test(name, () => {
+    const changed = structuredClone(built);
+    change(changed.projection.provisionalLeaderboard);
+    assert.throws(() => validateWritingPublication(changed.projection, changed.responseBundle), /provisional/);
+  });
+  const hidden = structuredClone(built);
+  hidden.projection.provisionalLeaderboard = null;
+  assert.throws(() => validateWritingPublication(hidden.projection, hidden.responseBundle), /provisional/);
 });
 
 test("completed but not-yet-judged answers remain available without scores or leaderboard entries", async t => {
@@ -322,6 +416,7 @@ test("completed but not-yet-judged answers remain available without scores or le
   assert.ok(projection.entries.every(entry => entry.score === null && entry.rank === null));
   assert.equal(stub.status, "unscored");
   assert.equal(stub.leader, undefined);
+  assert.equal(projection.provisionalLeaderboard, null);
 });
 
 test("frozen task, skill, answer, receipt, and judge-source tampering are rejected", async t => {
@@ -457,7 +552,7 @@ test("selection pins both immutable sources and rejects hash drift, missing pins
   const f = await fixture(t, { prepareOnly: true });
   const pinned = selectedReader(f);
   const built = pinned.build();
-  assert.deepEqual(pinned.reads, [WRITING_SELECTION_PATH, pinned.selection.run.path, pinned.selection.skill.path]);
+  assert.deepEqual(pinned.reads, [WRITING_SELECTION_PATH, pinned.selection.run.path, pinned.selection.skill.path, "benchmarks/storytelling-plot-twists/publication.json", "benchmarks/dungeon-master-adventure-outline/publication.json"]);
   assert.equal(built.projection.scoreBasis.sourceSha256, hash(f.runText));
   assert.ok(built.responseBundle.responses.every(response => response.provenance.sourceSha256 === hash(f.runText)));
   assert.deepEqual(pinned.build(), built, "Identical selected bytes project reproducibly.");
@@ -498,6 +593,163 @@ test("lazy serialization escapes HTML and line separators without executing answ
     assert.equal(context.window.compromised, undefined);
   }
   assert.throws(() => serializeWritingModule(payload, "VASIR_WRITING;window.compromised=true"), /invalid public module name/);
+});
+
+function twistsDefinition() {
+  const definition = structuredClone(CORPUS);
+  definition.id = PLOT_TWISTS_BENCHMARK_ID;
+  definition.title = "Plot twists";
+  definition.edition = "storytelling-plot-twists-v1";
+  definition.cases = [{ id: "scifi-outline", title: "Science-fiction outline", task: "Create a brief outline of a scifi story with one or more major plot twists" }];
+  definition.judging = { panel: ["codex:gpt-6-astra@xhigh", "codex:gpt-5.6-sol@xhigh"], synthesizer: null };
+  definition.scoring.dimensions = definition.scoring.dimensions.slice(0, 7).map((dimension, index) => ({ ...dimension, weight: [10, 10, 20, 20, 15, 10, 15][index] }));
+  return definition;
+}
+
+test("Plot twists retains every trial, weighted ratings and a distinct two-model judge panel", async t => {
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10,
+    ratings: ({ treatment }, judgeIndex) => [1, 2, 3, 4, 5, 6, 7].map(value => value + Number(treatment) + judgeIndex) });
+  const { projection, responseBundle } = f.project();
+  assert.equal(projection.benchmarks[0].id, PLOT_TWISTS_BENCHMARK_ID);
+  assert.equal(projection.benchmarks[0].title, "Plot twists");
+  assert.equal(projection.cases.length, 1);
+  assert.equal(projection.trialCount, 10);
+  assert.equal(projection.caseResults.length, 20);
+  assert.equal(projection.trialSummaries.length, 10);
+  assert.equal(projection.coverage.completedSettingCount, 1);
+  assert.equal(projection.coverage.usablePairs, 10);
+  assert.equal(projection.scoreBasis.dimensions.length, 7);
+  assert.deepEqual(projection.scoreBasis.judges, twistsDefinition().judging.panel);
+  assert.equal(projection.settings[0].deltas.skill, 10);
+  assert.equal(new Set(responseBundle.responses.map(response => response.outputText)).size, 20);
+  assert.equal(new Set(responseBundle.responses.map(response => `${response.condition}:${response.trialNumber}`)).size, 20);
+  for (const response of responseBundle.responses) {
+    assert.equal(response.judgments.length, 2);
+    const score = response.judgments.reduce((sum, judgment) => sum + projection.scoreBasis.dimensions.reduce((total, dimension) => total + judgment.dimensions[dimension.id].rating * dimension.weight / 10, 0), 0) / 2;
+    assert.equal(response.score, score);
+  }
+  const changed = structuredClone({ projection, responseBundle });
+  changed.responseBundle.responses[0].trialNumber = 2;
+  assert.throws(() => validateWritingPublication(changed.projection, changed.responseBundle), /Writing publication:/);
+});
+
+test("Plot twists ranks use original quarter-point panel means before display rounding", async t => {
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10,
+    ratings: ({ treatment }, judgeIndex) => Array.from({ length: 7 }, (_, index) => 6 + Number(treatment) + Number(judgeIndex === 1 && index === 4)) });
+  const { projection } = f.project();
+  assert.equal(projection.caseResults[0].exactScore, 60.75);
+  assert.equal(projection.caseResults[0].score, 60.8);
+  assert.equal(projection.benchmarkResults[0].exactScore, 60.75);
+  assert.equal(projection.entries[0].exactScore, 60.75);
+});
+
+test("an incomplete Plot twists panel leaves all ten trials visible and excludes both condition ranks", async t => {
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10, missingJudge: true });
+  const { projection, responseBundle } = f.project();
+  assert.equal(projection.coverage.responseCount, 20);
+  assert.equal(projection.coverage.judgmentCount, 20);
+  assert.equal(projection.coverage.completedSettingCount, 0);
+  assert.ok(responseBundle.responses.every(response => response.outputText && response.judgments.length === 1));
+  assert.ok(projection.entries.every(entry => entry.score === null && entry.rank === null));
+  assert.equal(projection.provisionalLeaderboard, undefined, "Core idea provisional scoring never applies to Plot twists.");
+});
+
+test("required skill reads preserve precise instructions and redact private event identities", async t => {
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10, requiredSkillFiles: ["SKILL.md", "references/idea.md"] });
+  const { projection, responseBundle } = f.project();
+  assert.equal(projection.coverage.completedSettingCount, 1);
+  const response = responseBundle.responses.find(response => response.condition === "skill");
+  assert.equal(response.runtime.requiredSkillReads.status, "complete");
+  assert.ok(response.runtime.requiredSkillReads.files.every(file => file.complete));
+  assert.ok(!JSON.stringify(responseBundle).includes("private-tool-event"));
+  assert.ok(responseBundle.promptFiles.find(file => file.title.startsWith("references/idea.md · ")).title.includes("mandatory verified tool read before scoring"));
+  assert.equal(responseBundle.promptFiles[0].content, createStorytellingSkillInstruction({ skillSnapshot: f.snapshot, skillDirectoryPath: "<frozen-skill-directory>", requiredSkillFiles: ["SKILL.md", "references/idea.md"] }));
+  const changed = structuredClone(f.run);
+  changed.rows.find(row => row.conditionId === "skill:writing-storytelling").runtimeReceipt.requiredSkillReads.files[0].observedChunks = [];
+  assert.throws(() => f.project(changed), /required frozen skill read evidence/);
+});
+
+test("missing required reading retains the returned trial answer as unscored protocol evidence", async t => {
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10, requiredSkillFiles: ["SKILL.md", "references/idea.md"], incompleteRead: true });
+  const { projection, responseBundle } = f.project();
+  assert.equal(projection.coverage.responseCount, 20);
+  assert.equal(projection.coverage.completedSettingCount, 0);
+  const responses = responseBundle.responses.filter(response => response.condition === "skill");
+  assert.equal(responses.length, 10);
+  assert.ok(responses.every(response => response.outputText && response.status === "error" && response.score === null && response.judgments.length === 0 && response.runtime.requiredSkillReads.status === "incomplete"));
+  assert.ok(responses.every(response => /Required frozen skill reading/.test(response.failureReason)));
+});
+
+test("settled terminal exclusions finish execution without shrinking review denominators or ranking partial configurations", async t => {
+  const failedModels = new Set();
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10,
+    models: ["codex:gpt-6-astra@low", "codex:gpt-5.6-sol@low", "codex:gpt-5.6-terra@low", "codex:gpt-5.6-luna@low"],
+    requiredSkillFiles: ["SKILL.md", "references/idea.md"], incompleteRead: ({ configuration }) => {
+      if (!["gpt-6-astra", "gpt-5.6-terra"].includes(configuration.model) || failedModels.has(configuration.model)) return false;
+      failedModels.add(configuration.model);
+      return true;
+    } });
+  assert.equal(f.run.runStatus, "incomplete", "The saved runner status is preserved.");
+  const { projection, responseBundle } = f.project();
+  assert.equal(projection.coverage.responseCount, 80);
+  assert.equal(projection.coverage.validResponseCount, 78);
+  assert.equal(projection.coverage.terminalGenerationFailureCount, 2);
+  assert.equal(projection.coverage.terminallyExcludedPairCount, 2);
+  assert.equal(projection.coverage.terminallyExcludedJudgmentCount, 8);
+  assert.equal(projection.coverage.expectedJudgmentCount, 160);
+  assert.equal(projection.coverage.judgmentCount, 152);
+  assert.equal(projection.coverage.pendingGenerationCount, 0);
+  assert.equal(projection.coverage.pendingJudgmentCount, 0);
+  assert.equal(projection.coverage.executionComplete, true);
+  assert.equal(projection.coverage.executionStatus, "complete-with-exclusions");
+  assert.equal(projection.coverage.completedSettingCount, 2);
+  assert.equal(projection.coverage.settingCount, 4);
+  const excluded = responseBundle.responses.filter(response => response.judgingDisposition === "terminal-excluded");
+  assert.equal(excluded.length, 4);
+  assert.equal(excluded.filter(response => response.generationDisposition === "complete").length, 2);
+  assert.ok(excluded.every(response => response.outputText && response.score === null && response.judgments.length === 0));
+  assert.ok(projection.entries.filter(entry => /astra|terra/.test(entry.configurationId)).every(entry => entry.score === null && entry.rank === null));
+  const changed = structuredClone(projection);
+  changed.coverage.pendingJudgmentCount = 8;
+  assert.throws(() => validateWritingPublication(changed, responseBundle), /execution status/);
+});
+
+test("operational generation failures and missing eligible judges remain unresolved", async t => {
+  const f = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10, missingJudge: true,
+    fail: ({ treatment }) => treatment });
+  const { projection } = f.project();
+  assert.equal(projection.coverage.terminalGenerationFailureCount, 0);
+  assert.equal(projection.coverage.terminallyExcludedJudgmentCount, 0);
+  assert.equal(projection.coverage.pendingGenerationCount, 10);
+  assert.equal(projection.coverage.pendingJudgmentCount, 40);
+  assert.equal(projection.coverage.executionComplete, false);
+  assert.equal(projection.coverage.executionStatus, "in-progress");
+});
+
+test("additive Writing publication keeps Core idea bytes and Plot twists archives independently joined", async t => {
+  const core = await fixture(t, { prepareOnly: true });
+  const twists = await fixture(t, { definitionOverride: twistsDefinition(), trials: 10, prepareOnly: true });
+  const before = core.project();
+  const coreSelection = prepareWritingPublicationSource({ repoRootDirectory: core.root, runDirectory: core.outputDirectory });
+  write(core.root, WRITING_SELECTION_PATH, coreSelection);
+  const directory = path.join(core.root, ".agents/vasir-evals/storytelling-plot-twists/fixture");
+  write(core.root, path.relative(core.root, path.join(directory, "run.json")), twists.runText);
+  write(core.root, path.relative(core.root, path.join(directory, "skill-snapshot.json")), twists.snapshotText);
+  const selection = prepareWritingPublicationSource({ repoRootDirectory: core.root, benchmarkId: PLOT_TWISTS_BENCHMARK_ID, runDirectory: directory });
+  write(core.root, writingSelectionPath(PLOT_TWISTS_BENCHMARK_ID), selection);
+  const built = buildWritingPublication({ repoRootDirectory: core.root });
+  assert.deepEqual(built.projection.benchmarks, before.projection.benchmarks);
+  assert.deepEqual(built.projection.entries, before.projection.entries);
+  assert.equal(built.projection.benchmarkPublications.length, 1, "Do not duplicate the full default archive in the collection.");
+  assert.equal(built.projection.benchmarkPublications[0].benchmarkId, PLOT_TWISTS_BENCHMARK_ID);
+  assert.equal(built.responseBundle.benchmarkResponses[0].responseBundle.responses.length, 20);
+  assert.deepEqual(built.stub.benchmarkIds, [WRITING_BENCHMARK_ID, PLOT_TWISTS_BENCHMARK_ID]);
+  assert.equal(built.stub.collectionCoverage.benchmarkCount, 2);
+  assert.equal(built.stub.collectionCoverage.expectedResponseCount, 24);
+  assert.equal(validateWritingPublication(built.projection, built.responseBundle), built.projection);
+  const changed = structuredClone(built);
+  changed.responseBundle.benchmarkResponses[0].benchmarkId = WRITING_BENCHMARK_ID;
+  assert.throws(() => validateWritingPublication(changed.projection, changed.responseBundle), /Writing publication:/);
 });
 
 test("real corpus and full planned model inventory remain transparently zero-scored without provider calls", async t => {

@@ -304,14 +304,19 @@ test("selected immutable runs deterministically project the exact real developme
   const expectedCounts = workflow ? { ...EXPECTED_COUNTS, families: games ? 3 : 2, tracks: games ? 3 : 2, benchmarks: games ? 5 : 4, categories: 2, resultEntries: 124, responses: 268, developmentResultSets: 4 } : { ...EXPECTED_COUNTS };
   if (writing) {
     const selectedWriting = first.writing;
+    const writingBenchmarks = [selectedWriting, ...(selectedWriting.benchmarkPublications ?? []).map(item => item.projection), ...Object.values(selectedWriting.additionalBenchmarks ?? {})];
     assert.deepEqual(writing.coverage, selectedWriting.coverage);
     assert.equal(first.projection.schemaVersion, 6);
-    for (const field of ["families", "tracks", "benchmarks", "categories", "resultEntries", "developmentResultSets"]) {
+    for (const field of ["families", "categories"]) {
       expectedCounts[field] += selectedWriting.counts[field];
     }
-    expectedCounts.responses += selectedWriting.coverage.responseCount;
+    expectedCounts.tracks += new Set(writingBenchmarks.flatMap(item => item.tracks.map(track => track.id))).size;
+    for (const field of ["benchmarks", "resultEntries", "developmentResultSets"]) {
+      expectedCounts[field] += writingBenchmarks.reduce((sum, item) => sum + item.counts[field], 0);
+    }
+    expectedCounts.responses += writingBenchmarks.reduce((sum, item) => sum + item.coverage.responseCount, 0);
     expectedCounts.settings = new Set([
-      ...first.projection.settings, ...(workflow?.settings ?? []), ...selectedWriting.settings
+      ...first.projection.settings, ...(workflow?.settings ?? []), ...writingBenchmarks.flatMap(item => item.settings)
     ].map(setting => setting.configurationId)).size;
   }
   assert.deepEqual(first.counts, expectedCounts, "Global counts add the selected Writing snapshot without changing family-local evidence");
@@ -321,7 +326,7 @@ test("selected immutable runs deterministically project the exact real developme
     entrypoints: [...expectedRoutes.entrypoints, ...(games ? ["/games.html"] : [])],
     familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(games ? ["/#capabilities/games"] : []), ...(workflow ? ["/#capabilities/ai-workflows"] : []), ...(writing ? ["/#capabilities/writing/storytelling"] : [])],
     viewFragments: [...EXPECTED_ROUTES.viewFragments, ...(games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []), ...(workflow ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []), ...(writing ? ["/#capabilities/writing/storytelling/benchmarks", "/#capabilities/writing/storytelling/efficiency"] : [])],
-    reportFragments: [...expectedRoutes.reportFragments, ...(games ? ["/games.html?benchmark=2d-jumping-demo"] : []), ...(writing ? [`/benchmark-report.html#${writing.benchmarkId}`] : [])]
+    reportFragments: [...expectedRoutes.reportFragments, ...(games ? ["/games.html?benchmark=2d-jumping-demo"] : []), ...(writing ? (writing.benchmarkIds ?? [writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : [])]
   });
   if (games) {
     assert.equal(games.runs.length, 10);

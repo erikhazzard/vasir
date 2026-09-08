@@ -1,0 +1,27 @@
+[
+  {
+    "path": "cli/benchmark-publication-artifact.js",
+    "prior": "7c7d45c6ea0fed97c4eec3468b45352df3f440dc7373077c16655ece73543356",
+    "integrated": "ec8970d658be5b8da0352d98127802531edf1f5d1084a2cd8b3826e6be7468ce"
+  },
+  {
+    "path": "cli/benchmark-publish.js",
+    "prior": "6847159689004f6c685d2365b560dbf43214d8c4084cb7f15363172a80b53633",
+    "integrated": "2143015768f5a2a8be44754736ea55b8c64356a86f630a7b976533df7c21075f"
+  },
+  {
+    "path": "cli/eval/dungeon-master-publication.js",
+    "prior": "e48cbfd6ab2c2ce21214f33a2d6cb758130fda78542079053eb94cc6e37a098b",
+    "integrated": "715a133afe86b01cacbdc16cf812a5f40a3f3a1802031c12bdf805396b562821"
+  },
+  {
+    "path": "test/dungeon-master-publication.test.js",
+    "prior": "1a30e122e04b25a2be24a3a75324ec7d09b52161cf9596d040ea82e13176f7f1",
+    "integrated": "e47dcc4efaca129a676cfd7b947429154d180eca6be717335e7148b05c98364b"
+  },
+  {
+    "path": "test/dungeon-master-artifact-scan.test.js",
+    "prior": null,
+    "integrated": "520edd9355079018e01d275371dd222321d8fce37b8256426e6bf7befae61d65"
+  }
+]

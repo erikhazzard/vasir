@@ -1,0 +1,89 @@
+{
+  "sourceWorkspace": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasir-craft-transfer-20260907-gzwaa5l2/racer",
+  "sourceFiles": {
+    "index.html": "23f81902df7e86c2dca5831a9a88048f728090ca53e8b45b18ef5e1431473faa",
+    "styles.css": "2e90d5cbd16e8cedc7f8cca8019451710c45b3e58821cb8f954d42b03cb95b0e",
+    "GAME_DESIGN.md": "b90d65c02d2d9f5c87ac8c1f16f74bf262ff8c1abef08b0c202ed50a55201de4",
+    "src/audio.mjs": "aaf87cbea4da276bb6a6ecc9060a9d733da0e952c8ead83c5fea52ec9cdf3dfc",
+    "src/world.mjs": "9a498b412347a76f06b3725d869d71e1df071d41db8951d09c91216795fd4784",
+    "src/simulation.mjs": "13933c110fb73ad9d52da1d112915db7eebbbf65de8619dca45a1dd8d9938b7e",
+    "src/main.mjs": "1f4610e0fbfb1150242df6f8cad1c0c74458daae8a39b341defc94067cd84a99",
+    "vendor/three.module.js": "bbf5ed13fe4373f5bd38b14ea8e62e9f157327da5638edc6d3863e08b167c9c7",
+    "vendor/three.core.js": "3718df126d69c125362a03340913204470d8c50238605150e57f808840fb7759"
+  },
+  "retainedFiles": {
+    "browser-checks.json": {
+      "bytes": 13634,
+      "sha256": "e0b1d8aac16d6a2850c72b98e34a9075da58a3d0f9bb2fee2608e562e51546a2"
+    },
+    "final-verification.json": {
+      "bytes": 6055,
+      "sha256": "8b26b310e67193f510d8d6a188294437d4ad95c2cad17b3209adb078ad201624"
+    },
+    "harbour-run-end.png": {
+      "bytes": 112949,
+      "sha256": "cad961f6c04299b183cff74764516d0c702392e25a4319c4a38495dfa456d124"
+    },
+    "harbour-run-gate-2.png": {
+      "bytes": 205402,
+      "sha256": "0682155aa7d64697659a63fa670209698d76ec8cc76c6c092bb4d14c260de409"
+    },
+    "harbour-run-gate-3.png": {
+      "bytes": 199420,
+      "sha256": "7d315f89708e60b90f8af04386b1ac714b852a1425c50724fc9bebdeed980142"
+    },
+    "harbour-run.json": {
+      "bytes": 142951,
+      "sha256": "c6a5b6f60adda5a1a01bbcc3637fed13965ba508dfac722aeda6f4bfadf8c281"
+    },
+    "harbour-run.mp4": {
+      "bytes": 7204578,
+      "sha256": "47afc68bace0a70c618a51a799ec97be6a46ff39acad96ec5d6d54bf3ad8c622"
+    },
+    "initial-run-gate-2.png": {
+      "bytes": 191924,
+      "sha256": "8078be6894d6e30d7bb30152ed0a612357d7d44192e8f53c4a774a090f37e859"
+    },
+    "release-run.json": {
+      "bytes": 147414,
+      "sha256": "90d86de536f84a4b479dcb5044ad89c36f8f54ef76a803ee2a1f210f0863b8bc"
+    },
+    "repaired-light-contact.json": {
+      "bytes": 42603,
+      "sha256": "99e360f85426640440a990d81f4ff4d53436e8775408ff4bfc0c55de7f2d9fd6"
+    },
+    "repaired-light-contact.mp4": {
+      "bytes": 1974987,
+      "sha256": "82c3166587896aeb6e5d95d0e82788186e78abab5fd6990b3fef59bc518205a4"
+    },
+    "repaired-strong-contact-contact.png": {
+      "bytes": 157825,
+      "sha256": "d5cfe75a7604365158f4932a170cd321735d3818cce3a7b4b2aefff0ff1f8741"
+    },
+    "repaired-strong-contact-recovery.png": {
+      "bytes": 165446,
+      "sha256": "a1500580bf9f604e767f3bd0217e9dd9e9729e86dc50198ca16a9193109ef29f"
+    },
+    "repaired-strong-contact.json": {
+      "bytes": 21195,
+      "sha256": "305db6d6bd795468d77c3a2fa50121502cfcf20becb8610969c04f7506d4ef96"
+    },
+    "repaired-strong-contact.mp4": {
+      "bytes": 1149349,
+      "sha256": "e476269e69fa1b8f07271107493ead3d528a64002da56ad95d2c1ecc7793c434"
+    },
+    "simulation-checks.json": {
+      "bytes": 1077,
+      "sha256": "a8f13bf899bcee68266acc7a863aaf1075841195423dd676dade23dd855f6493"
+    },
+    "source-and-checks.zip": {
+      "bytes": 888171,
+      "sha256": "087b3ed4e57aba1b51190286027340a157e3b0a4b0e002ff96c499eee4cb9619"
+    },
+    "source-sha256.txt": {
+      "bytes": 478,
+      "sha256": "590bfe2f95232494a9c4ccf77c7cf78a8799de040d331ec848cf841ab5c66073"
+    }
+  },
+  "omitted": "Raw frame directories, full gallery, redundant captures, copied skill catalog, CLI event log."
+}

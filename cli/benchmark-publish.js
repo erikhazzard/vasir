@@ -1327,6 +1327,17 @@ async function verifyHttpPublication({ artifact, manifest, bucketName, fetchImpl
   });
 }
 
+export function buildStorytellingBrowserProofChecks({ routes, siteRootDirectory, targetUrl, outputDirectory }) {
+  const benchmarkIds = ["storytelling-core-idea", "storytelling-plot-twists", "dungeon-master-adventure-outline"].filter(id => routes.reportFragments.includes(`/benchmark-report.html#${id}`));
+  return benchmarkIds.flatMap(benchmarkId => [[1440, 1000], [390, 844], [820, 1000]].map(([width, height]) => ({
+    benchmarkId, width, height,
+    args: [path.join(siteRootDirectory, "writing-browsercheck.mjs"), "--url", `${targetUrl}/`,
+      "--benchmark", benchmarkId, "--output-dir", path.join(outputDirectory, `live-writing-${benchmarkId}-${width}`),
+      "--width", String(width), "--height", String(height),
+      ...(benchmarkId !== "storytelling-core-idea" ? ["--require-scored"] : [])]
+  })));
+}
+
 function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, environmentVariables }) {
   const capturePath = path.join(artifact.siteRootDirectory, "capture.mjs");
   const checks = [
@@ -1395,16 +1406,10 @@ function runBrowserProof({ artifact, chromeBinary, spawnSyncImplementation, envi
       if (result?.error || result?.status !== 0) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: `Games browser proof failed: ${String(result?.stderr || result?.stdout || result?.error?.message || "no proof").slice(-2000)}`, suggestion: "Inspect the playable and playback routes before retrying the unchanged release.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification", rollback: { status: "pending", releaseId: null } });
     }
   }
-  if (artifact.routes.familyFragments.includes("/#capabilities/writing/storytelling")) {
-    for (const [width, height] of [[1440, 1000], [390, 844]]) {
-      const result = spawnSyncImplementation(process.execPath, [
-        path.join(artifact.siteRootDirectory, "writing-browsercheck.mjs"),
-        "--url", `${artifact.config.target.url}/`,
-        "--output-dir", path.join(artifact.temporaryDirectory, `live-writing-${width}`),
-        "--width", String(width), "--height", String(height)
-      ], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 180_000, maxBuffer: DEFAULT_COMMAND_BUFFER_BYTES, env: { ...environmentVariables, CHROME_BIN: chromeBinary } });
-      if (result?.error || result?.status !== 0) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: `Writing browser proof failed: ${String(result?.stderr || result?.stdout || result?.error?.message || "no proof").slice(-2000)}`, suggestion: "Inspect the Writing explorer, story cases and blind response evidence before retrying the unchanged release.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification", rollback: { status: "pending", releaseId: null } });
-    }
+  for (const check of buildStorytellingBrowserProofChecks({ routes: artifact.routes, siteRootDirectory: artifact.siteRootDirectory, targetUrl: artifact.config.target.url, outputDirectory: artifact.temporaryDirectory })) {
+    const result = spawnSyncImplementation(process.execPath, check.args,
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 180_000, maxBuffer: DEFAULT_COMMAND_BUFFER_BYTES, env: { ...environmentVariables, CHROME_BIN: chromeBinary } });
+    if (result?.error || result?.status !== 0) throw publishError({ code: "BENCHMARK_PUBLISH_VERIFICATION_FAILED", message: `Writing browser proof failed for ${check.benchmarkId} at ${check.width}×${check.height}: ${String(result?.stderr || result?.stdout || result?.error?.message || "no proof").slice(-2000)}`, suggestion: "Inspect the selected Writing benchmark, trial coverage and original response evidence before retrying the unchanged release.", config: artifact.config, releaseId: artifact.releaseId, stage: "verification", rollback: { status: "pending", releaseId: null } });
   }
   return {
     verifiedReportRoutes: artifact.routes.reportFragments.length,

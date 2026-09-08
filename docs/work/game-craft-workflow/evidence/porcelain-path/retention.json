@@ -1,0 +1,77 @@
+{
+  "sourceWorkspace": "/var/folders/25/snsb8p8n1psg9ljhjxfl_9p80000gn/T/vasir-craft-transfer-20260907-gzwaa5l2/ceramic",
+  "sourceFiles": {
+    "index.html": "43f26498869c09924b23b065b25eac7e96a0aa43fff271fc08f78d00cdb26666",
+    "style.css": "a9bc3d2a009073d698822a7390502eb8889ac6f78bcbca21f327616518c0dde5",
+    "game.js": "7ee148aa9793468e05360191a2d09880475ba7f1a09e5079aeb0e84e69b62f1d",
+    "puzzle.js": "9e45c3d97c2ee03acd0290e50adb6035ddf0476183f2d2a29dfb166d61760d81",
+    "assets/mark.svg": "b3c762fa51e7e6c2a50bb42213c7bddce5faa49cab6171f65d6b2d799e090334"
+  },
+  "retainedFiles": {
+    "browser-environment.json": {
+      "bytes": 213,
+      "sha256": "ef440cd73740306429a8e5e73c1996c370c923b931ce1e8023a2f1de57fe65e0"
+    },
+    "browser-errors.json": {
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "browser-proof.json": {
+      "bytes": 97551,
+      "sha256": "fd1278a74859b03678d0c2517fcc0621e79fb9111b8bec788980c7dad1f3a32a"
+    },
+    "build-identity.json": {
+      "bytes": 624,
+      "sha256": "7d69bfe3265647e97d5421c845cf9f38bc7c9e06ef926d02d6aa135a3fdef40b"
+    },
+    "final-820x680.png": {
+      "bytes": 434530,
+      "sha256": "f1d1e39a2d4016b43bc8c1966db6d21178fec697d5b4821a842a20dbbdf1ab2a"
+    },
+    "initial-first-turn.png": {
+      "bytes": 817144,
+      "sha256": "cfbeba8041116a7cfa295133f23536adc604959f4d66d3c3dbdf36cb974aadaf"
+    },
+    "initial-small-landscape-820x680.png": {
+      "bytes": 385281,
+      "sha256": "d990d0c3ea0c655daf01f39ba4f99ee20ffe23baac4a2784403e923f58b30f6d"
+    },
+    "ordinary-turn-sequence.png": {
+      "bytes": 110879,
+      "sha256": "7b8f60cc6203bae639cbb472f8afe8f12fc569a4ab23059a4ba8c81ba93c32a3"
+    },
+    "played-mouse-route-timing.json": {
+      "bytes": 53719,
+      "sha256": "be2a8592bd50e23ce1fc0b922cf34fd47133302fbdc99c563f8087be718228b3"
+    },
+    "played-mouse-route.mp4": {
+      "bytes": 518273,
+      "sha256": "742a89fbd559b30208a0a5b38d3a043043ed7549cd8578ec5cba885dd78bf370"
+    },
+    "repaired-comparison-first-turn.png": {
+      "bytes": 838923,
+      "sha256": "2aaa981ad3b206141580a2243bde107c1faa546d0def742bac4a3faf92578d00"
+    },
+    "responsive-proof.json": {
+      "bytes": 6699,
+      "sha256": "699c3dae587bc3fd6fdd7d143ca985f07f378d3baabcd839f20652463a7b7c25"
+    },
+    "rules-proof.json": {
+      "bytes": 1149,
+      "sha256": "5741f4c0c3cdae80ae612eb7ac881fae970c9368b7ee251f8fa25bc307a58dda"
+    },
+    "session-cleanup.json": {
+      "bytes": 299,
+      "sha256": "bea2acb109d82428b0cdfff66ec1d5d3dfad1b7bb96ae5c6b61d11736cec48e9"
+    },
+    "solved-desktop.png": {
+      "bytes": 753662,
+      "sha256": "dde5714c62349f86929c486588dd66934fb2def224ddcda265141027dd32e287"
+    },
+    "source-and-checks.zip": {
+      "bytes": 32683,
+      "sha256": "f0bb4535b440a6de56112e85a9df49d857a4b4f2d121c95cb368bbaa2b97eb5e"
+    }
+  },
+  "omitted": "Full scratch evidence gallery, redundant viewport images, copied skill catalog, CLI event log."
+}

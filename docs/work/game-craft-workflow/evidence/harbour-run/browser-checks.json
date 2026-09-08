@@ -1,0 +1,606 @@
+[
+  {
+    "name": "Ready clock stays at zero; intro clears",
+    "passed": true
+  },
+  {
+    "name": "Arrow keys: acceleration, steering load, coast, Space braking",
+    "passed": true,
+    "acceleration": {
+      "phase": "running",
+      "x": 0,
+      "z": 4.425584284274499,
+      "yaw": 0,
+      "speed": 2.887301683470172,
+      "steer": 0,
+      "time": 0.37500000000000033,
+      "nextGate": 0,
+      "hits": 0,
+      "missed": false,
+      "slip": 0,
+      "accel": 6.845775521259689,
+      "load": 0,
+      "bodyPitch": 0.070232326143821,
+      "bodyRoll": 0,
+      "bump": 0,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      },
+      "camera": [
+        0,
+        10.548378503883344,
+        19.396907489225775
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        }
+      ],
+      "render": {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 138,
+        "textures": 20
+      }
+    },
+    "loaded": {
+      "phase": "running",
+      "x": -0.016919954397582374,
+      "z": -0.6711992686346643,
+      "yaw": -0.08433331461427754,
+      "speed": 7.587395469143218,
+      "steer": -1,
+      "time": 1.2999999999999978,
+      "nextGate": 0,
+      "hits": 0,
+      "missed": false,
+      "slip": 0.34406154743561784,
+      "accel": 3.6644438903185517,
+      "load": -6.952835847011149,
+      "bodyPitch": 0.03591432595406375,
+      "bodyRoll": -0.019528196993925707,
+      "bump": 0,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": -1
+      },
+      "camera": [
+        0.034502575459273266,
+        10.676361725827299,
+        15.48289774923575
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        }
+      ],
+      "render": {
+        "calls": 243,
+        "triangles": 83092,
+        "geometries": 138,
+        "textures": 20
+      }
+    },
+    "coasting": {
+      "phase": "running",
+      "x": -0.4928784369733952,
+      "z": -3.2203390905029865,
+      "yaw": -0.34800901157991815,
+      "speed": 7.074351930452908,
+      "steer": 0,
+      "time": 1.6499999999999966,
+      "nextGate": 0,
+      "hits": 0,
+      "missed": false,
+      "slip": 0.2423966772917452,
+      "accel": -1.7697159936130902,
+      "load": -1.3018951093379028,
+      "bodyPitch": -0.01574087394415625,
+      "bodyRoll": -0.04997678805671696,
+      "bump": 0,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      },
+      "camera": [
+        0.5795499013362045,
+        10.681456980452356,
+        12.929029713187193
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        }
+      ],
+      "render": {
+        "calls": 244,
+        "triangles": 83280,
+        "geometries": 138,
+        "textures": 20
+      }
+    },
+    "braking": {
+      "phase": "running",
+      "x": -0.7858071866460126,
+      "z": -4.066147357565496,
+      "yaw": -0.3633060465783261,
+      "speed": 3.851063476266805,
+      "steer": 0,
+      "time": 1.8166666666666627,
+      "nextGate": 0,
+      "hits": 0,
+      "missed": false,
+      "slip": 0.05659245359483078,
+      "accel": -18,
+      "load": -0.15813510407023781,
+      "bodyPitch": -0.08952397296505761,
+      "bodyRoll": -0.010079390735897002,
+      "bump": 0,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": true,
+        "steer": 0
+      },
+      "camera": [
+        0.7765300818334057,
+        10.642348174158482,
+        11.678544250608933
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        }
+      ],
+      "render": {
+        "calls": 244,
+        "triangles": 83256,
+        "geometries": 138,
+        "textures": 20
+      }
+    },
+    "stopped": {
+      "phase": "running",
+      "x": -0.9179203346179128,
+      "z": -4.4256458344895195,
+      "yaw": -0.3676915458780908,
+      "speed": -6.968898801348796e-12,
+      "steer": 0,
+      "time": 2.5166666666666604,
+      "nextGate": 0,
+      "hits": 0,
+      "missed": false,
+      "slip": 0.000011090548576609259,
+      "accel": 1.0015554090426907e-9,
+      "load": 5.254804142960915e-16,
+      "bodyPitch": 0.006014963403926367,
+      "bodyRoll": -0.00038464487572406885,
+      "bump": 0,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": true,
+        "steer": 0
+      },
+      "camera": [
+        1.1376156861660822,
+        10.501871759782071,
+        9.94549979056618
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        }
+      ],
+      "render": {
+        "calls": 246,
+        "triangles": 83586,
+        "geometries": 138,
+        "textures": 20
+      }
+    }
+  },
+  {
+    "name": "Escape / P pause and resume; clock and position freeze; held input cleared",
+    "passed": true
+  },
+  {
+    "name": "Focus loss pauses and clears throttle",
+    "passed": true,
+    "method": "Synthetic blur dispatch because headless tab focus did not blur"
+  },
+  {
+    "name": "Missing a gate blocks progress; reverse returns behind it",
+    "passed": true,
+    "missed": {
+      "phase": "running",
+      "x": 1.501331677390482,
+      "z": -23.338154777194813,
+      "yaw": 0.047088600444767,
+      "speed": 8.377853885046134,
+      "steer": 0,
+      "time": 3.8083333333333225,
+      "nextGate": 0,
+      "hits": 1,
+      "missed": true,
+      "slip": 0.010551455453964631,
+      "accel": 3.1004969581012887,
+      "load": 0.006783001202300237,
+      "bodyPitch": 0.03130598130562656,
+      "bodyRoll": 0.00040643752965467927,
+      "bump": -0.00046299543460815367,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      },
+      "camera": [
+        1.1886273987428726,
+        10.69900549620738,
+        -6.9900844581570265
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        },
+        {
+          "type": "pause",
+          "time": 2.5166666666666604
+        },
+        {
+          "type": "resume",
+          "time": 2.5166666666666604
+        },
+        {
+          "type": "pause",
+          "time": 2.61666666666666
+        },
+        {
+          "type": "resume",
+          "time": 2.61666666666666
+        },
+        {
+          "type": "restart",
+          "at": 3.0197666666666625
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        },
+        {
+          "type": "pause",
+          "time": 0.6416666666666668
+        },
+        {
+          "type": "restart",
+          "at": 3.66536666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        },
+        {
+          "type": "contact",
+          "force": 7.411596268586011,
+          "nx": 0.753018252114936,
+          "nz": 0.6579996291653716,
+          "x": -0.647595696818845,
+          "z": -19.81658989608646,
+          "time": 3.1083,
+          "speed": 5.362,
+          "carX": 0.047595696818845096,
+          "carZ": -18.41912031891778
+        }
+      ],
+      "render": {
+        "calls": 256,
+        "triangles": 84961,
+        "geometries": 140,
+        "textures": 20
+      }
+    },
+    "reversed": {
+      "phase": "running",
+      "x": 1.085455679637752,
+      "z": -14.514829808482279,
+      "yaw": 0.047175228542296624,
+      "speed": 0,
+      "steer": 0,
+      "time": 8.425000000000162,
+      "nextGate": 0,
+      "hits": 1,
+      "missed": false,
+      "slip": 4.539317125547282e-19,
+      "accel": -3.6111186457260672e-34,
+      "load": 0,
+      "bodyPitch": 0.020478347550498845,
+      "bodyRoll": -5.219723473499513e-15,
+      "bump": 3.187095776667136e-16,
+      "gateTimes": [],
+      "best": null,
+      "target": {
+        "x": -5,
+        "z": -20,
+        "half": 4.2
+      },
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": true,
+        "steer": 0
+      },
+      "camera": [
+        0.8146400767388277,
+        10.50000000000003,
+        -0.07639178400368371
+      ],
+      "events": [
+        {
+          "type": "restart",
+          "at": 0.07666666666666666
+        },
+        {
+          "type": "restart",
+          "at": 0.1699666666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        },
+        {
+          "type": "pause",
+          "time": 2.5166666666666604
+        },
+        {
+          "type": "resume",
+          "time": 2.5166666666666604
+        },
+        {
+          "type": "pause",
+          "time": 2.61666666666666
+        },
+        {
+          "type": "resume",
+          "time": 2.61666666666666
+        },
+        {
+          "type": "restart",
+          "at": 3.0197666666666625
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        },
+        {
+          "type": "pause",
+          "time": 0.6416666666666668
+        },
+        {
+          "type": "restart",
+          "at": 3.66536666666666
+        },
+        {
+          "type": "start",
+          "time": 0.0083,
+          "speed": 0.072,
+          "carX": 0,
+          "carZ": 4.999402777777778
+        },
+        {
+          "type": "contact",
+          "force": 7.411596268586011,
+          "nx": 0.753018252114936,
+          "nz": 0.6579996291653716,
+          "x": -0.647595696818845,
+          "z": -19.81658989608646,
+          "time": 3.1083,
+          "speed": 5.362,
+          "carX": 0.047595696818845096,
+          "carZ": -18.41912031891778
+        }
+      ],
+      "render": {
+        "calls": 247,
+        "triangles": 83786,
+        "geometries": 140,
+        "textures": 20
+      }
+    }
+  },
+  {
+    "name": "Restart resets the run and repeated restarts keep GPU resource counts flat",
+    "passed": true,
+    "resources": [
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      },
+      {
+        "calls": 241,
+        "triangles": 83012,
+        "geometries": 140,
+        "textures": 20
+      }
+    ]
+  },
+  {
+    "name": "Landscape 1280 × 720: no scroll; pause controls fit",
+    "passed": true
+  },
+  {
+    "name": "Landscape 1024 × 576: no scroll; pause controls fit",
+    "passed": true
+  }
+]

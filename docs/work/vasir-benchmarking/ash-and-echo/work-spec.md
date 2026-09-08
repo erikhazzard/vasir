@@ -174,7 +174,7 @@ UI direction: a spare cinematic title over a living scene, ivory editorial serif
 
 ## Current motion
 
-Revision 23 is complete and creator-accepted as a good stopping point, available at http://127.0.0.1:8317/?v=23. The [revision 23 packet](evidence/revision-23/README.md) preserves the exact implementation, motion comparisons and proof. The recommended next action is to extract the repeated critique/repair decisions into the existing Vasir game workflow, then test transfer on a fresh brief without this conversation. No new gameplay pass or skill implementation has begun; the accepted build remains the reference.
+Revision 23 is complete and creator-accepted as a good stopping point, available at http://127.0.0.1:8317/?v=23. The [revision 23 packet](evidence/revision-23/README.md) preserves the exact implementation, motion comparisons and proof. The creator subsequently approved transferring the process and explicitly required applicability to any game. The completed [game craft workflow](../../game-craft-workflow/work-spec.md) now carries those lessons through five existing skills, with two fresh non-platformer builds and eight static routing probes. The accepted build remains unchanged as its development reference.
 
 ## Archived implementation notes: revisions 8–16
 

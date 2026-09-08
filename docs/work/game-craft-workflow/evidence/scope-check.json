@@ -1,0 +1,51 @@
+{
+  "manifestFootprint": [
+    {
+      "skill": "game__orchestrating-playable-build",
+      "manifestWordsBefore": 1969,
+      "manifestWordsAfter": 1300
+    },
+    {
+      "skill": "game__art-directing",
+      "manifestWordsBefore": 8020,
+      "manifestWordsAfter": 7654
+    },
+    {
+      "skill": "game__adding-juice",
+      "manifestWordsBefore": 2565,
+      "manifestWordsAfter": 1317
+    },
+    {
+      "skill": "game__directing",
+      "manifestWordsBefore": 4251,
+      "manifestWordsAfter": 1711
+    },
+    {
+      "skill": "game__genre-routing",
+      "manifestWordsBefore": 367,
+      "manifestWordsAfter": 611
+    }
+  ],
+  "unchangedReferenceRuntimeFiles": 18,
+  "catalogSkills": 73,
+  "unchangedReferenceRuntimeNames": [
+    "ash-flow.js",
+    "ash-material.js",
+    "atmosphere.js",
+    "audio.js",
+    "cast-shadows.js",
+    "character.js",
+    "cloud-texture.js",
+    "depth.js",
+    "fog-volume.js",
+    "foreground.js",
+    "game.js",
+    "index.html",
+    "lighting.js",
+    "main.js",
+    "renderer.js",
+    "style.css",
+    "surface-ash.js",
+    "wildlife.js"
+  ]
+}

@@ -2450,9 +2450,10 @@ export function serializeBenchmarkPublicationResponses(responseBundle, projectio
 
 export function buildBenchmarkPublicationRoutes(projection) {
   validateBenchmarkPublicationProjection(projection);
+  const writingSections = projection.writing ? ["storytelling", ...new Set(Object.values(projection.writing.additionalBenchmarks ?? {}).map(benchmark => benchmark.subcategory))] : [];
   return {
     entrypoints: ["/", "/index.html", "/benchmark-report.html", ...(projection.games ? ["/games.html"] : [])],
-    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.games ? ["/#capabilities/games"] : []), ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : []), ...(projection.writing ? ["/#capabilities/writing/storytelling"] : [])],
+    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.games ? ["/#capabilities/games"] : []), ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : []), ...writingSections.map(section => `/#capabilities/writing/${section}`)],
     viewFragments: [
       "/#capabilities/overall/benchmarks",
       "/#capabilities/overall/efficiency",
@@ -2460,7 +2461,7 @@ export function buildBenchmarkPublicationRoutes(projection) {
       "/#capabilities/engineering/efficiency",
       ...(projection.games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []),
       ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []),
-      ...(projection.writing ? ["/#capabilities/writing/storytelling/benchmarks", "/#capabilities/writing/storytelling/efficiency"] : [])
+      ...writingSections.flatMap(section => [`/#capabilities/writing/${section}/benchmarks`, `/#capabilities/writing/${section}/efficiency`])
     ],
     reportFragments: [
       ...Array.from(
@@ -2468,7 +2469,7 @@ export function buildBenchmarkPublicationRoutes(projection) {
         (benchmark) => `/benchmark-report.html#${benchmark.reportFragment}`
       ),
       ...(projection.games ? (projection.games.benchmarks ?? [projection.games]).map(report => `/games.html?benchmark=${encodeURIComponent(report.benchmark.id)}`) : []),
-      ...(projection.writing ? [`/benchmark-report.html#${projection.writing.benchmarkId}`] : [])
+      ...(projection.writing ? (projection.writing.benchmarkIds ?? [projection.writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : [])
     ]
   };
 }
@@ -2564,24 +2565,24 @@ export function buildBenchmarkPublicationProjection({
     counts: workflows ? {
       ...projection.counts,
       families: projection.counts.families + workflows.projection.counts.families + (games ? 1 : 0) + (writing ? 1 : 0),
-      tracks: projection.counts.tracks + workflows.projection.counts.tracks + (games ? 1 : 0) + (writing ? 1 : 0),
-      benchmarks: projection.counts.benchmarks + workflows.projection.counts.benchmarks + (games ? 1 : 0) + (writing ? 1 : 0),
+      tracks: projection.counts.tracks + workflows.projection.counts.tracks + (games ? 1 : 0) + (writing?.counts?.tracks ?? (writing ? 1 : 0)),
+      benchmarks: projection.counts.benchmarks + workflows.projection.counts.benchmarks + (games ? 1 : 0) + (writing?.counts?.benchmarks ?? writing?.stub.collectionCoverage?.benchmarkCount ?? (writing ? 1 : 0)),
       categories: projection.counts.categories + workflows.projection.counts.categories + (writing ? 1 : 0),
-      settings: new Set([...projection.settings, ...workflows.projection.settings, ...(writing?.projection.settings ?? [])].map(setting => setting.configurationId)).size,
-      resultEntries: projection.counts.resultEntries + workflows.projection.counts.resultEntries + (writing?.projection.counts.resultEntries ?? 0),
-      responses: projection.counts.responses + workflows.projection.counts.responses + (writing?.projection.counts.responses ?? 0),
-      developmentResultSets: projection.counts.developmentResultSets + workflows.projection.counts.developmentResultSets + (writing ? 1 : 0)
+      settings: new Set([...projection.settings, ...workflows.projection.settings, ...(writing?.settings ?? writing?.projection.settings ?? [])].map(setting => setting.configurationId)).size,
+      resultEntries: projection.counts.resultEntries + workflows.projection.counts.resultEntries + (writing?.counts?.resultEntries ?? writing?.projection.counts.resultEntries ?? 0),
+      responses: projection.counts.responses + workflows.projection.counts.responses + (writing?.counts?.responses ?? writing?.projection.counts.responses ?? 0),
+      developmentResultSets: projection.counts.developmentResultSets + workflows.projection.counts.developmentResultSets + (writing?.counts?.developmentResultSets ?? (writing ? 1 : 0))
     } : {
       ...projection.counts,
       ...(writing ? {
         families: projection.counts.families + 1,
-        tracks: projection.counts.tracks + 1,
-        benchmarks: projection.counts.benchmarks + 1,
+        tracks: projection.counts.tracks + (writing.counts?.tracks ?? 1),
+        benchmarks: projection.counts.benchmarks + (writing.counts?.benchmarks ?? writing.stub.collectionCoverage?.benchmarkCount ?? 1),
         categories: projection.counts.categories + 1,
-        settings: new Set([...projection.settings, ...writing.projection.settings].map(setting => setting.configurationId)).size,
-        resultEntries: projection.counts.resultEntries + writing.projection.counts.resultEntries,
-        responses: projection.counts.responses + writing.projection.counts.responses,
-        developmentResultSets: projection.counts.developmentResultSets + 1
+        settings: new Set([...projection.settings, ...(writing.settings ?? writing.projection.settings)].map(setting => setting.configurationId)).size,
+        resultEntries: projection.counts.resultEntries + (writing.counts?.resultEntries ?? writing.projection.counts.resultEntries),
+        responses: projection.counts.responses + (writing.counts?.responses ?? writing.projection.counts.responses),
+        developmentResultSets: projection.counts.developmentResultSets + (writing.counts?.developmentResultSets ?? 1)
       } : {})
     }
   };

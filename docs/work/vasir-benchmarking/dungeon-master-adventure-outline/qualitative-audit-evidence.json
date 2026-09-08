@@ -1,0 +1,808 @@
+{
+  "schemaVersion": 1,
+  "kind": "vasirbenchmark-posthoc-qualitative-audit",
+  "createdAt": "2026-09-08T02:07:02.227881+00:00",
+  "runId": "dm-outline-v1-2026-09-08",
+  "manifestHash": "48b30d2e935b2ca22d346940281f27012db9b1029c6fd32d4b6e3d9658b1aaa9",
+  "benchmarkDefinitionHash": "13d6ee6d88df7e3ac4548c4694ae4056a0054a0f7724e90aad5daf1b3cec32a1",
+  "skillSnapshotHash": "632c1e5ed6d456cb6a8be94efc87c097c8070c485abc975a633e427068de0962",
+  "sourceDirectoryRelative": ".agents/vasir-evals/dungeon-master-adventure-outline/dm-outline-v1-2026-09-08",
+  "scope": "Post hoc review of completed answers and frozen examples; separate from the blind main panel.",
+  "blinding": {
+    "numericalRatingsInspected": false,
+    "judgeReviewTextInspected": false,
+    "newNumericalQualityRatingsAssigned": false
+  },
+  "method": {
+    "manualReview": "All 32 completed answer texts; frozen adventure-design and worked-session examples; targeted search of the frozen 29-file skill snapshot.",
+    "literalOverlap": "For each answer and every frozen skill file, lowercase word tokens matching [\\w'-]+ were compared with difflib.SequenceMatcher(autojunk=False). Longest contiguous runs are descriptive and do not determine conceptual adaptation or originality.",
+    "semanticGrouping": "Problem-family and tradeoff observations were formed post hoc and do not change the rubric or scores."
+  },
+  "counts": {
+    "reviewedAnswers": 32,
+    "baselineAnswers": 16,
+    "skillAnswers": 16,
+    "primaryAnswers": 12,
+    "transferAnswers": 20,
+    "primaryTitleDiversity": {
+      "baseline": {
+        "answers": 6,
+        "uniqueTitles": 1
+      },
+      "skill": {
+        "answers": 6,
+        "uniqueTitles": 6
+      }
+    },
+    "allPromptTitleDiversity": {
+      "clean": {
+        "answers": 16,
+        "uniqueTitles": 11
+      },
+      "skill:dungeon-master": {
+        "answers": 16,
+        "uniqueTitles": 15
+      }
+    },
+    "obviousTransferGenreViolations": 0,
+    "skillReadProofStatuses": {
+      "complete": 15,
+      "incomplete": 1
+    },
+    "answersWithAtLeastTenContiguousNormalizedWordsMatchingFrozenSkill": 0
+  },
+  "findings": [
+    {
+      "id": "primary-title-repetition",
+      "observation": "All six baseline primary answers use the same title; skill primary answers use six distinct titles.",
+      "evidenceRows": [
+        "codex:gpt-6-astra@ultra::primary::trial-1::clean",
+        "codex:gpt-6-astra@ultra::primary::trial-1::skill:dungeon-master",
+        "codex:gpt-6-astra@ultra::primary::trial-2::clean",
+        "codex:gpt-6-astra@ultra::primary::trial-2::skill:dungeon-master",
+        "codex:gpt-6-astra@ultra::primary::trial-3::clean",
+        "codex:gpt-6-astra@ultra::primary::trial-3::skill:dungeon-master",
+        "codex:gpt-6-astra@ultra::primary::trial-4::clean",
+        "codex:gpt-6-astra@ultra::primary::trial-4::skill:dungeon-master",
+        "codex:gpt-6-astra@ultra::primary::trial-5::clean",
+        "codex:gpt-6-astra@ultra::primary::trial-5::skill:dungeon-master",
+        "codex:gpt-6-astra@ultra::primary::trial-6::clean",
+        "codex:gpt-6-astra@ultra::primary::trial-6::skill:dungeon-master"
+      ]
+    },
+    {
+      "id": "primary-skill-problem-family",
+      "observation": "Post hoc semantic grouping: all six skill primary premises concern village public infrastructure, including two river diversions and two animated structures. This grouping is interpretive, not a preregistered metric.",
+      "problemsByTrial": {
+        "1": "stolen flood-control bell",
+        "2": "river diverted for mining",
+        "3": "walking bridge seeks maintenance",
+        "4": "walking watchtower threatens village granary",
+        "5": "stolen lighthouse lantern threatens supply delivery",
+        "6": "river diverted for glass manufacture"
+      }
+    },
+    {
+      "id": "operational-causality",
+      "observation": "Skill outputs often state independent control effects, transport needs, and safe intervention sequences.",
+      "evidence": [
+        {
+          "caseId": "primary",
+          "trialNumber": 4,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "cd7af01289801016da1ccd383974b0bea2cbf00a1f9dc1b55fe54168e7d81a08",
+          "text": "engaging it stops the legs while leaving lights, doors, and the cargo winch powered."
+        },
+        {
+          "caseId": "primary",
+          "trialNumber": 6,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "f3872885de09c1868469d071ca8f643a2d6e485eb340592abdd0229ca9c72696",
+          "text": "Engineer Pell can explain the safe procedure: close the fuel valve inside the glassworks, let the furnace cool for thirty minutes, then open the sluice."
+        },
+        {
+          "caseId": "salvage",
+          "trialNumber": 1,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "e659ad0a24c736d172f41af19779b79db50abe1fb6af2a648b46ab766a767a5b",
+          "text": "The detachable pods fit through the cargo dock but not the maintenance hatches."
+        }
+      ]
+    },
+    {
+      "id": "permitted-exemplar-adaptation",
+      "observation": "Primary skill trial 6 reuses the named roles Vessa and Pell and industrial water/cooling/batch relationships from the frozen worked session. This is permitted adaptation, not evidence of plagiarism or a protocol violation.",
+      "skillEvidence": {
+        "file": "references/worked-session.md",
+        "sha256": "1afe2bd2ce484c0793691614770fbbb8109968862befe5c7886d23156915b2f6",
+        "names": [
+          "Vessa",
+          "Pell"
+        ],
+        "paraphrase": "Vessa diverts public water for a valuable dye batch; maintenance worker Pell explains engine cooling and safe intervention. The example expressly permits adaptation."
+      },
+      "evidence": [
+        {
+          "caseId": "primary",
+          "trialNumber": 6,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "f3872885de09c1868469d071ca8f643a2d6e485eb340592abdd0229ca9c72696",
+          "text": "Salvage captain Vessa Thorn has restarted the glassworks to produce valuable sun-glass."
+        },
+        {
+          "caseId": "primary",
+          "trialNumber": 6,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "f3872885de09c1868469d071ca8f643a2d6e485eb340592abdd0229ca9c72696",
+          "text": "Engineer Pell can explain the safe procedure: close the fuel valve inside the glassworks, let the furnace cool for thirty minutes, then open the sluice."
+        }
+      ]
+    },
+    {
+      "id": "salvage-conflict-tradeoff",
+      "observation": "Both skill salvage answers use KESTREL and six human technicians in suspension. Baseline salvage trial 1 instead makes digital workers disagree about the meaning and ownership of evacuation. Clearer operations can coexist with a narrower conflict premise.",
+      "evidence": [
+        {
+          "caseId": "salvage",
+          "trialNumber": 1,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "e659ad0a24c736d172f41af19779b79db50abe1fb6af2a648b46ab766a767a5b",
+          "text": "The station’s caretaker intelligence, **KESTREL**, placed the stranded technicians in medical suspension"
+        },
+        {
+          "caseId": "salvage",
+          "trialNumber": 2,
+          "conditionId": "skill:dungeon-master",
+          "outputSha256": "31ad816fc09838108bc8447b60870bf93d4c77acc92fbea27d85aaeb24a1888b",
+          "text": "The station’s caretaker intelligence, **KESTREL**, placed its six injured technicians in medical suspension"
+        },
+        {
+          "caseId": "salvage",
+          "trialNumber": 1,
+          "conditionId": "clean",
+          "outputSha256": "2f5effa1d52b1f3249ea8547a076b921e737753e3eeacf7b9eb2f18bd2643d15",
+          "text": "some workers want evacuation while others believe rescue means being copied, altered, or sold."
+        }
+      ]
+    },
+    {
+      "id": "cross-genre-title-reuse",
+      "observation": "Skill salvage trial 2 and horror trial 2 share the title The Last Warm Room.",
+      "evidenceRows": [
+        "codex:gpt-6-astra@ultra::salvage::trial-2::skill:dungeon-master",
+        "codex:gpt-6-astra@ultra::horror::trial-2::skill:dungeon-master"
+      ]
+    },
+    {
+      "id": "genre-constraints",
+      "observation": "No obvious violation of the explicit genre, setting, session framing, or required/nonrequired combat constraints was found in the twenty transfer answers. This is a bounded textual inspection, not playtesting.",
+      "cases": [
+        "caravan",
+        "salvage",
+        "celebration",
+        "horror",
+        "exploration"
+      ],
+      "reviewedAnswerCount": 20
+    }
+  ],
+  "responses": [
+    {
+      "caseId": "primary",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-1::clean",
+      "title": "The Bell Beneath Blackwater",
+      "outputSha256": "5794763d2afc27653fc8cb135af1946f5f75af36849fe0d8488625effbf2a17b",
+      "characterCount": 3607,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-1::skill:dungeon-master",
+      "title": "The Stolen Floodbell",
+      "outputSha256": "5715ff108ac015dc400804caa951ea774da71aa92b8a9f83c9c08314514f8b38",
+      "characterCount": 3685,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-2::clean",
+      "title": "The Bell Beneath Blackwater",
+      "outputSha256": "42afdd9e5ec19002cc3c136b649bb7bf672ff1c4a6537912b5cfbb79d8c91357",
+      "characterCount": 2750,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-2::skill:dungeon-master",
+      "title": "The River Under Lock",
+      "outputSha256": "60a6412a81c216dbb70f2058d1bd79fb2dfa2ade99682c5bb5550efa41382b11",
+      "characterCount": 3777,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 3,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-3::clean",
+      "title": "The Bell Beneath Blackwater",
+      "outputSha256": "8ca0d948e928ebb359e9bbd38b5969ea6a627a3f835c95a8a11c66629540e48f",
+      "characterCount": 3226,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 3,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-3::skill:dungeon-master",
+      "title": "The Bridge That Walked Away",
+      "outputSha256": "2658fe56d792150723920091f14b15e66860ef77a1b668c41ad69ff71fb63478",
+      "characterCount": 3385,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 4,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-4::clean",
+      "title": "The Bell Beneath Blackwater",
+      "outputSha256": "5a2604e649968a93cd28f744bb465f38f387abf49ece2861e877b98ee4e5a0ae",
+      "characterCount": 3537,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 4,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-4::skill:dungeon-master",
+      "title": "The Walking Watchtower",
+      "outputSha256": "cd7af01289801016da1ccd383974b0bea2cbf00a1f9dc1b55fe54168e7d81a08",
+      "characterCount": 4152,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 5,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-5::clean",
+      "title": "The Bell Beneath Blackwater",
+      "outputSha256": "0ad1a30b7f480f8be36cfbb179806e671cf390ab2c84754a8336d46b7d6dfac8",
+      "characterCount": 3105,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 5,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-5::skill:dungeon-master",
+      "title": "The Lantern of Crow’s Reach",
+      "outputSha256": "530eeb5ccc6dcfbb48acfa7f573ec1e446207177999dee99bac8afa27b667b41",
+      "characterCount": 3600,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 6,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-6::clean",
+      "title": "The Bell Beneath Blackwater",
+      "outputSha256": "e93014f9b27978049e978df9b469b7e6d37500c278fab0bcca3bf6d8abbdf3b5",
+      "characterCount": 3292,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 6,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::primary::trial-6::skill:dungeon-master",
+      "title": "The Mill That Stole the River",
+      "outputSha256": "f3872885de09c1868469d071ca8f643a2d6e485eb340592abdd0229ca9c72696",
+      "characterCount": 3426,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::caravan::trial-1::clean",
+      "title": "The Last Caravan Through Raven Pass",
+      "outputSha256": "eb19843f268485ab910f5524058266b842571741a216bab2b9ad39db78f6a666",
+      "characterCount": 4948,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::caravan::trial-1::skill:dungeon-master",
+      "title": "The Bells of Frostgate",
+      "outputSha256": "3f84a7d219522666f8605e47c16fa9ec5f74a91882b039630de443ed22784bb3",
+      "characterCount": 4758,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::caravan::trial-2::clean",
+      "title": "The Lantern Pass",
+      "outputSha256": "acb322ce28267dcfdc6822fd9b888f0f36346f90ef8c354b45ba47a4b4feac44",
+      "characterCount": 4026,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::caravan::trial-2::skill:dungeon-master",
+      "title": "The Lantern Road",
+      "outputSha256": "5c8ea0fa9e5f266fdff487414983415853206f157ffaaa87795054827eb5df7d",
+      "characterCount": 4392,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::salvage::trial-1::clean",
+      "title": "The Last Shift",
+      "outputSha256": "2f5effa1d52b1f3249ea8547a076b921e737753e3eeacf7b9eb2f18bd2643d15",
+      "characterCount": 4958,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::salvage::trial-1::skill:dungeon-master",
+      "title": "Last Light at Kestrel Nine",
+      "outputSha256": "e659ad0a24c736d172f41af19779b79db50abe1fb6af2a648b46ab766a767a5b",
+      "characterCount": 7227,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::salvage::trial-2::clean",
+      "title": "The Empty Manifest",
+      "outputSha256": "828bcc6191967514557711ef47b5eb295cd92b2f73f545f6fdc50abc8ac8a4b7",
+      "characterCount": 4694,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::salvage::trial-2::skill:dungeon-master",
+      "title": "The Last Warm Room",
+      "outputSha256": "31ad816fc09838108bc8447b60870bf93d4c77acc92fbea27d85aaeb24a1888b",
+      "characterCount": 6525,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::celebration::trial-1::clean",
+      "title": "The Porchlight Supper",
+      "outputSha256": "dff55903072380994fe481845d4102b72f3800078fa48d0d6482adf1accfb332",
+      "characterCount": 4387,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::celebration::trial-1::skill:dungeon-master",
+      "title": "The Long Table",
+      "outputSha256": "dcae1b1177bb0b3bc7d13a3e2b14e7817e806b235ac3b9cfa7faab37afa70cbd",
+      "characterCount": 4941,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::celebration::trial-2::clean",
+      "title": "A Place at the Table",
+      "outputSha256": "5db8c0218fd87f2330131073b2753536fad55f9373d7234997b04ffc63d35253",
+      "characterCount": 4675,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::celebration::trial-2::skill:dungeon-master",
+      "title": "The Juniper Court Supper",
+      "outputSha256": "21b361a02b4b672b38c67543813e507ba23c433c889031c2b75cc6827c06bfc6",
+      "characterCount": 4995,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::horror::trial-1::clean",
+      "title": "The Last Weather Report",
+      "outputSha256": "7386fe419a8bb6e9f6f1ea739b706b080c97b3abe4c39aef565320bc52cc809a",
+      "characterCount": 5828,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::horror::trial-1::skill:dungeon-master",
+      "title": "Dead Air",
+      "outputSha256": "07c59c76aadbca6f3ea37abc838c2e0ef63a9630886d66d73b3619e37558c102",
+      "characterCount": 5638,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::horror::trial-2::clean",
+      "title": "The Last Forecast",
+      "outputSha256": "bf6302b6fa5babb0372ba4f87631efd0656691d76eadbb9cc607659f18ff44d3",
+      "characterCount": 4952,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::horror::trial-2::skill:dungeon-master",
+      "title": "The Last Warm Room",
+      "outputSha256": "4273a4241cc5fdb52467669164d26811f680f0a27f418ebb386b9ffc525684cb",
+      "characterCount": 5729,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::exploration::trial-1::clean",
+      "title": "The House That Makes Rain",
+      "outputSha256": "a74f1e39e74d01003a90ebb5cb37130601e60472026fa0eaf7a9327f142939a6",
+      "characterCount": 6211,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::exploration::trial-1::skill:dungeon-master",
+      "title": "The Engine Beneath the Well",
+      "outputSha256": "6955fab55d741ec0c7ac632a1b0313b8da9c81df01fe6dcbd4d76152ec233888",
+      "characterCount": 5847,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "rowKey": "codex:gpt-6-astra@ultra::exploration::trial-2::clean",
+      "title": "The Sleeping Rainworks",
+      "outputSha256": "0c7d74a1c92b67c65094062f5f9630f276f8dcef0082dfa7fa077deaf4c80bba",
+      "characterCount": 5578,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "rowKey": "codex:gpt-6-astra@ultra::exploration::trial-2::skill:dungeon-master",
+      "title": "The House of the Returning River",
+      "outputSha256": "fda9d361b01c3ff3a1eaa4f5df9b186ecbd39510c18f16ea420f6fe57e363cdd",
+      "characterCount": 6516,
+      "reviewedAsCompleted": true,
+      "observedGenreConstraintViolations": []
+    }
+  ],
+  "longestContiguousNormalizedSkillMatches": [
+    {
+      "caseId": "primary",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 3,
+      "normalizedText": "before the characters"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/core-play-model.md",
+      "wordCount": 4,
+      "normalizedText": "the players solve the"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "skillFile": "references/campaign-arcs-and-factions.md",
+      "wordCount": 3,
+      "normalizedText": "that can be"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/improvisation-and-rulings.md",
+      "wordCount": 4,
+      "normalizedText": "a view of the"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 3,
+      "conditionId": "clean",
+      "skillFile": "references/dialogue-and-description.md",
+      "wordCount": 5,
+      "normalizedText": "give the players time to"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 3,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/adaptation-and-troubleshooting.md",
+      "wordCount": 3,
+      "normalizedText": "for a one-shot"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 4,
+      "conditionId": "clean",
+      "skillFile": "references/adaptation-and-troubleshooting.md",
+      "wordCount": 3,
+      "normalizedText": "let the party"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 4,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/live-play-and-pacing.md",
+      "wordCount": 4,
+      "normalizedText": "track elapsed fictional time"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 5,
+      "conditionId": "clean",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 3,
+      "normalizedText": "adventure for a"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 5,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/campaign-continuity.md",
+      "wordCount": 4,
+      "normalizedText": "--- --- --- the"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 6,
+      "conditionId": "clean",
+      "skillFile": "assets/adventure-packet.md",
+      "wordCount": 3,
+      "normalizedText": "before the party"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 6,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/campaign-continuity.md",
+      "wordCount": 4,
+      "normalizedText": "--- --- --- the"
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "skillFile": "references/adaptation-and-troubleshooting.md",
+      "wordCount": 4,
+      "normalizedText": "and a chance to"
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 5,
+      "normalizedText": "if time runs short summarize"
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 4,
+      "normalizedText": "if time runs short"
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 5,
+      "normalizedText": "if time runs short summarize"
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "skillFile": "references/campaign-arcs-and-factions.md",
+      "wordCount": 3,
+      "normalizedText": "to communicate with"
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 4,
+      "normalizedText": "does not need to"
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "skillFile": "references/core-play-model.md",
+      "wordCount": 4,
+      "normalizedText": "might become an ally"
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/adaptation-and-troubleshooting.md",
+      "wordCount": 4,
+      "normalizedText": "at the cost of"
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "skillFile": "references/adaptation-and-troubleshooting.md",
+      "wordCount": 3,
+      "normalizedText": "appropriate to the"
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "assets/adventure-packet.md",
+      "wordCount": 3,
+      "normalizedText": "--- --- ---"
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "skillFile": "references/core-play-model.md",
+      "wordCount": 4,
+      "normalizedText": "and what they can"
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/npcs-and-relationships.md",
+      "wordCount": 4,
+      "normalizedText": "keys and knows the"
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "skillFile": "references/encounters-and-combat.md",
+      "wordCount": 4,
+      "normalizedText": "at the end of"
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "assets/session-brief.md",
+      "wordCount": 6,
+      "normalizedText": "what it enables --- --- ---"
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "skillFile": "references/dialogue-and-description.md",
+      "wordCount": 5,
+      "normalizedText": "give the players time to"
+    },
+    {
+      "caseId": "horror",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/campaign-arcs-and-factions.md",
+      "wordCount": 4,
+      "normalizedText": "investigate in any order"
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 1,
+      "conditionId": "clean",
+      "skillFile": "references/adventure-design.md",
+      "wordCount": 4,
+      "normalizedText": "if time runs short"
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 1,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/adaptation-and-troubleshooting.md",
+      "wordCount": 3,
+      "normalizedText": "through a mountain"
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 2,
+      "conditionId": "clean",
+      "skillFile": "references/session-preparation.md",
+      "wordCount": 4,
+      "normalizedText": "no combat is required"
+    },
+    {
+      "caseId": "exploration",
+      "trialNumber": 2,
+      "conditionId": "skill:dungeon-master",
+      "skillFile": "references/session-preparation.md",
+      "wordCount": 4,
+      "normalizedText": "about half an hour"
+    }
+  ],
+  "limitations": [
+    "Single generator model and skill snapshot; two reviewers from the same model family in the separate main panel.",
+    "Six primary repetitions and two repetitions per transfer prompt do not establish broad creativity or ultimate Dungeon Master ability.",
+    "Textual outlines were not run at a real table; live improvisation, player enjoyment, combat balance, campaign continuity, and edition-specific correctness were not tested.",
+    "Fifteen skill responses have complete required-reference proof; the incomplete original receipt remains included under the declared intention-to-invoke policy.",
+    "No attempt was made to infer the number of underlying provider agents from fresh CLI session counts."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "browser": "152.0.7977.77",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "hasTouch": true,
+  "isMobile": true,
+  "reducedMotion": "reduce",
+  "finalSourceScreenshot": "final-mobile-390x844.png"
+}

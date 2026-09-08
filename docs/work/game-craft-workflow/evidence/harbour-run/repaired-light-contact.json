@@ -1,0 +1,1779 @@
+{
+  "method": "Native keyboard steering from normal spawn to right wall, then S reverse and Space stop",
+  "contact": {
+    "type": "contact",
+    "force": 2.5417315404055776,
+    "nx": -1,
+    "nz": 0,
+    "x": 16.011957001904115,
+    "z": -5.721670240829883,
+    "time": 6.6917,
+    "speed": 0.511,
+    "carX": 14.440862529675627,
+    "carZ": -5.353829517705821
+  },
+  "atContact": {
+    "phase": "running",
+    "x": 14.443506138335843,
+    "z": -5.43112435902105,
+    "yaw": 1.0789248415924768,
+    "speed": 0.10642690052497933,
+    "steer": 0,
+    "time": 6.825000000000129,
+    "nextGate": 0,
+    "hits": 0,
+    "missed": false,
+    "slip": 0.18040516906212134,
+    "accel": -0.021390161197474278,
+    "load": -0.003661263885832559,
+    "bodyPitch": -0.016956578440169165,
+    "bodyRoll": 0.004486041082213574,
+    "bump": -0.0058215873695456576,
+    "gateTimes": [],
+    "best": 21.183333333332772,
+    "target": {
+      "x": -5,
+      "z": -20,
+      "half": 4.2
+    },
+    "input": {
+      "throttle": false,
+      "brake": false,
+      "handbrake": false,
+      "steer": 0
+    },
+    "camera": [
+      9.432778832238332,
+      10.529768289103295,
+      8.464997724063002
+    ],
+    "events": [
+      {
+        "type": "restart",
+        "at": 0.06666666666666667
+      },
+      {
+        "type": "restart",
+        "at": 0.06666666666666667
+      },
+      {
+        "type": "start",
+        "time": 0.0083,
+        "speed": 0.072,
+        "carX": 0,
+        "carZ": 4.999402777777778
+      },
+      {
+        "type": "contact",
+        "force": 2.5417315404055776,
+        "nx": -1,
+        "nz": 0,
+        "x": 16.011957001904115,
+        "z": -5.721670240829883,
+        "time": 6.6917,
+        "speed": 0.511,
+        "carX": 14.440862529675627,
+        "carZ": -5.353829517705821
+      }
+    ],
+    "render": {
+      "calls": 225,
+      "triangles": 80982,
+      "geometries": 139,
+      "textures": 20
+    }
+  },
+  "recovered": {
+    "phase": "running",
+    "x": 12.829817601854932,
+    "z": -4.574759644551257,
+    "yaw": 1.0748904846407996,
+    "speed": -2.981732328062682,
+    "steer": 0,
+    "time": 8.075000000000182,
+    "nextGate": 0,
+    "hits": 0,
+    "missed": false,
+    "slip": 4.025803681528828e-7,
+    "accel": -1.553606900088127,
+    "load": 0.0000016298390791912057,
+    "bodyPitch": -0.015989108684909752,
+    "bodyRoll": -0.000004615735218764065,
+    "bump": -0.0000027473575510533,
+    "gateTimes": [],
+    "best": 21.183333333332772,
+    "target": {
+      "x": -5,
+      "z": -20,
+      "half": 4.2
+    },
+    "input": {
+      "throttle": false,
+      "brake": true,
+      "handbrake": false,
+      "steer": 0
+    },
+    "camera": [
+      8.318059531135082,
+      10.500005094262386,
+      8.920033804661783
+    ],
+    "events": [
+      {
+        "type": "restart",
+        "at": 0.06666666666666667
+      },
+      {
+        "type": "restart",
+        "at": 0.06666666666666667
+      },
+      {
+        "type": "start",
+        "time": 0.0083,
+        "speed": 0.072,
+        "carX": 0,
+        "carZ": 4.999402777777778
+      },
+      {
+        "type": "contact",
+        "force": 2.5417315404055776,
+        "nx": -1,
+        "nz": 0,
+        "x": 16.011957001904115,
+        "z": -5.721670240829883,
+        "time": 6.6917,
+        "speed": 0.511,
+        "carX": 14.440862529675627,
+        "carZ": -5.353829517705821
+      }
+    ],
+    "render": {
+      "calls": 227,
+      "triangles": 81172,
+      "geometries": 139,
+      "textures": 20
+    }
+  },
+  "recording": {
+    "frames": 170,
+    "seconds": 8.448254108428955
+  },
+  "timeline": [
+    {
+      "wallMs": 0,
+      "x": 0,
+      "z": 5,
+      "yaw": 0,
+      "speed": 0,
+      "bodyPitch": 0,
+      "bodyRoll": 0,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 68,
+      "x": 1.8732174171172105e-7,
+      "z": 4.983444438514893,
+      "yaw": 0.00011203184749042984,
+      "speed": 0.49417747097790715,
+      "bodyPitch": 0.01422575057409127,
+      "bodyRoll": 0.000001131718153111621,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 136,
+      "x": 0.000020960466490096168,
+      "z": 4.9207861025717055,
+      "yaw": 0.002027616716119539,
+      "speed": 1.1043062988910715,
+      "bodyPitch": 0.036228733561884205,
+      "bodyRoll": 0.000036384416029380755,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 203,
+      "x": 0.00017518902738225837,
+      "z": 4.841108777920411,
+      "yaw": 0.007373079675070258,
+      "speed": 1.5597255491655302,
+      "bodyPitch": 0.054543712443896136,
+      "bodyRoll": 0.00027233914376053757,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 272,
+      "x": 0.0014506614429632876,
+      "z": 4.6823835637481706,
+      "yaw": 0.025859882082308553,
+      "speed": 2.181967863990031,
+      "bodyPitch": 0.06740557560245813,
+      "bodyRoll": 0.0014280257183099032,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 341,
+      "x": 0.005715930471095709,
+      "z": 4.496433247526722,
+      "yaw": 0.05405519348878832,
+      "speed": 2.7137639212821982,
+      "bodyPitch": 0.07048719742319177,
+      "bodyRoll": 0.00347765550302525,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 410,
+      "x": 0.013436917792880913,
+      "z": 4.31717010459179,
+      "yaw": 0.08647155632626406,
+      "speed": 2.6720867232439924,
+      "bodyPitch": 0.056996368263419854,
+      "bodyRoll": 0.006438843886936201,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 477,
+      "x": 0.02522027263816057,
+      "z": 4.148341347495884,
+      "yaw": 0.11861624429665209,
+      "speed": 3.067865452867761,
+      "bodyPitch": 0.04716782666604574,
+      "bodyRoll": 0.00968940059818387,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 544,
+      "x": 0.04828095176280712,
+      "z": 3.921561000761878,
+      "yaw": 0.16451452290183421,
+      "speed": 3.011794914404173,
+      "bodyPitch": 0.03435374553545464,
+      "bodyRoll": 0.012965968628656475,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 612,
+      "x": 0.07210319708304842,
+      "z": 3.7487662510936897,
+      "yaw": 0.20212952422918998,
+      "speed": 2.9680234727103576,
+      "bodyPitch": 0.018238414454708543,
+      "bodyRoll": 0.01565502463837122,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 680,
+      "x": 0.10613015045931148,
+      "z": 3.5554821472297826,
+      "yaw": 0.2459455245016993,
+      "speed": 2.918283900340017,
+      "bodyPitch": 0.005120443830728802,
+      "bodyRoll": 0.017407119679204858,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 746,
+      "x": 0.1532204221345927,
+      "z": 3.3437899281198407,
+      "yaw": 0.29545262838290287,
+      "speed": 2.86307784061464,
+      "bodyPitch": -0.003189010497584543,
+      "bodyRoll": 0.018204685898044134,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 815,
+      "x": 0.20276067386040958,
+      "z": 3.161051475835526,
+      "yaw": 0.3392233382320611,
+      "speed": 2.814883928621854,
+      "bodyPitch": -0.007257250090389193,
+      "bodyRoll": 0.01824370847522785,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 883,
+      "x": 0.2518070021288227,
+      "z": 3.005544666957026,
+      "yaw": 0.3771718340745399,
+      "speed": 2.773472764308151,
+      "bodyPitch": -0.008462873045518763,
+      "bodyRoll": 0.017797824509360814,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 951,
+      "x": 0.3222694613104131,
+      "z": 2.8118407110172203,
+      "yaw": 0.42536275021474046,
+      "speed": 2.7213155184572946,
+      "bodyPitch": -0.008144959059212155,
+      "bodyRoll": 0.01711272984232024,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1019,
+      "x": 0.38249175522081097,
+      "z": 2.6661561903671536,
+      "yaw": 0.4623327924078761,
+      "speed": 2.6816008093940753,
+      "bodyPitch": -0.007262500080061511,
+      "bodyRoll": 0.016367505719041105,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1085,
+      "x": 0.46527691312115776,
+      "z": 2.4885812503525266,
+      "yaw": 0.5048487870579657,
+      "speed": 3.1299172763802248,
+      "bodyPitch": 0.006073910431100159,
+      "bodyRoll": 0.015980583402967728,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1152,
+      "x": 0.560511821719484,
+      "z": 2.304849839392764,
+      "yaw": 0.5491867115731893,
+      "speed": 3.077296080173605,
+      "bodyPitch": 0.013796412145150505,
+      "bodyRoll": 0.016403039666169548,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1218,
+      "x": 0.66158803510219,
+      "z": 2.1282494382305304,
+      "yaw": 0.5944806723782958,
+      "speed": 3.025045455061496,
+      "bodyPitch": 0.011590785106915826,
+      "bodyRoll": 0.017190988772148627,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1287,
+      "x": 0.7684374162114155,
+      "z": 1.959142455477603,
+      "yaw": 0.6399737225084944,
+      "speed": 2.9734843053854307,
+      "bodyPitch": 0.005939111862527123,
+      "bodyRoll": 0.017903317553355263,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1355,
+      "x": 0.9096914375451021,
+      "z": 1.7586515187405973,
+      "yaw": 0.6965118423876658,
+      "speed": 2.910290441835486,
+      "bodyPitch": -0.0007146810606700046,
+      "bodyRoll": 0.018335928358416922,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1423,
+      "x": 1.0283617584217362,
+      "z": 1.6071329145663142,
+      "yaw": 0.7412278380174552,
+      "speed": 2.8608580056986526,
+      "bodyPitch": -0.004193694609601014,
+      "bodyRoll": 0.018269460731965885,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1490,
+      "x": 1.1515742785409753,
+      "z": 1.4635615308295913,
+      "yaw": 0.7853744292378497,
+      "speed": 2.8124640633068774,
+      "bodyPitch": -0.006012469638735957,
+      "bodyRoll": 0.017910408818879914,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1557,
+      "x": 1.2788517668768944,
+      "z": 1.3279348632911903,
+      "yaw": 0.828903334905702,
+      "speed": 2.7651126851134347,
+      "bodyPitch": -0.0066291398800564574,
+      "bodyRoll": 0.017366413035594094,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1625,
+      "x": 1.409718405731827,
+      "z": 1.2002100294161382,
+      "yaw": 0.8717938241148999,
+      "speed": 2.718791039956047,
+      "bodyPitch": -0.006560045529262014,
+      "bodyRoll": 0.01674216033137078,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1691,
+      "x": 1.5437103880101197,
+      "z": 1.080312669693777,
+      "yaw": 0.9140402538323141,
+      "speed": 2.6734774147730747,
+      "bodyPitch": -0.006203068399071665,
+      "bodyRoll": 0.01611369469166843,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1759,
+      "x": 1.6952886391003963,
+      "z": 0.9570102835347545,
+      "yaw": 0.956482044414756,
+      "speed": 3.1221588241743814,
+      "bodyPitch": 0.00663146287711966,
+      "bodyRoll": 0.01584890163424605,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1825,
+      "x": 1.8607527081561979,
+      "z": 0.8335731554550342,
+      "yaw": 1.0007308604825456,
+      "speed": 3.0697002020886304,
+      "bodyPitch": 0.013993615528817763,
+      "bodyRoll": 0.01635437613193315,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1893,
+      "x": 2.0283494089741856,
+      "z": 0.7190678589513523,
+      "yaw": 1.0459286483758974,
+      "speed": 3.0176164079043537,
+      "bodyPitch": 0.01159146810437097,
+      "bodyRoll": 0.017173094610653975,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 1
+      }
+    },
+    {
+      "wallMs": 1961,
+      "x": 2.1978492298788344,
+      "z": 0.6137647777861551,
+      "yaw": 1.0887205611072344,
+      "speed": 2.9667161252416996,
+      "bodyPitch": 0.005862309353954029,
+      "bodyRoll": 0.017721712469023886,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2028,
+      "x": 2.3687536793832566,
+      "z": 0.517398258526989,
+      "yaw": 1.1216696690331958,
+      "speed": 2.9186406283709143,
+      "bodyPitch": 0.0003473904650100868,
+      "bodyRoll": 0.017083765017557824,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2095,
+      "x": 2.540242819281864,
+      "z": 0.4287947862345144,
+      "yaw": 1.1416980490839583,
+      "speed": 2.873787040887812,
+      "bodyPitch": -0.0035585105917258055,
+      "bodyRoll": 0.014703705388716546,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2162,
+      "x": 2.711379839563442,
+      "z": 0.3461581772388579,
+      "yaw": 1.1526953135923255,
+      "speed": 2.8310599806930266,
+      "bodyPitch": -0.005730151631301344,
+      "bodyRoll": 0.011028727733096046,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2227,
+      "x": 2.8813932812606584,
+      "z": 0.26779618718585524,
+      "yaw": 1.1587307403197213,
+      "speed": 2.789566556485635,
+      "bodyPitch": -0.006581323469419343,
+      "bodyRoll": 0.0070804203923630436,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2294,
+      "x": 3.049759224068032,
+      "z": 0.19245731937176005,
+      "yaw": 1.1606384753194,
+      "speed": 2.748963316851196,
+      "bodyPitch": -0.006636304672083068,
+      "bodyRoll": 0.00362731999095402,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": -1
+      }
+    },
+    {
+      "wallMs": 2363,
+      "x": 3.216084827515586,
+      "z": 0.11914282280815747,
+      "yaw": 1.155472257897664,
+      "speed": 2.7090911947109273,
+      "bodyPitch": -0.006327598200286938,
+      "bodyRoll": 0.0007099228437067561,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": -1
+      }
+    },
+    {
+      "wallMs": 2431,
+      "x": 3.379944349951772,
+      "z": 0.046774652561247194,
+      "yaw": 1.1446045521981167,
+      "speed": 2.669677653455579,
+      "bodyPitch": -0.005929604836742764,
+      "bodyRoll": -0.0018205992217873953,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2498,
+      "x": 3.5579096987849654,
+      "z": -0.03326123086074792,
+      "yaw": 1.1364731090281273,
+      "speed": 3.1241627872200053,
+      "bodyPitch": 0.006858512805097427,
+      "bodyRoll": -0.003473139807170768,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2567,
+      "x": 3.745698049205285,
+      "z": -0.11928527365370475,
+      "yaw": 1.1319963935446224,
+      "speed": 3.0781790041335126,
+      "bodyPitch": 0.014149875251728368,
+      "bodyRoll": -0.00393627791216022,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2634,
+      "x": 3.930278395986657,
+      "z": -0.20501139682289898,
+      "yaw": 1.1295395199957927,
+      "speed": 3.032995108943836,
+      "bodyPitch": 0.011669667524226292,
+      "bodyRoll": -0.0034451007027014725,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2702,
+      "x": 4.111840944089848,
+      "z": -0.2901442784357481,
+      "yaw": 1.1281911592037834,
+      "speed": 2.9885625183485027,
+      "bodyPitch": 0.00587759197675305,
+      "bodyRoll": -0.002477209953101384,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2768,
+      "x": 4.290547883171514,
+      "z": -0.37445076530446875,
+      "yaw": 1.1274511631114759,
+      "speed": 2.9448510335149765,
+      "bodyPitch": 0.0003261813726906462,
+      "bodyRoll": -0.0014558972633983086,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2837,
+      "x": 4.466523186499685,
+      "z": -0.4577782666885373,
+      "yaw": 1.1270450446453537,
+      "speed": 2.9018410210583436,
+      "bodyPitch": -0.0036122948691402375,
+      "bodyRoll": -0.0006317121000686482,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2904,
+      "x": 4.639859983243367,
+      "z": -0.5400378429441585,
+      "yaw": 1.126822162105513,
+      "speed": 2.859517344854171,
+      "bodyPitch": -0.0057982258692224516,
+      "bodyRoll": -0.00009603788095741261,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 2973,
+      "x": 4.8529286994500715,
+      "z": -0.64129324874179,
+      "yaw": 1.1266791167417842,
+      "speed": 2.8075576857999667,
+      "bodyPitch": -0.006720495769111412,
+      "bodyRoll": 0.00020647452072797347,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3040,
+      "x": 5.020571398735041,
+      "z": -0.7210217176153394,
+      "yaw": 1.1266213366140625,
+      "speed": 2.7667307033351043,
+      "bodyPitch": -0.0066480375066991886,
+      "bodyRoll": 0.0002484170879092401,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3108,
+      "x": 5.185766981872229,
+      "z": -0.7996148511746153,
+      "yaw": 1.1265896262076338,
+      "speed": 2.7265491254564305,
+      "bodyPitch": -0.00629360842726362,
+      "bodyRoll": 0.00019999684348191488,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3176,
+      "x": 5.348558991173833,
+      "z": -0.8770802537943735,
+      "yaw": 1.1265722231676008,
+      "speed": 2.687001244569938,
+      "bodyPitch": -0.005896811174441736,
+      "bodyRoll": 0.00012248024387673286,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3244,
+      "x": 5.525775880203585,
+      "z": -0.9614202064332089,
+      "yaw": 1.126562672176727,
+      "speed": 3.140948663722311,
+      "bodyPitch": 0.006832558124411199,
+      "bodyRoll": 0.00005198004719165034,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3313,
+      "x": 5.713283443537422,
+      "z": -1.0506630946725648,
+      "yaw": 1.1265574304817993,
+      "speed": 3.0947945761626574,
+      "bodyPitch": 0.014091319456763429,
+      "bodyRoll": 0.000003664134937382976,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3379,
+      "x": 5.898036868913654,
+      "z": -1.1385979278747753,
+      "yaw": 1.1265545537786301,
+      "speed": 3.0493840263289007,
+      "bodyPitch": 0.011603269550794812,
+      "bodyRoll": -0.000020937886831417214,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3446,
+      "x": 6.080080929339683,
+      "z": -1.2252447626534575,
+      "yaw": 1.1265529750104575,
+      "speed": 3.0047031362119463,
+      "bodyPitch": 0.005807364751434583,
+      "bodyRoll": -0.000027542976560121805,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3513,
+      "x": 6.259459361816969,
+      "z": -1.310623707067866,
+      "yaw": 1.1265521085641135,
+      "speed": 2.9607383424937015,
+      "bodyPitch": 0.0002672853474888974,
+      "bodyRoll": -0.000023632110835909132,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3580,
+      "x": 6.436214976065919,
+      "z": -1.3947547402148965,
+      "yaw": 1.1265516330482777,
+      "speed": 2.917476387716212,
+      "bodyPitch": -0.0036600732281294856,
+      "bodyRoll": -0.000015622313943137024,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3647,
+      "x": 6.61038972532616,
+      "z": -1.4776576101750414,
+      "yaw": 1.1265513720796538,
+      "speed": 2.874904311793814,
+      "bodyPitch": -0.005835797706604655,
+      "bodyRoll": -0.000007715910607491599,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3713,
+      "x": 6.7820247541701875,
+      "z": -1.5593517789664546,
+      "yaw": 1.1265512288570367,
+      "speed": 2.8330094438224807,
+      "bodyPitch": -0.006685697266844669,
+      "bodyRoll": -0.000001897208504017941,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3781,
+      "x": 6.951160432702087,
+      "z": -1.6398563948584126,
+      "yaw": 1.126551150254798,
+      "speed": 2.7917793941645384,
+      "bodyPitch": -0.0067375269607372395,
+      "bodyRoll": 0.0000013920819178684948,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3847,
+      "x": 7.117836382769673,
+      "z": -1.7191902802597114,
+      "yaw": 1.1265511071169745,
+      "speed": 2.751202046794865,
+      "bodyPitch": -0.006424509218249602,
+      "bodyRoll": 0.000002611546034391949,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3915,
+      "x": 7.282091499478538,
+      "z": -1.797371928312372,
+      "yaw": 1.1265510834424348,
+      "speed": 2.7112655518975792,
+      "bodyPitch": -0.006023038226750894,
+      "bodyRoll": 0.00000251355951048199,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 3983,
+      "x": 7.443963969895202,
+      "z": -1.8744195042636265,
+      "yaw": 1.126551070449572,
+      "speed": 2.671958318703375,
+      "bodyPitch": -0.005670699993659046,
+      "bodyRoll": 0.0000018072596359561059,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4051,
+      "x": 7.620292428559096,
+      "z": -1.9583478065823443,
+      "yaw": 1.1265510633189375,
+      "speed": 3.126536023093249,
+      "bodyPitch": 0.007024304372697567,
+      "bodyRoll": 9.932076564447307e-7,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4118,
+      "x": 7.806937814052593,
+      "z": -2.0471867336992586,
+      "yaw": 1.1265510594055625,
+      "speed": 3.080614330968002,
+      "bodyPitch": 0.014233480734523457,
+      "bodyRoll": 3.412024953847494e-7,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4186,
+      "x": 7.990844008927397,
+      "z": -2.1347218709585722,
+      "yaw": 1.1265510572578568,
+      "speed": 3.035431832646937,
+      "bodyPitch": 0.011704016172963846,
+      "bodyRoll": -6.279554439018926e-8,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4253,
+      "x": 8.172055041711902,
+      "z": -2.22097417396028,
+      "yaw": 1.1265510560791707,
+      "speed": 2.9909747489197116,
+      "bodyPitch": 0.005881007129462474,
+      "bodyRoll": -2.416373402580454e-7,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4321,
+      "x": 8.394844511524232,
+      "z": -2.3270168619761673,
+      "yaw": 1.1265510553226938,
+      "speed": 2.9364030208115417,
+      "bodyPitch": -0.0008458321427689329,
+      "bodyRoll": -2.5523745017921805e-7,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4389,
+      "x": 8.570148196661531,
+      "z": -2.4104574037957542,
+      "yaw": 1.126551055017131,
+      "speed": 2.893529340874761,
+      "bodyPitch": -0.004328877611157465,
+      "bodyRoll": -1.8674166455021518e-7,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4456,
+      "x": 8.742894251317304,
+      "z": -2.4926805722132257,
+      "yaw": 1.1265510548494344,
+      "speed": 2.851338402274954,
+      "bodyPitch": -0.006130014650157407,
+      "bodyRoll": -1.0488967254345356e-7,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4524,
+      "x": 8.913123348551808,
+      "z": -2.573705726595328,
+      "yaw": 1.126551054757401,
+      "speed": 2.809817692724707,
+      "bodyPitch": -0.0067316266202050124,
+      "bodyRoll": -3.800464619091017e-8,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4592,
+      "x": 9.08087541764075,
+      "z": -2.6535518723201843,
+      "yaw": 1.126551054706892,
+      "speed": 2.768954976880819,
+      "bodyPitch": -0.006656036321481014,
+      "bodyRoll": 4.134988512709071e-9,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4661,
+      "x": 9.246189660496807,
+      "z": -2.732237668577427,
+      "yaw": 1.1265510546791717,
+      "speed": 2.7287382888325156,
+      "bodyPitch": -0.006299545674272678,
+      "bodyRoll": 2.3401262560932448e-8,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4729,
+      "x": 9.409104567644517,
+      "z": -2.80978143596297,
+      "yaw": 1.1265510546639588,
+      "speed": 2.689155924834299,
+      "bodyPitch": -0.005901574563214441,
+      "bodyRoll": 2.6571119427941207e-8,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4796,
+      "x": 9.586443729008604,
+      "z": -2.894190818256413,
+      "yaw": 1.1265510546556095,
+      "speed": 3.143013049605879,
+      "bodyPitch": 0.0068602689536670074,
+      "bodyRoll": 2.1152361186207328e-8,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4865,
+      "x": 9.77407193716636,
+      "z": -2.9834975513574693,
+      "yaw": 1.1265510546510276,
+      "speed": 3.0968256598524686,
+      "bodyPitch": 0.01411983273518853,
+      "bodyRoll": 1.3006003538157253e-8,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4931,
+      "x": 9.95894513043764,
+      "z": -3.0714929604251964,
+      "yaw": 1.1265510546485127,
+      "speed": 3.0513824305123576,
+      "bodyPitch": 0.011624754139179086,
+      "bodyRoll": 5.685422016089653e-9,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 4997,
+      "x": 10.14110763210726,
+      "z": -3.1581981423276577,
+      "yaw": 1.1265510546471327,
+      "speed": 3.0066694695726857,
+      "bodyPitch": 0.005827558083967859,
+      "bodyRoll": 6.631000833294283e-10,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5065,
+      "x": 10.320602939929874,
+      "z": -3.2436338009999566,
+      "yaw": 1.1265510546463755,
+      "speed": 2.9626731999997964,
+      "bodyPitch": 0.0002703692104928587,
+      "bodyRoll": -1.9315951230110545e-9,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5132,
+      "x": 10.497473744791987,
+      "z": -3.3278202563267083,
+      "yaw": 1.12655105464596,
+      "speed": 2.919380350968707,
+      "bodyPitch": -0.0036580327881604127,
+      "bodyRoll": -2.6772755570742925e-9,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5199,
+      "x": 10.671761948856,
+      "z": -3.410777452778062,
+      "yaw": 1.1265510546457318,
+      "speed": 2.8767779493857053,
+      "bodyPitch": -0.005840528581733444,
+      "bodyRoll": -2.3372909701783504e-9,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5266,
+      "x": 10.843508683203488,
+      "z": -3.4925249678074333,
+      "yaw": 1.1265510546456066,
+      "speed": 2.8348533116926693,
+      "bodyPitch": -0.0066908721746273955,
+      "bodyRoll": -1.5632740306981577e-9,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5334,
+      "x": 11.012749144165547,
+      "z": -3.5730928908462674,
+      "yaw": 1.1251252306834694,
+      "speed": 2.793591670767107,
+      "bodyPitch": -0.006742993857454929,
+      "bodyRoll": -0.00008457565855678759,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": -1
+      }
+    },
+    {
+      "wallMs": 5401,
+      "x": 11.179433921071166,
+      "z": -3.652685550022006,
+      "yaw": 1.1180357040986366,
+      "speed": 2.752917245307757,
+      "bodyPitch": -0.0064294523657797845,
+      "bodyRoll": -0.0006350471663674195,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": -1
+      }
+    },
+    {
+      "wallMs": 5467,
+      "x": 11.343317892759371,
+      "z": -3.731898555708608,
+      "yaw": 1.1059915334590407,
+      "speed": 2.7126753117536024,
+      "bodyPitch": -0.006027954276258485,
+      "bodyRoll": -0.0018140630451323584,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5536,
+      "x": 11.504146517203457,
+      "z": -3.8113141000528943,
+      "yaw": 1.0971926239365104,
+      "speed": 2.6730881642169844,
+      "bodyPitch": -0.005674823221739067,
+      "bodyRoll": -0.002858276508876545,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5606,
+      "x": 11.726150515548493,
+      "z": -3.9237852750522477,
+      "yaw": 1.0915295366101052,
+      "speed": 3.238103428246151,
+      "bodyPitch": 0.011776378069829728,
+      "bodyRoll": -0.003151576069630937,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5675,
+      "x": 11.876762393669328,
+      "z": -4.001087721833557,
+      "yaw": 1.089242053111935,
+      "speed": 1.9986966413604075,
+      "bodyPitch": -0.004125693144650531,
+      "bodyRoll": -0.002668289651460714,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": true,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5742,
+      "x": 12.011231614143282,
+      "z": -4.070778084932996,
+      "yaw": 1.0879866555507656,
+      "speed": 2.481267065785013,
+      "bodyPitch": -0.008203179894457615,
+      "bodyRoll": -0.001853789147485928,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5809,
+      "x": 12.17333841816382,
+      "z": -4.155414661436837,
+      "yaw": 1.0872976787612718,
+      "speed": 2.943813408492728,
+      "bodyPitch": 0.009344966827185254,
+      "bodyRoll": -0.001051399116027292,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5878,
+      "x": 12.345751185177551,
+      "z": -4.24573584050556,
+      "yaw": 1.0869195602821993,
+      "speed": 2.900820263208415,
+      "bodyPitch": 0.018079464793335116,
+      "bodyRoll": -0.00043464233399448995,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 5944,
+      "x": 12.515581398093675,
+      "z": -4.334865544558931,
+      "yaw": 1.0867120444610618,
+      "speed": 2.858512921342815,
+      "bodyPitch": 0.015225514295280945,
+      "bodyRoll": -0.00004865269844789607,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6012,
+      "x": 12.68289775504994,
+      "z": -4.422770145557373,
+      "yaw": 1.0865981573637484,
+      "speed": 2.8168782226738474,
+      "bodyPitch": 0.00843239860898921,
+      "bodyRoll": 0.00013648220781325928,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6080,
+      "x": 12.847756704129852,
+      "z": -4.509437594392922,
+      "yaw": 1.0865356547995415,
+      "speed": 2.7759036860245256,
+      "bodyPitch": 0.0018709251056749292,
+      "bodyRoll": 0.00018288916131498529,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6145,
+      "x": 13.010206800017835,
+      "z": -4.5948691313800465,
+      "yaw": 1.0865013526650193,
+      "speed": 2.735577235881289,
+      "bodyPitch": -0.002791577783643174,
+      "bodyRoll": 0.00015353040386264518,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6213,
+      "x": 13.170291607986957,
+      "z": -4.679073788963358,
+      "yaw": 1.0864825272544507,
+      "speed": 2.6958871039609495,
+      "bodyPitch": -0.0054025011314610075,
+      "bodyRoll": 0.00009706916326310346,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6282,
+      "x": 13.344497865948693,
+      "z": -4.770717599618778,
+      "yaw": 1.0864721956500765,
+      "speed": 3.149462120123361,
+      "bodyPitch": 0.005980701515667835,
+      "bodyRoll": 0.00004323745438756795,
+      "bump": 0,
+      "input": {
+        "throttle": true,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6350,
+      "x": 13.528775755749763,
+      "z": -4.86766569009338,
+      "yaw": 1.0864665255453763,
+      "speed": 3.1031706690153054,
+      "bodyPitch": 0.012910189417018554,
+      "bodyRoll": 0.000005242318576107731,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6415,
+      "x": 13.710346043601,
+      "z": -4.96319233362798,
+      "yaw": 1.0864634137259388,
+      "speed": 3.057625325744845,
+      "bodyPitch": 0.010601912666766291,
+      "bodyRoll": -0.00001483172726060934,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6483,
+      "x": 13.889252848217216,
+      "z": -5.057319375800465,
+      "yaw": 1.086461705923222,
+      "speed": 3.012812153836917,
+      "bodyPitch": 0.005154133763827323,
+      "bodyRoll": -0.000020865184842093994,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6551,
+      "x": 14.065539233291972,
+      "z": -5.150068697641206,
+      "yaw": 1.0864607686612189,
+      "speed": 2.968717533156143,
+      "bodyPitch": -0.00007539540089711435,
+      "bodyRoll": -0.000018440625090463935,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6618,
+      "x": 14.239247328881083,
+      "z": -5.241462029472805,
+      "yaw": 1.0864602542809254,
+      "speed": 2.925328151010265,
+      "bodyPitch": -0.0037875310258516873,
+      "bodyRoll": -0.000012511117857513013,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6685,
+      "x": 14.410418409936304,
+      "z": -5.331520844964637,
+      "yaw": 1.0864599719830352,
+      "speed": 2.8826309936060874,
+      "bodyPitch": -0.005845409863259901,
+      "bodyRoll": -0.00000642213435505706,
+      "bump": 0,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    },
+    {
+      "wallMs": 6752,
+      "x": 14.442026950899532,
+      "z": -5.400303194919569,
+      "yaw": 1.0827722922685896,
+      "speed": 0.2990868407065249,
+      "bodyPitch": -0.017672598290418794,
+      "bodyRoll": 0.0037864480732687665,
+      "bump": -0.00615511510145323,
+      "input": {
+        "throttle": false,
+        "brake": false,
+        "handbrake": false,
+        "steer": 0
+      }
+    }
+  ]
+}

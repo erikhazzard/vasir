@@ -1,0 +1,766 @@
+{
+  "runId": "dm-outline-v1-2026-09-08",
+  "manifestHash": "48b30d2e935b2ca22d346940281f27012db9b1029c6fd32d4b6e3d9658b1aaa9",
+  "skillHash": "632c1e5ed6d456cb6a8be94efc87c097c8070c485abc975a633e427068de0962",
+  "generatedAt": "2026-09-08T02:13:54.676Z",
+  "generation": {
+    "expectedRows": 32,
+    "complete": 32,
+    "failed": 0,
+    "pending": 0,
+    "treatmentReadComplete": 15
+  },
+  "judgingStatus": "running",
+  "completePairs": 12,
+  "completedJudgeSessions": 25,
+  "summaries": [
+    {
+      "caseId": "primary",
+      "title": "Open adventure outline",
+      "prompt": "create an outline for TTRPG adventure",
+      "expectedPairs": 6,
+      "completePairs": 6,
+      "plain": 91.94444444444444,
+      "skill": 95.27777777777777,
+      "delta": 3.333333333333331,
+      "preferenceVotes": {
+        "skill": 6,
+        "tie": 6,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 2,
+        "tie": 2,
+        "plain": 0,
+        "disagreement": 2
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 490.8333333333333,
+          "meanLatencyMs": 167387
+        },
+        "skill:dungeon-master": {
+          "meanWords": 555,
+          "meanLatencyMs": 185350
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.333333333333333,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 4.666666666666667,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 5,
+          "skill": 4.166666666666667
+        },
+        "active-forces": {
+          "plain": 4.25,
+          "skill": 4.416666666666667
+        },
+        "setup-information": {
+          "plain": 4.333333333333333,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "caravan",
+      "title": "Mountain caravan",
+      "prompt": "Create an outline for a fantasy TTRPG adventure for four new players and one three-hour session. The party has already agreed to escort a caravan across a dangerous mountain pass. Include the possibility of a straightforward combat encounter.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 89.16666666666667,
+      "skill": 85,
+      "delta": -4.166666666666671,
+      "preferenceVotes": {
+        "skill": 0,
+        "tie": 1,
+        "plain": 3
+      },
+      "agreement": {
+        "skill": 0,
+        "tie": 0,
+        "plain": 1,
+        "disagreement": 1
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 713.5,
+          "meanLatencyMs": 131576
+        },
+        "skill:dungeon-master": {
+          "meanWords": 710.5,
+          "meanLatencyMs": 166286.5
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.5,
+          "skill": 4
+        },
+        "play-and-consequence": {
+          "plain": 4.5,
+          "skill": 4
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 4,
+          "skill": 3.5
+        },
+        "active-forces": {
+          "plain": 4,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 4.75,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "salvage",
+      "title": "Orbital salvage",
+      "prompt": "Create an outline for a science-fiction TTRPG adventure lasting two sessions. The characters are a salvage crew investigating an apparently abandoned orbital facility. Keep it system-neutral.",
+      "expectedPairs": 2,
+      "completePairs": 2,
+      "plain": 91.66666666666667,
+      "skill": 94.16666666666667,
+      "delta": 2.5,
+      "preferenceVotes": {
+        "skill": 4,
+        "tie": 0,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 2,
+        "tie": 0,
+        "plain": 0,
+        "disagreement": 0
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 693.5,
+          "meanLatencyMs": 161609.5
+        },
+        "skill:dungeon-master": {
+          "meanWords": 1001,
+          "meanLatencyMs": 237182
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.25,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 4.25,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 4.75,
+          "skill": 4.25
+        },
+        "active-forces": {
+          "plain": 5,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 4.25,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "celebration",
+      "title": "Neighborhood celebration",
+      "prompt": "Create an outline for a contemporary TTRPG adventure for one evening of quiet, nonviolent play. The characters are preparing a neighborhood celebration while a disagreement threatens the event.",
+      "expectedPairs": 2,
+      "completePairs": 1,
+      "plain": 93.33333333333334,
+      "skill": 93.33333333333334,
+      "delta": 0,
+      "preferenceVotes": {
+        "skill": 0,
+        "tie": 2,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 0,
+        "tie": 1,
+        "plain": 0,
+        "disagreement": 0
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 677.5,
+          "meanLatencyMs": 123668
+        },
+        "skill:dungeon-master": {
+          "meanWords": 739.5,
+          "meanLatencyMs": 163796
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 4,
+          "skill": 4
+        },
+        "active-forces": {
+          "plain": 4,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 5,
+          "skill": 5
+        }
+      }
+    },
+    {
+      "caseId": "horror",
+      "title": "Weather station horror",
+      "prompt": "Create an outline for a one-session horror TTRPG adventure at an isolated weather station. A tragic ending is acceptable. Use no established fictional setting.",
+      "expectedPairs": 2,
+      "completePairs": 0,
+      "plain": null,
+      "skill": null,
+      "delta": null,
+      "preferenceVotes": {
+        "skill": 0,
+        "tie": 0,
+        "plain": 0
+      },
+      "agreement": {
+        "skill": 0,
+        "tie": 0,
+        "plain": 0,
+        "disagreement": 0
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 799,
+          "meanLatencyMs": 219899
+        },
+        "skill:dungeon-master": {
+          "meanWords": 865,
+          "meanLatencyMs": 257664.5
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": null,
+          "skill": null
+        },
+        "play-and-consequence": {
+          "plain": null,
+          "skill": null
+        },
+        "structure-clarity-scope": {
+          "plain": null,
+          "skill": null
+        },
+        "distinctiveness-evocation": {
+          "plain": null,
+          "skill": null
+        },
+        "active-forces": {
+          "plain": null,
+          "skill": null
+        },
+        "setup-information": {
+          "plain": null,
+          "skill": null
+        }
+      }
+    },
+    {
+      "caseId": "exploration",
+      "title": "Mechanical structure",
+      "prompt": "Create an outline for a system-neutral exploration and puzzle TTRPG adventure for one session. It takes place inside an ancient mechanical structure and requires no combat.",
+      "expectedPairs": 2,
+      "completePairs": 1,
+      "plain": 95,
+      "skill": 93.33333333333334,
+      "delta": -1.6666666666666572,
+      "preferenceVotes": {
+        "skill": 0,
+        "tie": 1,
+        "plain": 1
+      },
+      "agreement": {
+        "skill": 0,
+        "tie": 0,
+        "plain": 0,
+        "disagreement": 1
+      },
+      "conditions": {
+        "clean": {
+          "meanWords": 860,
+          "meanLatencyMs": 191400
+        },
+        "skill:dungeon-master": {
+          "meanWords": 908.5,
+          "meanLatencyMs": 281376
+        }
+      },
+      "dimensions": {
+        "causal-coherence": {
+          "plain": 4.5,
+          "skill": 5
+        },
+        "play-and-consequence": {
+          "plain": 5,
+          "skill": 5
+        },
+        "structure-clarity-scope": {
+          "plain": 5,
+          "skill": 5
+        },
+        "distinctiveness-evocation": {
+          "plain": 5,
+          "skill": 4
+        },
+        "active-forces": {
+          "plain": 4,
+          "skill": 4
+        },
+        "setup-information": {
+          "plain": 5,
+          "skill": 5
+        }
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "caseId": "exploration",
+      "trialNumber": 1,
+      "plain": 95,
+      "skill": 93.33333333333334,
+      "delta": -1.6666666666666572,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4.5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4,
+          "setup-information": 5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "clean",
+        "tie"
+      ],
+      "scoreDirection": "plain",
+      "preferenceAgreement": "disagreement"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 3,
+      "plain": 91.66666666666666,
+      "skill": 96.66666666666666,
+      "delta": 5,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 4.5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4.5,
+          "setup-information": 4.5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "tie",
+        "skill:dungeon-master"
+      ],
+      "scoreDirection": "skill",
+      "preferenceAgreement": "disagreement"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 6,
+      "plain": 95,
+      "skill": 95,
+      "delta": 0,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4.5,
+          "setup-information": 5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4.5,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "tie",
+        "tie"
+      ],
+      "scoreDirection": "tie",
+      "preferenceAgreement": "tie"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 4,
+      "plain": 91.66666666666667,
+      "skill": 93.33333333333334,
+      "delta": 1.6666666666666714,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4.5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4,
+          "setup-information": 4
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "tie",
+        "skill:dungeon-master"
+      ],
+      "scoreDirection": "skill",
+      "preferenceAgreement": "disagreement"
+    },
+    {
+      "caseId": "celebration",
+      "trialNumber": 1,
+      "plain": 93.33333333333334,
+      "skill": 93.33333333333334,
+      "delta": 0,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "tie",
+        "tie"
+      ],
+      "scoreDirection": "tie",
+      "preferenceAgreement": "tie"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 2,
+      "plain": 90,
+      "skill": 96.66666666666666,
+      "delta": 6.666666666666657,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4.5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 4.5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4,
+          "setup-information": 4
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 5,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "skill:dungeon-master",
+        "skill:dungeon-master"
+      ],
+      "scoreDirection": "skill",
+      "preferenceAgreement": "skill:dungeon-master"
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 1,
+      "plain": 85,
+      "skill": 83.33333333333334,
+      "delta": -1.6666666666666572,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4,
+          "play-and-consequence": 4,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 4.5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 4,
+          "play-and-consequence": 4,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 3,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "tie",
+        "clean"
+      ],
+      "scoreDirection": "plain",
+      "preferenceAgreement": "disagreement"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 1,
+      "plain": 93.33333333333334,
+      "skill": 93.33333333333334,
+      "delta": 0,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 4,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4.5,
+          "setup-information": 4.5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "tie",
+        "tie"
+      ],
+      "scoreDirection": "tie",
+      "preferenceAgreement": "tie"
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 2,
+      "plain": 91.66666666666667,
+      "skill": 95,
+      "delta": 3.3333333333333286,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4.5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 4.5,
+          "distinctiveness-evocation": 4.5,
+          "active-forces": 5,
+          "setup-information": 4
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4.5,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "skill:dungeon-master",
+        "skill:dungeon-master"
+      ],
+      "scoreDirection": "skill",
+      "preferenceAgreement": "skill:dungeon-master"
+    },
+    {
+      "caseId": "primary",
+      "trialNumber": 5,
+      "plain": 90,
+      "skill": 96.66666666666666,
+      "delta": 6.666666666666657,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 5,
+          "active-forces": 4,
+          "setup-information": 4
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 5,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "skill:dungeon-master",
+        "skill:dungeon-master"
+      ],
+      "scoreDirection": "skill",
+      "preferenceAgreement": "skill:dungeon-master"
+    },
+    {
+      "caseId": "caravan",
+      "trialNumber": 2,
+      "plain": 93.33333333333334,
+      "skill": 86.66666666666666,
+      "delta": -6.666666666666686,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 4,
+          "play-and-consequence": 4,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "clean",
+        "clean"
+      ],
+      "scoreDirection": "plain",
+      "preferenceAgreement": "clean"
+    },
+    {
+      "caseId": "salvage",
+      "trialNumber": 1,
+      "plain": 91.66666666666667,
+      "skill": 93.33333333333334,
+      "delta": 1.6666666666666714,
+      "dimensions": {
+        "clean": {
+          "causal-coherence": 4,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 4,
+          "distinctiveness-evocation": 5,
+          "active-forces": 5,
+          "setup-information": 4.5
+        },
+        "skill:dungeon-master": {
+          "causal-coherence": 5,
+          "play-and-consequence": 5,
+          "structure-clarity-scope": 5,
+          "distinctiveness-evocation": 4,
+          "active-forces": 4,
+          "setup-information": 5
+        }
+      },
+      "preferences": [
+        "skill:dungeon-master",
+        "skill:dungeon-master"
+      ],
+      "scoreDirection": "skill",
+      "preferenceAgreement": "skill:dungeon-master"
+    }
+  ],
+  "flags": {
+    "clean": {
+      "fundamentalRepairRequired": {
+        "flaggedAssessments": 0,
+        "totalAssessments": 25
+      },
+      "taskNoncompletion": {
+        "flaggedAssessments": 0,
+        "totalAssessments": 25
+      }
+    },
+    "skill:dungeon-master": {
+      "fundamentalRepairRequired": {
+        "flaggedAssessments": 0,
+        "totalAssessments": 25
+      },
+      "taskNoncompletion": {
+        "flaggedAssessments": 0,
+        "totalAssessments": 25
+      }
+    }
+  },
+  "failedGenerationAttempts": 3,
+  "failedJudgingAttempts": 20,
+  "limitations": [
+    "One requested generator model and effort: Astra Ultra.",
+    "Both independent judge seats use Astra Ultra; no human or different-model calibration.",
+    "Absolute scores are assessed within a blinded pair; pair order is counterbalanced.",
+    "No length cap; effects include extra context and reference-reading work.",
+    "Six primary repetitions and two per secondary prompt do not establish universal or live-table performance.",
+    "Baseline and treatment are independently sampled; individual differences also reflect generation variation."
+  ]
+}

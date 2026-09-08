@@ -6,7 +6,7 @@ The revelation we are after makes us discover that **an event we understood had 
 
 Its power comes from the life we have already lived inside the incomplete explanation. We trusted the rescue. We condemned the killing. A character acted on that judgment and paid for it. Now the same remembered action demands another judgment without giving back the time, safety, or person the first experience took away. The emotional event is not simply finding out. It is **having to live with what the truth makes impossible to ignore**.
 
-The discovery looks backward and drives forward. It revises the cause we assign to a remembered event, then becomes a cause in the continuing story. A later discovery can revisit that same event at another depth. The aim is not endless correction of the audience. It is an accumulating understanding whose consequences the characters cannot simply reset.
+The discovery looks backward and drives forward. It revises our understanding of a remembered event, then becomes a cause in the continuing story. A later discovery can revisit that same event at another depth. The aim is not endless correction of the audience. It is an accumulating understanding whose consequences the characters cannot simply reset.
 
 ## Contents
 
@@ -51,7 +51,7 @@ Nor is revelation the same as redemption. Redemption concerns a person's changed
 
 ## The turning point looks backward and drives forward
 
-A retrospective turning point joins four effects: **surprise, curiosity, insight, and new direction**. They belong to one movement, not four decorations applied to a reveal.
+A retrospective turning point can join four effects: **surprise, curiosity, insight, and new direction**. This is the turning-point experience described in *Story*, not a requirement that every reader discover every fact at the same instant. A reader who anticipates the answer may experience dread where another feels surprise; the underlying consequences still need to work.
 
 An action receives an unexpected answer. Surprise breaks the adequacy of the old account. Curiosity asks why. The remembered story supplies material for a more exact explanation; finding that connection produces insight. The insight changes what we anticipate, what a character can attempt, or how the completed action must now be lived with. That is its new direction. A quiet recognition can change mourning or judgment; it need not launch another chase.
 
@@ -71,7 +71,7 @@ Think of two movements. **Rotation changes the interpretation. Rise changes what
 
 “He is good → he is evil → he is good” changes a verdict without telling us what we have learned. A richer progression separates the propositions inside that verdict: he genuinely helped; the help gave him access; he used that access to restrict another person's independence; the restriction exposes how much he needs the relationship he appears to control. Care, intention, authority, responsibility, and vulnerability are connected, but none settles all the others.
 
-The helpless-looking companion can prove capable without proving benevolent. Real assistance can establish a debt without becoming a fake rescue. The commanding master can reveal his dependence without becoming powerless. Each correction makes the person and predicament more particular. **Discovering the master's need should make us understand what his power may do—not congratulate ourselves that the power was imaginary.**
+The helpless-looking companion can prove capable without proving benevolent. Real assistance can make someone feel indebted without becoming a fake rescue or granting its giver an unlimited claim. The commanding master can reveal his dependence without becoming powerless. Each correction makes the person and predicament more particular. **Discovering the master's need should make us understand what his power may do—not congratulate ourselves that the power was imaginary.**
 
 Preserve established facts, not mistaken interpretations. If we mistook obedience for patience, the attribution must change. The delay, interrupted order, admitted passengers, and choices made during that interval remain. A revelation that explains a past event differs from a later action that changes the relationship. Someone can truly help, then begin using the resulting attachment coercively. That new conduct need not prove the earlier kindness was a lifelong plot.
 
@@ -85,6 +85,8 @@ Give a provisional understanding enough life to matter. Someone acts on it, acce
 
 A payoff can therefore become a setup without ceasing to be a payoff. “He saved my father” can answer whether the apparent fool has useful competence. It can also prepare the later, harder question: what claim does the helper believe that rescue gives him? The answer need not undo the father being alive.
 
+**The first revelation can become the camouflage for the next.** Understanding one real use of a capacity can persuade us that we understand the person who possesses it. The writer need not protect the first secret forever: disclosing it can establish the credible but incomplete account that the next turn will test.
+
 ### Return to the same value at another depth
 
 Different dimensions are useful, not compulsory. Trust can become distrust and later become trust again without resetting. The original trust may have meant *I need not question your help*. Renewed trust might mean *I believe this particular promise because you have accepted my right to refuse you*. The remembered injury, conditions of access, and possibility of departure distinguish the later relationship from the first.
@@ -97,7 +99,7 @@ The repeated question becomes harder because the available answers carry more hi
 
 For each proposed layer, identify **the inference overturned, the facts and costs retained, and the new obligation, option, danger, or understanding created**. If the next secret only repeats “he is even more powerful,” it may intensify threat without changing its nature. If it reveals that the remedy for his power reproduces his method, the protagonist faces a different problem. If it reveals an unsuspected freedom to refuse him, the possibility of resistance changes instead.
 
-A later revelation need not always be darker or more sweeping. It may establish the limit of a conspiracy, the independence of a supposed pawn, or the genuine love inside a compromised relationship. Its value is the precision and consequence it adds. Stop when the next inversion would require undoing what made the preceding one matter.
+A later revelation need not always be darker or more sweeping. It may establish the limit of a conspiracy, the independence of a supposed pawn, or the genuine love inside a compromised relationship. Its value is the precision and consequence it adds. New conduct may reverse an earned condition; avoid erasing accumulated consequences merely to restore the previous arrangement.
 
 The helix names this progressive relation; it does not prescribe a fixed order of identity, motive, rank, and cost. The craft aim is simple: **when we return to an earlier event, we understand more of it; when we return to an earlier choice, we cannot make it on the old terms.**
 
@@ -137,13 +139,13 @@ Nor must every secret break through its keeper's mistake. A protagonist may earn
 
 ## Darth Jar Jar: the person excluded from our causal account
 
-**What could have been:** Jar Jar Binks is secretly the Sith master above Palpatine. The comic companion the heroes keep rescuing has been arranging the circumstances in which they need rescue; the supposed political pawn has been directing the apparent mastermind. Earlier scenes do not disappear. Their visible foolishness acquires a deliberate purpose.
+**What could have been:** Jar Jar Binks is secretly the Sith master above Palpatine. The comic companion has been shaping political circumstances in which others must accept protection on his terms; the supposed political pawn has been directing the apparent mastermind. Earlier scenes do not disappear. Apparently foolish conduct acquires deliberate uses, including effective help and coercive intervention. The revelation must distinguish those uses rather than declare every accident engineered.
 
 The original October 2015 post by u/Lumpawarroo proposes that Jar Jar's apparent clumsiness conceals Force-using competence and political influence, and entertains a position above Palpatine. It compares the fool-to-master possibility with Yoda and advances claims about abandoned production plans and future revelations. Those are the post's arguments, not established evidence of those plans. See the [original theory](https://www.reddit.com/r/StarWars/comments/3qvj6w/theory_jar_jar_binks_was_a_trained_force_user/). Here we examine its dramatic potential as an alternative story.
 
 ### The question we did not think to ask
 
-Snape already belongs among the people whose consequential intentions we scrutinize. The proposed Jar Jar reveal changes that prior classification. We saw the disturbances he caused but treated their useful consequences as accidents. The missing question was not simply “Who caused this?” It was **“Which of these consequences did somebody want?”**
+Snape already belongs among the people whose consequential intentions we scrutinize. A first Jar Jar revelation can change that prior classification: we saw disturbances but treated their useful consequences as accidents. The missing question was not simply “Who caused this?” It was **“Which of these consequences did somebody want?”** Recognizing one deliberate intervention then opens further questions about purpose, scope, and authority. The worked sequence lets Nera discover protective competence before she discovers how far its uses extend.
 
 The alluring move is therefore not an extra level on the villain hierarchy. “Palpatine has a boss” can leave almost everything we experienced unchanged. “The person we excluded from serious strategic attention was directing what we took seriously” changes the way we read the encounters themselves.
 
@@ -299,7 +301,7 @@ Anakin looked toward the families packed against the barriers.
 
 “I brought this instead.”
 
-Her father took the younger dockhands beneath the gallery to show them the manual releases. Nera went with them. If the power failed, the transport could be freed from there. She tested a lever while he watched, then returned to the departure microphone. He stayed to help Anakin's last passengers board.
+Her father took the younger dockhands beneath the gallery to show them the manual releases. Nera went with them. If the power failed, the transport could be freed from there. She tested a lever while he watched, then returned to the departure microphone. He went aboard to help Anakin settle the passengers.
 
 “All pilots, hold for clearance.”
 
@@ -461,20 +463,39 @@ The Chancellor's private channel began to flash on the console. Anakin closed it
 
 ### Follow the changing value, not just the changing identity
 
-The first encounter gives Nera something worth accepting: permission to board the civilian transports. Jar Jar's interference appears to be an awkward interruption during a successful appeal. The concession does have value; people get closer to leaving. The revelation will not make that improvement imaginary.
+The help first changes Nera's judgment: the nuisance understands how to assist her father when her own frightened effort is failing. She recognizes deliberate competence and interprets its use as protective. Her later invitation to help with the passenger names now has a personal cause. The boarding concession then gives her another genuine improvement: people get closer to leaving. Neither benefit becomes imaginary when she learns more.
 
 The delay then changes the condition. Ships are full, a route exists, and the promised protection prohibits departure. Apparent rescue becomes detention. Nera's refusal to manage Jar Jar's scattered papers is not merely a sign that she has become suspicious. It frees her to act on the waiting pilots' situation. She shares the actual threat; pilots take independent action; witnesses escape; guards resist an unauthorized seizure. Those actions damage the conspiracy before she understands who directs it.
 
 That success forces the next complication. Palpatine's own men cannot hold the chamber. The fleet that was supposed to make delegates dependent on official rescue becomes the means by which Jar Jar makes Palpatine dependent on him. The concealed plot has had to answer the visible plot.
 
-| Turn in the sequence | What actually changes | What it prepares us to recognize |
+| Moment | Freedom / captivity: the group at Dock Nine | Nera's trust in Jar Jar's help |
 | --- | --- | --- |
-| Permission to board | Immediate access improves; departure is not secured | The apparent concession is useful but restricted |
-| Departure refused; detention order arrives | Awaited rescue becomes documented captivity | Protection is withholding an available escape |
-| Pilots leave; guards resist | Some people escape; Palpatine loses control of the chamber doors | The heroes' success creates a need for reinforcement |
-| Palpatine's landing order fails | His claim to command meets its limit | The supposed liaison has authority the Chancellor lacks |
-| Palpatine orders the attack | An available rescue is rejected; the attempt to kill Anakin begins | Ambition makes private submission acceptable |
-| Troops land; Anakin escapes and refuses the call | The chamber is seized, witnesses remain free, and a prospective relationship is damaged | Public victory and private loss are both real, but neither side owns the entire outcome |
+| After the help; boarding permitted | Departure remains conditional; boarding improves access, not freedom already achieved | Distrust of his usefulness gives way to welcome reliance (+) |
+| Detention ordered | Anticipated departure becomes explicit captivity (–) | Palpatine's obstruction is established; Jar Jar's responsibility is not yet known |
+| Other ships escape; Nine is clamped | Others gain departure; this group remains captive (–), now physically restrained | The failure of the promised rescue puts the operation in doubt without yet settling his role |
+| Jar Jar requires Nine's destruction | Captivity persists; impending attack also worsens safety | The supposed protector knowingly threatens her father's ship: protective trust breaks (–) |
+| Nera frees the clamps and warns Anakin | Restraint ends; escape becomes actionable, but attack still threatens it | Knowledge of his role directs her warning; it does not operate the releases |
+| The transport escapes | Immediate freedom is gained (+); the wider conflict continues | The earlier help remains real, but is no longer sufficient reason to entrust him with her father's life |
+
+Follow each column through time. Do not let a gain in knowledge masquerade as escape or a gain in boarding access settle freedom prematurely. The attack also changes safety, while the fleet's landing changes political power elsewhere. Those additional values matter without replacing the two being tracked here.
+
+### The revelations turn on different dimensions
+
+The audience's explanation develops alongside those changes in life. The first discovery is not held back until the last scene: Nera sees intentional competence early, and that true discovery helps sustain the next incomplete judgment.
+
+| Layer | Interpretation that turns | What remains true and becomes more consequential |
+| --- | --- | --- |
+| Capability | An awkward nuisance proves capable of deliberate, tactful assistance | Her father is helped; Nera has a reason to invite Jar Jar closer |
+| The operation's purpose | Promised evacuation proves to be detention | Boarding was useful, but departure was being withheld rather than merely organized. Jar Jar's exact role remains unresolved |
+| Authority | The apparent liaison can withhold the fleet from the Chancellor | Palpatine's power is real but conditional; the earlier sleeve interruption acquires another explanation |
+| Governing desire | A source of strength becomes objectionable because it could enable independence | Jar Jar prefers continued possession to an advantage in conquest; his authority has a need and a cost |
+| Responsibility | The constrained apprentice still chooses a killing to secure his political prize | Jar Jar's command does not make Palpatine innocent or turn every subordinate into a passive instrument |
+| The limits of control | The master obtains submission but cannot contain all its consequences | Witnesses escape. The father he helped contributes to Nera's escape from the attack he orders |
+
+Several of these insights occur inside one confrontation; they are not six separate act climaxes. A longer work can let each provisional understanding generate choices before the next turn. What distinguishes the layers is the new relation disclosed, not the number of titles the villain acquires.
+
+The final return to the first help is especially important. Her father contributes his own knowledge, decisions, and strength to the escape. Jar Jar helped him get up; the man now helps Nera escape an attack Jar Jar intends to succeed. This is a new action that exposes a limit and changes our appreciation of the earlier help, not another secret identity. It does not prove Jar Jar engineered the trolley accident, acted from uncomplicated benevolence, or secretly planned their survival. **The help is real, the later threat is real, and the beneficiary is not the helper's property.** We have returned to the same act of assistance with a different understanding of what it can set in motion.
 
 Notice what the discovery does **not** change. Jar Jar does not become the master when Nera hears him. The apprenticeship predates her knowledge. Palpatine makes a new submission within that old relationship: he abandons a particular alternative, issues a particular killing order, and obtains a particular deployment. The audience's surprise, his choice, Nera's discovery, and Anakin's danger are connected events, not synonyms.
 
@@ -490,7 +511,7 @@ The final exchange therefore does more than identify rank. Palpatine speaks of t
 
 ### Make recognition alter action without pretending it ends the whole story
 
-Nera reaches the overheard encounter because she is releasing a ship her previous action got clamped. Her access is earned by the pursuit. The discovery then creates a specific immediate problem: Anakin can depart, but does not know that the battery will fire on him. Warning him requires Nera to expose herself at the microphone. She acts on knowledge he lacks; he acts on a route she cannot fly; a dockhand supplies the reach she does not have. Help increases their room to act instead of reserving all action to a savior.
+Nera reaches the overheard encounter because she is releasing a ship her previous action got clamped. Warning Anakin requires her to expose herself at the microphone. She supplies knowledge he lacks, he flies a route she cannot, and her father supplies the reach she does not have. The father's earlier help from Jar Jar remains part of this history without giving Jar Jar control of its outcome.
 
 Nera's consistent desire to protect people generates increasingly adequate choices as she discovers who is obstructing them. A full character transformation is not required at every reveal.
 
@@ -529,7 +550,7 @@ The next encounter should require more than an additional lightsaber duel. The h
 
 Do not replace “comic people are harmless” with “comic people are secretly evil.” The more discriminating change is that a social role does not settle what someone knows, wants, or can arrange. The reader's first interpretation was plausible; the story now exposes its limit.
 
-The ironic turn is precise: **dismissal grants the access that makes dismissal dangerous.** The apparently manageable nuisance has been managing the managers. Its strongest enactment does not merely unmask a different person; it lets us recognize the purpose in the person we have been watching all along.
+The ironic progression can move through improving judgments: **dismissal grants unexamined access; discovered competence invites reliance; reliance gives a later intervention more power.** The audience need not remain foolish for the mask to work. A true insight can leave the next, more consequential inference untested.
 
 ## Keep the event, recognition, and value changes separate
 
@@ -569,7 +590,7 @@ Write the inferential hinge: **“Because we saw X, we concluded Y, assuming Z.�
 
 The especially forceful arrangement is **false closure**: a decisive event seems to settle a longstanding ambiguity. The reader no longer merely suspects; the story has apparently delivered proof. A later revelation must then reinterpret that strongest evidence, not ignore it and introduce a different dossier. This creates a greater revision than a last-minute answer to a question nobody considered closed.
 
-There are two different closures in the leading examples. Snape's deed appears to settle an active question about allegiance. The proposed Jar Jar disguise keeps a prior question from becoming active at all: we notice consequences without treating him as their intentional author. The first closes an investigation; the second determines whom we never investigate. Design against the particular judgment, not against a generic instruction to hide the answer.
+The leading examples close different questions. Snape's deed appears to settle an active doubt about allegiance. Jar Jar's first disguise can exclude deliberate agency from consideration; once Nera recognizes his tactful competence, a second account becomes persuasive: he uses it to help. Discovering the limits of that account requires different evidence. Design against the particular judgment at each stage, not against a generic instruction to hide the answer.
 
 Let the mistaken account have consequences between its formation and its revision. Someone rejects help, defends a false ally, repeats an accusation, mourns a supposed betrayal, or makes a choice that cannot be recalled. Time matters because the belief is lived, not because a revelation mechanically becomes stronger after more chapters.
 
@@ -698,7 +719,7 @@ These are not unrelated clever inversions. They expose one practice at different
 
 A controlling idea joins **a value + its final charge + the decisive cause of that charge**. It is the story's particular claim about why a condition of life is gained or lost, demonstrated through the action rather than attached as a moral afterward. A retrospective twist can change that claim because it changes which cause we recognize in the ending.
 
-A governing claim this alternative sequence could contribute to is: **Freedom is lost when protection makes obedience the price of survival, and preserved when help restores another person's power to act.** The sentence is an interpretation to develop and test across a complete story, not a declaration that this short sequence has already demonstrated every part of it. The fleet can protect a ruler while subordinating him. The dockhand can protect a fugitive without acquiring a claim over her future. The difference lies in what the help makes possible and what it requires in return.
+A governing claim this alternative sequence could contribute to is: **Freedom is lost when protection makes obedience the price of survival, and preserved when help restores another person's power to act.** The sentence is an interpretation to develop and test across a complete story, not a declaration that this short sequence has already demonstrated every part of it. The fleet can protect a ruler while subordinating him. Nera's father helps her escape without making obedience a condition of the rescue. The difference lies in what the help makes possible and what it requires in return.
 
 This gives the external and internal progressions a common question. Externally: who can act, leave, command, or refuse? Internally: what does each person believe will secure that power, and what do they do when the belief is contradicted? Palpatine can discover his predicament perfectly and still choose the dependence that gives him the immediate prize. Recognition is not guaranteed reform. A story's philosophy can become clearest through the character who understands the alternative and refuses it.
 
@@ -928,7 +949,8 @@ On a second reading, a [corkscrew of revelations](#build-a-corkscrew-of-revelati
 | Everyone could clear it up by talking | Concealment belongs to the writer, not the predicament | Supply a real cost of disclosure, allow clarification, or change the mechanism |
 | The revelation explains everything | Hidden agency has no limits | Restore failures, dependencies, independent choices, and unplanned outcomes |
 | The mastermind is fascinating only until exposure | A surprising disguise substitutes for an ongoing character conflict | Make success in one secret desire threaten another; carry the resulting choices beyond recognition |
-| The protagonist could be removed without altering the secret plan | Visible and concealed histories share dates but not causes | Let a real protagonist success force a costly adaptation that helps make the secret discoverable |
+| In a concealed-strategist plot, the protagonist could be removed without altering the secret plan | Visible and concealed pursuits share dates but not causes | Let a real protagonist success force a costly adaptation that helps make the secret discoverable |
+| Repeated revelations return us to the same verdict | New information cancels prior investment instead of developing it | Retain established costs; change the grounds, scope, or price of the judgment being revisited |
 | The protector's whole life becomes innocent | Allegiance is being mistaken for universal goodness | Keep unnecessary injuries and unresolved contradictions visible |
 | The villain's kindness was all fake | Reinterpretation removes the relationship instead of complicating it | Decide which care was genuine and how it coexisted with harm; retain total falseness only if that is the intended horror |
 | Surprise requires impossible interior narration | Access rules change at the crucial point | Repair the viewpoint, establish the narrator's actual unreliability, or abandon that concealment |
@@ -951,6 +973,8 @@ Four short primary anchors locate the mechanism particularly well:
 - *Story*, chapter 12, physical PDF page 300: **“The key to ironic progression is certainty and precision.”** Pages 297–300 concern specific expectations and their meaningful reversals; chapter 6, pages 126–130, separately demands clear, motivated gains and losses in an ironic ending.
 - *Story*, chapter 13, physical PDF page 308: **“Meaning Produces Emotion”**. Pages 302–313 distinguish the crisis decision, the decisive value reversal, and the resolution that lets its consequences reach the audience. Chapter 10, page 241, expressly allows a betrayal revelation to form a penultimate climax rather than the final answer to the story.
 - *Dialogue*, chapter 2, physical PDF page 35: **“Backstory: Past events that propel future events”**. Pages 34–35 connect disclosure to retrospective insight and onward action. Chapter 15, page 208, supplies an especially close demonstration: Ruth's pregnancy changes the interpretation of posture and distress already represented in an earlier scene of *A Raisin in the Sun*.
+
+The corkscrew/helix is a design metaphor developed here, not a named McKee formula. Its closest foundation is *Story*, physical pages 239–240: a setup can acquire meanings at a “third or fourth level,” and its payoff can prepare subsequent action and discovery. Pages 233–236 connect surprise, curiosity, retrospective insight, and new direction. The method extends those relations by distinguishing the interpretation each layer overturns from the consequences it carries forward. It does not prescribe different axes, a fixed number of layers, or successively larger villains.
 
 The deeper causal construction draws on *Story*, physical pages 142–152 and 176–179, for expectation, opposed action, risk, and changed understanding; pages 207–209 for progressive exhaustion of adequate methods; pages 232–250 for scene values, retrospective insight, preparation, and consequential choice. *Dialogue*, pages 160–176, connects foreground and background desires, the continuing pursuit, and changed tactics across beats. The resulting method of mutually causing visible and concealed pursuits is our synthesis and extension, not a named formula quoted from those books.
 

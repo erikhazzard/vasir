@@ -67,6 +67,8 @@ normally. Other models/providers continue. A bare 429, a rate-limit message, or
 an output-filtering 400 does not open the circuit. Each new invocation starts
 closed; it still reuses every compatible completed judgment without rerolling.
 The circuit does not change prompts, frozen inventories, panel seats, or scores.
+Claude's explicit "You've hit your session limit" diagnostic also opens the
+circuit. Do not keep sending requests or switch account routing to evade it.
 
 Before resuming a judge pass with failures, let its lock owner finish and archive
 the unchanged full run plus frozen skill snapshot. Generic judge recovery reuses
@@ -115,6 +117,16 @@ require both arms of every story and the full independent panel.
 `--require-scored` additionally rejects a preview with no complete scored
 configuration; it exercises the real ranking and efficiency branches.
 
+An unfinished panel can additionally expose an **Astra-only provisional
+leaderboard**. This uses Astra xhigh's original assessments, both conditions,
+all twelve frozen stories, and equal case weights. Only configurations with
+every paired assessment are ranked. Eleven-story results remain separate,
+unranked diagnostics; Fable's uneven partial coverage is never mixed into this
+comparison. The additive `provisionalLeaderboard` carries its own source,
+corpus, judge, coverage, and score basis. It must be labeled provisional in the
+UI and must not replace official panel totals or feed the Writing/Overall
+indices. Hide it when the pending second-judge assessments have all completed.
+
 Review exact answers, original ratings, coverage, frozen reference files,
 provider identity limits, source uncertainty, and usage-normalization limits.
 Check the unchanged Overall projection and historical report routes. A local
@@ -127,7 +139,8 @@ node bin/vasir.js benchmark publish --dry-run
 node bin/vasir.js benchmark publish
 ```
 
-Use the guarded publisher, not an ad-hoc upload. Require the accepted-source,
-byte-budget, immutable-release, live-byte and browser checks before claiming the
-release is live. Writing remains excluded from Overall; Prose and Poetry stay
+Use the guarded publisher, not an ad-hoc upload. Its default fast path retains
+accepted-source, byte-budget, immutable-release, and bounded live-byte checks;
+an exhaustive retained-asset/browser audit is opt-in with `--full-audit`, not a
+routine deployment requirement. Writing remains excluded from Overall; Prose and Poetry stay
 unscored until they have their own benchmark evidence.

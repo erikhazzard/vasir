@@ -1,0 +1,21 @@
+{
+  "createdAt": "2026-09-08T01:57:38.772Z",
+  "records": [
+    {
+      "path": "benchmarks/public-results.json",
+      "sha256": "e38dee13048ef18bb5db6ea027f3a308a43167cdeddfc9b072dbf0a1d7b2d979"
+    },
+    {
+      "path": "benchmarks/storytelling-core-idea/publication.json",
+      "sha256": "20a28d169ae0122a92f2803b36099adc108c5aaf65f8637e1547da3ac292cc1c"
+    },
+    {
+      "path": "benchmarks/storytelling-plot-twists/publication.json",
+      "sha256": "8d3e1c0b6e44e7abbe2536671fc09d70e8eba9ae395913c0c8dd7779c43ffc6d"
+    },
+    {
+      "path": "benchmarks/2d-jumping-demo/publication.json",
+      "sha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321"
+    }
+  ]
+}

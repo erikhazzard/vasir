@@ -1,16 +1,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { prepareWritingPublicationSource, WRITING_SELECTION_PATH } from "./writing-publication.js";
+import { prepareWritingPublicationSource, writingSelectionPath, WRITING_BENCHMARK_ID } from "./writing-publication.js";
 import { buildBenchmarkPublicationProjection } from "./benchmark-publication-projection.js";
 
-const { values } = parseArgs({ options: { "run-directory": { type: "string" }, "project-root": { type: "string" } } });
+const { values } = parseArgs({ options: { "run-directory": { type: "string" }, "project-root": { type: "string" }, benchmark: { type: "string" } } });
 if (!values["run-directory"]) throw new Error("Pass --run-directory with a frozen storytelling run checkpoint.");
 const repoRootDirectory = path.resolve(values["project-root"] ?? process.cwd());
-const selection = prepareWritingPublicationSource({ repoRootDirectory, runDirectory: path.resolve(repoRootDirectory, values["run-directory"]) });
-fs.writeFileSync(path.join(repoRootDirectory, WRITING_SELECTION_PATH), `${JSON.stringify(selection, null, 2)}\n`);
+const benchmarkId = values.benchmark ?? WRITING_BENCHMARK_ID;
+const selection = prepareWritingPublicationSource({ repoRootDirectory, benchmarkId, runDirectory: path.resolve(repoRootDirectory, values["run-directory"]) });
+fs.writeFileSync(path.join(repoRootDirectory, writingSelectionPath(benchmarkId)), `${JSON.stringify(selection, null, 2)}\n`);
 const publication = buildBenchmarkPublicationProjection({ repoRootDirectory });
 for (const [name, source] of [["data.js", publication.dataSource], ["responses.js", publication.responsesSource], ["writing-data.js", publication.writingDataSource], ["writing-responses.js", publication.writingResponsesSource]]) {
   fs.writeFileSync(path.join(repoRootDirectory, "site/vasirbenchmark.com", name), source);
 }
-process.stdout.write(`${JSON.stringify({ sourceSha256: selection.run.sha256, coverage: publication.writing.coverage, basisSha256: publication.basisSha256 })}\n`);
+const selectedProjection = publication.writing.benchmarks[0].id === benchmarkId ? publication.writing
+  : publication.writing.benchmarkPublications?.find(item => item.benchmarkId === benchmarkId)?.projection;
+if (!selectedProjection) throw new Error("The selected Storytelling benchmark is absent from the generated collection.");
+process.stdout.write(`${JSON.stringify({ benchmarkId, sourceSha256: selection.run.sha256, coverage: selectedProjection.coverage, basisSha256: publication.basisSha256 })}\n`);

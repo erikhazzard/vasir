@@ -57,6 +57,23 @@ function sha256(contents) {
   return crypto.createHash("sha256").update(contents).digest("hex");
 }
 
+// This affects only the parent-path privacy scan, never archived/public bytes.
+// The Writing projector has already validated the frozen archive and its hashes.
+export function writingParentPathScanSource(writing, responses) {
+  const source = structuredClone(responses);
+  const id = "dungeon-master-adventure-outline";
+  const skillPaths = new Set(writing?.additionalBenchmarks?.[id]?.methodology?.skillFiles?.map(file => file.path) ?? []);
+  const archive = source?.additionalBenchmarks?.[id]?.promptFiles ?? [];
+  for (const file of archive) {
+    if (!skillPaths.has(file.title)) continue;
+    file.content = file.content.replace(/(\]\()(\.\.\/[^\s)]+)(\))/gu, (match, opening, href, closing) => {
+      const destination = path.posix.normalize(path.posix.join(path.posix.dirname(file.title), href.split("#")[0]));
+      return skillPaths.has(destination) ? `${opening}<verified-frozen-skill-link>${closing}` : match;
+    });
+  }
+  return JSON.stringify(source);
+}
+
 function artifactError({ code = "BENCHMARK_PUBLISH_ARTIFACT_INVALID", message, suggestion, stage = "artifact", context = {} }) {
   return new VasirCliError({
     code,
@@ -463,7 +480,9 @@ function assertFileWithinSiteRoot({ siteRootDirectory, filePath, relativePath })
 
 export function buildBenchmarkPublicationArtifact({
   repoRootDirectory,
-  validateAcceptance = true
+  validateAcceptance = true,
+  publicationSourceRootDirectory = repoRootDirectory,
+  publicationReadFileSyncImplementation = fs.readFileSync
 }) {
   const { config, configPath, siteRootDirectory, templatePath } = readBenchmarkDeploymentConfig({ repoRootDirectory });
   const acceptance = validateAcceptance
@@ -479,7 +498,13 @@ export function buildBenchmarkPublicationArtifact({
     });
   }
 
-  const publicationProjection = buildBenchmarkPublicationProjection({ repoRootDirectory });
+  // A reviewed presentation checkout may use the original immutable evidence
+  // root. In particular, historical Games receipts retain absolute build paths.
+  // Source pins and all artifact validators still run against that source root.
+  const publicationProjection = buildBenchmarkPublicationProjection({
+    repoRootDirectory: publicationSourceRootDirectory,
+    readFileSyncImplementation: publicationReadFileSyncImplementation
+  });
   const generatedFiles = new Map([
     ["data.js", Buffer.from(publicationProjection.dataSource, "utf8")],
     ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")],
@@ -656,6 +681,13 @@ export function buildBenchmarkPublicationArtifact({
     if (data.writing) {
       validateWritingPublication(writing, writingResponses);
       if (JSON.stringify(writing.coverage) !== JSON.stringify(data.writing.coverage)) throw artifactError({ message: "Writing lazy evidence and landing coverage differ.", suggestion: "Regenerate both bundles from the same pinned source." });
+      if (JSON.stringify(Object.keys(writing.additionalBenchmarks ?? {})) !== JSON.stringify(Object.keys(data.writing.additionalBenchmarks ?? {})) || JSON.stringify(writing.allWritingCoverage) !== JSON.stringify(data.writing.allWritingCoverage)) throw artifactError({ message: "Additional Writing selections differ between landing and lazy evidence.", suggestion: "Regenerate the entire Writing collection from the same pinned sources." });
+      for (const [id, additional] of Object.entries(writing.additionalBenchmarks ?? {})) {
+        if (JSON.stringify(additional.coverage) !== JSON.stringify(data.writing.additionalBenchmarks[id].coverage)) throw artifactError({ message: "Additional Writing coverage differs from its landing descriptor.", suggestion: "Regenerate all Writing bundles from the pinned source." });
+      }
+      if (JSON.stringify(writing.collectionCoverage) !== JSON.stringify(data.writing.collectionCoverage)) throw artifactError({ message: "Writing benchmark collection coverage differs from the landing summary.", suggestion: "Regenerate the collection and summary from the same selected sources." });
+      const writingBenchmarkIds = [writing.benchmarks[0].id, ...(writing.benchmarkPublications ?? []).map(child => child.benchmarkId), ...Object.keys(writing.additionalBenchmarks ?? {})];
+      if (JSON.stringify(writingBenchmarkIds) !== JSON.stringify(data.writing.benchmarkIds ?? [data.writing.benchmarkId])) throw artifactError({ message: "Writing report identities differ from the selected benchmark collection.", suggestion: "Preserve each selected Writing benchmark and its own report route." });
     } else if (writing !== null || writingResponses !== null) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
     const benchmarkRoutes = buildBenchmarkPublicationRoutes(data);
     if (JSON.stringify(benchmarkRoutes) !== JSON.stringify(publicationProjection.routes)) {
@@ -677,7 +709,8 @@ export function buildBenchmarkPublicationArtifact({
         // independently validated against pinned evidence before reaching here.
         const authoredResponseText = file.path === "responses.js" && publicationProjection.projection.aiWorkflows;
         // Preserve authored /users/ API routes while rejecting the literal Mac /Users/ home prefix.
-        return PRIVATE_LOCAL_PATH_PATTERN.test(source) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(source));
+        const parentPathSource = file.path === "writing-responses.js" ? writingParentPathScanSource(writing, writingResponses) : source;
+        return PRIVATE_LOCAL_PATH_PATTERN.test(source) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(parentPathSource));
       })
       .map((file) => file.path);
     if (textualLeakPaths.length > 0) {
