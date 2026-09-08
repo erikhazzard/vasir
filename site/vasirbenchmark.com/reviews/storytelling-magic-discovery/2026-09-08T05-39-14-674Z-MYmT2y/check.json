@@ -1,0 +1,851 @@
+{
+  "kind": "vasirbenchmark-creation-release-check",
+  "schemaVersion": 1,
+  "releaseId": "4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e",
+  "mode": "local-frozen-bytes",
+  "status": "passed",
+  "startedAt": "2026-09-08T05:38:23.891Z",
+  "reports": [
+    {
+      "directory": "/Users/erikhazzard/code/vasir/tmp/writing-magic-release/checks/2026-09-08T05-38-23-889Z-wUl7Vs/1440",
+      "width": 1440,
+      "height": 1000,
+      "proof": {
+        "path": "/Users/erikhazzard/code/vasir/tmp/writing-magic-release/checks/2026-09-08T05-38-23-889Z-wUl7Vs/1440/writing-browsercheck.json",
+        "bytes": 468141,
+        "sha256": "51574b5603519b681d34ceb09ba6aa1f6b87ba0f1d6b60a528b8a2b985f13e83"
+      },
+      "captures": [
+        {
+          "path": "writing-models.png",
+          "bytes": 166878,
+          "sha256": "155e5a4b87c22e965cca41fa063f6f32a175036b955724c06530764fdf03be3e",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 136413,
+          "sha256": "eb039b954ef4868aadf47e3fc5052b354d1334059083c20b250b1a43558d7ad3",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-partial.png",
+          "bytes": 136413,
+          "sha256": "eb039b954ef4868aadf47e3fc5052b354d1334059083c20b250b1a43558d7ad3",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 179129,
+          "sha256": "28221eadf3f2301f8df029ebdcd887ac6715b4281b75bd20e740bffdce4ec143",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 145067,
+          "sha256": "e53e33cc11f3c1a0dac91f9b6329f6436b97e878cf0fa06b60240a4f6949b8c0",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 144569,
+          "sha256": "889486208900aa253be909227885f8e1a3c4a7e2b378168f0037124b298ef313",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 144421,
+          "sha256": "5829771f37efa91d07f52432ca875d1407b1aa77ee3d022f22a804243a2ebf66",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 151827,
+          "sha256": "8024d0ed870beeca4a0faf85ae80efe00485dc91553fa167c96d3f9f5517f889",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 204233,
+          "sha256": "d1f1a6cae4b666cfaf6dfd41a2905a405a3103541acc524d94e23e7540694397",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 197761,
+          "sha256": "835b77fefa07afc7c3caa46f661b60f7140c4048b4363437ce1655917bfc402a",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 165847,
+          "sha256": "6004d6015d034afa239806dd759b6d6de0881f5a0a715ec188c2bd20dede4d09",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 169901,
+          "sha256": "ae4708f059d6a0cf7f6b063a74e66d2a96c367e4a088129c59187ab0f515ce9d",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 224757,
+          "sha256": "d9e2769222ae3ba7561e89f8d691e314e2b9094612a3c10ce72733efffc4cdcd",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 288922,
+          "sha256": "f81846e5ce98f9a7ec332940562c15fccc467831a114beabb2d79ca57a280da0",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 228071,
+          "sha256": "445b4fa1d24f9a6bda0931926aa6ca8c8e8062faf29708e07cbee641bcaded15",
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 203435,
+          "sha256": "2b6e7ba939c5c4190d54fdf7feb41b301a9c2951edcc5d408f61e9becbf5c87f",
+          "width": 1440,
+          "height": 1000
+        }
+      ]
+    },
+    {
+      "directory": "/Users/erikhazzard/code/vasir/tmp/writing-magic-release/checks/2026-09-08T05-38-23-889Z-wUl7Vs/820",
+      "width": 820,
+      "height": 1000,
+      "proof": {
+        "path": "/Users/erikhazzard/code/vasir/tmp/writing-magic-release/checks/2026-09-08T05-38-23-889Z-wUl7Vs/820/writing-browsercheck.json",
+        "bytes": 468267,
+        "sha256": "f3a700ec5d0f23af400c0c20f47fb57b17eca7c5db8189ef7eeb8b45d484adc7"
+      },
+      "captures": [
+        {
+          "path": "writing-models.png",
+          "bytes": 113916,
+          "sha256": "e0158f4b8f0db3eabbea4c011d2f92d633128d8a5a8a747b5357fa648ffa055d",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 124899,
+          "sha256": "ebee438c23fbbf2d572a01243137fadc3e6978605f0f9967ba2358f71bc72a2f",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-partial.png",
+          "bytes": 124899,
+          "sha256": "ebee438c23fbbf2d572a01243137fadc3e6978605f0f9967ba2358f71bc72a2f",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 123848,
+          "sha256": "86a4a7a40202b9009dce217ed039e7a6e3e6968c6056b6d29bdf53d75c4eeff3",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 132816,
+          "sha256": "86149c48784093622ac2fa01a8a94ac1a9ac4678915d99fb3b416143828bef78",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 105265,
+          "sha256": "2e75dd0be59db285d186f9e34d665957b94705e14c3b7c60c406d8039629ae97",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 105029,
+          "sha256": "821619884e37967187d78ec3699f6b649b76c5c3732f92f8da2b2e9496b82695",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 125082,
+          "sha256": "01928928b4234f217fb5d04a6ed35505f9bae536243ade0904a006afb3ccf3f3",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 164670,
+          "sha256": "67d09374f9fe80a1b9b3f94cc5d1d0ce46da3a43b6c80687c3708f1c2ec4a26f",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 152912,
+          "sha256": "3d1a4206672dac6caaa264dac47433f05573337d650f209808af89e188980770",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 145574,
+          "sha256": "ed2266cad1b92edce351fd0358ffc2af13227c7515b639ad07994886da2abb48",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 138143,
+          "sha256": "5bf05a3b9006544f27a711c4ee299b305474f25d727ea22a549ba2e59989c90b",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 181410,
+          "sha256": "0cb80142f80bda43646df8f851952f594ddcb620587698193cd67bd0a9b0e341",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 209978,
+          "sha256": "ab99f69f803d8ec079ec1eb09736cd4faf5ab856d43aea017ba124fef58b4e78",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 107095,
+          "sha256": "edb974f9011aa1402add218e03e1bdabc3d30e267e7b97796e2e3b9e4e8b77fd",
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 169022,
+          "sha256": "d9f0c99759081161ad1b8855d73628379fdd597eaca5118c537709bdce83c142",
+          "width": 820,
+          "height": 1000
+        }
+      ]
+    },
+    {
+      "directory": "/Users/erikhazzard/code/vasir/tmp/writing-magic-release/checks/2026-09-08T05-38-23-889Z-wUl7Vs/390",
+      "width": 390,
+      "height": 844,
+      "proof": {
+        "path": "/Users/erikhazzard/code/vasir/tmp/writing-magic-release/checks/2026-09-08T05-38-23-889Z-wUl7Vs/390/writing-browsercheck.json",
+        "bytes": 468088,
+        "sha256": "7fb33a4ca3bef6e2f56d9b05c9477eb832843d3bf0bcee04ab2af1e954b90b09"
+      },
+      "captures": [
+        {
+          "path": "writing-models.png",
+          "bytes": 68928,
+          "sha256": "1849a206ad3b2188cef0e675172d865d6a9263b57a055e4f6412bab1b245d99a",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-stacked-rows.png",
+          "bytes": 74333,
+          "sha256": "f11fdd547b5b224eb917fc2a409998b606005559a54d09e64306566f2724459b",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-partial.png",
+          "bytes": 72922,
+          "sha256": "5bdc9882d7abea0e97d76f41010b22183c4f9fd6145968672090ab9176d52c6e",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-benchmarks.png",
+          "bytes": 78771,
+          "sha256": "26bb2b534b6747737257072872f905073430448d189e7d531d29f4c0642a60cf",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-provisional.png",
+          "bytes": 69083,
+          "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-efficiency.png",
+          "bytes": 64876,
+          "sha256": "3e8be1fc054a29b1fb7e694acfc068c4e2ed4d13349f2d91da4501ac8d822552",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-efficiency-tokens.png",
+          "bytes": 64741,
+          "sha256": "ac0891aef52d91c19b9e91c5e9a09e7a03278448f32b3f7dd0013a1299c8d203",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-report.png",
+          "bytes": 57971,
+          "sha256": "8493d2db5da5600e29de01d7f7080e68be0f323aa47c1b33c6721c03ea6b91a3",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-method.png",
+          "bytes": 80507,
+          "sha256": "a19634efbd292cb1e3381acd1d599919149bc1f552bca0aa28a1334a106753b1",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-rubric-anchors.png",
+          "bytes": 85570,
+          "sha256": "f3cb4c3fece82191048b04679180f8cd7b46558685ace7fba9db51c29ffca131",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-method-execution.png",
+          "bytes": 76799,
+          "sha256": "9ce3a59d47814eac92423f99e6c33ef41fe087fe84d0b0b5f0be4cd2a517e55a",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-reference.png",
+          "bytes": 71440,
+          "sha256": "be48891d3c5105a9c84c70c24478941e8742a4c625d4c45f042d701b43e27924",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-answer.png",
+          "bytes": 76566,
+          "sha256": "59383e7b08f54c2d20c6d3c41989a2333904862946e6f473447f5fd8f2d12f51",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-judgments.png",
+          "bytes": 71658,
+          "sha256": "d762cd67ceb91e25ad38acbd02c41fa0d85321f71c4405f37b065a9ade097eb8",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-judge-resources.png",
+          "bytes": 68888,
+          "sha256": "e0bc4ccf3f51352ee61d2b5e23c3a2391683efb20fb9e5062719e04407f877fd",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "path": "writing-execution.png",
+          "bytes": 62200,
+          "sha256": "e5bd17bba86e97dd7967018f1f09f539c4228cfaeb4fbff8dcc75924affbfb07",
+          "width": 390,
+          "height": 844
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "uri": "/index.html?writing=storytelling-magic-discovery",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/index.html",
+      "bytes": 2649,
+      "sha256": "7125cdea9f30322be95cd8dd7315edc2a5ee12afd045c2a80a377d2222045141"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "uri": "/index.html?writing=storytelling-magic-discovery",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/index.html",
+      "bytes": 2649,
+      "sha256": "7125cdea9f30322be95cd8dd7315edc2a5ee12afd045c2a80a377d2222045141"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "bytes": 1980074,
+      "sha256": "98395783f9be4c5bcd2ae8a26edf256ded8abcff0b59ada28a1ee3c129b59c39"
+    },
+    {
+      "uri": "/benchmark-report.html?writing=storytelling-magic-discovery&setting=claude-claude-opus-5-max",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.html",
+      "bytes": 2480,
+      "sha256": "ba3e7ad98917544e2173ae5b9ee0d9a1377c4fedbd414f797e7640257bac2821"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.css",
+      "bytes": 33972,
+      "sha256": "2f729f153ddf2176264130a112c2f36b97d7c1367ec381adc2df635f759d9359"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.js",
+      "bytes": 98605,
+      "sha256": "191eddc86dd299cd8a8c5b1617d7e3b314ba78bed3da8ce17687a4661ed24a0c"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "bytes": 1980074,
+      "sha256": "98395783f9be4c5bcd2ae8a26edf256ded8abcff0b59ada28a1ee3c129b59c39"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-creation-responses.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-creation-responses.js",
+      "bytes": 6561951,
+      "sha256": "5ecca79e69f9ff8123c7f187d61736c7cbd0485d555d7f2a06dbca5ab9685b7e"
+    },
+    {
+      "uri": "/index.html?writing=storytelling-magic-discovery",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/index.html",
+      "bytes": 2649,
+      "sha256": "7125cdea9f30322be95cd8dd7315edc2a5ee12afd045c2a80a377d2222045141"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/index.html?writing=storytelling-magic-discovery",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/index.html",
+      "bytes": 2649,
+      "sha256": "7125cdea9f30322be95cd8dd7315edc2a5ee12afd045c2a80a377d2222045141"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "bytes": 1980074,
+      "sha256": "98395783f9be4c5bcd2ae8a26edf256ded8abcff0b59ada28a1ee3c129b59c39"
+    },
+    {
+      "uri": "/benchmark-report.html?writing=storytelling-magic-discovery&setting=claude-claude-opus-5-max",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.html",
+      "bytes": 2480,
+      "sha256": "ba3e7ad98917544e2173ae5b9ee0d9a1377c4fedbd414f797e7640257bac2821"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.css",
+      "bytes": 33972,
+      "sha256": "2f729f153ddf2176264130a112c2f36b97d7c1367ec381adc2df635f759d9359"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.js",
+      "bytes": 98605,
+      "sha256": "191eddc86dd299cd8a8c5b1617d7e3b314ba78bed3da8ce17687a4661ed24a0c"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "bytes": 1980074,
+      "sha256": "98395783f9be4c5bcd2ae8a26edf256ded8abcff0b59ada28a1ee3c129b59c39"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-creation-responses.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-creation-responses.js",
+      "bytes": 6561951,
+      "sha256": "5ecca79e69f9ff8123c7f187d61736c7cbd0485d555d7f2a06dbca5ab9685b7e"
+    },
+    {
+      "uri": "/index.html?writing=storytelling-magic-discovery",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/index.html",
+      "bytes": 2649,
+      "sha256": "7125cdea9f30322be95cd8dd7315edc2a5ee12afd045c2a80a377d2222045141"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/index.html?writing=storytelling-magic-discovery",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/index.html",
+      "bytes": 2649,
+      "sha256": "7125cdea9f30322be95cd8dd7315edc2a5ee12afd045c2a80a377d2222045141"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/app.js",
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "bytes": 1980074,
+      "sha256": "98395783f9be4c5bcd2ae8a26edf256ded8abcff0b59ada28a1ee3c129b59c39"
+    },
+    {
+      "uri": "/benchmark-report.html?writing=storytelling-magic-discovery&setting=claude-claude-opus-5-max",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.html",
+      "bytes": 2480,
+      "sha256": "ba3e7ad98917544e2173ae5b9ee0d9a1377c4fedbd414f797e7640257bac2821"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/style.css",
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.css",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.css",
+      "bytes": 33972,
+      "sha256": "2f729f153ddf2176264130a112c2f36b97d7c1367ec381adc2df635f759d9359"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/data.js",
+      "bytes": 875736,
+      "sha256": "d17a1a18c5e17dc32e8f651ed68d0c61f9f2d0a0829bcbc3506c5b1af56cd44b"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/benchmark-report.js",
+      "bytes": 98605,
+      "sha256": "191eddc86dd299cd8a8c5b1617d7e3b314ba78bed3da8ce17687a4661ed24a0c"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-data.js",
+      "bytes": 1980074,
+      "sha256": "98395783f9be4c5bcd2ae8a26edf256ded8abcff0b59ada28a1ee3c129b59c39"
+    },
+    {
+      "uri": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-creation-responses.js",
+      "servedPath": "/releases/4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e/writing-creation-responses.js",
+      "bytes": 6561951,
+      "sha256": "5ecca79e69f9ff8123c7f187d61736c7cbd0485d555d7f2a06dbca5ab9685b7e"
+    }
+  ],
+  "cspSha256": "624a9f0c9263671dc167be75d65b04901c77a59955f65289b3751d9d348aa245",
+  "routerSha256": "a7bad3b2e851fffd6b40fadec20eecafc3700301e473f515331d37cd2b4acafe",
+  "sourceSelections": [
+    {
+      "benchmarkId": "storytelling-core-idea",
+      "path": "benchmarks/storytelling-core-idea/publication.json",
+      "bytes": 583,
+      "sha256": "dfbdb501233d5838452f95e41088b4c2112e12cb5b5f5f711e94b0fad4a83af9",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5/run.json",
+          "bytes": 55882781,
+          "sha256": "0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5/skill-snapshot.json",
+          "bytes": 453845,
+          "sha256": "a4db1b5ea3ae79e9655be2ab793fa71e153571359a88d098a383bf94cd4667e5"
+        }
+      ]
+    },
+    {
+      "benchmarkId": "storytelling-plot-twists",
+      "path": "benchmarks/storytelling-plot-twists/publication.json",
+      "bytes": 587,
+      "sha256": "8d3e1c0b6e44e7abbe2536671fc09d70e8eba9ae395913c0c8dd7779c43ffc6d",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399/run.json",
+          "bytes": 4891853,
+          "sha256": "97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399/skill-snapshot.json",
+          "bytes": 470201,
+          "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+        }
+      ]
+    },
+    {
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "path": "benchmarks/dungeon-master-adventure-outline/publication.json",
+      "bytes": 610,
+      "sha256": "e92adbedd7ff43bf6eaf34272267a5b10558f257b9d2ebda71707ad5c18007d6",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a/run.json",
+          "bytes": 2715303,
+          "sha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a"
+        },
+        {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a/skill-snapshot.json",
+          "bytes": 383221,
+          "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+        }
+      ]
+    },
+    {
+      "benchmarkId": "storytelling-magic-discovery",
+      "path": "benchmarks/storytelling-magic-discovery/publication.json",
+      "bytes": 1217,
+      "sha256": "3dc61c105531ed538f0f72a8c74b563bf48c7cfe3b667dd5c9720b8df28739ee",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/run.json",
+          "bytes": 2306274,
+          "sha256": "233db3f8cf5c4db8ddd6432ff7323d7be567a46654213f9a00a148e04329a18f"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/skill-snapshot.json",
+          "bytes": 470201,
+          "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judging.json",
+          "bytes": 54200034,
+          "sha256": "927abaeb682628de190bc609bd999c23a5be33e260ce3a989b10283a2b49f138"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judge-context.json",
+          "bytes": 316721,
+          "sha256": "ecbc9f56410245065b6d160c0a6f411ed2a5dcafab13a805efd1950b43d3e9fe"
+        }
+      ]
+    }
+  ],
+  "claimBoundary": "Local HTTP rehearsal of pinned candidate files using the actual production CSP and release router; this does not establish uploaded bytes or live delivery.",
+  "baseUrl": "http://127.0.0.1:59285",
+  "completedAt": "2026-09-08T05:38:44.419Z"
+}

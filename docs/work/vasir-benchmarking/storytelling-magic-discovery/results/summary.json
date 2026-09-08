@@ -1,0 +1,1745 @@
+{
+  "benchmarkId": "storytelling-magic-discovery",
+  "generatedAt": "2026-09-08T05:01:23.461Z",
+  "sourcePins": {
+    "run": "233db3f8cf5c4db8ddd6432ff7323d7be567a46654213f9a00a148e04329a18f",
+    "skill": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4",
+    "judging": "927abaeb682628de190bc609bd999c23a5be33e260ce3a989b10283a2b49f138",
+    "judgeContext": "ecbc9f56410245065b6d160c0a6f411ed2a5dcafab13a805efd1950b43d3e9fe"
+  },
+  "coverage": {
+    "benchmarkCount": 1,
+    "caseCount": 1,
+    "promptCount": 1,
+    "trialCount": 3,
+    "settingCount": 33,
+    "completedSettingCount": 33,
+    "responseCount": 198,
+    "validResponseCount": 198,
+    "expectedResponseCount": 198,
+    "scoredResponseCount": 198,
+    "usablePairs": 99,
+    "expectedPairs": 99,
+    "judgmentCount": 792,
+    "expectedJudgmentCount": 792,
+    "expectedJudgeRequestCount": 396,
+    "completedJudgeRequestCount": 396,
+    "terminalGenerationFailureCount": 0,
+    "terminalJudgmentFailureCount": 0,
+    "terminallyExcludedPairCount": 0,
+    "terminallyExcludedJudgmentCount": 0,
+    "pendingGenerationCount": 0,
+    "pendingJudgmentCount": 0,
+    "executionComplete": true,
+    "executionStatus": "complete"
+  },
+  "summary": {
+    "benchmarkId": "storytelling-magic-discovery",
+    "runId": "storytelling-magic-discovery-v1-2026-09-08",
+    "status": "development",
+    "verification": "unverified",
+    "evidenceKind": "development",
+    "baselineLabel": "Plain answer",
+    "treatmentLabel": "Storytelling skill",
+    "baseline": 81.9,
+    "treatment": 92,
+    "delta": 10.1,
+    "wins": 97,
+    "ties": 0,
+    "losses": 2,
+    "usablePairs": 99,
+    "expectedPairs": 99,
+    "complete": 198,
+    "total": 198,
+    "completionLabel": "scored responses",
+    "calibration": "Human calibration pending",
+    "detailHref": "benchmark-report.html#storytelling-magic-discovery",
+    "sourceHref": null
+  },
+  "contextSummaries": {
+    "naive": {
+      "baseline": 82.6,
+      "treatment": 92.4,
+      "delta": 9.8,
+      "wins": 96,
+      "ties": 0,
+      "losses": 3,
+      "usablePairs": 99,
+      "expectedPairs": 99,
+      "cohort": "same-complete-four-seat-three-trial-configurations"
+    },
+    "informed": {
+      "baseline": 81.2,
+      "treatment": 91.6,
+      "delta": 10.4,
+      "wins": 97,
+      "ties": 0,
+      "losses": 2,
+      "usablePairs": 99,
+      "expectedPairs": 99,
+      "cohort": "same-complete-four-seat-three-trial-configurations"
+    }
+  },
+  "configurations": [
+    {
+      "configurationId": "codex:gpt-6-astra@high",
+      "label": "GPT-6 Astra · high",
+      "rank": 1,
+      "plain": 92.25,
+      "skill": 97.91666666666667,
+      "uplift": 5.666666666666671,
+      "contexts": {
+        "plain": {
+          "naive": 92.66666666666667,
+          "informed": 91.83333333333333
+        },
+        "skill": {
+          "naive": 98,
+          "informed": 97.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-6-astra-high",
+        "configurationId": "codex:gpt-6-astra@high",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 90.75,
+            "treatment": 98,
+            "delta": 7.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 92,
+            "treatment": 98,
+            "delta": 6
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 94,
+            "treatment": 97.75,
+            "delta": 3.75
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 5.666666666666667,
+        "sampleStandardDeviation": 1.773649721149397,
+        "minimum": 3.75,
+        "maximum": 7.25,
+        "range": 3.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-6-astra@xhigh",
+      "label": "GPT-6 Astra · xhigh",
+      "rank": 1,
+      "plain": 95.16666666666667,
+      "skill": 97.91666666666667,
+      "uplift": 2.75,
+      "contexts": {
+        "plain": {
+          "naive": 96.16666666666667,
+          "informed": 94.16666666666667
+        },
+        "skill": {
+          "naive": 98.16666666666667,
+          "informed": 97.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-6-astra-xhigh",
+        "configurationId": "codex:gpt-6-astra@xhigh",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 95.5,
+            "treatment": 96.25,
+            "delta": 0.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 94.25,
+            "treatment": 98.25,
+            "delta": 4
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 95.75,
+            "treatment": 99.25,
+            "delta": 3.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 2.75,
+        "sampleStandardDeviation": 1.75,
+        "minimum": 0.75,
+        "maximum": 4,
+        "range": 3.25
+      }
+    },
+    {
+      "configurationId": "codex:gpt-6-astra@max",
+      "label": "GPT-6 Astra · max",
+      "rank": 3,
+      "plain": 95.33333333333333,
+      "skill": 97.83333333333333,
+      "uplift": 2.5,
+      "contexts": {
+        "plain": {
+          "naive": 95.5,
+          "informed": 95.16666666666667
+        },
+        "skill": {
+          "naive": 98.5,
+          "informed": 97.16666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-6-astra-max",
+        "configurationId": "codex:gpt-6-astra@max",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 94,
+            "treatment": 98.5,
+            "delta": 4.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 96,
+            "treatment": 97.5,
+            "delta": 1.5
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 96,
+            "treatment": 97.5,
+            "delta": 1.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 2.5,
+        "sampleStandardDeviation": 1.7320508075688772,
+        "minimum": 1.5,
+        "maximum": 4.5,
+        "range": 3
+      }
+    },
+    {
+      "configurationId": "codex:gpt-6-astra@ultra",
+      "label": "GPT-6 Astra · ultra",
+      "rank": 4,
+      "plain": 96.16666666666667,
+      "skill": 97.16666666666667,
+      "uplift": 1,
+      "contexts": {
+        "plain": {
+          "naive": 96.66666666666667,
+          "informed": 95.66666666666667
+        },
+        "skill": {
+          "naive": 97.16666666666667,
+          "informed": 97.16666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-6-astra-ultra",
+        "configurationId": "codex:gpt-6-astra@ultra",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 98.25,
+            "treatment": 97.5,
+            "delta": -0.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 94.75,
+            "treatment": 97.5,
+            "delta": 2.75
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 95.5,
+            "treatment": 96.5,
+            "delta": 1
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 1,
+        "sampleStandardDeviation": 1.75,
+        "minimum": -0.75,
+        "maximum": 2.75,
+        "range": 3.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-6-astra@medium",
+      "label": "GPT-6 Astra · medium",
+      "rank": 5,
+      "plain": 93.25,
+      "skill": 97.08333333333333,
+      "uplift": 3.8333333333333286,
+      "contexts": {
+        "plain": {
+          "naive": 93.66666666666667,
+          "informed": 92.83333333333333
+        },
+        "skill": {
+          "naive": 97.66666666666667,
+          "informed": 96.5
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-6-astra-medium",
+        "configurationId": "codex:gpt-6-astra@medium",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 94.75,
+            "treatment": 96.75,
+            "delta": 2
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 91.5,
+            "treatment": 97.5,
+            "delta": 6
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 93.5,
+            "treatment": 97,
+            "delta": 3.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 3.8333333333333335,
+        "sampleStandardDeviation": 2.0207259421636903,
+        "minimum": 2,
+        "maximum": 6,
+        "range": 4
+      }
+    },
+    {
+      "configurationId": "claude:claude-fable-5-1@max",
+      "label": "Claude Fable 5.1 · max",
+      "rank": 6,
+      "plain": 92.41666666666667,
+      "skill": 96.58333333333333,
+      "uplift": 4.166666666666657,
+      "contexts": {
+        "plain": {
+          "naive": 93.33333333333333,
+          "informed": 91.5
+        },
+        "skill": {
+          "naive": 96.83333333333333,
+          "informed": 96.33333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-fable-5-1-max",
+        "configurationId": "claude:claude-fable-5-1@max",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 95.25,
+            "treatment": 97.5,
+            "delta": 2.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 93.25,
+            "treatment": 96.25,
+            "delta": 3
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 88.75,
+            "treatment": 96,
+            "delta": 7.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 4.166666666666667,
+        "sampleStandardDeviation": 2.6964482812272395,
+        "minimum": 2.25,
+        "maximum": 7.25,
+        "range": 5
+      }
+    },
+    {
+      "configurationId": "claude:claude-opus-5@max",
+      "label": "Claude Opus 5 · max",
+      "rank": 7,
+      "plain": 87.16666666666667,
+      "skill": 96.25,
+      "uplift": 9.083333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 88,
+          "informed": 86.33333333333333
+        },
+        "skill": {
+          "naive": 96.66666666666667,
+          "informed": 95.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-opus-5-max",
+        "configurationId": "claude:claude-opus-5@max",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 91.5,
+            "treatment": 96.75,
+            "delta": 5.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 81,
+            "treatment": 95.25,
+            "delta": 14.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 89,
+            "treatment": 96.75,
+            "delta": 7.75
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 9.083333333333334,
+        "sampleStandardDeviation": 4.645786621588784,
+        "minimum": 5.25,
+        "maximum": 14.25,
+        "range": 9
+      }
+    },
+    {
+      "configurationId": "codex:gpt-6-astra@low",
+      "label": "GPT-6 Astra · low",
+      "rank": 8,
+      "plain": 91.75,
+      "skill": 96.08333333333333,
+      "uplift": 4.333333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 92.33333333333333,
+          "informed": 91.16666666666667
+        },
+        "skill": {
+          "naive": 95.83333333333333,
+          "informed": 96.33333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-6-astra-low",
+        "configurationId": "codex:gpt-6-astra@low",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 91.25,
+            "treatment": 97.25,
+            "delta": 6
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 89.75,
+            "treatment": 94.25,
+            "delta": 4.5
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 94.25,
+            "treatment": 96.75,
+            "delta": 2.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 4.333333333333333,
+        "sampleStandardDeviation": 1.755942292142123,
+        "minimum": 2.5,
+        "maximum": 6,
+        "range": 3.5
+      }
+    },
+    {
+      "configurationId": "claude:claude-fable-5-1@xhigh",
+      "label": "Claude Fable 5.1 · xhigh",
+      "rank": 9,
+      "plain": 88.41666666666667,
+      "skill": 95.75,
+      "uplift": 7.333333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 88.33333333333333,
+          "informed": 88.5
+        },
+        "skill": {
+          "naive": 96.16666666666667,
+          "informed": 95.33333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 83.75,
+            "treatment": 93.25,
+            "delta": 9.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 90.25,
+            "treatment": 96.5,
+            "delta": 6.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 91.25,
+            "treatment": 97.5,
+            "delta": 6.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 7.333333333333333,
+        "sampleStandardDeviation": 1.8763883748662837,
+        "minimum": 6.25,
+        "maximum": 9.5,
+        "range": 3.25
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-sol@max",
+      "label": "GPT-5.6 Sol · max",
+      "rank": 9,
+      "plain": 81.08333333333333,
+      "skill": 95.75,
+      "uplift": 14.666666666666671,
+      "contexts": {
+        "plain": {
+          "naive": 81.33333333333333,
+          "informed": 80.83333333333333
+        },
+        "skill": {
+          "naive": 95.83333333333333,
+          "informed": 95.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-sol-max",
+        "configurationId": "codex:gpt-5.6-sol@max",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 77.25,
+            "treatment": 96.25,
+            "delta": 19
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 81.75,
+            "treatment": 95,
+            "delta": 13.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 84.25,
+            "treatment": 96,
+            "delta": 11.75
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 14.666666666666666,
+        "sampleStandardDeviation": 3.8269875010683445,
+        "minimum": 11.75,
+        "maximum": 19,
+        "range": 7.25
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-sol@ultra",
+      "label": "GPT-5.6 Sol · ultra",
+      "rank": 11,
+      "plain": 82.5,
+      "skill": 95.08333333333333,
+      "uplift": 12.583333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 83.5,
+          "informed": 81.5
+        },
+        "skill": {
+          "naive": 95.33333333333333,
+          "informed": 94.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-sol-ultra",
+        "configurationId": "codex:gpt-5.6-sol@ultra",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 80.5,
+            "treatment": 94,
+            "delta": 13.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 84.25,
+            "treatment": 96.25,
+            "delta": 12
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 82.75,
+            "treatment": 95,
+            "delta": 12.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 12.583333333333334,
+        "sampleStandardDeviation": 0.8036375634160796,
+        "minimum": 12,
+        "maximum": 13.5,
+        "range": 1.5
+      }
+    },
+    {
+      "configurationId": "claude:claude-opus-5@xhigh",
+      "label": "Claude Opus 5 · xhigh",
+      "rank": 12,
+      "plain": 87.75,
+      "skill": 94.5,
+      "uplift": 6.75,
+      "contexts": {
+        "plain": {
+          "naive": 88.66666666666667,
+          "informed": 86.83333333333333
+        },
+        "skill": {
+          "naive": 95,
+          "informed": 94
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-opus-5-xhigh",
+        "configurationId": "claude:claude-opus-5@xhigh",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 85.75,
+            "treatment": 96.5,
+            "delta": 10.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 88.5,
+            "treatment": 94.25,
+            "delta": 5.75
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 89,
+            "treatment": 92.75,
+            "delta": 3.75
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 6.75,
+        "sampleStandardDeviation": 3.605551275463989,
+        "minimum": 3.75,
+        "maximum": 10.75,
+        "range": 7
+      }
+    },
+    {
+      "configurationId": "claude:claude-fable-5-1@high",
+      "label": "Claude Fable 5.1 · high",
+      "rank": 13,
+      "plain": 86.5,
+      "skill": 94.25,
+      "uplift": 7.75,
+      "contexts": {
+        "plain": {
+          "naive": 87.33333333333333,
+          "informed": 85.66666666666667
+        },
+        "skill": {
+          "naive": 94.83333333333333,
+          "informed": 93.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-fable-5-1-high",
+        "configurationId": "claude:claude-fable-5-1@high",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 85.25,
+            "treatment": 93.75,
+            "delta": 8.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 82.5,
+            "treatment": 94.75,
+            "delta": 12.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 91.75,
+            "treatment": 94.25,
+            "delta": 2.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 7.75,
+        "sampleStandardDeviation": 4.9180788932265,
+        "minimum": 2.5,
+        "maximum": 12.25,
+        "range": 9.75
+      }
+    },
+    {
+      "configurationId": "claude:claude-opus-5@high",
+      "label": "Claude Opus 5 · high",
+      "rank": 14,
+      "plain": 85.91666666666667,
+      "skill": 93.75,
+      "uplift": 7.833333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 86,
+          "informed": 85.83333333333333
+        },
+        "skill": {
+          "naive": 94,
+          "informed": 93.5
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-opus-5-high",
+        "configurationId": "claude:claude-opus-5@high",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 88.75,
+            "treatment": 94,
+            "delta": 5.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 86,
+            "treatment": 93.75,
+            "delta": 7.75
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 83,
+            "treatment": 93.5,
+            "delta": 10.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 7.833333333333333,
+        "sampleStandardDeviation": 2.625991876098122,
+        "minimum": 5.25,
+        "maximum": 10.5,
+        "range": 5.25
+      }
+    },
+    {
+      "configurationId": "claude:claude-opus-5@medium",
+      "label": "Claude Opus 5 · medium",
+      "rank": 15,
+      "plain": 81.75,
+      "skill": 93.58333333333333,
+      "uplift": 11.833333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 82.5,
+          "informed": 81
+        },
+        "skill": {
+          "naive": 93.5,
+          "informed": 93.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-opus-5-medium",
+        "configurationId": "claude:claude-opus-5@medium",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 86.25,
+            "treatment": 93,
+            "delta": 6.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 84.75,
+            "treatment": 95.75,
+            "delta": 11
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 74.25,
+            "treatment": 92,
+            "delta": 17.75
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 11.833333333333334,
+        "sampleStandardDeviation": 5.54714641354754,
+        "minimum": 6.75,
+        "maximum": 17.75,
+        "range": 11
+      }
+    },
+    {
+      "configurationId": "claude:claude-fable-5-1@medium",
+      "label": "Claude Fable 5.1 · medium",
+      "rank": 16,
+      "plain": 86,
+      "skill": 93.08333333333333,
+      "uplift": 7.083333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 86.66666666666667,
+          "informed": 85.33333333333333
+        },
+        "skill": {
+          "naive": 93.5,
+          "informed": 92.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-fable-5-1-medium",
+        "configurationId": "claude:claude-fable-5-1@medium",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 82.75,
+            "treatment": 93.5,
+            "delta": 10.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 90.5,
+            "treatment": 92.5,
+            "delta": 2
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 84.75,
+            "treatment": 93.25,
+            "delta": 8.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 7.083333333333333,
+        "sampleStandardDeviation": 4.543768626738529,
+        "minimum": 2,
+        "maximum": 10.75,
+        "range": 8.75
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-sol@high",
+      "label": "GPT-5.6 Sol · high",
+      "rank": 17,
+      "plain": 74.83333333333333,
+      "skill": 92.83333333333333,
+      "uplift": 18,
+      "contexts": {
+        "plain": {
+          "naive": 74.5,
+          "informed": 75.16666666666667
+        },
+        "skill": {
+          "naive": 93,
+          "informed": 92.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-sol-high",
+        "configurationId": "codex:gpt-5.6-sol@high",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 73.75,
+            "treatment": 91.5,
+            "delta": 17.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 77.5,
+            "treatment": 91.25,
+            "delta": 13.75
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 73.25,
+            "treatment": 95.75,
+            "delta": 22.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 18,
+        "sampleStandardDeviation": 4.380353866983808,
+        "minimum": 13.75,
+        "maximum": 22.5,
+        "range": 8.75
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-sol@medium",
+      "label": "GPT-5.6 Sol · medium",
+      "rank": 18,
+      "plain": 75.25,
+      "skill": 91.91666666666667,
+      "uplift": 16.66666666666667,
+      "contexts": {
+        "plain": {
+          "naive": 76,
+          "informed": 74.5
+        },
+        "skill": {
+          "naive": 92.16666666666667,
+          "informed": 91.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-sol-medium",
+        "configurationId": "codex:gpt-5.6-sol@medium",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 75.25,
+            "treatment": 88.75,
+            "delta": 13.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 73.25,
+            "treatment": 94.25,
+            "delta": 21
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 77.25,
+            "treatment": 92.75,
+            "delta": 15.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 16.666666666666668,
+        "sampleStandardDeviation": 3.8837267325770144,
+        "minimum": 13.5,
+        "maximum": 21,
+        "range": 7.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-terra@ultra",
+      "label": "GPT-5.6 Terra · ultra",
+      "rank": 18,
+      "plain": 77.83333333333333,
+      "skill": 91.91666666666667,
+      "uplift": 14.083333333333343,
+      "contexts": {
+        "plain": {
+          "naive": 78.16666666666667,
+          "informed": 77.5
+        },
+        "skill": {
+          "naive": 92.33333333333333,
+          "informed": 91.5
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-terra-ultra",
+        "configurationId": "codex:gpt-5.6-terra@ultra",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 77.5,
+            "treatment": 89.75,
+            "delta": 12.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 71.75,
+            "treatment": 93.75,
+            "delta": 22
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 84.25,
+            "treatment": 92.25,
+            "delta": 8
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 14.083333333333334,
+        "sampleStandardDeviation": 7.177801427549618,
+        "minimum": 8,
+        "maximum": 22,
+        "range": 14
+      }
+    },
+    {
+      "configurationId": "claude:claude-opus-5@low",
+      "label": "Claude Opus 5 · low",
+      "rank": 20,
+      "plain": 80.16666666666667,
+      "skill": 91.66666666666667,
+      "uplift": 11.5,
+      "contexts": {
+        "plain": {
+          "naive": 81.66666666666667,
+          "informed": 78.66666666666667
+        },
+        "skill": {
+          "naive": 92.33333333333333,
+          "informed": 91
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-opus-5-low",
+        "configurationId": "claude:claude-opus-5@low",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 83.5,
+            "treatment": 92,
+            "delta": 8.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 79.25,
+            "treatment": 90.25,
+            "delta": 11
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 77.75,
+            "treatment": 92.75,
+            "delta": 15
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 11.5,
+        "sampleStandardDeviation": 3.278719262151,
+        "minimum": 8.5,
+        "maximum": 15,
+        "range": 6.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-sol@xhigh",
+      "label": "GPT-5.6 Sol · xhigh",
+      "rank": 20,
+      "plain": 76.75,
+      "skill": 91.66666666666667,
+      "uplift": 14.916666666666671,
+      "contexts": {
+        "plain": {
+          "naive": 78.16666666666667,
+          "informed": 75.33333333333333
+        },
+        "skill": {
+          "naive": 92.16666666666667,
+          "informed": 91.16666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-sol-xhigh",
+        "configurationId": "codex:gpt-5.6-sol@xhigh",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 80.25,
+            "treatment": 89.75,
+            "delta": 9.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 70.5,
+            "treatment": 93.25,
+            "delta": 22.75
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 79.5,
+            "treatment": 92,
+            "delta": 12.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 14.916666666666666,
+        "sampleStandardDeviation": 6.947721449031569,
+        "minimum": 9.5,
+        "maximum": 22.75,
+        "range": 13.25
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-luna@max",
+      "label": "GPT-5.6 Luna · max",
+      "rank": 22,
+      "plain": 79.75,
+      "skill": 91.58333333333333,
+      "uplift": 11.833333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 81.16666666666667,
+          "informed": 78.33333333333333
+        },
+        "skill": {
+          "naive": 92.5,
+          "informed": 90.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-luna-max",
+        "configurationId": "codex:gpt-5.6-luna@max",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 77.25,
+            "treatment": 92.75,
+            "delta": 15.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 81.25,
+            "treatment": 90.5,
+            "delta": 9.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 80.75,
+            "treatment": 91.5,
+            "delta": 10.75
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 11.833333333333334,
+        "sampleStandardDeviation": 3.2627953250753152,
+        "minimum": 9.25,
+        "maximum": 15.5,
+        "range": 6.25
+      }
+    },
+    {
+      "configurationId": "claude:claude-fable-5-1@low",
+      "label": "Claude Fable 5.1 · low",
+      "rank": 23,
+      "plain": 80.83333333333333,
+      "skill": 91.08333333333333,
+      "uplift": 10.25,
+      "contexts": {
+        "plain": {
+          "naive": 82,
+          "informed": 79.66666666666667
+        },
+        "skill": {
+          "naive": 91.33333333333333,
+          "informed": 90.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "claude-claude-fable-5-1-low",
+        "configurationId": "claude:claude-fable-5-1@low",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 85.75,
+            "treatment": 94.5,
+            "delta": 8.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 78.25,
+            "treatment": 89.25,
+            "delta": 11
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 78.5,
+            "treatment": 89.5,
+            "delta": 11
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 10.25,
+        "sampleStandardDeviation": 1.299038105676658,
+        "minimum": 8.75,
+        "maximum": 11,
+        "range": 2.25
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-terra@xhigh",
+      "label": "GPT-5.6 Terra · xhigh",
+      "rank": 24,
+      "plain": 69.08333333333333,
+      "skill": 89.83333333333333,
+      "uplift": 20.75,
+      "contexts": {
+        "plain": {
+          "naive": 69.66666666666667,
+          "informed": 68.5
+        },
+        "skill": {
+          "naive": 91,
+          "informed": 88.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-terra-xhigh",
+        "configurationId": "codex:gpt-5.6-terra@xhigh",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 70.5,
+            "treatment": 90.25,
+            "delta": 19.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 62.75,
+            "treatment": 94,
+            "delta": 31.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 74,
+            "treatment": 85.25,
+            "delta": 11.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 20.75,
+        "sampleStandardDeviation": 10.037429949942366,
+        "minimum": 11.25,
+        "maximum": 31.25,
+        "range": 20
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-luna@xhigh",
+      "label": "GPT-5.6 Luna · xhigh",
+      "rank": 25,
+      "plain": 78.75,
+      "skill": 89.58333333333333,
+      "uplift": 10.833333333333329,
+      "contexts": {
+        "plain": {
+          "naive": 79.83333333333333,
+          "informed": 77.66666666666667
+        },
+        "skill": {
+          "naive": 90.5,
+          "informed": 88.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-luna-xhigh",
+        "configurationId": "codex:gpt-5.6-luna@xhigh",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 75.75,
+            "treatment": 89.75,
+            "delta": 14
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 79,
+            "treatment": 90,
+            "delta": 11
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 81.5,
+            "treatment": 89,
+            "delta": 7.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 10.833333333333334,
+        "sampleStandardDeviation": 3.253203549323856,
+        "minimum": 7.5,
+        "maximum": 14,
+        "range": 6.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-terra@max",
+      "label": "GPT-5.6 Terra · max",
+      "rank": 26,
+      "plain": 80.83333333333333,
+      "skill": 88.83333333333333,
+      "uplift": 8,
+      "contexts": {
+        "plain": {
+          "naive": 80.66666666666667,
+          "informed": 81
+        },
+        "skill": {
+          "naive": 88.16666666666667,
+          "informed": 89.5
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-terra-max",
+        "configurationId": "codex:gpt-5.6-terra@max",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 77,
+            "treatment": 92.25,
+            "delta": 15.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 87,
+            "treatment": 86.5,
+            "delta": -0.5
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 78.5,
+            "treatment": 87.75,
+            "delta": 9.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 8,
+        "sampleStandardDeviation": 7.949056547792323,
+        "minimum": -0.5,
+        "maximum": 15.25,
+        "range": 15.75
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-sol@low",
+      "label": "GPT-5.6 Sol · low",
+      "rank": 27,
+      "plain": 74.83333333333333,
+      "skill": 88.58333333333333,
+      "uplift": 13.75,
+      "contexts": {
+        "plain": {
+          "naive": 75.66666666666667,
+          "informed": 74
+        },
+        "skill": {
+          "naive": 89,
+          "informed": 88.16666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-sol-low",
+        "configurationId": "codex:gpt-5.6-sol@low",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 73,
+            "treatment": 86.75,
+            "delta": 13.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 75.25,
+            "treatment": 89.25,
+            "delta": 14
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 76.25,
+            "treatment": 89.75,
+            "delta": 13.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 13.75,
+        "sampleStandardDeviation": 0.25,
+        "minimum": 13.5,
+        "maximum": 14,
+        "range": 0.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-terra@medium",
+      "label": "GPT-5.6 Terra · medium",
+      "rank": 28,
+      "plain": 73.75,
+      "skill": 86.5,
+      "uplift": 12.75,
+      "contexts": {
+        "plain": {
+          "naive": 74.33333333333333,
+          "informed": 73.16666666666667
+        },
+        "skill": {
+          "naive": 87.16666666666667,
+          "informed": 85.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-terra-medium",
+        "configurationId": "codex:gpt-5.6-terra@medium",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 72.25,
+            "treatment": 85.5,
+            "delta": 13.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 74,
+            "treatment": 86.5,
+            "delta": 12.5
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 75,
+            "treatment": 87.5,
+            "delta": 12.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 12.75,
+        "sampleStandardDeviation": 0.4330127018922193,
+        "minimum": 12.5,
+        "maximum": 13.25,
+        "range": 0.75
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-luna@high",
+      "label": "GPT-5.6 Luna · high",
+      "rank": 29,
+      "plain": 71.58333333333333,
+      "skill": 85.83333333333333,
+      "uplift": 14.25,
+      "contexts": {
+        "plain": {
+          "naive": 73,
+          "informed": 70.16666666666667
+        },
+        "skill": {
+          "naive": 86.83333333333333,
+          "informed": 84.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-luna-high",
+        "configurationId": "codex:gpt-5.6-luna@high",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 73.25,
+            "treatment": 86.25,
+            "delta": 13
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 71.75,
+            "treatment": 84.25,
+            "delta": 12.5
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 69.75,
+            "treatment": 87,
+            "delta": 17.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 14.25,
+        "sampleStandardDeviation": 2.6100766272276377,
+        "minimum": 12.5,
+        "maximum": 17.25,
+        "range": 4.75
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-luna@medium",
+      "label": "GPT-5.6 Luna · medium",
+      "rank": 30,
+      "plain": 71.41666666666667,
+      "skill": 83.83333333333333,
+      "uplift": 12.416666666666657,
+      "contexts": {
+        "plain": {
+          "naive": 72,
+          "informed": 70.83333333333333
+        },
+        "skill": {
+          "naive": 83.83333333333333,
+          "informed": 83.83333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-luna-medium",
+        "configurationId": "codex:gpt-5.6-luna@medium",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 74.5,
+            "treatment": 85.25,
+            "delta": 10.75
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 69.75,
+            "treatment": 85,
+            "delta": 15.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 70,
+            "treatment": 81.25,
+            "delta": 11.25
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 12.416666666666666,
+        "sampleStandardDeviation": 2.466441431158124,
+        "minimum": 10.75,
+        "maximum": 15.25,
+        "range": 4.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-terra@low",
+      "label": "GPT-5.6 Terra · low",
+      "rank": 31,
+      "plain": 69.08333333333333,
+      "skill": 83.5,
+      "uplift": 14.416666666666671,
+      "contexts": {
+        "plain": {
+          "naive": 70.66666666666667,
+          "informed": 67.5
+        },
+        "skill": {
+          "naive": 84.66666666666667,
+          "informed": 82.33333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-terra-low",
+        "configurationId": "codex:gpt-5.6-terra@low",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 62.5,
+            "treatment": 79.75,
+            "delta": 17.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 76.5,
+            "treatment": 83.5,
+            "delta": 7
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 68.25,
+            "treatment": 87.25,
+            "delta": 19
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 14.416666666666666,
+        "sampleStandardDeviation": 6.482347825698135,
+        "minimum": 7,
+        "maximum": 19,
+        "range": 12
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-terra@high",
+      "label": "GPT-5.6 Terra · high",
+      "rank": 32,
+      "plain": 70.66666666666667,
+      "skill": 82.16666666666667,
+      "uplift": 11.5,
+      "contexts": {
+        "plain": {
+          "naive": 71.5,
+          "informed": 69.83333333333333
+        },
+        "skill": {
+          "naive": 83,
+          "informed": 81.33333333333333
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-terra-high",
+        "configurationId": "codex:gpt-5.6-terra@high",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 68.5,
+            "treatment": 83.75,
+            "delta": 15.25
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 71.75,
+            "treatment": 80.5,
+            "delta": 8.75
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 71.75,
+            "treatment": 82.25,
+            "delta": 10.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 11.5,
+        "sampleStandardDeviation": 3.3634060117684275,
+        "minimum": 8.75,
+        "maximum": 15.25,
+        "range": 6.5
+      }
+    },
+    {
+      "configurationId": "codex:gpt-5.6-luna@low",
+      "label": "GPT-5.6 Luna · low",
+      "rank": 33,
+      "plain": 72.91666666666667,
+      "skill": 81.33333333333333,
+      "uplift": 8.416666666666657,
+      "contexts": {
+        "plain": {
+          "naive": 73.66666666666667,
+          "informed": 72.16666666666667
+        },
+        "skill": {
+          "naive": 82,
+          "informed": 80.66666666666667
+        }
+      },
+      "trialEffects": {
+        "settingId": "codex-gpt-5-6-luna-low",
+        "configurationId": "codex:gpt-5.6-luna@low",
+        "trials": [
+          {
+            "trialNumber": 1,
+            "baseline": 66.25,
+            "treatment": 78.75,
+            "delta": 12.5
+          },
+          {
+            "trialNumber": 2,
+            "baseline": 79,
+            "treatment": 82.25,
+            "delta": 3.25
+          },
+          {
+            "trialNumber": 3,
+            "baseline": 73.5,
+            "treatment": 83,
+            "delta": 9.5
+          }
+        ],
+        "complete": true,
+        "count": 3,
+        "expectedCount": 3,
+        "mean": 8.416666666666666,
+        "sampleStandardDeviation": 4.719198378255923,
+        "minimum": 3.25,
+        "maximum": 12.5,
+        "range": 9.25
+      }
+    }
+  ],
+  "limitations": [
+    "One fixed fantasy-creation prompt and three trials per configuration cannot establish general writing ability or support precise inferential claims.",
+    "A skill-naive judge receives no skill context here; its prior training exposure is unknown. Two context seats share each canonical judge model and are not independent model families.",
+    "Style and candidate self-disclosures can imply a generation condition despite hidden labels; blindness is procedural rather than guaranteed.",
+    "Informed judges receive a fixed root-plus-eight-reference pack; creators have progressive access to the entire frozen skill. Their actual exposure may differ.",
+    "Quota or provider failures affect coverage and must remain visible; they do not authorize shrinking the frozen inventory or selecting replacement stories for quality.",
+    "Three trials on one exact prompt support descriptive repeat variation, not confidence intervals or significance claims.",
+    "The four review seats cross two related model families with two context conditions; they are not four independent training sources.",
+    "Incomplete paired configurations have no aggregate score or rank. Missing answers and reviews are never imputed."
+  ]
+}

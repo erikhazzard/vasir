@@ -13,6 +13,7 @@ import { buildWorkSpecPublication, validateWorkSpecPublication, validateWorkSpec
 import { buildOverallPublication, validateOverallPublication } from "./overall-publication.js";
 import { buildGamesPublication, validateGamesPublication } from "./games-publication.js";
 import { buildWritingPublication, validateWritingSummary, serializeWritingModule } from "./writing-publication.js";
+import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE } from "./writing-response-archives.js";
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -2450,10 +2451,9 @@ export function serializeBenchmarkPublicationResponses(responseBundle, projectio
 
 export function buildBenchmarkPublicationRoutes(projection) {
   validateBenchmarkPublicationProjection(projection);
-  const writingSections = projection.writing ? ["storytelling", ...new Set(Object.values(projection.writing.additionalBenchmarks ?? {}).map(benchmark => benchmark.subcategory))] : [];
   return {
     entrypoints: ["/", "/index.html", "/benchmark-report.html", ...(projection.games ? ["/games.html"] : [])],
-    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.games ? ["/#capabilities/games"] : []), ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : []), ...writingSections.map(section => `/#capabilities/writing/${section}`)],
+    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(projection.games ? ["/#capabilities/games"] : []), ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows"] : []), ...(projection.writing ? ["/#capabilities/writing"] : [])],
     viewFragments: [
       "/#capabilities/overall/benchmarks",
       "/#capabilities/overall/efficiency",
@@ -2461,7 +2461,7 @@ export function buildBenchmarkPublicationRoutes(projection) {
       "/#capabilities/engineering/efficiency",
       ...(projection.games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []),
       ...(projection.aiWorkflows ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []),
-      ...writingSections.flatMap(section => [`/#capabilities/writing/${section}/benchmarks`, `/#capabilities/writing/${section}/efficiency`])
+      ...(projection.writing ? ["/#capabilities/writing/benchmarks", "/#capabilities/writing/efficiency"] : [])
     ],
     reportFragments: [
       ...Array.from(
@@ -2537,9 +2537,13 @@ export function buildBenchmarkPublicationProjection({
   }
 
   const writing = buildWritingPublication({ repoRootDirectory, readFileSyncImplementation });
+  const writingArchives = splitWritingResponseArchives(writing?.responseBundle ?? null);
   if (writing) {
     projection.schemaVersion = 6;
     projection.writing = writing.stub;
+    if (writingArchives.creation) projection.writing.responseArchives = {
+      [WRITING_CREATION_ARCHIVE.benchmarkId]: { href: WRITING_CREATION_ARCHIVE.href, globalName: WRITING_CREATION_ARCHIVE.globalName }
+    };
   }
 
   const basisSha256 = sha256(stableSerialize({
@@ -2559,7 +2563,8 @@ export function buildBenchmarkPublicationProjection({
     writing: writing?.projection ?? null,
     writingResponses: writing?.responseBundle ?? null,
     writingDataSource: serializeWritingModule(writing?.projection ?? null, "VASIR_WRITING"),
-    writingResponsesSource: serializeWritingModule(writing?.responseBundle ?? null, "VASIR_WRITING_RESPONSES"),
+    writingResponsesSource: serializeWritingModule(writingArchives.primary, "VASIR_WRITING_RESPONSES"),
+    writingCreationResponsesSource: serializeWritingModule(writingArchives.creation, WRITING_CREATION_ARCHIVE.globalName),
     basisSha256,
     routes: buildBenchmarkPublicationRoutes(projection),
     counts: workflows ? {

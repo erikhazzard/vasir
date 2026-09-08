@@ -138,6 +138,89 @@ test('resources use the score weights without renormalizing missing resource evi
   assert.equal(treatment.tokens, 300);
 });
 
+test('disjoint subcategory cohorts retain known 50-percent contributions but no category score, rank, uplift, or resources', () => {
+  const source = publication('twists', 'storytelling', { storyModel: [60, 80], missingModel: [null, null] });
+  source.additionalBenchmarks = { dm: publication('adventure', 'dungeon-master', { adventureModel: [70, 90] }) };
+  const before = JSON.stringify(source);
+  const result = build(freeze(source));
+  assert.equal(JSON.stringify(source), before);
+  assert.deepEqual(result.writingCategory.benchmarkWeights, { twists: 0.5, adventure: 0.5 });
+  assert.deepEqual(result.categories.map(group => group.weight), [0.5, 0.5]);
+  assert.equal(result.coverage.completedSettingCount, 0);
+  assert.deepEqual(result.categoryLeaders, []);
+  assert.deepEqual(result.regressions, []);
+  for (const entry of result.entries) {
+    for (const field of ['score', 'exactScore', 'baselineScore', 'exactBaselineScore', 'delta', 'exactDelta', 'rank', 'latency', 'tokens', 'cost']) assert.equal(entry[field], null, `${entry.id}: ${field}`);
+    assert.equal(entry.metrics.meanLatencyMs, null);
+    assert.equal(entry.metrics.meanOutputTokens, null);
+    assert.equal(entry.metrics.meanCostUsd, null);
+  }
+  for (const [settingId, groupId, baseline, skill] of [['storyModel', 'storytelling', 60, 80], ['adventureModel', 'dungeon-master', 70, 90]]) {
+    for (const [condition, score] of [['baseline', baseline], ['skill', skill]]) {
+      const entry = result.entries.find(item => item.settingId === settingId && item.condition === condition);
+      const known = entry.categories.find(reading => reading.category === groupId);
+      const missing = entry.categories.find(reading => reading.category !== groupId);
+      assert.equal(known.exactScore, score);
+      assert.equal(known.weight, 0.5);
+      assert.equal(known.exactContribution, score * 0.5, 'Known evidence keeps its fixed half-index weight, not a renormalized whole index.');
+      assert.equal(missing.weight, 0.5);
+      assert.equal(missing.score, null);
+      assert.equal(missing.exactScore, null);
+      assert.equal(missing.exactContribution, null, 'Missing evidence is unavailable, never zero.');
+      assert.equal(entry.coverage.completedBenchmarks, 1);
+      assert.equal(entry.coverage.expectedBenchmarks, 2);
+    }
+  }
+  assert.ok(result.entries.filter(entry => entry.settingId === 'missingModel').every(entry => entry.categories.every(reading => reading.exactScore === null && reading.exactContribution === null)));
+  const partial = result.entries.filter(entry => entry.condition === 'skill' && !Number.isFinite(entry.exactScore) && entry.categories.some(reading => reading.weight > 0 && Number.isFinite(reading.exactScore)));
+  assert.deepEqual(partial.map(entry => entry.settingId), ['storyModel', 'adventureModel']);
+});
+
+test('selected Dungeon Master and Plot twists retain their disjoint paired subcategory evidence', t => {
+  const globals = { window: {} };
+  vm.runInNewContext(fs.readFileSync(new URL('../site/vasirbenchmark.com/writing-data.js', import.meta.url), 'utf8'), globals);
+  const result = build(freeze(globals.window.VASIR_WRITING));
+  const publications = result.writingCategory.publications;
+  const dm = publications.find(item => item.benchmarks[0].id === 'dungeon-master-adventure-outline');
+  const twists = publications.find(item => item.benchmarks[0].id === 'storytelling-plot-twists');
+  if (!dm || !twists) return t.skip('Both benchmarks must be selected to check their real disjoint cohort.');
+  const sourcePaired = (item, identity) => ['baseline', 'skill'].every(condition => Number.isFinite(item.entries.find(entry => entry.configurationId === identity && entry.condition === condition)?.exactScore));
+  const dmIdentities = dm.settings.filter(setting => sourcePaired(dm, setting.configurationId)).map(setting => setting.configurationId);
+  const twistIdentities = twists.settings.filter(setting => sourcePaired(twists, setting.configurationId)).map(setting => setting.configurationId);
+  assert.equal(dmIdentities.some(identity => twistIdentities.includes(identity)), false, 'These frozen source cohorts do not overlap.');
+  assert.equal(result.coverage.completedSettingCount, 0);
+  assert.ok(result.entries.every(entry => entry.exactScore === null && entry.rank === null && entry.exactDelta === null));
+  const dmGroup = result.categories.find(group => group.id === 'dungeon-master');
+  const storyGroup = result.categories.find(group => group.id === 'storytelling');
+  assert.ok(dmGroup && storyGroup);
+  assert.equal(dmGroup.weight, storyGroup.weight);
+  if (result.categories.length === 2) {
+    assert.equal(dmGroup.weight, 0.5);
+    assert.equal(storyGroup.weight, 0.5);
+  }
+  for (const sourceEntry of dm.entries.filter(entry => Number.isFinite(entry.exactScore))) {
+    const entry = result.entries.find(item => item.configurationId === sourceEntry.configurationId && item.condition === sourceEntry.condition);
+    const reading = entry.categories.find(item => item.category === 'dungeon-master');
+    assert.equal(reading.exactScore, sourceEntry.exactScore);
+    assert.equal(reading.exactContribution, sourceEntry.exactScore * dmGroup.weight);
+    const missingStory = entry.categories.find(item => item.category === 'storytelling');
+    assert.equal(missingStory.exactScore, null);
+    assert.equal(missingStory.exactContribution, null);
+  }
+  // Storytelling may later activate Core idea as its judging progresses. Its
+  // existing declared-cohort rule, not the availability of Twists alone, then
+  // determines whether that whole subgroup can be displayed for a setting.
+  for (const identity of twistIdentities) {
+    const canDisplayStory = storyGroup.activeBenchmarkIds.every(id => sourcePaired(publications.find(item => item.benchmarks[0].id === id), identity));
+    for (const entry of result.entries.filter(item => item.configurationId === identity)) {
+      const reading = entry.categories.find(item => item.category === 'storytelling');
+      assert.equal(Number.isFinite(reading.exactScore), canDisplayStory);
+      assert.equal(reading.exactContribution, canDisplayStory ? reading.exactScore * storyGroup.weight : null);
+      assert.equal(entry.categories.find(item => item.category === 'dungeon-master').exactScore, null);
+    }
+  }
+});
+
 test('a wholly incomplete publication is visible but never activated or scored as zero', () => {
   const result = build(freeze(publication('pending', 'storytelling', { a: [50, null], b: [null, 70] })));
   assert.deepEqual(result.writingCategory.activeBenchmarkIds, []);

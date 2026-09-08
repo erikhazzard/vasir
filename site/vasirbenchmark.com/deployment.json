@@ -41,7 +41,8 @@
     {
       "path": "responses.js",
       "contentType": "text/javascript; charset=utf-8",
-      "cacheClass": "immutable"
+      "cacheClass": "immutable",
+      "kind": "response-archive"
     },
     {
       "path": "benchmark-report.html",
@@ -86,13 +87,20 @@
     {
       "path": "writing-responses.js",
       "contentType": "text/javascript; charset=utf-8",
-      "cacheClass": "immutable"
+      "cacheClass": "immutable",
+      "kind": "response-archive"
+    },
+    {
+      "path": "writing-creation-responses.js",
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheClass": "immutable",
+      "kind": "response-archive"
     }
   ],
   "limits": {
     "maxFileBytes": 2097152,
     "maxResponseFileBytes": 8388608,
-    "maxArtifactBytes": 16777216,
+    "maxArtifactBytes": 25165824,
     "maxCompressedLandingBytes": 300000,
     "maxPhysicalStorageBytes": 1073741824,
     "releaseRetentionDays": 30,

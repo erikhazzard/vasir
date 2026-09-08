@@ -1911,7 +1911,7 @@ async function auditCategoryNavigation() {
       if (tab?.tagName !== 'BUTTON' || tab.disabled || tab.getAttribute('aria-disabled') === 'true' || tab.dataset.categoryStatus !== 'development-index' || tab.hasAttribute('href') || tab.getAttribute('aria-controls') !== 'capability-field-panel') failures.push('Published Writing is not an enabled native homepage category.');
       const expectedScore = Number.isFinite(writing.categoryIndex?.leader?.score) ? writing.categoryIndex.leader.score.toFixed(1) + '/100' : '—';
       if (!visible(tab?.querySelector(':scope > strong')) || text(tab?.querySelector(':scope > strong')) !== expectedScore) failures.push('Writing category invents a score or omits its source-derived leader.');
-      const writingBenchmarkCount = (writing.benchmarks?.length || 1) + Object.keys(writing.additionalBenchmarks || {}).length;
+      const writingBenchmarkCount = new Set(writing.benchmarkIds || [writing.benchmarkId]).size;
       if (!tab?.getAttribute('aria-label')?.includes(writingBenchmarkCount + ' published benchmarks') || !tab?.getAttribute('aria-label')?.includes('Excluded from Overall')) failures.push('Writing category does not disclose published benchmark coverage and Overall exclusion.');
       continue;
     }
@@ -2648,7 +2648,7 @@ try {
     // Every published category participates in the same keyboard navigation.
     const hasGames = await evaluate('Boolean(window.VASIR_DATA.games)');
     const hasWriting = await evaluate('Boolean(window.VASIR_DATA.writing?.coverage?.caseCount)');
-    if (hasWriting) editions.writing = await evaluate('window.VASIR_DATA.writing.scoreBasisLabel');
+    if (hasWriting) editions.writing = 'Writing development index';
     const navigationSteps = [
       {category: 'engineering'}, ...(hasGames ? [{category: 'games', move: 'next'}] : []),
       ...(hasWriting ? [{category: 'writing', move: 'next'}] : []), {category: 'ai-workflows', move: 'next'},

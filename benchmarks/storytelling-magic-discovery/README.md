@@ -11,3 +11,7 @@ Ten equally weighted dimensions rate the resulting story from 1 to 10. The task 
 The benchmark reports all three trial scores and paired differences, separate results for each judge context, and the balanced four-seat panel. Missing scores remain null. Three trials on one prompt support descriptive comparisons, not precise confidence claims or conclusions about general writing ability.
 
 The source definition is [benchmark.json](./benchmark.json). The preregistered design and interpretation rules are in [methodology.md](./methodology.md); execution and coverage checks are in [RUNBOOK.md](./RUNBOOK.md). Source readiness does not mean a run is complete: the run manifest and retained result artifacts establish actual coverage.
+
+## Execution status — 8 September 2026
+
+The cohort is complete: 198 creator answers, 396 completed judge requests, and 792 answer assessments, with its immutable publication source selected. See the [results](../../docs/work/vasir-benchmarking/storytelling-magic-discovery/results/README.md), [independent quantitative check](../../docs/work/vasir-benchmarking/storytelling-magic-discovery/results/insights.md), and [runtime audit](../../docs/work/vasir-benchmarking/storytelling-magic-discovery/runtime-audit.md). This dated status does not change the preregistered design. The report is published, with separate [acceptance and live deployment evidence](../../docs/work/vasir-benchmarking/storytelling-magic-discovery/release.md).

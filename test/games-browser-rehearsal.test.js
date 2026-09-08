@@ -10,7 +10,7 @@ import { loadGamesRehearsalSiteFiles } from "../site/vasirbenchmark.com/games-br
 
 const SITE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../site/vasirbenchmark.com");
 const PUBLIC_FILES = JSON.parse(fs.readFileSync(path.join(SITE_ROOT, "deployment.json"))).publicFiles;
-const WRITING_PATHS = ["writing-data.js", "writing-responses.js"];
+const WRITING_PATHS = ["writing-data.js", "writing-responses.js", "writing-creation-responses.js"];
 const RELEASE_ID = "a".repeat(64);
 const ORIGIN = "https://vasirbenchmark.com";
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
@@ -41,7 +41,7 @@ test("Games rehearsal maps the full immutable manifest to its verified 13-file s
   for (const file of fixture.siteFiles.filter(entry => WRITING_PATHS.includes(entry.path))) file.sourcePath = "/not-read-by-games";
   const result = loadGamesRehearsalSiteFiles({ ...fixture, releaseId: RELEASE_ID });
   assert.equal(result.files.size, 13);
-  assert.equal(result.scope.declaredSiteFileCount, 15);
+  assert.equal(result.scope.declaredSiteFileCount, 16);
   assert.equal(result.scope.verifiedSiteFiles.length, 13);
   assert.deepEqual(result.scope.ignoredSiteFiles, WRITING_PATHS);
   assert.equal(result.scope.mapping, "immutable-release");

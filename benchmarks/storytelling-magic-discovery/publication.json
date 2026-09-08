@@ -1,0 +1,21 @@
+{
+  "kind": "vasirbenchmark-storytelling-creation-source",
+  "schemaVersion": 1,
+  "benchmarkId": "storytelling-magic-discovery",
+  "run": {
+    "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/run.json",
+    "sha256": "233db3f8cf5c4db8ddd6432ff7323d7be567a46654213f9a00a148e04329a18f"
+  },
+  "skill": {
+    "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/skill-snapshot.json",
+    "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+  },
+  "judging": {
+    "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judging.json",
+    "sha256": "927abaeb682628de190bc609bd999c23a5be33e260ce3a989b10283a2b49f138"
+  },
+  "judgeContext": {
+    "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judge-context.json",
+    "sha256": "ecbc9f56410245065b6d160c0a6f411ed2a5dcafab13a805efd1950b43d3e9fe"
+  }
+}

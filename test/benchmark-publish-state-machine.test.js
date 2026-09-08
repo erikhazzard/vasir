@@ -58,7 +58,7 @@ function createPublicationRepoFixture() {
   // This historical fixture omits Writing sources, so its navigation must reflect that selection.
   const gamesHtmlPath = path.join(siteRoot, "games.html");
   fs.writeFileSync(gamesHtmlPath, fs.readFileSync(gamesHtmlPath, "utf8").replace(
-    '<a class="game-capabilities__link" href="./index.html#capabilities/writing/storytelling">Writing</a>',
+    '<a class="game-capabilities__link" href="./index.html#capabilities/writing">Writing</a>',
     '<span class="game-capabilities__unavailable">Writing <small>Coming soon</small></span>'
   ), "utf8");
   createBenchmarkFixtureRoot(temporaryRoot);
@@ -71,7 +71,7 @@ function createPublicationRepoFixture() {
   const lockPath = path.join(siteRoot, "template-lock.json");
   const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
   const acceptedPaths = [
-    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js"].includes(filePath)),
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js", "writing-creation-responses.js"].includes(filePath)),
     "capture.mjs",
     "capture.sh",
     "games-browsercheck.mjs",

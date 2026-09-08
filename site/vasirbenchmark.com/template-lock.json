@@ -1,402 +1,199 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-09-08-writing-plot-twists-final-7380e5b39c1d",
+  "version": "writing-magic-discovery-4632a18ef2b2",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
     "authority": "user",
-    "acceptedAt": "2026-09-08T01:42:02.780Z",
-    "verdict": "Authorized additive Plot twists benchmark publication; candidate visually reviewed and browser-verified by the agent",
-    "response": "Test fresh agents with the science-fiction plot-twist outline prompt, separately with the storytelling skill and twist reference; publish the Writing / Storytelling / Plot twists benchmark and return its performance table.",
-    "basis": "The user explicitly authorized this benchmark and website publication. This records agent review under that authority, not fresh human screenshot approval.",
-    "criterion": "Independent Core idea and Plot twists navigation, all ten trial identities and original outputs/reviews, exact scores, final exclusions without pending-review claims, incomplete configuration ranks withheld, and existing category data preserved.",
+    "scope": {
+      "kind": "focused-writing-benchmark",
+      "schemaVersion": 1,
+      "benchmarkId": "storytelling-magic-discovery",
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "width": 390,
+          "height": 844
+        }
+      ]
+    },
+    "acceptedAt": "2026-09-08T05:39:19.403Z",
+    "verdict": "Agent-reviewed additive creation benchmark under explicit user publication approval",
+    "response": "Come back when the full benchmark has been run and the page has been updated / pushed",
+    "continuingDeploymentApproval": "you'll need to update the benchmarks page and vasir repo - you have full approval and can push / publish / deploy",
+    "preserveOtherWork": "you're good to deploy and stuff, you can just git add git commit changes just dont overwrite their stuff",
+    "basis": "The agent inspected fresh screenshots after three successful benchmark-specific browser checks. User authority comes from the quoted task and standing deployment approval; no fresh human screenshot approval is claimed.",
     "verification": {
-      "releaseId": "7380e5b39c1d2e3f7d2ef08c6377dfabb786217cfae341410d9294408d547668",
-      "finalRunSha256": "97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399",
-      "candidate": {
-        "path": "tmp/plot-twists-benchmark/release-candidate-v1/candidate.json",
-        "bytes": 358563,
-        "sha256": "a968ca689a504a0e622cbe66975e4afb645acb3fa9f17910ef85798513272edc"
+      "releaseId": "4632a18ef2b2da4500c3441e55ec8b99a028ef26920eb72c127fdedf7063ae4e",
+      "browserProof": {
+        "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/check.json",
+        "bytes": 38664,
+        "sha256": "d1b851b684841023c5ddb524ca8ed29c744971eb8353c89d7624991232be1b2b"
       },
-      "previousAcceptance": {
-        "path": "tmp/plot-twists-benchmark/release-candidate-v1/previous-template-lock.json",
-        "bytes": 560576,
-        "sha256": "4bf98287d9c2d9b4e732c8873edf45539f3bfa8e394589037296e9938ddbad22"
-      },
-      "canonicalRun": {
-        "path": "tmp/plot-twists-benchmark/release-candidate-v1/canonical/canonical-receipt.json",
-        "bytes": 18537,
-        "sha256": "17b29295a1fda1a50472a4ef52d2a60512c6128585452eb42f4fe021c9290848"
-      },
-      "localBrowserChecks": 32,
-      "preservedProjectionFields": {
-        "overall": "4b51cf8398cc2e019ce565508e664a41469a74a19054f0131702aa541a08f0a8",
-        "games": "d49291d02d6dae20fcc59a4ab9b8c4b9629fe89567365e410619c60834f1df5d",
-        "aiWorkflows": "3efa56a9e45c89d008691ed72d0e6da2b78dc9135586c6447578afe66840ec13",
-        "scoreBasis": "67a07945de60bae1623b65068a95ae5841418d62e59c1735c9cbc69b3a178512",
-        "settings": "6a8347d2e3ebf5003df995d6fea6ed76132f219d8d57d914ac31a706d9aa076c",
-        "benchmarkResults": "db4ae6f38f8990a958725bc00a39a1aef4c98060d464f51df72e7b493ccff7ce"
-      },
-      "writingBrowserProofs": [
+      "browserReports": [
         {
-          "benchmark": "core",
           "width": 1440,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/writing-core-1440/writing-browsercheck.json",
-          "bytes": 34518,
-          "sha256": "fee71ed0c996f49195e806f95d446374be3be8f2af4d99fb4c8bf92161ea218b",
-          "checks": 126,
-          "coverage": {
-            "benchmarkCount": 1,
-            "caseCount": 12,
-            "settingCount": 33,
-            "completedSettingCount": 0,
-            "responseCount": 790,
-            "expectedResponseCount": 792,
-            "scoredResponseCount": 116,
-            "usablePairs": 58,
-            "expectedPairs": 396,
-            "judgmentCount": 904,
-            "expectedJudgmentCount": 1584
-          },
-          "scoredBranchCoverage": {
-            "required": false,
-            "completeSettings": 0,
-            "unscoredSettings": 33,
-            "tiedRankEntries": 0,
-            "regressionSettings": 0,
-            "completePanels": 116,
-            "singleJudgeResponses": 672,
-            "scoredPairs": 58,
-            "regressionPairs": 1,
-            "tiedPairs": 0,
-            "efficiency": [
-              {
-                "metric": "latency",
-                "eligiblePoints": 0,
-                "frontierPoints": 0,
-                "selectedEntry": null,
-                "mismatches": []
-              },
-              {
-                "metric": "tokens",
-                "eligiblePoints": 0,
-                "frontierPoints": 0,
-                "selectedEntry": null,
-                "mismatches": []
-              }
-            ]
-          }
+          "height": 1000,
+          "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-browsercheck.json",
+          "bytes": 468141,
+          "sha256": "51574b5603519b681d34ceb09ba6aa1f6b87ba0f1d6b60a528b8a2b985f13e83"
         },
         {
-          "benchmark": "core",
           "width": 820,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/writing-core-820/writing-browsercheck.json",
-          "bytes": 34499,
-          "sha256": "a49cc9404f599c4a4274904b4b699780008fbf0bc6721823675e7f993e4ffb23",
-          "checks": 126,
-          "coverage": {
-            "benchmarkCount": 1,
-            "caseCount": 12,
-            "settingCount": 33,
-            "completedSettingCount": 0,
-            "responseCount": 790,
-            "expectedResponseCount": 792,
-            "scoredResponseCount": 116,
-            "usablePairs": 58,
-            "expectedPairs": 396,
-            "judgmentCount": 904,
-            "expectedJudgmentCount": 1584
-          },
-          "scoredBranchCoverage": {
-            "required": false,
-            "completeSettings": 0,
-            "unscoredSettings": 33,
-            "tiedRankEntries": 0,
-            "regressionSettings": 0,
-            "completePanels": 116,
-            "singleJudgeResponses": 672,
-            "scoredPairs": 58,
-            "regressionPairs": 1,
-            "tiedPairs": 0,
-            "efficiency": [
-              {
-                "metric": "latency",
-                "eligiblePoints": 0,
-                "frontierPoints": 0,
-                "selectedEntry": null,
-                "mismatches": []
-              },
-              {
-                "metric": "tokens",
-                "eligiblePoints": 0,
-                "frontierPoints": 0,
-                "selectedEntry": null,
-                "mismatches": []
-              }
-            ]
-          }
+          "height": 1000,
+          "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-browsercheck.json",
+          "bytes": 468267,
+          "sha256": "f3a700ec5d0f23af400c0c20f47fb57b17eca7c5db8189ef7eeb8b45d484adc7"
         },
         {
-          "benchmark": "core",
           "width": 390,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/writing-core-390/writing-browsercheck.json",
-          "bytes": 34465,
-          "sha256": "379876393896f5ba380bb584ea56735de18ca5a0ffce428edb19e193f1d64468",
-          "checks": 126,
-          "coverage": {
-            "benchmarkCount": 1,
-            "caseCount": 12,
-            "settingCount": 33,
-            "completedSettingCount": 0,
-            "responseCount": 790,
-            "expectedResponseCount": 792,
-            "scoredResponseCount": 116,
-            "usablePairs": 58,
-            "expectedPairs": 396,
-            "judgmentCount": 904,
-            "expectedJudgmentCount": 1584
-          },
-          "scoredBranchCoverage": {
-            "required": false,
-            "completeSettings": 0,
-            "unscoredSettings": 33,
-            "tiedRankEntries": 0,
-            "regressionSettings": 0,
-            "completePanels": 116,
-            "singleJudgeResponses": 672,
-            "scoredPairs": 58,
-            "regressionPairs": 1,
-            "tiedPairs": 0,
-            "efficiency": [
-              {
-                "metric": "latency",
-                "eligiblePoints": 0,
-                "frontierPoints": 0,
-                "selectedEntry": null,
-                "mismatches": []
-              },
-              {
-                "metric": "tokens",
-                "eligiblePoints": 0,
-                "frontierPoints": 0,
-                "selectedEntry": null,
-                "mismatches": []
-              }
-            ]
-          }
-        },
-        {
-          "benchmark": "twists",
-          "width": 1440,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/writing-twists-1440/writing-browsercheck.json",
-          "bytes": 37873,
-          "sha256": "6ac78444f4834b4d4d7470bdbfce795eb2e2820100f6d113c2aaca7195da8046",
-          "checks": 125,
-          "coverage": {
-            "benchmarkCount": 1,
-            "caseCount": 1,
-            "settingCount": 4,
-            "completedSettingCount": 2,
-            "responseCount": 80,
-            "expectedResponseCount": 80,
-            "scoredResponseCount": 76,
-            "usablePairs": 38,
-            "expectedPairs": 40,
-            "judgmentCount": 152,
-            "expectedJudgmentCount": 160,
-            "validResponseCount": 78,
-            "terminalGenerationFailureCount": 2,
-            "terminallyExcludedPairCount": 2,
-            "terminallyExcludedJudgmentCount": 8,
-            "pendingGenerationCount": 0,
-            "pendingJudgmentCount": 0,
-            "executionComplete": true,
-            "executionStatus": "complete-with-exclusions"
-          },
-          "scoredBranchCoverage": {
-            "required": true,
-            "completeSettings": 2,
-            "unscoredSettings": 2,
-            "tiedRankEntries": 0,
-            "regressionSettings": 0,
-            "completePanels": 76,
-            "singleJudgeResponses": 0,
-            "scoredPairs": 38,
-            "regressionPairs": 1,
-            "tiedPairs": 0,
-            "efficiency": [
-              {
-                "metric": "latency",
-                "eligiblePoints": 4,
-                "frontierPoints": 4,
-                "selectedEntry": "codex-gpt-5-6-sol-ultra-baseline",
-                "mismatches": []
-              },
-              {
-                "metric": "tokens",
-                "eligiblePoints": 4,
-                "frontierPoints": 3,
-                "selectedEntry": "codex-gpt-5-6-sol-ultra-baseline",
-                "mismatches": []
-              }
-            ]
-          }
-        },
-        {
-          "benchmark": "twists",
-          "width": 820,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/writing-twists-820/writing-browsercheck.json",
-          "bytes": 37855,
-          "sha256": "0ffed65412dbdaeaa57597eab43894f260604f48de8326a3a108fdcf7bdd3310",
-          "checks": 125,
-          "coverage": {
-            "benchmarkCount": 1,
-            "caseCount": 1,
-            "settingCount": 4,
-            "completedSettingCount": 2,
-            "responseCount": 80,
-            "expectedResponseCount": 80,
-            "scoredResponseCount": 76,
-            "usablePairs": 38,
-            "expectedPairs": 40,
-            "judgmentCount": 152,
-            "expectedJudgmentCount": 160,
-            "validResponseCount": 78,
-            "terminalGenerationFailureCount": 2,
-            "terminallyExcludedPairCount": 2,
-            "terminallyExcludedJudgmentCount": 8,
-            "pendingGenerationCount": 0,
-            "pendingJudgmentCount": 0,
-            "executionComplete": true,
-            "executionStatus": "complete-with-exclusions"
-          },
-          "scoredBranchCoverage": {
-            "required": true,
-            "completeSettings": 2,
-            "unscoredSettings": 2,
-            "tiedRankEntries": 0,
-            "regressionSettings": 0,
-            "completePanels": 76,
-            "singleJudgeResponses": 0,
-            "scoredPairs": 38,
-            "regressionPairs": 1,
-            "tiedPairs": 0,
-            "efficiency": [
-              {
-                "metric": "latency",
-                "eligiblePoints": 4,
-                "frontierPoints": 4,
-                "selectedEntry": "codex-gpt-5-6-sol-ultra-baseline",
-                "mismatches": []
-              },
-              {
-                "metric": "tokens",
-                "eligiblePoints": 4,
-                "frontierPoints": 3,
-                "selectedEntry": "codex-gpt-5-6-sol-ultra-baseline",
-                "mismatches": []
-              }
-            ]
-          }
-        },
-        {
-          "benchmark": "twists",
-          "width": 390,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/writing-twists-390/writing-browsercheck.json",
-          "bytes": 37820,
-          "sha256": "c9c000dac9ad3e35685194d4ee66996fca6faf46556110921d518b982906e260",
-          "checks": 125,
-          "coverage": {
-            "benchmarkCount": 1,
-            "caseCount": 1,
-            "settingCount": 4,
-            "completedSettingCount": 2,
-            "responseCount": 80,
-            "expectedResponseCount": 80,
-            "scoredResponseCount": 76,
-            "usablePairs": 38,
-            "expectedPairs": 40,
-            "judgmentCount": 152,
-            "expectedJudgmentCount": 160,
-            "validResponseCount": 78,
-            "terminalGenerationFailureCount": 2,
-            "terminallyExcludedPairCount": 2,
-            "terminallyExcludedJudgmentCount": 8,
-            "pendingGenerationCount": 0,
-            "pendingJudgmentCount": 0,
-            "executionComplete": true,
-            "executionStatus": "complete-with-exclusions"
-          },
-          "scoredBranchCoverage": {
-            "required": true,
-            "completeSettings": 2,
-            "unscoredSettings": 2,
-            "tiedRankEntries": 0,
-            "regressionSettings": 0,
-            "completePanels": 76,
-            "singleJudgeResponses": 0,
-            "scoredPairs": 38,
-            "regressionPairs": 1,
-            "tiedPairs": 0,
-            "efficiency": [
-              {
-                "metric": "latency",
-                "eligiblePoints": 4,
-                "frontierPoints": 4,
-                "selectedEntry": "codex-gpt-5-6-sol-ultra-baseline",
-                "mismatches": []
-              },
-              {
-                "metric": "tokens",
-                "eligiblePoints": 4,
-                "frontierPoints": 3,
-                "selectedEntry": "codex-gpt-5-6-sol-ultra-baseline",
-                "mismatches": []
-              }
-            ]
-          }
+          "height": 844,
+          "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-browsercheck.json",
+          "bytes": 468088,
+          "sha256": "7fb33a4ca3bef6e2f56d9b05c9477eb832843d3bf0bcee04ab2af1e954b90b09"
         }
       ],
-      "gamesBrowserProofs": [
+      "candidateManifest": {
+        "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/candidate-manifest.json",
+        "bytes": 367896,
+        "sha256": "863183098f0138b5996fd26d29cc2c19ee8800ae823dc194d5e5f72318dc9087"
+      },
+      "viewports": [
         {
           "width": 1440,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/games-1440/games-browsercheck-1440.json",
-          "bytes": 137919,
-          "sha256": "35436e6e5eeeb40ba15657bacb858046647df2df01d0f58284b0e785f16d37ae",
-          "checks": 32,
-          "coverage": {
-            "rows": 10,
-            "clipsAdvanced": 10,
-            "clipsFailed": 0,
-            "gamesLoadedAndInputObserved": 10,
-            "gamesWithObservedFailure": 0,
-            "gamesUnverified": 0,
-            "unavailableRows": 0
-          },
-          "delivery": "local-pinned-bytes"
+          "height": 1000
+        },
+        {
+          "width": 820,
+          "height": 1000
         },
         {
           "width": 390,
-          "path": "tmp/plot-twists-benchmark/release-candidate-v1/games-390/games-browsercheck-390.json",
-          "bytes": 137036,
-          "sha256": "291856f3df628ebe27deebe8d5af2212adda8be3affc8b6a304f5750ed874c19",
-          "checks": 32,
-          "coverage": {
-            "rows": 10,
-            "clipsAdvanced": 10,
-            "clipsFailed": 0,
-            "gamesLoadedAndInputObserved": 10,
-            "gamesWithObservedFailure": 0,
-            "gamesUnverified": 0,
-            "unavailableRows": 0
-          },
-          "delivery": "local-pinned-bytes"
+          "height": 844
         }
       ],
-      "gamesReportCaptures": "All ten standalone Games report captures are refreshed from the same pinned candidate; desktop and mobile each establish ten advancing clips and ten game input observations with no delivery or runtime failures.",
-      "totalBytes": 14356720,
-      "compressedLandingBytes": 285962,
-      "visualReview": "Agent inspected desktop/mobile Plot twists leaderboard, trial report, and exclusion evidence; browser checks cover all declared trials and three viewport sizes."
+      "coverage": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "promptCount": 1,
+        "trialCount": 3,
+        "settingCount": 33,
+        "completedSettingCount": 33,
+        "responseCount": 198,
+        "validResponseCount": 198,
+        "expectedResponseCount": 198,
+        "scoredResponseCount": 198,
+        "usablePairs": 99,
+        "expectedPairs": 99,
+        "judgmentCount": 792,
+        "expectedJudgmentCount": 792,
+        "expectedJudgeRequestCount": 396,
+        "completedJudgeRequestCount": 396,
+        "terminalGenerationFailureCount": 0,
+        "terminalJudgmentFailureCount": 0,
+        "terminallyExcludedPairCount": 0,
+        "terminallyExcludedJudgmentCount": 0,
+        "pendingGenerationCount": 0,
+        "pendingJudgmentCount": 0,
+        "executionComplete": true,
+        "executionStatus": "complete"
+      },
+      "sourceSelections": [
+        {
+          "benchmarkId": "storytelling-core-idea",
+          "path": "benchmarks/storytelling-core-idea/publication.json",
+          "bytes": 583,
+          "sha256": "dfbdb501233d5838452f95e41088b4c2112e12cb5b5f5f711e94b0fad4a83af9",
+          "sources": [
+            {
+              "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5/run.json",
+              "bytes": 55882781,
+              "sha256": "0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5"
+            },
+            {
+              "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5/skill-snapshot.json",
+              "bytes": 453845,
+              "sha256": "a4db1b5ea3ae79e9655be2ab793fa71e153571359a88d098a383bf94cd4667e5"
+            }
+          ]
+        },
+        {
+          "benchmarkId": "storytelling-plot-twists",
+          "path": "benchmarks/storytelling-plot-twists/publication.json",
+          "bytes": 587,
+          "sha256": "8d3e1c0b6e44e7abbe2536671fc09d70e8eba9ae395913c0c8dd7779c43ffc6d",
+          "sources": [
+            {
+              "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399/run.json",
+              "bytes": 4891853,
+              "sha256": "97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399"
+            },
+            {
+              "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399/skill-snapshot.json",
+              "bytes": 470201,
+              "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+            }
+          ]
+        },
+        {
+          "benchmarkId": "dungeon-master-adventure-outline",
+          "path": "benchmarks/dungeon-master-adventure-outline/publication.json",
+          "bytes": 610,
+          "sha256": "e92adbedd7ff43bf6eaf34272267a5b10558f257b9d2ebda71707ad5c18007d6",
+          "sources": [
+            {
+              "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a/run.json",
+              "bytes": 2715303,
+              "sha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a"
+            },
+            {
+              "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a/skill-snapshot.json",
+              "bytes": 383221,
+              "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+            }
+          ]
+        },
+        {
+          "benchmarkId": "storytelling-magic-discovery",
+          "path": "benchmarks/storytelling-magic-discovery/publication.json",
+          "bytes": 1217,
+          "sha256": "3dc61c105531ed538f0f72a8c74b563bf48c7cfe3b667dd5c9720b8df28739ee",
+          "sources": [
+            {
+              "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/run.json",
+              "bytes": 2306274,
+              "sha256": "233db3f8cf5c4db8ddd6432ff7323d7be567a46654213f9a00a148e04329a18f"
+            },
+            {
+              "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/skill-snapshot.json",
+              "bytes": 470201,
+              "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+            },
+            {
+              "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judging.json",
+              "bytes": 54200034,
+              "sha256": "927abaeb682628de190bc609bd999c23a5be33e260ce3a989b10283a2b49f138"
+            },
+            {
+              "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judge-context.json",
+              "bytes": 316721,
+              "sha256": "ecbc9f56410245065b6d160c0a6f411ed2a5dcafab13a805efd1950b43d3e9fe"
+            }
+          ]
+        }
+      ],
+      "helper": {
+        "bytes": 33106,
+        "sha256": "79b522598dd551de3b9b535483e981047beccfafaf8dc5e9e7887f413fe5e2c5"
+      },
+      "fullGamesAudit": false
     }
   },
   "deployment": {
@@ -411,577 +208,428 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "Plot twists is final with two terminal protocol exclusions: 80 retained outlines, 78 valid generations, 152 completed reviews, eight excluded review slots; Sol and Luna have ten complete pairs, Astra and Terra only nine-pair diagnostics. Core idea remains independently in progress. All are uncalibrated model-judged development results, not proof of human-reader response. Writing remains excluded from Overall. Acceptance is not live deployment proof.",
+  "claimBoundary": "Focused magic-discovery benchmark review at three viewports. Existing selected Core idea, Plot twists, and Dungeon Master source bytes are pinned and preserved. Retained Games assets and other site views are not a new exhaustive browser audit.",
   "files": [
     {
       "path": "app.js",
-      "role": "runtime",
-      "bytes": 162787,
-      "sha256": "03af22526984de545f0bcd7a52f09e517f379276ca2ef9ed7d61690c985326d1"
+      "bytes": 188816,
+      "sha256": "878445e7b5dd06d3027a8cc17d30596ff6109f4625ec7b79dbc7bf0c592d0e9d"
     },
     {
       "path": "assets/d3.v7.min.js",
-      "role": "runtime",
       "bytes": 279706,
       "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
     },
     {
       "path": "assets/kanit-latin-900-normal.woff2",
-      "role": "runtime",
       "bytes": 19216,
       "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
     },
     {
       "path": "benchmark-report.css",
-      "role": "runtime",
-      "bytes": 33336,
-      "sha256": "6a6bcaad0730f560bcd951e25132aa5b92485bdf3c6eac400fc171065a72c084"
+      "bytes": 33972,
+      "sha256": "2f729f153ddf2176264130a112c2f36b97d7c1367ec381adc2df635f759d9359"
     },
     {
       "path": "benchmark-report.html",
-      "role": "runtime",
       "bytes": 2115,
       "sha256": "915c3ce28a71cdff6fc974a7dcaa5f8b65c813991706603aa36114c7843a1eec"
     },
     {
       "path": "benchmark-report.js",
-      "role": "runtime",
-      "bytes": 83794,
-      "sha256": "081cabddb234e42dc8626c05559f5ca594066b16acd33078e1683b5b0656f9bd"
+      "bytes": 98605,
+      "sha256": "191eddc86dd299cd8a8c5b1617d7e3b314ba78bed3da8ce17687a4661ed24a0c"
     },
     {
       "path": "capture.mjs",
-      "role": "qa-harness",
-      "bytes": 161867,
-      "sha256": "81e8fafebc1859b387b0469b5172c2f7825263c29c84766d42af3f8ef9d4aa8b"
+      "bytes": 161981,
+      "sha256": "157dd520a925ceb272d628a78b624c8f918cf10cb930d95647fbc4f154ac9bd9"
     },
     {
       "path": "capture.sh",
-      "role": "qa-harness",
       "bytes": 4994,
       "sha256": "4cb2289a907a7d4fee4c541c4c8ae0268582b35797a2d3f1edd4e6201259eef0"
     },
     {
+      "path": "deployment.json",
+      "bytes": 3120,
+      "sha256": "56e3d087931caa496912b1a378eee7c14087819dbc09babe36cf10a643e81d4e"
+    },
+    {
       "path": "games-browsercheck.mjs",
-      "role": "qa-harness",
-      "bytes": 51241,
-      "sha256": "dab6036e0032b374cf46104f08552ef29a220857ccff1ba1b1122e5465cc3c0a"
+      "bytes": 51327,
+      "sha256": "2871411b8879bf959e3888c4dc5728b7f823733648489dc0624f65e43aa2b034"
     },
     {
       "path": "games.css",
-      "role": "runtime",
       "bytes": 19893,
       "sha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
     },
     {
       "path": "games.html",
-      "role": "runtime",
-      "bytes": 3098,
-      "sha256": "0194d6af2b9318d8fd5a8d396abd8b9e219e006a685a91792118fcf01a0ccd81"
+      "bytes": 3085,
+      "sha256": "eed02c026dc2cf1aa63f1a3433bf38926ae33cef6b3bbc6c3171dee80cf7f5b0"
     },
     {
       "path": "games.js",
-      "role": "runtime",
       "bytes": 31995,
       "sha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
     },
     {
       "path": "index.html",
-      "role": "runtime",
       "bytes": 2284,
       "sha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9"
     },
     {
+      "path": "infra/production.yml",
+      "bytes": 13270,
+      "sha256": "2ed8abf3aa8ef413cf730b27751487b4d8b8a5610d323e66d6c65ab5afb66605"
+    },
+    {
       "path": "style.css",
-      "role": "runtime",
-      "bytes": 145252,
-      "sha256": "57d6398f202a285e90caf158efb253b929e2b321ffde16ca10c1c1e7e00a6b31"
+      "bytes": 151018,
+      "sha256": "0a53cbd8a2bece24c642dc6162dd7793ac209919176e461b290475ef0f83897a"
     },
     {
       "path": "writing-browsercheck.mjs",
-      "role": "qa",
-      "bytes": 78874,
-      "sha256": "a6f9bdd9992a29bc2497df6f5cee7202e8c990bc7a205e463418899f43b43888"
+      "bytes": 124179,
+      "sha256": "09c08c15853bdf13433ceff7e892cfe1e75629a6305942954e2edd1ff544d0e1"
     }
   ],
   "captures": [
     {
-      "route": "#capabilities/overall",
-      "sha256": "e79faaf18daef3474bad533e76b17ccd5be4c7f97e65912bbf5dca8e4c939939",
-      "bytes": 175721,
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop.png"
-    },
-    {
-      "route": "#capabilities/overall",
-      "sha256": "ca16c43b0d250359804eddd49c04cb0f4e2ac08dd565750ee8522fb1798293e3",
-      "bytes": 71136,
-      "width": 390,
-      "height": 844,
-      "path": "mobile.png"
-    },
-    {
-      "route": "#capabilities/engineering",
-      "sha256": "94a596387834e631abe6a021c1ca2260f276c2919b073473c6261b87ef3045b8",
-      "bytes": 150898,
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-capabilities.png"
-    },
-    {
-      "route": "#capabilities/engineering",
-      "sha256": "67d691f5643a15148d766af6fdc2ac8b48c824598c208f51fff9755b13dd8e20",
-      "bytes": 68104,
-      "width": 390,
-      "height": 844,
-      "path": "mobile-capabilities.png"
-    },
-    {
-      "route": "#capabilities/engineering/benchmarks",
-      "sha256": "309febe70f84733058d403b9fd67d2253b87d80530cad9d2a98fdc2e15685f20",
-      "bytes": 200158,
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-capability-benchmarks.png"
-    },
-    {
-      "route": "#capabilities/engineering/benchmarks",
-      "sha256": "1e6f34d13599b586f7cd9fd2728fee2637acf4a6496a3bdddc702e253f7832a6",
-      "bytes": 68782,
-      "width": 390,
-      "height": 844,
-      "path": "mobile-capability-benchmarks.png"
-    },
-    {
-      "route": "#capabilities/overall/efficiency",
-      "sha256": "76abde701e9ef25549ba4fdeb6ee1bf962bda28fc97a2431c9604c8f13d3cf7e",
-      "bytes": 188237,
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-efficiency.png"
-    },
-    {
-      "route": "#capabilities/overall/efficiency",
-      "sha256": "ab83fe57473cf3f79ad3bcca6b4ab9b27774ce9cdcd782ae0373ddf9b83fd01b",
-      "bytes": 62923,
-      "width": 390,
-      "height": 844,
-      "path": "mobile-efficiency.png"
-    },
-    {
-      "route": "#hyper-scale-chat",
-      "sha256": "19ea1c3d24f6fde831635b67336adc0375189e0338020a61151fa1bb6b5fb616",
-      "bytes": 157056,
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-benchmark-report.png"
-    },
-    {
-      "route": "#hyper-scale-chat",
-      "sha256": "b6ac310949a41fa188762f971101a2f1ca8b46b1f9848e819538da7419f8d45d",
-      "bytes": 61998,
-      "width": 390,
-      "height": 844,
-      "path": "mobile-benchmark-report.png"
-    },
-    {
-      "route": "#capabilities/ai-workflows",
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-workflows.png",
-      "sha256": "a045777cf006cc4cbc042394ea3161cb510c55ac44ebff931e74db8b68fb700d",
-      "bytes": 150045
-    },
-    {
-      "route": "#capabilities/ai-workflows",
-      "width": 390,
-      "height": 844,
-      "path": "mobile-workflows.png",
-      "sha256": "71578c595fd0ec68c22436a84bf82d70943238982b47f948f558715a7737f394",
-      "bytes": 63467
-    },
-    {
-      "route": "#capabilities/ai-workflows/benchmarks",
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-workflow-benchmarks.png",
-      "sha256": "24bf109b3160fe565ace21b7d8d785cf0936d0e65752482803ba79a1e4474cac",
-      "bytes": 123868
-    },
-    {
-      "route": "#capabilities/ai-workflows/benchmarks",
-      "width": 390,
-      "height": 844,
-      "path": "mobile-workflow-benchmarks.png",
-      "sha256": "96fb65c3f88f06fb6540709fa96a14ee5a992bf54044c4964dd9ecc82bd0ba58",
-      "bytes": 65480
-    },
-    {
-      "route": "#capabilities/ai-workflows/efficiency",
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-workflow-efficiency.png",
-      "sha256": "8a7f917aaf523583708740086305ca91eb223301083e8a171e4580af0f69243e",
-      "bytes": 196804
-    },
-    {
-      "route": "#capabilities/ai-workflows/efficiency",
-      "width": 390,
-      "height": 844,
-      "path": "mobile-workflow-efficiency.png",
-      "sha256": "7c7524d804f56cb055f5503a7600be0e6810a516644a14951513d9c72e847fc2",
-      "bytes": 59505
-    },
-    {
-      "route": "#work-spec-chat",
-      "width": 1440,
-      "height": 1000,
-      "path": "desktop-workflow-report.png",
-      "sha256": "3fcb485331e7c32c00d2534d47fe2a474db6fcb1a4e49ecc3c610795cb0ea8df",
-      "bytes": 200324
-    },
-    {
-      "route": "#work-spec-chat",
-      "width": 390,
-      "height": 844,
-      "path": "mobile-workflow-report.png",
-      "sha256": "76253333ef3a621ca4b071e878cba07d03f15d4a952dcaf6af42db380164d9ce",
-      "bytes": 74637
-    },
-    {
-      "path": "desktop-game-models.png",
-      "route": "/#capabilities/games",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 126268,
-      "sha256": "a8f71a52ec6b17130114b79f9bab5c240d081c87cce06859d52b1cee3f68fd70"
-    },
-    {
-      "path": "desktop-game-benchmarks.png",
-      "route": "/#capabilities/games/benchmarks",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 120545,
-      "sha256": "5b2d6632e9d50ecd6b1f72ef6d5ad8f1d9804dece3a47a8d7d1f9354ad521186"
-    },
-    {
-      "path": "desktop-game-efficiency.png",
-      "route": "/#capabilities/games/efficiency",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 132268,
-      "sha256": "76a1f4eac7b8b6adb25a14374182e5f26609cb85d238743706b900cd424b27b3"
-    },
-    {
-      "path": "mobile-game-models.png",
-      "route": "/#capabilities/games",
-      "width": 390,
-      "height": 844,
-      "bytes": 66434,
-      "sha256": "ef3548ee7a7051e5ba9675aafbbe707f5a29adf44046477effe0f496afe058fb"
-    },
-    {
-      "path": "mobile-game-benchmarks.png",
-      "route": "/#capabilities/games/benchmarks",
-      "width": 390,
-      "height": 844,
-      "bytes": 68198,
-      "sha256": "29c9f530e3c39c88772433e36e849f60731d2ec3670ce211ee414203a37a1ed1"
-    },
-    {
-      "path": "mobile-game-efficiency.png",
-      "route": "/#capabilities/games/efficiency",
-      "width": 390,
-      "height": 844,
-      "bytes": 61937,
-      "sha256": "cb586e53ffa0d34b1d43ade0472b9a3dd6b4eddcf76d2349518027d4fece5abe"
-    },
-    {
-      "path": "desktop-games.png",
-      "route": "/games.html",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 133607,
-      "sha256": "1909ff4a5e29d6f08827d8ad3707c0ea70ffcacaf697f8579cbe36ae789f7672"
-    },
-    {
-      "path": "mobile-games.png",
-      "route": "/games.html",
-      "width": 390,
-      "height": 844,
-      "bytes": 59055,
-      "sha256": "25b60638b31319777f008a7b54087614dd660b1ddd2b4896d8482302a2c4da69"
-    },
-    {
-      "path": "desktop-games-ratings.png",
-      "route": "/games.html",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 117971,
-      "sha256": "27a47111a49d9e8927c7b743f905b863db8adb157d003ee79c411202ff757911"
-    },
-    {
-      "path": "mobile-games-ratings.png",
-      "route": "/games.html",
-      "width": 390,
-      "height": 844,
-      "bytes": 52735,
-      "sha256": "db68939b314be08d272f36180a8d5472a5fc651ac1bab61e167c00958639f1d6"
-    },
-    {
-      "path": "desktop-games-playback.png",
-      "route": "/games.html",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 476835,
-      "sha256": "2221a051dc0a1be36000e5977607f9936f11ff2dc9aa8f0c2564b3d5a49b8213"
-    },
-    {
-      "path": "mobile-games-playback.png",
-      "route": "/games.html",
-      "width": 390,
-      "height": 844,
-      "bytes": 164831,
-      "sha256": "65197c1957d168e5f6db7e489a72797b9abffad1d6fe189e878c725e55f94704"
-    },
-    {
-      "path": "desktop-games-play.png",
-      "route": "/games.html",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 480184,
-      "sha256": "b2998aaad284a1a1a4eccfdc06640a2f1f63efa7c649c142ac3b15c466735284"
-    },
-    {
-      "path": "mobile-games-play.png",
-      "route": "/games.html",
-      "width": 390,
-      "height": 844,
-      "bytes": 169074,
-      "sha256": "9707dfc3980cbf1a1e9784f30220912e98c2e713d139f6232552a4be9f717c23"
-    },
-    {
-      "path": "desktop-games-fullscreen.png",
-      "route": "/games.html",
-      "width": 1440,
-      "height": 1000,
-      "bytes": 465862,
-      "sha256": "d029e1617c72e2580d3fa6a4eeddaf85b9e05ebf8fe3b9b09fde4c745c9451af"
-    },
-    {
-      "path": "mobile-games-fullscreen.png",
-      "route": "/games.html",
-      "width": 390,
-      "height": 844,
-      "bytes": 383145,
-      "sha256": "366c3095a52abeaafb1e85e6af1740ca9c6c0cc931df222729fef2e10bf3bf16"
-    },
-    {
-      "path": "desktop-writing-models.png",
-      "route": "#capabilities/writing/storytelling",
-      "bytes": 151184,
-      "sha256": "847229113890c9b1cc9317f514f50e24356b144f561556e59689dfbdeeccee9d",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-models.png",
+      "bytes": 166878,
+      "sha256": "155e5a4b87c22e965cca41fa063f6f32a175036b955724c06530764fdf03be3e",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-benchmarks.png",
-      "route": "#capabilities/writing/storytelling/benchmarks",
-      "bytes": 157532,
-      "sha256": "e64a0c029fa90406c333c1bc70cac322b4c451a00bfaf4ce4473cb73e8058e76",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-stacked-rows.png",
+      "bytes": 136413,
+      "sha256": "eb039b954ef4868aadf47e3fc5052b354d1334059083c20b250b1a43558d7ad3",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-efficiency.png",
-      "route": "#capabilities/writing/storytelling/efficiency",
-      "bytes": 171739,
-      "sha256": "e2ec1bd38509087889e88c000fe671e067a4627b66d14e573ded387d01dffeee",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-partial.png",
+      "bytes": 136413,
+      "sha256": "eb039b954ef4868aadf47e3fc5052b354d1334059083c20b250b1a43558d7ad3",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-efficiency-tokens.png",
-      "route": "#capabilities/writing/storytelling/efficiency",
-      "bytes": 161725,
-      "sha256": "f4f330de9a7d00f47e754aa9acf37217de065aa296471a59d75c041ec7d293db",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-benchmarks.png",
+      "bytes": 179129,
+      "sha256": "28221eadf3f2301f8df029ebdcd887ac6715b4281b75bd20e740bffdce4ec143",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-report.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 156056,
-      "sha256": "36e2224cd9f517e4749b153e57c19e78230708d20fe40fe1a35a4ebda36a5cfc",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-provisional.png",
+      "bytes": 145067,
+      "sha256": "e53e33cc11f3c1a0dac91f9b6329f6436b97e878cf0fa06b60240a4f6949b8c0",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-method.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 181273,
-      "sha256": "77433ec997d99288c9cd81ba99b026b181e1c9b0a1822c1b1cbf7f9fb5f43828",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-efficiency.png",
+      "bytes": 144569,
+      "sha256": "889486208900aa253be909227885f8e1a3c4a7e2b378168f0037124b298ef313",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-rubric-anchors.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 177441,
-      "sha256": "862ae1ff84af1d7968f6dade8fec005361c06f0b52f83728373a028d08a50cbd",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-efficiency-tokens.png",
+      "bytes": 144421,
+      "sha256": "5829771f37efa91d07f52432ca875d1407b1aa77ee3d022f22a804243a2ebf66",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-method-execution.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 167125,
-      "sha256": "460e2eaa55ec93128ddc80e87063356f1c179edf6afccbe4e4f2856327ecd376",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-report.png",
+      "bytes": 151827,
+      "sha256": "8024d0ed870beeca4a0faf85ae80efe00485dc91553fa167c96d3f9f5517f889",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-reference.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 181756,
-      "sha256": "5ac6dee6bafe188eb4052b775e12fd032ac7ee264c4f25675916740c7d4a8aba",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-method.png",
+      "bytes": 204233,
+      "sha256": "d1f1a6cae4b666cfaf6dfd41a2905a405a3103541acc524d94e23e7540694397",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-answer.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 181361,
-      "sha256": "67f13e0a5c9feb7d4d90b34b2ddda613f12b47a95bfe6b9f63ebcb748bc0ecd2",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-rubric-anchors.png",
+      "bytes": 197761,
+      "sha256": "835b77fefa07afc7c3caa46f661b60f7140c4048b4363437ce1655917bfc402a",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-judgments.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 182981,
-      "sha256": "2c2ccd51d9ce23baa5a54ce7a8f1713fdc17a28c0628418f75ed26091c0b5e29",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-method-execution.png",
+      "bytes": 165847,
+      "sha256": "6004d6015d034afa239806dd759b6d6de0881f5a0a715ec188c2bd20dede4d09",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-judge-resources.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 101762,
-      "sha256": "339a6fcf7dcd749cbc69685a4d13f2c06dcee0e0e6b8ecf142b052080b1b856c",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-reference.png",
+      "bytes": 169901,
+      "sha256": "ae4708f059d6a0cf7f6b063a74e66d2a96c367e4a088129c59187ab0f515ce9d",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "desktop-writing-execution.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 172422,
-      "sha256": "1e437ae1a48bd298e8fb454894ed82eb8579735c0d0c9a912294552746ca444d",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-answer.png",
+      "bytes": 224757,
+      "sha256": "d9e2769222ae3ba7561e89f8d691e314e2b9094612a3c10ce72733efffc4cdcd",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "mobile-writing-models.png",
-      "route": "#capabilities/writing/storytelling",
-      "bytes": 63709,
-      "sha256": "423dc24f65335001c29526f9708acb1839bf0cb59dae3270f2e983379c7198a0",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-judgments.png",
+      "bytes": 288922,
+      "sha256": "f81846e5ce98f9a7ec332940562c15fccc467831a114beabb2d79ca57a280da0",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-judge-resources.png",
+      "bytes": 228071,
+      "sha256": "445b4fa1d24f9a6bda0931926aa6ca8c8e8062faf29708e07cbee641bcaded15",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/1440/writing-execution.png",
+      "bytes": 203435,
+      "sha256": "2b6e7ba939c5c4190d54fdf7feb41b301a9c2951edcc5d408f61e9becbf5c87f",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-models.png",
+      "bytes": 113916,
+      "sha256": "e0158f4b8f0db3eabbea4c011d2f92d633128d8a5a8a747b5357fa648ffa055d",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-stacked-rows.png",
+      "bytes": 124899,
+      "sha256": "ebee438c23fbbf2d572a01243137fadc3e6978605f0f9967ba2358f71bc72a2f",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-partial.png",
+      "bytes": 124899,
+      "sha256": "ebee438c23fbbf2d572a01243137fadc3e6978605f0f9967ba2358f71bc72a2f",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-benchmarks.png",
+      "bytes": 123848,
+      "sha256": "86a4a7a40202b9009dce217ed039e7a6e3e6968c6056b6d29bdf53d75c4eeff3",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-provisional.png",
+      "bytes": 132816,
+      "sha256": "86149c48784093622ac2fa01a8a94ac1a9ac4678915d99fb3b416143828bef78",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-efficiency.png",
+      "bytes": 105265,
+      "sha256": "2e75dd0be59db285d186f9e34d665957b94705e14c3b7c60c406d8039629ae97",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-efficiency-tokens.png",
+      "bytes": 105029,
+      "sha256": "821619884e37967187d78ec3699f6b649b76c5c3732f92f8da2b2e9496b82695",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-report.png",
+      "bytes": 125082,
+      "sha256": "01928928b4234f217fb5d04a6ed35505f9bae536243ade0904a006afb3ccf3f3",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-method.png",
+      "bytes": 164670,
+      "sha256": "67d09374f9fe80a1b9b3f94cc5d1d0ce46da3a43b6c80687c3708f1c2ec4a26f",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-rubric-anchors.png",
+      "bytes": 152912,
+      "sha256": "3d1a4206672dac6caaa264dac47433f05573337d650f209808af89e188980770",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-method-execution.png",
+      "bytes": 145574,
+      "sha256": "ed2266cad1b92edce351fd0358ffc2af13227c7515b639ad07994886da2abb48",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-reference.png",
+      "bytes": 138143,
+      "sha256": "5bf05a3b9006544f27a711c4ee299b305474f25d727ea22a549ba2e59989c90b",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-answer.png",
+      "bytes": 181410,
+      "sha256": "0cb80142f80bda43646df8f851952f594ddcb620587698193cd67bd0a9b0e341",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-judgments.png",
+      "bytes": 209978,
+      "sha256": "ab99f69f803d8ec079ec1eb09736cd4faf5ab856d43aea017ba124fef58b4e78",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-judge-resources.png",
+      "bytes": 107095,
+      "sha256": "edb974f9011aa1402add218e03e1bdabc3d30e267e7b97796e2e3b9e4e8b77fd",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/820/writing-execution.png",
+      "bytes": 169022,
+      "sha256": "d9f0c99759081161ad1b8855d73628379fdd597eaca5118c537709bdce83c142",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-models.png",
+      "bytes": 68928,
+      "sha256": "1849a206ad3b2188cef0e675172d865d6a9263b57a055e4f6412bab1b245d99a",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-benchmarks.png",
-      "route": "#capabilities/writing/storytelling/benchmarks",
-      "bytes": 82492,
-      "sha256": "ac695dc18ac0b0e828d0091d578adc68fb0c194e6a52c94a0c1db8e56bf01f4f",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-stacked-rows.png",
+      "bytes": 74333,
+      "sha256": "f11fdd547b5b224eb917fc2a409998b606005559a54d09e64306566f2724459b",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-efficiency.png",
-      "route": "#capabilities/writing/storytelling/efficiency",
-      "bytes": 75367,
-      "sha256": "b77852ebd0ae512c521f83ab306343f128e9fa57d81e8b64d2c2242fce8cc73e",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-partial.png",
+      "bytes": 72922,
+      "sha256": "5bdc9882d7abea0e97d76f41010b22183c4f9fd6145968672090ab9176d52c6e",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-efficiency-tokens.png",
-      "route": "#capabilities/writing/storytelling/efficiency",
-      "bytes": 74551,
-      "sha256": "5803a0354a111e142a1ff5869015d7532841569182fd6b94e175f2e8402bc5da",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-benchmarks.png",
+      "bytes": 78771,
+      "sha256": "26bb2b534b6747737257072872f905073430448d189e7d531d29f4c0642a60cf",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-report.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 62786,
-      "sha256": "2131233f7afc58220ee3659f90e157b4fb03dcf66945085fae8334b2b3d5d0a3",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-provisional.png",
+      "bytes": 69083,
+      "sha256": "20ab3b7fa9dc19c62ff552fe94f38405b832ad776a48b21383bfd0a55264ef0f",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-method.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 76895,
-      "sha256": "dbfa1b0ca8c0f8fe613fbd4a09994949a2fd70fa95df7d414fd561f0311fe201",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-efficiency.png",
+      "bytes": 64876,
+      "sha256": "3e8be1fc054a29b1fb7e694acfc068c4e2ed4d13349f2d91da4501ac8d822552",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-rubric-anchors.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 75668,
-      "sha256": "61019a7310544c837355f35033c48d2181d36e19d9981b85c3794bcdccdbbb69",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-efficiency-tokens.png",
+      "bytes": 64741,
+      "sha256": "ac0891aef52d91c19b9e91c5e9a09e7a03278448f32b3f7dd0013a1299c8d203",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-method-execution.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 83972,
-      "sha256": "cd8a75dce2680a17e161f0778e2fc35ef1a76075033008bc11223e88c50f7ca1",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-report.png",
+      "bytes": 57971,
+      "sha256": "8493d2db5da5600e29de01d7f7080e68be0f323aa47c1b33c6721c03ea6b91a3",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-reference.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 77222,
-      "sha256": "b5bc4d83bfad570d31791db989bd9a4fda1556f47e39573812f68c659f9b0ba3",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-method.png",
+      "bytes": 80507,
+      "sha256": "a19634efbd292cb1e3381acd1d599919149bc1f552bca0aa28a1334a106753b1",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-answer.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 76086,
-      "sha256": "7110aed9ef4b96656e8c4b6a292d51c05f9d80e495f7798ee312d240fe5a15b5",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-rubric-anchors.png",
+      "bytes": 85570,
+      "sha256": "f3cb4c3fece82191048b04679180f8cd7b46558685ace7fba9db51c29ffca131",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-judgments.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 64246,
-      "sha256": "0d5b8be583c0bb88a5705a5920c41798a76f1131d0bf2d39d0acec72ce0114cf",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-method-execution.png",
+      "bytes": 76799,
+      "sha256": "9ce3a59d47814eac92423f99e6c33ef41fe087fe84d0b0b5f0be4cd2a517e55a",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-judge-resources.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 61371,
-      "sha256": "fbe1ee33b31c205187b9851972099e66df3fcce191493f81e1788d3810161274",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-reference.png",
+      "bytes": 71440,
+      "sha256": "be48891d3c5105a9c84c70c24478941e8742a4c625d4c45f042d701b43e27924",
       "width": 390,
       "height": 844
     },
     {
-      "path": "mobile-writing-execution.png",
-      "route": "/benchmark-report.html#storytelling-core-idea",
-      "bytes": 63637,
-      "sha256": "c161a151efbaf62dffa246805fa38e37cae37c94c39e6260a580bcc72cd41941",
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-answer.png",
+      "bytes": 76566,
+      "sha256": "59383e7b08f54c2d20c6d3c41989a2333904862946e6f473447f5fd8f2d12f51",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-judgments.png",
+      "bytes": 71658,
+      "sha256": "d762cd67ceb91e25ad38acbd02c41fa0d85321f71c4405f37b065a9ade097eb8",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-judge-resources.png",
+      "bytes": 68888,
+      "sha256": "e0bc4ccf3f51352ee61d2b5e23c3a2391683efb20fb9e5062719e04407f877fd",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/390/writing-execution.png",
+      "bytes": 62200,
+      "sha256": "e5bd17bba86e97dd7967018f1f09f539c4228cfaeb4fbff8dcc75924affbfb07",
       "width": 390,
       "height": 844
     }
@@ -3529,5 +3177,497 @@
         }
       ]
     }
-  ]
+  ],
+  "retainedCaptureEvidence": {
+    "explanation": "Historical captures remain prior evidence and are not claimed to depict this candidate.",
+    "version": "2026-09-08-writing-category-hierarchy-c266a8d078ad",
+    "receipt": {
+      "path": "reviews/storytelling-magic-discovery/2026-09-08T05-39-14-674Z-MYmT2y/previous-template-lock.json",
+      "bytes": 3930743,
+      "sha256": "ff45dcc2061d2af52853f05b95ed438a4417cf20c31e38cd50e3f1b06a990989"
+    },
+    "captures": [
+      {
+        "route": "#capabilities/overall",
+        "sha256": "b98f6894013e9baea1ba77144ebd5974e73b294a9f92f5d1f459285141757611",
+        "bytes": 175643,
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop.png"
+      },
+      {
+        "route": "#capabilities/overall",
+        "sha256": "ca16c43b0d250359804eddd49c04cb0f4e2ac08dd565750ee8522fb1798293e3",
+        "bytes": 71136,
+        "width": 390,
+        "height": 844,
+        "path": "mobile.png"
+      },
+      {
+        "route": "#capabilities/engineering",
+        "sha256": "859b87876f28fdd2b489eed93bf172ca4c4ba2c213cdd296cee558cd8e040fe0",
+        "bytes": 150825,
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-capabilities.png"
+      },
+      {
+        "route": "#capabilities/engineering",
+        "sha256": "f4f466ef2a35bd4519664ee36743f43e335facf1bf88acb3c56d552262bd8aa6",
+        "bytes": 67810,
+        "width": 390,
+        "height": 844,
+        "path": "mobile-capabilities.png"
+      },
+      {
+        "route": "#capabilities/engineering/benchmarks",
+        "sha256": "0f4f39b9b3641cd104bc9b68f7030d82fffa2bd3cb7375b2802a46b9716fcee5",
+        "bytes": 200140,
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-capability-benchmarks.png"
+      },
+      {
+        "route": "#capabilities/engineering/benchmarks",
+        "sha256": "1e6f34d13599b586f7cd9fd2728fee2637acf4a6496a3bdddc702e253f7832a6",
+        "bytes": 68782,
+        "width": 390,
+        "height": 844,
+        "path": "mobile-capability-benchmarks.png"
+      },
+      {
+        "route": "#capabilities/overall/efficiency",
+        "sha256": "337eb4755c5b646c5a811be0911866c9fef4295901369eccb834b9efb027bf6f",
+        "bytes": 188169,
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-efficiency.png"
+      },
+      {
+        "route": "#capabilities/overall/efficiency",
+        "sha256": "ab83fe57473cf3f79ad3bcca6b4ab9b27774ce9cdcd782ae0373ddf9b83fd01b",
+        "bytes": 62923,
+        "width": 390,
+        "height": 844,
+        "path": "mobile-efficiency.png"
+      },
+      {
+        "route": "#hyper-scale-chat",
+        "sha256": "19ea1c3d24f6fde831635b67336adc0375189e0338020a61151fa1bb6b5fb616",
+        "bytes": 157056,
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-benchmark-report.png"
+      },
+      {
+        "route": "#hyper-scale-chat",
+        "sha256": "b6ac310949a41fa188762f971101a2f1ca8b46b1f9848e819538da7419f8d45d",
+        "bytes": 61998,
+        "width": 390,
+        "height": 844,
+        "path": "mobile-benchmark-report.png"
+      },
+      {
+        "route": "#capabilities/ai-workflows",
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-workflows.png",
+        "sha256": "4c82dcbb30fba087d08062b680cff95c24666c7df630daadb00fc90580482322",
+        "bytes": 149967
+      },
+      {
+        "route": "#capabilities/ai-workflows",
+        "width": 390,
+        "height": 844,
+        "path": "mobile-workflows.png",
+        "sha256": "71578c595fd0ec68c22436a84bf82d70943238982b47f948f558715a7737f394",
+        "bytes": 63467
+      },
+      {
+        "route": "#capabilities/ai-workflows/benchmarks",
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-workflow-benchmarks.png",
+        "sha256": "4abb1f04e24d1aa616b0f733b8b259e20d41a5be2c16a8770b30ddc781ac79c4",
+        "bytes": 123797
+      },
+      {
+        "route": "#capabilities/ai-workflows/benchmarks",
+        "width": 390,
+        "height": 844,
+        "path": "mobile-workflow-benchmarks.png",
+        "sha256": "96fb65c3f88f06fb6540709fa96a14ee5a992bf54044c4964dd9ecc82bd0ba58",
+        "bytes": 65480
+      },
+      {
+        "route": "#capabilities/ai-workflows/efficiency",
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-workflow-efficiency.png",
+        "sha256": "ccf4178f5fd147f9bc941e2522211ed748fcc38cb6a4b0ed08a2c3ecec3f3cdf",
+        "bytes": 196743
+      },
+      {
+        "route": "#capabilities/ai-workflows/efficiency",
+        "width": 390,
+        "height": 844,
+        "path": "mobile-workflow-efficiency.png",
+        "sha256": "7c7524d804f56cb055f5503a7600be0e6810a516644a14951513d9c72e847fc2",
+        "bytes": 59505
+      },
+      {
+        "route": "#work-spec-chat",
+        "width": 1440,
+        "height": 1000,
+        "path": "desktop-workflow-report.png",
+        "sha256": "3fcb485331e7c32c00d2534d47fe2a474db6fcb1a4e49ecc3c610795cb0ea8df",
+        "bytes": 200324
+      },
+      {
+        "route": "#work-spec-chat",
+        "width": 390,
+        "height": 844,
+        "path": "mobile-workflow-report.png",
+        "sha256": "76253333ef3a621ca4b071e878cba07d03f15d4a952dcaf6af42db380164d9ce",
+        "bytes": 74637
+      },
+      {
+        "path": "desktop-game-models.png",
+        "route": "/#capabilities/games",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 126193,
+        "sha256": "4b4830da3d1b415474e8848df4177a7417b6b1273954f5ede479fb6c3d34f579"
+      },
+      {
+        "path": "desktop-game-benchmarks.png",
+        "route": "/#capabilities/games/benchmarks",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 120485,
+        "sha256": "a23cafa41be656b038243e0ed1fa369f1c0645c754a8aa49b14638a84f4213b1"
+      },
+      {
+        "path": "desktop-game-efficiency.png",
+        "route": "/#capabilities/games/efficiency",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 132206,
+        "sha256": "937e12ad8829a5f6434208f882bded5ed052fc7357a8f648fba2e0f4ff9dcaab"
+      },
+      {
+        "path": "mobile-game-models.png",
+        "route": "/#capabilities/games",
+        "width": 390,
+        "height": 844,
+        "bytes": 66434,
+        "sha256": "ef3548ee7a7051e5ba9675aafbbe707f5a29adf44046477effe0f496afe058fb"
+      },
+      {
+        "path": "mobile-game-benchmarks.png",
+        "route": "/#capabilities/games/benchmarks",
+        "width": 390,
+        "height": 844,
+        "bytes": 68198,
+        "sha256": "29c9f530e3c39c88772433e36e849f60731d2ec3670ce211ee414203a37a1ed1"
+      },
+      {
+        "path": "mobile-game-efficiency.png",
+        "route": "/#capabilities/games/efficiency",
+        "width": 390,
+        "height": 844,
+        "bytes": 61937,
+        "sha256": "cb586e53ffa0d34b1d43ade0472b9a3dd6b4eddcf76d2349518027d4fece5abe"
+      },
+      {
+        "path": "desktop-games.png",
+        "route": "/games.html",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 133607,
+        "sha256": "1909ff4a5e29d6f08827d8ad3707c0ea70ffcacaf697f8579cbe36ae789f7672"
+      },
+      {
+        "path": "mobile-games.png",
+        "route": "/games.html",
+        "width": 390,
+        "height": 844,
+        "bytes": 59055,
+        "sha256": "25b60638b31319777f008a7b54087614dd660b1ddd2b4896d8482302a2c4da69"
+      },
+      {
+        "path": "desktop-games-ratings.png",
+        "route": "/games.html",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 117971,
+        "sha256": "27a47111a49d9e8927c7b743f905b863db8adb157d003ee79c411202ff757911"
+      },
+      {
+        "path": "mobile-games-ratings.png",
+        "route": "/games.html",
+        "width": 390,
+        "height": 844,
+        "bytes": 52735,
+        "sha256": "db68939b314be08d272f36180a8d5472a5fc651ac1bab61e167c00958639f1d6"
+      },
+      {
+        "path": "desktop-games-playback.png",
+        "route": "/games.html",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 476821,
+        "sha256": "24251a8d73e60efc4395c8f65835c6d9f946ff365e12c24742175ec8bcb28a55"
+      },
+      {
+        "path": "mobile-games-playback.png",
+        "route": "/games.html",
+        "width": 390,
+        "height": 844,
+        "bytes": 164831,
+        "sha256": "65197c1957d168e5f6db7e489a72797b9abffad1d6fe189e878c725e55f94704"
+      },
+      {
+        "path": "desktop-games-play.png",
+        "route": "/games.html",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 481014,
+        "sha256": "d8f57237650c8299f8fd0c084979de163293f4139c539acef392f5a5902b99d3"
+      },
+      {
+        "path": "mobile-games-play.png",
+        "route": "/games.html",
+        "width": 390,
+        "height": 844,
+        "bytes": 166847,
+        "sha256": "f3b6248151043ea8d7e8160980985802f46e9997371e222de7aa5ba6765ab33e"
+      },
+      {
+        "path": "desktop-games-fullscreen.png",
+        "route": "/games.html",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 467720,
+        "sha256": "019c55ee2ece325722ad79f0779491919f12074c75bf194b5ed00e5cedcfd03f"
+      },
+      {
+        "path": "mobile-games-fullscreen.png",
+        "route": "/games.html",
+        "width": 390,
+        "height": 844,
+        "bytes": 380182,
+        "sha256": "17c5251cfeb39fc0b86cdb1364742e087dc7f7a0596cb4ec6514af693d528d8f"
+      },
+      {
+        "path": "desktop-writing-models.png",
+        "route": "#capabilities/writing/storytelling",
+        "bytes": 167004,
+        "sha256": "bc639d9986ff474f59308adcc640c07216fa392d8e3ebcc9312061a37aff0d3c",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-benchmarks.png",
+        "route": "#capabilities/writing/storytelling/benchmarks",
+        "bytes": 167381,
+        "sha256": "de9bd9816ac4e7abafc352cafd700121547014a458cdec96682671944b73e1c6",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-efficiency.png",
+        "route": "#capabilities/writing/storytelling/efficiency",
+        "bytes": 139463,
+        "sha256": "b1081094e1883d5dacbcab539aa8c7b76bea57f5222dd86aff4448d949701e0a",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-efficiency-tokens.png",
+        "route": "#capabilities/writing/storytelling/efficiency",
+        "bytes": 139319,
+        "sha256": "b6cab32bbc3d29bce42e19805ead7edc5b69913000accefc9b67d6a51e782ea4",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-report.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 155938,
+        "sha256": "744400947911553b4c986f4474abac0c7cdda9f7a538b8261c79eaf0c0e0bed4",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-method.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 181273,
+        "sha256": "77433ec997d99288c9cd81ba99b026b181e1c9b0a1822c1b1cbf7f9fb5f43828",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-rubric-anchors.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 177441,
+        "sha256": "862ae1ff84af1d7968f6dade8fec005361c06f0b52f83728373a028d08a50cbd",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-method-execution.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 167125,
+        "sha256": "460e2eaa55ec93128ddc80e87063356f1c179edf6afccbe4e4f2856327ecd376",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-reference.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 181756,
+        "sha256": "5ac6dee6bafe188eb4052b775e12fd032ac7ee264c4f25675916740c7d4a8aba",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-answer.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 181471,
+        "sha256": "b168fcf3e2642be3a1b6e2624b132fefc3ad3e9021e0efbb346817e58eb52b8a",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-judgments.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 182952,
+        "sha256": "143c6c723a126d49129ffbf6d95bc6aa7f7d1032a39dd8544095a5c7be7db149",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-judge-resources.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 101758,
+        "sha256": "1dd73bc945d99164aeb32ac0a26cce4a182705f12a19a48b50f6d3790bdc3cee",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "desktop-writing-execution.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 172374,
+        "sha256": "0207f6c9b3feff46e7688b67c6400d617d4c7d20674cbfe67418e4d348bf6d79",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "path": "mobile-writing-models.png",
+        "route": "#capabilities/writing/storytelling",
+        "bytes": 69037,
+        "sha256": "de55f7a2404a461b2202a0db1a6859f23d0e4c9178f44315a07b1d34247da804",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-benchmarks.png",
+        "route": "#capabilities/writing/storytelling/benchmarks",
+        "bytes": 75417,
+        "sha256": "6f35293f23f5990e40d166bce86509f9703fce676c58d2295051f1e30354290b",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-efficiency.png",
+        "route": "#capabilities/writing/storytelling/efficiency",
+        "bytes": 64901,
+        "sha256": "2188fd8170aa083519670d5e64095e4961145bf293ffdd4c4bedbcbda23d3720",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-efficiency-tokens.png",
+        "route": "#capabilities/writing/storytelling/efficiency",
+        "bytes": 64772,
+        "sha256": "63631fcc93078456333d492d0e9e7c3f2190e2580b0a049dff117168901b00ea",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-report.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 62943,
+        "sha256": "1fcef03c57456d48eb9d8e3315afb6ce9d8e66e26eb0352ed8a2921ec6dbc944",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-method.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 76895,
+        "sha256": "dbfa1b0ca8c0f8fe613fbd4a09994949a2fd70fa95df7d414fd561f0311fe201",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-rubric-anchors.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 75670,
+        "sha256": "035c4f21dfb043b2d17fc5cd1c48358a3b4ccc3ab6807c679eaccfd241398f14",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-method-execution.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 83972,
+        "sha256": "cd8a75dce2680a17e161f0778e2fc35ef1a76075033008bc11223e88c50f7ca1",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-reference.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 77231,
+        "sha256": "68f2fb3d742e5d14066111925e072cc1403edfca2e061af76b8b4f88db7963a9",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-answer.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 76033,
+        "sha256": "4f609e27110444f0848ff7b572e7b182359b1cca56c83f8cbe1d1808a763b205",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-judgments.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 64094,
+        "sha256": "92f1649e397124d6276db8c74aff2474c5c96ea4e7d98245e4a32a16fae625d9",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-judge-resources.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 61373,
+        "sha256": "88c9ce4f420e5029912d675903ad5affa91300d5a0a7fcba34221fde0ae575a0",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "path": "mobile-writing-execution.png",
+        "route": "/benchmark-report.html#storytelling-core-idea",
+        "bytes": 63637,
+        "sha256": "c161a151efbaf62dffa246805fa38e37cae37c94c39e6260a580bcc72cd41941",
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "previousRetainedEvidence": null
+  }
 }

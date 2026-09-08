@@ -8,6 +8,7 @@ import zlib from "node:zlib";
 import { VasirCliError } from "./cli-error.js";
 import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
 import { validateWritingPublication } from "./eval/writing-publication.js";
+import { WRITING_CREATION_ARCHIVE, hydrateWritingResponseArchives } from "./eval/writing-response-archives.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 import {
   buildBenchmarkPublicationProjection,
@@ -18,7 +19,7 @@ import {
 
 const DEPLOYMENT_CONFIG_PATH = path.join("site", "vasirbenchmark.com", "deployment.json");
 const TEMPLATE_LOCK_FILE_NAME = "template-lock.json";
-const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js", "writing-data.js", "writing-responses.js"]);
+const GENERATED_PUBLIC_FILE_PATHS = new Set(["data.js", "responses.js", "writing-data.js", "writing-responses.js", WRITING_CREATION_ARCHIVE.path]);
 const RELEASE_ID_PATTERN = /^[a-f0-9]{64}$/;
 const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
 const PRIVATE_PARENT_PATH_PATTERN = /(?:^|[^.])\.\.[/\\]/i;
@@ -42,7 +43,7 @@ const CANONICAL_PUBLIC_FILES = Object.freeze([
   { path: "assets/d3.v7.min.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "app.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "data.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
-  { path: "responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
+  { path: "responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable", kind: "response-archive" },
   { path: "benchmark-report.html", contentType: "text/html; charset=utf-8", cacheClass: "html" },
   { path: "benchmark-report.css", contentType: "text/css; charset=utf-8", cacheClass: "immutable" },
   { path: "benchmark-report.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
@@ -51,10 +52,17 @@ const CANONICAL_PUBLIC_FILES = Object.freeze([
   { path: "games.css", contentType: "text/css; charset=utf-8", cacheClass: "immutable" },
   { path: "games.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
   { path: "writing-data.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" },
-  { path: "writing-responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable" }
+  { path: "writing-responses.js", contentType: "text/javascript; charset=utf-8", cacheClass: "immutable", kind: "response-archive" },
+  { path: WRITING_CREATION_ARCHIVE.path, contentType: "text/javascript; charset=utf-8", cacheClass: "immutable", kind: "response-archive" }
 ]);
 function sha256(contents) {
   return crypto.createHash("sha256").update(contents).digest("hex");
+}
+
+export function getBenchmarkPublicationFileByteLimit(config, relativePath) {
+  return config.publicFiles.find(file => file.path === relativePath)?.kind === "response-archive"
+    ? (config.limits.maxResponseFileBytes ?? config.limits.maxFileBytes)
+    : config.limits.maxFileBytes;
 }
 
 // This affects only the parent-path privacy scan, never archived/public bytes.
@@ -72,6 +80,81 @@ export function writingParentPathScanSource(writing, responses) {
     });
   }
   return JSON.stringify(source);
+}
+
+// The creation archive retains frozen references both as individual files and
+// inside the exact informed-judge context. Normalize only hash-verified copies
+// for this one privacy check; candidate answers and original reviews stay raw.
+export function writingCreationParentPathScanSource(writing, responses) {
+  const source = structuredClone(responses);
+  if (!source) return JSON.stringify(source);
+  const id = WRITING_CREATION_ARCHIVE.benchmarkId;
+  const projection = writing?.benchmarks?.[0]?.id === id ? writing
+    : writing?.benchmarkPublications?.find(child => child.benchmarkId === id)?.projection;
+  const methodology = projection?.methodology;
+  const pins = new Map((methodology?.skillFiles ?? [])
+    .filter(file => isNormalizedRelativePublicPath(file.path) && /^[a-f0-9]{64}$/.test(file.sha256) && Number.isSafeInteger(file.bytes) && file.bytes >= 0)
+    .map(file => [file.path, file]));
+  const verifiedFile = (name, content) => {
+    const pin = pins.get(name);
+    return pin && typeof content === "string" && Buffer.byteLength(content) === pin.bytes && sha256(content) === pin.sha256;
+  };
+  const normalizeLinks = (name, content) => content.replace(/(\]\()(\.\.\/[^\s)]+)(\))/gu, (match, opening, href, closing) => {
+    const [target, fragment = "", ...extraFragments] = href.split("#");
+    if (extraFragments.length || target.includes("?") || PRIVATE_PARENT_PATH_PATTERN.test(fragment)) return match;
+    const destination = path.posix.normalize(path.posix.join(path.posix.dirname(name), target));
+    return pins.has(destination) ? `${opening}<verified-frozen-skill-link>${closing}` : match;
+  });
+  for (const file of source.promptFiles ?? []) {
+    if (verifiedFile(file.title, file.content) && file.sha256 === pins.get(file.title).sha256) {
+      file.content = normalizeLinks(file.title, file.content);
+    }
+  }
+
+  const context = (responses.promptFiles ?? []).find(file => file.id === "frozen-informed-judge-context");
+  const contextHash = typeof context?.content === "string" ? sha256(context.content) : null;
+  const informedProfiles = (methodology?.judgeProfiles ?? []).filter(profile => profile.contextMode === "informed");
+  if (!contextHash || context.sha256 !== contextHash || !informedProfiles.length ||
+    informedProfiles.some(profile => profile.contextSha256 !== contextHash)) return JSON.stringify(source);
+  const sections = [...context.content.matchAll(/<<<FROZEN_CONTEXT_FILE ("(?:\\.|[^"\\])*")>>>\n([\s\S]*?)\n<<<END_FROZEN_CONTEXT_FILE>>>/gu)];
+  const names = methodology.informedSkillFiles ?? [];
+  if (sections.length !== names.length || sections.map(section => section[0]).join("\n\n") !== context.content) return JSON.stringify(source);
+  for (let index = 0; index < sections.length; index += 1) {
+    if (sections[index][1] !== JSON.stringify(names[index]) || !verifiedFile(names[index], sections[index][2])) return JSON.stringify(source);
+  }
+  const sanitizedContext = sections.map((section, index) =>
+    `<<<FROZEN_CONTEXT_FILE ${section[1]}>>>\n${normalizeLinks(names[index], section[2])}\n<<<END_FROZEN_CONTEXT_FILE>>>`
+  ).join("\n\n");
+  source.promptFiles.find(file => file.id === context.id).content = sanitizedContext;
+  const rootIndex = names.indexOf("SKILL.md");
+  const rootFile = (source.promptFiles ?? []).find(file => file.id === "frozen-skill-root");
+  if (rootIndex >= 0 && typeof rootFile?.content === "string" && sha256(rootFile.content) === rootFile.sha256) {
+    const rootContent = sections[rootIndex][2];
+    rootFile.content = rootFile.content.replaceAll(rootContent, normalizeLinks("SKILL.md", rootContent));
+  }
+  for (const segment of source.judgePromptSegments ?? []) {
+    if (typeof segment.content === "string" && sha256(segment.content) === segment.sha256) {
+      segment.content = segment.content.replaceAll(context.content, sanitizedContext);
+    }
+  }
+  return JSON.stringify(source);
+}
+
+// JSON escaping can turn a possessive followed by a newline ("saint's:\n")
+// into something the Windows-drive detector reads as s:\. Normalize control
+// characters only in the scan copy of an exact, hash-verified answer literal.
+// Real backslashes, other source code, reviews and every public byte stay intact.
+export function writingCreationLocalPathScanSource(source, responses) {
+  const literal = value => JSON.stringify(value).replaceAll("<", "\\u003c").replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
+  for (const response of responses?.responses ?? []) {
+    const answer = response.outputText;
+    if (typeof answer !== "string" || sha256(answer) !== response.provenance?.outputSha256) continue;
+    const encoded = literal(answer);
+    if (!PRIVATE_LOCAL_PATH_PATTERN.test(encoded)) continue;
+    const normalized = answer.replace(/[\u0000-\u001f\u2028\u2029]/gu, " ");
+    if (normalized !== answer) source = source.replaceAll(encoded, literal(normalized));
+  }
+  return source;
 }
 
 function artifactError({ code = "BENCHMARK_PUBLISH_ARTIFACT_INVALID", message, suggestion, stage = "artifact", context = {} }) {
@@ -237,8 +320,8 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (!Array.isArray(config.publicFiles) || config.publicFiles.length !== CANONICAL_PUBLIC_FILES.length) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist must contain exactly fifteen files.",
-      suggestion: "Restore the reviewed fifteen-file allowlist in deployment.json.",
+      message: "The production allowlist must contain exactly sixteen files.",
+      suggestion: "Restore the reviewed sixteen-file allowlist in deployment.json.",
       stage: "acceptance"
     });
   }
@@ -248,7 +331,8 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
       const observed = config.publicFiles[index];
       return observed?.path === expected.path &&
         observed?.contentType === expected.contentType &&
-        observed?.cacheClass === expected.cacheClass
+        observed?.cacheClass === expected.cacheClass &&
+        (observed?.kind ?? null) === (expected.kind ?? null)
         ? null
         : expected.path;
     })
@@ -256,8 +340,8 @@ export function readBenchmarkDeploymentConfig({ repoRootDirectory }) {
   if (publicContractDrift.length > 0) {
     throw artifactError({
       code: "BENCHMARK_PUBLISH_CONFIG_INVALID",
-      message: "The production allowlist drifted from the canonical fifteen-file publication contract.",
-      suggestion: "Restore the reviewed paths, content types, cache classes, and ordering in deployment.json.",
+      message: "The production allowlist drifted from the canonical sixteen-file publication contract.",
+      suggestion: "Restore the reviewed paths, content types, cache classes, archive classifications, and ordering in deployment.json.",
       stage: "acceptance",
       context: { expectedPaths: CANONICAL_PUBLIC_FILES.map(({ path: filePath }) => filePath) }
     });
@@ -509,11 +593,10 @@ export function buildBenchmarkPublicationArtifact({
     ["data.js", Buffer.from(publicationProjection.dataSource, "utf8")],
     ["responses.js", Buffer.from(publicationProjection.responsesSource, "utf8")],
     ["writing-data.js", Buffer.from(publicationProjection.writingDataSource, "utf8")],
-    ["writing-responses.js", Buffer.from(publicationProjection.writingResponsesSource, "utf8")]
+    ["writing-responses.js", Buffer.from(publicationProjection.writingResponsesSource, "utf8")],
+    [WRITING_CREATION_ARCHIVE.path, Buffer.from(publicationProjection.writingCreationResponsesSource, "utf8")]
   ]);
-  const fileByteLimit = relativePath => ["responses.js", "writing-responses.js"].includes(relativePath)
-    ? (config.limits.maxResponseFileBytes ?? config.limits.maxFileBytes)
-    : config.limits.maxFileBytes;
+  const fileByteLimit = relativePath => getBenchmarkPublicationFileByteLimit(config, relativePath);
   const sourceFiles = config.publicFiles.map((fileConfig) => {
     const generatedContents = generatedFiles.get(fileConfig.path);
     if (generatedContents) {
@@ -677,9 +760,16 @@ export function buildBenchmarkPublicationArtifact({
     const writingFile = filesByPath.get("writing-data.js");
     const writingResponsesFile = filesByPath.get("writing-responses.js");
     const writing = evaluateSiteModule({ source: writingFile.body.toString("utf8"), filePath: writingFile.outputPath, globalName: "VASIR_WRITING", publicPath: "writing-data.js", allowNull: true });
-    const writingResponses = evaluateSiteModule({ source: writingResponsesFile.body.toString("utf8"), filePath: writingResponsesFile.outputPath, globalName: "VASIR_WRITING_RESPONSES", publicPath: "writing-responses.js", allowNull: true });
+    const primaryWritingResponses = evaluateSiteModule({ source: writingResponsesFile.body.toString("utf8"), filePath: writingResponsesFile.outputPath, globalName: "VASIR_WRITING_RESPONSES", publicPath: "writing-responses.js", allowNull: true });
+    const writingCreationFile = filesByPath.get(WRITING_CREATION_ARCHIVE.path);
+    const writingCreationResponses = evaluateSiteModule({ source: writingCreationFile.body.toString("utf8"), filePath: writingCreationFile.outputPath, globalName: WRITING_CREATION_ARCHIVE.globalName, publicPath: WRITING_CREATION_ARCHIVE.path, allowNull: true });
+    const writingResponses = hydrateWritingResponseArchives(primaryWritingResponses, writingCreationResponses);
     if (data.writing) {
       validateWritingPublication(writing, writingResponses);
+      const expectedResponseArchives = writingCreationResponses ? {
+        [WRITING_CREATION_ARCHIVE.benchmarkId]: { href: WRITING_CREATION_ARCHIVE.href, globalName: WRITING_CREATION_ARCHIVE.globalName }
+      } : {};
+      if (JSON.stringify(data.writing.responseArchives ?? {}) !== JSON.stringify(expectedResponseArchives)) throw artifactError({ message: "Writing response archive descriptors differ from the generated evidence.", suggestion: "Regenerate the landing descriptor and all Writing archives from the same selected sources." });
       if (JSON.stringify(writing.coverage) !== JSON.stringify(data.writing.coverage)) throw artifactError({ message: "Writing lazy evidence and landing coverage differ.", suggestion: "Regenerate both bundles from the same pinned source." });
       if (JSON.stringify(Object.keys(writing.additionalBenchmarks ?? {})) !== JSON.stringify(Object.keys(data.writing.additionalBenchmarks ?? {})) || JSON.stringify(writing.allWritingCoverage) !== JSON.stringify(data.writing.allWritingCoverage)) throw artifactError({ message: "Additional Writing selections differ between landing and lazy evidence.", suggestion: "Regenerate the entire Writing collection from the same pinned sources." });
       for (const [id, additional] of Object.entries(writing.additionalBenchmarks ?? {})) {
@@ -688,7 +778,7 @@ export function buildBenchmarkPublicationArtifact({
       if (JSON.stringify(writing.collectionCoverage) !== JSON.stringify(data.writing.collectionCoverage)) throw artifactError({ message: "Writing benchmark collection coverage differs from the landing summary.", suggestion: "Regenerate the collection and summary from the same selected sources." });
       const writingBenchmarkIds = [writing.benchmarks[0].id, ...(writing.benchmarkPublications ?? []).map(child => child.benchmarkId), ...Object.keys(writing.additionalBenchmarks ?? {})];
       if (JSON.stringify(writingBenchmarkIds) !== JSON.stringify(data.writing.benchmarkIds ?? [data.writing.benchmarkId])) throw artifactError({ message: "Writing report identities differ from the selected benchmark collection.", suggestion: "Preserve each selected Writing benchmark and its own report route." });
-    } else if (writing !== null || writingResponses !== null) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
+    } else if (writing !== null || writingResponses !== null || writingCreationResponses !== null) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
     const benchmarkRoutes = buildBenchmarkPublicationRoutes(data);
     if (JSON.stringify(benchmarkRoutes) !== JSON.stringify(publicationProjection.routes)) {
       throw artifactError({
@@ -709,8 +799,10 @@ export function buildBenchmarkPublicationArtifact({
         // independently validated against pinned evidence before reaching here.
         const authoredResponseText = file.path === "responses.js" && publicationProjection.projection.aiWorkflows;
         // Preserve authored /users/ API routes while rejecting the literal Mac /Users/ home prefix.
-        const parentPathSource = file.path === "writing-responses.js" ? writingParentPathScanSource(writing, writingResponses) : source;
-        return PRIVATE_LOCAL_PATH_PATTERN.test(source) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(parentPathSource));
+        const parentPathSource = file.path === "writing-responses.js" ? writingParentPathScanSource(writing, primaryWritingResponses)
+          : file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationParentPathScanSource(writing, writingCreationResponses) : source;
+        const localPathSource = file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationLocalPathScanSource(source, writingCreationResponses) : source;
+        return PRIVATE_LOCAL_PATH_PATTERN.test(localPathSource) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(parentPathSource));
       })
       .map((file) => file.path);
     if (textualLeakPaths.length > 0) {
@@ -727,7 +819,7 @@ export function buildBenchmarkPublicationArtifact({
       // Story fact packets can describe a simulated world (The Matrix) or a
       // simulated relationship. Their pinned source is validated structurally;
       // retired-demo vocabulary is not a valid test of that literary evidence.
-      .filter((file) => !["responses.js", "writing-responses.js", "writing-data.js"].includes(file.path))
+      .filter((file) => !["responses.js", "writing-responses.js", "writing-data.js", WRITING_CREATION_ARCHIVE.path].includes(file.path))
       .filter((file) => FIXTURE_TOKEN_PATTERN.test(file.body.toString("utf8")))
       .map((file) => file.path);
     if (fixtureTokenPaths.length > 0) {

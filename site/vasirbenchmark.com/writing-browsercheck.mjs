@@ -16,6 +16,9 @@ const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, argument
 assert.ok(options.url && options['output-dir'], 'Usage: writing-browsercheck.mjs --url URL --output-dir PATH [--width 1440 --height 1000] [--require-scored]');
 const requireScored = Object.hasOwn(options, 'require-scored');
 const requestedBenchmark = options.benchmark ?? null;
+const creationBenchmarkId = 'storytelling-magic-discovery';
+const isCreation = requestedBenchmark === creationBenchmarkId;
+const writingArchiveRequest = request => /\/writing-(?:creation-)?responses\.js$/.test(new URL(request.url).pathname);
 const baseUrl = new URL(options.url);
 assert.ok(baseUrl.protocol === 'https:' || (baseUrl.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(baseUrl.hostname)), 'Use HTTPS or a local HTTP server.');
 const width = Number(options.width || 1440);
@@ -112,9 +115,29 @@ const noOverflow = async name => {
   }
   check(`${name}: no horizontal page overflow`, result.scroll <= result.viewport + 1, JSON.stringify(result));
 };
+const verifyWritingAnswerLinkBounds = async scope => {
+  const proof=await evaluate(`(() => {
+    const links=[...document.querySelectorAll('.writing-selection a[data-writing-answer-benchmark]')].filter(link=>link.getBoundingClientRect().width>0&&link.getBoundingClientRect().height>0),viewport=document.documentElement.clientWidth,mismatches=[];
+    const evidence=links.map(link=>{
+      const box=link.getBoundingClientRect(),style=getComputedStyle(link),number=value=>parseFloat(value)||0;
+      const bounds={left:box.left+number(style.borderLeftWidth)+number(style.paddingLeft),right:box.right-number(style.borderRightWidth)-number(style.paddingRight),top:box.top+number(style.borderTopWidth)+number(style.paddingTop),bottom:box.bottom-number(style.borderBottomWidth)-number(style.paddingBottom)};
+      if(box.left < -1 || box.right > viewport+1)mismatches.push(link.dataset.writingAnswerBenchmark+':card-outside-viewport');
+      const fits=rect=>rect.left>=bounds.left-1.5&&rect.right<=bounds.right+1.5&&rect.top>=bounds.top-1.5&&rect.bottom<=bounds.bottom+1.5;
+      const children=[...link.children].map(child=>{
+        const rect=child.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(child);const textRects=[...range.getClientRects()].filter(rect=>rect.width>0&&rect.height>0);
+        if(!fits(rect)||textRects.some(rect=>!fits(rect)))mismatches.push(link.dataset.writingAnswerBenchmark+':'+child.tagName+':clipped-content');
+        return {tag:child.tagName,text:child.textContent,width:rect.width,lineRects:textRects.length};
+      });
+      return {benchmarkId:link.dataset.writingAnswerBenchmark,cardWidth:box.width,children};
+    });
+    return {links:evidence,mismatches};
+  })()`);
+  check(`Writing ${scope}: answer-card children and actual text lines fit their cards and viewport`,!proof.mismatches.length,JSON.stringify(proof));
+  return {scope,...proof};
+};
 const verifyWritingProgress = async scope => {
   const proof = await evaluate(`(() => {
-    const data=window.VASIR_WRITING, coverage=data.coverage, element=document.querySelector('[data-writing-progress]');
+    const data=window.VASIR_WRITING, coverage=data.coverage, element=document.querySelector('[data-writing-progress]'),creation=data.benchmarks[0].id==='storytelling-magic-discovery';
     const inProgress=typeof coverage.executionComplete==='boolean'?!coverage.executionComplete:coverage.judgmentCount<coverage.expectedJudgmentCount || coverage.completedSettingCount<coverage.settingCount;
     const excluded=coverage.executionStatus==='complete-with-exclusions';
     const expected={answers:coverage.responseCount+'/'+coverage.expectedResponseCount+' final answers',reviews:coverage.judgmentCount+'/'+coverage.expectedJudgmentCount+' planned judge reviews',panels:coverage.scoredResponseCount+'/'+coverage.expectedResponseCount+' complete '+data.scoreBasis.judgeCount+'-judge answer panels'};
@@ -125,12 +148,15 @@ const verifyWritingProgress = async scope => {
     const browse=element?.querySelector('[data-writing-browse-answers]');
     const rect=browse?.getBoundingClientRect();
     const mismatches=[];
-    if(status!==(excluded?'FINAL SNAPSHOT · '+coverage.terminallyExcludedPairCount+' EXCLUDED '+(coverage.terminallyExcludedPairCount===1?'PAIR':'PAIRS'):inProgress?'IN PROGRESS':'COMPLETE SNAPSHOT')) mismatches.push('progress-status');
+    if(status!==(excluded?creation?'FINAL SNAPSHOT · INCOMPLETE PANELS RETAINED':'FINAL SNAPSHOT · '+coverage.terminallyExcludedPairCount+' EXCLUDED '+(coverage.terminallyExcludedPairCount===1?'PAIR':'PAIRS'):inProgress?'IN PROGRESS':'COMPLETE SNAPSHOT')) mismatches.push('progress-status');
     if(Object.keys(expected).some(key=>counts[key]!==expected[key])) mismatches.push('progress-counts');
     if(inProgress && !disclosure.includes('Judging incomplete; available answers and reviews are published.')) mismatches.push('incomplete-disclosure');
     if(!disclosure.includes('Incomplete configurations are not ranked.') || !disclosure.includes('Case scores require the full judge panel.')) mismatches.push('ranking-disclosure');
     if(failures && !excluded && !disclosure.includes(failures+' failed generations are retained; planned totals include unavailable slots.')) mismatches.push('failed-slot-disclosure');
-    if(excluded) {
+    if(excluded && creation) {
+      if(inProgress || coverage.pendingGenerationCount!==0 || coverage.pendingJudgmentCount!==0 || coverage.judgmentCount+coverage.terminalJudgmentFailureCount+coverage.terminallyExcludedJudgmentCount!==coverage.expectedJudgmentCount) mismatches.push('creation-terminal-accounting');
+      if(!disclosure.includes(coverage.validResponseCount+' valid final answers') || !disclosure.includes(coverage.terminalGenerationFailureCount+' terminal generation failures') || !disclosure.includes(coverage.terminalJudgmentFailureCount+' failed assessments') || !disclosure.includes('No judge reviews are pending.') || !disclosure.includes('Missing scores remain unassigned.')) mismatches.push('creation-terminal-disclosure');
+    } else if(excluded) {
       if(inProgress || coverage.pendingGenerationCount!==0 || coverage.pendingJudgmentCount!==0 || coverage.judgmentCount+coverage.terminallyExcludedJudgmentCount!==coverage.expectedJudgmentCount) mismatches.push('terminal-exclusion-accounting');
       if(!disclosure.includes(coverage.validResponseCount+' valid final answers') || !disclosure.includes(coverage.terminalGenerationFailureCount+' failed full-read verifications') || !disclosure.includes(coverage.terminallyExcludedJudgmentCount+' terminally excluded reviews') || !disclosure.includes('No judge reviews are pending.') || disclosure.includes('Judging incomplete')) mismatches.push('terminal-exclusion-disclosure');
       if(data.caseResults.filter(cell=>cell.generationDisposition==='complete').length!==coverage.validResponseCount || data.caseResults.filter(cell=>cell.generationDisposition==='terminal-protocol-failure').length!==coverage.terminalGenerationFailureCount || data.caseResults.filter(cell=>cell.judgingDisposition==='terminal-excluded').reduce((sum,cell)=>sum+cell.coverage.expectedJudgments,0)!==coverage.terminallyExcludedJudgmentCount) mismatches.push('terminal-exclusion-source-counts');
@@ -158,7 +184,7 @@ const verifyWritingCategory = async () => {
   const initial = await evaluate('({overall:JSON.stringify(window.VASIR_DATA.overall),lazy:!!window.VASIR_WRITING,available:!!document.querySelector("#capability-category-writing:not([disabled])")})');
   overallSha256 = sha256(initial.overall);
   check('Writing appears in capability navigation', initial.available);
-  check('Overall loads without Writing data or answer bundles', !initial.lazy && !requests.some(request => /\/writing-(?:data|responses)\.js$/.test(new URL(request.url).pathname)));
+  check('Overall loads without Writing data or answer bundles', !initial.lazy && !requests.some(request => /\/writing-(?:data|(?:creation-)?responses)\.js$/.test(new URL(request.url).pathname)));
   check('Writing remains excluded from Overall', !JSON.parse(initial.overall).categories.some(category => category.id === 'writing'));
   const overallLayout = await layout();
   await click('#capability-category-writing');
@@ -202,7 +228,7 @@ const verifyWritingCategory = async () => {
       }
     }
     const rank=entry=>Number.isFinite(entry.exactScore)?1+expected.filter(other=>other.condition===entry.condition&&Number.isFinite(other.exactScore)&&other.exactScore>entry.exactScore).length:null;
-    const rows=[...document.querySelectorAll('#capability-ranking .setting-row')];
+    const rows=[...document.querySelectorAll('#capability-ranking #result-list > .setting-row')];
     const format=value=>Number.isFinite(value)?value.toFixed(1):'—';
     const ordered=rows.map(row=>expected.find(entry=>entry.id===row.dataset.fullEntryId));
     for(const row of rows) {
@@ -240,20 +266,72 @@ const verifyWritingCategory = async () => {
   check('Writing explicitly discloses a development index excluded from Overall', proof.disclosure);
   check('Writing scores, fixed active cohort, paired bars and ranks follow independent source arithmetic', !proof.mismatches.length, JSON.stringify(proof));
   check('Writing answers stay lazy on the category leaderboard', proof.answersLazy);
+  const answerLinkBounds=[await verifyWritingAnswerLinkBounds('leaderboard')];
+  const partialEvidence=await evaluate(`(() => {
+    const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING;
+    const publications=[root,...(root.benchmarkPublications || []).map(item=>item.projection),...Object.values(root.additionalBenchmarks || {})];
+    const pairComplete=(publication,id)=>['baseline','skill'].every(condition=>Number.isFinite(publication.entries.find(entry=>entry.settingId===id&&entry.condition===condition)?.exactScore));
+    const active=publications.filter(publication=>publication.settings.some(setting=>pairComplete(publication,setting.id))),groupId=publication=>publication.benchmarks[0].trackId || publication.subcategory || 'storytelling',groups=[...new Set(active.map(groupId))];
+    const settings=[...new Map(publications.flatMap(publication=>publication.settings).map(setting=>[setting.id,setting])).values()];
+    const round=value=>Number.isFinite(value)?Math.round((value+Number.EPSILON)*10)/10:null;
+    const groupReadings=(id,condition)=>groups.map(group=>{const members=active.filter(publication=>groupId(publication)===group),available=members.every(publication=>pairComplete(publication,id));const exactScore=available?members.reduce((sum,publication)=>sum+publication.entries.find(entry=>entry.settingId===id&&entry.condition===condition).exactScore,0)/members.length:null;return {groupId:group,weight:1/groups.length,rawScore:round(exactScore),exactScore,contribution:available?exactScore/groups.length:null,available};});
+    const expected=settings.map(setting=>({settingId:setting.id,label:setting.label,baseline:groupReadings(setting.id,'baseline'),skill:groupReadings(setting.id,'skill'),total:null,rank:null,delta:null})).filter(row=>row.skill.some(reading=>reading.available)&&row.skill.some(reading=>!reading.available)).sort((a,b)=>a.label.localeCompare(b.label)||a.settingId.localeCompare(b.settingId));
+    const node=document.querySelector('[data-writing-partial-coverage]'),rows=[...document.querySelectorAll('[data-writing-partial-list] > [data-writing-partial-setting]')],mismatches=[],observed=[];
+    if(JSON.stringify(rows.map(row=>row.dataset.writingPartialSetting))!==JSON.stringify(expected.map(row=>row.settingId)))mismatches.push('partial-inventory-and-alphabetical-order');
+    if(expected.length&&(!node||!node.textContent.includes('Partial coverage — not ranked')||!node.textContent.includes('unavailable—not zero')||node.closest('#result-list')))mismatches.push('partial-qualification-and-placement');
+    const close=(left,right)=>Number.isFinite(left)&&Math.abs(left-right)<1e-8;
+    for(const row of rows){
+      const source=expected.find(item=>item.settingId===row.dataset.writingPartialSetting),record={settingId:row.dataset.writingPartialSetting,total:null,rank:null,delta:null};
+      if(!source){mismatches.push('unknown-partial-setting');continue;}
+      if(['baselineScore','fullScore','baselineRank','fullRank','delta'].some(key=>row.dataset[key]!==''))mismatches.push('partial-must-have-no-total-rank-uplift');
+      if(row.querySelectorAll('[data-writing-partial-total]').length!==2||[...row.querySelectorAll('[data-writing-partial-total]')].some(total=>total.textContent!=='—')||row.querySelector('[data-writing-partial-uplift] strong')?.textContent!=='—')mismatches.push('visible-partial-null-totals');
+      for(const condition of ['baseline','skill']){
+        const profile=row.querySelector('[data-writing-partial-condition="'+condition+'"]'),slots=[...profile.querySelectorAll('[data-writing-group-id]')],stack=profile.querySelector('.capability-composition__stack'),stackWidth=stack.getBoundingClientRect().width;
+        if(slots.length!==groups.length)mismatches.push('fixed-capacity-group-count');
+        record[condition]=slots.map(slot=>{
+          const reading=source[condition].find(item=>item.groupId===slot.dataset.writingGroupId),available=slot.dataset.writingPartialAvailability==='known',fill=slot.querySelector('.writing-partial__fill');
+          const actual={groupId:slot.dataset.writingGroupId,weight:Number(slot.dataset.weight),rawScore:slot.dataset.rawScore===''?null:Number(slot.dataset.rawScore),exactScore:slot.dataset.rawExactScore===''?null:Number(slot.dataset.rawExactScore),contribution:slot.dataset.contribution===''?null:Number(slot.dataset.contribution),available};
+          if(!reading||available!==reading.available||!close(actual.weight,reading.weight)||Math.abs(slot.getBoundingClientRect().width-stackWidth*reading.weight)>1.5)mismatches.push('fixed-capacity-geometry:'+record.settingId+':'+actual.groupId);
+          if(available){
+            if(!['rawScore','exactScore','contribution'].every(key=>close(actual[key],reading[key]))||!fill||Math.abs(fill.getBoundingClientRect().width-slot.clientWidth*reading.exactScore/100)>1.5)mismatches.push('known-group-source-and-fill:'+record.settingId+':'+actual.groupId);
+          }else if(actual.rawScore!==null||actual.exactScore!==null||actual.contribution!==null||fill||!slot.textContent.includes('unavailable')||!getComputedStyle(slot).backgroundImage.includes('repeating-linear-gradient'))mismatches.push('missing-is-hatched-not-zero:'+record.settingId+':'+actual.groupId);
+          if(slot.tagName!=='BUTTON'||slot.disabled||slot.dataset.entryId!==record.settingId+'-skill')mismatches.push('partial-group-navigation-control');
+          return actual;
+        });
+      }
+      observed.push(record);
+    }
+    return {settingIds:rows.map(row=>row.dataset.writingPartialSetting),rows:observed,mismatches};
+  })()`);
+  check('Partial rows preserve fixed subgroup weights, known source contributions and hatched unavailable capacity without totals or ranks',!partialEvidence.mismatches.length,JSON.stringify(partialEvidence));
   const writingLayout=await layout();
   check('Writing paired rows reuse Overall typography', !proof.visibleSettingIds.length || (writingLayout?.font===overallLayout?.font && writingLayout?.fontSize===overallLayout?.fontSize), JSON.stringify({overallLayout,writingLayout}));
   await noOverflow('Writing category leaderboard');
   await capture('writing-models.png');
   await evaluate('document.querySelector("#capability-ranking .score-axis-header")?.scrollIntoView({block:"start",behavior:"instant"})');
   await capture('writing-stacked-rows.png');
-  const expand = await evaluate('!!document.querySelector("#show-all") && document.querySelectorAll("#capability-ranking .setting-row").length<window.VASIR_WRITING_CATEGORY.coverage.completedSettingCount');
+  if(partialEvidence.settingIds.length){
+    await evaluate('document.querySelector("[data-writing-partial-coverage]").scrollIntoView({block:"start",behavior:"instant"})');
+    await noOverflow('Writing partial coverage');
+    await capture('writing-partial.png');
+    check('Partial group buttons retain roving keyboard navigation',await evaluate(`(() => {const stack=document.querySelector('[data-writing-partial-list] .capability-composition__stack'),buttons=[...stack.querySelectorAll('[data-writing-group-id]')];buttons[0].focus();buttons[0].dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));return document.activeElement===buttons[buttons.length>1?1:0];})()`));
+    for(const availability of ['known','unavailable']){
+      const selector='[data-writing-partial-list] [data-writing-partial-availability="'+availability+'"]';
+      const group=await evaluate(`document.querySelector(${JSON.stringify(selector)}).dataset.writingGroupId`);
+      await click(selector);
+      check(`Partial ${availability} subgroup opens its own Benchmark tests`,await evaluate(`location.hash==='#capabilities/writing/benchmarks'&&!document.querySelector('#capability-benchmarks').hidden&&!!document.querySelector('[data-writing-track="${group}"]')`));
+      await click('[data-capability-mode=models]');
+    }
+  }
+  const expand = await evaluate('!!document.querySelector("#show-all") && document.querySelectorAll("#capability-ranking #result-list > .setting-row").length<window.VASIR_WRITING_CATEGORY.coverage.completedSettingCount');
   if(expand)await click('#show-all');
-  check('Every published setting remains inspectable, without ranking coverage gaps', await evaluate(`document.querySelectorAll('#capability-ranking .setting-row').length===${proof.completeSettings} && document.querySelectorAll('[data-writing-coverage-gaps] [data-incomplete-setting-id]').length===${proof.unscoredSettings}`));
-  const inspectId=await evaluate('document.querySelector("[data-incomplete-setting-id]")?.dataset.incompleteSettingId || document.querySelector("#capability-ranking .setting-row")?.dataset.settingId || null');
+  check('Every published setting remains inspectable, without ranking coverage gaps', await evaluate(`document.querySelectorAll('#capability-ranking #result-list > .setting-row').length===${proof.completeSettings} && document.querySelectorAll('[data-writing-coverage-gaps] [data-incomplete-setting-id]').length===${proof.unscoredSettings}`));
+  const inspectId=await evaluate('document.querySelector("[data-incomplete-setting-id]")?.dataset.incompleteSettingId || document.querySelector("#capability-ranking #result-list > .setting-row")?.dataset.settingId || null');
   if(inspectId){
     await evaluate('(() => {const details=document.querySelector("[data-writing-coverage-gaps]");if(details)details.open=true;})()');
     await click(`#capability-ranking .setting-row__select[data-entry-id="${inspectId}-skill"]`);
     check('Selecting a setting opens every available benchmark answer link with its original case and trial route',await evaluate(`(() => {const id=${JSON.stringify(inspectId)},data=window.VASIR_WRITING_CATEGORY,panel=document.querySelector('#capability-ranking [data-writing-selected-setting]');const publications=data.writingCategory.publications.filter(publication=>publication.settings.some(setting=>setting.id===id));const links=[...panel.querySelectorAll('[data-writing-answer-benchmark]')];return panel.dataset.writingSelectedSetting===id&&links.length===publications.length&&publications.every(publication=>{const link=links.find(link=>link.dataset.writingAnswerBenchmark===publication.benchmarks[0].id),url=link&&new URL(link.href);return url&&url.searchParams.get('setting')===id&&url.hash==='#'+publication.benchmarks[0].id+'/'+publication.cases[0].id+((publication.trialCount || 1)>1?'/trial-1':'');});})()`));
+    answerLinkBounds.push(await verifyWritingAnswerLinkBounds('selected setting'));
   }
   const segment=await evaluate('document.querySelector("#capability-ranking [data-writing-group-id]")?.dataset.writingGroupId || null');
   if(segment){await click(`#capability-ranking [data-writing-group-id="${segment}"]`);check('A stacked group segment opens category Benchmark tests',await evaluate('location.hash==="#capabilities/writing/benchmarks" && !document.querySelector("#capability-benchmarks").hidden'));}
@@ -261,6 +339,47 @@ const verifyWritingCategory = async () => {
   check('Category Benchmark tests includes every published benchmark with unchanged field means and report links', await evaluate(`(() => {const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING;const publications=[root,...(root.benchmarkPublications || []).map(item=>item.projection),...Object.values(root.additionalBenchmarks || {})];const rows=[...document.querySelectorAll('#capability-benchmarks .benchmark-ledger__row')];const format=value=>Number.isFinite(value)?value.toFixed(1):'—';return rows.length===publications.length&&publications.every(publication=>{const summary=publication.benchmarkSummaries[0],row=rows.find(row=>row.dataset.benchmarkId===summary.benchmarkId);return row&&row.dataset.baselineScore===format(summary.baseline)&&row.dataset.treatmentScore===format(summary.treatment)&&row.href.includes('benchmark-report.html#'+summary.benchmarkId);});})()`));
   await noOverflow('Writing category benchmarks');
   await capture('writing-benchmarks.png');
+  const provisionalDisplayEvidence=[];
+  const provisionalIds=await evaluate('window.VASIR_WRITING_CATEGORY.writingCategory.publications.filter(publication=>publication.provisionalLeaderboard).map(publication=>publication.benchmarks[0].id)');
+  check('Only raw source provisional blocks appear inside Benchmark tests',await evaluate(`JSON.stringify([...document.querySelectorAll('#capability-benchmarks [data-writing-provisional-benchmark]')].map(node=>node.dataset.writingProvisionalBenchmark).sort())===${JSON.stringify(JSON.stringify([...provisionalIds].sort()))}`));
+  for(const benchmarkId of provisionalIds){
+    const selector=`#capability-benchmarks [data-writing-provisional-benchmark="${benchmarkId}"]`;
+    await click(`${selector} > summary`);
+    const displayed=await evaluate(`(() => {
+      const benchmarkId=${JSON.stringify(benchmarkId)},data=window.VASIR_WRITING_CATEGORY,publication=data.writingCategory.publications.find(item=>item.benchmarks[0].id===benchmarkId),source=publication.provisionalLeaderboard,node=document.querySelector(${JSON.stringify(selector)}),mismatches=[];
+      const format=value=>Number.isFinite(value)?value.toFixed(1):'—';
+      const rows=[...node.querySelectorAll('[data-writing-provisional-setting]')],eligible=source.entries.filter(entry=>entry.condition==='skill'&&entry.eligibleForRank);
+      const diagnostics=[...node.querySelectorAll('[data-writing-provisional-incomplete]')];
+      if(!node.open||!node.closest('#capability-benchmarks')||node.previousElementSibling?.dataset.benchmarkId!==benchmarkId)mismatches.push('benchmark-placement');
+      const text=node.textContent;
+      if(!/provisional/i.test(node.querySelector('summary').textContent)||!text.includes(source.label)||!/single.judge/i.test(text)||!text.includes(String(source.expectedCaseCount))||!/excluded|not included|do not enter|not part|never enter/i.test(text))mismatches.push('qualified-basis');
+      if(rows.length!==eligible.length||eligible.length!==source.rankedSettingCount)mismatches.push('ranked-count');
+      let previous=Infinity;
+      for(const row of rows){
+        const id=row.dataset.writingProvisionalSetting,skill=eligible.find(entry=>entry.settingId===id),baseline=source.entries.find(entry=>entry.settingId===id&&entry.condition==='baseline');
+        if(!skill||!baseline){mismatches.push('row-identity');continue;}
+        if(row.dataset.baselineScore!==format(baseline.score)||row.dataset.fullScore!==format(skill.score)||row.dataset.delta!==format(skill.delta)||row.dataset.baselineRank!==String(baseline.rank)||row.dataset.fullRank!==String(skill.rank))mismatches.push('row-readings:'+id);
+        if(skill.exactScore>previous)mismatches.push('exact-score-order');previous=skill.exactScore;
+        const link=row.querySelector('a[href*="benchmark-report.html"]'),url=link&&new URL(link.href);
+        if(!url||url.searchParams.get('setting')!==id||!url.hash.startsWith('#'+benchmarkId))mismatches.push('direct-original-report:'+id);
+      }
+      if(JSON.stringify(diagnostics.map(row=>row.dataset.writingProvisionalIncomplete).sort())!==JSON.stringify(source.incompleteSettings.map(item=>item.settingId).sort()))mismatches.push('incomplete-inventory');
+      for(const row of diagnostics){
+        const diagnostic=source.incompleteSettings.find(item=>item.settingId===row.dataset.writingProvisionalIncomplete);
+        if(row.hasAttribute('data-writing-provisional-setting')||!/(unranked|no rank|rank —|not ranked)/i.test(row.textContent)||row.dataset.baselineRank!==''||row.dataset.fullRank!=='')mismatches.push('incomplete-rank');
+        if(!diagnostic||row.dataset.baselineScore!==format(diagnostic.scores.baseline)||row.dataset.fullScore!==format(diagnostic.scores.skill)||row.dataset.delta!==format(diagnostic.delta)||!row.textContent.includes(diagnostic.completedPairCount+'/'+diagnostic.expectedPairCount))mismatches.push('incomplete-diagnostic-readings');
+      }
+      for(const key of ['baseline','treatment','delta'])if(!node.querySelector('summary').textContent.includes(format(source.summary[key])))mismatches.push('summary-'+key);
+      return {benchmarkId,judgeConfigurationIds:source.judgeConfigurationIds,rankedSettings:rows.length,incompleteSettings:diagnostics.length,sourceSha256:source.sourceSha256,activeBenchmarkIds:data.writingCategory.activeBenchmarkIds,mismatches};
+    })()`);
+    check(`Provisional ${benchmarkId}: separate qualified rows, exact published scores, ranks and unranked gaps`,!displayed.mismatches.length,JSON.stringify(displayed));
+    check('Opening provisional evidence never changes the primary category cohort',JSON.stringify(displayed.activeBenchmarkIds)===JSON.stringify(proof.activeBenchmarkIds));
+    await evaluate(`document.querySelector(${JSON.stringify(selector)})?.scrollIntoView({block:'start',behavior:'instant'})`);
+    await noOverflow('Writing provisional results');
+    await capture(provisionalDisplayEvidence.length?`writing-provisional-${benchmarkId}.png`:'writing-provisional.png');
+    await click(`${selector} > summary`);
+    provisionalDisplayEvidence.push(displayed);
+  }
   await click('[data-capability-mode=efficiency]');
   await waitFor(()=>evaluate('!document.querySelector("#capability-efficiency").hidden && !!document.querySelector("#efficiency-view").textContent'),'Writing category efficiency');
   const efficiencyEvidence=[];
@@ -269,6 +388,7 @@ const verifyWritingCategory = async () => {
     const efficiency=await evaluate(`(() => {const metric=${JSON.stringify(metric)},data=window.VASIR_WRITING_CATEGORY,eligible=data.entries.filter(entry=>Number.isFinite(entry.score)&&Number.isFinite(entry[metric])&&entry[metric]>0),frontier=eligible.filter(entry=>!eligible.some(other=>other.score>=entry.score&&other[metric]<=entry[metric]&&(other.score>entry.score||other[metric]<entry[metric]))),points=[...document.querySelectorAll('[data-plot-point]')],mismatches=[];if(points.length!==eligible.length)mismatches.push('point-count');for(const point of points){const entry=eligible.find(entry=>entry.id===point.dataset.entryId);if(!entry||point.dataset.score!==entry.score.toFixed(1)||Number(point.dataset.resource)!==entry[metric]||point.dataset.frontier!==String(frontier.some(other=>other.id===entry.id)))mismatches.push('point-evidence');if(!['plotX','plotY'].every(key=>Number.isFinite(Number(point.dataset[key]))&&Number(point.dataset[key])>=0&&Number(point.dataset[key])<=100))mismatches.push('point-geometry');}return {metric,eligiblePoints:eligible.length,frontierPoints:frontier.length,mismatches};})()`);
     check(`Category ${metric} efficiency shows only complete finite scores and recorded resources`,!efficiency.mismatches.length,JSON.stringify(efficiency));
     efficiencyEvidence.push(efficiency);
+    answerLinkBounds.push(await verifyWritingAnswerLinkBounds(metric+' efficiency'));
     await noOverflow(`Writing category ${metric} efficiency`);
     await capture(metric==='latency'?'writing-efficiency.png':'writing-efficiency-tokens.png');
   }
@@ -277,7 +397,154 @@ const verifyWritingCategory = async () => {
     await navigate(pageUrl('index.html',alias),'window.VASIR_WRITING_CATEGORY && document.querySelector("#capability-benchmarks:not([hidden])")');
     check(`Legacy ${alias} preserves the full category`,await evaluate(`location.hash==='#capabilities/writing/benchmarks' && JSON.stringify(window.VASIR_WRITING_CATEGORY.benchmarks.map(item=>item.id).sort())===${JSON.stringify(JSON.stringify([...proof.benchmarkIds].sort()))}`));
   }
-  return {...proof,efficiencyEvidence};
+  check('Writing landing routes never download either answer archive', !requests.some(writingArchiveRequest));
+  return {...proof,partialEvidence,answerLinkBounds,efficiencyEvidence,provisionalDisplayEvidence};
+};
+
+// Check the single fixed judge against the actual answer archive, after reports
+// have legitimately loaded it. This never loads answers into the category page.
+const verifyProvisionalArchive = async () => {
+  const proof=await evaluate(`(() => {
+    const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING,archiveRoot=window.VASIR_WRITING_RESPONSES_COLLECTION || window.VASIR_WRITING_RESPONSES;
+    const publications=[root,...(root.benchmarkPublications || []).map(item=>item.projection),...Object.values(root.additionalBenchmarks || {})].filter(item=>item.provisionalLeaderboard);
+    const mean=values=>values.length?values.reduce((sum,value)=>sum+value,0)/values.length:null,round=value=>Number.isFinite(value)?Math.round((value+Number.EPSILON)*10)/10:null,close=(left,right)=>right===null?left===null:Number.isFinite(left)&&Math.abs(left-right)<1e-8;
+    return publications.map(publication=>{
+      const source=publication.provisionalLeaderboard,id=publication.benchmarks[0].id,archive=archiveRoot.additionalBenchmarks?.[id]||archiveRoot.benchmarkResponses?.find(item=>item.benchmarkId===id)?.responseBundle||archiveRoot,mismatches=[];
+      if(source.judgeCount!==1||JSON.stringify(source.judgeConfigurationIds)!==JSON.stringify(['codex:gpt-6-astra@xhigh']))mismatches.push('fixed-judge-basis');
+      if(source.sourceSha256!==publication.scoreBasis.sourceSha256||JSON.stringify(source.caseIds)!==JSON.stringify(publication.cases.map(story=>story.id)))mismatches.push('source-and-corpus');
+      const judgeId=source.judgeConfigurationIds[0],answerMap=new Map(archive.responses.map(answer=>[answer.settingId+'|'+answer.caseId+'|'+answer.condition,answer]));
+      let reviewedAnswers=0;
+      const cohorts=publication.settings.map(setting=>{
+        const pairs=publication.cases.map(story=>{const values={caseId:story.id};for(const condition of ['baseline','skill']){const answer=answerMap.get(setting.id+'|'+story.id+'|'+condition),judgments=answer?.judgments.filter(judge=>judge.judgeConfigurationId===judgeId)||[];if(judgments.length>1)mismatches.push('duplicate-fixed-review');const judge=judgments[0];values[condition]=judge?.score??null;if(judge){reviewedAnswers++;const calculated=publication.scoreBasis.dimensions.reduce((sum,dimension)=>sum+judge.dimensions[dimension.id].rating,0);if(!close(judge.score,calculated))mismatches.push('original-rating-total');}}return values;}).filter(pair=>Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill));
+        return {settingId:setting.id,pairs,complete:pairs.length===publication.cases.length,baseline:mean(pairs.map(pair=>pair.baseline)),skill:mean(pairs.map(pair=>pair.skill)),delta:mean(pairs.map(pair=>pair.skill-pair.baseline))};
+      });
+      const eligible=cohorts.filter(cohort=>cohort.complete);
+      for(const cohort of cohorts)for(const condition of ['baseline','skill']){
+        const entry=source.entries.find(item=>item.settingId===cohort.settingId&&item.condition===condition),score=cohort.complete?cohort[condition]:null,delta=cohort.complete?condition==='skill'?cohort.delta:0:null,rank=cohort.complete?1+eligible.filter(other=>other[condition]>score).length:null;
+        if(!entry||!close(entry.exactScore,score)||!close(entry.score,round(score))||!close(entry.exactDelta,delta)||!close(entry.delta,round(delta))||entry.rank!==rank||entry.eligibleForRank!==cohort.complete||entry.completedPairCount!==cohort.pairs.length)mismatches.push('fixed-review-cohort:'+cohort.settingId+':'+condition);
+      }
+      for(const diagnostic of source.incompleteSettings){const cohort=cohorts.find(item=>item.settingId===diagnostic.settingId),missing=publication.cases.map(story=>story.id).filter(caseId=>!cohort.pairs.some(pair=>pair.caseId===caseId));if(cohort.complete||JSON.stringify(diagnostic.missingCaseIds)!==JSON.stringify(missing)||!close(diagnostic.exactScores.baseline,cohort.baseline)||!close(diagnostic.exactScores.skill,cohort.skill)||!close(diagnostic.exactDelta,cohort.delta))mismatches.push('unranked-diagnostic:'+diagnostic.settingId);}
+      const expectedSummary={exactBaseline:mean(eligible.map(cohort=>cohort.baseline)),exactTreatment:mean(eligible.map(cohort=>cohort.skill)),exactDelta:mean(eligible.map(cohort=>cohort.delta))};
+      for(const [key,value] of Object.entries(expectedSummary))if(!close(source.summary[key],value))mismatches.push('field-mean:'+key);
+      if(source.rankedSettingCount!==eligible.length||source.incompleteSettings.length!==cohorts.length-eligible.length)mismatches.push('corpus-count');
+      return {benchmarkId:id,judgeConfigurationId:judgeId,sourceSha256:source.sourceSha256,reviewedAnswers,rankedSettings:eligible.length,incompleteSettings:cohorts.length-eligible.length,mismatches};
+    });
+  })()`);
+  for(const result of proof)check(`Provisional ${result.benchmarkId}: original fixed-judge reviews independently reproduce complete-corpus means, ranks and diagnostics`,!result.mismatches.length,JSON.stringify(result));
+  return proof;
+};
+
+const verifyCreationArchiveAndContexts = async () => {
+  const proof = await evaluate(`(async () => {
+    const data=window.VASIR_WRITING,archive=window.VASIR_WRITING_RESPONSES,mismatches=[];
+    const hash=async text=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),mean=values=>values.length&&values.every(Number.isFinite)?values.reduce((a,b)=>a+b,0)/values.length:null;
+    const close=(a,b)=>b===null?a===null:Number.isFinite(a)&&Math.abs(a-b)<1e-8,format=value=>Number.isFinite(value)?value.toFixed(1):'—',signed=value=>Number.isFinite(value)?(value>0?'+':'')+value.toFixed(1):'—';
+    const seats=['astra-xhigh-naive','astra-xhigh-informed','sol-xhigh-naive','sol-xhigh-informed'],models=['codex:gpt-6-astra@xhigh','codex:gpt-5.6-sol@xhigh'];
+    const files=['SKILL.md','references/core-model.md','references/story-development.md','references/plot-and-structure.md','references/characters.md','references/character-arcs.md','references/relationships-and-cast.md','references/world-and-myth.md','references/antagonism-and-irony.md'];
+    const profiles=archive.judgeProfiles||[],context=archive.promptFiles.find(file=>file.id==='frozen-informed-judge-context');
+    if(data.benchmarks[0].id!=='storytelling-magic-discovery'||data.trialCount!==3||data.settings.length!==33||data.cases.length!==1||data.scoreBasis.judgeCount!==4||data.scoreBasis.dimensions.length!==10||data.scoreBasis.ratingMinimum!==1||data.scoreBasis.ratingMaximum!==10||data.coverage.expectedResponseCount!==198||data.coverage.expectedJudgmentCount!==792)mismatches.push('creation-inventory');
+    if(!same(profiles.map(profile=>profile.id),seats)||new Set(profiles.map(profile=>profile.id)).size!==4||new Set(profiles.map(profile=>profile.configurationId)).size!==2||!same(profiles,data.scoreBasis.reviewers)||!same(profiles,data.methodology.judgeProfiles))mismatches.push('four-frozen-profiles');
+    if(!context||!same(data.methodology.informedSkillFiles,files))throw Error('Frozen informed context is missing or its file inventory changed.');
+    const contextSha256=await hash(context.content),emptySha256=await hash('');
+    if(context.sha256!==contextSha256)mismatches.push('context-content-hash');
+    const reconstructedContext=[];
+    for(const name of files){
+      const prefix='<<<FROZEN_CONTEXT_FILE '+JSON.stringify(name)+'>>>\\n',start=context.content.indexOf(prefix),end=context.content.indexOf('\\n<<<END_FROZEN_CONTEXT_FILE>>>',start+prefix.length),source=data.methodology.skillFiles.find(file=>file.path===name);
+      if(start<0||end<0||!source){mismatches.push('context-file:'+name);continue;}
+      const contents=context.content.slice(start+prefix.length,end);
+      if(await hash(contents)!==source.sha256||new TextEncoder().encode(contents).length!==source.bytes)mismatches.push('context-frozen-bytes:'+name);
+      reconstructedContext.push(prefix+contents+'\\n<<<END_FROZEN_CONTEXT_FILE>>>');
+    }
+    if(reconstructedContext.join('\\n\\n')!==context.content)mismatches.push('context-file-order');
+    for(const [index,profile] of profiles.entries())if(profile.configurationId!==models[Math.floor(index/2)]||profile.reasoning!=='xhigh'||profile.contextMode!==(index%2?'informed':'naive')||profile.contextSha256!==(index%2?contextSha256:emptySha256)||profile.contextFileId!==(index%2?'frozen-informed-judge-context':null))mismatches.push('profile-context:'+profile.id);
+    const requests=new Map((archive.judgeRequests||[]).map(request=>[request.id,request])),segments=new Map((archive.judgePromptSegments||[]).map(segment=>[segment.sha256,segment.content])),answers=new Map(archive.responses.filter(answer=>answer.provenance?.outputSha256).map(answer=>[answer.provenance.outputSha256,answer.outputText])),finals=new Map();
+    if(requests.size!==archive.judgeRequests.length||requests.size>396)mismatches.push('judge-request-inventory');
+    for(const [digest,content] of segments)if(await hash(content)!==digest)mismatches.push('prompt-segment-hash');
+    for(const [digest,content] of answers)if(await hash(content)!==digest)mismatches.push('answer-content-hash');
+    for(const request of requests.values()){
+      const profile=profiles.find(profile=>profile.id===request.profileId),parts=request.promptParts?.map(part=>part.textSha256?segments.get(part.textSha256):part.encoding==='json-string'&&answers.has(part.outputSha256)?JSON.stringify(answers.get(part.outputSha256)):null);
+      if(!profile||!parts||parts.some(part=>typeof part!=='string')){mismatches.push('request-prompt-parts');continue;}
+      const prompt=parts.join('');
+      if(await hash(prompt)!==request.promptSha256)mismatches.push('original-prompt-hash');
+      const hasContext=prompt.includes('\\n\\nFROZEN CRAFT CONTEXT\\n'+context.content+'\\nEND FROZEN CRAFT CONTEXT.');
+      if(hasContext!==(profile.contextMode==='informed'))mismatches.push('request-context-exposure');
+      if(request.candidateOrder.length!==2||!same(request.candidateOrder.map(candidate=>candidate.candidateId),['A','B']))mismatches.push('anonymous-candidate-order');
+      if(typeof request.outputText==='string'&&await hash(request.outputText)!==request.outputSha256)mismatches.push('original-review-hash');
+      if(request.status==='complete'){try{finals.set(request.id,JSON.parse(request.outputText));}catch{mismatches.push('original-review-json');}}
+    }
+    for(const answer of archive.responses){
+      const ids=answer.judgments.map(judge=>judge.reviewerId);
+      if(new Set(ids).size!==ids.length||ids.some(id=>!seats.includes(id))||(Number.isFinite(answer.score)&&ids.length!==4))mismatches.push('answer-reviewer-inventory');
+      for(const judge of answer.judgments){
+        const request=requests.get(judge.requestId),raw=finals.get(judge.requestId)?.evaluations?.find(item=>item.candidateId===judge.candidateId),profile=profiles.find(profile=>profile.id===judge.reviewerId);
+        if(!request||!raw||!profile||request.profileId!==profile.id||judge.judgeConfigurationId!==profile.configurationId||judge.contextMode!==profile.contextMode||raw.review!==judge.rationale||raw.dimensions.length!==10||new Set(raw.dimensions.map(item=>item.id)).size!==10){mismatches.push('original-review-identity');continue;}
+        let total=0;
+        for(const dimension of data.scoreBasis.dimensions){const original=raw.dimensions.find(item=>item.id===dimension.id),reading=judge.dimensions[dimension.id];if(!original||!Number.isInteger(original.rating)||original.rating<1||original.rating>10||reading.rating!==original.rating||reading.evidence!==original.evidence)mismatches.push('original-rating-evidence');total+=original?.rating||0;}
+        if(!close(judge.score,total))mismatches.push('original-rating-total');
+      }
+    }
+    const contextRows=[...document.querySelectorAll('[data-creation-setting]')];
+    if(contextRows.length!==data.settings.length||!document.querySelector('[data-creation-context-comparison]')?.textContent.includes('four fresh review seats'))mismatches.push('visible-context-inventory');
+    for(const setting of data.settings){
+      const cells=data.caseResults.filter(cell=>cell.settingId===setting.id),complete=cells.length===6&&cells.every(cell=>Number.isFinite(cell.exactScore)),row=contextRows.find(row=>row.dataset.creationSetting===setting.id);
+      if(!row||setting.eligibleForRank!==complete){mismatches.push('context-eligible-setting');continue;}
+      for(const mode of ['balanced','naive','informed']){
+        const score=condition=>complete?mean(cells.filter(cell=>cell.condition===condition).map(cell=>{
+          const answer=archive.responses.find(answer=>answer.settingId===setting.id&&answer.trialNumber===cell.trialNumber&&answer.condition===condition);
+          const reviews=answer.judgments.filter(judge=>mode==='balanced'||judge.contextMode===mode);
+          return reviews.length===(mode==='balanced'?4:2)?mean(reviews.map(judge=>judge.score)):null;
+        })):null;
+        const plain=score('baseline'),skill=score('skill'),delta=plain===null||skill===null?null:skill-plain;
+        for(const [condition,value] of [['baseline',plain],['skill',skill],['delta',delta]])if(row.querySelector('[data-creation-context="'+mode+'"][data-context-score="'+condition+'"]')?.textContent!==(condition==='delta'?signed(value):format(value)))mismatches.push('visible-context-mean:'+setting.id+':'+mode+':'+condition);
+      }
+      const effect=data.trialEffects.find(effect=>effect.settingId===setting.id),values=[1,2,3].map(trial=>{const pair=cells.filter(cell=>cell.trialNumber===trial),plain=pair.find(cell=>cell.condition==='baseline')?.exactScore,skill=pair.find(cell=>cell.condition==='skill')?.exactScore;return Number.isFinite(plain)&&Number.isFinite(skill)?skill-plain:null;}),average=mean(values),sd=average===null?null:Math.sqrt(values.reduce((sum,value)=>sum+(value-average)**2,0)/2),range=average===null?null:Math.max(...values)-Math.min(...values);
+      if(!close(effect?.mean,average)||!close(effect?.sampleStandardDeviation,sd)||!close(effect?.range,range))mismatches.push('trial-variation-source');
+      for(const [index,value] of values.entries())if(row.querySelector('[data-creation-trial-delta="'+(index+1)+'"]')?.textContent!==signed(value))mismatches.push('visible-trial-delta');
+      if(row.querySelector('[data-creation-trial-mean]')?.textContent!==signed(average)||row.querySelector('[data-creation-trial-sd]')?.textContent!==format(sd)||row.querySelector('[data-creation-trial-range]')?.textContent!==format(range)+' · '+signed(average===null?null:Math.min(...values))+' to '+signed(average===null?null:Math.max(...values)))mismatches.push('visible-trial-variation');
+    }
+    return {profiles:profiles.map(({id,configurationId,contextMode,contextSha256})=>({id,configurationId,contextMode,contextSha256})),contextSha256,contextBytes:new TextEncoder().encode(context.content).length,contextFileCount:files.length,verifiedRequestCount:requests.size,verifiedOriginalFinals:finals.size,contextRows:contextRows.length,mismatches};
+  })()`);
+  check('Creation: four frozen fresh-context seats, exact context bytes, original requests and visible three-trial means',!proof.mismatches.length,JSON.stringify(proof));
+  return proof;
+};
+
+const verifyCreationExpandedReviews = async (caseId, trialNumber) => {
+  const proof=await evaluate(`(async () => {
+    const archive=window.VASIR_WRITING_RESPONSES,caseId=${JSON.stringify(caseId)},trial=${trialNumber},mismatches=[],expanded=[];
+    const settle=()=>new Promise(resolve=>setTimeout(resolve,0)),hash=async text=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    for(const profile of archive.judgeProfiles){
+      const answer=archive.responses.find(answer=>answer.caseId===caseId&&answer.trialNumber===trial&&answer.judgments.some(judge=>judge.reviewerId===profile.id));
+      if(!answer)continue;
+      const judge=answer.judgments.find(judge=>judge.reviewerId===profile.id),request=archive.judgeRequests.find(request=>request.id===judge.requestId),row=document.querySelector('[data-report-setting-id="'+answer.settingId+'"]'),panel=row?.querySelector('[data-condition="'+answer.condition+'"]'),review=panel?.querySelector('[data-reviewer-id="'+profile.id+'"]'),details=review?.querySelector('[data-creation-judge-evidence]');
+      if(!details||details.dataset.creationJudgeEvidence!==request.id||review.querySelector('[data-judge-context]')?.dataset.judgeContext!==profile.contextMode){mismatches.push('expand-review-identity');continue;}
+      row.querySelector('.model-run').open=true;panel.querySelector('.model-run__judging').open=true;details.open=true;await settle();
+      const original=details.querySelector('[data-creation-original-review]')?.textContent;
+      if(original!==request.outputText||await hash(original||'')!==request.outputSha256)mismatches.push('expanded-original-review');
+      const promptDetails=details.querySelector('[data-creation-judge-prompt]');
+      if(!promptDetails){mismatches.push('expand-prompt-control');continue;}
+      promptDetails.open=true;await settle();
+      const prompt=promptDetails.querySelector('[data-creation-original-prompt]')?.textContent,parts=request.promptParts.map(part=>part.textSha256?archive.judgePromptSegments.find(segment=>segment.sha256===part.textSha256)?.content:part.encoding==='json-string'?JSON.stringify(archive.responses.find(response=>response.provenance?.outputSha256===part.outputSha256)?.outputText):null);
+      if(parts.some(part=>typeof part!=='string')||prompt!==parts.join('')||await hash(prompt||'')!==request.promptSha256)mismatches.push('expanded-original-prompt');
+      const rect=element=>{const box=element.getBoundingClientRect();return {left:box.left,right:box.right,top:box.top,bottom:box.bottom,width:box.width,height:box.height};};
+      const elementGeometry=element=>{const style=getComputedStyle(element);return {tag:element.tagName,id:element.id,className:typeof element.className==='string'?element.className:'',rect:rect(element),clientWidth:element.clientWidth,scrollWidth:element.scrollWidth,display:style.display,visibility:style.visibility,overflowX:style.overflowX,minWidth:style.minWidth,whiteSpace:style.whiteSpace,wordBreak:style.wordBreak,hidden:element.hidden,open:element.tagName==='DETAILS'?element.open:null};};
+      const detailsRect=rect(details),promptRect=rect(promptDetails),viewportWidth=document.documentElement.clientWidth,pageScrollWidth=document.documentElement.scrollWidth;
+      const failureFlags={evidenceClosed:!details.open,promptClosed:!promptDetails.open,evidenceZeroWidth:detailsRect.width<=0,promptZeroHeight:promptRect.height<=0,pageOverflow:pageScrollWidth>viewportWidth+1};
+      const geometry={failureFlags,viewportWidth,pageScrollWidth,windowInnerWidth:window.innerWidth,scrollX:window.scrollX,scrollY:window.scrollY,evidence:elementGeometry(details),prompt:elementGeometry(promptDetails)};
+      if(Object.values(failureFlags).some(Boolean)){
+        mismatches.push('expanded-evidence-visibility-or-overflow');
+        geometry.ancestors=[];
+        for(let ancestor=promptDetails.parentElement;ancestor;ancestor=ancestor.parentElement)geometry.ancestors.push(elementGeometry(ancestor));
+        geometry.pageOverflowElements=[...document.querySelectorAll('body *')].map(element=>({element,box:element.getBoundingClientRect()})).filter(({box})=>box.width>0&&box.right+window.scrollX>viewportWidth+1).sort((left,right)=>right.box.right-left.box.right).slice(0,40).map(({element})=>elementGeometry(element));
+      }
+      expanded.push({profileId:profile.id,requestId:request.id,outputSha256:request.outputSha256,promptSha256:request.promptSha256,promptCharacters:prompt?.length||0,geometry});
+      promptDetails.open=false;details.open=false;
+    }
+    return {caseId,trialNumber:trial,expanded,mismatches};
+  })()`);
+  check(`Creation trial ${trialNumber}: expanded original reviews and reconstructed prompts retain exact bytes`,!proof.mismatches.length,JSON.stringify(proof));
+  await noOverflow(`Creation expanded evidence, trial ${trialNumber}`);
+  return proof;
 };
 
 const verifyDungeonMaster = async () => {
@@ -298,6 +565,7 @@ const verifyDungeonMaster = async () => {
   await noOverflow('Writing category efficiency');
   await capture('dungeon-master-efficiency.png');
   await navigate(pageUrl('benchmark-report.html',benchmarkId), `document.querySelector('[data-writing-case]')&&document.querySelector('[data-writing-rubric]')&&(window.VASIR_WRITING_RESPONSES_COLLECTION || window.VASIR_WRITING_RESPONSES)?.additionalBenchmarks?.[${JSON.stringify(benchmarkId)}]`);
+  const provisionalArchiveEvidence=await verifyProvisionalArchive();
   const inventory = await evaluate(`(() => {
     const data=${dataExpression};
     return {coverage:data.coverage,cases:data.cases.map(story=>({id:story.id,sourceCaseId:story.sourceCaseId,trialNumber:story.trialNumber,cohort:story.cohort})),dimensions:data.scoreBasis.dimensions.length,ratingMinimum:data.scoreBasis.ratingMinimum,ratingMaximum:data.scoreBasis.ratingMaximum,judges:data.scoreBasis.judgeCount,overall:JSON.stringify(window.VASIR_DATA.overall),settings:data.settings.map(setting=>({configurationId:setting.configurationId,reasoning:setting.reasoning})),primaryPrompt:document.querySelector('[data-primary-question]').textContent,design:document.querySelector('[data-writing-design]').textContent,pairReviews:document.querySelector('[data-writing-progress-count="pair-reviews"]').textContent,progress:{answers:document.querySelector('[data-writing-progress-count="answers"]').textContent,reviews:document.querySelector('[data-writing-progress-count="reviews"]').textContent}};
@@ -422,7 +690,7 @@ const verifyDungeonMaster = async () => {
   await click('.report-context__back');
   await waitFor(()=>evaluate(`location.hash==='#capabilities/writing/benchmarks'&&!!document.querySelector('#capability-benchmarks:not([hidden])')`).catch(()=>false),'Dungeon Master return to Writing benchmark list');
   check('Dungeon Master return navigation retains every published Writing benchmark', await evaluate(`window.VASIR_WRITING_CATEGORY.benchmarks.length===${categoryEvidence.benchmarkIds.length}&&!!document.querySelector('[data-benchmark-id="${benchmarkId}"]')`));
-  return {benchmarkId,coverage:inventory.coverage,categoryEvidence,caseEvidence,promptArchive,savedAnswer,savedAdherence};
+  return {benchmarkId,coverage:inventory.coverage,categoryEvidence,provisionalArchiveEvidence,caseEvidence,promptArchive,savedAnswer,savedAdherence};
 };
 
 try {
@@ -448,7 +716,7 @@ try {
     if (message.method === 'Network.loadingFinished') {
       const requestId = message.params.requestId;
       const response = responses.get(requestId);
-      if (response && /\/(?:app|benchmark-report|writing-data|writing-responses)\.js$/.test(new URL(response.url).pathname)) {
+      if (response && /\/(?:app|benchmark-report|writing-data|writing-responses|writing-creation-responses)\.js$/.test(new URL(response.url).pathname)) {
         loadedFilePromises.push(send('Network.getResponseBody', { requestId }).then(result => {
           const bytes = Buffer.from(result.body, result.base64Encoded ? 'base64' : 'utf8');
           return { url:response.url, bytes:bytes.length, sha256:sha256(bytes) };
@@ -482,13 +750,16 @@ try {
   const selectedReportUrl=selectedReport.href;
 
   await navigate(selectedReportUrl, 'window.VASIR_WRITING_RESPONSES && document.querySelector("[data-writing-case]") && document.querySelector("[data-writing-rubric]")');
+  const provisionalArchiveEvidence=isCreation?[]:await verifyProvisionalArchive();
   check('Selected model opens directly in the report', await evaluate(`document.querySelector('[data-report-setting-id="${chosenSettingId}"] .model-run').open`));
   check('Writing report does not load unrelated response bundles', await evaluate('!window.VASIR_RESPONSES'));
+  if(isCreation) check('Creation report loads its dedicated archive without the legacy Writing archive', requests.some(request => new URL(request.url).pathname.endsWith('/writing-creation-responses.js')) && !requests.some(request => new URL(request.url).pathname.endsWith('/writing-responses.js')));
   await verifyWritingProgress('report');
+  const creationArchiveEvidence=isCreation?await verifyCreationArchiveAndContexts():null;
   check('Writing case metadata and answer archive share the same pinned source', await evaluate(`(() => { const data=window.VASIR_WRITING, evidence=window.VASIR_WRITING_RESPONSES;return evidence.responses.filter(response=>response.outputText.length).length===data.coverage.responseCount && evidence.responses.every(response=>{ const cell=data.caseResults.find(cell=>cell.caseId===response.caseId && cell.settingId===response.settingId && cell.condition===response.condition && (cell.trialNumber || 1)===(response.trialNumber || 1));return response.provenance.sourceSha256===data.scoreBasis.sourceSha256 && cell?.status===response.status && cell.score===response.score && cell.wordCount===response.wordCount && cell.failureReason===response.failureReason;}); })()`));
   const verifyCase = async (caseId, trialNumber = 1) => {
     const proof = await evaluate(`(() => {
-      const data=window.VASIR_WRITING, evidence=window.VASIR_WRITING_RESPONSES;
+      const data=window.VASIR_WRITING, evidence=window.VASIR_WRITING_RESPONSES,creation=data.benchmarks[0].id==='storytelling-magic-discovery';
       const caseId=${JSON.stringify(caseId)}, trialNumber=${trialNumber};
       const story=data.cases.find(story=>story.id===caseId);
       const source=evidence.responses.filter(response=>response.caseId===caseId && (response.trialNumber || 1)===trialNumber);
@@ -553,7 +824,7 @@ try {
           for (const button of execution.querySelectorAll('[data-open-prompt-file]')) {
             const reference=button.querySelector('[data-reference-path]').textContent;
             const file=evidence.promptFiles.find(file=>file.id===button.dataset.openPromptFile);
-            if(!file || (reference==='SKILL.md'?file.id!=='frozen-skill-root':!file.title.startsWith(reference+' · '))) mismatches.push('runtime-reference-archive-link');
+            if(!file || (reference==='SKILL.md'?file.id!=='frozen-skill-root':creation?file.title!==reference:!file.title.startsWith(reference+' · '))) mismatches.push('runtime-reference-archive-link');
           }
         }
         const words=output.trim()?output.trim().split(/\\s+/u).length:0;
@@ -595,7 +866,8 @@ try {
           dimensions.forEach(dimension=>{
             const reading=judgment.dimensions?.[dimension.dataset.dimensionId];
             const cells=dimension.querySelectorAll('td');
-            if(reading && (cells[0].textContent!==String(reading.rating) || cells[1].textContent!==(reading.reason || '—'))) mismatches.push('dimension-evidence');
+            if(reading && (cells[0].textContent!==String(reading.rating) || (creation?dimension.querySelector('[data-dimension-reason]')?.textContent:cells[1].textContent)!==(reading.reason || '—'))) mismatches.push('dimension-evidence');
+            if(creation && dimension.querySelector('[data-cited-evidence]')?.textContent!==reading?.evidence) mismatches.push('creation-cited-evidence');
           });
           if(element.querySelector('[data-judge-rationale]').textContent!==judgment.rationale) mismatches.push('judge-rationale');
           const resources=element.querySelector('[data-judge-resources]');
@@ -612,10 +884,11 @@ try {
       const paired=pairs.filter(pair=>Number.isFinite(pair.baseline) && Number.isFinite(pair.skill));
       for(const row of rows) {
         const pair=pairs.find(pair=>pair.settingId===row.dataset.reportSettingId);
-        const rank=Number.isFinite(pair.skill)?1+pairs.filter(other=>Number.isFinite(other.skill)&&other.skill>pair.skill).length:null;
+        const aggregate=data.benchmarkResults.find(result=>result.settingId===pair.settingId&&result.condition==='skill');
+        const rank=creation?(Number.isFinite(aggregate?.exactScore)?1+data.benchmarkResults.filter(other=>other.condition==='skill'&&Number.isFinite(other.exactScore)&&other.exactScore>aggregate.exactScore).length:null):Number.isFinite(pair.skill)?1+pairs.filter(other=>Number.isFinite(other.skill)&&other.skill>pair.skill).length:null;
         const delta=Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill)?round(pair.skill-pair.baseline):null;
         const summary=row.querySelector('.model-preview__row');
-        if(summary.querySelector('.model-preview__identity small').textContent!==(rank?'Storytelling skill rank #'+rank+' of '+data.settings.length:'Panel total not assessable')) mismatches.push('story-rank');
+        if(summary.querySelector('.model-preview__identity small').textContent!==(rank?(creation?'Three-trial balanced skill':'Storytelling skill')+' rank #'+rank+' of '+data.settings.length:creation?'Three-trial aggregate incomplete':'Panel total not assessable')) mismatches.push('story-rank');
         if(summary.querySelector('.model-preview__delta').textContent!==signed(delta)+' pts' || summary.classList.contains('is-regression')!==(delta<0)) mismatches.push('story-paired-delta');
       }
       const means={baseline:paired.length?round(paired.reduce((sum,pair)=>sum+pair.baseline,0)/paired.length):null,skill:paired.length?round(paired.reduce((sum,pair)=>sum+pair.skill,0)/paired.length):null,delta:paired.length?round(paired.reduce((sum,pair)=>sum+pair.skill-pair.baseline,0)/paired.length):null};
@@ -631,6 +904,7 @@ try {
     await waitFor(() => evaluate(`Number(document.querySelector('[data-writing-trial]')?.value)===${trialNumber} && Number(document.querySelector('#report-page')?.dataset.activeWritingTrial)===${trialNumber}`), `Writing trial ${trialNumber}`);
   };
   const caseEvidence = [];
+  const creationExpandedEvidence = [];
   for (const story of writing.cases) {
     if (await evaluate('document.querySelector("[data-writing-case]").value') !== story.id) {
       await evaluate(`(() => { const select=document.querySelector('[data-writing-case]'); select.value=${JSON.stringify(story.id)}; select.dispatchEvent(new Event('change',{bubbles:true})); })()`);
@@ -642,6 +916,7 @@ try {
     for (let trialNumber = 1; trialNumber <= writing.trialCount; trialNumber += 1) {
       await selectTrial(trialNumber);
       caseEvidence.push(await verifyCase(story.id, trialNumber));
+      if(isCreation) creationExpandedEvidence.push(await verifyCreationExpandedReviews(story.id,trialNumber));
     }
   }
   check('Every declared rubric dimension is present', await evaluate('document.querySelectorAll("[data-rubric-dimension]").length===window.VASIR_WRITING.scoreBasis.dimensions.length'));
@@ -742,12 +1017,16 @@ try {
   }
 
   const loadedFiles = (await Promise.all(loadedFilePromises)).filter(Boolean);
+  if(isCreation) {
+    const creationFiles=loadedFiles.filter(file=>new URL(file.url).pathname.endsWith('/writing-creation-responses.js'));
+    check('Creation archive response bytes and SHA-256 are recorded without downloading the legacy archive',creationFiles.length>0&&creationFiles.every(file=>file.bytes>0&&/^[a-f0-9]{64}$/.test(file.sha256))&&new Set(creationFiles.map(file=>file.sha256)).size===1&&!requests.some(request=>new URL(request.url).pathname.endsWith('/writing-responses.js')));
+  }
   check('Writing lazy data bytes stay identical between explorer and report', new Set(loadedFiles.filter(file=>new URL(file.url).pathname.endsWith('/writing-data.js')).map(file=>file.sha256)).size===1);
   check('No browser runtime or network failures', errors.length === 0, JSON.stringify(errors));
   check('No failed HTTP responses', [...responses.values()].every(response => response.status < 400), JSON.stringify([...responses.values()].filter(response => response.status >= 400).map(response => ({url:response.url,status:response.status}))));
   const scoredBranchCoverage = {required:requireScored,completeSettings:scoredCollection.completeSettings,unscoredSettings:scoredCollection.unscoredSettings,tiedRankEntries:scoredCollection.tiedRankEntries,regressionSettings:scoredCollection.regressionSettings,completePanels:caseEvidence.reduce((sum,story)=>sum+story.completePanelResponses,0),singleJudgeResponses:caseEvidence.reduce((sum,story)=>sum+story.singleJudgeResponses,0),scoredPairs:caseEvidence.reduce((sum,story)=>sum+story.scoredPairs,0),regressionPairs:caseEvidence.reduce((sum,story)=>sum+story.regressionPairs,0),tiedPairs:caseEvidence.reduce((sum,story)=>sum+story.tiedPairs,0),efficiency:efficiencyEvidence};
-  if (requireScored) check('Scored QA exercised complete panels and populated latency/token frontiers', scoredBranchCoverage.completePanels > 0 && efficiencyEvidence.every(proof => proof.eligiblePoints > 0 && proof.frontierPoints > 0), JSON.stringify(scoredBranchCoverage));
-  const receipt = { kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'passed',benchmarkId:writing.benchmarks[0],trialCount:writing.trialCount,url:baseUrl.href,width,height,harnessSha256,overallSha256,coverage,categoryEvidence,checks,caseEvidence,scoredBranchCoverage,progressEvidence,promptArchive,savedAnswer,savedExecution,loadedFiles,screenshots,failureScreenshots,errors,completedAt:new Date().toISOString() };
+  if (requireScored) check('Scored reports retain complete panels; category efficiency reflects only complete index coverage', scoredBranchCoverage.completePanels > 0 && efficiencyEvidence.every(proof => scoredCollection.completeSettings > 0 ? proof.eligiblePoints > 0 && proof.frontierPoints > 0 : proof.eligiblePoints === 0 && proof.frontierPoints === 0), JSON.stringify(scoredBranchCoverage));
+  const receipt = { kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'passed',benchmarkId:writing.benchmarks[0],trialCount:writing.trialCount,url:baseUrl.href,width,height,harnessSha256,overallSha256,coverage,categoryEvidence,provisionalArchiveEvidence,...(isCreation?{creationArchiveEvidence,creationExpandedEvidence}:{}),checks,caseEvidence,scoredBranchCoverage,progressEvidence,promptArchive,savedAnswer,savedExecution,loadedFiles,screenshots,failureScreenshots,errors,completedAt:new Date().toISOString() };
   fs.writeFileSync(path.join(output, 'writing-browsercheck.json'), `${JSON.stringify(receipt,null,2)}\n`);
   process.stdout.write(`${JSON.stringify({status:'passed',checks:checks.length,cases:caseEvidence.length,width,height,receipt:path.join(output,'writing-browsercheck.json')})}\n`);
   }

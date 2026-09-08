@@ -324,8 +324,8 @@ test("selected immutable runs deterministically project the exact real developme
   assert.deepEqual(first.routes, {
     ...expectedRoutes,
     entrypoints: [...expectedRoutes.entrypoints, ...(games ? ["/games.html"] : [])],
-    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(games ? ["/#capabilities/games"] : []), ...(workflow ? ["/#capabilities/ai-workflows"] : []), ...(writing ? ["/#capabilities/writing/storytelling"] : [])],
-    viewFragments: [...EXPECTED_ROUTES.viewFragments, ...(games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []), ...(workflow ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []), ...(writing ? ["/#capabilities/writing/storytelling/benchmarks", "/#capabilities/writing/storytelling/efficiency"] : [])],
+    familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(games ? ["/#capabilities/games"] : []), ...(workflow ? ["/#capabilities/ai-workflows"] : []), ...(writing ? ["/#capabilities/writing"] : [])],
+    viewFragments: [...EXPECTED_ROUTES.viewFragments, ...(games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []), ...(workflow ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []), ...(writing ? ["/#capabilities/writing/benchmarks", "/#capabilities/writing/efficiency"] : [])],
     reportFragments: [...expectedRoutes.reportFragments, ...(games ? ["/games.html?benchmark=2d-jumping-demo"] : []), ...(writing ? (writing.benchmarkIds ?? [writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : [])]
   });
   if (games) {

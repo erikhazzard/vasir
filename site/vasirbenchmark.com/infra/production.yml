@@ -213,7 +213,7 @@ Resources:
           } else if (request.uri === '/games.html') {
             request.uri = '/releases/${ActiveReleaseId}/games.html';
           }
-          if (!/^\/releases\/[a-f0-9]{64}\/(index\.html|style\.css|app\.js|data\.js|responses\.js|writing-(data|responses)\.js|benchmark-report\.(html|css|js)|games\.(html|css|js)|assets\/(d3\.v7\.min\.js|kanit-latin-900-normal\.woff2))$/.test(request.uri)) {
+          if (!/^\/releases\/[a-f0-9]{64}\/(index\.html|style\.css|app\.js|data\.js|responses\.js|writing-(data|responses|creation-responses)\.js|benchmark-report\.(html|css|js)|games\.(html|css|js)|assets\/(d3\.v7\.min\.js|kanit-latin-900-normal\.woff2))$/.test(request.uri)) {
             return { statusCode: 403, statusDescription: 'Forbidden',
               headers: { 'cache-control': { value: 'no-store' } } };
           }

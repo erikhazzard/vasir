@@ -8,9 +8,18 @@
   const isWritingBenchmark = benchmarkId => Boolean(benchmarkId && (rootData?.writing?.benchmarkId === benchmarkId || rootData?.writing?.additionalBenchmarks?.[benchmarkId] || rootData?.writing?.benchmarkIds?.includes(benchmarkId) || rootData?.writing?.benchmarks?.some(benchmark => benchmark.id === benchmarkId)));
   const isWorkSpec = isWorkflowBenchmark(initialBenchmarkId);
   const isWriting = isWritingBenchmark(initialBenchmarkId);
+  const isCreation = isWriting && initialBenchmarkId === 'storytelling-magic-discovery';
+  const writingArchive = isWriting ? rootData?.writing?.responseArchives?.[initialBenchmarkId] : null;
+  const writingArchiveGlobal = writingArchive?.globalName || 'VASIR_WRITING_RESPONSES';
   try {
+    if (isCreation && !writingArchive) throw new Error('Creation response archive descriptor missing.');
+    if (writingArchive) {
+      const archiveUrl = new URL(writingArchive.href, runtimeBase);
+      const releaseDirectory = new URL('./', runtimeBase);
+      if (writingArchiveGlobal !== 'VASIR_WRITING_CREATION_RESPONSES' || archiveUrl.origin !== releaseDirectory.origin || !archiveUrl.pathname.startsWith(releaseDirectory.pathname)) throw new Error('Invalid release archive descriptor.');
+    }
     await Promise.all((isWriting
-      ? [['VASIR_WRITING', './writing-data.js'], ['VASIR_WRITING_RESPONSES', './writing-responses.js']]
+      ? [['VASIR_WRITING', './writing-data.js'], [writingArchiveGlobal, writingArchive?.href || './writing-responses.js']]
       : [['VASIR_RESPONSES', './responses.js']]).filter(([key]) => !window[key]).map(([, src]) => new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = new URL(src, runtimeBase).href;
@@ -23,14 +32,14 @@
     return;
   }
   const writingCollection = window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING;
-  const writingResponseCollection = window.VASIR_WRITING_RESPONSES_COLLECTION || window.VASIR_WRITING_RESPONSES;
+  const writingResponseCollection = writingArchive ? window[writingArchiveGlobal] : window.VASIR_WRITING_RESPONSES_COLLECTION || window.VASIR_WRITING_RESPONSES;
   const writingProjectionFor = benchmarkId => writingCollection?.additionalBenchmarks?.[benchmarkId] || writingCollection?.benchmarkPublications?.find(item => item.benchmarkId === benchmarkId)?.projection || writingCollection;
   const writingResponsesFor = benchmarkId => writingResponseCollection?.additionalBenchmarks?.[benchmarkId] || writingResponseCollection?.benchmarkResponses?.find(item => item.benchmarkId === benchmarkId)?.responseBundle || writingResponseCollection;
   const data = isWriting ? writingProjectionFor(initialBenchmarkId) : isWorkSpec ? rootData.aiWorkflows : rootData;
   const responseData = isWriting ? writingResponsesFor(initialBenchmarkId) : isWorkSpec ? window.VASIR_RESPONSES?.aiWorkflows : window.VASIR_RESPONSES;
   if (isWriting) {
     window.VASIR_WRITING_COLLECTION = writingCollection;
-    window.VASIR_WRITING_RESPONSES_COLLECTION = writingResponseCollection;
+    if (!writingArchive) window.VASIR_WRITING_RESPONSES_COLLECTION = writingResponseCollection;
     window.VASIR_WRITING = data;
     window.VASIR_WRITING_RESPONSES = responseData;
   }
@@ -97,8 +106,13 @@
   const settingById = new Map(data.settings.map((setting) => [setting.id, setting]));
   const settingByConfigurationId = new Map([...rootData.settings, ...data.settings].map((setting) => [setting.configurationId, setting]));
   const expectedJudgeConfigurationIds = Array.isArray(data.scoreBasis?.judges) ? data.scoreBasis.judges : [];
+  const reviewerProfiles = Array.isArray(data.scoreBasis?.reviewers) ? data.scoreBasis.reviewers : [];
+  const reviewerProfileById = new Map(reviewerProfiles.map(profile => [profile.id, profile]));
   const messageSetById = new Map((hasResponseCollections ? responseData.messageSets : []).map((messageSet) => [messageSet.id, messageSet]));
   const promptFileById = new Map((responseData?.promptFiles || []).map(file => [file.id, file]));
+  const creationRequestById = new Map((responseData?.judgeRequests || []).map(request => [request.id, request]));
+  const creationSegmentByHash = new Map((responseData?.judgePromptSegments || []).map(segment => [segment.sha256, segment.content]));
+  const creationAnswerByHash = new Map((responseData?.responses || []).filter(response => response.provenance?.outputSha256).map(response => [response.provenance.outputSha256, response.outputText]));
   const caseById = new Map((data.cases || []).map(story => [story.id, story]));
   const caseSummaryById = new Map((data.caseSummaries || []).map(summary => [summary.caseId, summary]));
   const trialSummaryKey = (caseId, trialNumber) => `${caseId}\u0000${trialNumber}`;
@@ -121,6 +135,10 @@
   const hasCompleteResponseMatrix = isWriting ? hasResponseCollections
     && expectedJudgeConfigurationIds.length === Number(data.scoreBasis?.judgeCount)
     && expectedJudgeConfigurationIds.length > 0
+    && (!isCreation || (reviewerProfileById.size === 4 && reviewerProfiles.length === 4
+      && new Set(reviewerProfiles.map(profile => profile.configurationId)).size === 2
+      && ['naive', 'informed'].every(mode => new Set(reviewerProfiles.filter(profile => profile.contextMode === mode).map(profile => profile.configurationId)).size === 2)
+      && responseData.responses.length === expectedResponseCount && reportResults.length === expectedResponseCount))
     && messageSetById.size === responseData.messageSets.length
     && responseByKey.size === responseData.responses.length
     && benchmarkResultByKey.size === reportResults.length
@@ -138,8 +156,14 @@
       && typeof response.outputText === 'string'
       && (!response.outputText.length || messageSetById.has(response.messageSetId))
       && Array.isArray(response.judgments)
+      && (!isCreation || (new Set(response.judgments.map(judgment => judgment.reviewerId)).size === response.judgments.length
+        && response.judgments.length === benchmarkResultByKey.get(responseKey(response.benchmarkId, response.settingId, response.condition, response.caseId, actualTrialNumber(response))).coverage?.completedJudgments
+        && (!Number.isFinite(response.score) || response.judgments.length === 4)))
       && response.judgments.every(judgment => (
         expectedJudgeConfigurationIds.includes(judgment.judgeConfigurationId)
+        && (!isCreation || (reviewerProfileById.get(judgment.reviewerId)?.configurationId === judgment.judgeConfigurationId
+          && reviewerProfileById.get(judgment.reviewerId)?.contextMode === judgment.contextMode
+          && creationRequestById.get(judgment.requestId)?.profileId === judgment.reviewerId))
         && (judgment.score === null || (Number.isFinite(judgment.score) && judgment.score >= 0 && judgment.score <= 100))
         && typeof judgment.rationale === 'string'
         && (judgment.score === null || data.scoreBasis.dimensions.every(dimension => {
@@ -255,14 +279,14 @@
   const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isWriting ? ' · Uncalibrated development' : ''}`;
   const writingInProgress = isWriting && (typeof data.coverage.executionComplete === 'boolean' ? !data.coverage.executionComplete : data.coverage.judgmentCount < data.coverage.expectedJudgmentCount || data.coverage.completedSettingCount < data.coverage.settingCount);
   const writingFinalExclusions = isWriting && data.coverage.executionStatus === 'complete-with-exclusions';
-  const writingProgressStatus = writingFinalExclusions ? `FINAL SNAPSHOT · ${data.coverage.terminallyExcludedPairCount} EXCLUDED ${data.coverage.terminallyExcludedPairCount === 1 ? 'PAIR' : 'PAIRS'}` : writingInProgress ? 'IN PROGRESS' : 'COMPLETE SNAPSHOT';
+  const writingProgressStatus = writingFinalExclusions ? isCreation ? 'FINAL SNAPSHOT · INCOMPLETE PANELS RETAINED' : `FINAL SNAPSHOT · ${data.coverage.terminallyExcludedPairCount} EXCLUDED ${data.coverage.terminallyExcludedPairCount === 1 ? 'PAIR' : 'PAIRS'}` : writingInProgress ? 'IN PROGRESS' : 'COMPLETE SNAPSHOT';
   const usesConsensusScoring = scoreBasis.aggregation === 'unanimity-gates-mean-dimensions-v1';
   const panelMethod = isWriting ? data.scoreBasis.panelMethod || 'Each answer is scored on the published rubric. Inspect the independent ratings and reasons below.' : isWorkSpec
     ? 'Each judge rates value (25%), grounding (15%), acceptance (20%), delivery (15%), scope (15%), and coherence (10%) from 0 to 4. Their weighted totals are averaged only when both assessments and all dimensions are assessable. Readiness is a separate verdict; judge disagreement remains unresolved.'
     : usesConsensusScoring
     ? 'Both judges must pass each gate; either failure applies its gate ceiling. Dimension ratings use the arithmetic mean, including half points. The task rubric recomputes the score before applying the lowest failed-gate ceiling.'
     : 'Gates use majority vote and dimension ratings use the median. The task rubric recomputes the score before applying the lowest majority-failed gate ceiling.';
-  const panelLabel = expectedJudgeConfigurationIds
+  const panelLabel = isCreation ? reviewerProfiles.map(profile => profile.label || profile.id).join(' + ') : expectedJudgeConfigurationIds
     .map((configurationId) => settingByConfigurationId.get(configurationId)?.label || configurationId)
     .join(' + ');
 
@@ -382,8 +406,8 @@
         treatmentResponse: responseByKey.get(responseKey(benchmark.id, setting.id, 'skill')) || null,
         baseline: baseline.score,
         treatment: treatment.score,
-        baselineRankingScore: isWorkSpec || isWriting ? baseline.exactScore ?? baseline.score : baseline.score,
-        treatmentRankingScore: isWorkSpec || isWriting ? treatment.exactScore ?? treatment.score : treatment.score,
+        baselineRankingScore: isCreation ? data.benchmarkResults.find(result => result.settingId === setting.id && result.condition === 'baseline')?.exactScore ?? null : isWorkSpec || isWriting ? baseline.exactScore ?? baseline.score : baseline.score,
+        treatmentRankingScore: isCreation ? data.benchmarkResults.find(result => result.settingId === setting.id && result.condition === 'skill')?.exactScore ?? null : isWorkSpec || isWriting ? treatment.exactScore ?? treatment.score : treatment.score,
         delta: Number.isFinite(treatment.score) && Number.isFinite(baseline.score)
           ? isWriting ? Math.round(((treatment.exactScore ?? treatment.score) - (baseline.exactScore ?? baseline.score)) * 10) / 10 : isWorkSpec ? setting.deltas.skill : Math.round((treatment.score - baseline.score) * 10) / 10
           : null
@@ -422,12 +446,45 @@
     if (!isWriting) return '';
     const coverage = data.coverage;
     const failures = data.caseResults.filter(cell => ['error', 'unavailable'].includes(cell.status)).length;
-    const exclusionDisclosure = writingFinalExclusions ? `${coverage.validResponseCount} valid final answers; ${coverage.terminalGenerationFailureCount} failed full-read verifications are retained. ${coverage.judgmentCount} completed judge reviews and ${coverage.terminallyExcludedJudgmentCount} terminally excluded reviews account for all ${coverage.expectedJudgmentCount} planned reviews. No judge reviews are pending. ` : '';
+    const exclusionDisclosure = writingFinalExclusions ? isCreation
+      ? `${coverage.validResponseCount} valid final answers; ${coverage.terminalGenerationFailureCount || 0} terminal generation failures are retained. ${coverage.judgmentCount} completed answer assessments, ${coverage.terminalJudgmentFailureCount || 0} failed assessments, and ${coverage.terminallyExcludedJudgmentCount || 0} assessments excluded with their generation pair account for all ${coverage.expectedJudgmentCount} planned assessments. No judge reviews are pending. Missing scores remain unassigned. `
+      : `${coverage.validResponseCount} valid final answers; ${coverage.terminalGenerationFailureCount} failed full-read verifications are retained. ${coverage.judgmentCount} completed judge reviews and ${coverage.terminallyExcludedJudgmentCount} terminally excluded reviews account for all ${coverage.expectedJudgmentCount} planned reviews. No judge reviews are pending. ` : '';
     return `<aside class="writing-progress" data-writing-progress aria-label="Writing benchmark progress">
       <div class="writing-progress__heading"><strong class="writing-progress__status" data-writing-progress-status>${escapeHTML(writingProgressStatus)}</strong><a class="writing-progress__link" data-writing-browse-answers href="#ranking" data-report-section="ranking">Browse answers &amp; reviews ↓</a></div>
       <p class="writing-progress__counts"><span data-writing-progress-count="answers">${coverage.responseCount}/${coverage.expectedResponseCount} final answers</span><span data-writing-progress-count="reviews">${coverage.judgmentCount}/${coverage.expectedJudgmentCount} ${data.cohortSummaries ? 'planned answer assessments' : 'planned judge reviews'}</span>${data.cohortSummaries ? `<span data-writing-progress-count="pair-reviews">${data.pairwisePreferences.length}/${data.cases.length * JUDGE_COUNT} blind pair reviews</span>` : ''}<span data-writing-progress-count="panels">${coverage.scoredResponseCount}/${coverage.expectedResponseCount} complete ${JUDGE_COUNT}-judge answer panels</span></p>
       <p data-writing-progress-disclosure>${exclusionDisclosure}${writingInProgress ? 'Judging incomplete; available answers and reviews are published. ' : ''}Case scores require the full judge panel. Incomplete configurations are not ranked.${failures && !writingFinalExclusions ? ` ${failures} failed generations are retained; planned totals include unavailable slots.` : ''}</p>
     </aside>`;
+  };
+
+  const creationContextComparisonMarkup = () => {
+    if (!isCreation) return '';
+    const aggregate = (settingId, condition) => data.benchmarkResults.find(result => result.settingId === settingId && result.condition === condition);
+    const effects = new Map((data.trialEffects || []).map(effect => [effect.settingId, effect]));
+    const contextCells = (setting, mode) => {
+      const score = condition => {
+        const result = aggregate(setting.id, condition);
+        if (!setting.eligibleForRank || !result?.eligibleForRank) return null;
+        return mode === 'balanced' ? result.exactScore : result.contextScores?.[mode];
+      };
+      const plain = score('baseline'), skill = score('skill');
+      const delta = Number.isFinite(plain) && Number.isFinite(skill) ? skill - plain : null;
+      return `<td data-creation-context="${mode}" data-context-score="baseline">${formatScore(plain)}</td><td data-creation-context="${mode}" data-context-score="skill">${formatScore(skill)}</td><td data-creation-context="${mode}" data-context-score="delta">${signed(delta)}</td>`;
+    };
+    return `<section class="writing-cohorts" data-creation-context-comparison aria-labelledby="creation-context-title">
+      <h3 id="creation-context-title">Three-trial scores by judge context</h3>
+      <p>Balanced scores average all four fresh review seats: Astra xhigh and Sol xhigh, each with and without supplied skill context. Naive means no skill context was supplied; informed means the frozen skill root and eight references were supplied. Each context mean weights the same two models equally.</p>
+      <p>These configuration averages require all three paired trials and all four reviews per answer. Incomplete configurations show no aggregate or rank. The selected trial’s answers and reviews appear below.</p>
+      <div class="writing-cohorts__table" role="region" aria-label="Three-trial scores by model setting and judge context" tabindex="0"><table>
+        <thead><tr><th scope="col" rowspan="2">Model setting</th><th scope="colgroup" colspan="3">Balanced · four seats</th><th scope="colgroup" colspan="3">Naive · two models</th><th scope="colgroup" colspan="3">Informed · two models</th><th scope="col" rowspan="2">Trial variation</th></tr><tr>${['balanced', 'naive', 'informed'].map(() => '<th scope="col">Plain /100</th><th scope="col">Skill /100</th><th scope="col">Uplift</th>').join('')}</tr></thead>
+        <tbody>${data.settings.map(setting => {
+          const effect = effects.get(setting.id);
+          return `<tr data-creation-setting="${escapeHTML(setting.id)}"><th scope="row">${escapeHTML(setting.label)}${setting.eligibleForRank ? '' : '<small> · incomplete</small>'}</th>${['balanced', 'naive', 'informed'].map(mode => contextCells(setting, mode)).join('')}<td><details class="writing-rubric-anchors" data-creation-trial-variation="${escapeHTML(setting.id)}"><summary>${effect?.count ?? 0}/3 paired trials</summary><dl>${[1, 2, 3].map(trialNumber => {
+            const trial = effect?.trials?.find(item => item.trialNumber === trialNumber);
+            return `<div><dt>Trial ${trialNumber} uplift</dt><dd data-creation-trial-delta="${trialNumber}">${signed(trial?.delta)}</dd></div>`;
+          }).join('')}<div><dt>Mean uplift</dt><dd data-creation-trial-mean>${signed(effect?.mean)}</dd></div><div><dt>Sample standard deviation</dt><dd data-creation-trial-sd>${formatScore(effect?.sampleStandardDeviation)}</dd></div><div><dt>Range · minimum to maximum</dt><dd data-creation-trial-range>${formatScore(effect?.range)} · ${signed(effect?.minimum)} to ${signed(effect?.maximum)}</dd></div></dl></details></td></tr>`;
+        }).join('')}</tbody></table></div>
+      <p>Trial deltas are skill minus plain after averaging the four reviews. Standard deviation and range describe only these three writing samples; they are not confidence intervals or significance tests. The judge models share a provider and overlap with generator families.</p>
+    </section>`;
   };
 
   const heroMarkup = (benchmark, summary) => {
@@ -562,6 +619,36 @@
 
   const writingJudgeResourcesMarkup = judgment => judgment.resources ? `<details class="work-spec-assessment writing-judge-resources" data-judge-resources><summary class="work-spec-assessment__summary">Shared judge-batch resources</summary><div class="work-spec-assessment__body"><p>These resources cover the entire matched-pair batch, not this answer alone. The same batch is recorded on both answers; count each judge and prompt SHA-256 once when totaling resources.</p><dl class="writing-evidence-fields">${writingEvidenceFieldsMarkup(judgment.resources, [['scope', 'Resource scope'], ['candidateCount', 'Candidates in batch'], ['durationMs', 'Batch duration (ms)']], 'data-judge-resource')}${writingEvidenceFieldsMarkup(judgment, [['promptSha256', 'Judge prompt SHA-256']], 'data-judge-resource')}</dl>${writingUsageMarkup(judgment.resources.usage)}</div></details>` : '';
 
+  const creationEvidenceMarkup = requestId => !isCreation || !creationRequestById.has(requestId) ? '' : `<details class="work-spec-assessment" data-creation-judge-evidence="${escapeHTML(requestId)}"><summary class="work-spec-assessment__summary">Original final review and exact judge prompt</summary><div class="work-spec-assessment__body" data-creation-evidence-body></div></details>`;
+
+  const creationPromptText = request => {
+    if (!Array.isArray(request?.promptParts)) return null;
+    const parts = request.promptParts.map(part => {
+      if (part.textSha256) return creationSegmentByHash.get(part.textSha256);
+      if (part.encoding === 'json-string' && creationAnswerByHash.has(part.outputSha256)) return JSON.stringify(creationAnswerByHash.get(part.outputSha256));
+      return null;
+    });
+    return parts.every(part => typeof part === 'string') ? parts.join('') : null;
+  };
+
+  const hydrateCreationEvidence = details => {
+    if (!isCreation || !details?.open) return;
+    const requestId = details.dataset?.creationJudgeEvidence || details.dataset?.creationJudgePrompt;
+    const request = creationRequestById.get(requestId);
+    if (!request) return;
+    const isPrompt = Boolean(details.dataset.creationJudgePrompt);
+    const body = details.querySelector(isPrompt ? '[data-creation-prompt-body]' : '[data-creation-evidence-body]');
+    if (!body || body.dataset.hydrated === 'true') return;
+    const profile = reviewerProfileById.get(request.profileId), label = profile?.label || request.profileId;
+    if (isPrompt) {
+      const prompt = creationPromptText(request);
+      body.innerHTML = prompt === null ? '<p role="alert">The exact archived prompt could not be reconstructed.</p>' : `${copyButtonMarkup(prompt, `Copy exact judge prompt for ${label}`)}<p>Original prompt SHA-256: <code>${escapeHTML(request.promptSha256)}</code></p><pre class="model-run__text" data-creation-original-prompt><code>${escapeHTML(prompt)}</code></pre>`;
+    } else {
+      body.innerHTML = `<p>This is the original final response for both anonymous candidates in one shared judge request. The exact prompt includes both answers and the context supplied to this seat.</p><p>Reviewer: ${escapeHTML(label)}</p>${request.failureReason ? `<p>${escapeHTML(request.failureReason)}</p>` : ''}${typeof request.outputText === 'string' ? `${copyButtonMarkup(request.outputText, `Copy original final judge response for ${label}`)}<p>Original final response SHA-256: <code>${escapeHTML(request.outputSha256)}</code></p><pre class="model-run__text" data-creation-original-review><code>${escapeHTML(request.outputText)}</code></pre>` : '<p>No final response was returned by this judge request.</p>'}<details class="work-spec-assessment" data-creation-judge-prompt="${escapeHTML(requestId)}"><summary class="work-spec-assessment__summary">Exact judge prompt · ${escapeHTML(profile?.contextMode || 'recorded')} context</summary><div class="work-spec-assessment__body" data-creation-prompt-body></div></details>`;
+    }
+    body.dataset.hydrated = 'true';
+  };
+
   const writingCitationsMarkup = evidence => typeof evidence === 'string' ? `<p data-cited-evidence>${escapeHTML(evidence)}</p>` : !Array.isArray(evidence) || !evidence.length ? '' : `<ul data-cited-evidence>${evidence.map(item => `<li>${typeof item === 'string' ? `<span data-evidence-reference>${escapeHTML(item)}</span>` : `${item.quote ? `<blockquote data-evidence-quote>${escapeHTML(item.quote)}</blockquote>` : ''}${item.reference ? `<span data-evidence-reference>${escapeHTML(item.reference)}</span>` : ''}`}</li>`).join('')}</ul>`;
 
   const writingFlagLabel = id => ({ fundamentalRepairRequired: 'Fundamental repair required', taskNoncompletion: 'Task noncompletion' })[id] || gateLabel(id.replaceAll('_', '-'));
@@ -582,12 +669,13 @@
     if (isWriting) {
       return `<li class="model-run__judge" data-judge-review${judgment.reviewerId ? ` data-reviewer-id="${escapeHTML(judgment.reviewerId)}"` : ''}>
         <header class="model-run__judge-header"><span class="model-run__judge-identity"><strong class="model-run__judge-index">Judge ${String(judgmentIndex + 1).padStart(2, '0')}</strong><span class="model-run__judge-configuration" data-judge-configuration>${escapeHTML(judgeLabel)}</span></span><span class="model-run__judge-score"><strong class="model-run__judge-score-value" data-judge-score>${formatScore(judgment.score)}</strong>${Number.isFinite(judgment.score) ? `<small class="model-run__judge-score-unit">/${SCORE_MAXIMUM}</small>` : ''}</span></header>
+        ${judgment.contextMode ? `<p class="model-run__aggregation-note" data-judge-context="${escapeHTML(judgment.contextMode)}">${judgment.contextMode === 'informed' ? 'Skill-informed: the frozen skill root and eight references were supplied.' : 'Skill-naive: no storytelling skill context was supplied.'}</p>` : ''}
         ${judgment.assessmentStatus ? `<p class="model-run__aggregation-note">${escapeHTML(judgment.assessmentStatus)}</p>` : ''}
-        ${scoreBasis.dimensions.every(dimension => !judgment.dimensions?.[dimension.id]?.reason) ? '<p class="model-run__aggregation-note">This saved review has one overall rationale, shown below the ratings. Separate dimension reasons were not recorded.</p>' : ''}
+        ${!isCreation && scoreBasis.dimensions.every(dimension => !judgment.dimensions?.[dimension.id]?.reason) ? '<p class="model-run__aggregation-note">This saved review has one overall rationale, shown below the ratings. Separate dimension reasons were not recorded.</p>' : ''}
         <div class="work-spec-dimensions"><table class="work-spec-dimensions__table writing-dimensions"><caption class="visually-hidden">${scoreBasis.dimensions.length} rubric dimensions and this judge’s reasons</caption><thead><tr><th scope="col">Dimension</th><th scope="col">Rating /${scoreBasis.ratingMaximum}</th><th scope="col">Reason and evidence</th></tr></thead><tbody>${scoreBasis.dimensions.map(dimension => {
           const reading = judgment.dimensions?.[dimension.id];
           return `<tr data-dimension-id="${escapeHTML(dimension.id)}"><th scope="row">${escapeHTML(dimension.label)}${Number.isFinite(dimension.weight) ? `<small class="work-spec-dimensions__weight">${Number(dimension.weight.toFixed(2))}% weight</small>` : ''}</th><td>${Number.isFinite(reading?.rating) ? reading.rating : 'Not assessed'}</td><td><span data-dimension-reason>${escapeHTML(reading?.reason || '—')}</span>${writingCitationsMarkup(reading?.evidence)}</td></tr>`;
-        }).join('')}</tbody></table></div><p class="model-run__judge-rationale" data-judge-rationale>${escapeHTML(judgment.rationale)}</p>${writingFlagsMarkup(judgment.flags)}${writingJudgeResourcesMarkup(judgment)}
+        }).join('')}</tbody></table></div><p class="model-run__judge-rationale" data-judge-rationale>${escapeHTML(judgment.rationale)}</p>${writingFlagsMarkup(judgment.flags)}${writingJudgeResourcesMarkup(judgment)}${creationEvidenceMarkup(judgment.requestId)}
       </li>`;
     }
     if (isWorkSpec) {
@@ -653,7 +741,7 @@
     `;
   };
 
-  const judgingMarkup = ({ judgments, notScored = false }) => {
+  const judgingMarkup = ({ judgments, notScored = false, response }) => {
     const scores = judgments.map((judgment) => judgment.score).filter(Number.isFinite);
     const scoreRange = scores.length > 0 && scores.length === judgments.length
       ? `${Math.min(...scores).toFixed(1)}–${Math.max(...scores).toFixed(1)}`
@@ -671,6 +759,7 @@
           <ol class="model-run__judges">
             ${judgments.map((judgment, judgmentIndex) => judgeReviewMarkup({ judgment, judgmentIndex })).join('')}
           </ol>
+          ${isCreation ? [...creationRequestById.values()].filter(request => request.status === 'error' && request.candidateOrder?.some(candidate => candidate.outputSha256 === response?.provenance?.outputSha256)).map(request => `<section data-creation-review-failure><p>${escapeHTML(reviewerProfileById.get(request.profileId)?.label || request.profileId)}: this request did not produce a valid assessment. Its missing score was not imputed.</p>${creationEvidenceMarkup(request.id)}</section>`).join('') : ''}
         </div>
       </details>
     `;
@@ -683,8 +772,8 @@
     const messages = messageSet?.messages || [];
     const outputText = response?.outputText || '';
     const terminalFailure = candidate => ['error', 'unavailable'].includes(candidate?.status);
-    const terminalExcluded = response?.judgingDisposition === 'terminal-excluded';
-    const notScored = isWriting && (terminalExcluded || terminalFailure(response) || (outputText.length > 0 && terminalFailure(pairedResponse)));
+    const terminalExcluded = response?.judgingDisposition === 'terminal-excluded' || (isCreation && response?.reviewerStatuses?.some(review => review.disposition === 'terminal-excluded'));
+    const notScored = isWriting && (terminalExcluded || terminalFailure(response) || (outputText.length > 0 && terminalFailure(pairedResponse)) || (isCreation && response?.reviewerStatuses?.some(review => review.disposition === 'terminal-failure')));
     const headingId = `model-run-${rowIndex}-${condition}`;
     const modifier = isBaseline ? 'model-run__condition--baseline' : 'model-run__condition--skill';
     const trialLabel = Number.isInteger(response?.trialNumber) ? `${isWriting ? data.trialLabel || 'Trial' : 'Trial'} ${response.trialNumber}` : 'Recorded trial';
@@ -700,7 +789,7 @@
         </header>
         ${isWorkSpec ? `<p class="work-spec-verdict" data-condition-readiness>${escapeHTML(response.readinessLabel || 'Readiness not reported')}</p>` : ''}
         ${isWriting ? `<p class="writing-answer-status" data-output-word-count="${outputText.trim() ? outputText.trim().split(/\s+/u).length : 0}">${outputText.trim() ? `${outputText.trim().split(/\s+/u).length.toLocaleString()} words · exact final answer` : escapeHTML(response?.failureReason || response?.status || 'No completed answer recorded')}${response?.status && outputText.length ? ` · ${escapeHTML(response.status)}` : ''}</p>` : ''}
-        ${terminalExcluded ? `<p class="writing-answer-status" data-writing-exclusion>Not scored: this pair was excluded because ${terminalFailure(response) ? 'this answer' : 'its paired answer'} failed the required full-read verification. Both saved answers remain available; no further judge reviews are planned.${response?.failureReason ? ` ${escapeHTML(response.failureReason)}` : ''}</p>` : ''}
+        ${terminalExcluded ? `<p class="writing-answer-status" data-writing-exclusion>${isCreation ? 'Not scored: this original generation pair did not complete. Returned answers remain available; missing scores were not imputed.' : `Not scored: this pair was excluded because ${terminalFailure(response) ? 'this answer' : 'its paired answer'} failed the required full-read verification. Both saved answers remain available; no further judge reviews are planned.`}${response?.failureReason ? ` ${escapeHTML(response.failureReason)}` : ''}</p>` : ''}
         <details class="model-run__prompt">
           <summary class="model-run__prompt-summary">
             <strong class="model-run__prompt-title">${isWriting ? 'Question &amp; skill context' : 'Input prompt'}</strong>
@@ -713,7 +802,7 @@
             </ol>
           </div>
         </details>
-        ${judgingMarkup({ judgments: response?.judgments || [], notScored })}
+        ${judgingMarkup({ judgments: response?.judgments || [], notScored, response })}
         ${writingExecutionMarkup(response)}
         <section class="model-run__section" aria-label="Full model output">
           <header class="model-run__section-header">
@@ -736,7 +825,7 @@
       <li class="model-preview__item" data-report-setting-id="${escapeHTML(row.setting.id)}">
         <details class="model-run"${isWriting && requestedSettingId === row.setting.id ? ' open' : ''}>
           <summary class="model-preview__row${regressionClass}">
-            <span class="model-preview__identity"><strong>${escapeHTML(settingLabel)}</strong><small>${row.rank ? `${escapeHTML(TREATMENT_LABEL)} rank #${row.rank} of ${SETTING_COUNT}` : 'Panel total not assessable'}</small></span>
+            <span class="model-preview__identity"><strong>${escapeHTML(settingLabel)}</strong><small>${row.rank ? `${isCreation ? 'Three-trial balanced skill' : escapeHTML(TREATMENT_LABEL)} rank #${row.rank} of ${SETTING_COUNT}` : isCreation ? 'Three-trial aggregate incomplete' : 'Panel total not assessable'}</small></span>
             ${comparable ? `<span
               class="model-preview__plot"
               style="--preview-start:${start}%;--preview-width:${width}%;--preview-baseline:${row.baseline}%;--preview-treatment:${row.treatment}%"
@@ -780,13 +869,13 @@
       <header class="report-section__heading">
         <div>
           <p class="ui-eyebrow">${escapeHTML(SCORE_EDITION_LABEL)} field · all ${SETTING_COUNT} matched settings</p>
-          <h2 id="ranking-title">${escapeHTML(TREATMENT_LABEL)} task scores</h2>
+          <h2 id="ranking-title">${isCreation ? 'Selected trial answers &amp; reviews' : `${escapeHTML(TREATMENT_LABEL)} task scores`}</h2>
         </div>
-        <p>All ${SETTING_COUNT} settings, ordered by ${escapeHTML(TREATMENT_LABEL)} task score. Rank is secondary and can change as the field grows.</p>
+        <p>${isCreation ? `All ${SETTING_COUNT} settings, ordered by the complete three-trial balanced skill score. Values and transcripts below describe the selected trial. Incomplete three-trial configurations have no rank.` : `All ${SETTING_COUNT} settings, ordered by ${escapeHTML(TREATMENT_LABEL)} task score. Rank is secondary and can change as the field grows.`}</p>
       </header>
       <details class="preview-disclosure" open>
-        <summary class="preview-disclosure__summary">All ${SETTING_COUNT} matched settings · task score /${SCORE_MAXIMUM}</summary>
-        <ol class="model-preview" aria-label="All ${SETTING_COUNT} matched results for ${escapeHTML(TREATMENT_LABEL)} and ${escapeHTML(BASELINE_LABEL)}, ordered by ${escapeHTML(TREATMENT_LABEL)} task score">
+        <summary class="preview-disclosure__summary">All ${SETTING_COUNT} matched settings · ${isCreation ? 'selected trial' : 'task'} score /${SCORE_MAXIMUM}</summary>
+        <ol class="model-preview" aria-label="All ${SETTING_COUNT} matched results for ${escapeHTML(TREATMENT_LABEL)} and ${escapeHTML(BASELINE_LABEL)}, ordered by ${isCreation ? 'three-trial balanced skill score' : `${escapeHTML(TREATMENT_LABEL)} task score`}">
           ${modelPreviewRows(benchmark).map(modelRowMarkup).join('')}
         </ol>
       </details>
@@ -934,6 +1023,7 @@
         ${writingProgressMarkup()}
         ${heroMarkup(benchmark, summary)}
         ${writingCohortsMarkup()}
+        ${creationContextComparisonMarkup()}
         ${overviewMarkup(benchmark)}
         ${rankingMarkup(benchmark)}
         ${writingPairwiseMarkup()}
@@ -983,6 +1073,8 @@
       window.location.hash = reportHash(activeBenchmarkId, activeCaseId, selectedTrialFor(activeCaseId, Number(event.target.value)), section);
     }
   });
+
+  reportView.addEventListener('toggle', event => hydrateCreationEvidence(event.target), true);
 
   reportView.addEventListener('click', async (event) => {
     const promptReference = event.target.closest('[data-open-prompt-file]');

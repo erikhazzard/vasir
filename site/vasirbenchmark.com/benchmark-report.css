@@ -134,6 +134,10 @@
   text-transform: uppercase;
 }
 
+:where([data-active-writing-benchmark="storytelling-magic-discovery"]) .evidence-truth {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
 .evidence-truth p {
   margin: 0;
 }
@@ -1474,6 +1478,13 @@
   gap: var(--space-2);
 }
 
+[data-creation-evidence-body],
+[data-creation-prompt-body] {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  overflow-wrap: anywhere;
+}
+
 .writing-case-picker {
   display: grid;
   grid-template-columns: minmax(12rem, 1fr) minmax(0, 2fr);
@@ -1675,5 +1686,15 @@
   .writing-dimensions td {
     padding-inline: var(--space-2);
     overflow-wrap: anywhere;
+  }
+
+  :where([data-active-writing-benchmark="storytelling-magic-discovery"]) .writing-dimensions :is(th, td):first-child {
+    min-width: 6rem;
+    overflow-wrap: normal;
+  }
+
+  :where([data-active-writing-benchmark="storytelling-magic-discovery"]) .writing-dimensions :is(th, td):nth-child(2) {
+    min-width: 4rem;
+    overflow-wrap: normal;
   }
 }

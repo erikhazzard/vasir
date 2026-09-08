@@ -9,8 +9,8 @@ const TWISTS = 'storytelling-plot-twists';
 const DM = 'dungeon-master-adventure-outline';
 
 function publication(id, { trials = 1, repetitions = false, exclusions = false, caseCount = 1 } = {}) {
-  const cases = Array.from({ length: caseCount }, (_, index) => ({ id: `case-${index + 1}`, benchmarkId: id, title: `Prompt ${index + 1}`, prompt: `Exact prompt ${index + 1}`, ...(repetitions ? { trialNumber: index ? 6 : 1, cohort: 'primary' } : {}) }));
-  const settings = Array.from({ length: 4 }, (_, index) => ({ id: `model-${index}`, configurationId: `provider:model-${index}@high`, label: `Model ${index}` }));
+  const cases = Array.from({ length: caseCount }, (_, index) => ({ id: `case-${index + 1}`, benchmarkId: id, title: `Prompt ${index + 1}`, prompt: `Exact prompt ${repetitions && index < 2 ? 1 : index + 1}`, ...(repetitions ? { sourceCaseId: index < 2 ? 'primary' : `secondary-${index - 1}`, trialNumber: index === 1 ? 6 : 1, cohort: index < 2 ? 'primary' : 'transfer', genre: index === 3 ? 'science-fiction' : 'fantasy' } : {}) }));
+  const settings = Array.from({ length: repetitions ? 1 : 4 }, (_, index) => ({ id: `model-${index}`, configurationId: `provider:model-${index}@high`, label: `Model ${index}` }));
   const conditions = [{ id: 'baseline', label: 'Plain answer', short: 'Plain' }, { id: 'skill', label: repetitions ? 'Dungeon Master skill' : 'Storytelling skill' }];
   const dimensions = [{ id: 'coherence', label: 'Coherence', description: 'Coherent causality', weight: 100, anchors: { 1: 'Weak', 5: 'Mixed', 10: 'Strong' } }];
   const judges = ['provider:judge-1@high', 'provider:judge-2@high'];
@@ -41,14 +41,29 @@ function publication(id, { trials = 1, repetitions = false, exclusions = false, 
   const coverage = { caseCount: cases.length, responseCount: cells.length, expectedResponseCount: cells.length, judgmentCount: responses.reduce((sum, response) => sum + response.judgments.length, 0), expectedJudgmentCount: cells.length * 2, scoredResponseCount: cells.filter(cell => cell.score !== null).length, completedSettingCount: exclusions ? 2 : 4, settingCount: 4, ...(exclusions ? { validResponseCount: cells.length - 2, terminalGenerationFailureCount: 2, terminallyExcludedPairCount: 2, terminallyExcludedJudgmentCount: 8, pendingGenerationCount: 0, pendingJudgmentCount: 0, executionComplete: true, executionStatus: 'complete-with-exclusions' } : {}) };
   const benchmark = { id, category: 'writing', suite: repetitions ? 'Dungeon Master' : 'Storytelling', name: id === TWISTS ? 'Plot twists' : repetitions ? 'Adventure outline' : 'Core idea', description: 'Published task description', prompt: cases[0].prompt, taskKind: id === TWISTS ? 'story-outline' : 'story-interpretation', limitations: ['One task only'] };
   const projection = { trialCount: trials, cases, settings, conditions, benchmarks: [benchmark], benchmarkResults: [], benchmarkSummaries: [{ benchmarkId: id, baselineLabel: 'Plain answer', treatmentLabel: conditions[1].label, baseline: 90, treatment: 99, delta: 9, wins: 4, ties: 0, losses: 0, runId: 'fixture-run' }], caseSummaries: cases.map(story => ({ caseId: story.id, baseline: 80, treatment: 88, delta: 8, wins: 4, ties: 0, losses: 0 })), trialSummaries, caseResults: cells, categories: [{ id: 'writing', name: 'Writing', color: '#b65a31' }], scoreBasis: { dimensions, judges, judgeCount: 2, ratingMinimum: 1, ratingMaximum: 10, range: { minimum: 10, maximum: 100 }, trialsPerTask: trials, panelMethod: 'Published scoring method' }, coverage, caseLabel: id === TWISTS ? 'prompt' : 'story', trialLabel: repetitions ? 'Repetition' : 'Trial' };
-  if (repetitions) Object.assign(projection, { subcategory: 'dungeon-master', cohortSummaries: { primary: { baseline: 50, treatment: 55, delta: 5, usablePairs: 2, expectedPairs: 2, complete: true } }, pairwisePreferences: cases.map(story => ({ caseId: story.id, reviewerId: 'judge-1', winner: 'skill', confidence: 'high', reason: `Preference for ${story.id}` })), flagRates: [{ condition: 'skill', fundamentalRepairRequired: 0, taskNoncompletion: 0, reviewedAnswers: 8 }] });
+  if (repetitions) {
+    coverage.promptCount = new Set(cases.map(story => story.sourceCaseId)).size;
+    coverage.completedSettingCount = coverage.settingCount = settings.length;
+    const cohortSummary = predicate => {
+      const selectedCases = cases.filter(predicate);
+      const summaries = trialSummaries.filter(summary => selectedCases.some(story => story.id === summary.caseId));
+      const mean = field => summaries.reduce((sum, summary) => sum + summary[field], 0) / summaries.length;
+      return { baseline: mean('baseline'), treatment: mean('treatment'), delta: mean('delta'), usablePairs: selectedCases.length, expectedPairs: selectedCases.length, complete: true, sourcePromptCount: new Set(selectedCases.map(story => story.sourceCaseId)).size };
+    };
+    Object.assign(projection, { subcategory: 'dungeon-master', cohortSummaries: {
+      primary: cohortSummary(story => story.cohort === 'primary'),
+      transfer: cohortSummary(story => story.cohort === 'transfer'),
+      fantasyTransfer: cohortSummary(story => story.cohort === 'transfer' && story.genre === 'fantasy'),
+      otherGenreTransfer: cohortSummary(story => story.cohort === 'transfer' && story.genre !== 'fantasy')
+    }, pairwisePreferences: cases.map(story => ({ caseId: story.id, reviewerId: 'judge-1', winner: 'skill', confidence: 'high', reason: `Preference for ${story.id}` })), flagRates: [{ condition: 'skill', fundamentalRepairRequired: 0, taskNoncompletion: 0, reviewedAnswers: cases.length }] });
+  }
   return { projection, responseBundle: { kind: 'vasirbenchmark-writing-responses', schemaVersion: 1, promptFiles: [], messageSets: [{ id: 'shared-prompt', messages: [{ role: 'user', content: 'Exact shared task' }] }], responses } };
 }
 
 function collections(options = {}) {
   const core = publication(CORE, { caseCount: 2 });
   const twists = publication(TWISTS, { trials: 10, exclusions: true, ...options });
-  const dm = publication(DM, { repetitions: true, caseCount: 2 });
+  const dm = publication(DM, { repetitions: true, caseCount: 4 });
   const data = { ...core.projection, benchmarkPublications: [{ benchmarkId: TWISTS, projection: twists.projection }], additionalBenchmarks: { [DM]: dm.projection } };
   const archive = { ...core.responseBundle, benchmarkResponses: [{ benchmarkId: TWISTS, responseBundle: twists.responseBundle }], additionalBenchmarks: { [DM]: dm.responseBundle } };
   return { data, archive, core, twists, dm };
@@ -77,10 +92,10 @@ test('Writing report selects every trial without collapsing the eighty response 
   assert.equal(page.window.VASIR_WRITING_RESPONSES, source.twists.responseBundle);
   assert.equal(page.window.VASIR_WRITING_COLLECTION, source.data);
   assert.equal(page.window.VASIR_WRITING_RESPONSES_COLLECTION, source.archive);
-  assert.match(page.reportView.innerHTML, /index\.html\?writing=storytelling-plot-twists#capabilities\/writing\/storytelling\/benchmarks/);
+  assert.match(page.reportView.innerHTML, /class="report-context__back" href="\.\/index\.html#capabilities\/writing\/benchmarks"/);
   for (let trial = 1; trial <= 10; trial += 1) {
     page.navigate(`#${TWISTS}/case-1/trial-${trial}`);
-    assert.deepEqual(page.reportPage.dataset, { activeWritingBenchmark: TWISTS, activeWritingCase: 'case-1', activeWritingTrial: String(trial) });
+    assert.deepEqual(page.reportPage.dataset, { activeWritingBenchmark: TWISTS, writingSubcategory: 'storytelling', activeWritingCase: 'case-1', activeWritingTrial: String(trial) });
     const html = page.reportView.innerHTML;
     assert.doesNotMatch(html, /EXACT RUN MATRIX IS INCOMPLETE/);
     const summary = source.twists.projection.trialSummaries.find(summary => summary.trialNumber === trial);
@@ -146,10 +161,12 @@ test('Core remains the default collection member and Dungeon Master preserves ac
   assert.doesNotMatch(dm.reportView.innerHTML, /EXACT RUN MATRIX IS INCOMPLETE|data-writing-trial(?:\s|>)/);
   for (const response of source.dm.responseBundle.responses) assert.equal(dm.reportView.innerHTML.includes(response.outputText), response.caseId === 'case-2');
   assert.match(dm.reportView.innerHTML, /data-writing-cohorts/);
+  for (const cohort of ['primary', 'transfer', 'fantasyTransfer', 'otherGenreTransfer']) assert.match(dm.reportView.innerHTML, new RegExp(`data-writing-cohort="${cohort}"`));
+  assert.match(dm.reportView.innerHTML, /3 distinct prompts · 4 matched pairs/);
   assert.match(dm.reportView.innerHTML, /Preference for case-2/);
   assert.match(dm.reportView.innerHTML, /Adventure completed/);
   assert.match(dm.reportView.innerHTML, /Repetition 6/);
-  assert.match(dm.reportView.innerHTML, /index\.html#capabilities\/writing\/dungeon-master\/benchmarks/);
+  assert.match(dm.reportView.innerHTML, /class="report-context__back" href="\.\/index\.html#capabilities\/writing\/benchmarks"/);
   dm.choose('[data-writing-case]', 'case-1');
   assert.equal(dm.reportPage.dataset.activeWritingTrial, '1');
   assert.equal(dm.window.location.hash, `#${DM}/case-1/method`);

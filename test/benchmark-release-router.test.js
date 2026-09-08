@@ -18,7 +18,7 @@ vm.runInContext(source.replaceAll("${ActiveReleaseId}", releaseId), context);
 const route = uri => context.handler({ request: { uri } });
 
 test("production release router serves every declared public file, including lazy Writing evidence", () => {
-  assert.equal(config.publicFiles.length, 15);
+  assert.equal(config.publicFiles.length, 16);
   for (const file of config.publicFiles) {
     const uri = `/releases/${releaseId}/${file.path}`;
     assert.equal(route(uri).uri, uri, `The CDN would reject ${file.path}`);
@@ -33,10 +33,12 @@ test("stable HTML entrypoints route to the active immutable release", () => {
 
 test("production release router rejects unlisted files, apex script aliases, and traversal", () => {
   for (const uri of [
-    "/writing-data.js", "/writing-responses.js", "/app.js",
+    "/writing-data.js", "/writing-responses.js", "/writing-creation-responses.js", "/app.js",
     `/releases/${releaseId}/writing-private.js`, `/releases/${releaseId}/run.json`,
     `/releases/${releaseId}/../data.js`, `/releases/${releaseId}/%2e%2e/data.js`,
     `/releases/${releaseId}/writing-data.js/extra`, `/releases/${releaseId}/writing-data.js.map`,
+    `/releases/${releaseId}/writing-creation-responses.js/extra`, `/releases/${releaseId}/writing-creation-responses.js.map`,
+    `/releases/${releaseId}/writing-private-responses.js`, `/releases/${releaseId}/writing-creation-responses.json`,
     "/releases/not-a-release/writing-data.js", `/artifacts/${releaseId}/index.html`
   ]) {
     assert.equal(route(uri).statusCode, 403, `Unexpectedly public: ${uri}`);
@@ -45,6 +47,6 @@ test("production release router rejects unlisted files, apex script aliases, and
 
 test("Games navigation links to the available Writing capability", () => {
   const html = fs.readFileSync(path.join(site, "games.html"), "utf8");
-  assert.match(html, /<a class="game-capabilities__link" href="\.\/index\.html#capabilities\/writing\/storytelling">Writing<\/a>/);
+  assert.match(html, /<a class="game-capabilities__link" href="\.\/index\.html#capabilities\/writing">Writing<\/a>/);
   assert.doesNotMatch(html, /game-capabilities__unavailable[^>]*>Writing/);
 });

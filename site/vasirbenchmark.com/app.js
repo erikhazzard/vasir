@@ -1095,6 +1095,40 @@ function buildWritingCategoryCollection(collection) {
     `;
   };
 
+  const writingPartialCoverageMarkup = () => {
+    if (!isWriting) return '';
+    const groups = data.categories.filter(group => group.weight > 0);
+    const partial = data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID
+      && !Number.isFinite(entry.exactScore)
+      && entry.categories.some(reading => Number.isFinite(reading.exactScore) && reading.weight > 0))
+      .sort((left, right) => left.label.localeCompare(right.label) || left.id.localeCompare(right.id));
+    if (!partial.length) return '';
+    const profile = (entry, fullEntryId) => `<span class="capability-composition capability-composition--${conditionVisualClass(entry.condition)}" data-condition="${escapeHtml(entry.condition)}" data-writing-partial-condition="${escapeHtml(entry.condition)}" role="group" aria-label="${escapeHtml(conditionById.get(entry.condition).label)}: partial subgroup evidence, category total and rank unavailable">
+      <span class="capability-composition__meta"><span class="capability-composition__label">${escapeHtml(conditionById.get(entry.condition).label)}</span><span class="capability-composition__rank">Rank —</span></span>
+      <span class="capability-composition__track"><span class="capability-composition__stack" role="toolbar" aria-label="Open subgroup benchmark tests, including unavailable groups">
+        ${groups.map((group, index) => {
+          const reading = entry.categories.find(item => item.category === group.id);
+          const known = Number.isFinite(reading?.exactScore);
+          const insight = known ? `${group.name}: ${formatScore(reading.score)} of ${SCORE_MAXIMUM}; fixed weight ${formatWeight(group.weight)}; ${reading.exactContribution.toFixed(2)} known weighted points. The category total remains unavailable.` : `${group.name}: unavailable evidence, not zero; fixed ${formatWeight(group.weight)} capacity. The category total remains unavailable.`;
+          return `<button class="capability-composition__segment writing-partial__slot${known ? '' : ' writing-partial__slot--unavailable'}" type="button" data-writing-group-id="${escapeHtml(group.id)}" data-entry-id="${escapeHtml(fullEntryId)}" data-writing-partial-availability="${known ? 'known' : 'unavailable'}" data-weight="${group.weight}" data-raw-score="${known ? formatScore(reading.score) : ''}" data-raw-exact-score="${known ? reading.exactScore : ''}" data-contribution="${known ? reading.exactContribution : ''}" style="--segment-width:${(group.weight * 100).toFixed(6)}%;--partial-color:${escapeHtml(group.color)}" tabindex="${index === 0 ? '0' : '-1'}" aria-label="${escapeHtml(insight)} Open ${escapeHtml(group.name)} benchmark tests." title="${escapeHtml(insight)}">
+            ${known ? `<span class="writing-partial__fill" aria-hidden="true" style="width:${COMPOSITE_SCORE_SCALE(reading.exactScore).toFixed(6)}%"></span>` : ''}
+            <span class="writing-partial__slot-label"><strong>${escapeHtml(group.short)} ${known ? formatScore(reading.score) : 'unavailable'}</strong><small>${known ? `${reading.exactContribution.toFixed(2)} pts · ` : ''}${formatWeight(group.weight)}${known ? '' : ' capacity'}</small></span>
+          </button>`;
+        }).join('')}
+      </span></span><strong class="capability-composition__total" data-writing-partial-total>—</strong>
+    </span>`;
+    return `<section class="writing-partial" data-writing-partial-coverage aria-labelledby="writing-partial-title">
+      <header class="writing-partial__heading"><h4 id="writing-partial-title">Partial coverage — not ranked</h4><p>Fixed subgroup weights. Solid fills show known contributions; hatched slots are unavailable—not zero. No category total, rank, or uplift is inferred. Settings are ordered alphabetically.</p></header>
+      <ol class="result-list" data-writing-partial-list aria-label="Unranked partial subgroup evidence, ordered by model label">${partial.map(entry => {
+        const baseline = baselineBySetting.get(entry.settingId), selected = selectedEntry().settingId === entry.settingId;
+        return `<li class="setting-row writing-partial__row${selected ? ' is-selected' : ''}" data-writing-partial-setting="${escapeHtml(entry.settingId)}" data-baseline-score="" data-full-score="" data-baseline-rank="" data-full-rank="" data-delta=""><div class="setting-row__layout">
+          <button class="setting-row__select" type="button" data-entry-id="${escapeHtml(entry.id)}" aria-pressed="${selected}" aria-label="Inspect ${escapeHtml(entry.label)}. Partial coverage, no category score or rank."><span class="setting-row__identity"><span class="setting-row__rank">—</span><span class="setting-row__model"><strong>${escapeHtml(entry.family)}</strong><span>${escapeHtml(entry.reasoning)}</span><small>Partial coverage · not ranked</small></span></span><span class="setting-row__disclosure">${selected ? 'Selected' : 'Inspect'} ↗</span></button>
+          <span class="setting-row__pair">${profile(entry, entry.id)}${profile(baseline, entry.id)}</span><span class="setting-row__delta" data-writing-partial-uplift><strong>—</strong><span>pts</span></span>
+        </div></li>`;
+      }).join('')}</ol>
+    </section>`;
+  };
+
   const writingCoverageMarkup = () => {
     const missing = rankedCondition(TREATMENT_CONDITION_ID).entries.filter(entry => !Number.isFinite(entry.score));
     if (!missing.length) return '';
@@ -1168,7 +1202,7 @@ function buildWritingCategoryCollection(collection) {
           ${isWriting && !rankedEntries.length ? '<p class="overall-ledger-note">No setting has complete paired coverage of the active benchmarks yet. Available results are under Benchmark tests.</p>' : ''}
         </section>
         ${isOverall ? overallCoverageMarkup() : ''}
-        ${isWriting ? writingSelectionMarkup() + writingCoverageMarkup() : ''}
+        ${isWriting ? writingPartialCoverageMarkup() + writingSelectionMarkup() + writingCoverageMarkup() : ''}
       </section>
     `;
   };

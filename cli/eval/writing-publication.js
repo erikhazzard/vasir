@@ -5,7 +5,9 @@ import path from "node:path";
 import { isBenchmarkAgentRuntimeReceiptCompatible } from "./agent-runtime.js";
 import { createBenchmarkHash } from "./benchmark-source.js";
 import { buildDungeonMasterPublication, DUNGEON_MASTER_BENCHMARK_ID, validateDungeonMasterPublication } from "./dungeon-master-publication.js";
+import { buildStorytellingCreationPublication, prepareStorytellingCreationPublicationSource, STORYTELLING_CREATION_BENCHMARK_ID, validateStorytellingCreationPublication } from "./storytelling-creation-publication.js";
 import { createStorytellingSkillInstruction, isStorytellingRequiredSkillReadReceiptCompatible, validateStorytellingSkillSnapshot } from "./storytelling-agent-runtime.js";
+import { serializeWritingCreationResponseArchive } from "./writing-response-archives.js";
 
 export const WRITING_BENCHMARK_ID = "storytelling-core-idea";
 export const WRITING_SELECTION_PATH = "benchmarks/storytelling-core-idea/publication.json";
@@ -13,7 +15,7 @@ const HASH = /^[a-f0-9]{64}$/;
 const PANEL = ["codex:gpt-6-astra@xhigh", "claude:claude-fable-5-1@max"];
 export const PLOT_TWISTS_BENCHMARK_ID = "storytelling-plot-twists";
 const TWISTS_PANEL = ["codex:gpt-6-astra@xhigh", "codex:gpt-5.6-sol@xhigh"];
-const BENCHMARK_IDS = [WRITING_BENCHMARK_ID, PLOT_TWISTS_BENCHMARK_ID];
+const BENCHMARK_IDS = [WRITING_BENCHMARK_ID, PLOT_TWISTS_BENCHMARK_ID, STORYTELLING_CREATION_BENCHMARK_ID];
 export const writingSelectionPath = benchmarkId => {
   requireEvidence(BENCHMARK_IDS.includes(benchmarkId), "unsupported Writing benchmark.");
   return `benchmarks/${benchmarkId}/publication.json`;
@@ -222,7 +224,7 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
   const isTwists = benchmarkId === PLOT_TWISTS_BENCHMARK_ID;
   const panel = isTwists ? TWISTS_PANEL : PANEL;
   const trialCount = run?.generation?.trialCount;
-  requireEvidence(run?.kind === "benchmark" && BENCHMARK_IDS.includes(benchmarkId) && ["storytelling-core-idea-v1", "storytelling-response-v2"].includes(run.storytelling?.runnerVersion), "unsupported source run.");
+  requireEvidence(run?.kind === "benchmark" && BENCHMARK_IDS.includes(benchmarkId) && benchmarkId !== STORYTELLING_CREATION_BENCHMARK_ID && ["storytelling-core-idea-v1", "storytelling-response-v2"].includes(run.storytelling?.runnerVersion), "unsupported source run.");
   requireEvidence(run.benchmark.hash === createBenchmarkHash(run.benchmark.definition), "frozen benchmark hash changed.");
   validateStorytellingSkillSnapshot(snapshot);
   requireEvidence(snapshot.hash === run.treatment?.hash && run.treatment?.id === "skill:writing-storytelling" && Number.isInteger(trialCount) && trialCount >= 1 && (isTwists || trialCount === 1), "treatment or trial contract changed.");
@@ -443,6 +445,7 @@ export function validateWritingPublication(projection, responseBundle) {
     return projection;
   }
   const benchmarkId = projection?.benchmarks?.[0]?.id;
+  if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return validateStorytellingCreationPublication(projection, responseBundle);
   const panel = benchmarkId === PLOT_TWISTS_BENCHMARK_ID ? TWISTS_PANEL : PANEL;
   const trialCount = projection?.trialCount ?? 1;
   requireEvidence(projection?.kind === "vasirbenchmark-writing-projection" && projection.schemaVersion === 1 && projection.benchmarks?.length === 1 && BENCHMARK_IDS.includes(benchmarkId) && projection.scoreBasis?.dimensions?.length === (benchmarkId === PLOT_TWISTS_BENCHMARK_ID ? 7 : 10) && same(projection.scoreBasis.judges, panel), "invalid public Writing projection.");
@@ -537,6 +540,7 @@ export function validateWritingPublication(projection, responseBundle) {
 }
 
 function buildSelectedWritingPublication({ repoRootDirectory, benchmarkId, readFileSyncImplementation = fs.readFileSync }) {
+  if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return buildStorytellingCreationPublication({ repoRootDirectory, readFileSyncImplementation });
   let selectionText;
   try { selectionText = readFileSyncImplementation(path.join(repoRootDirectory, writingSelectionPath(benchmarkId)), "utf8"); }
   catch (error) { if (error.code === "ENOENT") return null; throw error; }
@@ -557,6 +561,7 @@ function writingCollectionCoverage(projections) {
 function buildStorytellingPublications(options) {
   const selected = BENCHMARK_IDS.map(benchmarkId => buildSelectedWritingPublication({ ...options, benchmarkId })).filter(Boolean);
   if (!selected.length) return null;
+  requireEvidence(selected[0].projection.benchmarks[0].id !== STORYTELLING_CREATION_BENCHMARK_ID, "Creation publication is additive; preserve an existing Writing benchmark as the collection default.");
   if (selected.length === 1 && selected[0].projection.benchmarks[0].id === WRITING_BENCHMARK_ID) return selected[0];
   const primary = selected[0];
   const benchmarkPublications = selected.slice(1).map(item => ({ benchmarkId: item.projection.benchmarks[0].id, projection: item.projection }));
@@ -603,6 +608,7 @@ export function buildWritingPublication(options) {
 
 /** Pin an immutable checkpoint without editing any answer or judgment. */
 export function prepareWritingPublicationSource({ repoRootDirectory, runDirectory, benchmarkId = WRITING_BENCHMARK_ID }) {
+  if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return prepareStorytellingCreationPublicationSource({ repoRootDirectory, runDirectory });
   const root = path.resolve(repoRootDirectory);
   const directory = path.resolve(runDirectory);
   requireEvidence(directory.startsWith(`${path.join(root, ".agents", "vasir-evals", benchmarkId)}${path.sep}`), "checkpoint source is outside the benchmark artifact directory.");
@@ -624,7 +630,8 @@ export function prepareWritingPublicationSource({ repoRootDirectory, runDirector
 }
 
 export function serializeWritingModule(value, globalName) {
-  requireEvidence(["VASIR_WRITING", "VASIR_WRITING_RESPONSES"].includes(globalName), "invalid public module name.");
+  requireEvidence(["VASIR_WRITING", "VASIR_WRITING_RESPONSES", "VASIR_WRITING_CREATION_RESPONSES"].includes(globalName), "invalid public module name.");
+  if (globalName === "VASIR_WRITING_CREATION_RESPONSES") return serializeWritingCreationResponseArchive(value);
   const serialized = JSON.stringify(value).replaceAll("<", "\\u003c").replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
   return `(function () { 'use strict'; window.${globalName} = Object.freeze(${serialized}); }());\n`;
 }

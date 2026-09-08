@@ -1328,7 +1328,7 @@ async function verifyHttpPublication({ artifact, manifest, bucketName, fetchImpl
 }
 
 export function buildStorytellingBrowserProofChecks({ routes, siteRootDirectory, targetUrl, outputDirectory }) {
-  const benchmarkIds = ["storytelling-core-idea", "storytelling-plot-twists", "dungeon-master-adventure-outline"].filter(id => routes.reportFragments.includes(`/benchmark-report.html#${id}`));
+  const benchmarkIds = ["storytelling-core-idea", "storytelling-plot-twists", "storytelling-magic-discovery", "dungeon-master-adventure-outline"].filter(id => routes.reportFragments.includes(`/benchmark-report.html#${id}`));
   return benchmarkIds.flatMap(benchmarkId => [[1440, 1000], [390, 844], [820, 1000]].map(([width, height]) => ({
     benchmarkId, width, height,
     args: [path.join(siteRootDirectory, "writing-browsercheck.mjs"), "--url", `${targetUrl}/`,
@@ -1767,6 +1767,7 @@ export async function publishBenchmarkSite({
   dryRun = false,
   fullAudit = false,
   buildArtifactImplementation = buildBenchmarkPublicationArtifact,
+  convergeInfrastructureImplementation = convergeInfrastructure,
   spawnSyncImplementation = childProcess.spawnSync,
   environmentVariables = process.env,
   platform = process.platform,
@@ -1820,7 +1821,7 @@ export async function publishBenchmarkSite({
       });
     }
 
-    let stack = convergeInfrastructure({ artifact, aws, existingStack: observedStack });
+    let stack = convergeInfrastructureImplementation({ artifact, aws, existingStack: observedStack });
     markAction(actions, "converge-infrastructure");
     onProgress({ id: "converge-infrastructure", stage: "infrastructure", detail: stack.StackStatus });
     bucketName = outputMap(stack).BucketName;

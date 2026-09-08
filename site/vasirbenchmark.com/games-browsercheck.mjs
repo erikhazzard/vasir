@@ -17,7 +17,7 @@ const GAMES_REHEARSAL_SITE_PATHS = Object.freeze([
   'benchmark-report.html', 'benchmark-report.css', 'benchmark-report.js',
   'assets/kanit-latin-900-normal.woff2', 'games.html', 'games.css', 'games.js'
 ]);
-const WRITING_REHEARSAL_SITE_PATHS = Object.freeze(['writing-data.js', 'writing-responses.js']);
+const WRITING_REHEARSAL_SITE_PATHS = Object.freeze(['writing-data.js', 'writing-responses.js', 'writing-creation-responses.js']);
 
 // Read only the Games-scoped subset, but never silently accept missing or unknown site files.
 // Exporting this adapter allows its fail-closed manifest rules to be tested without Chrome.
@@ -34,7 +34,7 @@ export function loadGamesRehearsalSiteFiles({ siteFiles, releaseId: declaredRele
   }
   for (const key of GAMES_REHEARSAL_SITE_PATHS) assert.ok(entries.has(key), `Missing required Games site file: ${key}`);
   const ignoredSiteFiles = WRITING_REHEARSAL_SITE_PATHS.filter(key => entries.has(key));
-  assert.ok(ignoredSiteFiles.length === 0 || ignoredSiteFiles.length === WRITING_REHEARSAL_SITE_PATHS.length, 'Include either both Writing bundles or neither in the site manifest.');
+  assert.ok(ignoredSiteFiles.length === 0 || entries.has('writing-data.js') && entries.has('writing-responses.js'), 'Include either both Writing bundles or neither in the site manifest; the creation archive is an optional extension.');
 
   const scopedFiles = GAMES_REHEARSAL_SITE_PATHS.map(key => {
     const file = entries.get(key);

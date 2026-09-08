@@ -5797,6 +5797,21 @@ body {
   filter: grayscale(0.7);
 }
 
+.writing-partial__heading {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--sdk-line);
+  border-bottom: 1px solid var(--sdk-line);
+  background: var(--sdk-canvas);
+}
+.writing-partial__heading h4 { margin: 0 0 0.4rem; font-size: 0.9375rem; }
+.writing-partial__heading p { max-width: 100ch; margin: 0; color: var(--sdk-ink-soft); font-size: 0.8125rem; line-height: 1.6; }
+.writing-partial__slot { position: relative; background: var(--sdk-canvas); }
+.writing-partial__fill { position: absolute; inset: 0 auto 0 0; background: var(--partial-color); pointer-events: none; }
+.writing-partial__slot--unavailable { background: repeating-linear-gradient(135deg, var(--sdk-canvas), var(--sdk-canvas) 5px, var(--sdk-line) 5px, var(--sdk-line) 7px); }
+.writing-partial__slot-label { position: relative; display: grid; gap: 0.1rem; padding: 0.15rem 0.25rem; background: rgb(255 255 255 / 88%); color: var(--sdk-ink); font-size: 0.5625rem; line-height: 1.1; white-space: normal; }
+.writing-partial__slot-label strong { font: inherit; font-weight: 750; }
+.writing-partial__slot-label small { font: inherit; font-size: 0.5rem; }
+
 .writing-index-gaps {
   padding: 1.25rem;
   border-top: 1px solid var(--sdk-line);
@@ -6576,6 +6591,7 @@ body {
 
 .writing-selection a {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
@@ -6590,9 +6606,18 @@ body {
 }
 
 .writing-selection a > span {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   font-family: var(--font-data);
   color: var(--sdk-blue-ink);
+}
+
+.writing-selection a > strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 67.5rem) {

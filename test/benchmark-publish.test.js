@@ -130,7 +130,7 @@ function createPublicationRepoCopy(prefix) {
   // This historical fixture omits Writing sources, so its navigation must reflect that selection.
   const gamesHtmlPath = path.join(copiedSiteRoot, "games.html");
   fs.writeFileSync(gamesHtmlPath, fs.readFileSync(gamesHtmlPath, "utf8").replace(
-    '<a class="game-capabilities__link" href="./index.html#capabilities/writing/storytelling">Writing</a>',
+    '<a class="game-capabilities__link" href="./index.html#capabilities/writing">Writing</a>',
     '<span class="game-capabilities__unavailable">Writing <small>Coming soon</small></span>'
   ), "utf8");
   createBenchmarkFixtureRoot(temporaryRoot);
@@ -143,7 +143,7 @@ function createPublicationRepoCopy(prefix) {
   const lockPath = path.join(copiedSiteRoot, "template-lock.json");
   const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
   const acceptedPaths = [
-    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js"].includes(filePath)),
+    ...config.publicFiles.map((file) => file.path).filter((filePath) => !["data.js", "responses.js", "writing-data.js", "writing-responses.js", "writing-creation-responses.js"].includes(filePath)),
     "capture.mjs",
     "capture.sh",
     "games-browsercheck.mjs",
@@ -199,7 +199,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
   try {
     assert.match(first.releaseId, /^[a-f0-9]{64}$/);
     assert.equal(first.releaseId, second.releaseId);
-    assert.equal(first.fileCount, 15);
+    assert.equal(first.fileCount, 16);
     assert.deepEqual(first.sourceManifest, second.sourceManifest);
     assert.deepEqual(first.publicManifest, second.publicManifest);
     assert.deepEqual(first.routes.entrypoints, ["/", "/index.html", "/benchmark-report.html"]);
@@ -237,7 +237,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     assert.ok(first.compressedLandingBytes <= first.config.limits.maxCompressedLandingBytes);
     assert.equal(first.config.limits.maxFileBytes, 2 * 1024 * 1024);
     assert.equal(first.config.limits.maxResponseFileBytes, 8 * 1024 * 1024);
-    assert.equal(first.config.limits.maxArtifactBytes, 16 * 1024 * 1024);
+    assert.equal(first.config.limits.maxArtifactBytes, 24 * 1024 * 1024);
     const landingDependencyPaths = new Set([
       "index.html",
       "style.css",
@@ -387,7 +387,7 @@ test("benchmark deployment config cannot substitute accepted QA files into the p
       () => readBenchmarkDeploymentConfig({ repoRootDirectory: temporaryRoot }),
       (error) => {
         assert.equal(error.code, "BENCHMARK_PUBLISH_CONFIG_INVALID");
-        assert.match(error.message, /canonical fifteen-file publication contract/);
+        assert.match(error.message, /canonical sixteen-file publication contract/);
         return true;
       }
     );
