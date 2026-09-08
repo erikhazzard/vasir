@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAtApproximate": "2026-09-08T18:40:00Z",
+  "source": "Current default Claude Code v2.1.263 interactive /usage panel, safe mode, no model prompt or generation. Initial cached panel showed 105%; refreshed session display showed 100%. Recorded manually from terminal output.",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "plan": "Claude Max",
+  "sessionUsedPercent": 100,
+  "sessionResetLabel": "4:40pm (America/New_York)",
+  "sessionResetInterpretedUTC": "2026-09-08T20:40:00Z",
+  "weekAllModelsUsedPercent": 30,
+  "weekFableUsedPercent": 55,
+  "diagnosticModelCalls": 0,
+  "decision": "Keep Claude benchmark dispatch paused. Reset time is a hint; confirm current capacity before resuming. No account switching, purchase, reset-credit consumption, or attempt to bypass the limit."
+}

@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import { fileURLToPath } from 'node:url';
+import { acceptedWritingRankingFixture } from './fixtures/writing-ranking-accepted-20260908.js';
+import { buildWritingPublication } from '../cli/eval/writing-publication.js';
+import { deriveExpectedWritingCategory, verifyCandidateCategoryProjection } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 
 const app = fs.readFileSync(new URL('../site/vasirbenchmark.com/app.js', import.meta.url), 'utf8');
 const boundary = app.indexOf('(async function () {');
@@ -20,13 +24,24 @@ const freeze = object => {
 };
 const globals = { window: {} };
 vm.runInNewContext(fs.readFileSync(new URL('../site/vasirbenchmark.com/writing-data.js', import.meta.url), 'utf8'), globals);
-const published = freeze(globals.window.VASIR_WRITING);
+const currentPublished = freeze(globals.window.VASIR_WRITING);
+const published = freeze(acceptedWritingRankingFixture());
 const publications = [published, ...published.benchmarkPublications.map(item => item.projection), ...Object.values(published.additionalBenchmarks)];
 const sourceById = Object.fromEntries(publications.map(source => [source.benchmarks[0].id, source]));
 const storyIds = ['storytelling-core-idea', 'storytelling-plot-twists', 'storytelling-magic-discovery'];
 const selectedEntries = source => source.entries.some(entry => Number.isFinite(entry.exactScore)) ? source.entries : source.provisionalLeaderboard.entries;
 const sourceEntry = (source, identity, condition) => selectedEntries(source).find(entry => entry.configurationId === identity && entry.condition === condition);
 const entryFor = (result, identity, condition = 'skill') => result.entries.find(entry => entry.configurationId === identity && entry.condition === condition);
+
+test('current publication matches its immutable selected sources and independently verified ranks for every score choice', () => {
+  const selected = buildWritingPublication({ repoRootDirectory: fileURLToPath(new URL('../', import.meta.url)) }).projection;
+  assert.deepEqual(plain(currentPublished), plain(selected), 'Generated publication differs from the immutable source selections.');
+  const expected = deriveExpectedWritingCategory(currentPublished);
+  assert.equal(expected.settingIds.length, 33);
+  for (const selection of expected.selectionIds) {
+    verifyCandidateCategoryProjection(build(currentPublished, selection), deriveExpectedWritingCategory(currentPublished, selection));
+  }
+});
 
 function publication(id, group, configurations) {
   const settings = Object.keys(configurations).map(configurationId => ({ id: configurationId, configurationId, family: configurationId, label: configurationId, provider: 'test', reasoning: 'fixed' }));
@@ -55,7 +70,7 @@ function addProvisional(source, configurations) {
   return source;
 }
 
-test('default Storytelling ranks four common-test settings and retains all 33 available means', () => {
+test('accepted regression checkpoint ranks four common-test settings and retains all 33 available means', () => {
   const before = JSON.stringify(published);
   const result = build(published);
   assert.equal(JSON.stringify(published), before);
@@ -149,7 +164,7 @@ test('default Storytelling ranks four common-test settings and retains all 33 av
   assert.equal(entryFor(result, 'claude:claude-opus-5@max').rank, null);
 });
 
-test('five score choices expose Core 31, recovered Twists 4, Magic 33 and Dungeon Master 1 without altering source totals', () => {
+test('accepted regression score choices retain Core 31, Twists 4, Magic 33 and Dungeon Master 1 without altering source totals', () => {
   const result = build(published);
   assert.deepEqual(result.writingCategory.selections.map(selection => [selection.id, selection.completedSettingCount]), [
     ['storytelling', 4], [storyIds[0], 31], [storyIds[1], 4], [storyIds[2], 33], ['dungeon-master', 1]
