@@ -115,7 +115,23 @@ The fast release uses the same 73-file snapshot mechanism with manifest SHA-256
 only the publisher and its two CLI entry modules differ from the prior reviewed
 snapshot. Candidate website bytes and selected results are unchanged.
 
-Guarded deployment verification is recorded below when completed. Local browser
-proof alone is not a live-release claim. Missing Fable capacity continues to
-block final benchmark completion, not this explicitly approved in-progress
-publication.
+## Published
+
+Fast publisher commit `96e4223` was pushed and used successfully on 2026-09-08
+at approximately 01:21 UTC. Staging completed in under one minute; the entire
+run took approximately two and a half minutes including AWS/CloudFront
+propagation. The active release is `5e0ec92e…fffefe1e` above. All 15 site files
+and one retained game HTML isolation probe passed live byte verification;
+526 unchanged assets were reused. Origin privacy passed and the publication
+lease was released. No live browser suite was requested or claimed.
+
+A separate HTTPS read confirmed the new HTML release pointer and source-derived
+Writing coverage: 790/792 answers, 904/1,584 reviews, 116 fully reviewed answers
+and zero complete configuration rankings. The live route is
+`https://vasirbenchmark.com/#capabilities/writing/storytelling`.
+
+All concurrent website edits were restored and byte-verified. Only the accepted
+lock and 60 capture files were carried forward into that restored worktree;
+the publication source snapshot remains retained privately. Missing Fable
+capacity continues to block final benchmark completion, not this explicitly
+approved and now live in-progress publication.

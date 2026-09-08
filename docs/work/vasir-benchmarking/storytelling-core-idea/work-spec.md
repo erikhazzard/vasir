@@ -85,8 +85,10 @@ Actual byte counts must pass the publication validator before deployment.
 - Renew the source/capture acceptance lock only after reviewed captures for the
   exact selected release. In-progress presentation acceptance must be explicitly
   distinguished from final scored-benchmark acceptance.
-- Guarded dry-run, AWS identity check, immutable release publication, live byte
-  verification and browser proof precede any completion claim.
+- Guarded dry-run, AWS identity check, immutable release publication and live
+  byte verification precede any live-release claim. Under the user's subsequent
+  fast-publishing instruction, exhaustive live browser/asset audits are opt-in
+  with `--full-audit`; earlier local presentation proofs remain recorded.
 - Coordinate final publication with the concurrent Games benchmark task; its
   active changes must not be discarded or unintentionally deployed mid-update.
 
