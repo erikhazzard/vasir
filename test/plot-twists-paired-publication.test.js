@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { completePairedFixture, createPairedFixture, mockPairedProvider, pairedAssessment, codexPairedOutput, claudePairedOutput } from './helpers/plot-twists-paired-fixture.js';
+import { completePairedFixture, createPairedFixture, createSupplementalPairedFixture, mockPairedProvider, pairedAssessment, codexPairedOutput, claudePairedOutput } from './helpers/plot-twists-paired-fixture.js';
 import { applyPairedRuntimeValidationErratum, exportPairedRun, runPairedGenerations, runPairedJudgments } from '../cli/eval/plot-twists-paired-runtime.js';
 import { projectPlotTwistsPairedRun, validatePlotTwistsPairedPublication, preparePlotTwistsPairedPublicationSource,
   buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, WRITING_PAIRED_SCORE_BASIS } from '../cli/eval/plot-twists-paired-publication.js';
@@ -187,7 +187,7 @@ test('unattempted and partially reviewed evidence cannot be selected as the comp
   const pending = project(exportPairedRun({ runDirectoryPath }));
   assert.equal(pending.projection.coverage.completedSettingCount, 0);
   assert.ok(pending.projection.entries.every(item => item.exactScore === null && item.rank === null));
-  assert.throws(() => preparePlotTwistsPairedPublicationSource({ repoRootDirectory: path.dirname(runDirectoryPath), runDirectory: runDirectoryPath }), /all six declared pairs/);
+  assert.throws(() => preparePlotTwistsPairedPublicationSource({ repoRootDirectory: path.dirname(runDirectoryPath), runDirectory: runDirectoryPath }), /all declared pairs/);
   await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider() });
   await runPairedJudgments({ runDirectoryPath, limit: 1, spawnImplementation: mockPairedProvider() });
   const partial = project(exportPairedRun({ runDirectoryPath }));
@@ -196,7 +196,7 @@ test('unattempted and partially reviewed evidence cannot be selected as the comp
   assert.equal(partial.projection.coverage.scoredResponseCount, 0);
   assert.equal(partial.projection.coverage.executionComplete, false);
   assert.equal(validatePlotTwistsPairedPublication(partial.projection), partial.projection);
-  assert.throws(() => preparePlotTwistsPairedPublicationSource({ repoRootDirectory: path.dirname(runDirectoryPath), runDirectory: runDirectoryPath }), /all six declared pairs/);
+  assert.throws(() => preparePlotTwistsPairedPublicationSource({ repoRootDirectory: path.dirname(runDirectoryPath), runDirectory: runDirectoryPath }), /all declared pairs/);
 });
 
 test('explicit validation erratum is disclosed without exposing raw original records or inventing replacement calls', async t => {
@@ -237,4 +237,137 @@ test('explicit validation erratum is disclosed without exposing raw original rec
     value => { value.generations[0].validationCorrection.originalRecord.responseText = 'Changed original'; }]) {
     const changed = structuredClone(snapshot); mutate(changed); assert.throws(() => project(changed));
   }
+});
+
+test('same-edition reasoning extension retains the original six pairs and appends only eight declared settings', async t => {
+  const fixture = await createSupplementalPairedFixture(t), { runDirectoryPath, parentSnapshot, parentSnapshotPath } = fixture;
+  const parentBytes = fs.readFileSync(parentSnapshotPath), parentBefore = JSON.stringify(parentSnapshot);
+  const parent = projectPlotTwistsPairedRun({ snapshot: parentSnapshot, sourceSha256: hash(parentBytes) });
+  const pending = project(exportPairedRun({ runDirectoryPath }));
+  const expectedIds = [...parentSnapshot.manifest.configurations.map(item => item.id),
+    'codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
+    'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max',
+    'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
+  assert.deepEqual(pending.projection.settings.map(item => item.configurationId), expectedIds);
+  assert.equal(pending.projection.coverage.completedSettingCount, 6);
+  assert.equal(pending.projection.coverage.expectedPairs, 14);
+  assert.equal(pending.projection.coverage.executionComplete, false);
+  assert.equal(pending.projection.coverage.scoredResponseCount, 12);
+  assert.equal(validatePlotTwistsPairedPublication(pending.projection), pending.projection);
+  assert.throws(() => preparePlotTwistsPairedPublicationSource({ repoRootDirectory: path.dirname(runDirectoryPath), runDirectory: runDirectoryPath }), /all declared pairs/);
+
+  const manifest = JSON.parse(fs.readFileSync(path.join(runDirectoryPath, 'manifest.json'), 'utf8')), calls = [];
+  await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  const addedPlans = manifest.judgmentPlan.filter(plan => !parentSnapshot.judgments.some(row => row.id === plan.id));
+  const rubricIds = manifest.specification.benchmark.rubric.map(item => item.id);
+  await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls, answer: (_call, index) => {
+    const plan = addedPlans[index - 16], result = pairedAssessment(rubricIds);
+    for (const label of ['A', 'B']) for (const rating of result[`assessment${label}`].ratings)
+      rating.score = plan.candidateMap[label] === 'skill' ? 1 : 4;
+    return codexPairedOutput(JSON.stringify(result));
+  } }) });
+  assert.equal(calls.length, 32, 'Only sixteen appended generations and sixteen paired reviews are dispatched.');
+  const snapshot = exportPairedRun({ runDirectoryPath }), before = JSON.stringify(snapshot);
+  const { projection, responseBundle } = project(snapshot);
+
+  await t.test('one fourteen-setting edition declares all 28 answers, 28 paired reviews and 56 assessments', () => {
+    assert.equal(projection.scoreBasis.edition, PLOT_TWISTS_PAIRED_EDITION);
+    assert.equal(projection.benchmarks.length, 1);
+    assert.deepEqual(projection.settings.map(item => item.configurationId), expectedIds);
+    for (const [key, value] of Object.entries({ settingCount: 14, expectedPairs: 14, usablePairs: 14, completedSettingCount: 14,
+      responseCount: 28, expectedResponseCount: 28, scoredResponseCount: 28, judgmentCount: 56, expectedJudgmentCount: 56,
+      pairedJudgeCallCount: 28, expectedPairedJudgeCallCount: 28, executionComplete: true })) assert.equal(projection.coverage[key], value, key);
+    assert.equal(projection.regressions.length, 8);
+    assert.equal(projection.benchmarkSummaries[0].losses, 8);
+    assert.equal(projection.benchmarkSummaries[0].ties, 6);
+    assert.ok(projection.settings.slice(6).every(setting => setting.deltas.skill === -60));
+    assert.match(projection.methodology.limitations.join(' '), /56 planned top-level benchmark CLI calls comprise 28 creator calls and 28 paired reviewer calls/);
+    assert.match(projection.methodology.execution.coverageExtensionPurpose, /not prespecified before the original cohort outcomes/);
+    assert.equal(projection.methodology.execution.validationErratumCohort, 'original six-setting cohort');
+    assert.equal(projection.methodology.execution.additionalCreatorCalls, 16);
+    assert.equal(projection.methodology.execution.additionalPairedReviewerCalls, 16);
+    assert.ok(Object.values(projection.methodology.execution).every(value => value === null || typeof value !== 'object'));
+    assert.doesNotMatch(projection.benchmarks[0].description, /six GPT|at medium effort/);
+  });
+  await t.test('every inherited answer and review stays exact while parent and supplement provenance remain distinct', () => {
+    assert.deepEqual(snapshot.parentSnapshot, parentSnapshot);
+    for (const kind of ['generations', 'judgments']) for (const original of parentSnapshot[kind])
+      assert.deepEqual(snapshot[kind].find(row => row.id === original.id), original);
+    const extension = projection.methodology.sourceContract.coverageExtension;
+    assert.equal(extension.parentSnapshotSha256, hash(parentBytes));
+    assert.equal(extension.parentManifestSha256, parentSnapshot.manifestSha256);
+    for (const original of parent.responseBundle.responses) {
+      const response = responseBundle.responses.find(row => row.provenance.generationId === original.provenance.generationId);
+      for (const key of ['outputText', 'score', 'judgments', 'messageSetId', 'wordCount', 'runtime']) assert.deepEqual(response[key], original[key]);
+      assert.equal(response.provenance.outputSha256, original.provenance.outputSha256);
+      assert.equal(response.provenance.exactMessagesSha256, original.provenance.exactMessagesSha256);
+      assert.equal(response.provenance.sourceCohort, 'original');
+      assert.equal(response.provenance.sourceSnapshotSha256, hash(parentBytes));
+      assert.equal(response.provenance.sourceManifestSha256, parentSnapshot.manifestSha256);
+    }
+    for (const original of parent.responseBundle.judgeRequests) {
+      const request = responseBundle.judgeRequests.find(row => row.id === original.id);
+      const { provenance, ...retained } = request;
+      assert.deepEqual(retained, original);
+      assert.deepEqual(provenance, { sourceCohort: 'original', sourceSnapshotSha256: hash(parentBytes), sourceManifestSha256: parentSnapshot.manifestSha256 });
+    }
+    assert.equal(responseBundle.responses.filter(row => row.provenance.sourceCohort === 'supplement').length, 16);
+    for (const row of [...responseBundle.responses, ...responseBundle.judgeRequests].filter(row => row.provenance.sourceCohort === 'supplement')) {
+      assert.equal(row.provenance.sourceSnapshotSha256, projection.scoreBasis.sourceSha256);
+      assert.equal(row.provenance.sourceManifestSha256, snapshot.manifestSha256);
+    }
+    assert.equal(projection.methodology.sourceContract.runtimeValidationErratum.sha256, parentSnapshot.runtimeValidationErratumSha256);
+    assert.equal(projection.methodology.sourceContract.executionValidationPolicy.sha256, snapshot.manifest.executionValidationPolicySha256);
+    assert.deepEqual(fs.readFileSync(parentSnapshotPath), parentBytes);
+    assert.equal(JSON.stringify(parentSnapshot), parentBefore);
+    assert.equal(JSON.stringify(snapshot), before);
+  });
+  await t.test('extension validation rejects missing originals, changed cohorts and forged lineage, including VM-decoded modules', () => {
+    const sandbox = { window: {} };
+    vm.runInNewContext(`window.projection = ${JSON.stringify(projection)}; window.responses = ${JSON.stringify(responseBundle)};`, sandbox);
+    assert.equal(validatePlotTwistsPairedPublication(sandbox.window.projection, sandbox.window.responses), sandbox.window.projection);
+    assert.equal(validatePlotTwistsPairedPublication(sandbox.window.projection), sandbox.window.projection);
+    for (const mutate of [
+      value => { value.generations.shift(); },
+      value => { value.generations[0].responseText += ' replaced'; },
+      value => { value.parentSnapshot.generations[0].responseText += ' replaced'; },
+      value => { value.coverageExtension.parentSnapshotSha256 = 'a'.repeat(64); }
+    ]) { const changed = structuredClone(snapshot); mutate(changed); assert.throws(() => project(changed)); }
+    for (const mutate of [
+      value => { value.responseBundle.responses[0].provenance.sourceCohort = 'supplement'; },
+      value => { value.responseBundle.responses[12].provenance.sourceManifestSha256 = parentSnapshot.manifestSha256; },
+      value => { value.responseBundle.judgeRequests[0].provenance.sourceSnapshotSha256 = 'a'.repeat(64); },
+      value => { value.projection.methodology.sourceContract.coverageExtension.addedConfigurations.pop(); },
+      value => { value.projection.coverage.expectedResponseCount = 12; }
+    ]) { const changed = structuredClone({ projection, responseBundle }); mutate(changed); assert.throws(() => validatePlotTwistsPairedPublication(changed.projection, changed.responseBundle)); }
+    const selection = preparePlotTwistsPairedPublicationSource({ repoRootDirectory: path.dirname(runDirectoryPath), runDirectory: runDirectoryPath });
+    assert.equal(buildPlotTwistsPairedPublication({ repoRootDirectory: path.dirname(runDirectoryPath), selection }).projection.coverage.completedSettingCount, 14);
+  });
+  await t.test('the complete appended source occupies the same single slot in the active three-benchmark catalog', () => {
+    const root = path.dirname(runDirectoryPath), selectionPath = 'benchmarks/storytelling-plot-twists/publication.json';
+    const originalSelection = fs.readFileSync(path.join(repo, selectionPath));
+    const selection = preparePlotTwistsPairedPublicationSource({ repoRootDirectory: root, runDirectory: runDirectoryPath });
+    const reader = (filename, encoding) => {
+      const relative = path.relative(repo, filename);
+      if (relative === selectionPath) return JSON.stringify(selection);
+      if (relative === selection.snapshot.path) return fs.readFileSync(path.join(root, relative), encoding);
+      return fs.readFileSync(filename, encoding);
+    };
+    const current = buildWritingPublication({ repoRootDirectory: repo });
+    const appended = buildWritingPublication({ repoRootDirectory: repo, readFileSyncImplementation: reader });
+    assert.deepEqual(appended.projection.writingScoreBasis, WRITING_PAIRED_SCORE_BASIS);
+    assert.deepEqual(appended.stub.benchmarkIds, WRITING_PAIRED_SCORE_BASIS.benchmarkIds);
+    assert.equal(appended.stub.catalog.length, 3);
+    assert.equal(appended.projection.benchmarkPublications.filter(item => item.benchmarkId === 'storytelling-plot-twists').length, 1);
+    assert.equal(appended.projection.benchmarkPublications.find(item => item.benchmarkId === 'storytelling-plot-twists').projection.settings.length, 14);
+    assert.deepEqual(appended.projection.provisionalLeaderboard, current.projection.provisionalLeaderboard, 'Core source scores are unchanged.');
+    assert.deepEqual(appended.projection.benchmarkPublications.find(item => item.benchmarkId === 'storytelling-magic-discovery'),
+      current.projection.benchmarkPublications.find(item => item.benchmarkId === 'storytelling-magic-discovery'), 'Magic source scores are unchanged.');
+    assert.equal(validateWritingPublication(appended.projection, appended.responseBundle), appended.projection);
+    assert.equal(validateWritingSummary(appended.stub), appended.stub);
+    const overallSource = buildOverallWritingSource(appended.projection);
+    assert.equal(overallSource.benchmarkResults.filter(item => item.benchmarkId === 'storytelling-plot-twists').length, 28);
+    assert.equal(overallSource.benchmarkDisplays['storytelling-plot-twists'].settingCount, 14);
+    assert.deepEqual(fs.readFileSync(path.join(repo, selectionPath)), originalSelection);
+  });
 });

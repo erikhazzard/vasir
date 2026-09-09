@@ -7,17 +7,19 @@ import { preparePairedRun, exportPairedRun, runPairedGenerations, runPairedJudgm
 export async function main(args = process.argv.slice(2)) {
   const [command, ...rest] = args;
   assert.ok(['prepare', 'status', 'export', 'generate', 'judge', 'apply-runtime-erratum'].includes(command),
-    'Usage: run.mjs <prepare|status|export|generate|judge|apply-runtime-erratum> --run-dir PATH [--limit N] [--concurrency 1|2] [--output FILE]');
+    'Usage: run.mjs <prepare|status|export|generate|judge|apply-runtime-erratum> --run-dir PATH [--parent-snapshot FILE] [--limit N] [--concurrency 1|2] [--output FILE]');
   const options = {};
   for (let index = 0; index < rest.length; index += 2) {
     const key = rest[index], value = rest[index + 1];
-    assert.ok(['--run-dir', '--limit', '--concurrency', '--output'].includes(key) && value && !value.startsWith('--'), 'Unknown option or missing value.');
+    assert.ok(['--run-dir', '--parent-snapshot', '--limit', '--concurrency', '--output'].includes(key) && value && !value.startsWith('--'), 'Unknown option or missing value.');
     assert.ok(!Object.hasOwn(options, key), 'Duplicate option.'); options[key] = value;
   }
   assert.ok(options['--run-dir'], '--run-dir is required.');
   const runDirectoryPath = path.resolve(options['--run-dir']);
+  assert.ok(command === 'prepare' || !options['--parent-snapshot'], 'Parent snapshot is a preparation-only option.');
   if (command === 'apply-runtime-erratum') { assert.equal(Object.keys(options).length, 1); return applyPairedRuntimeValidationErratum({ runDirectoryPath }); }
-  if (command === 'prepare') { assert.equal(Object.keys(options).length, 1); return preparePairedRun({ runDirectoryPath }); }
+  if (command === 'prepare') { assert.equal(Object.keys(options).length, options['--parent-snapshot'] ? 2 : 1);
+    return preparePairedRun({ runDirectoryPath, parentSnapshotPath: options['--parent-snapshot'] ? path.resolve(options['--parent-snapshot']) : null }); }
   if (['status', 'export'].includes(command)) {
     assert.ok(!options['--limit'] && !options['--concurrency'], 'Read-only commands cannot dispatch.');
     const snapshot = exportPairedRun({ runDirectoryPath });
@@ -40,6 +42,7 @@ export async function main(args = process.argv.slice(2)) {
 function summarize(snapshot) {
   return { runId: snapshot.runId, manifestSha256: snapshot.manifestSha256, globalStop: snapshot.globalStop,
     runtimeValidationErratumSha256: snapshot.runtimeValidationErratumSha256 || null,
+    ...(snapshot.coverageExtension ? { coverageExtension: snapshot.coverageExtension } : {}),
     ...Object.fromEntries(['generations', 'judgments'].map(kind => [kind, snapshot[kind].reduce((counts, row) => {
       counts[row.status] = (counts[row.status] || 0) + 1; return counts;
     }, {})])) };

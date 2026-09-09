@@ -60,6 +60,26 @@ export function verifyCoreJudgeOnlyRecovery(before, after) {
   verifyPreservedWritingEvidence(before, after, { allRows: true });
 }
 
+export function verifyPairedTwistsCoverageAppend(before, after, parentSnapshotSha256) {
+  const extension = after.coverageExtension;
+  assert.equal(extension?.version, 'paired-reasoning-coverage-extension-v1', 'A changed paired snapshot requires the declared coverage append.');
+  assert.ok(!before.coverageExtension && !before.parentSnapshot, 'Only the original paired cohort can be extended.');
+  assert.equal(extension.parentSnapshotSha256, parentSnapshotSha256, 'Coverage append must retain the accepted paired source.');
+  assert.equal(extension.parentManifestSha256, before.manifestSha256, 'Coverage append changed the accepted parent manifest.');
+  assert.deepEqual(after.parentSnapshot, before, 'Coverage append rewrote the accepted parent snapshot.');
+  assert.equal(digest(JSON.stringify(after.parentSnapshot, null, 2) + '\n'), parentSnapshotSha256, 'Coverage append parent bytes changed.');
+  assert.deepEqual(after.manifest.coverageExtension, extension, 'Coverage append declaration differs from its frozen manifest.');
+  assert.deepEqual(after.manifest.frozenBundle, before.manifest.frozenBundle, 'Coverage append changed the original treatment.');
+  for (const kind of ['generations', 'judgments']) {
+    const current = new Map(after[kind].map(row => [row.id, row]));
+    assert.equal(current.size, after[kind].length, 'Coverage append has duplicate ' + kind + ' identities.');
+    for (const row of before[kind]) assert.deepEqual(current.get(row.id), row, 'Coverage append changed an original ' + kind + ' record.');
+    const added = after[kind].filter(row => !before[kind].some(original => original.id === row.id));
+    assert.equal(added.length, kind === 'generations' ? extension.additionalGenerationCount : extension.additionalJudgeRequestCount);
+    assert.ok(added.every(row => extension.addedConfigurations.includes(row.configurationId)), 'Coverage append reran an original setting.');
+  }
+}
+
 export function verifyWritingSourceSelections({ repo, previousSelections }) {
   const contained = relative => {
     assert.ok(typeof relative === 'string' && relative && !path.isAbsolute(relative) && !relative.includes('\\') && relative.split('/').every(part => part && part !== '.' && part !== '..'), 'Unsafe source path.');
@@ -93,9 +113,22 @@ export function verifyWritingSourceSelections({ repo, previousSelections }) {
       assert.equal(selectedSources.length, 1, 'Paired replacement must select one complete immutable snapshot.');
       buildPlotTwistsPairedPublication({ repoRootDirectory: repo, selection: selected });
       if (unchanged) {
-        assert.equal(previous.lineage?.kind, 'declared-writing-source-replacement', 'The paired edition lost its original source history.');
+        assert.ok(['declared-writing-source-replacement', 'declared-writing-coverage-extension'].includes(previous.lineage?.kind), 'The paired edition lost its original source history.');
         record.lineage = structuredClone(previous.lineage);
       } else {
+        const previousSnapshot = previous.sources.find(source => path.basename(source.path) === 'snapshot.json');
+        if (previousSnapshot) {
+          assert.equal(previous.sources.length, 1, 'The accepted paired source must have one immutable snapshot.');
+          assert.equal(previous.lineage?.kind, 'declared-writing-source-replacement', 'Coverage append requires the original paired source history.');
+          const before = pinnedJson(previousSnapshot), after = pinnedJson(selected.snapshot);
+          verifyPairedTwistsCoverageAppend(before, after, previousSnapshot.sha256);
+          record.lineage = { kind: 'declared-writing-coverage-extension', edition: PLOT_TWISTS_PAIRED_EDITION,
+            parentSourceSha256: previousSnapshot.sha256, coverageExtension: structuredClone(after.coverageExtension),
+            previousSelection: { path: previous.path, bytes: previous.bytes, sha256: previous.sha256 },
+            previousSources: previous.sources, previousLineage: previous.lineage,
+            originalEvidencePreserved: true, answersAndCompletedReviewsPreserved: true, originalSettingsRerun: false };
+          return record;
+        }
         assert.ok(previous.sources.some(source => path.basename(source.path) === 'run.json'), 'An accepted paired measurement cannot be silently rerun or replaced within its edition.');
         record.lineage = { kind: 'declared-writing-source-replacement', edition: PLOT_TWISTS_PAIRED_EDITION,
           previousSelection: { path: previous.path, bytes: previous.bytes, sha256: previous.sha256 },

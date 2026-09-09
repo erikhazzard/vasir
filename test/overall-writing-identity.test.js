@@ -13,6 +13,12 @@ const engineering = JSON.parse(JSON.stringify(globals.window.VASIR_DATA));
 const writing = JSON.parse(JSON.stringify(globals.window.VASIR_WRITING));
 const efforts = ['low', 'medium', 'high', 'xhigh', 'max'];
 const policy = 'registered-claude-opus-5-alias-v1';
+const twistsPublication = writing.benchmarkPublications.find(item => item.benchmarkId === 'storytelling-plot-twists').projection;
+const writingPublications = [writing, ...writing.benchmarkPublications.map(item => item.projection)]
+  .filter(publication => writing.writingScoreBasis.benchmarkIds.includes(publication.benchmarks[0].id));
+const measuredOpusEfforts = efforts.filter(effort => writingPublications.every(publication =>
+  ['baseline', 'skill'].every(condition => (publication.provisionalLeaderboard || publication).entries.some(entry =>
+    entry.configurationId === `claude:claude-opus-5@${effort}` && entry.condition === condition && Number.isFinite(entry.exactScore)))));
 const sourceWithoutCanonicalOpus = () => {
   const result = structuredClone(engineering);
   result.settings = result.settings.filter(setting => setting.modelId !== 'claude:opus');
@@ -55,8 +61,9 @@ test('Overall aliases only proven same-effort Opus identities and preserves ever
     for (const field of ['id', 'configurationId', 'modelId', 'provider', 'family', 'reasoning', 'label']) assert.equal(setting[field], target[field]);
     const rows = canonical.benchmarkResults.filter(row => row.configurationId === configurationId);
     assert.equal(rows.length, original.benchmarkResults.filter(row => row.configurationId === sourceConfigurationId).length);
-    assert.equal(rows.filter(row => row.benchmarkId === 'storytelling-plot-twists').length, effort === 'medium' ? 2 : 0,
-      'aliasing must not manufacture the absent non-medium paired-edition slots');
+    assert.equal(rows.filter(row => row.benchmarkId === 'storytelling-plot-twists').length,
+      twistsPublication.entries.filter(entry => entry.configurationId === sourceConfigurationId).length,
+      'aliasing must preserve exactly the declared same-effort paired-edition slots');
     for (const row of rows) {
       const old = original.benchmarkResults.find(item => item.configurationId === sourceConfigurationId && item.benchmarkId === row.benchmarkId && item.condition === row.condition);
       assert.equal(row.sourceConfigurationId, old.configurationId);
@@ -111,17 +118,17 @@ test('each aliased benchmark cell retains that original report setting, not anot
   for (const row of rows) { assert.equal(row.sourceSettingId, source.id); assert.equal(row.sourceConfigurationId, configurationId); }
 });
 
-test('the five proven Opus aliases rank only the measured medium pair and cannot invent missing Claude evidence', () => {
+test('the five proven Opus aliases rank only complete original pairs and cannot invent missing Claude evidence', () => {
   const result = buildOverallPublication({ engineering, aiWorkflows: engineering.aiWorkflows, writing });
   const originalUnion = new Set([...engineering.settings, ...engineering.aiWorkflows.settings, ...writing.settings].map(setting => setting.configurationId));
   assert.equal(result.coverage.totalSettings, originalUnion.size - efforts.length);
-  assert.deepEqual(result.entries.filter(entry => entry.provider === 'claude').map(entry => [entry.configurationId, entry.condition]),
-    [['claude:opus@medium', 'baseline'], ['claude:opus@medium', 'skill']]);
+  assert.deepEqual(result.entries.filter(entry => entry.modelId === 'claude:opus').map(entry => [entry.configurationId, entry.condition]).sort(),
+    measuredOpusEfforts.flatMap(effort => ['baseline', 'skill'].map(condition => [`claude:opus@${effort}`, condition])).sort());
   for (const effort of efforts) {
     const record = result.coverage.records.find(item => item.configurationId === `claude:opus@${effort}`);
     assert.ok(record);
-    assert.equal(record.eligible, effort === 'medium');
-    if (effort === 'medium') {
+    assert.equal(record.eligible, measuredOpusEfforts.includes(effort));
+    if (measuredOpusEfforts.includes(effort)) {
       for (const condition of ['baseline', 'skill']) {
         assert.ok(Number.isInteger(record.ranks[condition]) && record.ranks[condition] > 0);
         assert.ok(Number.isFinite(record.exactScores[condition]));
@@ -132,7 +139,7 @@ test('the five proven Opus aliases rank only the measured medium pair and cannot
       assert.deepEqual(record.ranks, { baseline: null, skill: null });
       assert.deepEqual(record.exactScores, { baseline: null, skill: null });
       for (const condition of ['baseline', 'skill']) {
-        assert.ok(record.conditions[condition].missingTaskIds.includes('storytelling-plot-twists'));
+        assert.ok(record.conditions[condition].missingTaskIds.length + record.conditions[condition].unassessableTaskIds.length > 0);
         assert.ok(!record.conditions[condition].missingTaskIds.includes('storytelling-magic-discovery'));
       }
     }
@@ -144,7 +151,8 @@ test('the five proven Opus aliases rank only the measured medium pair and cannot
   const twists = incomplete.benchmarkPublications.find(item => item.benchmarkId === 'storytelling-plot-twists').projection;
   twists.entries = twists.entries.filter(entry => !(entry.configurationId === 'claude:claude-opus-5@medium' && entry.condition === 'skill'));
   const withheld = buildOverallPublication({ engineering, aiWorkflows: engineering.aiWorkflows, writing: incomplete });
-  assert.equal(withheld.entries.some(entry => entry.provider === 'claude'), false);
+  assert.equal(withheld.entries.some(entry => entry.configurationId === 'claude:opus@medium'), false);
+  assert.equal(withheld.settings.length, result.settings.length - 1, 'removing one arm must not remove other complete settings');
   const record = withheld.coverage.records.find(item => item.configurationId === 'claude:opus@medium');
   assert.equal(record.eligible, false);
   assert.deepEqual(record.ranks, { baseline: null, skill: null });

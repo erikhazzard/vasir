@@ -30,6 +30,18 @@ const writingConfigurationId = configurationId => configurationId.replace(/^clau
 const canonicalConfigurationId = configurationId => configurationId.replace(/^claude:claude-opus-5@/, 'claude:opus@');
 const writingOriginals = publications(built.writing);
 const writingInputs = built.writing.writingScoreBasis.benchmarkIds.map(id => writingOriginals.get(id));
+const originalScores = (configurationId, condition) => [
+  ...sources.engineering.benchmarks.map(benchmark => sources.engineering.benchmarkResults.find(cell =>
+    cell.benchmarkId === benchmark.id && cell.configurationId === configurationId && cell.condition === condition)?.score),
+  ...sources.aiWorkflows.benchmarks.map(benchmark => sources.aiWorkflows.benchmarkResults.find(cell =>
+    cell.benchmarkId === benchmark.id && cell.configurationId === configurationId && cell.condition === condition)?.exactScore),
+  ...writingInputs.map(publication => (publication.provisionalLeaderboard || publication).entries.find(cell =>
+    cell.configurationId === writingConfigurationId(configurationId) && cell.condition === condition)?.exactScore)
+];
+const originalConfigurationIds = [...new Set([...sources.engineering.settings, ...sources.aiWorkflows.settings,
+  ...writingInputs.flatMap(publication => publication.settings)].map(item => canonicalConfigurationId(item.configurationId)))];
+const completeOriginalIds = originalConfigurationIds.filter(id => ['baseline', 'skill'].every(condition =>
+  originalScores(id, condition).length === 7 && originalScores(id, condition).every(Number.isFinite)));
 
 test('normal publication automatically includes All Writing with fixed category priorities and complete exact pairs', () => {
   assert.equal(overall.scoreBasis.edition, 'overall-v3');
@@ -45,12 +57,10 @@ test('normal publication automatically includes All Writing with fixed category 
     ...writingInputs.flatMap(publication => publication.settings)].map(item => canonicalConfigurationId(item.configurationId))).size;
   const observedResponseCount = sources.engineering.benchmarkResults.length + sources.aiWorkflows.benchmarkResults.length
     + writingInputs.reduce((sum, publication) => sum + publication.settings.length * 2, 0);
-  assert.deepEqual({ ...overall.coverage, records: undefined }, { totalSettings, eligibleSettings: 4, incompleteSettings: totalSettings - 4,
-    observedResponseCount, expectedResponseCount: totalSettings * 7 * 2, eligibleResponseCount: 4 * 7 * 2, records: undefined });
-  assert.deepEqual(overall.settings.map(item => item.configurationId).sort(), [
-    'claude:opus@medium', 'codex:gpt-5.6-luna@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium'
-  ]);
-  assert.equal(overall.entries.filter(entry => entry.condition === 'skill' && entry.rank === 1)[0].configurationId, 'codex:gpt-5.6-sol@medium');
+  assert.deepEqual({ ...overall.coverage, records: undefined }, { totalSettings, eligibleSettings: completeOriginalIds.length, incompleteSettings: totalSettings - completeOriginalIds.length,
+    observedResponseCount, expectedResponseCount: totalSettings * 7 * 2, eligibleResponseCount: completeOriginalIds.length * 7 * 2, records: undefined });
+  assert.deepEqual(overall.settings.map(item => item.configurationId).sort(), [...completeOriginalIds].sort());
+  assert.ok(completeOriginalIds.includes('codex:gpt-5.6-sol@medium'), 'the completed original cohort must survive a coverage expansion');
   assert.equal(overall.portfolioCategories.find(item => item.id === 'games').status, 'coming-soon');
   assert.doesNotThrow(() => validateBenchmarkPublicationProjection(built.projection));
 });
@@ -86,15 +96,16 @@ test('compact adapter retains full benchmark rosters and exact original field me
   assert.equal(adapter.scoreBasis.edition, 'writing-storytelling-paired-v2');
   const twists = writingOriginals.get('storytelling-plot-twists');
   assert.equal(twists.scoreBasis.edition, 'storytelling-plot-twists-paired-v2');
-  assert.equal(twists.settings.length, 6);
-  assert.ok(twists.settings.every(setting => setting.reasoning === 'medium'));
+  assert.deepEqual(twists.settings.map(setting => setting.configurationId),
+    twists.methodology.sourceContract.configurations.map(setting => setting.id));
+  assert.equal(twists.settings.length, twists.coverage.settingCount);
   assert.equal(overall.benchmarkSummaries.find(item => item.benchmarkId === 'storytelling-core-idea').treatment, 84);
   for (const setting of adapter.settings) {
     const canonical = sources.engineering.settings.find(item => item.configurationId === setting.configurationId);
     if (canonical) assert.equal(setting.id, canonical.id);
   }
   const magic = overall.benchmarkResults.filter(cell => cell.benchmarkId === 'storytelling-magic-discovery' && cell.condition === 'skill' && cell.exactScore !== null);
-  assert.equal(magic.length, 33, 'task leaderboard is not reduced to the four complete Overall settings');
+  assert.equal(magic.length, 33, 'task leaderboard is not reduced to complete Overall settings');
 });
 
 test('one missing Writing arm excludes both Overall conditions, never promotes an available-score partial', () => {

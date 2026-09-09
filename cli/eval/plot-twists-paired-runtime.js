@@ -13,6 +13,12 @@ export const PAIRED_CREATORS = Object.freeze(['codex:gpt-6-astra@medium', 'codex
   'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium',
   'claude:claude-fable-5-1@medium', 'claude:claude-opus-5@medium']);
 export const PAIRED_JUDGES = Object.freeze(['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh']);
+export const PAIRED_ADDED_CREATORS = Object.freeze(['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
+  'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max',
+  'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh']);
+export const PAIRED_EXPANDED_CREATORS = Object.freeze([...PAIRED_CREATORS, ...PAIRED_ADDED_CREATORS]);
+export const PAIRED_COVERAGE_EXTENSION_VERSION = 'paired-reasoning-coverage-extension-v1';
+const extensionPurpose = 'Later user-requested reasoning coverage expansion. Retain all six original medium pairs and their reviews unchanged; generate and judge only the eight declared additional settings. This expanded roster was not prespecified before the original cohort outcomes.';
 export const PAIRED_VALIDATION_ERRATUM_VERSION = 'paired-code-mode-diagnostic-and-final-message-v1';
 const disabledCodeModeNotice = 'Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.';
 const validationErratumPolicy = Object.freeze({ version: PAIRED_VALIDATION_ERRATUM_VERSION,
@@ -21,6 +27,10 @@ const validationErratumPolicy = Object.freeze({ version: PAIRED_VALIDATION_ERRAT
   finalAnswerSelection: 'last-completed-agent-message-as-already-selected-by-generic-parser',
   preserveAllAssistantMessagesInRawStream: true, originalAttemptRecordsModified: false,
   additionalInferenceCallsForCorrection: 0, continuation: 'untouched-pending-slots-only' });
+export const PAIRED_SUPPLEMENTAL_VALIDATION_POLICY = Object.freeze({ version: 'paired-one-turn-last-message-validation-v1',
+  allowedStartupDiagnostic: disabledCodeModeNotice, maximumStartupDiagnosticCount: 1, startupDiagnosticMustPrecedeTurn: true,
+  completedTurnsRequired: 1, toolsAllowed: false, finalAnswerSelection: 'last-completed-agent-message-as-already-selected-by-generic-parser',
+  preserveAllAssistantMessagesInRawStream: true, appliesTo: 'new-supplemental-attempts-only', additionalInferenceCallsForValidation: 0 });
 export const PAIRED_RUNTIME_POLICY = Object.freeze({ version: PAIRED_RUNTIME_VERSION, concurrency: 2,
   automaticHostRetries: 0, previouslyAttemptedSlotsMayBeRepeated: false, freshSession: true,
   creatorTools: [], judgeTools: [], timeoutMs: 600000, terminationGraceMs: 5000,
@@ -50,13 +60,20 @@ function runtimeInventory() {
   }));
 }
 
-function validateSpecification(specification) {
+const coverageFor = count => ({ configurationCount: count, caseCount: 1, trialsPerConfigurationCaseCondition: 1,
+  generationRowCount: count * 2, matchedPairCount: count, judgeSeatsPerPair: 2, judgeRequestCount: count * 2, individualAnswerAssessmentCount: count * 4 });
+function expandedSpecification(original) {
+  return { ...original, configurations: [...PAIRED_EXPANDED_CREATORS], coverage: coverageFor(14),
+    coverageExpansion: { version: PAIRED_COVERAGE_EXTENSION_VERSION, purpose: extensionPurpose,
+      inheritedProtocol: 'The original specification below remains historical evidence. Its six-medium-only counts, original no-reuse declaration, and original roster-freeze limitation describe the first cohort; this explicit amendment changes coverage only. Task, treatment delivery, rubric, anchors, judge panel, ordering, and runtime limits remain identical.' } };
+}
+function validateSpecification(specification, expanded = false) {
   assert.equal(specification.edition, 'storytelling-plot-twists-paired-v2');
   assert.equal(specification.benchmark.id, 'storytelling-plot-twists');
   assert.equal(specification.benchmark.caseId, 'scifi-outline');
   assert.equal(specification.benchmark.prompt, 'Create a brief outline of an original science-fiction story with one or more major plot twists. Include the ending. Maximum 550 words for the entire answer.');
   assert.equal(specification.benchmark.wordLimit, 550);
-  assert.deepEqual(specification.configurations, [...PAIRED_CREATORS]);
+  assert.deepEqual(specification.configurations, [...(expanded ? PAIRED_EXPANDED_CREATORS : PAIRED_CREATORS)]);
   assert.deepEqual(conditionIds(specification), ['baseline', 'skill']);
   assert.deepEqual(specification.judging.panel, [...PAIRED_JUDGES]);
   assert.ok(specification.judging.orderSeed && specification.judging.instructions);
@@ -66,8 +83,7 @@ function validateSpecification(specification) {
   assert.equal(specification.treatment.existingSnapshotHash, '06a52744c28f5e7ec367edd5c07d0d0720071eeb835d128d2fa07f3d43b5e8ca');
   assert.equal(specification.treatment.rootSha256, '551e0b710e8a60ea7e3f84208f81ec48402ba63f732278885fd13360b5c322c4');
   assert.equal(specification.treatment.deliveryMode, 'frozen-inline-once');
-  assert.deepEqual(specification.coverage, { configurationCount: 6, caseCount: 1, trialsPerConfigurationCaseCondition: 1,
-    generationRowCount: 12, matchedPairCount: 6, judgeSeatsPerPair: 2, judgeRequestCount: 12, individualAnswerAssessmentCount: 24 });
+  assert.deepEqual(specification.coverage, coverageFor(expanded ? 14 : 6));
   for (const [key, value] of Object.entries({ concurrency: 2, timeoutMs: 600000, terminationGraceMs: 5000, automaticRetries: 0,
     claudeMaxTurns: 1, claudeMaxOutputTokens: 32768, claudeMaxRetries: 0, creatorTools: [], judgeTools: [], freshSession: true, stopOnQuotaOrAuthentication: true })) {
     assert.deepEqual(specification.runtimeLimits[key], value, 'Declared runtime limit is unsupported: ' + key);
@@ -113,22 +129,41 @@ function inventories(specification) {
   return { generationPlan, judgmentPlan };
 }
 
-export function preparePairedRun({ runDirectoryPath, specificationPath = path.join(root, 'benchmarks/storytelling-plot-twists-paired-v2/specification.json'), sourceRoot = root, now = new Date().toISOString() }) {
-  const specificationFileText = fs.readFileSync(specificationPath, 'utf8'), specification = JSON.parse(specificationFileText);
-  validateSpecification(specification);
+export function preparePairedRun({ runDirectoryPath, specificationPath = path.join(root, 'benchmarks/storytelling-plot-twists-paired-v2/specification.json'), sourceRoot = root,
+  parentSnapshotPath = null, now = new Date().toISOString() }) {
+  const parentText = parentSnapshotPath ? fs.readFileSync(parentSnapshotPath, 'utf8') : null;
+  const parentSnapshot = parentText ? validatePairedRunExport(JSON.parse(parentText)) : null;
+  if (parentSnapshot) {
+    assert.ok(!parentSnapshot.coverageExtension && !parentSnapshot.parentSnapshot, 'Only the original six-setting cohort can be extended.');
+    assert.ok(!parentSnapshot.globalStop && [...parentSnapshot.generations, ...parentSnapshot.judgments].every(row => row.status === 'succeeded'), 'The original cohort must be complete.');
+    assert.equal(parentText, JSON.stringify(parentSnapshot, null, 2) + '\n', 'Parent snapshot must use the immutable export serialization.');
+  }
+  const specificationFileText = parentSnapshot ? JSON.stringify(expandedSpecification(parentSnapshot.manifest.specification), null, 2) + '\n' : fs.readFileSync(specificationPath, 'utf8');
+  const specification = JSON.parse(specificationFileText);
+  validateSpecification(specification, Boolean(parentSnapshot));
   const runId = path.basename(path.resolve(runDirectoryPath)); safeId(runId);
   const manifest = { schemaVersion: 1, runId, createdAt: now, specification, specificationFileText,
     specificationSha256: pairedDigest(specification), specificationFileSha256: pairedDigest(specificationFileText),
-    configurations: specification.configurations.map(resolveBenchmarkConfiguration), frozenBundle: freezeBundle(specification, sourceRoot),
+    configurations: specification.configurations.map(resolveBenchmarkConfiguration), frozenBundle: parentSnapshot?.manifest.frozenBundle || freezeBundle(specification, sourceRoot),
     runtimePolicy: PAIRED_RUNTIME_POLICY, runtimeInventory: runtimeInventory(), ...inventories(specification),
-    sourceHashes: sourcePaths.map(filename => ({ path: filename, sha256: pairedDigest(fs.readFileSync(path.join(root, filename))) })) };
+    sourceHashes: sourcePaths.map(filename => ({ path: filename, sha256: pairedDigest(fs.readFileSync(path.join(root, filename))) })),
+    ...(parentSnapshot ? { coverageExtension: { version: PAIRED_COVERAGE_EXTENSION_VERSION, purpose: extensionPurpose,
+      parentSnapshotSha256: pairedDigest(parentText), parentManifestSha256: parentSnapshot.manifestSha256,
+      addedConfigurations: [...PAIRED_ADDED_CREATORS], retainedConfigurationCount: 6, additionalGenerationCount: 16, additionalJudgeRequestCount: 16 },
+      executionValidationPolicy: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY, executionValidationPolicySha256: pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY) } : {}) };
+  if (parentSnapshot) validatePairedRunExport({ kind: 'storytelling-plot-twists-paired-run', schemaVersion: 1, runId,
+    manifest, manifestSha256: pairedDigest(manifest), parentSnapshot, coverageExtension: manifest.coverageExtension, globalStop: null,
+    ...Object.fromEntries(['generations', 'judgments'].map(kind => [kind,
+      manifest[kind === 'generations' ? 'generationPlan' : 'judgmentPlan'].map(slot => parentSnapshot[kind].find(row => row.id === slot.id) || { ...slot, status: 'pending' })])) });
   fs.mkdirSync(path.dirname(path.resolve(runDirectoryPath)), { recursive: true });
   fs.mkdirSync(runDirectoryPath);
   writeOnce(path.join(runDirectoryPath, 'specification.json'), specificationFileText);
   writeOnce(path.join(runDirectoryPath, 'manifest.json'), manifest);
   writeOnce(path.join(runDirectoryPath, 'manifest.sha256'), pairedDigest(manifest) + '\n');
+  if (parentSnapshot) writeOnce(path.join(runDirectoryPath, 'parent-snapshot.json'), parentText);
   for (const kind of ['generations', 'judgments']) fs.mkdirSync(path.join(runDirectoryPath, kind));
-  return { runId, runDirectoryPath: path.resolve(runDirectoryPath), manifestSha256: pairedDigest(manifest), generationCount: 12, pairedJudgeRequestCount: 12, status: 'prepared' };
+  return { runId, runDirectoryPath: path.resolve(runDirectoryPath), manifestSha256: pairedDigest(manifest), generationCount: parentSnapshot ? 16 : 12,
+    pairedJudgeRequestCount: parentSnapshot ? 16 : 12, ...(parentSnapshot ? { coverageExtension: manifest.coverageExtension } : {}), status: 'prepared' };
 }
 
 function inputPayload(configuration, promptText, bundleText = null) {
@@ -228,8 +263,10 @@ function terminalEvidence(raw, configuration, responseText, receipt) {
   assert.equal(indexes('turn.started').length, 1); assert.equal(indexes('turn.completed').length, 1);
   const start = indexes('turn.started')[0], end = indexes('turn.completed')[0];
   assert.ok(start < end); assert.equal(end, events.length - 1, 'Unexpected events after completion.');
-  const corrected = receipt?.validationErratumVersion === PAIRED_VALIDATION_ERRATUM_VERSION;
-  if (corrected) assert.match(receipt.validationErratumSha256, /^[a-f0-9]{64}$/);
+  const supplemental = receipt?.executionValidationPolicyVersion === PAIRED_SUPPLEMENTAL_VALIDATION_POLICY.version;
+  if (supplemental) assert.equal(receipt.executionValidationPolicySha256, pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY));
+  const corrected = supplemental || receipt?.validationErratumVersion === PAIRED_VALIDATION_ERRATUM_VERSION;
+  if (corrected && !supplemental) assert.match(receipt.validationErratumSha256, /^[a-f0-9]{64}$/);
   const messages = []; let startupDiagnosticCount = 0;
   for (const [index, event] of events.entries()) {
     if (['thread.started', 'turn.started', 'turn.completed'].includes(event.type)) continue;
@@ -249,7 +286,8 @@ function terminalEvidence(raw, configuration, responseText, receipt) {
   assert.ok(events[end].usage?.output_tokens > 0, 'Missing output usage.');
   return { stopReason: 'turn.completed', completedTurns: 1, toolCallCount: 0, modelVerification: 'explicit-cli-request-only',
     modelAttribution: { requestedModel: configuration.model }, usage: events[end].usage,
-    ...(corrected ? { startupDiagnosticCount, assistantMessageCount: messages.length, validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION } : {}) };
+    ...(corrected ? { startupDiagnosticCount, assistantMessageCount: messages.length,
+      ...(supplemental ? { executionValidationPolicyVersion: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY.version } : { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION }) } : {}) };
 }
 
 export function pairedStopReason(raw, error = null) {
@@ -264,7 +302,11 @@ export function pairedStopReason(raw, error = null) {
 
 export async function runPairedAgent({ configuration, promptText, bundleText = null, outputSchema = null, artifactDirectoryPath,
   spawnImplementation = childProcess.spawn, environmentVariables = process.env, signal = null, timeoutMs = PAIRED_RUNTIME_POLICY.timeoutMs,
-  validationErratumSha256 = null }) {
+  validationErratumSha256 = null, executionValidationPolicy = null }) {
+  if (executionValidationPolicy) assert.deepEqual(executionValidationPolicy, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY);
+  assert.ok(!(validationErratumSha256 && executionValidationPolicy), 'Historical correction and new-attempt validation authorities cannot be combined.');
+  const supplementalReceipt = executionValidationPolicy ? { executionValidationPolicyVersion: executionValidationPolicy.version,
+    executionValidationPolicySha256: pairedDigest(executionValidationPolicy) } : {};
   const startedAt = Date.now(), raw = { stdout: '', stderr: '', exitCode: null, signal: null };
   let invocation = null, result = null, error = null, terminal = null, child = null, killTimer = null;
   const abort = () => child?.kill('SIGTERM');
@@ -298,6 +340,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
     assert.ok(!signal?.aborted, 'Dispatch interrupted before launch.');
     result = await runBenchmarkAgent({ configuration, promptText, outputSchema, spawnImplementation: spawnIsolated, environmentVariables, timeoutMs });
     terminal = terminalEvidence(raw, configuration, result.text, { ...result.runtimeReceipt,
+      ...supplementalReceipt,
       ...(validationErratumSha256 ? { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256 } : {}) });
   } catch (failure) { error = normalizeError(failure); }
   finally { signal?.removeEventListener('abort', abort); clearTimeout(killTimer); }
@@ -309,7 +352,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
     requestedReasoning: configuration.reasoning, freshSession: true, persistedSession: false,
     cliArguments: invocation?.arguments || null, rawStreamsRetained: true, rawStdoutSha256: pairedDigest(raw.stdout), rawStderrSha256: pairedDigest(raw.stderr),
     exitCode: raw.exitCode, signal: raw.signal, terminalEvidence: terminal, hiddenProviderInstructionsVerified: false,
-    providerInternalRetriesVerified: false, runtimePolicy: PAIRED_RUNTIME_POLICY,
+    providerInternalRetriesVerified: false, runtimePolicy: PAIRED_RUNTIME_POLICY, ...supplementalReceipt,
     ...(validationErratumSha256 ? { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256 } : {}) };
   return { status: error ? 'failed' : 'succeeded', responseText, outputSha256: pairedDigest(responseText), promptText, promptSha256: pairedDigest(promptText),
     inputPayload: payload, inputPayloadSha256: pairedDigest(payload), exactMessages: exactMessages(payload), exactMessagesSha256: pairedDigest(exactMessages(payload)), bundleSha256: bundleText ? pairedDigest(bundleText) : null,
@@ -364,6 +407,7 @@ export function applyPairedRuntimeValidationErratum({ runDirectoryPath, now = ne
   assert.ok(!fs.existsSync(path.join(runDirectoryPath, 'dispatch.lock')), 'Wait for the original pair to finish.');
   assert.ok(!fs.existsSync(path.join(runDirectoryPath, 'runtime-validation-erratum.json')), 'An erratum already exists.');
   const snapshot = exportPairedRun({ runDirectoryPath }), manifest = snapshot.manifest;
+  assert.ok(!snapshot.coverageExtension, 'The historical erratum cannot authorize supplemental attempts.');
   assert.ok(snapshot.generations.slice(2).every(row => row.status === 'pending') && snapshot.judgments.every(row => row.status === 'pending'), 'Only untouched pending slots may follow the original Astra pair.');
   const erratum = { schemaVersion: 1, version: PAIRED_VALIDATION_ERRATUM_VERSION, createdAt: now,
     originalManifestSha256: snapshot.manifestSha256, policy: validationErratumPolicy,
@@ -385,6 +429,10 @@ function loadManifest(runDirectoryPath, execution = false) {
   assert.equal(pairedDigest(manifest), fs.readFileSync(path.join(runDirectoryPath, 'manifest.sha256'), 'utf8').trim(), 'Manifest hash changed.');
   assert.equal(fs.readFileSync(path.join(runDirectoryPath, 'specification.json'), 'utf8'), manifest.specificationFileText, 'Original specification bytes changed.');
   const correction = readErratum(runDirectoryPath, manifest);
+  if (manifest.coverageExtension) {
+    assert.ok(!correction, 'Supplemental runs do not reuse the historical correction authority.');
+    assert.equal(pairedDigest(fs.readFileSync(path.join(runDirectoryPath, 'parent-snapshot.json'))), manifest.coverageExtension.parentSnapshotSha256, 'Original parent snapshot bytes changed.');
+  }
   if (execution) for (const source of correction?.erratum.correctedSourceHashes || manifest.sourceHashes) assert.equal(pairedDigest(fs.readFileSync(path.join(root, source.path))), source.sha256, 'Executor source changed after preparation: ' + source.path);
   if (execution) assert.deepEqual(runtimeInventory(), manifest.runtimeInventory, 'Installed CLI changed after preparation.');
   return manifest;
@@ -406,10 +454,30 @@ function readRecord(runDirectoryPath, kind, slot) {
 export function validatePairedRunExport(snapshot) {
   assert.equal(snapshot.kind, 'storytelling-plot-twists-paired-run'); assert.equal(snapshot.schemaVersion, 1);
   const manifest = snapshot.manifest, specification = manifest.specification;
-  validateSpecification(specification); assert.equal(snapshot.runId, manifest.runId);
+  const extension = manifest.coverageExtension, parent = snapshot.parentSnapshot;
+  validateSpecification(specification, Boolean(extension)); assert.equal(snapshot.runId, manifest.runId);
   assert.equal(snapshot.manifestSha256, pairedDigest(manifest)); assert.equal(manifest.specificationSha256, pairedDigest(specification));
   assert.equal(manifest.specificationFileSha256, pairedDigest(manifest.specificationFileText)); assert.deepEqual(JSON.parse(manifest.specificationFileText), specification);
   assert.deepEqual(manifest.runtimePolicy, PAIRED_RUNTIME_POLICY);
+  if (extension) {
+    assert.ok(parent && !parent.coverageExtension && !parent.parentSnapshot, 'A single original cohort is required.');
+    validatePairedRunExport(parent);
+    assert.ok(!parent.globalStop && [...parent.generations, ...parent.judgments].every(row => row.status === 'succeeded'), 'The retained original cohort must be complete.');
+    assert.deepEqual(extension, { version: PAIRED_COVERAGE_EXTENSION_VERSION, purpose: extensionPurpose,
+      parentSnapshotSha256: pairedDigest(JSON.stringify(parent, null, 2) + '\n'), parentManifestSha256: parent.manifestSha256,
+      addedConfigurations: [...PAIRED_ADDED_CREATORS], retainedConfigurationCount: 6, additionalGenerationCount: 16, additionalJudgeRequestCount: 16 });
+    assert.deepEqual(snapshot.coverageExtension, extension);
+    assert.deepEqual(specification, expandedSpecification(parent.manifest.specification), 'Only declared reasoning coverage may change.');
+    assert.deepEqual(manifest.frozenBundle, parent.manifest.frozenBundle, 'The original frozen treatment must remain unchanged.');
+    assert.deepEqual(manifest.runtimeInventory, parent.manifest.runtimeInventory, 'Provider CLI versions must match the original cohort.');
+    assert.deepEqual(manifest.executionValidationPolicy, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY);
+    assert.equal(manifest.executionValidationPolicySha256, pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY));
+    for (const source of manifest.sourceHashes) if (!['cli/eval/plot-twists-paired-runtime.js', 'benchmarks/storytelling-plot-twists-paired-v2/run.mjs'].includes(source.path))
+      assert.equal(source.sha256, parent.manifest.sourceHashes.find(original => original.path === source.path)?.sha256, 'Coverage expansion cannot change the generic transport or registry.');
+    assert.ok(!snapshot.runtimeValidationErratum && !snapshot.runtimeValidationErratumSha256 && !snapshot.supersededStop, 'Historical correction belongs only to the retained parent.');
+  } else {
+    assert.ok(!parent && !snapshot.coverageExtension && !manifest.executionValidationPolicy && !manifest.executionValidationPolicySha256);
+  }
   const erratum = snapshot.runtimeValidationErratum;
   if (erratum) {
     validateErratum(erratum, manifest, snapshot.runtimeValidationErratumSha256);
@@ -431,10 +499,13 @@ export function validatePairedRunExport(snapshot) {
     assert.equal(bundle.sourceSnapshotInventory.find(row => row.relativePath === file.path)?.sha256, file.sha256); }
   assert.equal(bundle.text, bundle.files.map(file => `--- Frozen skill file: ${file.path} ---\n${file.content}`).join('\n\n')); assert.equal(bundle.sha256, pairedDigest(bundle.text));
   for (const kind of ['generations', 'judgments']) {
-    assert.equal(snapshot[kind].length, 12); assert.equal(new Set(snapshot[kind].map(row => row.id)).size, 12);
+    const count = extension ? 28 : 12;
+    assert.equal(snapshot[kind].length, count); assert.equal(new Set(snapshot[kind].map(row => row.id)).size, count);
     for (const [index, row] of snapshot[kind].entries()) {
       const slot = expected[kind === 'generations' ? 'generationPlan' : 'judgmentPlan'][index];
       for (const [key, value] of Object.entries(slot)) assert.deepEqual(row[key], value, 'Attempt identity changed: ' + key);
+      const original = parent?.[kind].find(item => item.id === row.id);
+      if (original) { assert.deepEqual(row, original, 'A retained original record changed.'); continue; }
       if (row.validationCorrection) {
         assert.ok(erratum, 'Original reclassification requires an explicit erratum.');
         assert.deepEqual(row, normalizedOriginal(row.validationCorrection.originalRecord, erratum, snapshot.runtimeValidationErratumSha256));
@@ -456,6 +527,11 @@ export function validatePairedRunExport(snapshot) {
       assert.equal(row.runtimeReceipt.requestedModel, configuration.model); assert.equal(row.runtimeReceipt.requestedReasoning, configuration.reasoning);
       assert.equal(row.runtimeReceipt.freshSession, true); assert.equal(row.runtimeReceipt.persistedSession, false);
       assert.equal(row.runtimeReceipt.hiddenProviderInstructionsVerified, false); assert.equal(row.runtimeReceipt.providerInternalRetriesVerified, false);
+      if (extension) {
+        assert.equal(row.runtimeReceipt.executionValidationPolicyVersion, manifest.executionValidationPolicy.version);
+        assert.equal(row.runtimeReceipt.executionValidationPolicySha256, manifest.executionValidationPolicySha256);
+        assert.ok(!row.runtimeReceipt.validationErratumVersion && !row.runtimeReceipt.validationErratumSha256 && !row.validationCorrection);
+      } else assert.ok(!row.runtimeReceipt.executionValidationPolicyVersion && !row.runtimeReceipt.executionValidationPolicySha256);
       if (row.runtimeReceipt.validationErratumVersion || row.runtimeReceipt.validationErratumSha256) {
         assert.ok(erratum, 'Diagnostic handling requires the pinned explicit erratum.');
         assert.equal(row.runtimeReceipt.validationErratumVersion, PAIRED_VALIDATION_ERRATUM_VERSION);
@@ -479,7 +555,16 @@ export function validatePairedRunExport(snapshot) {
 
 export function exportPairedRun({ runDirectoryPath }) {
   const manifest = loadManifest(runDirectoryPath), correction = readErratum(runDirectoryPath, manifest);
-  const generations = manifest.generationPlan.map(slot => readRecord(runDirectoryPath, 'generations', slot));
+  const parentSnapshot = manifest.coverageExtension ? readJson(path.join(runDirectoryPath, 'parent-snapshot.json')) : null;
+  const retainedOrLocal = (kind, slot) => {
+    const retained = parentSnapshot?.[kind].find(row => row.id === slot.id);
+    if (retained) {
+      assert.ok(!fs.existsSync(path.join(runDirectoryPath, kind, slot.id)), 'A retained parent slot must never be reserved or replaced.');
+      return retained;
+    }
+    return readRecord(runDirectoryPath, kind, slot);
+  };
+  const generations = manifest.generationPlan.map(slot => retainedOrLocal('generations', slot));
   if (correction) for (const pin of correction.erratum.originalFailedRecords) {
     const index = generations.findIndex(row => row.id === pin.id);
     generations[index] = normalizedOriginal(generations[index], correction.erratum, correction.sha256);
@@ -487,9 +572,10 @@ export function exportPairedRun({ runDirectoryPath }) {
   const stopFilename = correction ? 'STOP.after-erratum.json' : 'STOP.json';
   return validatePairedRunExport({ kind: 'storytelling-plot-twists-paired-run', schemaVersion: 1, runId: manifest.runId,
     manifestSha256: pairedDigest(manifest), manifest, generations,
-    judgments: manifest.judgmentPlan.map(slot => readRecord(runDirectoryPath, 'judgments', slot)),
+    judgments: manifest.judgmentPlan.map(slot => retainedOrLocal('judgments', slot)),
     globalStop: fs.existsSync(path.join(runDirectoryPath, stopFilename)) ? readJson(path.join(runDirectoryPath, stopFilename)) : null,
-    ...(correction ? { runtimeValidationErratum: correction.erratum, runtimeValidationErratumSha256: correction.sha256, supersededStop: correction.erratum.originalStop } : {}) });
+    ...(correction ? { runtimeValidationErratum: correction.erratum, runtimeValidationErratumSha256: correction.sha256, supersededStop: correction.erratum.originalStop } : {}),
+    ...(parentSnapshot ? { parentSnapshot, coverageExtension: manifest.coverageExtension } : {}) });
 }
 
 async function dispatch({ runDirectoryPath, kind, limit = Infinity, concurrency = 2, spawnImplementation = childProcess.spawn,
@@ -520,7 +606,7 @@ async function dispatch({ runDirectoryPath, kind, limit = Infinity, concurrency 
         if (outputSchema) writeOnce(path.join(directory, 'output-schema.json'), outputSchema);
         onProgress({ event: 'started', kind, id: slot.id, configurationId: configuration.id });
         const result = await runPairedAgent({ configuration, promptText, bundleText, outputSchema, artifactDirectoryPath: directory, spawnImplementation, environmentVariables, signal,
-          validationErratumSha256: snapshot.runtimeValidationErratumSha256 || null });
+          validationErratumSha256: snapshot.runtimeValidationErratumSha256 || null, executionValidationPolicy: manifest.executionValidationPolicy || null });
         const record = { ...slot, ...result, attempt, artifactDirectory: `${kind}/${slot.id}`, finishedAt: new Date().toISOString() };
         if (kind === 'generations') { record.wordCount = pairedWordCount(record.responseText); record.wordLimitExceeded = record.wordCount > manifest.specification.benchmark.wordLimit;
           record.blindingWarnings = /\b(?:Claude|Fable|Opus|GPT-[\d.]|skill[- ]assisted|baseline condition)\b/i.test(record.responseText) ? ['Candidate may disclose identity or treatment; original text retained.'] : []; }

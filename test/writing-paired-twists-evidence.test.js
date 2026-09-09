@@ -3,7 +3,7 @@ import { createHash, webcrypto } from 'node:crypto';
 import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
-import { completePairedFixture } from './helpers/plot-twists-paired-fixture.js';
+import { completePairedFixture, completeSupplementalPairedFixture } from './helpers/plot-twists-paired-fixture.js';
 import { projectPlotTwistsPairedRun } from '../cli/eval/plot-twists-paired-publication.js';
 import { deriveExpectedPairedTwistsEvidence } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 
@@ -80,4 +80,33 @@ test('fresh paired evidence binds every original answer, exact input, paired rev
   for (const options of [{ omitPrompt: true }, { replaceOutput: true }]) {
     assert.ok((await inspect(built, renderedDocument(built, options))).mismatches.length, 'Source hashes alone cannot substitute for rendered original evidence.');
   }
+});
+
+test('same-edition coverage proof requires all fourteen settings and the original/supplement source bindings', async t => {
+  const { snapshot } = await completeSupplementalPairedFixture(t);
+  const built = projectPlotTwistsPairedRun({ snapshot, sourceSha256: hash(JSON.stringify(snapshot)) });
+  const expected = deriveExpectedPairedTwistsEvidence(built.projection, built.responseBundle);
+  assert.equal(expected.answers.length, 28); assert.equal(expected.requests.length, 28);
+  assert.equal(expected.answers.filter(answer => answer.provenance.sourceCohort === 'original').length, 12);
+  assert.equal(expected.requests.filter(request => request.provenance.sourceCohort === 'supplement').length, 16);
+  const document = renderedDocument(built);
+  assert.deepEqual(await inspect(built, document), expected);
+  assert.equal(document.opened.size, 28);
+  for (const [label, mutate] of [
+    ['missing retained answer', value => { value.responseBundle.responses.splice(0, 1); }],
+    ['missing supplemental review', value => { value.responseBundle.judgeRequests.pop(); }],
+    ['partial setting ranked', value => { value.projection.coverage.completedSettingCount--; }],
+    ['undeclared effort', value => { value.projection.settings.at(-1).configurationId = 'claude:claude-opus-5@max'; }],
+    ['old six-only score inventory', value => { value.projection.entries.splice(12); }],
+    ['original answer relabeled as new', value => { value.responseBundle.responses[0].provenance.sourceCohort = 'supplement'; }],
+    ['original answer source rewritten', value => { value.responseBundle.responses[0].provenance.sourceSnapshotSha256 = value.projection.scoreBasis.sourceSha256; }],
+    ['supplement review claims parent manifest', value => { value.responseBundle.judgeRequests.at(-1).provenance.sourceManifestSha256 = expected.coverageExtension.parentManifestSha256; }],
+    ['undeclared append', value => { delete value.projection.methodology.sourceContract.coverageExtension; delete value.responseBundle.sourceContract.coverageExtension; }],
+    ['altered declared roster', value => { value.projection.methodology.sourceContract.coverageExtension.addedConfigurations.pop(); }],
+    ['changed independent score', value => { value.projection.entries.at(-1).exactScore++; }]
+  ]) await t.test(label, async () => {
+    const changed = structuredClone(built); mutate(changed);
+    assert.throws(() => deriveExpectedPairedTwistsEvidence(changed.projection, changed.responseBundle));
+    assert.ok((await inspect(changed)).mismatches.length, label);
+  });
 });

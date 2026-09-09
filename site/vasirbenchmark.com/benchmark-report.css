@@ -115,7 +115,7 @@
   min-height: 3.35rem;
   padding: 0.72rem 4.5rem;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 0.8rem;
   border-bottom: 1px solid var(--line-strong);
@@ -132,10 +132,6 @@
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-}
-
-:where([data-active-writing-benchmark="storytelling-magic-discovery"]) .evidence-truth {
-  grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
 .evidence-truth p {

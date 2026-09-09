@@ -1109,8 +1109,35 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
   const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
   const benchmarkId = 'storytelling-plot-twists';
   const judges = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
-  const configurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium',
+  const originalConfigurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium',
     'codex:gpt-5.6-luna@medium', 'claude:claude-opus-5@medium', 'claude:claude-fable-5-1@medium'];
+  const addedConfigurations = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
+    'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max',
+    'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
+  const contract = publication.methodology?.sourceContract, extension = contract?.coverageExtension;
+  const configurations = extension ? [...originalConfigurations, ...addedConfigurations] : originalConfigurations;
+  const settingCount = configurations.length, answerCount = settingCount * conditions.length, requestCount = settingCount * judges.length;
+  if (extension) {
+    assert.equal(extension.version, 'paired-reasoning-coverage-extension-v1');
+    assert.ok(typeof extension.purpose === 'string' && extension.purpose.trim());
+    for (const field of ['parentSnapshotSha256', 'parentManifestSha256']) assert.match(extension[field], /^[a-f0-9]{64}$/);
+    sameIds(extension.addedConfigurations, addedConfigurations, 'Declared additional Plot twists configurations');
+    assert.equal(extension.retainedConfigurationCount, originalConfigurations.length);
+    assert.equal(extension.additionalGenerationCount, addedConfigurations.length * conditions.length);
+    assert.equal(extension.additionalJudgeRequestCount, addedConfigurations.length * judges.length);
+    assert.equal(contract.executionValidationPolicy?.version, 'paired-one-turn-last-message-validation-v1');
+    assert.match(contract.executionValidationPolicy.sha256, /^[a-f0-9]{64}$/);
+    assert.ok(typeof contract.executionValidationPolicy.purpose === 'string' && contract.executionValidationPolicy.purpose.trim());
+    sameIds(contract.configurations.map(item => item.id), configurations, 'Declared complete Plot twists configurations');
+    assert.equal(contract.sourceSha256, publication.scoreBasis.sourceSha256);
+    assert.equal(contract.manifestSha256, publication.scoreBasis.manifestSha256);
+  } else assert.equal(contract?.executionValidationPolicy, undefined, 'Supplemental policy requires a declared extension.');
+  const cohortProvenance = configurationId => {
+    const original = originalConfigurations.includes(configurationId);
+    return { sourceCohort: original ? 'original' : 'supplement',
+      sourceSnapshotSha256: original ? extension.parentSnapshotSha256 : publication.scoreBasis.sourceSha256,
+      sourceManifestSha256: original ? extension.parentManifestSha256 : publication.scoreBasis.manifestSha256 };
+  };
   assert.equal(publication.benchmarks?.[0]?.id, benchmarkId);
   assert.equal(publication.scoreBasis.edition, PAIRED_TWISTS_EDITION);
   assert.equal(publication.scoreBasis.method, 'complete-paired-single-prompt-two-judge-mean-v2');
@@ -1121,14 +1148,16 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
   assert.equal(publication.scoreBasis.aggregation, 'mean-four-ratings-times-twenty-then-mean-two-judges');
   assert.ok(publication.scoreBasis.dimensions.every(dimension => dimension.weight === 25));
   sameIds(publication.scoreBasis.judges, judges, 'Fresh Plot twists judge panel');
-  sameIds(publication.settings.map(setting => setting.configurationId), configurations, 'Fresh Plot twists six medium configurations');
+  sameIds(publication.settings.map(setting => setting.configurationId), configurations, 'Declared complete Plot twists configurations');
   assert.equal(publication.methodology?.completion, undefined, 'A fresh edition cannot masquerade as historical completion.');
   assert.ok(archive && Array.isArray(archive.responses) && Array.isArray(archive.judgeRequests), 'Pinned fresh Plot twists archive missing.');
   assert.equal(archive.supersededResponses, undefined, 'Historical answers must not be mixed into the fresh edition.');
-  assert.equal(archive.responses.length, 12);
-  assert.equal(archive.judgeRequests.length, 12);
-  for (const [field, value] of Object.entries({ settingCount: 6, expectedResponseCount: 12, responseCount: 12, scoredResponseCount: 12,
-    completedSettingCount: 6, expectedJudgmentCount: 24, judgmentCount: 24, pairedJudgeCallCount: 12, expectedPairedJudgeCallCount: 12, expectedPairs: 6, usablePairs: 6 })) assert.equal(publication.coverage[field], value, 'Fresh Plot twists coverage ' + field);
+  exact(archive.sourceContract, contract, 'Paired archive source contract changed.');
+  assert.equal(archive.responses.length, answerCount);
+  assert.equal(archive.judgeRequests.length, requestCount);
+  for (const [field, value] of Object.entries({ settingCount, expectedResponseCount: answerCount, responseCount: answerCount, scoredResponseCount: answerCount,
+    completedSettingCount: settingCount, expectedJudgmentCount: answerCount * judges.length, judgmentCount: answerCount * judges.length,
+    pairedJudgeCallCount: requestCount, expectedPairedJudgeCallCount: requestCount, expectedPairs: settingCount, usablePairs: settingCount })) assert.equal(publication.coverage[field], value, 'Paired Plot twists coverage ' + field);
   assert.equal(publication.coverage.executionComplete, true);
   const task = publication.cases[0];
   assert.equal(task.id, 'scifi-outline');
@@ -1149,7 +1178,7 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
   assert.equal(files.get('paired-skill-twists').sha256, 'cb68cc0f2df390bdbe1d11fe14634966a789e29b0281a226e55e477bbc8000b8', 'Original twists reference must remain unchanged.');
   for (const id of ['paired-skill-root', 'paired-skill-twists']) assert.equal(files.get('paired-skill-bundle').content.split(files.get(id).content).length, 2, 'Frozen root and twists must each appear once in the inline bundle.');
   const requestMap = new Map(archive.judgeRequests.map(request => [request.id, request]));
-  assert.equal(requestMap.size, 12, 'Fresh paired requests must have unique identities.');
+  assert.equal(requestMap.size, requestCount, 'Paired requests must have unique identities.');
   const answerKey = response => `${response.configurationId}|${response.condition}`;
   sameIds(archive.responses.map(answerKey), configurations.flatMap(configurationId => conditions.map(condition => `${configurationId}|${condition}`)), 'Fresh answer inventory');
   const answers = archive.responses.map(response => {
@@ -1158,6 +1187,8 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
     assert.equal(hash(response.outputText), response.provenance.outputSha256, 'Fresh original answer hash');
     assert.equal(response.provenance.sourceSha256, publication.scoreBasis.sourceSha256);
     assert.equal(response.provenance.manifestSha256, publication.scoreBasis.manifestSha256);
+    if (extension) for (const [field, value] of Object.entries(cohortProvenance(response.configurationId))) assert.equal(response.provenance[field], value, 'Paired answer cohort ' + field);
+    else for (const field of ['sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256']) assert.equal(response.provenance[field], undefined, 'Undeclared answer cohort.');
     assert.equal(response.provenance.questionSha256, hash(task.prompt));
     assert.equal(response.provenance.skillSha256, response.condition === 'skill' ? files.get('paired-skill-bundle').sha256 : null);
     const messages = archive.messageSets.find(item => item.id === response.messageSetId)?.messages;
@@ -1193,15 +1224,18 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
     });
     const exactScore = mean(scores);
     for (const cells of [publication.caseResults, publication.benchmarkResults, publication.entries]) {
-      assert.equal(cells.length, 12, 'Historical score rows cannot enter the fresh edition.');
+      assert.equal(cells.length, answerCount, 'Only declared score rows can enter the paired edition.');
       const cell = cells.find(item => item.configurationId === response.configurationId && item.condition === response.condition);
       assert.ok(cell); close(cell.exactScore, exactScore, 'Fresh panel arithmetic');
     }
     return { configurationId: response.configurationId, condition: response.condition, outputSha256: response.provenance.outputSha256,
+      ...(extension ? { provenance: cohortProvenance(response.configurationId) } : {}),
       messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore };
   });
   const requests = archive.judgeRequests.map(request => {
     assert.ok(judges.includes(request.judgeConfigurationId));
+    if (extension) exact(request.provenance, cohortProvenance(request.configurationId), 'Paired original request cohort changed.');
+    else assert.equal(request.provenance, undefined, 'Undeclared request cohort.');
     assert.equal(hash(request.promptText), request.promptSha256, 'Fresh original judge prompt hash');
     assert.equal(hash(request.outputText), request.outputSha256, 'Fresh original judge output hash');
     sameIds(Object.keys(request.candidateMap), ['A', 'B'], 'Fresh anonymous labels');
@@ -1218,6 +1252,7 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
       exact(candidate, { candidateLabel: label, wordCount: count, exceedsWordLimit: count > task.wordLimit, answer: answer.outputText }, 'Fresh judge candidate bytes and word-count facts');
     }
     return { requestId: request.id, configurationId: request.configurationId, judgeConfigurationId: request.judgeConfigurationId,
+      ...(extension ? { provenance: cohortProvenance(request.configurationId) } : {}),
       promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap,
       candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: true };
   });
@@ -1230,6 +1265,7 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
   }
   return { kind: 'vasirbenchmark-paired-twists-browser-evidence', benchmarkId, edition: PAIRED_TWISTS_EDITION, caseId: task.id,
     sourceSha256: publication.scoreBasis.sourceSha256, manifestSha256: publication.scoreBasis.manifestSha256,
+    ...(extension ? { coverageExtension: extension, executionValidationPolicy: contract.executionValidationPolicy } : {}),
     skillFiles, answers, requests, mismatches: [] };
 }
 
@@ -1426,7 +1462,8 @@ export function verifyWritingProofEvidence(proof, expected) {
       assert.equal(proof.predecessorArchiveEvidence, undefined, 'Fresh Plot twists cannot display historical answers.');
       sameIds(proof.caseEvidence?.map(item => item.caseId), publication.cases.map(item => item.id), 'Fresh Plot twists shared report task');
       const observed = proof.caseEvidence[0];
-      for (const [field, value] of Object.entries({ trialNumber: 1, rows: 6, sourceResponses: 12, judgments: 24 })) assert.equal(observed[field], value, 'Fresh Plot twists browser ' + field);
+      for (const [field, value] of Object.entries({ trialNumber: 1, rows: publication.settings.length,
+        sourceResponses: publication.settings.length * conditions.length, judgments: publication.settings.length * conditions.length * 2 })) assert.equal(observed[field], value, 'Paired Plot twists browser ' + field);
       exact(observed.mismatches, [], 'Fresh Plot twists shared report checks failed.');
     } else if (publication.methodology?.completion) {
       verifyTwistsCompletionCoverage(publication);

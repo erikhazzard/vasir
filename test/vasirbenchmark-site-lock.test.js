@@ -9,7 +9,7 @@ import { PAIRED_TWISTS_EDITION, PAIRED_WRITING_SCORE_BASIS, deriveExpectedPaired
 import { WRITING_COMPACT_BENCHMARKS, WRITING_ESTABLISHED_SCORE_BASIS, projectWritingCompactRun } from '../cli/eval/writing-compact-publication.js';
 import { WRITING_RESPONSE_ARCHIVES, WRITING_CREATION_ARCHIVE, hydrateWritingResponseArchives } from '../cli/eval/writing-response-archives.js';
 import { projectPlotTwistsPairedRun } from '../cli/eval/plot-twists-paired-publication.js';
-import { completePairedFixture } from './helpers/plot-twists-paired-fixture.js';
+import { completePairedFixture, completeSupplementalPairedFixture } from './helpers/plot-twists-paired-fixture.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const siteRoot = join(repoRoot, 'site', 'vasirbenchmark.com');
@@ -150,6 +150,19 @@ function selectedSourceReferences(value, found = []) {
   return found;
 }
 
+const pairedOriginalConfigurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium', 'claude:claude-fable-5-1@medium', 'claude:claude-opus-5@medium'];
+const pairedAddedConfigurations = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
+  'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max', 'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
+function assertPairedCoverageExtension(extension) {
+  assert.equal(extension.version, 'paired-reasoning-coverage-extension-v1');
+  assert.ok(typeof extension.purpose === 'string' && extension.purpose.trim());
+  for (const field of ['parentSnapshotSha256', 'parentManifestSha256']) assert.match(extension[field], /^[a-f0-9]{64}$/);
+  assert.deepEqual(extension.addedConfigurations, pairedAddedConfigurations);
+  assert.equal(extension.retainedConfigurationCount, pairedOriginalConfigurations.length);
+  assert.equal(extension.additionalGenerationCount, pairedAddedConfigurations.length * 2);
+  assert.equal(extension.additionalJudgeRequestCount, pairedAddedConfigurations.length * 2);
+}
+
 async function assertSelectedSourceEvidence(selection, readLockedFile = assertLockedFile) {
   assert.equal(selection.path, `benchmarks/${selection.benchmarkId}/publication.json`);
   // The tracked source selection is always required and byte-verified, even on a bare checkout.
@@ -161,13 +174,29 @@ async function assertSelectedSourceEvidence(selection, readLockedFile = assertLo
     assert.equal(selected.schemaVersion, 1);
     assert.equal(selection.sources.length, 1);
     assert.equal(selected.snapshot.path, `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${selected.snapshot.sha256}/snapshot.json`);
-    assert.equal(selection.lineage?.kind, 'declared-writing-source-replacement');
-    assert.equal(selection.lineage.edition, PAIRED_TWISTS_EDITION);
-    assert.equal(selection.lineage.originalEvidencePreserved, true);
-    assert.equal(selection.lineage.priorAnswersAndReviewsReused, false);
-    assert.equal(selection.lineage.previousSelection.path, selection.path);
-    assert.match(selection.lineage.previousSelection.sha256, /^[a-f0-9]{64}$/);
-    assert.ok(selection.lineage.previousSources.length >= 2);
+    let replacement = selection.lineage;
+    if (replacement?.kind === 'declared-writing-coverage-extension') {
+      assertPairedCoverageExtension(replacement.coverageExtension);
+      assert.equal(replacement.edition, PAIRED_TWISTS_EDITION);
+      assert.equal(replacement.originalEvidencePreserved, true);
+      assert.equal(replacement.answersAndCompletedReviewsPreserved, true);
+      assert.equal(replacement.originalSettingsRerun, false);
+      assert.equal(replacement.parentSourceSha256, replacement.coverageExtension.parentSnapshotSha256);
+      assert.equal(replacement.previousSelection.path, selection.path);
+      assert.match(replacement.previousSelection.sha256, /^[a-f0-9]{64}$/);
+      assert.equal(replacement.previousSources.length, 1);
+      assert.equal(replacement.previousSources[0].sha256, replacement.parentSourceSha256);
+      assert.equal(replacement.previousSources[0].path, `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${replacement.parentSourceSha256}/snapshot.json`);
+      assert.notEqual(selected.snapshot.sha256, replacement.parentSourceSha256);
+      replacement = replacement.previousLineage;
+    }
+    assert.equal(replacement?.kind, 'declared-writing-source-replacement');
+    assert.equal(replacement.edition, PAIRED_TWISTS_EDITION);
+    assert.equal(replacement.originalEvidencePreserved, true);
+    assert.equal(replacement.priorAnswersAndReviewsReused, false);
+    assert.equal(replacement.previousSelection.path, selection.path);
+    assert.match(replacement.previousSelection.sha256, /^[a-f0-9]{64}$/);
+    assert.ok(replacement.previousSources.length >= 2);
   } else assert.ok(selection.sources.length >= 2);
   const byPath = (left, right) => left.path.localeCompare(right.path) || left.sha256.localeCompare(right.sha256);
   assert.deepEqual(selection.sources.map(({ path, sha256 }) => ({ path, sha256 })).sort(byPath), selectedSourceReferences(selected).sort(byPath), 'accepted source metadata differs from the tracked selection');
@@ -182,7 +211,8 @@ async function assertSelectedSourceEvidence(selection, readLockedFile = assertLo
     }
   }
   if (paired) for (let lineage = selection.lineage; lineage; lineage = lineage.previousLineage) for (const source of lineage.previousSources) {
-    assert.ok(source.path.startsWith('.agents/vasir-evals/storytelling-plot-twists/publication-snapshots/'), 'retained evidence must remain in the original immutable archive');
+    const sourceEdition = lineage.kind === 'declared-writing-coverage-extension' ? PAIRED_TWISTS_EDITION : 'storytelling-plot-twists';
+    assert.ok(source.path.startsWith(`.agents/vasir-evals/${sourceEdition}/publication-snapshots/`), 'retained evidence must remain in its original immutable archive');
     try { await readLockedFile(source, repoRoot); } catch (error) { if (error.code !== 'ENOENT') throw error; unavailable.push(source.path); }
   }
   return unavailable;
@@ -643,11 +673,35 @@ function assertOverallIntegrationReceipt(proof, canonical, index) {
   assert.deepEqual(leafWeights.filter(item => item.familyId === 'writing').map(item => item.benchmarkId), index.benchmarkIds);
   for (const task of leafWeights.filter(item => item.familyId === 'writing')) close(task.weight, index.benchmarkWeights[task.benchmarkId] * 0.25);
   const selected = category.selectionEvidence.find(item => item.selectionId === 'all-writing');
+  const writingRowFor = entry => {
+    const direct = selected.rowEvidence.find(item => item.configurationId === entry.configurationId);
+    if (direct) return direct;
+    // Only the registered Opus selector alias is supported. Its exact original
+    // identity must survive on every byte-pinned Writing task/condition cell.
+    const effort = /^claude:opus@(low|medium|high|xhigh|max)$/.exec(entry.configurationId)?.[1];
+    assert.ok(effort && entry.provider === 'claude' && entry.modelId === 'claude:opus' && entry.reasoning === effort,
+      'Overall cannot substitute an unregistered Writing identity');
+    const sourceConfigurationId = `claude:claude-opus-5@${effort}`;
+    const sourceRows = selected.rowEvidence.filter(item => item.configurationId === sourceConfigurationId);
+    assert.equal(sourceRows.length, 1, 'Overall alias requires exactly one original Writing row');
+    const row = sourceRows[0];
+    const cells = overall.benchmarkResults.filter(cell => cell.configurationId === entry.configurationId && cell.category === 'writing');
+    assert.deepEqual(cells.map(cell => `${cell.benchmarkId}|${cell.condition}`).sort(),
+      index.benchmarkIds.flatMap(id => ['baseline', 'skill'].map(condition => `${id}|${condition}`)).sort(),
+      'Overall alias requires every original Writing task in both conditions');
+    for (const cell of cells) {
+      assert.equal(cell.provider, 'claude'); assert.equal(cell.modelId, 'claude:opus'); assert.equal(cell.reasoning, effort);
+      assert.equal(cell.sourceConfigurationId, sourceConfigurationId); assert.equal(cell.sourceModelId, 'claude:claude-opus-5');
+      assert.equal(cell.sourceSettingId, row.settingId);
+      assert.equal(cell.complete, true); assert.equal(cell.eligibleForRank, true); assert.equal(cell.partial, false);
+    }
+    return row;
+  };
   const entryIds = new Set();
   for (const entry of overall.entries) {
     assert.ok(!entryIds.has(entry.id)); entryIds.add(entry.id);
     assert.ok(['baseline', 'skill'].includes(entry.condition));
-    const writingRow = selected.rowEvidence.find(item => item.configurationId === entry.configurationId);
+    const writingRow = writingRowFor(entry);
     assert.ok(writingRow && !writingRow.partial, 'Overall cannot rank a partial All Writing model');
     assert.deepEqual(entry.categories.map(item => item.category), Object.keys(categoryWeights));
     for (const component of entry.categories) {
@@ -668,8 +722,8 @@ function assertOverallIntegrationReceipt(proof, canonical, index) {
   const component = entry.categories.find(item => item.category === 'writing');
   close(clicked.exactScore, component.exactScore); close(clicked.weight, component.weight);
   assert.equal(destination.selectionId, 'all-writing'); assert.equal(destination.hash, '#capabilities/writing');
-  assert.equal(destination.configurationId, entry.configurationId);
-  const row = selected.rowEvidence.find(item => item.configurationId === destination.configurationId);
+  const row = writingRowFor(entry);
+  assert.equal(destination.configurationId, row.configurationId);
   assert.equal(destination.settingId, row.settingId); close(destination.exactScore, row.exactSkill);
   assert.deepEqual(navigation.mismatches, []);
 }
@@ -849,20 +903,34 @@ function assertSharedFrameInventory(manifest, candidate, canonical, writing, gam
         assert.equal(fresh?.kind, 'vasirbenchmark-paired-twists-browser-evidence');
         assert.equal(fresh.edition, PAIRED_TWISTS_EDITION);
         assert.equal(fresh.benchmarkId, benchmarkId);
-        assert.equal(fresh.answers.length, 12);
-        assert.equal(fresh.requests.length, 12);
-        const configurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium', 'claude:claude-fable-5-1@medium', 'claude:claude-opus-5@medium'];
+        const extension = fresh.coverageExtension;
+        if (extension) assertPairedCoverageExtension(extension);
+        const configurations = extension ? [...pairedOriginalConfigurations, ...pairedAddedConfigurations] : pairedOriginalConfigurations;
+        assert.equal(fresh.answers.length, configurations.length * 2);
+        assert.equal(fresh.requests.length, configurations.length * 2);
         const judges = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
         assert.deepEqual(fresh.answers.map(answer => `${answer.configurationId}|${answer.condition}`).sort(), configurations.flatMap(id => ['baseline', 'skill'].map(condition => `${id}|${condition}`)).sort());
-        assert.equal(new Set(fresh.requests.map(request => request.requestId)).size, 12);
+        assert.equal(new Set(fresh.requests.map(request => request.requestId)).size, configurations.length * judges.length);
         for (const configurationId of configurations) {
           const pair = fresh.requests.filter(request => request.configurationId === configurationId);
           assert.deepEqual(pair.map(request => request.judgeConfigurationId).sort(), [...judges].sort());
           assert.deepEqual(pair.map(request => request.candidateMap.A).sort(), ['baseline', 'skill']);
         }
         const selected = verification.sourceSelections.find(selection => selection.benchmarkId === benchmarkId);
-        assert.equal(selected.lineage?.kind, 'declared-writing-source-replacement');
+        assert.equal(selected.lineage?.kind, extension ? 'declared-writing-coverage-extension' : 'declared-writing-source-replacement');
         assert.equal(selected.lineage.edition, PAIRED_TWISTS_EDITION);
+        if (extension) {
+          assert.deepEqual(selected.lineage.coverageExtension, extension);
+          assert.equal(selected.lineage.parentSourceSha256, extension.parentSnapshotSha256);
+          assert.equal(fresh.executionValidationPolicy?.version, 'paired-one-turn-last-message-validation-v1');
+          assert.match(fresh.executionValidationPolicy.sha256, /^[a-f0-9]{64}$/);
+          for (const item of [...fresh.answers, ...fresh.requests]) {
+            const original = pairedOriginalConfigurations.includes(item.configurationId);
+            assert.deepEqual(item.provenance, { sourceCohort: original ? 'original' : 'supplement',
+              sourceSnapshotSha256: original ? extension.parentSnapshotSha256 : fresh.sourceSha256,
+              sourceManifestSha256: original ? extension.parentManifestSha256 : fresh.manifestSha256 });
+          }
+        } else assert.equal(fresh.executionValidationPolicy, undefined);
         assert.equal(selected.sources.length, 1);
         assert.equal(selected.sources[0].sha256, fresh.sourceSha256);
         assert.equal(selected.sources[0].path, `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${fresh.sourceSha256}/snapshot.json`);
@@ -1266,6 +1334,24 @@ test('fresh source selection accepts one independently pinned snapshot only with
     if (record.path === selection.path) return Buffer.from(JSON.stringify(selected));
     throw new Error('Available source bytes drifted');
   }), /bytes drifted/);
+  const expanded = structuredClone(selection);
+  const parent = { ...snapshot, sha256: 'e'.repeat(64), path: `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${'e'.repeat(64)}/snapshot.json` };
+  expanded.lineage = { kind: 'declared-writing-coverage-extension', edition: PAIRED_TWISTS_EDITION,
+    coverageExtension: { version: 'paired-reasoning-coverage-extension-v1', purpose: 'Explicit post-original coverage append.',
+      parentSnapshotSha256: parent.sha256, parentManifestSha256: 'f'.repeat(64), addedConfigurations: pairedAddedConfigurations,
+      retainedConfigurationCount: 6, additionalGenerationCount: 16, additionalJudgeRequestCount: 16 },
+    parentSourceSha256: parent.sha256, previousSelection: selection.lineage.previousSelection, previousSources: [parent],
+    previousLineage: selection.lineage, originalEvidencePreserved: true, answersAndCompletedReviewsPreserved: true, originalSettingsRerun: false };
+  assert.deepEqual(await assertSelectedSourceEvidence(expanded, reader), [snapshot.path, parent.path, ...previousSources.map(source => source.path)]);
+  for (const mutate of [
+    value => { value.lineage.originalSettingsRerun = true; },
+    value => { value.lineage.parentSourceSha256 = '0'.repeat(64); },
+    value => { delete value.lineage.previousLineage; },
+    value => { value.lineage.coverageExtension.addedConfigurations = pairedAddedConfigurations.slice(1); }
+  ]) {
+    const changed = structuredClone(expanded); mutate(changed);
+    await assert.rejects(assertSelectedSourceEvidence(changed, reader));
+  }
 });
 
 test('compact source evidence requires tracked selection bytes and separately discloses missing private snapshots', async () => {
@@ -1906,15 +1992,17 @@ test('published Storytelling lock requires exactly three public tests, five sele
   assert.equal(category.selectionEvidence[0].rowEvidence.find(row => row.settingId === 'model').exactSkill, 70);
 });
 
-test('fresh paired-edition lock requires the new independent source and twelve actual paired-review proofs, not the old experiment', async t => {
-  const { snapshot } = await completePairedFixture(t), sourceSha256 = sha256(JSON.stringify(snapshot));
+test('paired-edition lock requires the complete declared original or coverage-append source and actual review proofs', async t => {
+  for (const factory of [completePairedFixture, completeSupplementalPairedFixture]) await t.test(factory.name, async t => {
+  const { snapshot } = await factory(t), sourceSha256 = sha256(JSON.stringify(snapshot));
   const built = projectPlotTwistsPairedRun({ snapshot, sourceSha256 });
   const evidence = deriveExpectedPairedTwistsEvidence(built.projection, built.responseBundle);
   const fixture = publishedFrameFixture(), verification = fixture.manifest.acceptance.verification;
   verification.categoryIndex.writingScoreBasis = structuredClone(PAIRED_WRITING_SCORE_BASIS);
   Object.assign(verification.sourceSelections.find(item => item.benchmarkId === 'storytelling-plot-twists'), {
     sources: [{ path: `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${sourceSha256}/snapshot.json`, sha256: sourceSha256 }],
-    lineage: { kind: 'declared-writing-source-replacement', edition: PAIRED_TWISTS_EDITION }
+    lineage: { kind: evidence.coverageExtension ? 'declared-writing-coverage-extension' : 'declared-writing-source-replacement', edition: PAIRED_TWISTS_EDITION,
+      ...(evidence.coverageExtension ? { coverageExtension: structuredClone(evidence.coverageExtension), parentSourceSha256: evidence.coverageExtension.parentSnapshotSha256 } : {}) }
   });
   for (const [index, proof] of fixture.writing.entries()) if (proof.benchmarkId === 'storytelling-plot-twists') {
     proof.trialCount = 1;
@@ -1949,6 +2037,20 @@ test('fresh paired-edition lock requires the new independent source and twelve a
     }
     assert.throws(() => assertSharedFrameInventory(changed.manifest, changed.candidate, changed.canonical, changed.writing, changed.games));
   }
+  if (evidence.coverageExtension) for (const mutate of [
+    value => { value.coverageExtension.addedConfigurations.pop(); },
+    value => { value.answers[0].provenance.sourceCohort = 'supplement'; },
+    value => { value.requests.at(-1).provenance.sourceSnapshotSha256 = value.coverageExtension.parentSnapshotSha256; },
+    value => { delete value.coverageExtension; }
+  ]) {
+    const changed = structuredClone(fixture);
+    for (const [index, proof] of changed.writing.entries()) if (proof.benchmarkId === 'storytelling-plot-twists') {
+      mutate(proof.pairedTwistsEvidence);
+      changed.manifest.acceptance.verification.writingBrowserProofs[index].pairedTwistsEvidence = structuredClone(proof.pairedTwistsEvidence);
+    }
+    assert.throws(() => assertSharedFrameInventory(changed.manifest, changed.candidate, changed.canonical, changed.writing, changed.games));
+  }
+  });
 });
 
 test('published Storytelling lock rejects omitted active tests, changed arithmetic, private experiments and incomplete proof inventories', () => {

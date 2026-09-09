@@ -176,9 +176,33 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) < 1e-9;
   const words = text => text.trim() ? text.trim().split(/\s+/u).length : 0;
   const benchmarkId = 'storytelling-plot-twists', edition = 'storytelling-plot-twists-paired-v2';
-  const configurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium', 'claude:claude-opus-5@medium', 'claude:claude-fable-5-1@medium'];
+  const originalConfigurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium', 'claude:claude-opus-5@medium', 'claude:claude-fable-5-1@medium'];
+  const addedConfigurations = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
+    'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max', 'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
   const judges = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
   if (data?.benchmarks?.[0]?.id !== benchmarkId || data.scoreBasis?.edition !== edition || !archive) return { mismatches: ['paired-edition-missing'] };
+  const contract = data.methodology?.sourceContract, extension = contract?.coverageExtension;
+  const configurations = extension ? [...originalConfigurations, ...addedConfigurations] : originalConfigurations;
+  const settingCount = configurations.length, answerCount = settingCount * 2, requestCount = settingCount * judges.length;
+  fail('matching-source-contract', same(archive.sourceContract, contract));
+  if (extension) {
+    fail('declared-coverage-extension', extension.version === 'paired-reasoning-coverage-extension-v1'
+      && typeof extension.purpose === 'string' && Boolean(extension.purpose.trim())
+      && ['parentSnapshotSha256', 'parentManifestSha256'].every(field => /^[a-f0-9]{64}$/.test(extension[field] || ''))
+      && sameIds(extension.addedConfigurations, addedConfigurations) && extension.retainedConfigurationCount === originalConfigurations.length
+      && extension.additionalGenerationCount === addedConfigurations.length * 2 && extension.additionalJudgeRequestCount === addedConfigurations.length * judges.length
+      && sameIds(contract.configurations.map(item => item.id), configurations)
+      && contract.sourceSha256 === data.scoreBasis.sourceSha256 && contract.manifestSha256 === data.scoreBasis.manifestSha256);
+    fail('supplemental-validation-policy', contract.executionValidationPolicy?.version === 'paired-one-turn-last-message-validation-v1'
+      && /^[a-f0-9]{64}$/.test(contract.executionValidationPolicy.sha256 || '')
+      && typeof contract.executionValidationPolicy.purpose === 'string' && Boolean(contract.executionValidationPolicy.purpose.trim()));
+  } else fail('no-undeclared-supplemental-policy', !contract?.executionValidationPolicy);
+  const cohortProvenance = configurationId => {
+    const original = originalConfigurations.includes(configurationId);
+    return { sourceCohort: original ? 'original' : 'supplement',
+      sourceSnapshotSha256: original ? extension.parentSnapshotSha256 : data.scoreBasis.sourceSha256,
+      sourceManifestSha256: original ? extension.parentManifestSha256 : data.scoreBasis.manifestSha256 };
+  };
   fail('fresh-fixed-inventory', data.benchmarks.length === 1 && data.cases.length === 1 && data.trialCount === 1
     && data.scoreBasis.ratingMinimum === 0 && data.scoreBasis.ratingMaximum === 5
     && data.scoreBasis.method === 'complete-paired-single-prompt-two-judge-mean-v2'
@@ -187,7 +211,10 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
     && sameIds(data.scoreBasis.judges, judges) && !data.methodology?.completion && !archive.supersededResponses);
   const task = data.cases[0], files = new Map(archive.promptFiles.map(file => [file.id, file]));
   fail('unchanged-fixed-task', task.id === 'scifi-outline' && task.wordLimit === 550 && task.prompt === 'Create a brief outline of an original science-fiction story with one or more major plot twists. Include the ending. Maximum 550 words for the entire answer.');
-  fail('twelve-calls-twenty-four-assessments', data.coverage.pairedJudgeCallCount === 12 && data.coverage.expectedPairedJudgeCallCount === 12 && data.coverage.judgmentCount === 24 && data.coverage.expectedJudgmentCount === 24 && data.coverage.executionComplete === true);
+  for (const [field, expected] of Object.entries({ settingCount, expectedResponseCount: answerCount, responseCount: answerCount, scoredResponseCount: answerCount,
+    completedSettingCount: settingCount, expectedJudgmentCount: answerCount * judges.length, judgmentCount: answerCount * judges.length,
+    pairedJudgeCallCount: requestCount, expectedPairedJudgeCallCount: requestCount, expectedPairs: settingCount, usablePairs: settingCount })) fail('complete-coverage:' + field, data.coverage[field] === expected);
+  fail('completed-execution', data.coverage.executionComplete === true);
   const skillFiles = [];
   for (const id of ['paired-skill-bundle', 'paired-skill-root', 'paired-skill-twists']) {
     const file = files.get(id);
@@ -198,10 +225,12 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
   fail('unchanged-established-skill', files.get('paired-skill-root')?.sha256 === '551e0b710e8a60ea7e3f84208f81ec48402ba63f732278885fd13360b5c322c4' && files.get('paired-skill-twists')?.sha256 === 'cb68cc0f2df390bdbe1d11fe14634966a789e29b0281a226e55e477bbc8000b8');
   fail('four-criteria', task.rubric?.length === 4 && sameIds(task.rubric.map(item => item.id), data.scoreBasis.dimensions.map(item => item.id)));
   const requestMap = new Map(archive.judgeRequests.map(request => [request.id, request]));
-  fail('fresh-complete-archive', requestMap.size === 12 && archive.judgeRequests.length === 12
+  fail('fresh-complete-archive', requestMap.size === requestCount && archive.judgeRequests.length === requestCount
     && sameIds(archive.responses.map(response => response.configurationId + '|' + response.condition), configurations.flatMap(id => ['baseline', 'skill'].map(condition => id + '|' + condition))));
   for (const response of archive.responses) {
     const key = response.configurationId + ':' + response.condition;
+    fail(key + ':source-cohort', extension ? Object.entries(cohortProvenance(response.configurationId)).every(([field, value]) => response.provenance[field] === value)
+      : ['sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256'].every(field => response.provenance[field] === undefined));
     const messages = archive.messageSets.find(item => item.id === response.messageSetId)?.messages;
     fail(key + ':answer-binding', response.caseId === task.id && response.trialNumber === 1 && Boolean(response.outputText.trim())
       && await hash(response.outputText) === response.provenance.outputSha256
@@ -256,11 +285,13 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
     const exactScore = mean(scores);
     for (const cells of [data.caseResults, data.benchmarkResults, data.entries]) {
       const cell = cells.find(item => item.configurationId === response.configurationId && item.condition === response.condition);
-      fail(key + ':panel-arithmetic', cells.length === 12 && close(cell?.exactScore, exactScore));
+      fail(key + ':panel-arithmetic', cells.length === answerCount && close(cell?.exactScore, exactScore));
     }
-    answers.push({ configurationId: response.configurationId, condition: response.condition, outputSha256: response.provenance.outputSha256, messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore });
+    answers.push({ configurationId: response.configurationId, condition: response.condition, outputSha256: response.provenance.outputSha256,
+      ...(extension ? { provenance: cohortProvenance(response.configurationId) } : {}), messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore });
   }
   for (const request of archive.judgeRequests) {
+    fail(request.id + ':source-cohort', extension ? same(request.provenance, cohortProvenance(request.configurationId)) : request.provenance === undefined);
     fail(request.id + ':original-bytes', await hash(request.promptText) === request.promptSha256 && await hash(request.outputText) === request.outputSha256);
     fail(request.id + ':anonymous-map', sameIds(Object.keys(request.candidateMap), ['A', 'B']) && sameIds(Object.values(request.candidateMap), ['baseline', 'skill']));
     try {
@@ -273,7 +304,8 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
         return answer && candidate && same(candidate, { candidateLabel: label, wordCount: words(answer.outputText), exceedsWordLimit: words(answer.outputText) > task.wordLimit, answer: answer.outputText }) && request.candidateResponseHashes[label] === answer.provenance.outputSha256;
       }));
     } catch { mismatches.push(request.id + ':original-prompt-json'); }
-    requests.push({ requestId: request.id, configurationId: request.configurationId, judgeConfigurationId: request.judgeConfigurationId, promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap, candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: inspectDocument ? renderedRequests.has(request.id) : true });
+    requests.push({ requestId: request.id, configurationId: request.configurationId, judgeConfigurationId: request.judgeConfigurationId,
+      ...(extension ? { provenance: cohortProvenance(request.configurationId) } : {}), promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap, candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: inspectDocument ? renderedRequests.has(request.id) : true });
   }
   for (const configurationId of configurations) {
     const pair = archive.judgeRequests.filter(request => request.configurationId === configurationId);
@@ -282,13 +314,14 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
     fail(configurationId + ':frozen-seeded-order', pair.find(request => request.judgeConfigurationId === judges[0])?.candidateMap.A === (firstBaseline ? 'baseline' : 'skill'));
   }
   if (inspectDocument) {
-    fail('six-complete-rendered-models', document.querySelectorAll('[data-report-setting-id]').length === 6 && !document.querySelector('[data-output-absence]'));
+    fail('complete-rendered-model-settings', document.querySelectorAll('[data-report-setting-id]').length === settingCount && !document.querySelector('[data-output-absence]'));
     for (const criterion of task.rubric) {
       const element = document.querySelector('[data-rubric-dimension="' + criterion.id + '"]');
       fail(criterion.id + ':rubric-and-scale', element?.querySelector('[data-rubric-description]')?.textContent === criterion.criterion && Object.entries(data.methodology.ratingAnchors).every(([rating, text]) => element.querySelector('[data-rubric-anchor="' + rating + '"]')?.textContent === text));
     }
   }
-  return { kind: 'vasirbenchmark-paired-twists-browser-evidence', benchmarkId, edition, caseId: task.id, sourceSha256: data.scoreBasis.sourceSha256, manifestSha256: data.scoreBasis.manifestSha256, skillFiles, answers, requests, mismatches };
+  return { kind: 'vasirbenchmark-paired-twists-browser-evidence', benchmarkId, edition, caseId: task.id, sourceSha256: data.scoreBasis.sourceSha256, manifestSha256: data.scoreBasis.manifestSha256,
+    ...(extension ? { coverageExtension: extension, executionValidationPolicy: contract.executionValidationPolicy } : {}), skillFiles, answers, requests, mismatches };
 }
 
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, argument, index, all) => {
@@ -1365,7 +1398,7 @@ try {
     }
   }
   const pairedTwistsEvidence = isPairedTwists ? await evaluateFunction(inspectPairedTwistsReportInDocument, {}) : null;
-  if (pairedTwistsEvidence) check('Fresh Plot twists: exact inline inputs, twelve original paired reviews and independent four-criterion arithmetic', pairedTwistsEvidence.mismatches.length === 0, JSON.stringify(pairedTwistsEvidence));
+  if (pairedTwistsEvidence) check('Paired Plot twists: exact inline inputs, all declared original paired reviews and independent four-criterion arithmetic', pairedTwistsEvidence.mismatches.length === 0, JSON.stringify(pairedTwistsEvidence));
   const predecessorArchiveEvidence = await evaluate(`(${inspectWritingPredecessorArchiveInDocument.toString()})()`);
   if (predecessorArchiveEvidence) {
     check('Plot twists completion: both original failed attempts remain inspectable, unscored and exactly copyable', !predecessorArchiveEvidence.mismatches.length, JSON.stringify(predecessorArchiveEvidence));

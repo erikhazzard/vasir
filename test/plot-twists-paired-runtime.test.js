@@ -3,9 +3,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { preparePairedRun, exportPairedRun, validatePairedRunExport, runPairedGenerations, runPairedJudgments,
-  pairedCandidateMap, pairedDigest, pairedWordCount, validatePairedAssessment, PAIRED_CREATORS, PAIRED_JUDGES, PAIRED_RUNTIME_POLICY } from '../cli/eval/plot-twists-paired-runtime.js';
+  pairedCandidateMap, pairedDigest, pairedWordCount, validatePairedAssessment, PAIRED_CREATORS, PAIRED_JUDGES, PAIRED_RUNTIME_POLICY,
+  PAIRED_ADDED_CREATORS, PAIRED_EXPANDED_CREATORS, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY } from '../cli/eval/plot-twists-paired-runtime.js';
 import { main } from '../benchmarks/storytelling-plot-twists-paired-v2/run.mjs';
-import { createPairedFixture, completePairedFixture, mockPairedProvider, codexPairedOutput, claudePairedOutput, pairedAssessment } from './helpers/plot-twists-paired-fixture.js';
+import { createPairedFixture, completePairedFixture, createSupplementalPairedFixture, completeSupplementalPairedFixture,
+  mockPairedProvider, codexPairedOutput, claudePairedOutput, pairedAssessment } from './helpers/plot-twists-paired-fixture.js';
 
 test('prepare pins one prompt, exact six medium models, twelve answers and twelve paired requests without inference', t => {
   const runDirectoryPath = createPairedFixture(t), snapshot = exportPairedRun({ runDirectoryPath });
@@ -138,4 +140,93 @@ test('CLI status/export stay read-only by default and reject dispatch options or
   const output = path.join(path.dirname(runDirectoryPath), 'export.json'); await main(['export', '--run-dir', runDirectoryPath, '--output', output]);
   await assert.rejects(() => main(['export', '--run-dir', runDirectoryPath, '--output', output]), /EEXIST/);
   await assert.rejects(() => main(['retry', '--run-dir', runDirectoryPath]));
+});
+
+test('same-edition supplement retains original 24 records and dispatches exactly 16 new answers and 16 original paired reviews', async t => {
+  const { runDirectoryPath, parentSnapshot, parentSnapshotPath, parentRunDirectoryPath } = await createSupplementalPairedFixture(t);
+  const retainedFiles = ['manifest.json', 'manifest.sha256', 'specification.json', 'runtime-validation-erratum.json', 'STOP.json',
+    ...parentSnapshot.generations.flatMap(row => ['result.json', 'result.sha256', 'stdout.txt'].map(file => `${row.artifactDirectory}/${file}`)),
+    ...parentSnapshot.judgments.flatMap(row => ['result.json', 'result.sha256', 'stdout.txt'].map(file => `${row.artifactDirectory}/${file}`))];
+  const before = retainedFiles.map(file => [file, fs.readFileSync(path.join(parentRunDirectoryPath, file))]);
+  const prepared = exportPairedRun({ runDirectoryPath });
+  assert.deepEqual(prepared.manifest.configurations.map(row => row.id), [...PAIRED_EXPANDED_CREATORS]);
+  assert.deepEqual(prepared.coverageExtension.addedConfigurations, [...PAIRED_ADDED_CREATORS]);
+  assert.equal(prepared.coverageExtension.parentSnapshotSha256, pairedDigest(fs.readFileSync(parentSnapshotPath)));
+  assert.equal(prepared.generations.filter(row => row.status === 'pending').length, 16);
+  assert.equal(prepared.judgments.filter(row => row.status === 'pending').length, 16);
+  assert.deepEqual(prepared.parentSnapshot, parentSnapshot); assert.equal(prepared.runtimeValidationErratum, undefined);
+  const calls = []; const generated = await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(generated.dispatched, 16); assert.ok(calls.every(call => !call.args.includes('medium')));
+  const result = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(result.dispatched, 16); assert.equal(calls.length, 32);
+  const { snapshot } = result;
+  for (const kind of ['generations', 'judgments']) {
+    assert.equal(snapshot[kind].length, 28); assert.ok(snapshot[kind].every(row => row.status === 'succeeded'));
+    assert.deepEqual(snapshot[kind].slice(0, 12), parentSnapshot[kind]);
+    for (const row of snapshot[kind].slice(12)) {
+      assert.equal(row.attempt.number, 1); assert.equal(row.attempt.automaticRetries, 0);
+      assert.equal(row.runtimeReceipt.executionValidationPolicyVersion, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY.version);
+      assert.equal(row.runtimeReceipt.validationErratumVersion, undefined);
+    }
+    assert.equal(fs.readdirSync(path.join(runDirectoryPath, kind)).length, 16);
+  }
+  assert.equal((await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal((await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal(calls.length, 32);
+  for (const [file, bytes] of before) assert.deepEqual(fs.readFileSync(path.join(parentRunDirectoryPath, file)), bytes);
+  await assert.rejects(() => main(['status', '--run-dir', runDirectoryPath, '--parent-snapshot', parentSnapshotPath]), /preparation-only/);
+  const nestedPath = path.join(path.dirname(runDirectoryPath), 'nested-snapshot.json');
+  fs.writeFileSync(nestedPath, JSON.stringify(snapshot, null, 2) + '\n');
+  assert.throws(() => preparePairedRun({ runDirectoryPath: path.join(path.dirname(runDirectoryPath), 'nested-run'), parentSnapshotPath: nestedPath }), /original six-setting/);
+});
+
+test('supplement validates new final-message policy without borrowing parent correction authority and rejects extra tools', async t => {
+  const { runDirectoryPath } = await createSupplementalPairedFixture(t);
+  const calls = [];
+  const answer = (_call, index) => {
+    const events = codexPairedOutput('Original supplemental final ' + index, { extra: [
+      { type: 'item.completed', item: { type: 'agent_message', text: 'A brief preface.' } },
+      ...(index ? [{ type: 'item.completed', item: { type: 'command_execution', command: 'forbidden' } }] : [])
+    ] }).trim().split('\n').map(JSON.parse);
+    events.splice(1, 0, { type: 'item.completed', item: { type: 'error', message: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY.allowedStartupDiagnostic } });
+    return events.map(event => JSON.stringify(event)).join('\n') + '\n';
+  };
+  const result = await runPairedGenerations({ runDirectoryPath, limit: 3, concurrency: 1, spawnImplementation: mockPairedProvider({ calls, answer }) });
+  assert.equal(calls.length, 2); assert.equal(result.snapshot.generations[12].status, 'succeeded');
+  assert.equal(result.snapshot.generations[12].responseText, 'Original supplemental final 0');
+  assert.equal(result.snapshot.generations[12].runtimeReceipt.terminalEvidence.assistantMessageCount, 2);
+  assert.equal(result.snapshot.generations[13].status, 'failed'); assert.equal(result.snapshot.globalStop.reason, 'runtime-contract-failure');
+  await assert.rejects(() => runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) }), /Run is stopped/);
+  assert.equal(calls.length, 2);
+});
+
+test('supplement export independently rejects parent, protocol, provenance, roster, policy and record substitutions', async t => {
+  const { snapshot, runDirectoryPath } = await completeSupplementalPairedFixture(t);
+  for (const mutate of [
+    value => { value.generations[0].responseText += ' changed'; },
+    value => { value.parentSnapshot.generations[0].responseText += ' changed'; },
+    value => { value.coverageExtension.parentSnapshotSha256 = 'a'.repeat(64); },
+    value => { value.manifest.coverageExtension.addedConfigurations[5] = 'claude:claude-fable-5-1@ultracode'; value.manifestSha256 = pairedDigest(value.manifest); },
+    value => { value.manifest.specification.judging.instructions += ' Prefer skill.'; value.manifestSha256 = pairedDigest(value.manifest); },
+    value => { value.generations[12].runtimeReceipt.executionValidationPolicySha256 = 'a'.repeat(64); },
+    value => { value.generations[12].runtimeReceipt.validationErratumSha256 = value.parentSnapshot.runtimeValidationErratumSha256; },
+    value => { value.generations[12].responseText += ' changed'; },
+    value => { value.judgments[12].candidateMap = value.judgments[13].candidateMap; },
+    value => { value.generations[12].attempt.number = 2; },
+    value => { value.manifest.sourceHashes[1].sha256 = 'a'.repeat(64); value.manifestSha256 = pairedDigest(value.manifest); },
+    value => { delete value.parentSnapshot; }
+  ]) { const value = structuredClone(snapshot); mutate(value); assert.throws(() => validatePairedRunExport(value)); }
+  fs.mkdirSync(path.join(runDirectoryPath, 'generations', snapshot.generations[0].id));
+  assert.throws(() => exportPairedRun({ runDirectoryPath }), /retained parent slot/);
+});
+
+test('supplement preparation refuses incomplete parents and changed pinned parent bytes before dispatch', async t => {
+  const original = createPairedFixture(t), parentPath = path.join(path.dirname(original), 'incomplete.json');
+  fs.writeFileSync(parentPath, JSON.stringify(exportPairedRun({ runDirectoryPath: original }), null, 2) + '\n');
+  assert.throws(() => preparePairedRun({ runDirectoryPath: path.join(path.dirname(original), 'refused-run'), parentSnapshotPath: parentPath }), /original cohort must be complete/);
+  const { runDirectoryPath } = await createSupplementalPairedFixture(t);
+  fs.appendFileSync(path.join(runDirectoryPath, 'parent-snapshot.json'), '\n');
+  const calls = [];
+  await assert.rejects(() => runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) }), /parent snapshot bytes changed/);
+  assert.equal(calls.length, 0);
 });

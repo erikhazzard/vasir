@@ -45,7 +45,7 @@ Generated image assets are ordinary workspace files: create them through the bes
 | User asks for source/reference sprites without a stronger style direction | You may use `In the style of Sea of Stars sprite art. blank white background.` only for source/reference generation or cutout-friendly intermediate images. Runtime foreground sprites still need transparent output or a verified cutout before wiring. |
 | Image is only a concept/reference/source | Keep the durable generated source path, usually `src/assets/source-images/...`. |
 | Image is used by game runtime | Promote/copy it to a semantic `src/assets/...` path and wire that path into code. |
-| Provider/model is controllable | Prefer OpenAI image generation, `gpt-image-2`. |
+| Provider/model is controllable | Prefer OpenAI image generation, `gpt-image-2.5-sunburst`. |
 | Actual provider/model differs | Report the actual provider/model from the tool output; do not pretend it used OpenAI. |
 
 ## Workflow
@@ -79,7 +79,7 @@ Use the strongest available path in this order:
    Add `--transparent` for layerable gameplay foreground assets, including characters, enemies, sprites, icons, projectiles, VFX, and cursor/hand art. Add repeated `--reference-file <path>` for workspace-local references.
 3. **Do not create a new provider script** during a game turn. If the available path is missing or uses the wrong provider, name that as a platform/tooling gap rather than building a side channel.
 
-When provider/model is controllable, use OpenAI image generation with `gpt-image-2` unless a specific override is requested. If the active fallback returns Gemini, accept that as the current tool reality and report it plainly.
+When provider/model is controllable, use OpenAI image generation with `gpt-image-2.5-sunburst` unless a specific override is requested. If the active fallback returns Gemini, accept that as the current tool reality and report it plainly.
 
 ### Pass 2 - Shape The Prompt
 
@@ -184,9 +184,9 @@ Why: The lightweight wrapper stays lightweight; the backend exposes capability b
 
 ### Provider Honesty
 
-Bad: Say the asset used `gpt-image-2` because that is preferred, even though the Studio fallback returned Gemini.
+Bad: Say the asset used `gpt-image-2.5-sunburst` because that is preferred, even though the Studio fallback returned Gemini.
 
-Good: Prefer `gpt-image-2` when using native/controllable generation; if the fallback reports Gemini, state that the current Studio tool used Gemini.
+Good: Prefer `gpt-image-2.5-sunburst` when using native/controllable generation; if the fallback reports Gemini, state that the current Studio tool used Gemini.
 
 Why: Provider truth matters for debugging quality differences between local Codex and Studio.
 

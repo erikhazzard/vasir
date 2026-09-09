@@ -71,3 +71,19 @@ export async function completeErratumPairedFixture(t) {
   const { snapshot } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider() });
   return { runDirectoryPath, snapshot };
 }
+
+export async function createSupplementalPairedFixture(t) {
+  const parent = await completeErratumPairedFixture(t);
+  const parentSnapshotPath = path.join(path.dirname(parent.runDirectoryPath), 'parent-snapshot.json');
+  fs.writeFileSync(parentSnapshotPath, JSON.stringify(parent.snapshot, null, 2) + '\n', { flag: 'wx' });
+  const runDirectoryPath = path.join(path.dirname(parent.runDirectoryPath), 'supplement-run');
+  preparePairedRun({ runDirectoryPath, parentSnapshotPath });
+  return { runDirectoryPath, parentSnapshotPath, parentSnapshot: parent.snapshot, parentRunDirectoryPath: parent.runDirectoryPath };
+}
+
+export async function completeSupplementalPairedFixture(t) {
+  const fixture = await createSupplementalPairedFixture(t);
+  await runPairedGenerations({ runDirectoryPath: fixture.runDirectoryPath, spawnImplementation: mockPairedProvider() });
+  const { snapshot } = await runPairedJudgments({ runDirectoryPath: fixture.runDirectoryPath, spawnImplementation: mockPairedProvider() });
+  return { ...fixture, snapshot };
+}

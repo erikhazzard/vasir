@@ -98,17 +98,23 @@ test('the real generated paired candidate and independent oracle agree on the co
   assert.deepEqual(source.writingScoreBasis, WRITING_PAIRED_SCORE_BASIS);
   const expected = deriveExpectedWritingCategory(source, 'all-writing');
   verifyCandidateCategoryProjection(build(source, 'all-writing'), expected);
-  assert.equal(expected.rankedSettings, 6);
+  const sourceRows = ids.map(id => {
+    const publication = expected.publications.get(id);
+    return id === ids[0] ? publication.provisionalLeaderboard.entries : publication.entries;
+  });
+  const completeIds = expected.publications.get(ids[1]).settings.map(setting => setting.configurationId).filter(id => sourceRows.every(rows =>
+    ['baseline', 'skill'].every(condition => rows.some(row => row.configurationId === id && row.condition === condition && Number.isFinite(row.exactScore) && row.eligibleForRank !== false))));
+  assert.deepEqual(expected.entries.filter(entry => entry.condition === 'skill' && entry.eligibleForRank).map(entry => entry.configurationId).sort(), completeIds.sort());
+  assert.equal(expected.rankedSettings, completeIds.length);
   const runtime = fs.readFileSync(new URL('../site/vasirbenchmark.com/writing-browsercheck.mjs', import.meta.url), 'utf8');
   const inspector = runtime.slice(runtime.indexOf('const inspectWritingComparison = '));
   const expression = inspector.slice(inspector.indexOf(',round=') + ',round='.length, inspector.indexOf(';\n    const rows='));
   const displayRound = vm.runInNewContext('(' + expression + ')');
-  const baseline = expected.entries.find(entry => entry.configurationId === 'codex:gpt-6-astra@ultra' && entry.condition === 'baseline');
-  const skill = expected.entries.find(entry => entry.configurationId === 'codex:gpt-6-astra@ultra' && entry.condition === 'skill');
-  assert.equal(skill.partial, true); assert.equal(skill.eligibleForRank, false); assert.equal(skill.rank, null);
-  assert.equal(skill.exactDelta, 4.749999999999986, 'Retain the actual independent unrounded arithmetic.');
-  assert.equal(displayRound(skill.exactDelta, Math.max(Math.abs(baseline.exactScore), Math.abs(skill.exactScore))), 4.8);
-  assert.equal(displayRound(skill.exactDelta), 4.7, 'The regression must exercise cancellation at source-score scale.');
+  // This cancellation was observed in the original six-setting release's partial
+  // Astra ultra row. Keep that numerical regression when coverage later expands.
+  const historicalDelta = 4.749999999999986;
+  assert.equal(displayRound(historicalDelta, 100), 4.8);
+  assert.equal(displayRound(historicalDelta), 4.7, 'The regression must exercise cancellation at source-score scale.');
   for (const [value, wanted] of [[4.75 - 1e-10, 4.7], [4.75 + 1e-10, 4.8], [-4.75 - 1e-10, -4.8], [-4.75 + 1e-10, -4.7], [4.74, 4.7], [4.76, 4.8]]) {
     assert.equal(displayRound(value, 100), wanted, 'The bounded correction must not accept an actual score-boundary change.');
   }

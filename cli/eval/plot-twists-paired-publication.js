@@ -17,6 +17,12 @@ const ERRATUM_PURPOSE = 'A pinned validation correction permits the exact pre-tu
 const PANEL = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
 const MODELS = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium',
   'codex:gpt-5.6-luna@medium', 'claude:claude-fable-5-1@medium', 'claude:claude-opus-5@medium'];
+const ADDED_MODELS = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
+  'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max',
+  'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
+const EXTENSION_VERSION = 'paired-reasoning-coverage-extension-v1';
+const EXECUTION_VALIDATION_VERSION = 'paired-one-turn-last-message-validation-v1';
+const EXECUTION_VALIDATION_PURPOSE = 'Supplemental calls use the pinned one-turn validation policy: the exact pre-turn disabled-Code-Mode notice is allowed, tools are forbidden, and the last completed assistant message is the answer.';
 const LABELS = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-5.6-sol': 'GPT-5.6 Sol', 'gpt-5.6-terra': 'GPT-5.6 Terra',
   'gpt-5.6-luna': 'GPT-5.6 Luna', 'claude-fable-5-1': 'Claude Fable 5.1', 'claude-opus-5': 'Claude Opus 5' };
 const CONDITIONS = [{ id: 'baseline', sourceId: 'baseline', label: 'Plain answer', short: 'Plain', color: '#72777f', shape: 'circle' },
@@ -39,14 +45,25 @@ const identity = configuration => ({ id: configuration.id.replace(/[^a-zA-Z0-9-]
   reasoning: configuration.reasoning, label: `${LABELS[configuration.model]} · ${configuration.reasoning}` });
 const dimensionsFor = contract => contract.task.rubric.map(item => ({ id: item.id, title: item.criterion ?? item.title,
   label: item.criterion ?? item.title, description: item.description ?? item.criterion ?? item.title, weight: 25, anchors: contract.anchors }));
+const cohortProvenance = (contract, configurationId) => {
+  if (!contract.coverageExtension) return {};
+  const original = MODELS.includes(configurationId);
+  return { sourceCohort: original ? 'original' : 'supplement',
+    sourceSnapshotSha256: original ? contract.coverageExtension.parentSnapshotSha256 : contract.sourceSha256,
+    sourceManifestSha256: original ? contract.coverageExtension.parentManifestSha256 : contract.manifestSha256 };
+};
 
 function publicContract(snapshot, sourceSha256) {
   const { manifest } = snapshot, specification = manifest.specification;
+  const erratumSource = snapshot.parentSnapshot ?? snapshot;
   return { edition: PLOT_TWISTS_PAIRED_EDITION, benchmarkId: ID, runId: snapshot.runId,
     runtimeVersion: manifest.runtimePolicy.version, runtimeInventory: manifest.runtimeInventory,
-    ...(snapshot.runtimeValidationErratum ? { runtimeValidationErratum: {
-      version: snapshot.runtimeValidationErratum.version, sha256: snapshot.runtimeValidationErratumSha256,
-      purpose: ERRATUM_PURPOSE, additionalInferenceCalls: snapshot.runtimeValidationErratum.policy.additionalInferenceCallsForCorrection } } : {}),
+    ...(erratumSource.runtimeValidationErratum ? { runtimeValidationErratum: {
+      version: erratumSource.runtimeValidationErratum.version, sha256: erratumSource.runtimeValidationErratumSha256,
+      purpose: ERRATUM_PURPOSE, additionalInferenceCalls: erratumSource.runtimeValidationErratum.policy.additionalInferenceCallsForCorrection } } : {}),
+    ...(snapshot.coverageExtension ? { coverageExtension: { ...snapshot.coverageExtension },
+      executionValidationPolicy: { version: manifest.executionValidationPolicy.version,
+        sha256: manifest.executionValidationPolicySha256, purpose: EXECUTION_VALIDATION_PURPOSE } } : {}),
     sourceSha256, manifestSha256: snapshot.manifestSha256,
     specificationSha256: manifest.specificationSha256 ?? hash(JSON.stringify(specification)),
     task: { id: specification.benchmark.caseId, title: specification.benchmark.title, prompt: specification.benchmark.prompt,
@@ -60,7 +77,19 @@ function publicContract(snapshot, sourceSha256) {
 function validateContract(contract) {
   requireEvidence(contract?.edition === PLOT_TWISTS_PAIRED_EDITION && contract.benchmarkId === ID
     && contract.runtimeVersion === PAIRED_RUNTIME_VERSION
-    && same(contract.configurations?.map(item => item.id), MODELS) && same(contract.judges, PANEL), 'declared edition, creator roster, or panel changed.');
+    && same(contract.configurations?.map(item => item.id), contract.coverageExtension ? [...MODELS, ...ADDED_MODELS] : MODELS)
+    && same(contract.judges, PANEL), 'declared edition, creator roster, or panel changed.');
+  if (contract.coverageExtension) {
+    const extension = contract.coverageExtension;
+    requireEvidence(extension.version === EXTENSION_VERSION && typeof extension.purpose === 'string' && extension.purpose.trim()
+      && ['parentSnapshotSha256', 'parentManifestSha256'].every(key => /^[a-f0-9]{64}$/.test(extension[key] ?? ''))
+      && same(extension.addedConfigurations, ADDED_MODELS) && extension.retainedConfigurationCount === MODELS.length
+      && extension.additionalGenerationCount === ADDED_MODELS.length * CONDITIONS.length
+      && extension.additionalJudgeRequestCount === ADDED_MODELS.length * PANEL.length, 'declared coverage extension changed.');
+    requireEvidence(contract.executionValidationPolicy?.version === EXECUTION_VALIDATION_VERSION
+      && /^[a-f0-9]{64}$/.test(contract.executionValidationPolicy.sha256 ?? '')
+      && contract.executionValidationPolicy.purpose === EXECUTION_VALIDATION_PURPOSE, 'supplemental execution validation identity changed.');
+  } else requireEvidence(!contract.executionValidationPolicy, 'supplemental execution policy lacks a declared extension.');
   requireEvidence(contract.task?.id === 'scifi-outline' && contract.task.wordLimit === 550 && typeof contract.task.prompt === 'string'
     && contract.task.rubric?.length === 4 && new Set(contract.task.rubric.map(item => item.id)).size === 4, 'single-prompt task or rubric changed.');
   requireEvidence(['sourceSha256', 'manifestSha256', 'specificationSha256', 'bundleSha256'].every(key => /^[a-f0-9]{64}$/.test(contract[key] ?? '')),
@@ -77,6 +106,8 @@ function validateContract(contract) {
 function buildProjection(contract, responses, judgeRequests) {
   validateContract(contract);
   const dimensions = dimensionsFor(contract), settings = contract.configurations.map(identity);
+  const settingCount = settings.length, expectedResponseCount = settingCount * CONDITIONS.length;
+  const expectedPairedJudgeCallCount = settingCount * PANEL.length;
   const scored = response => response.judgments.length === 2 ? mean(response.judgments.map(judge => judge.score)) : null;
   const cells = responses.map(response => {
     const pair = responses.filter(item => item.configurationId === response.configurationId);
@@ -125,22 +156,23 @@ function buildProjection(contract, responses, judgeRequests) {
   const pairs = settings.map(setting => ({ baseline: aggregates.find(item => item.settingId === setting.id && item.condition === 'baseline').exactScore,
     treatment: aggregates.find(item => item.settingId === setting.id && item.condition === 'skill').exactScore })).filter(pair => Number.isFinite(pair.baseline) && Number.isFinite(pair.treatment));
   const summary = { baseline: round(mean(pairs.map(pair => pair.baseline))), treatment: round(mean(pairs.map(pair => pair.treatment))),
-    delta: round(mean(pairs.map(pair => pair.treatment - pair.baseline))), usablePairs: pairs.length, expectedPairs: 6,
+    delta: round(mean(pairs.map(pair => pair.treatment - pair.baseline))), usablePairs: pairs.length, expectedPairs: settingCount,
     wins: pairs.filter(pair => pair.treatment > pair.baseline).length, ties: pairs.filter(pair => pair.treatment === pair.baseline).length,
     losses: pairs.filter(pair => pair.treatment < pair.baseline).length };
-  const coverage = { benchmarkCount: 1, caseCount: 1, settingCount: 6, completedSettingCount: pairs.length,
-    responseCount: responses.filter(response => response.runtime).length, expectedResponseCount: 12,
-    scoredResponseCount: cells.filter(cell => Number.isFinite(cell.exactScore)).length, usablePairs: pairs.length, expectedPairs: 6,
-    judgmentCount: responses.reduce((sum, response) => sum + response.judgments.length, 0), expectedJudgmentCount: 24,
-    pairedJudgeCallCount: judgeRequests.filter(request => request.status === 'succeeded').length, expectedPairedJudgeCallCount: 12,
-    executionComplete: pairs.length === 6, executionStatus: pairs.length === 6 ? 'complete' : 'in-progress' };
+  const coverage = { benchmarkCount: 1, caseCount: 1, settingCount, completedSettingCount: pairs.length,
+    responseCount: responses.filter(response => response.runtime).length, expectedResponseCount,
+    scoredResponseCount: cells.filter(cell => Number.isFinite(cell.exactScore)).length, usablePairs: pairs.length, expectedPairs: settingCount,
+    judgmentCount: responses.reduce((sum, response) => sum + response.judgments.length, 0), expectedJudgmentCount: expectedResponseCount * PANEL.length,
+    pairedJudgeCallCount: judgeRequests.filter(request => request.status === 'succeeded').length, expectedPairedJudgeCallCount,
+    executionComplete: pairs.length === settingCount, executionStatus: pairs.length === settingCount ? 'complete' : 'in-progress' };
   const limitations = ['One prompt and one generation per condition describe this task, not general storytelling ability or repeated-run reliability.',
     'The two model judges share a provider and overlap with creator families; no human calibration or population confidence interval is claimed.',
     'The skill condition includes the complete frozen root and twists reference once. This does not isolate their separate effects or control for added input length.',
     'All declared settings and outcomes are retained. Missing responses and reviews do not become zero or enter a comparable rank.',
-    'The 24 planned top-level benchmark CLI calls comprise 12 creator calls and 12 paired reviewer calls, not a verified count of underlying provider inference requests. Host automatic retries are zero; provider-internal retries and built-in instructions are not independently verified.'];
+    `The ${expectedResponseCount + expectedPairedJudgeCallCount} planned top-level benchmark CLI calls comprise ${expectedResponseCount} creator calls and ${expectedPairedJudgeCallCount} paired reviewer calls, not a verified count of underlying provider inference requests. Host automatic retries are zero; provider-internal retries and built-in instructions are not independently verified.`,
+    ...(contract.coverageExtension ? ['The original six-setting cohort is retained unchanged. Eight declared model-and-effort settings append 16 creator calls and 16 paired reviewer calls; no original setting was rerun or replaced.'] : [])];
   const availability = { status: 'development', verification: 'unverified', code: 'development-uncalibrated', message: 'Exploratory model-judged results',
-    detail: 'One prompt, six medium-effort GPT and Claude settings, one plain/skill pair each, and two blinded paired judges.',
+    detail: `One prompt, ${settingCount} declared GPT and Claude model-and-effort settings, one plain/skill pair each, and two blinded paired judges.`,
     blockers: [{ code: 'human-calibration-pending', message: 'Human calibration pending.' }] };
   const scoreBasis = { id: `${PLOT_TWISTS_PAIRED_EDITION}:${contract.sourceSha256}`, edition: PLOT_TWISTS_PAIRED_EDITION,
     label: 'Plot twists · single-prompt paired panel', method: 'complete-paired-single-prompt-two-judge-mean-v2', unit: 'rubric-points',
@@ -152,39 +184,47 @@ function buildProjection(contract, responses, judgeRequests) {
     sourceSha256: contract.sourceSha256, manifestSha256: contract.manifestSha256, coverage,
     uncertainty: { status: 'descriptive-single-generation', reason: limitations[0] } };
   const benchmark = { id: ID, trackId: 'storytelling', familyId: 'writing', category: 'writing', suite: 'Storytelling', name: 'Plot twists', title: 'Plot twists',
-    description: 'One brief science-fiction outline with major plot twists, compared across six GPT and Claude models at medium effort.',
+    description: `One brief science-fiction outline with major plot twists, compared across ${settingCount} GPT and Claude settings at their declared effort levels.`,
     taskKind: 'story-outline', prompt: contract.task.prompt, judging: { panel: PANEL, synthesizer: null }, limitations,
     detailHref: `benchmark-report.html#${ID}`, reportFragment: ID, evidenceKind: 'development', resultAvailability: availability,
-    measured: { ...summary, complete: coverage.scoredResponseCount, total: 12, treatmentLabel: 'Storytelling skill', calibration: 'Human calibration pending' } };
+    measured: { ...summary, complete: coverage.scoredResponseCount, total: expectedResponseCount, treatmentLabel: 'Storytelling skill', calibration: 'Human calibration pending' } };
   const cases = [{ id: contract.task.id, benchmarkId: ID, title: contract.task.title, prompt: contract.task.prompt, wordLimit: contract.task.wordLimit,
     rubric: contract.task.rubric.map(item => ({ ...item, dimensionId: item.id, weight: 25 })) }];
-  const caseSummary = { caseId: contract.task.id, benchmarkId: ID, ...summary, complete: coverage.scoredResponseCount, total: 12,
+  const caseSummary = { caseId: contract.task.id, benchmarkId: ID, ...summary, complete: coverage.scoredResponseCount, total: expectedResponseCount,
     detailHref: `${benchmark.detailHref}/${contract.task.id}` };
-  const counts = { families: 1, tracks: 1, benchmarks: 1, categories: 1, cases: 1, conditions: 2, settings: 6,
-    resultEntries: 12, responses: coverage.responseCount, developmentResultSets: 1, eligibleResultSets: 0, withheldResultSets: 0 };
+  const counts = { families: 1, tracks: 1, benchmarks: 1, categories: 1, cases: 1, conditions: 2, settings: settingCount,
+    resultEntries: expectedResponseCount, responses: coverage.responseCount, developmentResultSets: 1, eligibleResultSets: 0, withheldResultSets: 0 };
   return { kind: 'vasirbenchmark-writing-projection', schemaVersion: 1, trialCount: 1, caseLabel: 'prompt', trialLabel: 'Trial',
     program: { id: 'vasirbench', title: 'VasirBench', status: 'development', evidenceStatus: 'development', verification: 'unverified' },
-    meta: { release: 'Plot twists · September 2026', status: availability.message, categories: 1, benchmarks: 1, settings: 6, conditions: 2, trials: 1, aggregateCells: 12, runs: 1, calibration: 0 },
+    meta: { release: 'Plot twists · September 2026', status: availability.message, categories: 1, benchmarks: 1, settings: settingCount, conditions: 2, trials: 1, aggregateCells: expectedResponseCount, runs: contract.coverageExtension ? 2 : 1, calibration: 0 },
     scoreBasis, conditions: CONDITIONS, categories: [{ id: 'writing', name: 'Writing', title: 'Writing', short: 'WRITE', weight: 1, color: '#b65a31', trackIds: ['storytelling'] }],
     families: [{ id: 'writing', title: 'Writing', description: 'Task-specific writing benchmarks.', trackIds: ['storytelling'] }],
     tracks: [{ id: 'storytelling', familyId: 'writing', title: 'Storytelling', description: 'Understanding and creating narrative.', benchmarkIds: [ID], resultAvailability: availability }],
     benchmarks: [benchmark], results: [{ benchmarkId: ID, runId: contract.runId, status: 'development', verification: 'unverified',
       baselineScore: summary.baseline, treatmentScore: summary.treatment, delta: summary.delta, responseCount: coverage.responseCount, matchedConfigurationCount: pairs.length, coverage }],
     settings, entries, benchmarkResults: aggregates, benchmarkSummaries: [{ benchmarkId: ID, runId: contract.runId, status: 'development', verification: 'unverified', evidenceKind: 'development',
-      baselineLabel: 'Plain answer', treatmentLabel: 'Storytelling skill', ...summary, complete: coverage.scoredResponseCount, total: 12,
+      baselineLabel: 'Plain answer', treatmentLabel: 'Storytelling skill', ...summary, complete: coverage.scoredResponseCount, total: expectedResponseCount,
       completionLabel: 'scored responses', calibration: 'Human calibration pending', detailHref: benchmark.detailHref, sourceHref: null }],
     cases, caseResults: cells, caseSummaries: [caseSummary], trialSummaries: [{ ...caseSummary, trialNumber: 1 }],
     methodology: { sourceContract: contract, corpusSha256: contract.specificationSha256, rubricSha256: hash(JSON.stringify(contract.task.rubric)),
       skillSha256: contract.bundleSha256, corpus: [{ id: contract.task.id, title: contract.task.title, sha256: hash(contract.task.prompt) }],
-      skillFiles: contract.skillFiles, ratingAnchors: contract.anchors, generationContract: 'The exact prompt is shared by all six creators. Plain receives no skill material; skill receives the entire frozen root and twists reference inline once. Both use fresh sessions. No tool reads or old trial evidence are claimed.',
+      skillFiles: contract.skillFiles, ratingAnchors: contract.anchors, generationContract: 'The exact prompt is shared by every declared model-and-effort setting. Plain receives no skill material; skill receives the entire frozen root and twists reference inline once. Both use fresh sessions. No tool reads or old ten-trial edition evidence are claimed.',
       blinding: scoreBasis.blinding, limitations, execution: { runnerVersion: contract.runtimeVersion, runtimeInventory: JSON.stringify(contract.runtimeInventory),
         trialCount: 1, hostAutomaticRetries: 0, deliveryMode: 'frozen-inline-once',
         ...(contract.runtimeValidationErratum ? { validationErratumVersion: contract.runtimeValidationErratum.version,
           validationErratumSha256: contract.runtimeValidationErratum.sha256, validationErratumPurpose: contract.runtimeValidationErratum.purpose,
-          validationErratumAdditionalInferenceCalls: contract.runtimeValidationErratum.additionalInferenceCalls } : {}) },
+          validationErratumAdditionalInferenceCalls: contract.runtimeValidationErratum.additionalInferenceCalls,
+          ...(contract.coverageExtension ? { validationErratumCohort: 'original six-setting cohort' } : {}) } : {}),
+        ...(contract.coverageExtension ? { coverageExtensionVersion: contract.coverageExtension.version,
+          coverageExtensionPurpose: contract.coverageExtension.purpose, parentSnapshotSha256: contract.coverageExtension.parentSnapshotSha256,
+          parentManifestSha256: contract.coverageExtension.parentManifestSha256, supplementalManifestSha256: contract.manifestSha256,
+          retainedSettingCount: contract.coverageExtension.retainedConfigurationCount, additionalSettingCount: contract.coverageExtension.addedConfigurations.length,
+          additionalCreatorCalls: contract.coverageExtension.additionalGenerationCount, additionalPairedReviewerCalls: contract.coverageExtension.additionalJudgeRequestCount,
+          executionValidationPolicyVersion: contract.executionValidationPolicy.version, executionValidationPolicySha256: contract.executionValidationPolicy.sha256,
+          executionValidationPolicyPurpose: contract.executionValidationPolicy.purpose } : {}) },
       resourceAccounting: 'Generation resources belong to each answer. Each judge request assesses a pair; count requestId once when totaling judge usage. Missing usage remains unknown. Raw provider usage is retained in source artifacts; Claude receipts may include auxiliary claude-haiku-4-5 activity, which is not a scored story answer or another declared benchmark call.' },
     coverage, categoryLeaders: [], efficientFrontier: [], regressions: entries.filter(entry => entry.condition === 'skill' && entry.delta < 0),
-    callouts: { overall: 'Plot twists contributes one equally weighted benchmark to the current Writing basis.', value: 'Quality, length and resources are separate outcomes.', regression: 'All six settings and paired losses remain visible.', category: 'One prompt; one plain/skill pair per model at medium effort.' },
+    callouts: { overall: 'Plot twists contributes one equally weighted benchmark to the current Writing basis.', value: 'Quality, length and resources are separate outcomes.', regression: `All ${settingCount} declared settings and paired losses remain visible.`, category: 'One prompt; one plain/skill pair per declared model-and-effort setting.' },
     availability, counts };
 }
 
@@ -197,6 +237,7 @@ export function projectPlotTwistsPairedRun({ snapshot, sourceSha256 }) {
       content: file.content, sha256: file.sha256, bytes: Buffer.byteLength(file.content) }))];
   const judgeRequests = snapshot.judgments.map(judge => ({ id: judge.id, caseId: contract.task.id, trialNumber: 1,
     configurationId: judge.configurationId, judgeConfigurationId: judge.judgeConfigurationId, status: judge.status,
+    ...(contract.coverageExtension ? { provenance: cohortProvenance(contract, judge.configurationId) } : {}),
     candidateMap: judge.candidateMap, candidateResponseHashes: judge.candidateResponseHashes,
     promptText: judge.promptText ?? null, promptSha256: judge.promptSha256 ?? null,
     outputText: judge.responseText ?? null, outputSha256: judge.outputSha256 ?? null,
@@ -230,6 +271,7 @@ export function projectPlotTwistsPairedRun({ snapshot, sourceSha256 }) {
       disagreement: judgments.length === 2 ? { scoreSpread: Math.abs(judgments[0].score - judgments[1].score),
         dimensionRanges: dimensions.map(item => ({ id: item.id, spread: Math.abs(judgments[0].dimensions[item.id].rating - judgments[1].dimensions[item.id].rating) })) } : null,
       provenance: { sourceSha256, manifestSha256: snapshot.manifestSha256, generationId: row.id, outputSha256: succeeded ? row.outputSha256 : null,
+        ...cohortProvenance(contract, row.configurationId),
         questionSha256: hash(contract.task.prompt), skillSha256: row.condition === 'skill' ? bundle.sha256 : null,
         exactMessagesSha256: hash(JSON.stringify(exactMessages)), inputPayloadSha256: row.inputPayloadSha256 ?? null },
       runtime: succeeded ? { freshSession: true, durationMs: row.durationMs ?? null, usage: usage(row.usage), rawProviderStreamRetained: true,
@@ -250,9 +292,11 @@ export function projectPlotTwistsPairedRun({ snapshot, sourceSha256 }) {
 export function validatePlotTwistsPairedPublication(projection, responseBundle) {
   const contract = projection?.methodology?.sourceContract;
   validateContract(contract);
+  const models = contract.configurations.map(item => item.id), answerCount = models.length * CONDITIONS.length;
+  const requestCount = models.length * PANEL.length;
   requireEvidence(projection.scoreBasis?.edition === PLOT_TWISTS_PAIRED_EDITION && same(projection.scoreBasis.dimensions, dimensionsFor(contract))
     && same(projection.scoreBasis.judges, PANEL) && projection.trialCount === 1 && projection.cases.length === 1
-    && same(projection.settings.map(item => item.configurationId), MODELS) && projection.caseResults.length === 12, 'public task, roster, or scoring contract changed.');
+    && same(projection.settings.map(item => item.configurationId), models) && projection.caseResults.length === answerCount, 'public task, roster, or scoring contract changed.');
   requireEvidence(projection.coverage.judgmentCount === 2 * projection.coverage.pairedJudgeCallCount,
     'completed paired reviews no longer match their two answer assessments.');
   for (const cell of projection.caseResults) {
@@ -276,19 +320,21 @@ export function validatePlotTwistsPairedPublication(projection, responseBundle) 
         usage: { inputTokens: cell.inputTokens, outputTokens: cell.outputTokens, totalTokens: cell.totalTokens } } : null,
       judgments: Array.from({ length: cell.coverage.completedJudgments }, () => ({ score: cell.exactScore,
         dimensions: Object.fromEntries(Object.entries(cell.dimensions).map(([id, rating]) => [id, { rating }])) })) }));
-    const requests = Array.from({ length: 12 }, (_, index) => ({ status: index < projection.coverage.pairedJudgeCallCount ? 'succeeded' : 'pending' }));
+    const requests = Array.from({ length: requestCount }, (_, index) => ({ status: index < projection.coverage.pairedJudgeCallCount ? 'succeeded' : 'pending' }));
     requireEvidence(same(projection, buildProjection(contract, evidence, requests)), 'public aggregates differ from their retained dimension means and coverage.');
     return projection;
   }
   requireEvidence(responseBundle.kind === 'vasirbenchmark-writing-responses' && responseBundle.edition === PLOT_TWISTS_PAIRED_EDITION
-    && same(responseBundle.sourceContract, contract) && responseBundle.responses.length === 12 && responseBundle.judgeRequests.length === 12, 'public evidence inventory changed.');
-  requireEvidence(new Set(responseBundle.responses.map(item => `${item.configurationId}:${item.condition}`)).size === 12
-    && responseBundle.responses.every(item => MODELS.includes(item.configurationId) && ['baseline', 'skill'].includes(item.condition)
+    && same(responseBundle.sourceContract, contract) && responseBundle.responses.length === answerCount && responseBundle.judgeRequests.length === requestCount, 'public evidence inventory changed.');
+  requireEvidence(new Set(responseBundle.responses.map(item => `${item.configurationId}:${item.condition}`)).size === answerCount
+    && responseBundle.responses.every(item => models.includes(item.configurationId) && ['baseline', 'skill'].includes(item.condition)
       && item.benchmarkId === ID && item.caseId === contract.task.id && item.trialNumber === 1
       && item.settingId === identity(contract.configurations.find(setting => setting.id === item.configurationId)).id), 'public answer identities changed.');
-  requireEvidence(new Set(responseBundle.judgeRequests.map(item => item.id)).size === 12
-    && new Set(responseBundle.judgeRequests.map(item => `${item.configurationId}:${item.judgeConfigurationId}`)).size === 12
-    && responseBundle.judgeRequests.every(item => MODELS.includes(item.configurationId) && PANEL.includes(item.judgeConfigurationId)), 'public judge inventory changed.');
+  requireEvidence(new Set(responseBundle.judgeRequests.map(item => item.id)).size === requestCount
+    && new Set(responseBundle.judgeRequests.map(item => `${item.configurationId}:${item.judgeConfigurationId}`)).size === requestCount
+    && responseBundle.judgeRequests.every(item => models.includes(item.configurationId) && PANEL.includes(item.judgeConfigurationId)), 'public judge inventory changed.');
+  if (contract.coverageExtension) for (const request of responseBundle.judgeRequests)
+    requireEvidence(same(request.provenance, cohortProvenance(contract, request.configurationId)), 'paired review parent or supplement provenance changed.');
   const files = new Map(responseBundle.promptFiles.map(file => [file.id, file]));
   requireEvidence(files.size === 3 && files.get('paired-skill-bundle')?.sha256 === contract.bundleSha256, 'inline treatment identity changed.');
   for (const file of files.values()) requireEvidence(hash(file.content) === file.sha256 && Buffer.byteLength(file.content) === file.bytes, 'frozen skill bytes changed.');
@@ -325,6 +371,8 @@ export function validatePlotTwistsPairedPublication(projection, responseBundle) 
     requireEvidence(same(originals, expectedMessages) && response.provenance.skillSha256 === (response.condition === 'skill' ? contract.bundleSha256 : null), 'plain or skill input contract changed.');
     requireEvidence(response.provenance.sourceSha256 === contract.sourceSha256 && response.provenance.manifestSha256 === contract.manifestSha256
       && response.provenance.questionSha256 === hash(contract.task.prompt), 'answer source identity changed.');
+    if (contract.coverageExtension) for (const [key, value] of Object.entries(cohortProvenance(contract, response.configurationId)))
+      requireEvidence(response.provenance[key] === value, 'answer parent or supplement provenance changed.');
     if (response.runtime) requireEvidence(hash(response.outputText) === response.provenance.outputSha256 && words(response.outputText) === response.wordCount
       && Array.from(response.outputText).length === response.characterCount && response.wordLimitExceeded === (response.wordCount > 550), 'original answer bytes changed.');
     else requireEvidence(response.outputText === '' && response.score === null && response.judgments.length === 0, 'failed or pending generation became a scored answer.');
@@ -357,7 +405,8 @@ export function buildPlotTwistsPairedPublication({ repoRootDirectory, selection,
   const bytes = readFileSyncImplementation(path.join(repoRootDirectory, pin.path), 'utf8');
   requireEvidence(hash(bytes) === pin.sha256, 'selected immutable paired source changed.');
   const built = projectPlotTwistsPairedRun({ snapshot: JSON.parse(bytes), sourceSha256: pin.sha256 });
-  requireEvidence(built.projection.coverage.completedSettingCount === 6, 'the new public measurement requires all six complete declared pairs.');
+  requireEvidence(built.projection.coverage.completedSettingCount === built.projection.settings.length,
+    'the public measurement requires all declared pairs to be complete.');
   return built;
 }
 
@@ -365,8 +414,9 @@ export function preparePlotTwistsPairedPublicationSource({ repoRootDirectory, ru
   const snapshot = exportPairedRun({ runDirectoryPath: runDirectory });
   validatePairedRunExport(snapshot);
   const text = `${JSON.stringify(snapshot, null, 2)}\n`, sha256 = hash(text);
-  requireEvidence(projectPlotTwistsPairedRun({ snapshot, sourceSha256: sha256 }).projection.coverage.completedSettingCount === 6,
-    'all six declared pairs require their original two reviews before publication.');
+  const projection = projectPlotTwistsPairedRun({ snapshot, sourceSha256: sha256 }).projection;
+  requireEvidence(projection.coverage.completedSettingCount === projection.settings.length,
+    'all declared pairs require their original two reviews before publication.');
   const relative = `.agents/vasir-evals/${PLOT_TWISTS_PAIRED_EDITION}/publication-snapshots/${sha256}/snapshot.json`;
   const filename = path.join(repoRootDirectory, relative);
   fs.mkdirSync(path.dirname(filename), { recursive: true });

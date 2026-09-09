@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
 import test from 'node:test';
-import { verifyCoreJudgeOnlyRecovery, verifyWritingSourceSelections, verifyPreservedWritingEvidence } from '../docs/work/vasir-benchmarking/writing-category/source-lineage.mjs';
+import { verifyCoreJudgeOnlyRecovery, verifyWritingSourceSelections, verifyPreservedWritingEvidence, verifyPairedTwistsCoverageAppend } from '../docs/work/vasir-benchmarking/writing-category/source-lineage.mjs';
 import { verifyTwistsCompletionCoverage } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 import { createTwistsCompletion } from '../cli/eval/plot-twists-completion.js';
 import { projectWritingRun } from '../cli/eval/writing-publication.js';
+import { completeSupplementalPairedFixture } from './helpers/plot-twists-paired-fixture.js';
 
 const clone = value => JSON.parse(JSON.stringify(value));
 const row = { rowKey: 'a', rowStatus: 'complete', outputText: 'Original answer', outputHash: 'original', score: 40, scoreBasisHash: 'old' };
@@ -31,6 +34,51 @@ test('judge-only recovery permits new reviews and derived scores, never replacem
     const changed = clone(after); change(changed);
     assert.throws(() => verifyCoreJudgeOnlyRecovery(original, changed));
   }
+});
+
+test('paired coverage append retains the exact accepted parent and rejects same-edition replacement', async t => {
+  const { snapshot, parentSnapshot, parentSnapshotPath } = await completeSupplementalPairedFixture(t);
+  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  const parentHash = hash(fs.readFileSync(parentSnapshotPath));
+  assert.doesNotThrow(() => verifyPairedTwistsCoverageAppend(parentSnapshot, snapshot, parentHash));
+  for (const mutate of [
+    value => { value.coverageExtension.parentSnapshotSha256 = '0'.repeat(64); },
+    value => { value.parentSnapshot.generations[0].responseText += ' changed'; },
+    value => { value.generations[0].rawStdout += ' changed'; },
+    value => { value.judgments[0].responseText += ' changed'; },
+    value => { value.generations.shift(); },
+    value => { value.judgments.push(value.judgments[0]); },
+    value => { value.generations.at(-1).configurationId = parentSnapshot.generations[0].configurationId; },
+    value => { delete value.coverageExtension; }
+  ]) {
+    const changed = clone(snapshot); mutate(changed);
+    assert.throws(() => verifyPairedTwistsCoverageAppend(parentSnapshot, changed, parentHash));
+  }
+  const repo = path.dirname(parentSnapshotPath);
+  const write = (relative, value) => {
+    const bytes = JSON.stringify(value, null, 2) + '\n';
+    fs.mkdirSync(path.dirname(path.join(repo, relative)), { recursive: true });
+    fs.writeFileSync(path.join(repo, relative), bytes);
+    return { path: relative, bytes: Buffer.byteLength(bytes), sha256: hash(bytes) };
+  };
+  const parentPin = write('original/snapshot.json', parentSnapshot);
+  const pairedSelection = pin => ({ kind: 'vasirbenchmark-plot-twists-paired-source', schemaVersion: 1,
+    edition: 'storytelling-plot-twists-paired-v2', snapshot: { path: pin.path, sha256: pin.sha256 } });
+  const previous = ['storytelling-core-idea', 'storytelling-plot-twists', 'dungeon-master-adventure-outline', 'storytelling-magic-discovery'].map(benchmarkId => {
+    const paired = benchmarkId === 'storytelling-plot-twists';
+    const source = paired ? parentPin : write(benchmarkId + '/run.json', { historical: benchmarkId });
+    return { benchmarkId, ...write(benchmarkId + '/publication.json', paired ? pairedSelection(source) : { run: source }), sources: [source],
+      ...(paired ? { lineage: { kind: 'declared-writing-source-replacement', edition: 'storytelling-plot-twists-paired-v2', originalEvidencePreserved: true, priorAnswersAndReviewsReused: false } } : {}) };
+  });
+  write('storytelling-plot-twists/publication.json', pairedSelection(write('extension/snapshot.json', snapshot)));
+  const accepted = verifyWritingSourceSelections({ repo, previousSelections: previous });
+  const lineage = accepted.find(item => item.benchmarkId === 'storytelling-plot-twists').lineage;
+  assert.equal(lineage.kind, 'declared-writing-coverage-extension');
+  assert.equal(lineage.parentSourceSha256, parentHash); assert.equal(lineage.originalSettingsRerun, false);
+  assert.deepEqual(lineage.previousLineage, previous[1].lineage);
+  assert.deepEqual(verifyWritingSourceSelections({ repo, previousSelections: accepted }), accepted);
+  write('storytelling-plot-twists/publication.json', pairedSelection(parentPin));
+  assert.throws(() => verifyWritingSourceSelections({ repo, previousSelections: accepted }), /original paired source history/);
 });
 
 test('policy-blocked Core generation rows are also immutable', () => {
