@@ -362,6 +362,19 @@
   scroll-margin-top: 0.75rem;
 }
 
+.report-judge-details {
+  min-width: 0;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.report-judge-details > summary {
+  padding: 1.2rem clamp(1rem, 5vw, 4.5rem);
+}
+
+.report-judge-details__body {
+  min-width: 0;
+}
+
 .report-section__heading {
   margin-bottom: 1.4rem;
   display: grid;
@@ -1688,12 +1701,12 @@
     overflow-wrap: anywhere;
   }
 
-  :where([data-active-writing-benchmark="storytelling-magic-discovery"]) .writing-dimensions :is(th, td):first-child {
+  .writing-dimensions :is(th, td):first-child {
     min-width: 6rem;
     overflow-wrap: normal;
   }
 
-  :where([data-active-writing-benchmark="storytelling-magic-discovery"]) .writing-dimensions :is(th, td):nth-child(2) {
+  .writing-dimensions :is(th, td):nth-child(2) {
     min-width: 4rem;
     overflow-wrap: normal;
   }

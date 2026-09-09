@@ -19,6 +19,22 @@ const GAMES_REHEARSAL_SITE_PATHS = Object.freeze([
 ]);
 const WRITING_REHEARSAL_SITE_PATHS = Object.freeze(['writing-data.js', 'writing-responses.js', 'writing-creation-responses.js', 'writing-twists-responses.js', 'writing-dungeon-master-responses.js']);
 
+// Fullscreen exit can legitimately restore a mobile scroll position outside the
+// observed frame. Keep that resource-unload proof separate from explicit Stop.
+export function classifyGamesFullscreenExitState(state, expectedRunId) {
+  assert.equal(state.fullscreen, false, 'Fullscreen must have exited before checking Stop.');
+  assert.equal(state.runId, expectedRunId, 'Fullscreen exit must retain the same game card.');
+  assert.equal(state.closePresent, true, 'The same game must retain its Stop control.');
+  if (state.mediaCount === 1 && state.ownMediaCount === 1 && state.closeDisabled === false) return 'active';
+  assert.equal(state.mediaCount, 0, `Unexpected media after fullscreen exit: ${JSON.stringify(state)}`);
+  assert.equal(state.ownMediaCount, 0);
+  assert.equal(state.closeDisabled, true);
+  assert.equal(state.feedback, 'Stopped while off screen. Activate again to restart.',
+    'An unloaded game requires the exact offscreen-stop explanation.');
+  assert.equal(state.frameWhollyOutside, true, 'An offscreen-unload result must show the frame outside the viewport.');
+  return 'offscreen-unloaded';
+}
+
 // Read only the Games-scoped subset, but never silently accept missing or unknown site files.
 // Exporting this adapter allows its fail-closed manifest rules to be tested without Chrome.
 export function loadGamesRehearsalSiteFiles({ siteFiles, releaseId: declaredReleaseId, manifestPath, origin = 'https://vasirbenchmark.com' }) {
@@ -432,8 +448,41 @@ try {
   await capture(`${width < 600 ? 'mobile' : 'desktop'}-games-fullscreen.png`);
   await evaluate('document.exitFullscreen()');
   await waitFor(() => evaluate('!document.fullscreenElement'), 'Fullscreen exits');
-  await click('.game-artifact__actions [data-artifact-action="close"]:enabled');
-  check('Stop unloads active game and returns focus', await evaluate('document.querySelectorAll("iframe,video").length === 0 && document.activeElement.classList.contains("game-artifact__watch")'));
+  const stoppedArticle = `.game-artifact[data-run-id=${JSON.stringify(frameState.runId)}]`;
+  // Snapshot and click in the same browser task so an observer callback cannot
+  // invalidate an enabled-control lookup between two separate CDP evaluations.
+  fullscreen.exit = await evaluate(`(() => {
+    const article = document.querySelector(${JSON.stringify(stoppedArticle)});
+    const frame = article?.querySelector('.game-artifact__frame');
+    const rect = frame?.getBoundingClientRect();
+    const close = article?.querySelector('[data-artifact-action="close"]');
+    const state = {fullscreen:Boolean(document.fullscreenElement),runId:article?.dataset.runId,
+      closePresent:Boolean(close),closeDisabled:close?.disabled,
+      mediaCount:document.querySelectorAll('iframe,video').length,ownMediaCount:article?.querySelectorAll('iframe,video').length,
+      feedback:article?.querySelector('.game-artifact__feedback')?.textContent?.trim(),
+      frameWhollyOutside:Boolean(rect && (rect.bottom <= 0 || rect.top >= innerHeight || rect.right <= 0 || rect.left >= innerWidth)),
+      frameRect:rect ? {top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right} : null,
+      viewport:{width:innerWidth,height:innerHeight},explicitStopActivated:false};
+    if (state.mediaCount === 1 && state.ownMediaCount === 1 && close && !close.disabled) {
+      close.scrollIntoView({block:'center',behavior:'instant'}); close.click(); state.explicitStopActivated = true;
+    }
+    return state;
+  })()`);
+  fullscreen.exit.mode = classifyGamesFullscreenExitState(fullscreen.exit, frameState.runId);
+  if (fullscreen.exit.mode === 'offscreen-unloaded') {
+    checks.push('Fullscreen exit restored an offscreen frame and unloaded it with the expected explanation');
+    await click(`${stoppedArticle} .game-artifact__actions [data-artifact-action="play"]:enabled`);
+    await waitFor(() => evaluate(`(() => {
+      const article = document.querySelector(${JSON.stringify(stoppedArticle)});
+      const frame = article?.querySelector('iframe');
+      if (!frame || frame.src !== ${JSON.stringify(frameState.url)} || document.querySelectorAll('iframe,video').length !== 1) return false;
+      try { return !frame.contentWindow.document; } catch(error) { return error.name === 'SecurityError'; }
+    })()`), 'The same game reloads at its original separate-origin URL for the explicit Stop check');
+    await gameContext(frameState.url);
+    await click(`${stoppedArticle} .game-artifact__actions [data-artifact-action="close"]:enabled`);
+    fullscreen.exit.explicitStopAfterReactivation = true;
+  } else check('Explicit Stop was activated on the still-active original game', fullscreen.exit.explicitStopActivated);
+  check('Stop unloads active game and returns focus', await evaluate(`document.querySelectorAll('iframe,video').length === 0 && document.activeElement === document.querySelector(${JSON.stringify(`${stoppedArticle} .game-artifact__watch`)})`));
 
   const published = await evaluate(`(() => { const data = window.VASIR_DATA.games; return data.runs.map(row => ({...row,reference:false})).map(row => ({id:row.id,configurationId:row.configurationId || null,reference:row.reference,status:row.status,eligible:row.score?.eligible ?? null,declaredFunctionalFailure:row.judgments?.some(judge => [judge.gates?.boot,judge.gates?.mobilePlay].some(gate => gate?.status === 'fail')) || false,artifact:row.artifact})); })()`);
   for (const [index, row] of published.entries()) {

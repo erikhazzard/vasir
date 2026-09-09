@@ -45,3 +45,26 @@ Only the operational audit's allocation ceiling/default and tests were then rais
 The metadata-only capacity check at 19:35:59.217Z reported 34 percent weekly usage, unchanged account context, and no spending or rate-limit stop. Receipt: `docs/work/vasir-benchmarking/writing-completion-20260908/codex-capacity-20260908T193559217Z.json`, SHA-256 `a7fb17d8fcfcd3ebe4ca6278a1d6ba21933cd722be4dca0493363616cebeae56`. It started no model turn and made no authentication, credit, or purchase change.
 
 The frozen controller resumed with `--recover --providers codex --concurrency 16 --maximum-calls 1161`, allowing at most 479 missing Codex writers and 682 missing fixed Astra Ultra reviews. Each missing unit receives at most one new attempt per invocation. New provider quota stops dispatch and drains active calls. Claude remains undispatched until root confirms its capacity. This continues the existing cohort and does not publish any result.
+
+## Completed Codex cohort and final drained archive
+
+Session `execution-2026-09-08T19-36-44.656Z` finished naturally at `2026-09-08T23:43:26.427Z`, with exactly 1,161 successful calls and no new failure. Its process (PID 40344, tool session 41574) exited zero and released the sole writer lock. All 736 Codex outlines and all 736 fixed-panel review calls are complete: 368 fully reviewed pairs, all six primary pairs and all ten transfer pairs for each of the 23 original Codex configurations. Across the three evening stages, 626 outlines and 703 review calls were added: 1,329 successes, with no quality rerolls or new scored failures.
+
+The checkpoint correctly remains `checkpointed-incomplete` for the full 33-setting experiment. The untouched remainder is 160 Fable outlines, 160 Opus outlines, and 320 corresponding fixed Codex review calls. No Claude generation was dispatched during this continuation. Both execution circuits are closed. The ledger retains all 1,414 expansion attempts: 1,408 successful attempts and the six historical quota failures; the original parent evidence also remains intact.
+
+The whole-evening audit passed at `2026-09-08T23:44:01.492Z`, retained in `operator-capacity/audit-2026-09-08T23-44-00.638Z/audit.json` (SHA-256 `e29ab53c45977b293bc5a3b82df4ac0f98bce06401d535f60266193b1c98cfe6`). It preserved all 110 prior successful writers, 33 prior reviews, 85 earlier expansion attempts, and 1,080 prior non-checkpoint files. It checked all 1,329 new attempts' raw/output hashes, distinct fresh sessions, exact prompt/configuration bindings, fixed reviewer identities, counterbalanced candidate order and output schema. Maximum observed concurrency was sixteen, with the earlier two- and eight-call stages independently checked against their own allocations. The four operational audit tests were rerun successfully before finalization.
+
+The final exact archive is `.agents/vasir-evals/dungeon-master-adventure-outline/completion-checkpoints/codex-complete-20260908T2344Z/`, created at `2026-09-08T23:44:19.659Z`. It contains 6,409 read-only, byte-pinned files. An independent verification at `23:44:54.024Z` rehashed the entire archive, confirmed its frozen source inspection, checked read-only file modes, and found no lockfiles or running sessions/attempts.
+
+- Run SHA-256: `24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248`.
+- Skill-snapshot file SHA-256: `3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6`.
+- File-inventory SHA-256: `1a3ca419eb379f3bc5141f5c10fc1f42437d92cab4e4a0e4e0fa8bba0ce4de9a`.
+- Archive-receipt SHA-256: `48ce5e415b210e35adca0d748c8ad81ab8cc04fa236d1f89185721575f498e19`.
+
+Root received this immutable archive for publication. This workstream did not change publication selectors or the published site.
+
+## Existing scheduling and recovery limits
+
+Read-only inspection confirmed that the frozen executor has no primary-first, model-priority, or separate judge-only selector. It always sorts eligible writers and reviewers by the frozen seed and unit key; bounded `--maximum-calls` stages do not change that order. The older standalone judge/resume implementations are not supported replacements for this expanded run: they use a different checkpoint format and original implementation pins, and the original resume path would select a different judge configuration from the expanded roster.
+
+The original recovery gate covers all historically interrupted providers, irrespective of the next invocation's writer-provider filter. A future Claude quota interruption would therefore require genuine post-interruption Claude readiness before another Codex-only invocation. No guard was weakened or cleared. Future Claude work requires root's explicit readiness/dispatch instruction, with exact prestate preservation and the original executor. The separate operational audit currently checks Codex `threadId` receipts; auditing a future Claude-containing stage would require a separately retained, tested audit-only extension for Claude `sessionId` receipts, not a change to frozen model execution.

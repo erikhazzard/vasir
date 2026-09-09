@@ -5,6 +5,7 @@ import path from "node:path";
 import process from "node:process";
 
 import { buildBenchmarkPublicationArtifact } from "./benchmark-publication-artifact.js";
+import { WRITING_COMPACT_BENCHMARKS } from './eval/writing-compact-publication.js';
 import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
 import { VasirCliError } from "./cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
@@ -1328,7 +1329,7 @@ async function verifyHttpPublication({ artifact, manifest, bucketName, fetchImpl
 }
 
 export function buildStorytellingBrowserProofChecks({ routes, siteRootDirectory, targetUrl, outputDirectory }) {
-  const benchmarkIds = ["storytelling-core-idea", "storytelling-plot-twists", "storytelling-magic-discovery", "dungeon-master-adventure-outline"].filter(id => routes.reportFragments.includes(`/benchmark-report.html#${id}`));
+  const benchmarkIds = ["storytelling-core-idea", "storytelling-plot-twists", "storytelling-magic-discovery", "dungeon-master-adventure-outline", ...WRITING_COMPACT_BENCHMARKS.map(benchmark => benchmark.id)].filter(id => routes.reportFragments.includes(`/benchmark-report.html#${id}`));
   return benchmarkIds.flatMap(benchmarkId => [[1440, 1000], [390, 844], [820, 1000]].map(([width, height]) => ({
     benchmarkId, width, height,
     args: [path.join(siteRootDirectory, "writing-browsercheck.mjs"), "--url", `${targetUrl}/`,

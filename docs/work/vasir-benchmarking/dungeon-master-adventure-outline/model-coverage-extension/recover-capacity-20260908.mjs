@@ -11,6 +11,18 @@ const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const save = (file, value) => fs.writeFileSync(file, JSON.stringify(value, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 
+export function verifyRecoverySessionIdentity(receipt, expectedProvider, seenSessions) {
+  assert.ok(['codex', 'claude'].includes(expectedProvider), 'Unsupported provider for session identity.');
+  assert.equal(receipt?.requestedConfiguration?.provider, expectedProvider, 'Session receipt provider mismatch.');
+  const field = expectedProvider === 'codex' ? 'threadId' : 'sessionId';
+  const id = receipt?.[field];
+  assert.ok(typeof id === 'string' && id.trim().length > 0, `Missing ${expectedProvider} ${field}.`);
+  const identity = `${expectedProvider}:${id}`;
+  assert.ok(!seenSessions.has(identity), 'A successful session was reused.');
+  seenSessions.add(identity);
+  return identity;
+}
+
 export function verifyRecoveryConcurrency(attempts, maximumConcurrency = 16) {
   assert.ok(Number.isInteger(maximumConcurrency) && maximumConcurrency >= 1 && maximumConcurrency <= 16, 'Root allocation cannot exceed sixteen.');
   const events = attempts.flatMap(attempt => {
@@ -123,7 +135,9 @@ try {
     for (const { pairId, judge } of priorReviews) assert.deepEqual(run.judging.pairs.find(pair => pair.pairId === pairId)?.judges.find(item => item.judgeId === judge.judgeId), judge, `Successful review changed: ${pairId}/${judge.judgeId}`);
     assert.deepEqual(run.expansionExecution.attempts.slice(0, original.expansionExecution.attempts.length), original.expansionExecution.attempts, 'Prior attempts changed.');
     const appended = run.expansionExecution.attempts.slice(original.expansionExecution.attempts.length);
-    const oldThreads = new Set([...priorRows, ...priorReviews.map(item => item.judge)].map(record => record.runtimeReceipt?.threadId).filter(Boolean));
+    const seenSessions = new Set();
+    for (const row of priorRows) verifyRecoverySessionIdentity(row.runtimeReceipt, row.provider, seenSessions);
+    for (const { judge } of priorReviews) verifyRecoverySessionIdentity(judge.runtimeReceipt, 'codex', seenSessions);
     for (const attempt of appended) {
       const streams = attempt.runtimeReceipt || attempt.error?.context;
       assert.equal(streams?.rawStreamsRetained, true, `Missing raw receipt: ${attempt.key}`);
@@ -143,8 +157,7 @@ try {
       const receipt = attempt.runtimeReceipt;
       assert.equal(receipt.freshSession, true);
       assert.equal(receipt.persistedSession, false);
-      assert.ok(receipt.threadId && !oldThreads.has(receipt.threadId), 'A successful session was reused.');
-      oldThreads.add(receipt.threadId);
+      verifyRecoverySessionIdentity(receipt, attempt.configurationId.split(':')[0], seenSessions);
       assert.equal(receipt.requestedConfiguration.id, attempt.configurationId);
       assert.equal(receipt.userPromptSha256, digest(record.promptText));
       if (attempt.kind === 'judge') {

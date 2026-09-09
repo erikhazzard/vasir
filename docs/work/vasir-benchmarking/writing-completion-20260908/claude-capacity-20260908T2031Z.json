@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAtApproximate": "2026-09-08T20:31:00Z",
+  "source": "Default Claude Code v2.1.263 interactive /usage in screen-reader safe mode; transcribed from refreshed terminal output, not its initial cached panel. No model prompt or generation.",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "plan": "Claude Max",
+  "sessionUsedPercent": 100,
+  "sessionResetLabel": "4:40pm (America/New_York)",
+  "sessionResetInterpretedUTC": "2026-09-08T20:40:00Z",
+  "weekAllModelsUsedPercent": 30,
+  "weekFableUsedPercent": 55,
+  "usageCreditsEnabled": false,
+  "usageCreditsObservation": "Usage credits are off · /usage-credits to turn them on",
+  "resetCreditConsumptionAllowed": false,
+  "environmentCheckedAt": "2026-09-08T20:32:13.335Z",
+  "claudeConfigDirOverridePresent": false,
+  "anthropicApiKeyOverridePresent": false,
+  "claudeOAuthTokenOverridePresent": false,
+  "diagnosticModelCalls": 0,
+  "decision": "Claude dispatch remains paused. The reported upcoming reset has not happened yet, and no payment, account, credential, or model-setting change was made."
+}

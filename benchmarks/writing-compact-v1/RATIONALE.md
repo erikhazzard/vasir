@@ -1,0 +1,15 @@
+# Compact Writing rationale
+
+This definition supersedes the unexecuted nine-task draft. The final sample is three plot-twist operations, one place description, and one original one-shot outline. It requires 60 creator calls and 60 paired judge calls across six Claude settings, not a new completion attempt for the historical 820-slot matrix.
+
+The task defines what is measured. D&D is a domain; its skill is one declared input. The place rubric measures evocation, specificity, coherent worldbuilding, and useful fulfillment. The one-shot rubric measures motives, coherent development, agency, consequence, and concise fulfillment. Neither demands statistics, combat balance, or exhaustive GM procedure. Item mechanics belongs to a future Game Design benchmark outside this run.
+
+The three twist tasks distinguish creation, repairing an unsupported reversal, and layered reinterpretation. The repair input and four preserved facts are identical between conditions. Later revelations must change the meaning of earlier material in the layered task; simply increasing the number of secrets receives no automatic credit. All tasks are evaluated on answer-specific effects, not adherence to a named school, vocabulary, or template.
+
+Only the skill root and explicitly selected references are frozen and delivered once inline. Storytelling uses the twist reference; repair also uses revision. Place uses the DM worldbuilding and location references; the one-shot uses adventure design. The original roots and reference bytes are checked against their prior frozen snapshots, then copied into a new immutable manifest. This demonstrates delivered context, not that the model attended to it.
+
+Both creator conditions have identical tasks, word caps, and zero tools. One Claude turn, 8,192 output tokens per segment including thinking, zero host/network retries, and two concurrent calls constrain the workload. The CLI's separate output-limit recovery can consume four such segments within one turn; actual evidence exposed this limitation and max dispatch was paused. This is not described as a whole-session token cap. Independent fresh Astra medium and Sol medium sessions assess each complete pair once. They receive opposite opaque candidate orders, the task, common anchors, four criteria, and original answers. No model identities, condition labels, skill, other reviews, or experiment discussion are supplied. Disagreement remains visible; no synthesizer reconciles scores.
+
+This is a small purposive sample, not a population estimate or a repeated-generation reliability study. The three benchmark means stay separate. New compact results must not be merged with old repeated trials or silently become required inputs to the broad Writing leaderboard. A versioned established-task score basis preserves comparable coverage while the new tasks are independently browseable.
+
+All legacy manifests, valid and failed generations, original reviews, and historical reports remain unchanged. The old unfinished matrix is retired from active execution, not erased. Existing Core idea and First discovery of magic evidence is reused without further model calls.

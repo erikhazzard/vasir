@@ -4,7 +4,51 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import vm from 'node:vm';
+import { createHash } from 'node:crypto';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { deriveExpectedOverallV3, deriveExpectedWritingCategory, deriveExpectedOverallAvailableCategories, verifyOverallV3Projection } from '../../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
+
+// Audit the original same-release Writing publication without loading it in the
+// page. Overall's production startup remains independent of the large archive.
+async function loadOverallV3Oracle(evaluate) {
+  const context = await evaluate('({root:window.VASIR_DATA,appUrl:[...document.scripts].map(script=>script.src).find(src=>new URL(src).pathname.endsWith("/app.js")),writingLoaded:!!window.VASIR_WRITING,answersLoaded:!!window.VASIR_WRITING_RESPONSES||!!window.VASIR_WRITING_CREATION_RESPONSES})');
+  if (context.root?.overall?.scoreBasis?.edition !== 'overall-v3') return null;
+  if (!context.appUrl || context.writingLoaded || context.answersLoaded) throw new Error('Overall v3 must start with a pinned app and without Writing data or answer archives.');
+  const sourceUrl = new URL('writing-data.js', context.appUrl);
+  let bytes;
+  if (sourceUrl.protocol === 'file:') bytes = fs.readFileSync(fileURLToPath(sourceUrl));
+  else {
+    const response = await fetch(sourceUrl, { redirect: 'error', signal: AbortSignal.timeout(30000) });
+    if (!response.ok) throw new Error('Cannot audit same-release Writing source: ' + response.status);
+    bytes = Buffer.from(await response.arrayBuffer());
+  }
+  const sandbox = { window: {} };
+  vm.runInNewContext(bytes.toString('utf8'), sandbox, { filename: sourceUrl.href, timeout: 10000 });
+  const writing = sandbox.window.VASIR_WRITING_COLLECTION || sandbox.window.VASIR_WRITING;
+  if (!writing) throw new Error('Same-release Writing source has no collection.');
+  const oracle = deriveExpectedOverallV3({ engineering: context.root, aiWorkflows: context.root.aiWorkflows, writing });
+  verifyOverallV3Projection(context.root.overall, oracle);
+  const sourceProjection = deriveExpectedWritingCategory(writing, 'all-writing');
+  const overallWritingPublications = [...sourceProjection.publications].filter(([benchmarkId]) => oracle.benchmarkIds.includes(benchmarkId));
+  const writingSummaries = overallWritingPublications.map(([benchmarkId, publication]) => {
+    const official = publication.benchmarkSummaries[0], provisional = publication.provisionalLeaderboard;
+    const usesProvisional = sourceProjection.sources.get(benchmarkId)?.provisional === true && provisional?.status === 'provisional' && !!provisional.rankedSettingCount;
+    return { ...official, ...(usesProvisional ? provisional.summary : {}), benchmarkId };
+  });
+  const benchmarkDisplays = Object.fromEntries(overallWritingPublications.map(([benchmarkId, publication]) => {
+    const basis = sourceProjection.sources.get(benchmarkId);
+    return [benchmarkId, { settingCount: basis.completedSettingCount, caseCount: publication.cases.length,
+      trials: publication.trialCount || publication.scoreBasis.trialsPerTask || 1, judgeCount: basis.judgeCount, provisional: basis.provisional }];
+  }));
+  return { ...oracle, availableCategoriesBySetting: Object.fromEntries(oracle.coverage.records.map(record => [record.id, deriveExpectedOverallAvailableCategories(oracle, record.configurationId)])), benchmarkSummaries: [...context.root.benchmarkSummaries, ...writingSummaries, ...context.root.aiWorkflows.benchmarkSummaries],
+    benchmarks: [...context.root.benchmarks, ...overallWritingPublications.flatMap(([, publication]) => publication.benchmarks), ...context.root.aiWorkflows.benchmarks], benchmarkDisplays,
+    writingCatalog: writing.writingScoreBasis ? { scoreBasis: writing.writingScoreBasis,
+      benchmarkIds: [...sourceProjection.publications.keys()], currentBenchmarkIds: sourceProjection.listedBenchmarkIds,
+      archivedBenchmarkIds: [...sourceProjection.publications.keys()].filter(id => !sourceProjection.listedBenchmarkIds.includes(id)) } : null,
+    originalWritingSource: { url: sourceUrl.href, sha256: createHash('sha256').update(bytes).digest('hex'), loadedOnlyByAudit: true },
+    sourceScoreVerified: true, lazyBeforeWriting: true, answersLazy: true };
+}
 
 const [pageInput, destinationInput, widthInput, heightInput, requestedTarget = 'leaderboard'] = process.argv.slice(2);
 const width = Number(widthInput);
@@ -51,6 +95,7 @@ const targetRoutes = {
 const EXPECTED_SETTING_COUNT = 36;
 const EXPECTED_CONDITION_COUNT = 2;
 const EXPECTED_BENCHMARK_COUNT = 3;
+const NAVIGATION_LOAD_TIMEOUT_MS = 30_000;
 const EXPECTED_PUBLIC_COUNTS = Object.freeze({
   benchmarks: EXPECTED_BENCHMARK_COUNT,
   conditions: EXPECTED_CONDITION_COUNT,
@@ -215,14 +260,22 @@ function createProtocol(socket) {
     }
   });
 
-  const once = (method, timeout = 15_000) => Promise.race([
-    new Promise((resolve) => {
-      const methodWaiters = waiters.get(method) || [];
-      methodWaiters.push(resolve);
-      waiters.set(method, methodWaiters);
-    }),
-    new Promise((_, reject) => setTimeout(() => reject(new Error('Timed out waiting for ' + method)), timeout))
-  ]);
+  const once = (method, timeout = 15_000) => new Promise((resolve, reject) => {
+    const cleanup = () => {
+      clearTimeout(timer);
+      const remaining = (waiters.get(method) || []).filter(waiter => waiter !== receive);
+      if (remaining.length) waiters.set(method, remaining);
+      else waiters.delete(method);
+    };
+    const receive = params => { cleanup(); resolve(params); };
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Timed out waiting for ' + method));
+    }, timeout);
+    const methodWaiters = waiters.get(method) || [];
+    methodWaiters.push(receive);
+    waiters.set(method, methodWaiters);
+  });
 
   const on = (method, listener) => {
     const methodListeners = listeners.get(method) || [];
@@ -1075,10 +1128,12 @@ async function auditSite(
     });
 
     const axisText = text(document.querySelector('.capability-ranking__axis'));
+    const conditionHeadings = [...document.querySelectorAll('.capability-ranking__axis .capability-ranking__condition-heading')];
     if (
       !/0\s*25\s*50\s*75\s*100/.test(axisText)
-      || !/Minimal baseline/i.test(axisText)
-      || !/Architecture skill/i.test(axisText)
+      || conditionHeadings.length !== data.conditions.length
+      || data.conditions.some((condition, index) => text(conditionHeadings[index]) !== (condition.short || condition.label)
+        || conditionHeadings[index]?.getAttribute('title') !== condition.label)
     ) failures.push(context + ': shared score axis/condition labels mismatch');
   };
 
@@ -1722,6 +1777,11 @@ async function auditSite(
       const context = 'Report ' + benchmark.id;
       const summary = summaryById.get(benchmark.id);
       if (await routeTo(benchmark.id) !== '#' + benchmark.id) failures.push(context + ': route mismatch');
+      const judgeDetails = document.querySelector('[data-report-judge-trial-details]');
+      if (!judgeDetails || judgeDetails.open || text(judgeDetails.querySelector(':scope > summary')) !== 'Judge & trial details') failures.push(context + ': shared judge details must start collapsed');
+      judgeDetails?.querySelector(':scope > summary')?.click();
+      await settle();
+      if (!judgeDetails?.open) failures.push(context + ': shared judge details did not open for evidence inspection');
       requireTruth(context, '.evidence-truth');
       const scoringOverview = text(document.querySelector('.report-overview__source'));
       const expectedPanelLabel = canonicalJudgeConfigurationIds
@@ -1737,10 +1797,10 @@ async function auditSite(
       if (document.title !== benchmark.name + ' · VasirBench') failures.push(context + ': document title mismatch');
       if (text(document.querySelector('#report-title')) !== benchmark.name) failures.push(context + ': title mismatch');
       if (!text(document.querySelector('.evidence-hero__prompt')).includes(benchmark.prompt)) failures.push(context + ': exact prompt missing');
-      if (text(document.querySelector('#ranking-title')) !== 'Architecture skill task scores') {
-        failures.push(context + ': task-score heading is not explicit');
+      if (text(document.querySelector('#ranking-title')) !== 'Model comparison') {
+        failures.push(context + ': shared model-comparison heading is missing');
       }
-      if (text(document.querySelector('#ranking .ui-eyebrow')) !== 'Engineering v2 field · all ' + expectedCounts.settings + ' matched settings') {
+      if (text(document.querySelector('#ranking .ui-eyebrow')) !== 'Engineering v2 field · all ' + expectedCounts.settings + ' settings') {
         failures.push(context + ': complete field cardinality is not explicit');
       }
 
@@ -1823,6 +1883,9 @@ async function auditSite(
           failures.push(context + ': missing section route ' + section);
         }
       });
+      judgeDetails?.querySelector(':scope > summary')?.click();
+      await settle();
+      if (judgeDetails?.open) failures.push(context + ': shared judge details did not close after evidence inspection');
     }
     await routeTo('hyper-scale-chat');
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1876,7 +1939,7 @@ async function auditSite(
   };
 }
 
-async function auditCategoryNavigation() {
+async function auditCategoryNavigation(writingCatalogOracle = null) {
   const failures = [];
   if (!window.VASIR_DATA?.overall) return {failures};
   const text = element => element?.textContent.replace(/\s+/g, ' ').trim() || '';
@@ -1911,8 +1974,28 @@ async function auditCategoryNavigation() {
       if (tab?.tagName !== 'BUTTON' || tab.disabled || tab.getAttribute('aria-disabled') === 'true' || tab.dataset.categoryStatus !== 'development-index' || tab.hasAttribute('href') || tab.getAttribute('aria-controls') !== 'capability-field-panel') failures.push('Published Writing is not an enabled native homepage category.');
       const expectedScore = Number.isFinite(writing.categoryIndex?.leader?.score) ? writing.categoryIndex.leader.score.toFixed(1) + '/100' : 'Results';
       if (!visible(tab?.querySelector(':scope > strong')) || text(tab?.querySelector(':scope > strong')) !== expectedScore) failures.push('Writing category invents a score or omits its source-derived leader.');
-      const writingBenchmarkCount = new Set(writing.benchmarkIds || [writing.benchmarkId]).size;
-      if (!tab?.getAttribute('aria-label')?.includes(writingBenchmarkCount + ' published benchmarks') || !tab?.getAttribute('aria-label')?.includes('Excluded from Overall')) failures.push('Writing category does not disclose published benchmark coverage and Overall exclusion.');
+      let writingBenchmarkCount = new Set(writing.benchmarkIds || [writing.benchmarkId]).size;
+      if (writing.writingScoreBasis) {
+        const sameIds = (left, right) => Array.isArray(left) && Array.isArray(right)
+          && new Set(left).size === left.length && new Set(right).size === right.length
+          && [...left].sort().join('|') === [...right].sort().join('|');
+        const catalog = writing.catalog;
+        const currentIds = Array.isArray(catalog) ? catalog.filter(item => !item.archived && !['unscored', 'planned'].includes(item.status)).map(item => item.id) : [];
+        const archivedIds = Array.isArray(catalog) ? catalog.filter(item => item.archived).map(item => item.id) : [];
+        if (!writingCatalogOracle || !Array.isArray(catalog)
+          || JSON.stringify(writing.writingScoreBasis) !== JSON.stringify(writingCatalogOracle.scoreBasis)
+          || !sameIds(catalog.map(item => item.id), writingCatalogOracle.benchmarkIds)
+          || !sameIds(writing.benchmarkIds, writingCatalogOracle.benchmarkIds)
+          || !sameIds(currentIds, writingCatalogOracle.currentBenchmarkIds)
+          || !sameIds(archivedIds, writingCatalogOracle.archivedBenchmarkIds)
+          || writing.catalogCoverage?.benchmarkCount !== writingCatalogOracle.benchmarkIds.length) {
+          failures.push('Writing current and archived benchmark coverage differs from the independent original-source catalog.');
+        }
+        writingBenchmarkCount = writingCatalogOracle?.currentBenchmarkIds?.length ?? 0;
+      }
+      const writingIncluded = window.VASIR_DATA.overall.scoreBasis?.edition === 'overall-v3';
+      const participation = writingIncluded ? /included in Overall/i.test(tab?.getAttribute('aria-label') || '') && /25%/.test(tab?.getAttribute('aria-label') || '') && !/excluded from Overall/i.test(tab?.getAttribute('aria-label') || '') : tab?.getAttribute('aria-label')?.includes('Excluded from Overall');
+      if (!tab?.getAttribute('aria-label')?.includes(writingBenchmarkCount + ' published benchmarks') || !participation) failures.push('Writing category does not disclose published benchmark coverage and edition-specific Overall participation.');
       continue;
     }
     if (!planned) {
@@ -2074,7 +2157,164 @@ async function auditGames(target) {
   return { failures, categoryCount: 1, benchmarkCount: reports.length, settingCount: new Set(runs.map(run => run.configurationId)).size, entryCount: runs.length, resultCount: runs.length, d3Version: window.d3?.version };
 }
 
-async function auditOverall(target) {
+// Serialized into the page with the independently derived, original-source
+// category readings. Missing leaves must never become partial category means.
+async function auditOverallAvailableProfiles(sourceOracle) {
+  const failures = [];
+  const text = node => node?.textContent.replace(/\s+/g, ' ').trim() || '';
+  const visible = node => !!node && node.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true }) && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0;
+  const close = (a, b, tolerance = 1e-8) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= tolerance;
+  const formatted = value => (Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value)) * 2) * 10) / 10).toFixed(1);
+  const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const records = sourceOracle.coverage.records;
+  const all = records.filter(record => !record.eligible);
+  if (document.querySelector('[data-overall-coverage-display="coverage-summary-v1"]')) {
+    const providers = [...new Set(records.map(record => record.provider))].sort();
+    const filter = document.querySelector('#overall-model-provider');
+    if (!visible(filter) || filter.value !== 'all' || JSON.stringify([...filter.options].map(option => option.value)) !== JSON.stringify(['all', ...providers])) failures.push('Overall provider filter must default to all registered source providers.');
+    const within = (node, bounds) => {
+      const box = node.getBoundingClientRect();
+      return box.left >= bounds.left - 1 && box.right <= bounds.right + 1 && node.scrollWidth <= node.clientWidth + 1;
+    };
+    const inspectSummary = async wanted => {
+      const disclosure = document.querySelector('#overall-available');
+      const rows = [...document.querySelectorAll('[data-incomplete-setting-id]')];
+      if (rows.length !== wanted.length || new Set(rows.map(row => row.dataset.incompleteSettingId)).size !== wanted.length) failures.push('Coverage summary omits or duplicates source settings.');
+      if (!wanted.length) {
+        if (disclosure) failures.push('Coverage summary exposes an empty disclosure.');
+        return;
+      }
+      if (disclosure?.tagName !== 'DETAILS' || disclosure.dataset.overallCoverageDisplay !== 'coverage-summary-v1' || disclosure.dataset.incompleteCount !== String(wanted.length)) {
+        failures.push('Coverage summary lacks its declared native disclosure or exact source count.');
+        return;
+      }
+      const summary = disclosure.querySelector('summary');
+      if (!visible(summary) || disclosure.open || rows.some(visible)) failures.push('Coverage summary must start closed with its rows hidden.');
+      if (!disclosure.open) summary?.click();
+      await settle();
+      try {
+        if (!disclosure.open) failures.push('Coverage summary does not open through its summary control.');
+        for (const record of wanted) {
+          const row = rows.find(node => node.dataset.incompleteSettingId === record.id);
+          if (!visible(row)) { failures.push('Opened coverage summary hides a source setting: ' + record.id); continue; }
+          if (text(row.querySelector('.overall-coverage__identity strong')) !== record.family || text(row.querySelector('.overall-coverage__identity > span')) !== record.reasoning) failures.push('Coverage summary changes the model identity: ' + record.id);
+          if (['baselineScore', 'skillScore', 'fullScore', 'baselineRank', 'skillRank', 'fullRank', 'delta', 'overallScore', 'overallRank'].some(key => Object.hasOwn(row.dataset, key)) || row.querySelector('.capability-composition, .setting-row__rank, .overall-coverage__uplift, [data-composite-exact-score], [data-overall-score], [data-overall-rank]')) failures.push('Coverage summary invents an Overall total, rank or uplift: ' + record.id);
+          const expected = sourceOracle.availableCategoriesBySetting[record.id];
+          const links = [...row.querySelectorAll('[data-overall-category]')];
+          if (!expected || links.length !== expected.length || new Set(links.map(link => link.dataset.overallCategory)).size !== expected.length) {
+            failures.push('Coverage summary loses or duplicates an independently derived category: ' + record.id);
+            continue;
+          }
+          for (const reading of expected) {
+            const link = links.find(node => node.dataset.overallCategory === reading.categoryId);
+            if (!visible(link) || link.tagName !== 'A') { failures.push('Coverage category is not a visible link: ' + record.id + '-' + reading.categoryId); continue; }
+            if (link.dataset.categoryComplete !== String(reading.complete) || link.dataset.availableTests !== reading.available + '/' + reading.expected) failures.push('Coverage category changes complete paired source coverage: ' + record.id + '-' + reading.categoryId);
+            for (const condition of ['baseline', 'skill']) {
+              const raw = link.dataset[condition === 'baseline' ? 'categoryExactBaseline' : 'categoryExactSkill'];
+              const actualScore = raw === 'null' ? null : typeof raw === 'string' && raw.trim() ? Number(raw) : NaN;
+              const score = reading.scores[condition];
+              if (score === null ? actualScore !== null : !close(actualScore, score)) failures.push('Coverage category differs from exact paired original-source scores: ' + record.id + '-' + condition + '-' + reading.categoryId);
+            }
+            const label = reading.complete ? 'Plain ' + formatted(reading.scores.baseline) + ' → Skill ' + formatted(reading.scores.skill) : reading.available + '/' + reading.expected + ' tests scored';
+            if (text(link.querySelector('span:last-child')) !== label) failures.push('Coverage category displays a fabricated or incorrect paired result: ' + record.id + '-' + reading.categoryId);
+            try {
+              const url = new URL(link.href, location.href);
+              if (url.origin !== location.origin || url.pathname !== new URL('./index.html', location.href).pathname || url.hash !== '#capabilities/' + reading.categoryId || url.searchParams.get('setting') !== reading.configurationId || url.searchParams.get('inspect') !== '1' || (reading.categoryId === 'writing' && url.searchParams.get('score') !== 'all-writing')) failures.push('Coverage category link loses original source identity: ' + record.id + '-' + reading.categoryId);
+            } catch { failures.push('Coverage category has an invalid source link: ' + record.id + '-' + reading.categoryId); }
+            if (!within(link, row.getBoundingClientRect())) failures.push('Coverage category overflows its compact row: ' + record.id + '-' + reading.categoryId);
+          }
+          if (!within(row, { left: 0, right: innerWidth })) failures.push('Coverage row overflows the viewport: ' + record.id);
+        }
+        if (document.documentElement.scrollWidth > innerWidth + 1) failures.push('Opened coverage summary has horizontal page overflow.');
+      } finally {
+        if (disclosure.open) summary?.click();
+        await settle();
+        if (disclosure.open || rows.some(visible)) failures.push('Coverage summary did not restore its closed state.');
+      }
+    };
+    try {
+      await inspectSummary(all);
+      for (const provider of providers) {
+        const select = document.querySelector('#overall-model-provider');
+        if (!select) { failures.push('Overall provider filter disappeared.'); break; }
+        select.value = provider; select.dispatchEvent(new Event('change', { bubbles: true })); await settle();
+        if (document.querySelector('#overall-model-provider')?.value !== provider) failures.push('Overall provider filter selection did not persist: ' + provider);
+        const ranked = [...document.querySelectorAll('.result-list > .setting-row')];
+        const expectedRanked = records.filter(record => record.eligible && record.provider === provider);
+        if (ranked.length !== Math.min(10, expectedRanked.length) || new Set(ranked.map(row => row.dataset.settingId)).size !== ranked.length || ranked.some(row => !expectedRanked.some(record => record.id === row.dataset.settingId))) failures.push('Overall provider filter invents or omits ranked models: ' + provider);
+        await inspectSummary(all.filter(record => record.provider === provider));
+      }
+    } finally {
+      const reset = document.querySelector('#overall-model-provider');
+      if (reset) { reset.value = 'all'; reset.dispatchEvent(new Event('change', { bubbles: true })); await settle(); }
+      if (document.querySelector('#overall-model-provider')?.value !== 'all') failures.push('Overall provider filter did not restore all source providers.');
+      await inspectSummary(all);
+    }
+    return { display: 'coverage-summary-v1', incompleteSettings: all.length, claudeSettings: all.filter(record => record.provider === 'claude').length, failures };
+  }
+  const inspect = async (wanted, auditDetails) => {
+    const rows = [...document.querySelectorAll('[data-incomplete-setting-id]')];
+    if (rows.length !== wanted.length || new Set(rows.map(row => row.dataset.incompleteSettingId)).size !== wanted.length) failures.push('Available category profiles omit or duplicate source settings.');
+    for (const record of wanted) {
+      const row = rows.find(row => row.dataset.incompleteSettingId === record.id);
+      if (!visible(row)) { failures.push('Available category profile is not visible: ' + record.id); continue; }
+      if (['baselineScore', 'fullScore', 'baselineRank', 'fullRank', 'delta'].some(key => row.dataset[key] !== 'null') || text(row.querySelector('.setting-row__rank')) !== '—' || text(row.querySelector('.overall-coverage__uplift strong')) !== '—') failures.push('Available category profile invents an Overall score or rank: ' + record.id);
+      const expected = sourceOracle.availableCategoriesBySetting[record.id];
+      if (!expected || row.querySelectorAll('[data-coverage-condition]').length !== 2) { failures.push('Available category profile lacks both independently derived conditions: ' + record.id); continue; }
+      for (const condition of ['baseline', 'skill']) {
+        const profile = row.querySelector('[data-coverage-condition="' + condition + '"]');
+        if (!visible(profile) || text(profile.querySelector('.capability-composition__total')) !== '—' || profile.querySelector('.capability-composition__rank')) failures.push('Available profile has a numeric total/rank: ' + record.id + '-' + condition);
+        const stack = profile?.querySelector('.capability-composition__stack');
+        const segments = [...(profile?.querySelectorAll('[data-overall-category]') || [])];
+        if (segments.length !== expected.length || new Set(segments.map(segment => segment.dataset.overallCategory)).size !== expected.length) failures.push('Available profile loses a category: ' + record.id);
+        for (const reading of expected) {
+          const segment = segments.find(segment => segment.dataset.overallCategory === reading.categoryId);
+          if (!visible(segment)) { failures.push('Available category is hidden: ' + record.id + '-' + reading.categoryId); continue; }
+          const score = reading.scores[condition];
+          const actualScore = segment.dataset.categoryExactScore === 'null' ? null : Number(segment.dataset.categoryExactScore);
+          if (segment.dataset.categoryComplete !== String(reading.complete) || (score === null ? actualScore !== null : !close(actualScore, score)) || !close(Number(segment.dataset.categoryWeight), reading.weight) || segment.dataset.availableTests !== reading.available + '/' + reading.expected) failures.push('Available category differs from complete paired original-source scores: ' + record.id + '-' + condition + '-' + reading.categoryId);
+          if (text(segment.querySelector('.capability-composition__score')) !== (score === null ? '—' : formatted(score)) || segment.classList.contains('overall-category-slot--missing') !== !reading.complete) failures.push('Available category score/missing treatment differs from source: ' + record.id + '-' + reading.categoryId);
+          const slotWidth = segment.getBoundingClientRect().width;
+          if (!close(parseFloat(segment.style.getPropertyValue('--segment-width')), reading.weight * 100) || !close(parseFloat(segment.style.getPropertyValue('--category-fill')), score ?? 0) || !close(slotWidth, stack.getBoundingClientRect().width * reading.weight, 1.25) || !close(parseFloat(getComputedStyle(segment, '::before').width), slotWidth * (score ?? 0) / 100, 1.25)) failures.push('Available category geometry changes fixed weight or exact score: ' + record.id + '-' + reading.categoryId);
+          const url = new URL(segment.href, location.href);
+          if (url.origin !== location.origin || url.pathname !== new URL('./index.html', location.href).pathname || url.hash !== '#capabilities/' + reading.categoryId || url.searchParams.get('setting') !== reading.configurationId || (reading.categoryId === 'writing' && url.searchParams.get('score') !== 'all-writing')) failures.push('Available category link loses original source identity: ' + record.id + '-' + reading.categoryId);
+        }
+      }
+      if (auditDetails) {
+        const details = row.querySelector('details.overall-coverage__details');
+        const links = [...row.querySelectorAll('[data-missing-task-id]')];
+        const missing = ['missingTaskIds', 'unassessableTaskIds'].flatMap(field => [...new Set(['baseline', 'skill'].flatMap(condition => record.conditions[condition][field]))]);
+        if (!details || details.open || links.some(visible)) failures.push('Missing-test evidence is not initially closed: ' + record.id);
+        details?.querySelector('summary')?.click();
+        await settle();
+        if (!details?.open || links.length !== missing.length || missing.some(id => !links.some(link => link.dataset.missingTaskId === id)) || links.some(link => !visible(link) || new URL(link.href, location.href).href !== new URL('./benchmark-report.html?from=overall#' + link.dataset.missingTaskId, location.href).href)) failures.push('Opened missing-test evidence loses original reports: ' + record.id);
+        details?.querySelector('summary')?.click();
+        await settle();
+        if (details?.open || links.some(visible)) failures.push('Missing-test evidence did not close after audit: ' + record.id);
+      }
+    }
+  };
+  const filter = document.querySelector('#overall-model-provider');
+  const expectedOptions = ['all', ...[...new Set(records.map(record => record.provider))].sort()];
+  if (!visible(filter) || filter.value !== 'all' || JSON.stringify([...filter.options].map(option => option.value)) !== JSON.stringify(expectedOptions)) failures.push('Overall provider filter must default to all registered source providers.');
+  await inspect(all, true);
+  const claude = all.filter(record => record.provider === 'claude');
+  if (!claude.length) failures.push('Claude filter fixture has no incomplete source models.');
+  if (filter) {
+    filter.value = 'claude'; filter.dispatchEvent(new Event('change', { bubbles: true })); await settle();
+    if (document.querySelector('#overall-model-provider')?.value !== 'claude') failures.push('Claude provider filter selection did not persist.');
+    const ranked = [...document.querySelectorAll('.result-list > .setting-row')];
+    const expectedRanked = records.filter(record => record.eligible && record.provider === 'claude');
+    if (ranked.length !== Math.min(10, expectedRanked.length) || ranked.some(row => !expectedRanked.some(record => record.id === row.dataset.settingId))) failures.push('Claude provider filter invents or omits ranked models.');
+    await inspect(claude, false);
+    const reset = document.querySelector('#overall-model-provider');
+    reset.value = 'all'; reset.dispatchEvent(new Event('change', { bubbles: true })); await settle();
+    if (document.querySelector('#overall-model-provider')?.value !== 'all' || document.querySelectorAll('[data-incomplete-setting-id]').length !== all.length) failures.push('Overall provider filter did not restore the complete source roster.');
+  }
+  return { display: 'category-profiles-v1', incompleteSettings: all.length, claudeSettings: claude.length, failures };
+}
+
+async function auditOverall(target, sourceOracle = null, inspectAvailableProfiles = null) {
   const root = window.VASIR_DATA;
   const data = root?.overall;
   const sources = [root, root?.aiWorkflows].filter(Boolean);
@@ -2085,18 +2325,21 @@ async function auditOverall(target) {
   const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const close = (a, b, tolerance = 0.000001) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= tolerance;
   const exactClose = (a, b) => close(a, b, 32 * Number.EPSILON * Math.max(1, Math.abs(b)));
-  const rounded = value => Number(value.toFixed(1));
+  const rounded = value => sourceOracle ? Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value)) * 2) * 10) / 10 : Number(value.toFixed(1));
   const number = value => Number(String(value).replaceAll('−', '-').match(/-?\d+(?:\.\d+)?/)?.[0]);
   const taskScore = cell => cell && (Object.hasOwn(cell, 'exactScore') ? cell.exactScore : cell.score);
   if (!data) return {failures: ['Overall projection missing.']};
-  const tasks = sources.flatMap(source => source.benchmarks);
-  const cells = sources.flatMap(source => source.benchmarkResults);
+  const isV3 = data.scoreBasis?.edition === 'overall-v3';
+  if (isV3 !== !!sourceOracle || sourceOracle && (sourceOracle.edition !== 'overall-v3' || !sourceOracle.sourceScoreVerified)) return {failures: ['Overall edition has no matching independently verified original-source oracle.']};
+  const editionLabel = isV3 ? 'Overall v3' : 'Overall v2';
+  const tasks = sourceOracle ? sourceOracle.benchmarks : sources.flatMap(source => source.benchmarks);
+  const cells = sourceOracle ? sourceOracle.sourceCells.map(cell => ({...cell, exactScore: cell.value})) : sources.flatMap(source => source.benchmarkResults);
   // Independent policy oracle: declared category priorities, normalized only across published categories.
   const priorities = new Map([['engineering', 0.25], ['games', 0.25], ['writing', 0.125], ['product-design', 0.25], ['ai-workflows', 0.125]]);
   const measuredCategories = [...new Set(tasks.map(task => task.category))];
   const publishedTargetWeight = measuredCategories.reduce((sum, category) => sum + priorities.get(category), 0);
   const categoryWeight = category => priorities.get(category) / publishedTargetWeight;
-  const identities = [...new Map(sources.flatMap(source => source.settings).map(setting => [setting.id, setting])).values()];
+  const identities = sourceOracle ? sourceOracle.coverage.records : [...new Map(sources.flatMap(source => source.settings).map(setting => [setting.id, setting])).values()];
   const cellFor = (id, condition, task) => cells.find(cell => cell.settingId === id && cell.condition === condition && cell.benchmarkId === task);
   const complete = identities.filter(setting => ['baseline', 'skill'].every(condition => tasks.every(task => Number.isFinite(taskScore(cellFor(setting.id, condition, task.id))))));
   const incomplete = identities.filter(setting => !complete.some(candidate => candidate.id === setting.id));
@@ -2107,8 +2350,8 @@ async function auditOverall(target) {
     }
     return measuredCategories.reduce((sum, family) => sum + sourceMean(id, condition, valueFor, family) * priorities.get(family), 0) / publishedTargetWeight;
   };
-  const sourceScore = (id, condition, category) => sourceMean(id, condition, taskScore, category);
-  const expected = new Map(complete.flatMap(setting => ['baseline', 'skill'].map(condition => {
+  const sourceScore = (id, condition, category) => sourceOracle ? (() => {const entry = sourceOracle.entries.find(entry => entry.settingId === id && entry.condition === condition); return category ? entry?.categories.find(component => component.category === category)?.exactScore : entry?.exactScore;})() : sourceMean(id, condition, taskScore, category);
+  const expected = new Map(sourceOracle ? sourceOracle.entries.map(entry => [entry.id, entry]) : complete.flatMap(setting => ['baseline', 'skill'].map(condition => {
     const exactScore = sourceScore(setting.id, condition);
     const baseline = sourceScore(setting.id, 'baseline');
     const meanResource = field => sourceMean(setting.id, condition, cell => cell[field]);
@@ -2128,9 +2371,10 @@ async function auditOverall(target) {
   })));
   const rank = entry => 1 + [...expected.values()].filter(other => other.condition === entry.condition && other.exactScore > entry.exactScore).length;
   const expectedSkill = [...expected.values()].filter(entry => entry.condition === 'skill').sort((a, b) => b.exactScore - a.exactScore || a.latency - b.latency || a.id.localeCompare(b.id));
-  if (tasks.length !== 4 || new Set(tasks.map(task => task.category)).size !== 2 || cells.length !== 268 || complete.length !== 26 || incomplete.length !== 10) failures.push('Frozen source task/cohort coverage changed.');
-  if (data.scoreBasis?.label !== 'Overall v2' || data.scoreBasis?.edition !== 'overall-v2' || data.scoreBasis?.method !== 'priority-weighted-published-category-mean-v1' || data.scoreBasis?.benchmarkWeighting !== 'equal-within-category' || data.scoreBasis?.categoryWeighting !== 'declared-priority-normalized-over-published-v1' || data.scoreBasis?.taskCount !== tasks.length) failures.push('Overall edition or category-priority weighting missing.');
-  if (data.scoreBasis?.portfolioCategoryCount !== 5 || data.scoreBasis?.publishedTargetWeight !== publishedTargetWeight || publishedTargetWeight !== 0.375) failures.push('Overall target-weight coverage is not 37.5% across two of five categories.');
+  if (!isV3 && (tasks.length !== 4 || new Set(tasks.map(task => task.category)).size !== 2 || cells.length !== 268 || complete.length !== 26 || incomplete.length !== 10)) failures.push('Frozen legacy source task/cohort coverage changed.');
+  if (data.scoreBasis?.label !== editionLabel || data.scoreBasis?.edition !== (isV3 ? 'overall-v3' : 'overall-v2') || data.scoreBasis?.method !== 'priority-weighted-published-category-mean-v1' || data.scoreBasis?.benchmarkWeighting !== (isV3 ? 'declared-within-category' : 'equal-within-category') || data.scoreBasis?.categoryWeighting !== 'declared-priority-normalized-over-published-v1' || data.scoreBasis?.taskCount !== tasks.length) failures.push('Overall edition or category-priority weighting missing.');
+  if (data.scoreBasis?.portfolioCategoryCount !== priorities.size || data.scoreBasis?.publishedTargetWeight !== publishedTargetWeight || publishedTargetWeight !== (isV3 ? 0.5 : 0.375)) failures.push('Overall target-weight coverage differs from independently declared category priorities.');
+  if (isV3 && (JSON.stringify(measuredCategories) !== JSON.stringify(['engineering','writing','ai-workflows']) || data.scoreBasis.benchmarkWeights.some(task => !exactClose(task.weight, sourceOracle.benchmarkWeights[task.benchmarkId])))) failures.push('Overall nested Writing task weights differ from the original source catalog.');
   if (data.portfolioCategories?.map(category => category.id).join('|') !== [...priorities.keys()].join('|')) failures.push('Overall omits or reorders the five-category target policy.');
   for (const [id, targetWeight] of priorities) {
     const category = data.portfolioCategories?.find(category => category.id === id);
@@ -2145,7 +2389,8 @@ async function auditOverall(target) {
   for (const entry of data.entries) {
     const oracle = expected.get(entry.id);
     if (!oracle || !close(entry.exactScore, oracle.exactScore) || entry.score !== oracle.score || !close(entry.exactDelta, oracle.exactDelta)) failures.push('Overall entry differs from saved final task scores: ' + entry.id);
-    if (!oracle || !exactClose(entry.latency, oracle.latency) || !exactClose(entry.tokens, oracle.tokens) || Object.entries(oracle.metrics).some(([key, value]) => key === 'sampleCount' || value === null ? entry.metrics?.[key] !== value : !exactClose(entry.metrics?.[key], value))) failures.push('Overall resources differ from exact category-weighted source means: ' + entry.id);
+    const resourceMatches = (actual, wanted) => wanted === null ? actual === null : exactClose(actual, wanted);
+    if (!oracle || !resourceMatches(entry.latency, oracle.latency) || !resourceMatches(entry.tokens, oracle.tokens) || Object.entries(oracle.metrics).some(([key, value]) => key === 'sampleCount' || value === null ? entry.metrics?.[key] !== value : !exactClose(entry.metrics?.[key], value))) failures.push('Overall resources differ from exact category-weighted source means: ' + entry.id);
   }
   if (data.coverage?.totalSettings !== identities.length || data.coverage?.eligibleSettings !== complete.length || data.coverage?.incompleteSettings !== incomplete.length || data.coverage?.observedResponseCount !== cells.length) failures.push('Overall coverage summary differs from source evidence.');
   for (const setting of incomplete) {
@@ -2156,11 +2401,13 @@ async function auditOverall(target) {
   const documentAudit = mode => {
     if (document.querySelector('.capability-selector__tab[aria-selected="true"]')?.dataset.categoryId !== 'overall') failures.push('Overall selection lost in ' + mode);
     if (text(document.querySelector('#capability-question')) !== 'Overall') failures.push('Overall heading mismatch.');
-    if (!text(document.querySelector('.capability-canvas__status')).includes('Overall v2')) failures.push('Overall edition disclosure missing.');
+    const editionDisclosure = text(document.querySelector('.capability-canvas__status')) + ' ' + text(document.querySelector('.benchmark-mast__evidence'));
+    if (!editionDisclosure.includes(editionLabel)) failures.push('Overall edition disclosure missing.');
     const method = document.querySelector('[data-overall-method]');
     const coverage = document.querySelector('[data-portfolio-coverage]');
-    if (!visible(method) || !['Engineering', '66.7%', 'AI Workflows', '33.3%'].every(value => text(method).includes(value))) failures.push('Overall current category weights are not visible.');
-    if (!visible(coverage) || !text(coverage).includes('2/5') || !text(coverage).includes('37.5%') || !/target weight/i.test(text(coverage))) failures.push('Overall measured categories and target-weight coverage are not visibly distinguished.');
+    const methodTokens = isV3 ? ['Engineering', '50%', 'Writing', '25%', 'AI Workflows'] : ['Engineering', '66.7%', 'AI Workflows', '33.3%'];
+    if (!visible(method) || !methodTokens.every(value => text(method).includes(value))) failures.push('Overall current category weights are not visible.');
+    if (!visible(coverage) || !text(coverage).includes(measuredCategories.length + '/' + priorities.size) || !text(coverage).includes(publishedTargetWeight * 100 + '%') || !/target weight/i.test(text(coverage))) failures.push('Overall measured categories and target-weight coverage are not visibly distinguished.');
     if (/each benchmark\s+25%|equal[- ]weight(?:ed)? across all/i.test(text(method) + ' ' + document.querySelector('#capability-category-overall')?.getAttribute('aria-label'))) failures.push('Overall still claims equal weights across all benchmark tasks.');
     if (Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1) failures.push('Overall ' + mode + ' overflows viewport.');
     const ids = [...document.querySelectorAll('[id]')].map(node => node.id);
@@ -2175,7 +2422,8 @@ async function auditOverall(target) {
     documentAudit(mode);
   };
   await route('models');
-  if (!text(document.querySelector('.capability-canvas__identity')).includes('4')) failures.push('Overall task scope missing.');
+  if (!text(document.querySelector('.capability-canvas__identity')).includes(String(tasks.length))) failures.push('Overall task scope missing.');
+  if (isV3 && /×\s*1\s*trial/i.test(text(document.querySelector('.capability-canvas__identity')) + ' ' + text(document.querySelector('.capability-canvas__status')))) failures.push('Overall v3 falsely presents a uniform one-trial source protocol.');
   const weightsDisclosure = document.querySelector('details.overall-weights');
   if (!weightsDisclosure || weightsDisclosure.open) failures.push('Overall target-weight method must be available in a collapsed disclosure.');
   weightsDisclosure?.querySelector('summary')?.click();
@@ -2203,7 +2451,7 @@ async function auditOverall(target) {
         if (!entry) { failures.push('Unknown Overall composition.'); continue; }
         if (!close(Number(composition.dataset.compositeExactScore), entry.exactScore) || number(text(composition.querySelector('.capability-composition__total'))) !== entry.score) failures.push('Overall visible total differs from exact aggregate.');
         const segments = [...composition.querySelectorAll('.capability-composition__segment')];
-        if (segments.length !== 2) failures.push('Overall bar omits a category.');
+        if (segments.length !== measuredCategories.length || new Set(segments.map(segment => segment.dataset.categoryId)).size !== measuredCategories.length) failures.push('Overall bar omits or duplicates a category.');
         let total = 0;
         for (const segment of segments) {
           const family = segment.dataset.categoryId;
@@ -2220,16 +2468,26 @@ async function auditOverall(target) {
     });
     return rows;
   };
-  if (inspectRows().length !== 10) failures.push('Overall collapsed cohort is not top10.');
+  if (inspectRows().length !== Math.min(10, complete.length)) failures.push('Overall collapsed cohort is not top10.');
   document.querySelector('#show-all')?.click();
   await settle();
   if (inspectRows().length !== complete.length) failures.push('Overall expansion omits eligible settings.');
   const gaps = [...document.querySelectorAll('[data-incomplete-setting-id]')];
+  const categoryProfiles = document.querySelector('[data-overall-coverage-display="category-profiles-v1"]');
+  const coverageSummary = document.querySelector('[data-overall-coverage-display="coverage-summary-v1"]');
   if (gaps.length !== incomplete.length) failures.push('Overall omits incomplete settings.');
   for (const setting of incomplete) {
     const row = gaps.find(node => node.dataset.incompleteSettingId === setting.id);
-    if (!visible(row) || !text(row).includes(setting.family) || !text(row).includes('3/4') || !row.querySelector('[data-missing-task-id="work-spec-chat"]')) failures.push('Incomplete coverage or recovery link missing: ' + setting.id);
+    // The compact disclosure is audited while open below against both exact
+    // category conditions. It intentionally has no per-row Overall readings.
+    if (coverageSummary) continue;
+    const missingTasks = tasks.filter(task => ['baseline', 'skill'].some(condition => !Number.isFinite(taskScore(cellFor(setting.id, condition, task.id)))));
+    if (!visible(row) || !text(row).includes(setting.family) || missingTasks.some(task => !row.querySelector('[data-missing-task-id="' + task.id + '"]'))) failures.push('Incomplete coverage or recovery link missing: ' + setting.id);
     if (['baselineScore', 'fullScore', 'baselineRank', 'fullRank', 'delta'].some(key => row?.dataset[key] !== 'null')) failures.push('Incomplete row exposes a numeric Overall result: ' + setting.id);
+    if (categoryProfiles) {
+      for (const condition of ['baseline', 'skill']) if (row?.dataset[condition + 'Coverage'] !== tasks.filter(task => cellFor(setting.id, condition, task.id)).length + '/' + tasks.length) failures.push('Available category profiles change original source coverage: ' + setting.id);
+      continue;
+    }
     for (const condition of ['baseline', 'skill']) {
       const observed = tasks.filter(task => cellFor(setting.id, condition, task.id)).length;
       const assessable = tasks.filter(task => Number.isFinite(taskScore(cellFor(setting.id, condition, task.id)))).length;
@@ -2242,17 +2500,27 @@ async function auditOverall(target) {
     const uplift = row?.querySelector('.overall-coverage__uplift strong');
     if (!visible(uplift) || primaryText(uplift) !== '—') failures.push('Incomplete row shows an available Overall uplift: ' + setting.id);
   }
-  document.querySelector('#show-all')?.click();
+  if (categoryProfiles || coverageSummary) {
+    if (!sourceOracle || !inspectAvailableProfiles) failures.push('Available category profiles have no independent source oracle.');
+    else failures.push(...(await inspectAvailableProfiles(sourceOracle)).failures);
+  }
+  if ((!categoryProfiles && !coverageSummary) || document.querySelector('#show-all')?.getAttribute('aria-expanded') === 'true') document.querySelector('#show-all')?.click();
   await settle();
 
   await route('benchmarks');
   const ledgerRows = [...document.querySelectorAll('.benchmark-ledger__row[data-benchmark-id]')].filter(visible);
-  if (ledgerRows.length !== tasks.length || document.querySelectorAll('.benchmark-ledger__track').length !== 2) failures.push('Overall ledger omits a benchmark or track.');
+  if (ledgerRows.length !== tasks.length || document.querySelectorAll('.benchmark-ledger__track').length !== new Set(tasks.map(task => task.suite)).size) failures.push('Overall ledger omits a benchmark or track.');
   for (const task of tasks) {
     const row = ledgerRows.find(row => row.dataset.benchmarkId === task.id);
-    const summary = sources.flatMap(source => source.benchmarkSummaries).find(summary => summary.benchmarkId === task.id);
-    if (!row || row.getAttribute('href') !== './benchmark-report.html?from=overall#' + task.id) failures.push('Overall report route missing: ' + task.id);
-    if (Number(row?.dataset.baselineScore) !== summary.baseline || Number(row?.dataset.treatmentScore) !== summary.treatment || !text(row?.querySelector('.benchmark-ledger__evidence')).includes(summary.complete + '/' + summary.total)) failures.push('Overall ledger changes the source cohort: ' + task.id);
+    const summary = (sourceOracle?.benchmarkSummaries || sources.flatMap(source => source.benchmarkSummaries)).find(summary => summary.benchmarkId === task.id);
+    const expectedReportUrl = new URL('./benchmark-report.html?from=overall#' + task.id, location.href).href;
+    if (!row || new URL(row.getAttribute('href'), location.href).href !== expectedReportUrl) failures.push('Overall report route missing: ' + task.id);
+    const rendered = value => Number.isFinite(value) ? value : null;
+    if (!summary || rendered(Number(row?.dataset.baselineScore)) !== summary.baseline || rendered(Number(row?.dataset.treatmentScore)) !== summary.treatment) failures.push('Overall ledger changes the source field means: ' + task.id);
+    const display = sourceOracle?.benchmarkDisplays[task.id];
+    if (display) {
+      if (!text(row?.querySelector('.benchmark-ledger__evidence')).includes(display.settingCount + ' model settings') || Number(row?.dataset.writingSettingCount) !== display.settingCount || Number(row?.dataset.writingCaseCount) !== display.caseCount || Number(row?.dataset.writingTrialCount) !== display.trials || Number(row?.dataset.writingJudgeCount) !== display.judgeCount) failures.push('Overall Writing ledger changes original task metadata: ' + task.id);
+    } else if (!text(row?.querySelector('.benchmark-ledger__evidence')).includes(summary.complete + '/' + summary.total)) failures.push('Overall ledger changes the source cohort: ' + task.id);
   }
 
   await route('efficiency');
@@ -2264,11 +2532,12 @@ async function auditOverall(target) {
     select.dispatchEvent(new Event('change', {bubbles: true}));
     await settle();
     const points = [...document.querySelectorAll('[data-plot-point][data-entry-id]')].filter(visible);
-    if (points.length !== expected.size) failures.push('Overall efficiency point count mismatch.');
+    const available = [...expected.values()].filter(entry => Number.isFinite(entry[metric]) && entry[metric] > 0);
+    if (points.length !== available.length) failures.push('Overall efficiency point count differs from available source resources.');
     // Resource switching animates point transforms for 220ms; inspect final geometry.
     await Promise.allSettled(points.flatMap(point => point.getAnimations().map(animation => animation.finished)));
     await settle();
-    const values = [...expected.values()].map(entry => entry[metric]);
+    const values = available.map(entry => entry[metric]);
     const low = Math.min(...values) * 0.9;
     const high = Math.max(...values) * 1.1;
     const canvas = document.querySelector('.efficiency-plane__canvas');
@@ -2276,7 +2545,7 @@ async function auditOverall(target) {
     if (!visible(canvas)) failures.push('Overall efficiency plot has no rendered area.');
     for (const point of points) {
       const oracle = expected.get(point.dataset.entryId);
-      if (!oracle) { failures.push('Overall efficiency has unknown point.'); continue; }
+      if (!oracle || !Number.isFinite(oracle[metric]) || oracle[metric] <= 0) { failures.push('Overall efficiency has an unknown or source-unavailable point.'); continue; }
       const x = (Math.log(oracle[metric]) - Math.log(low)) / (Math.log(high) - Math.log(low)) * 100;
       const y = 100 - oracle.exactScore;
       if (Number(point.dataset.score) !== oracle.score || !exactClose(Number(point.dataset.resource), oracle[metric]) || !close(Number(point.dataset.plotX), x, 0.000501) || !close(Number(point.dataset.plotY), y, 0.000501)) failures.push('Overall efficiency values differ from exact category-weighted source means: ' + oracle.id);
@@ -2291,7 +2560,7 @@ async function auditOverall(target) {
   await route(target === 'efficiency' ? 'efficiency' : 'models');
   window.scrollTo({top: 0, behavior: 'instant'});
   await settle();
-  return {failures, categoryCount: 2, benchmarkCount: tasks.length, settingCount: complete.length, entryCount: expected.size, resultCount: cells.length, d3Version: window.d3?.version};
+  return {failures, edition: data.scoreBasis.edition, categoryCount: measuredCategories.length, benchmarkCount: tasks.length, settingCount: complete.length, entryCount: expected.size, resultCount: cells.length, originalWritingSource: sourceOracle?.originalWritingSource || null, categoryWeights: Object.fromEntries(measuredCategories.map(category => [category, categoryWeight(category)])), writingBenchmarkWeights: sourceOracle?.writingBenchmarkWeights || null, d3Version: window.d3?.version};
 }
 
 async function auditWorkflows(target) {
@@ -2302,12 +2571,14 @@ async function auditWorkflows(target) {
   const scoreText = value => Number.isFinite(value) ? value.toFixed(1) : 'Not assessable';
   const visible = element => Boolean(element?.getClientRects().length);
   const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  let disclosureReportHref = null;
   if (!data || data.benchmarks?.length !== 1 || data.benchmarks[0].id !== 'work-spec-chat') {
     return { failures: ['AI Workflows requires its real one-task projection.'] };
   }
   const weights = { V: 25, G: 15, A: 20, D: 15, S: 15, C: 10 };
   if (JSON.stringify(data.scoreBasis.weights) !== JSON.stringify(weights)
     || data.scoreBasis.taskCount !== 1 || data.scoreBasis.trialsPerTask !== 1
+    || data.scoreBasis.calibrationStatus !== 'development-uncalibrated'
     || data.scoreBasis.judges.join('|') !== 'codex:gpt-6-astra@xhigh|claude:claude-fable-5-1@max'
     || data.scoreBasis.gates !== null || data.scoreBasis.caps !== null) failures.push('Work-spec rubric/panel contract mismatch.');
   if (data.entries.length !== data.settings.length * 2 || data.benchmarkResults.length !== data.entries.length) failures.push('Incomplete paired work-spec matrix.');
@@ -2317,13 +2588,16 @@ async function auditWorkflows(target) {
       ? 1 + data.benchmarkResults.filter(result => result.condition === condition && result.exactScore > cell.exactScore).length
       : null;
   };
-  const disclosure = text(document.querySelector('.capability-canvas__status, .evidence-truth'));
-  if (!disclosure.includes('1 task × 1 trial · 2 judges') || !disclosure.includes('Uncalibrated development')) failures.push('Single-case uncalibrated disclosure missing.');
+  const disclosureNode = document.querySelector('.capability-canvas__status, .evidence-truth');
+  const disclosure = text(disclosureNode);
+  if (!visible(disclosureNode) || !disclosure.includes('1 task × 1 trial · 2 judges')) failures.push('Single-case task/trial/judge disclosure missing.');
+  const isWorkflowReport = target === 'workflow-report' || target === 'workflow-inspector';
+  if (isWorkflowReport && !disclosure.includes('Uncalibrated development')) failures.push('Single-case uncalibrated disclosure missing from the work-spec report.');
   if (document.querySelector('.development-unavailable')) failures.push('Workflow renderer rejected the real data.');
   if (Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1) failures.push('Workflow page overflows horizontally.');
   if (text(document.querySelector('.capability-browser__canvas, .report-shell')).includes('Architecture skill')) failures.push('Engineering condition leaked into work-spec results.');
 
-  if (target === 'workflow-report' || target === 'workflow-inspector') {
+  if (isWorkflowReport) {
     if (!responses || responses.responses.length !== data.entries.length || responses.counts.judgments !== data.entries.length * 2) failures.push('Work-spec transcript matrix incomplete.');
     const rows = [...document.querySelectorAll('.model-preview__item')];
     if (rows.length !== data.settings.length) failures.push('Report omitted model settings.');
@@ -2437,11 +2711,31 @@ async function auditWorkflows(target) {
       const selectedEntry = data.entries.find(entry => entry.id === document.querySelector('#efficiency-entry')?.value);
       if (text(document.querySelector('[data-selected-readiness]')) !== selectedEntry?.readinessLabel) failures.push('Selected efficiency result omits its readiness verdict.');
     }
+    // The clean category header exposes the sample size; calibration limitations
+    // live in its accessible benchmark report. The runner follows this exact link
+    // and audits the rendered qualification and full provenance before returning.
+    const initialHash = location.hash;
+    try {
+      if (mode !== 'benchmarks') {
+        document.querySelector('[data-capability-mode="benchmarks"]')?.click();
+        await settle();
+      }
+      const expectedReportUrl = new URL('benchmark-report.html#work-spec-chat', location.href);
+      const reportLink = [...document.querySelectorAll('#capability-benchmarks a[href]')].find(link => link.href === expectedReportUrl.href);
+      if (!visible(reportLink) || !text(reportLink)) failures.push('Workflow calibration report is not inspectable from Benchmark tests.');
+      else disclosureReportHref = reportLink.href;
+    } finally {
+      if (mode !== 'benchmarks') {
+        document.querySelector('[data-capability-mode="' + mode + '"]')?.click();
+        await settle();
+      }
+      if (location.hash !== initialHash || document.querySelector('.capability-mode__tab[aria-selected="true"]')?.dataset.capabilityMode !== mode) failures.push('Workflow disclosure audit did not restore the initial view.');
+    }
   }
   [...document.querySelectorAll('button, a[href], summary, select')].filter(visible).forEach(element => {
     if (!element.getAttribute('aria-label') && !element.getAttribute('aria-labelledby') && !element.labels?.length && !text(element)) failures.push('Unnamed workflow control.');
   });
-  return { failures, benchmarkCount: data.benchmarks.length, settingCount: data.settings.length, entryCount: data.entries.length, resultCount: data.benchmarkResults.length, d3Version: window.d3?.version || '' };
+  return { failures, disclosureReportHref, benchmarkCount: data.benchmarks.length, settingCount: data.settings.length, entryCount: data.entries.length, resultCount: data.benchmarkResults.length, d3Version: window.d3?.version || '' };
 }
 
 function guideTarget(score) {
@@ -2497,6 +2791,7 @@ function guideState() {
 }
 
 let socket;
+const pageErrors = [];
 try {
   const port = await waitFor(() => {
     if (!fs.existsSync(portFile)) return null;
@@ -2504,7 +2799,6 @@ try {
   });
   socket = await connect(port);
   const protocol = createProtocol(socket);
-  const pageErrors = [];
 
   protocol.on('Runtime.exceptionThrown', ({ exceptionDetails }) => {
     pageErrors.push('exception: ' + (exceptionDetails?.exception?.description || exceptionDetails?.text || 'unknown'));
@@ -2542,7 +2836,7 @@ try {
     })
   ]);
 
-  const loaded = protocol.once('Page.loadEventFired');
+  const loaded = protocol.once('Page.loadEventFired', NAVIGATION_LOAD_TIMEOUT_MS);
   await protocol.send('Page.navigate', { url: pageUrl.href });
   await loaded;
 
@@ -2609,12 +2903,13 @@ try {
   }
 
   const hasOverall = await evaluate('Boolean(window.VASIR_DATA.overall)');
+  const overallSourceOracle = !isReportCapture && hasOverall ? await loadOverallV3Oracle(evaluate) : null;
   if (!isReportCapture && hasOverall) {
-    const navigationAudit = await evaluate('(' + auditCategoryNavigation.toString() + ')()');
+    const navigationAudit = await evaluate('(' + auditCategoryNavigation.toString() + ')(' + JSON.stringify(overallSourceOracle?.writingCatalog ?? null) + ')');
     if (navigationAudit.failures.length) throw new Error('QA failed: ' + navigationAudit.failures.join('; '));
   }
   const audit = isGamesCapture ? await evaluate('(' + auditGames.toString() + ')(' + JSON.stringify(captureTarget) + ')') : isOverallTarget && hasOverall
-    ? await evaluate('(' + auditOverall.toString() + ')(' + JSON.stringify(captureTarget) + ')')
+    ? await evaluate('(' + auditOverall.toString() + ')(' + JSON.stringify(captureTarget) + ',' + JSON.stringify(overallSourceOracle) + ',(' + auditOverallAvailableProfiles.toString() + '))')
     : isWorkflowCapture ? await evaluate('(' + auditWorkflows.toString() + ')(' + JSON.stringify(captureTarget) + ')') : await evaluate(
     '(' + auditSite.toString() + ')('
       + JSON.stringify(captureTarget)
@@ -2628,23 +2923,39 @@ try {
   );
   if (audit.failures.length) throw new Error('QA failed: ' + audit.failures.join('; '));
 
+  if (isWorkflowCapture && !isReportCapture) {
+    if (!audit.disclosureReportHref) throw new Error('QA failed: Workflow calibration report link missing.');
+    const reportLoaded = protocol.once('Page.loadEventFired', NAVIGATION_LOAD_TIMEOUT_MS);
+    await protocol.send('Page.navigate', { url: audit.disclosureReportHref });
+    await reportLoaded;
+    await waitFor(async () => await evaluate(readinessExpression + ' && Boolean(window.VASIR_RESPONSES)'));
+    const reportAudit = await evaluate('(' + auditWorkflows.toString() + ')("workflow-report")');
+    if (reportAudit.failures.length) throw new Error('QA failed in linked Workflow disclosure report: ' + reportAudit.failures.join('; '));
+    const restored = protocol.once('Page.loadEventFired', NAVIGATION_LOAD_TIMEOUT_MS);
+    await protocol.send('Page.navigate', { url: pageUrl.href });
+    await restored;
+    await waitFor(async () => await evaluate(readinessExpression));
+    await evaluate('new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+  }
+
   if (captureTarget === 'report' || captureTarget === 'workflow-report') {
     const overallReportUrl = new URL(pageUrl);
     overallReportUrl.searchParams.set('from', 'overall');
-    const overallLoaded = protocol.once('Page.loadEventFired');
+    const overallLoaded = protocol.once('Page.loadEventFired', NAVIGATION_LOAD_TIMEOUT_MS);
     await protocol.send('Page.navigate', { url: overallReportUrl.href });
     await overallLoaded;
     await waitFor(async () => await evaluate(readinessExpression));
     const overallBreadcrumb = await evaluate("document.querySelector('.report-breadcrumb a[href=\"./index.html#capabilities/overall/benchmarks\"]')?.textContent.trim()");
     if (overallBreadcrumb !== 'Overall') throw new Error('QA failed: Overall report breadcrumb label mismatch.');
-    const restored = protocol.once('Page.loadEventFired');
+    const restored = protocol.once('Page.loadEventFired', NAVIGATION_LOAD_TIMEOUT_MS);
     await protocol.send('Page.navigate', { url: pageUrl.href });
     await restored;
     await waitFor(async () => await evaluate(readinessExpression));
   }
 
   if (isOverallTarget && hasOverall) {
-    const editions = {overall: 'Overall v2', engineering: 'Engineering v2', games: 'Games v1 pilot', 'ai-workflows': 'Work Specs v1'};
+    const editions = {overall: overallSourceOracle ? 'Overall v3' : 'Overall v2', engineering: 'Engineering v2', games: 'Games v1 pilot', 'ai-workflows': 'Work Specs v1'};
+    const expectedWritingSelection = pageUrl.searchParams.get('score') || 'all-writing';
     // Every published category participates in the same keyboard navigation.
     const hasGames = await evaluate('Boolean(window.VASIR_DATA.games)');
     const hasWriting = await evaluate('Boolean(window.VASIR_DATA.writing?.coverage?.caseCount)');
@@ -2658,8 +2969,10 @@ try {
     for (const step of navigationSteps) {
       const {category} = step;
       const editionMatches = category === 'writing'
-        ? 'window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id === "storytelling" && document.querySelector(".capability-canvas__status")?.textContent.includes(window.VASIR_WRITING_CATEGORY.writingCategory.comparisonLabel) && /provisional/i.test(document.querySelector(".capability-canvas__status").textContent) === window.VASIR_WRITING_CATEGORY.scoreBasis.provisional'
-        : 'document.querySelector(".capability-canvas__status")?.textContent.includes(' + JSON.stringify(editions[category]) + ')';
+        ? '(() => { const projection = window.VASIR_WRITING_CATEGORY; const method = document.querySelector(".capability-canvas__header details[data-writing-index-method]"); return projection?.writingCategory.selection.id === ' + JSON.stringify(expectedWritingSelection) + ' && document.querySelector("#writing-score-selection")?.value === projection.writingCategory.selection.id && document.querySelector(".capability-canvas__status")?.textContent.trim() === projection.writingCategory.selection.title + " · Published benchmark results" && method && !method.open && method.querySelector("summary")?.textContent.trim() === "Methodology" && /provisional/i.test(method.textContent) === projection.scoreBasis.provisional; })()'
+        : category === 'overall'
+          ? '((document.querySelector(".capability-canvas__status")?.textContent || "") + " " + (document.querySelector(".benchmark-mast__evidence")?.textContent || "")).includes(' + JSON.stringify(editions[category]) + ')'
+          : 'document.querySelector(".capability-canvas__status")?.textContent.includes(' + JSON.stringify(editions[category]) + ')';
       let key = step.key;
       if (step.move) {
         const vertical = await evaluate('document.querySelector(".capability-selector__tabs")?.getAttribute("aria-orientation") === "vertical"');
@@ -2872,6 +3185,7 @@ try {
   );
 } catch (error) {
   console.error('Capture failed: ' + error.message);
+  if (pageErrors.length) console.error('Observed page errors: ' + [...new Set(pageErrors)].join('; '));
   process.exitCode = 1;
 } finally {
   socket?.close();

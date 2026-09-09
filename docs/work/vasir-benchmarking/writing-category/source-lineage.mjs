@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { validateTwistsCompletion, TWISTS_PARENT_SHA256 } from '../../../../cli/eval/plot-twists-completion.js';
 import { validateDungeonMasterExpansion, DM_ORIGINAL_RUN_SHA256 } from '../../../../cli/eval/dungeon-master-expansion-manifest.js';
+import { buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, PLOT_TWISTS_PAIRED_SOURCE_KIND } from '../../../../cli/eval/plot-twists-paired-publication.js';
 
 export const CORE_PARENT_SHA256 = '0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5';
 const digest = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -78,13 +79,32 @@ export function verifyWritingSourceSelections({ repo, previousSelections }) {
   assert.equal(new Set(previousSelections.map(item => item.benchmarkId)).size, 4, 'Duplicate Writing source selection.');
   return previousSelections.map(previous => {
     for (const source of previous.sources) pinnedJson(source);
+    for (let lineage = previous.lineage; lineage; lineage = lineage.previousLineage) {
+      for (const source of lineage.previousSources ?? []) pinnedJson(source);
+    }
     const observed = pin(previous.path);
     const selected = JSON.parse(fs.readFileSync(contained(previous.path), 'utf8'));
     const selectedSources = Object.values(selected).filter(value => value && typeof value === 'object' && value.path && value.sha256);
-    assert.equal(selectedSources.length, previous.sources.length, 'Selected source inventory changed.');
     for (const source of selectedSources) pinnedJson(source);
     const unchanged = observed.bytes === previous.bytes && observed.sha256 === previous.sha256;
     const record = { benchmarkId: previous.benchmarkId, ...observed, sources: selectedSources.map(source => pin(source.path)) };
+    if (selected.kind === PLOT_TWISTS_PAIRED_SOURCE_KIND) {
+      assert.equal(previous.benchmarkId, 'storytelling-plot-twists', 'Only Plot twists has a declared paired replacement.');
+      assert.equal(selectedSources.length, 1, 'Paired replacement must select one complete immutable snapshot.');
+      buildPlotTwistsPairedPublication({ repoRootDirectory: repo, selection: selected });
+      if (unchanged) {
+        assert.equal(previous.lineage?.kind, 'declared-writing-source-replacement', 'The paired edition lost its original source history.');
+        record.lineage = structuredClone(previous.lineage);
+      } else {
+        assert.ok(previous.sources.some(source => path.basename(source.path) === 'run.json'), 'An accepted paired measurement cannot be silently rerun or replaced within its edition.');
+        record.lineage = { kind: 'declared-writing-source-replacement', edition: PLOT_TWISTS_PAIRED_EDITION,
+          previousSelection: { path: previous.path, bytes: previous.bytes, sha256: previous.sha256 },
+          previousSources: previous.sources, ...(previous.lineage ? { previousLineage: previous.lineage } : {}),
+          originalEvidencePreserved: true, priorAnswersAndReviewsReused: false };
+      }
+      return record;
+    }
+    assert.equal(selectedSources.length, previous.sources.length, 'Selected source inventory changed.');
     if (unchanged) return record;
     assert.ok(Object.hasOwn(parentHashes, previous.benchmarkId), 'Magic discovery must remain byte-identical; no backfill is authorized.');
     const oldRunSource = previous.sources.find(source => path.basename(source.path) === 'run.json');

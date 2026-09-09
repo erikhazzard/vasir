@@ -10,7 +10,7 @@ import { createStorytellingSkillInstruction, freezeStorytellingSkill, STORYTELLI
 import { createDungeonMasterRows } from "../cli/eval/run-dungeon-master-benchmark.js";
 import { dmCandidateOrder, dmJudgePrompt, dmPairs, validateDmJudgeOutput } from "../cli/eval/judge-dungeon-master-benchmark.js";
 import { buildDungeonMasterPublication, DUNGEON_MASTER_BENCHMARK_ID, DUNGEON_MASTER_SELECTION_PATH, prepareDungeonMasterPublicationSource, projectDungeonMasterRun, validateDungeonMasterPublication } from "../cli/eval/dungeon-master-publication.js";
-import { buildWritingPublication, prepareWritingPublicationSource, validateWritingPublication, validateWritingSummary } from "../cli/eval/writing-publication.js";
+import { buildWritingPublication, buildWritingSourceCollection, prepareWritingPublicationSource, validateWritingPublication, validateWritingSummary } from "../cli/eval/writing-publication.js";
 import { runStorytellingBenchmark } from "../cli/eval/run-storytelling-benchmark.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -164,7 +164,7 @@ test("source selection pins immutable run and skill bytes and refuses active wri
   assert.throws(() => buildDungeonMasterPublication({ repoRootDirectory: f.root }), /unsafe source path/);
 });
 
-test("additive Writing selection preserves the existing Storytelling projection and answers", async t => {
+test("a private Dungeon Master selection preserves historical Storytelling evidence without completing the active release", async t => {
   const f = fixture(t);
   const corpus = JSON.parse(fs.readFileSync(path.join(REPO, "benchmarks/storytelling-core-idea/benchmark.json"), "utf8"));
   corpus.cases = corpus.cases.slice(0, 1);
@@ -174,18 +174,18 @@ test("additive Writing selection preserves the existing Storytelling projection 
   const storyDirectory = path.join(f.root, ".agents/vasir-evals/storytelling-core-idea/story-test");
   assert.ok(run);
   write(f.root, "benchmarks/storytelling-core-idea/publication.json", prepareWritingPublicationSource({ repoRootDirectory: f.root, runDirectory: storyDirectory }));
-  const before = buildWritingPublication({ repoRootDirectory: f.root });
+  const before = buildWritingSourceCollection({ repoRootDirectory: f.root });
   const dmDirectory = path.join(f.root, ".agents/vasir-evals", DUNGEON_MASTER_BENCHMARK_ID, "run");
   write(dmDirectory, "run.json", f.run); write(dmDirectory, "skill-snapshot.json", f.snapshot);
   write(f.root, DUNGEON_MASTER_SELECTION_PATH, prepareDungeonMasterPublicationSource({ repoRootDirectory: f.root, runDirectory: dmDirectory }));
-  const after = buildWritingPublication({ repoRootDirectory: f.root });
-  const { additionalBenchmarks, allWritingCoverage, ...defaultProjection } = after.projection;
-  const { additionalBenchmarks: additionalResponses, ...defaultResponses } = after.responseBundle;
-  assert.deepEqual(defaultProjection, before.projection); assert.deepEqual(defaultResponses, before.responseBundle);
-  assert.equal(additionalBenchmarks[DUNGEON_MASTER_BENCHMARK_ID].caseResults.length, 32);
-  assert.equal(additionalResponses[DUNGEON_MASTER_BENCHMARK_ID].responses.length, 32);
-  assert.equal(allWritingCoverage.benchmarkCount, 2);
-  assert.ok(after.stub.subsections.some(section => section.id === "dungeon-master"));
-  assert.notEqual(after.basisSha256, before.basisSha256);
+  const after = buildWritingSourceCollection({ repoRootDirectory: f.root });
+  assert.throws(() => buildWritingPublication({ repoRootDirectory: f.root }), /incomplete active release/);
+  assert.deepEqual(after, before, "A source selection cannot add a benchmark to the public release.");
+  assert.equal(after.projection.additionalBenchmarks, undefined);
+  assert.equal(after.responseBundle.additionalBenchmarks, undefined);
+  assert.equal(after.stub.subsections.some(section => section.id === "dungeon-master"), false);
+  const retained = buildDungeonMasterPublication({ repoRootDirectory: f.root });
+  assert.equal(retained.projection.caseResults.length, 32);
+  assert.equal(retained.responseBundle.responses.length, 32);
   validateWritingSummary(after.stub); validateWritingPublication(after.projection, after.responseBundle);
 });

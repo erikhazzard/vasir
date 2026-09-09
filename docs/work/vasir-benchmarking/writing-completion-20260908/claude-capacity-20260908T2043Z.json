@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAtApproximate": "2026-09-08T20:43:39Z",
+  "source": "Default Claude Code interactive /usage in screen-reader safe mode; transcribed from refreshed terminal output, not the initial cached panel. No model prompt or generation.",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "sessionUsedPercent": 0,
+  "weekAllModelsUsedPercent": 30,
+  "weekFableUsedPercent": 55,
+  "usageCreditsEnabled": false,
+  "usageCreditsObservation": "Usage credits are off · /usage-credits to turn them on",
+  "resetCreditConsumptionAllowed": false,
+  "diagnosticModelCalls": 0,
+  "decision": "Refreshed capacity is available. Resume original Core idea Claude judge-only at concurrency eight; Plot twists may recover its sole pinned historical Claude quota row at one, then process untouched Claude slots at eight. Dungeon Master remains Codex-only. No account, payment, credential, or model-setting change."
+}

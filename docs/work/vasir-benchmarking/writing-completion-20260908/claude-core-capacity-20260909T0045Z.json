@@ -1,0 +1,26 @@
+{
+  "kind": "archived-claude-success-capacity-v1",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "resetCreditConsumptionAllowed": false,
+  "rootAuthorization": {
+    "actor": "root",
+    "reason": "User requested retrying Claude tests after restored usage. At most 20 original recoverable Core idea Fable reviews at concurrency 4; the separate claude-core-retry-authorization-20260909T0037Z.json records preservation and no-credit policy. No successful or terminal-refusal retries, account changes, purchases, credit enabling, or frozen-experiment changes.",
+    "maximumCalls": 20,
+    "concurrency": 4
+  },
+  "sources": [
+    {
+      "archiveDirectory": "/Users/erikhazzard/code/vasir/.agents/vasir-evals/dungeon-master-adventure-outline/completion-checkpoints/claude-first-success-20260909T0035Z",
+      "archiveReceiptSha256": "ac2742aada67cdd95c7c0afcea42e129f109f253e20a8e5113e96b38d5de0d8d",
+      "runSha256": "365ba80b08ddce85a1c5678ffc2ce6c1cdb623930304a30c87178917e142ffb1",
+      "attemptKey": "claude:claude-fable-5-1@low::celebration::trial-1::skill:dungeon-master",
+      "configurationId": "claude:claude-fable-5-1@low",
+      "sessionId": "00cbb9d2-6fca-44f4-bd46-49dbdd221638",
+      "stdout": {
+        "path": "expansion-evidence/writer/0012c7732ac061b7c7623444/attempt-1/stdout.jsonl",
+        "bytes": 78740,
+        "sha256": "774971ecec871a849651601abb1b34583ba95fe22d4c0f41e9e47190786851ca"
+      }
+    }
+  ]
+}

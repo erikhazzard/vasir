@@ -1,0 +1,393 @@
+{
+  "kind": "vasirbenchmark-canonical-candidate-review",
+  "status": "passed",
+  "releaseId": "1dcdf377b0efcc7fffc6486b626fb675ed60dd2f3594e2f6216f63d4b1265d38",
+  "createdAt": "2026-09-09T18:48:44.957Z",
+  "preservation": {
+    "overall": "0cd20f294405adcff154b7c2d4da4ec320e68c802e6b36deab6af31adbd96e28",
+    "games": "d49291d02d6dae20fcc59a4ab9b8c4b9629fe89567365e410619c60834f1df5d",
+    "aiWorkflows": "3efa56a9e45c89d008691ed72d0e6da2b78dc9135586c6447578afe66840ec13",
+    "scoreBasis": "67a07945de60bae1623b65068a95ae5841418d62e59c1735c9cbc69b3a178512",
+    "settings": "6a8347d2e3ebf5003df995d6fea6ed76132f219d8d57d914ac31a706d9aa076c",
+    "benchmarkResults": "db4ae6f38f8990a958725bc00a39a1aef4c98060d464f51df72e7b493ccff7ce"
+  },
+  "overallSourceValidation": {
+    "kind": "independent-overall-v3-original-source-oracle",
+    "edition": "overall-v3",
+    "overallSha256": "0cd20f294405adcff154b7c2d4da4ec320e68c802e6b36deab6af31adbd96e28",
+    "writingSource": {
+      "path": "writing-data.js",
+      "bytes": 2810757,
+      "sha256": "2c9957bfc5f3e88e4542817f03e8107f8fef9e552c849511883013590a4652c7"
+    },
+    "oracle": {
+      "path": "docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs",
+      "initialSha256": "d8bd726897543aa000d4719af8c289dfd7cc2626fa990664674d9c1f7e70e827",
+      "sha256": "d8bd726897543aa000d4719af8c289dfd7cc2626fa990664674d9c1f7e70e827"
+    },
+    "controller": {
+      "path": "docs/work/vasir-benchmarking/storytelling-plot-twists/capture-candidate.mjs",
+      "initialSha256": "7b5fdd9cea18e5710a716b72e6e5da25a36fe254d370900a68388d8596d7a5ed",
+      "sha256": "7b5fdd9cea18e5710a716b72e6e5da25a36fe254d370900a68388d8596d7a5ed"
+    }
+  },
+  "source": {
+    "path": "site/vasirbenchmark.com/capture.mjs",
+    "initialSha256": "900242b93ebe5ba0575d82fe7e06b0898d21341f27fcc93b4f82e74ab8997faa",
+    "sha256": "900242b93ebe5ba0575d82fe7e06b0898d21341f27fcc93b4f82e74ab8997faa"
+  },
+  "results": [
+    {
+      "target": "report",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-benchmark-report.png",
+      "code": 0,
+      "bytes": 147176,
+      "sha256": "6f933b08aa7ac2d153733c5d596283f078bf61643c91a9a559a713e1d04a1a63",
+      "log": "desktop-benchmark-report.png · #hyper-scale-chat · 1440×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "capabilities",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-capabilities.png",
+      "code": 0,
+      "bytes": 151214,
+      "sha256": "a3eda9fc4797f04312ee759c9093ca25feb20694b81f9f8737605a88d8a149d4",
+      "log": "desktop-capabilities.png · #capabilities/engineering · 1440×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "capability-benchmarks",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-capability-benchmarks.png",
+      "code": 0,
+      "bytes": 224127,
+      "sha256": "90cbbf81f9f83c2810b8e0eb031e1b3624144db183fa0eae39448a11150f14fc",
+      "log": "desktop-capability-benchmarks.png · #capabilities/engineering/benchmarks · 1440×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "efficiency",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-efficiency.png",
+      "code": 0,
+      "bytes": 186238,
+      "sha256": "d39c5010e04f826aba9e97460349188dae432dd3d417f69338ee8f7d1dcab51d",
+      "log": "desktop-efficiency.png · #capabilities/overall/efficiency · 1440×1000 · 3 categories / 7 benchmarks / 19 settings / 38 condition entries / 466 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "game-benchmarks",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-game-benchmarks.png",
+      "code": 0,
+      "bytes": 121419,
+      "sha256": "38a5f0fe111fa1098158a69690ab1f9ad285fe564bd9ccc521675f266d60b150",
+      "log": "desktop-game-benchmarks.png · #capabilities/games/benchmarks · 1440×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "game-efficiency",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-game-efficiency.png",
+      "code": 0,
+      "bytes": 133113,
+      "sha256": "364e8a0053698f5c3970ef44674f2ded86f3fc7f76ec29cfbabc94a51638712c",
+      "log": "desktop-game-efficiency.png · #capabilities/games/efficiency · 1440×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "games",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-game-models.png",
+      "code": 0,
+      "bytes": 127205,
+      "sha256": "627775d3be72af22472ea114ff37a2eb4bfaf1a298d5e8a8a371c8cc1b868026",
+      "log": "desktop-game-models.png · #capabilities/games · 1440×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-benchmarks",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-workflow-benchmarks.png",
+      "code": 0,
+      "bytes": 131024,
+      "sha256": "218b2851c4d44a67b4b0f2ae2104587ac0b8df915f3506e3efb8cc2dd707e7ed",
+      "log": "desktop-workflow-benchmarks.png · #capabilities/ai-workflows/benchmarks · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-efficiency",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-workflow-efficiency.png",
+      "code": 0,
+      "bytes": 196359,
+      "sha256": "1229dfb05eff013979a39385b8364bf92f7c897b3e1f4eb1b8e10f23724144a4",
+      "log": "desktop-workflow-efficiency.png · #capabilities/ai-workflows/efficiency · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-report",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-workflow-report.png",
+      "code": 0,
+      "bytes": 204826,
+      "sha256": "5042770661cad75c551890e3f85592f17732a47e1b422ea1595be37cd33fa214",
+      "log": "desktop-workflow-report.png · #work-spec-chat · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflows",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop-workflows.png",
+      "code": 0,
+      "bytes": 149259,
+      "sha256": "875197a001d9327c45be141c9ada8b4494bd705270d8ad3eb472d36bbfef77a2",
+      "log": "desktop-workflows.png · #capabilities/ai-workflows · 1440×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "leaderboard",
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "filename": "desktop.png",
+      "code": 0,
+      "bytes": 179156,
+      "sha256": "8e7ca01a7c44f78a56d5e868f3b419cdb0d247c3e34538a41165c347ef839808",
+      "log": "desktop.png · #capabilities/overall · 1440×1000 · 3 categories / 7 benchmarks / 19 settings / 38 condition entries / 466 result cells · D3 7.9.0 · Claude release identities fit · guide pointer@63.2-spans-10-rows · QA clean\n"
+    },
+    {
+      "target": "report",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-benchmark-report.png",
+      "code": 0,
+      "bytes": 59526,
+      "sha256": "df6efd7442b994f647a5575495af1cc547a25e5dba9a1fc5f16288d6e7da8943",
+      "log": "mobile-benchmark-report.png · #hyper-scale-chat · 390×844 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "capabilities",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-capabilities.png",
+      "code": 0,
+      "bytes": 68574,
+      "sha256": "439a78dae61eb6eacc6e70666a69a8bf197d67020ba4a3f2846d6f5da42bcf54",
+      "log": "mobile-capabilities.png · #capabilities/engineering · 390×844 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "capability-benchmarks",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-capability-benchmarks.png",
+      "code": 0,
+      "bytes": 69479,
+      "sha256": "601cdd99d969b2b4b60c76604c01067a7b4ecb172416c88bc4af93fb334c9760",
+      "log": "mobile-capability-benchmarks.png · #capabilities/engineering/benchmarks · 390×844 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "efficiency",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-efficiency.png",
+      "code": 0,
+      "bytes": 62566,
+      "sha256": "c6e16ac86192a46b627794c35985644ef2cf04ece6572fd75a92014aa2b68b14",
+      "log": "mobile-efficiency.png · #capabilities/overall/efficiency · 390×844 · 3 categories / 7 benchmarks / 19 settings / 38 condition entries / 466 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "game-benchmarks",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-game-benchmarks.png",
+      "code": 0,
+      "bytes": 68706,
+      "sha256": "ace66074910639dd61bf46fd9d6623ad5128adf3372b0c64f065d5b37995b466",
+      "log": "mobile-game-benchmarks.png · #capabilities/games/benchmarks · 390×844 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "game-efficiency",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-game-efficiency.png",
+      "code": 0,
+      "bytes": 62459,
+      "sha256": "383402605f49adb1cf65e5dbd4d61fb46d329ddf41cb8714a9f99b4469013f42",
+      "log": "mobile-game-efficiency.png · #capabilities/games/efficiency · 390×844 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "games",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-game-models.png",
+      "code": 0,
+      "bytes": 66938,
+      "sha256": "a18155d1fba82ebe47c3266ce8b70452d20ce985872abd590ad43f96754cc0d3",
+      "log": "mobile-game-models.png · #capabilities/games · 390×844 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-benchmarks",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-workflow-benchmarks.png",
+      "code": 0,
+      "bytes": 67058,
+      "sha256": "fd4208273a5dcde588f063091ce2eda6f3af58c5ebb41bf25f5618a2770b20ae",
+      "log": "mobile-workflow-benchmarks.png · #capabilities/ai-workflows/benchmarks · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-efficiency",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-workflow-efficiency.png",
+      "code": 0,
+      "bytes": 58908,
+      "sha256": "160da47eaf42632eb4d00f178889f125f2037a0a66b88e9e41697f08bd874850",
+      "log": "mobile-workflow-efficiency.png · #capabilities/ai-workflows/efficiency · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-report",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-workflow-report.png",
+      "code": 0,
+      "bytes": 76077,
+      "sha256": "5138053c4bbfb5f03ff51c98ee582e51d05201098b886243be41f806ccb3f5e9",
+      "log": "mobile-workflow-report.png · #work-spec-chat · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflows",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile-workflows.png",
+      "code": 0,
+      "bytes": 63031,
+      "sha256": "4fe6252d479cbe3fc56aa369a89d1d3489d308dd972586d301bbe2ddcf3731e4",
+      "log": "mobile-workflows.png · #capabilities/ai-workflows · 390×844 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "leaderboard",
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "filename": "mobile.png",
+      "code": 0,
+      "bytes": 68645,
+      "sha256": "59c65acd5a279a3e7df6a662c3c8ffc01a5f8e8d7ecc6ce02451785091540e69",
+      "log": "mobile.png · #capabilities/overall · 390×844 · 3 categories / 7 benchmarks / 19 settings / 38 condition entries / 466 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "capabilities",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-capabilities.png",
+      "code": 0,
+      "bytes": 99814,
+      "sha256": "658d34492ebcb531b6fb6d1e1f8acbdef400f79a4c9464a925f5c50c389a8a8f",
+      "log": "tablet-capabilities.png · #capabilities/engineering · 820×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "game-benchmarks",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-game-benchmarks.png",
+      "code": 0,
+      "bytes": 102015,
+      "sha256": "9a4e2d414aa826f14dfb3428b888eec32a11f2d060dc68d2f3fef73094b9ea02",
+      "log": "tablet-game-benchmarks.png · #capabilities/games/benchmarks · 820×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "game-efficiency",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-game-efficiency.png",
+      "code": 0,
+      "bytes": 87871,
+      "sha256": "bb171d629d68ecd286c25bdc944c9c60898f4bf2bf039d12aa539b289bee75f4",
+      "log": "tablet-game-efficiency.png · #capabilities/games/efficiency · 820×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "games",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-games.png",
+      "code": 0,
+      "bytes": 86158,
+      "sha256": "3d393100a3be17c63d576aef80779975349d971e7d203af8b181fce3db6f7e14",
+      "log": "tablet-games.png · #capabilities/games · 820×1000 · 1 categories / 1 benchmarks / 5 settings / 10 condition entries / 10 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "leaderboard",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-leaderboard.png",
+      "code": 0,
+      "bytes": 121179,
+      "sha256": "42b875609555e8a673dbf40804f58aeb57910504bccc0a920267e6395af71c66",
+      "log": "tablet-leaderboard.png · #capabilities/overall · 820×1000 · 3 categories / 7 benchmarks / 19 settings / 38 condition entries / 466 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "report",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-report.png",
+      "code": 0,
+      "bytes": 103321,
+      "sha256": "d872636b861102ad0d936224673566f8a7705278f850a91213c6c09c832355fa",
+      "log": "tablet-report.png · #hyper-scale-chat · 820×1000 · 1 categories / 3 benchmarks / 36 settings / 72 condition entries / 216 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflow-report",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-workflow-report.png",
+      "code": 0,
+      "bytes": 185672,
+      "sha256": "220afbf2e9fa0190ab4db53c450d6196953c41757b4a3b695283b099eb008adc",
+      "log": "tablet-workflow-report.png · #work-spec-chat · 820×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    },
+    {
+      "target": "workflows",
+      "viewport": "tablet",
+      "width": 820,
+      "height": 1000,
+      "filename": "tablet-workflows.png",
+      "code": 0,
+      "bytes": 99284,
+      "sha256": "353ce15e784892f6c754f5c47ebde5a8a4ff1e831c71e839a19797ffaf734718",
+      "log": "tablet-workflows.png · #capabilities/ai-workflows · 820×1000 · 1 categories / 1 benchmarks / 26 settings / 52 condition entries / 52 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n"
+    }
+  ]
+}

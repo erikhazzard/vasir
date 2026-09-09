@@ -198,15 +198,22 @@ test("canonical publication appends an independent workflow family without chang
   assert.deepEqual({ ...engineeringResponses, schemaVersion: 2 }, previous.responseBundle);
   assert.equal(aiWorkflows.counts.settings, 1);
   assert.equal(overall.counts.settings, 1);
-  assert.equal(overall.coverage.totalSettings, 36);
+  const overallConfigurationIds = new Set([
+    ...engineering.settings, ...aiWorkflows.settings, ...built.projection.writing.overallSource.settings
+  ].map(setting => setting.configurationId));
+  assert.equal(overall.coverage.totalSettings, overallConfigurationIds.size);
+  assert.deepEqual(new Set(overall.coverage.records.map(setting => setting.configurationId)), overallConfigurationIds,
+    'Overall includes the configuration union after explicitly registered source aliases');
   assert.equal(workflowResponses.counts.judgments, 4);
   assert.equal(engineering.counts.benchmarks + aiWorkflows.counts.benchmarks, 4, "additive families cannot change the historical Engineering/workflow task count");
   assert.equal(engineering.counts.responses + aiWorkflows.counts.responses, 218, "Writing does not change retained Engineering/workflow responses");
-  assert.equal(built.counts.responses, 218 + (built.writing?.coverage.responseCount ?? 0));
+  const writingResponseCount = (built.writing?.allWritingCoverage ?? built.writing?.collectionCoverage ?? built.writing?.coverage)?.responseCount ?? 0;
+  assert.equal(built.counts.responses, 218 + writingResponseCount);
   assert.equal(new Set([...engineering.settings, ...aiWorkflows.settings].map(setting => setting.configurationId)).size, 36);
-  assert.equal(built.counts.settings, new Set([
-    ...engineering.settings, ...aiWorkflows.settings, ...(built.writing?.settings ?? [])
-  ].map(setting => setting.configurationId)).size, "shared configurations are not double counted across families");
+  const originalWritingIds = built.projection.writing.overallSource.settings.map(setting =>
+    built.projection.writing.overallSource.scoreBasis.identityAliases?.find(alias => alias.configurationId === setting.configurationId)?.sourceConfigurationId || setting.configurationId);
+  assert.equal(built.counts.settings, new Set([...engineering.settings.map(setting => setting.configurationId), ...aiWorkflows.settings.map(setting => setting.configurationId), ...originalWritingIds]).size,
+    'publication inventory retains original report identities while Overall joins only proven aliases');
   assert.ok(built.routes.familyFragments.includes("/#capabilities/ai-workflows"));
   assert.ok(built.routes.reportFragments.includes("/benchmark-report.html#work-spec-chat"));
   validateBenchmarkPublicationProjection(built.projection);

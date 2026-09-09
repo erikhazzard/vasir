@@ -120,6 +120,11 @@ test('creation selects each of three trials while context comparison remains a c
   for (let trial = 1; trial <= 3; trial++) {
     page.choose(String(trial));
     const html = page.reportView.innerHTML;
+    assert.match(html, /<h2 id="ranking-title">Model comparison<\/h2>/);
+    assert.match(html, /<details class="report-judge-details" data-report-judge-trial-details>/);
+    assert.ok(html.indexOf('id="ranking"') < html.indexOf('data-report-judge-trial-details'));
+    assert.ok(html.indexOf('data-report-judge-trial-details') < html.indexOf('data-creation-context-comparison'));
+    assert.equal((html.match(/<ol class="model-preview"/g) || []).length, 1);
     assert.equal(page.window.location.hash, `#${ID}/magic-discovery/trial-${trial}`);
     assert.equal(page.reportPage.dataset.activeWritingTrial, String(trial));
     assert.equal((html.match(/<option value="\d+"/g) || []).length, 3);

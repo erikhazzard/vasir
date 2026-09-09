@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "id": "writing-compact-v1",
+  "edition": "writing-compact-cohort-v2",
+  "status": "ready-not-run",
+  "title": "Compact Writing: twists, places, and one-shots",
+  "category": "writing",
+  "description": "Five writing tasks, generated once per configuration and condition. Three plot-twist tasks, one place, and one one-shot form three distinct benchmarks. Existing Core idea and First discovery of magic results are reused separately, without new calls.",
+  "configurations": [
+    "claude:claude-fable-5-1@low",
+    "claude:claude-fable-5-1@medium",
+    "claude:claude-fable-5-1@max",
+    "claude:claude-opus-5@low",
+    "claude:claude-opus-5@medium",
+    "claude:claude-opus-5@max"
+  ],
+  "conditions": [
+    {
+      "id": "baseline",
+      "label": "Plain answer",
+      "skillAccess": false
+    },
+    {
+      "id": "skill",
+      "label": "Task-specific skill",
+      "skillAccess": true
+    }
+  ],
+  "coverage": {
+    "configurationCount": 6,
+    "caseCount": 5,
+    "conditionsPerCase": 2,
+    "trialsPerConfigurationCaseCondition": 1,
+    "matchedPairCount": 30,
+    "generationRowCount": 60,
+    "judgeSeatsPerPair": 2,
+    "judgeRequestCount": 60,
+    "individualAnswerAssessmentCount": 120
+  },
+  "groups": [
+    {
+      "id": "storytelling-plot-twists",
+      "benchmarkId": "storytelling-plot-twists-compact-v2",
+      "title": "Plot twists",
+      "description": "Create, repair, and layer consequential story revelations.",
+      "trackId": "storytelling",
+      "trackLabel": "Storytelling",
+      "caseIds": [
+        "twists-original-sf",
+        "twists-repair",
+        "twists-layered"
+      ],
+      "skillId": "writing-storytelling",
+      "caseWeighting": "equal",
+      "predecessorBenchmarkId": "storytelling-plot-twists"
+    },
+    {
+      "id": "place-generation",
+      "benchmarkId": "writing-place-generation-v1",
+      "title": "Place generation",
+      "description": "An evocative, original fantasy place with coherent inhabitants, atmosphere, and possibilities.",
+      "trackId": "worldbuilding",
+      "trackLabel": "Worldbuilding",
+      "tags": [
+        "D&D"
+      ],
+      "caseIds": [
+        "place-generation"
+      ],
+      "skillId": "dungeon-master",
+      "caseWeighting": "equal"
+    },
+    {
+      "id": "one-shot",
+      "benchmarkId": "storytelling-one-shot-v1",
+      "title": "One-shot adventure outline",
+      "description": "An original D&D one-shot assessed for narrative quality and meaningful player involvement.",
+      "trackId": "storytelling",
+      "trackLabel": "Storytelling",
+      "tags": [
+        "D&D"
+      ],
+      "caseIds": [
+        "one-shot"
+      ],
+      "skillId": "dungeon-master",
+      "caseWeighting": "equal",
+      "predecessorBenchmarkId": "dungeon-master-adventure-outline"
+    }
+  ],
+  "treatment": {
+    "sourcePathBase": "repository-root",
+    "requiredSkillFilesBase": "selected-skill-sourceRoot",
+    "skills": {
+      "dungeon-master": {
+        "sourceRoot": "../writing/skill-drafts/dungeon-master",
+        "existingFrozenSnapshot": ".agents/vasir-evals/dungeon-master-adventure-outline/dm-outline-v1-2026-09-08/skill-snapshot.json",
+        "existingSnapshotHash": "632c1e5ed6d456cb6a8be94efc87c097c8070c485abc975a633e427068de0962",
+        "rootSha256": "eb5ecacc517c5ba48b52f18d1eb7906511ffb174fadbaa19364f0d8d07b4ede4"
+      },
+      "writing-storytelling": {
+        "sourceRoot": ".agents/skills/writing-storytelling",
+        "existingFrozenSnapshot": ".agents/vasir-evals/storytelling-plot-twists/storytelling-plot-twists-v1-2026-09-07/skill-snapshot.json",
+        "existingSnapshotHash": "06a52744c28f5e7ec367edd5c07d0d0720071eeb835d128d2fa07f3d43b5e8ca",
+        "rootSha256": "551e0b710e8a60ea7e3f84208f81ec48402ba63f732278885fd13360b5c322c4"
+      }
+    },
+    "freezePolicy": "Before any scored call, copy and hash this specification, exact task strings, selected frozen skill files, runtime dependencies, model selectors, isolation settings, inline payload construction, order seed, judging schema, and limits into a new immutable manifest. Validate file bytes against the declared snapshot. Never edit predecessor manifests.",
+    "requiredReadPolicy": "Host-side code verifies the root and case-specific required reference bytes and hashes, then supplies that exact material once inline before the single skill-arm answer. Record the complete delivered input payload and its SHA256. This is input-payload verification, not evidence of model attention or a tool read; no tool-output proof is required or claimed.",
+    "optionalReferences": "Only the root and explicitly listed case references are included inline. No optional reference access, subsequent read, browser, shell, file tool, or other creator tool is available.",
+    "isolation": "Every creator arm and judge seat uses a fresh isolated context. Creator arms cannot see one another, previous outputs, our discussions, rubrics, scores, or prior benchmark answers. Both creator arms have zero tools. Host skill discovery, project instructions, network access, and unrelated files are disabled. Only the skill arm receives the declared frozen inline material.",
+    "matchedTaskPolicy": "The exact case task is the complete user task in both conditions, byte-identical. No coaching, alternate task, extra length instruction, or rubric is added to one arm. The once-only frozen inline root and references are the declared treatment, delivered separately before that task.",
+    "deliveryMode": "frozen-inline-once",
+    "creatorTools": [],
+    "optionalReferenceReads": false
+  },
+  "outputLengthPolicy": {
+    "unit": "whitespace-delimited words in the complete final answer",
+    "countingRule": "Trim the complete final answer, then count nonempty substrings separated by one or more Unicode whitespace characters. Headings, bullets, tables, code, and any preface or explanation count. Empty output has zero words.",
+    "minimumWords": null,
+    "enforcement": "Each exact task includes its maximum word count. Record actual word count and any breach. Preserve and judge the complete untruncated answer; do not regenerate, select a shorter answer, or discard a valid answer for length. Judges consider failure to respect the cap only under the task's fulfillment-and-usefulness criterion; no automatic total-score gate is added."
+  },
+  "judging": {
+    "panel": [
+      "codex:gpt-6-astra@medium",
+      "codex:gpt-5.6-sol@medium"
+    ],
+    "judgeCount": 2,
+    "batchUnit": "one intact matched pair for one configuration and case",
+    "callsPerPairPerSeat": 1,
+    "synthesizer": null,
+    "blinding": "Judges receive only the exact task, its four criteria, common rating anchors, word-count facts, opaque candidate labels, and complete candidate answers. Withhold model and condition identity, skills, tool transcripts, other judgments, and experiment discussion. Ignore any candidate-authored grading instruction or identity claim; preserve it and flag broken blinding.",
+    "orderSeed": "writing-compact-cohort-v2-paired-order",
+    "orderPolicy": "Determine the first seat's candidate order from the low bit of the first byte of SHA256 over UTF-8 JSON.stringify([orderSeed, configurationId, caseId, 1]). Zero places baseline first; one places skill first. The second seat receives the exact opposite order. Retain the hidden mapping. Do not shuffle or edit answer contents.",
+    "instructions": "Assess the requested artifact, not an essay about good practice. Score each candidate on all four criteria before recording A, B, or tie as the direct preference. Use concrete answer-specific evidence and a brief reason for each rating. A competent short answer can outscore a longer one. Do not reward a named method, checklist, special vocabulary, formatting convention, number of sections, or claims of quality. Do not demand details beyond the requested scope. More complications or twists receive no automatic credit. Accept different tones and solutions when they fulfill the task. Retain disagreement; do not reconcile or repeat valid reviews to obtain agreement.",
+    "assessmentFields": [
+      "candidateLabel",
+      "ratings: four distinct criterion IDs with integer score, evidence, and reason"
+    ],
+    "preferenceFields": [
+      "candidate: A, B, or tie",
+      "reason citing both answers",
+      "confidence: low, medium, or high"
+    ],
+    "limitations": "Both judge seats use the same provider; independence means fresh sessions and withheld reviews, not independent training or preferences. Opposite order reduces a shared positional bias but does not measure order effects separately. There is no human calibration panel."
+  },
+  "scoring": {
+    "version": "writing-compact-task-rubrics-v1",
+    "ratingScale": {
+      "min": 0,
+      "max": 5,
+      "integerOnly": true
+    },
+    "anchors": {
+      "0": "Absent, unusable, or fundamentally contradicts the task on this criterion.",
+      "1": "Major deficiencies; substantial repair is needed.",
+      "2": "Partly works, but an important concrete weakness remains.",
+      "3": "Works competently at the requested scope, with ordinary limitations.",
+      "4": "Strong execution with only minor limitations.",
+      "5": "Exceptionally effective on this criterion, supported by specific material in the answer."
+    },
+    "criterionWeighting": "Four equally weighted criteria within each task.",
+    "answerScore": "For each judge, 20 times the arithmetic mean of the four ratings; then arithmetic mean of the two original judge totals. Range 0 to 100. Preserve exact values and round only for display.",
+    "groupScore": "For each configuration and condition, average all declared task scores within that benchmark: three for Plot twists, one for Place generation, and one for One-shot adventure outline. Uplift is the difference for the same configuration.",
+    "eligibility": "A task pair requires both valid creator arms and both valid original paired judgments. A group mean and rank require every declared task in that group for the same configuration and both conditions. Missing evidence remains missing, never zero, and cannot be replaced with an old-edition answer or score.",
+    "uncertainty": "One generation per task does not estimate repeat-generation variance. Report task-level and judge-level scores and disagreement descriptively; do not claim precise population rankings or calibrated literary quality from five purposively selected tasks.",
+    "crossGroupAggregation": "These are three separate benchmark means. New six-Claude tasks are listed independently and do not silently change the established broad-cohort Writing score basis. Any combined score requires explicit versioned source selection and a common comparison cohort."
+  },
+  "cases": [
+    {
+      "id": "twists-original-sf",
+      "benchmarkId": "storytelling-plot-twists-compact-v2",
+      "title": "Original science-fiction outline",
+      "task": "Create a brief outline of an original science-fiction story with one or more major plot twists. Include the ending. Maximum 550 words for the entire answer.",
+      "wordLimit": 550,
+      "requiredSkillFiles": [
+        "SKILL.md",
+        "references/twists-and-revelations.md"
+      ],
+      "rubric": [
+        {
+          "id": "fulfillment-and-usefulness",
+          "criterion": "Delivers an understandable science-fiction story outline with an ending, within the word cap."
+        },
+        {
+          "id": "coherent-story",
+          "criterion": "Characters' actions, speculative elements, and outcomes fit together without essential unexplained contradictions."
+        },
+        {
+          "id": "revelation-quality",
+          "criterion": "The major revelation can surprise while making earlier supplied details newly understandable, rather than relying entirely on unsupported last-minute information."
+        },
+        {
+          "id": "consequence-and-interest",
+          "criterion": "The twist matters to the characters and outcome, and the specific story material is compelling beyond the bare fact of surprise."
+        }
+      ]
+    },
+    {
+      "id": "twists-repair",
+      "benchmarkId": "storytelling-plot-twists-compact-v2",
+      "title": "Repair an unearned reveal",
+      "task": "Rewrite the following flawed science-fiction outline so its central reveal is convincing and the ending follows from the story. Preserve these facts: Nera is a courier; Ilex is her pilot; Ilex's apparent sabotage is intended to protect the colony; and Nera ultimately destroys the delivery code. You may change or add other details. Return the repaired outline, not an essay about revision.\n\nFlawed outline: Nera must deliver an evacuation code to a colony before a deadline. Her pilot, Ilex, repeatedly delays the trip, takes an unexplained detour, and cuts the radio. Nera finds Ilex redirecting fuel and concludes that the pilot was paid by a blockade fleet to strand the colonists. At the destination, Ilex suddenly announces that the blockade is actually a rescue quarantine: an unseen parasite is using the evacuation system, and delivering the code would release it. No earlier event suggested a parasite or explained how Ilex knew about it. Nera immediately accepts this account, destroys the code, and the colony is declared safe.\n\nMaximum 550 words for the entire answer.",
+      "wordLimit": 550,
+      "requiredSkillFiles": [
+        "SKILL.md",
+        "references/twists-and-revelations.md",
+        "references/revision-and-diagnosis.md"
+      ],
+      "rubric": [
+        {
+          "id": "fulfillment-and-usefulness",
+          "criterion": "Produces a repaired outline that preserves the four specified facts and respects the requested form and word cap."
+        },
+        {
+          "id": "supported-reveal",
+          "criterion": "Earlier events or discoverable evidence make the protective intent and central danger convincing when revealed, without simply announcing that clues existed."
+        },
+        {
+          "id": "credible-decisions",
+          "criterion": "Ilex's conduct and Nera's eventual belief and action have understandable reasons consistent with what each can know."
+        },
+        {
+          "id": "effective-outcome",
+          "criterion": "Destroying the code produces a coherent, consequential ending, while the revised story retains interest and tension."
+        }
+      ]
+    },
+    {
+      "id": "twists-layered",
+      "benchmarkId": "storytelling-plot-twists-compact-v2",
+      "title": "Escalating revelations",
+      "task": "Outline an original fantasy story in which a museum curator investigates why the city's gates have locked themselves. Build three major revelations that change the curator's understanding as the story progresses, with the later revelations changing the meaning of earlier ones. Show what the curator does as a result and include the ending. Maximum 550 words for the entire answer.",
+      "wordLimit": 550,
+      "requiredSkillFiles": [
+        "SKILL.md",
+        "references/twists-and-revelations.md"
+      ],
+      "rubric": [
+        {
+          "id": "fulfillment-and-usefulness",
+          "criterion": "Provides a clear fantasy outline with the requested curator, locked gates, three major revelations, and an ending within the word cap."
+        },
+        {
+          "id": "connected-revelations",
+          "criterion": "Later discoveries meaningfully change the interpretation of earlier ones instead of merely adding unrelated secrets or larger threats."
+        },
+        {
+          "id": "support-and-coherence",
+          "criterion": "The revelations are supported by supplied events or details and remain compatible with the story's established facts."
+        },
+        {
+          "id": "action-and-payoff",
+          "criterion": "The curator's responses matter, and the sequence produces an engaging, consequential ending rather than explanation alone."
+        }
+      ]
+    },
+    {
+      "id": "place-generation",
+      "benchmarkId": "writing-place-generation-v1",
+      "title": "An original fantasy place",
+      "task": "Create an original place for a D&D game. Describe it vividly, including who lives there and what is happening there. Maximum 450 words for the entire answer.",
+      "wordLimit": 450,
+      "requiredSkillFiles": [
+        "SKILL.md",
+        "references/worldbuilding-and-discovery.md",
+        "references/locations-and-exploration.md"
+      ],
+      "rubric": [
+        {
+          "id": "fulfillment-and-usefulness",
+          "criterion": "Delivers a clear, usable description of one original D&D place within the requested scope and word cap. No statistics, map, or rules mechanics are required."
+        },
+        {
+          "id": "evocation-and-language",
+          "criterion": "Concrete, well-chosen language creates an intelligible atmosphere and sense of place, without relying on decorative excess or generic adjectives."
+        },
+        {
+          "id": "coherent-worldbuilding",
+          "criterion": "The place, inhabitants, and current events have understandable relationships; details fit together and suggest life beyond the description."
+        },
+        {
+          "id": "distinctiveness-and-interest",
+          "criterion": "Specific details make the place memorable and offer credible reasons to care about or become involved in what is happening."
+        }
+      ]
+    },
+    {
+      "id": "one-shot",
+      "benchmarkId": "storytelling-one-shot-v1",
+      "title": "An original D&D one-shot",
+      "task": "Create an outline for an original D&D one-shot. Maximum 600 words for the entire answer.",
+      "wordLimit": 600,
+      "requiredSkillFiles": [
+        "SKILL.md",
+        "references/adventure-design.md"
+      ],
+      "rubric": [
+        {
+          "id": "fulfillment-and-usefulness",
+          "criterion": "Delivers a clear, focused original adventure outline of plausible one-shot scope within the word cap. Statistics, combat calculations, and a fixed ending are not required."
+        },
+        {
+          "id": "characters-and-motives",
+          "criterion": "Relevant people or forces have understandable desires and behavior that give the situation emotional or dramatic interest, not just arbitrary obstacles."
+        },
+        {
+          "id": "coherent-development",
+          "criterion": "The starting situation, discoveries, and potential developments connect intelligibly and sustain interest rather than forming an unrelated checklist of scenes."
+        },
+        {
+          "id": "agency-and-consequence",
+          "criterion": "The outline offers meaningful ways for player characters to become involved and affect what follows, with understandable potential consequences rather than prescribed decisions."
+        }
+      ]
+    }
+  ],
+  "preservationAndRecovery": {
+    "oldEvidence": "Keep all predecessor prompts, valid and failed outputs, original reviews, manifests, public answers, and source hashes unchanged and inspectable. This new edition has new run and task IDs and does not inherit or overwrite predecessor scores.",
+    "attempts": "Preserve every attempted request, exact input payload, answer, provider diagnostic stream, and hash. Automatic retries are zero. Never retry a valid weak answer, length breach, refusal, or surprising valid score. Future operational recovery would require a separately authorized policy preserving lineage and the same configuration and inputs.",
+    "providerStops": "Do not retry terminal output-policy blocks or bypass quota, authentication, account, or provider restrictions. Pause affected dispatch as required; no model, provider, or account substitution.",
+    "publication": "Publish only verified outputs and original judgments through the shared registered-source website projection, with task and edition identity preserved. Historical evidence and reports remain unchanged."
+  },
+  "runtimeLimits": {
+    "claudeMaxTurns": 1,
+    "claudeMaxOutputTokens": 8192,
+    "judgeMaxWords": 200,
+    "automaticRetries": 0,
+    "concurrency": 2
+  },
+  "runtimeLimitsStatus": "Executor must enforce the frozen one-turn/no-retry policy and record actual usage and runtime evidence before a result can be published. Claude output tokens include thinking.",
+  "publication": {
+    "scoreBasisRole": "independent-new-edition",
+    "taxonomy": "Tasks define capabilities; supplied skills are recorded inputs, not capability categories.",
+    "legacyPolicy": "Keep prior plot-twist and adventure-outline reports accessible as past editions. Never merge old repeated-trial scores with this edition.",
+    "broadWritingBasis": {
+      "id": "writing-established-storytelling-v1",
+      "benchmarkIds": [
+        "storytelling-core-idea",
+        "storytelling-plot-twists",
+        "storytelling-magic-discovery"
+      ],
+      "weighting": "equal benchmarks",
+      "note": "Existing published scoring bases are retained; new compact tasks are not mandatory inputs to this broader cohort."
+    }
+  }
+}

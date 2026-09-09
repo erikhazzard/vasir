@@ -10,7 +10,7 @@ import vm from "node:vm";
 import { runStorytellingBenchmark } from "../cli/eval/run-storytelling-benchmark.js";
 import { STORYTELLING_RUNTIME_VERSION, STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION, createStorytellingSkillInstruction } from "../cli/eval/storytelling-agent-runtime.js";
 import {
-  buildWritingPublication, prepareWritingPublicationSource, projectWritingRun,
+  buildWritingPublication, buildWritingSourceCollection, prepareWritingPublicationSource, projectWritingRun,
   serializeWritingModule, validateWritingPublication, validateWritingSummary,
   WRITING_BENCHMARK_ID, WRITING_SELECTION_PATH, PLOT_TWISTS_BENCHMARK_ID, writingSelectionPath
 } from "../cli/eval/writing-publication.js";
@@ -121,7 +121,7 @@ function selectedReader(f) {
   const selection = { kind: "vasirbenchmark-writing-source", schemaVersion: 1, run: { path: runPath, sha256: hash(f.runText) }, skill: { path: skillPath, sha256: hash(f.snapshotText) } };
   const files = new Map([[runPath, f.runText], [skillPath, f.snapshotText]]);
   const reads = [];
-  const build = () => buildWritingPublication({ repoRootDirectory: f.root, readFileSyncImplementation: filePath => {
+  const build = () => buildWritingSourceCollection({ repoRootDirectory: f.root, readFileSyncImplementation: filePath => {
     const relative = path.relative(f.root, filePath);
     reads.push(relative);
     if (relative === WRITING_SELECTION_PATH) return JSON.stringify(selection);
@@ -552,7 +552,7 @@ test("selection pins both immutable sources and rejects hash drift, missing pins
   const f = await fixture(t, { prepareOnly: true });
   const pinned = selectedReader(f);
   const built = pinned.build();
-  assert.deepEqual(pinned.reads, [WRITING_SELECTION_PATH, pinned.selection.run.path, pinned.selection.skill.path, "benchmarks/storytelling-plot-twists/publication.json", "benchmarks/storytelling-magic-discovery/publication.json", "benchmarks/dungeon-master-adventure-outline/publication.json"]);
+  assert.deepEqual(pinned.reads, [WRITING_SELECTION_PATH, pinned.selection.run.path, pinned.selection.skill.path, "benchmarks/storytelling-plot-twists/publication.json", "benchmarks/storytelling-magic-discovery/publication.json"]);
   assert.equal(built.projection.scoreBasis.sourceSha256, hash(f.runText));
   assert.ok(built.responseBundle.responses.every(response => response.provenance.sourceSha256 === hash(f.runText)));
   assert.deepEqual(pinned.build(), built, "Identical selected bytes project reproducibly.");
@@ -737,7 +737,8 @@ test("additive Writing publication keeps Core idea bytes and Plot twists archive
   write(core.root, path.relative(core.root, path.join(directory, "skill-snapshot.json")), twists.snapshotText);
   const selection = prepareWritingPublicationSource({ repoRootDirectory: core.root, benchmarkId: PLOT_TWISTS_BENCHMARK_ID, runDirectory: directory });
   write(core.root, writingSelectionPath(PLOT_TWISTS_BENCHMARK_ID), selection);
-  const built = buildWritingPublication({ repoRootDirectory: core.root });
+  const built = buildWritingSourceCollection({ repoRootDirectory: core.root });
+  assert.throws(() => buildWritingPublication({ repoRootDirectory: core.root }), /incomplete active release.*storytelling-magic-discovery/);
   assert.deepEqual(built.projection.benchmarks, before.projection.benchmarks);
   assert.deepEqual(built.projection.entries, before.projection.entries);
   assert.equal(built.projection.benchmarkPublications.length, 1, "Do not duplicate the full default archive in the collection.");

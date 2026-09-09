@@ -26,3 +26,17 @@ test("unselected Writing sources are not requested and incomplete Core idea stay
   assert.equal(checks.length, 3);
   assert.ok(checks.every(check => !check.args.includes("--require-scored")));
 });
+
+test('all three compact editions receive scored browser proofs without replacing legacy reports', () => {
+  const ids = ['storytelling-core-idea', 'storytelling-plot-twists', 'dungeon-master-adventure-outline',
+    'storytelling-plot-twists-compact-v2', 'writing-place-generation-v1', 'storytelling-one-shot-v1'];
+  const checks = buildStorytellingBrowserProofChecks(options(ids.map(id => `/benchmark-report.html#${id}`)));
+  assert.equal(checks.length, ids.length * 3);
+  assert.deepEqual([...new Set(checks.map(check => check.benchmarkId))], ids);
+  for (const id of ids.slice(3)) {
+    const selected = checks.filter(check => check.benchmarkId === id);
+    assert.equal(selected.length, 3);
+    assert.ok(selected.every(check => check.args.includes('--require-scored')));
+    assert.ok(selected.every(check => argument(check, '--benchmark') === id));
+  }
+});

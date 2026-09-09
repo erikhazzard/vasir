@@ -2,6 +2,8 @@ import crypto from "node:crypto";
 
 import { VasirCliError } from "../cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
+import { buildOverallWritingSource } from './overall-writing-source.js';
+export { buildOverallWritingSource } from './overall-writing-source.js';
 
 const CONDITIONS = ["baseline", "skill"];
 const IDENTITY_FIELDS = ["id", "configurationId", "modelId", "provider", "family", "reasoning", "label"];
@@ -48,26 +50,33 @@ function requireEvidence(condition, message) {
   });
 }
 
-function responseMetrics(cells, weights) {
+function responseMetrics(cells, weights, allowMissing = false) {
   for (const cell of cells) {
     for (const metric of ["latencyMs", "inputTokens", "outputTokens", "totalTokens"]) {
-      requireEvidence(Number.isFinite(cell[metric]) && cell[metric] >= 0, `an eligible response lacks ${metric}.`);
+      requireEvidence(allowMissing && cell[metric] === null || Number.isFinite(cell[metric]) && cell[metric] >= 0, `an eligible response lacks ${metric}.`);
     }
   }
+  const reading = field => cells.every(cell => Number.isFinite(cell[field])) ? weightedMean(cells.map(cell => cell[field]), weights) : null;
   return {
     sampleCount: cells.length,
-    meanLatencyMs: weightedMean(cells.map(cell => cell.latencyMs), weights),
-    meanInputTokens: weightedMean(cells.map(cell => cell.inputTokens), weights),
-    meanOutputTokens: weightedMean(cells.map(cell => cell.outputTokens), weights),
-    meanTotalTokens: weightedMean(cells.map(cell => cell.totalTokens), weights),
+    meanLatencyMs: reading('latencyMs'),
+    meanInputTokens: reading('inputTokens'),
+    meanOutputTokens: reading('outputTokens'),
+    meanTotalTokens: reading('totalTokens'),
     costUsd: null
   };
 }
 
 // This reconstruction consumes authoritative task cells, never family means,
 // display-rounded workflow scores, or candidate-supplied Overall values.
-function reconstructOverall({ engineering, aiWorkflows }) {
-  const sources = [engineering, aiWorkflows];
+function reconstructOverall({ engineering, aiWorkflows, writing }) {
+  requireEvidence(engineering && aiWorkflows, 'both published family datasets are required.');
+  const writingSource = writing ? writing.kind === 'vasirbenchmark-overall-writing-source' ? writing : buildOverallWritingSource(writing, engineering) : null;
+  const declaration = writingSource ? { ...DECLARATION, schemaVersion: 3, edition: 'overall-v3',
+    resourceAggregation: 'weighted-mean-over-the-same-task-cells-null-propagating-v3',
+    sourceScoreFields: { ...DECLARATION.sourceScoreFields, 'writing-all-writing-v1': 'exactScore', 'writing-established-storytelling-v1': 'exactScore',
+      ...(writingSource.scoreBasis.edition === 'writing-storytelling-paired-v2' ? { 'writing-storytelling-paired-v2': 'exactScore' } : {}) } } : DECLARATION;
+  const sources = [engineering, writingSource, aiWorkflows].filter(Boolean);
   requireEvidence(sources.every(source => source && Array.isArray(source.settings) && Array.isArray(source.benchmarkResults)), "both published family datasets are required.");
   const taskById = new Map();
   const identities = new Map();
@@ -78,8 +87,8 @@ function reconstructOverall({ engineering, aiWorkflows }) {
   for (const source of sources) {
     const family = source.families?.[0];
     const category = source.categories?.[0];
-    const declaredCategory = DECLARATION.categories.find(candidate => candidate.id === category?.id);
-    const scoreField = DECLARATION.sourceScoreFields[source.scoreBasis?.edition];
+    const declaredCategory = declaration.categories.find(candidate => candidate.id === category?.id);
+    const scoreField = declaration.sourceScoreFields[source.scoreBasis?.edition];
     requireEvidence(source.families?.length === 1 && source.categories?.length === 1 && family.id === category.id && declaredCategory && !familyTasks.some(candidate => candidate.familyId === family.id) && scoreField && Array.isArray(source.benchmarks) && source.benchmarks.length > 0, "a source family or score edition is unsupported.");
     requireEvidence(equal(source.benchmarks.map(benchmark => benchmark.id), source.scoreBasis.benchmarkIds), "a source score basis omits or reorders its published tasks.");
     const sourceSettings = new Map();
@@ -96,12 +105,14 @@ function reconstructOverall({ engineering, aiWorkflows }) {
       requireEvidence(!taskById.has(benchmark.id) && benchmark.familyId === family.id, "a published benchmark is duplicated or assigned to the wrong family.");
       taskById.set(benchmark.id, { familyId: family.id, scoreField, sourceScoreBasisId: source.scoreBasis.id });
     }
-    familyTasks.push({ familyId: family.id, category, benchmarkIds, targetWeight: declaredCategory.targetWeight });
+    const withinWeights = family.id === 'writing' ? source.scoreBasis.benchmarkWeights : benchmarkIds.map(benchmarkId => ({ benchmarkId, weight: 1 / benchmarkIds.length }));
+    requireEvidence(equal(withinWeights.map(item => item.benchmarkId), benchmarkIds) && withinWeights.every(item => Number.isFinite(item.weight) && item.weight > 0) && Math.abs(withinWeights.reduce((sum, item) => sum + item.weight, 0) - 1) < 1e-12, 'source within-category weights are invalid.');
+    familyTasks.push({ familyId: family.id, category, benchmarkIds, withinWeights, targetWeight: declaredCategory.targetWeight });
     sourceBases.push({ familyId: family.id, id: source.scoreBasis.id, edition: source.scoreBasis.edition, scoreField, benchmarkIds, aggregation: source.scoreBasis.aggregation, batchUnit: source.scoreBasis.batchUnit });
     for (const cell of source.benchmarkResults) {
       const identity = sourceSettings.get(cell.configurationId);
       const key = cellKey(cell.configurationId, cell.condition, cell.benchmarkId);
-      requireEvidence(identity && identity.id === cell.settingId && benchmarkIds.includes(cell.benchmarkId) && cell.category === family.id && CONDITIONS.includes(cell.condition) && cell.trials === 1 && !cellsByKey.has(key), "source response identity, task, condition, or trial is invalid or duplicated.");
+      requireEvidence(identity && identity.id === cell.settingId && benchmarkIds.includes(cell.benchmarkId) && cell.category === family.id && CONDITIONS.includes(cell.condition) && (family.id === 'writing' || cell.trials === 1) && !cellsByKey.has(key), "source response identity, task, condition, or trial is invalid or duplicated.");
       const value = cell[scoreField];
       requireEvidence(value === null || Number.isFinite(value) && value >= 0 && value <= 100, "an authoritative source task score is absent or outside its range.");
       cellsByKey.set(key, { cell, value });
@@ -118,11 +129,12 @@ function reconstructOverall({ engineering, aiWorkflows }) {
   const benchmarkWeights = benchmarkIds.map(benchmarkId => {
     const task = taskById.get(benchmarkId);
     const category = categoryWeightById.get(task.familyId);
-    return { benchmarkId, ...task, weight: category.weight / category.taskCount };
+    const family = familyTasks.find(item => item.familyId === task.familyId);
+    return { benchmarkId, ...task, weight: family.familyId === 'writing' ? category.weight * family.withinWeights.find(item => item.benchmarkId === benchmarkId).weight : category.weight / category.taskCount };
   });
   const taskWeights = benchmarkWeights.map(task => task.weight);
   const categories = familyTasks.map(({ category, targetWeight }) => ({ ...clone(category), targetWeight, weight: categoryWeightById.get(category.id).weight }));
-  const portfolioCategories = DECLARATION.categories.map(category => {
+  const portfolioCategories = declaration.categories.map(category => {
     const family = familyTasks.find(candidate => candidate.familyId === category.id);
     return {
       ...clone(category),
@@ -169,13 +181,13 @@ function reconstructOverall({ engineering, aiWorkflows }) {
 
     const categoryScores = Object.fromEntries(CONDITIONS.map(condition => [condition, familyTasks.map(family => {
       const values = family.benchmarkIds.map(benchmarkId => cellsByKey.get(cellKey(identity.configurationId, condition, benchmarkId)).value);
-      const exactScore = mean(values);
+      const exactScore = family.familyId === 'writing' ? weightedMean(values, family.withinWeights.map(item => item.weight)) : mean(values);
       const weight = categoryWeightById.get(family.familyId).weight;
       return { category: family.familyId, score: round(exactScore), exactScore, weight, exactContribution: exactScore * weight };
     })]));
     const exactScores = Object.fromEntries(CONDITIONS.map(condition => [condition, categoryScores[condition].reduce((sum, category) => sum + category.exactContribution, 0)]));
     const exactDelta = exactScores.skill - exactScores.baseline;
-    const metrics = Object.fromEntries(CONDITIONS.map(condition => [condition, responseMetrics(sourceCells[condition].map(value => value.cell), taskWeights)]));
+    const metrics = Object.fromEntries(CONDITIONS.map(condition => [condition, responseMetrics(sourceCells[condition].map(value => value.cell), taskWeights, Boolean(writingSource))]));
     const setting = {
       ...identity,
       scores: { baseline: round(exactScores.baseline), skill: round(exactScores.skill) },
@@ -210,7 +222,7 @@ function reconstructOverall({ engineering, aiWorkflows }) {
       baselineCategories: clone(setting.categories.baseline),
       metrics: clone(metrics),
       cost: null,
-      latency: metrics.meanLatencyMs / 1000,
+      latency: metrics.meanLatencyMs === null ? null : metrics.meanLatencyMs / 1000,
       tokens: metrics.meanOutputTokens,
       rank: null
     };
@@ -236,42 +248,45 @@ function reconstructOverall({ engineering, aiWorkflows }) {
     eligibleResponseCount: eligibleSettings * taskCount * CONDITIONS.length,
     records: coverageRecords
   };
-  const declarationSha256 = hash(DECLARATION);
+  const declarationSha256 = hash(declaration);
   const scoreBasis = {
-    id: `${DECLARATION.edition}:${hash({ declaration: DECLARATION, sourceBases, benchmarkWeights })}`,
-    label: "Overall v2",
-    edition: DECLARATION.edition,
-    declarationVersion: DECLARATION.schemaVersion,
+    id: `${declaration.edition}:${hash({ declaration, sourceBases, benchmarkWeights })}`,
+    label: writingSource ? "Overall v3" : "Overall v2",
+    edition: declaration.edition,
+    declarationVersion: declaration.schemaVersion,
     declarationSha256,
-    method: DECLARATION.method,
+    method: declaration.method,
     unit: "rubric-points",
     range: { minimum: 0, maximum: 100 },
-    benchmarkWeighting: "equal-within-category",
-    categoryWeighting: DECLARATION.categoryWeighting,
+    benchmarkWeighting: writingSource ? 'declared-within-category' : "equal-within-category",
+    categoryWeighting: declaration.categoryWeighting,
     categoryWeights,
     publishedTargetWeight,
     portfolioCategoryCount: portfolioCategories.length,
     benchmarkIds,
     benchmarkWeights,
     taskCount,
-    trialsPerTask: 1,
+    trialsPerTask: writingSource ? null : 1,
     judgeCount: new Set(sources.flatMap(source => source.scoreBasis.judges)).size,
     judges: [...new Set(sources.flatMap(source => source.scoreBasis.judges))],
-    aggregation: "weighted-category-means-of-authoritative-final-task-scores-v2",
+    aggregation: writingSource ? 'weighted-category-means-of-authoritative-final-task-scores-v3' : "weighted-category-means-of-authoritative-final-task-scores-v2",
     batchUnit: "task-specific",
     effectMethod: "paired-absolute-delta-v1",
     effectUnit: "rubric-points",
     treatment: "Task-specific skill",
     sourceBases,
-    eligibility: DECLARATION.eligibility,
-    resourceAggregation: DECLARATION.resourceAggregation,
+    eligibility: declaration.eligibility,
+    resourceAggregation: declaration.resourceAggregation,
+    ...(writingSource ? { provisional: writingSource.scoreBasis.provisional, writingSources: clone(writingSource.scoreBasis.sources) } : {}),
     calibrationStatus: "development-uncalibrated",
-    uncertainty: { status: "not-estimated", reason: "The published task rubrics are uncalibrated and have one trial per condition. Overall is a development aggregate with declared category priorities, without a confidence interval or broader capability claim." }
+    uncertainty: { status: "not-estimated", reason: writingSource
+      ? "The published task rubrics and judge panels are uncalibrated; trial counts vary by source benchmark. Overall inherits selected provisional bases and is a development aggregate with declared category priorities, without a confidence interval or broader capability claim."
+      : "The published task rubrics are uncalibrated and have one trial per condition. Overall is a development aggregate with declared category priorities, without a confidence interval or broader capability claim." }
   };
   const availability = {
     status: "development", verification: "unverified", code: "development-unverified-results",
     message: "Development results — not verified benchmark claims.",
-    detail: "Overall weights category means by declared priorities normalized across published categories, with equal task weights within each category. It ranks only settings with complete assessable results in both conditions. Task-specific skills differ by benchmark; human calibration remains pending.",
+    detail: `Overall weights category means by declared priorities normalized across published categories, with ${writingSource ? 'equal task weights within Engineering and AI Workflows; Writing uses equal tracks and equal benchmarks within each track' : 'equal task weights within each category'}. It ranks only settings with complete assessable results in both conditions. Task-specific skills differ by benchmark; human calibration remains pending.${writingSource?.scoreBasis.provisional ? ' The aggregate inherits provisional status from its selected Writing score bases.' : ''}`,
     blockers: [{ code: "author-calibration-pending", message: "Human calibration and broader task validation remain pending." }]
   };
   const skillEntries = entries.filter(entry => entry.condition === "skill");
@@ -297,6 +312,7 @@ function reconstructOverall({ engineering, aiWorkflows }) {
     entries,
     benchmarkResults: sourceCells,
     benchmarkSummaries: sources.flatMap(source => clone(source.benchmarkSummaries)),
+    ...(writingSource ? { benchmarkDisplays: clone(writingSource.benchmarkDisplays) } : {}),
     categoryLeaders,
     efficientFrontier: [],
     regressions: skillEntries.filter(entry => entry.exactDelta < 0).map(clone),

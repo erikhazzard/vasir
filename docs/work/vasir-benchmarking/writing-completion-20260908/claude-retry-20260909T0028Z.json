@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "kind": "authorized-bounded-benchmark-availability-test",
+  "authorization": "User: please try running the claude tests again, theres more usage now",
+  "checkedAt": "2026-09-09T00:28:40.332Z",
+  "authenticationObservation": {
+    "source": "Claude CLI auth status; identifying account fields omitted",
+    "loggedIn": true,
+    "authMethod": "claude.ai",
+    "apiProvider": "firstParty",
+    "subscriptionType": "team"
+  },
+  "accountContext": "Default Claude context; no configuration, token, API-key or provider endpoint override; no agent-initiated login or account switch",
+  "usageObservation": "Fresh interactive CLI stopped at onboarding/login-method setup before /usage could be opened. Current allowance and credit settings are unverified. Prior capacity percentages are not reused as current proof.",
+  "readinessClaim": false,
+  "benchmarkId": "dungeon-master-adventure-outline",
+  "runId": "dm-model-coverage-20260908-v2",
+  "prestateSha256": "24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248",
+  "maximumCalls": 1,
+  "concurrency": 1,
+  "policy": "Try the first original unfinished Claude writer in frozen seeded order, using the existing closed-circuit executor and one attempt only. Successful work contributes to the benchmark; no diagnostic prompt replaces it. Stop and retain evidence on failure. Expand only after actual success and a new coordinator decision. No successful-answer or terminal-refusal retries, credit enabling, purchases, authentication changes, model substitution, or frozen experiment edits."
+}

@@ -84,6 +84,7 @@ const audit = { kind: 'plot-twists-complete-codex-checkpoint', version: 1, verif
   initialSource: { path: path.relative(repo, initialPath), sha256: initialSha },
   preservedInitialValidAnswers: priorValid.length, preservedInitialReviews: priorBatches.length,
   preservedInitialAttemptPrefixes: true, retainedStreamsVerified: retainedStreams,
+  retainedProviderStreamDirectory: path.relative(repo, directory), rawProviderStreamsCopied: false,
   frozenRuntimeSourcesVerified: run.completion.manifest.runtimeSources,
   skillSnapshotSha256: hash(snapshotBytes), manifestSha256: hash(manifestBytes), auditScriptSha256: hash(sourceBytes),
   rowCounts: run.summary.rowCounts, publicationCoverage: projection.coverage, fullSettings,

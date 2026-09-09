@@ -24,13 +24,14 @@ test("creation evidence grids wrap long SHA labels without clipping original tex
   assert.match(css, /\.model-run__text\s*\{[^}]*white-space:\s*pre-wrap\s*;/u);
 });
 
-test("mobile creation dimension and rating columns retain readable words while evidence can wrap", () => {
+test("all mobile Writing dimension and rating columns retain readable words while evidence can wrap", () => {
   const css = fs.readFileSync(new URL("../site/vasirbenchmark.com/benchmark-report.css", import.meta.url), "utf8");
   const mobile = css.slice(css.indexOf('@media (max-width: 42rem)'));
-  const selector = ':where([data-active-writing-benchmark="storytelling-magic-discovery"]) .writing-dimensions :is(th, td)';
+  const selector = '.writing-dimensions :is(th, td)';
   for (const [column, width] of [[':first-child', '6rem'], [':nth-child(2)', '4rem']]) {
     const offset = mobile.indexOf(selector + column);
-    assert.ok(offset >= 0, `${column} is scoped to creation on mobile.`);
+    assert.ok(offset >= 0, `${column} uses the shared Writing mobile table rule.`);
+    assert.equal(mobile.slice(mobile.lastIndexOf('\n', offset), offset).trim(), '', 'No benchmark-only prefix can exclude a Writing report.');
     const rule = mobile.slice(offset, mobile.indexOf('}', offset));
     assert.ok(rule.includes(`min-width: ${width};`));
     assert.match(rule, /overflow-wrap:\s*normal\s*;/u);

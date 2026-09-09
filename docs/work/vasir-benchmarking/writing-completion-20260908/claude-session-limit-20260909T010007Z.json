@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "retained-original-provider-quota",
+  "observedAt": "2026-09-09T01:00:07.020Z",
+  "provider": "claude",
+  "configurationId": "claude:claude-opus-5@low",
+  "benchmarkId": "dungeon-master-adventure-outline",
+  "runId": "dm-model-coverage-20260908-v2",
+  "rowKey": "claude:claude-opus-5@low::primary::trial-5::clean",
+  "httpStatus": 429,
+  "providerMessage": "You've hit your session limit · resets 1:30am (America/New_York)",
+  "stdoutSha256": "2269331b99de6bb3ad38a3518e8b105254ddf2e35e9e256888430a2b399b1a9b",
+  "stdoutBytes": 3362,
+  "source": ".agents/vasir-evals/dungeon-master-adventure-outline/dm-model-coverage-20260908-v2/expansion-evidence/writer/607fbbfff0c630d77a5ee1de/attempt-1/stdout.jsonl",
+  "action": "Stop new Claude dispatch and drain already-running calls. Core continuation has not dispatched. Earlier successful-call proofs do not override this later actual quota failure.",
+  "resetIsReadinessEvidence": false,
+  "accountSwitchPerformed": false,
+  "creditConsumptionEnabled": false
+}

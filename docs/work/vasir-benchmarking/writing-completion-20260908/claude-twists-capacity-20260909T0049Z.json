@@ -1,0 +1,39 @@
+{
+  "kind": "archived-claude-success-capacity-v1",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "resetCreditConsumptionAllowed": false,
+  "rootAuthorization": {
+    "actor": "root",
+    "reason": "User requested retrying Claude benchmarks after restored usage. Root authorizes at most20 untouched original Plot twists rows at concurrency4 with both models proven by successful original archived requests and actual allowed non-overage metadata. Preserve every successful answer/review and all terminal refusals. No account change, credit enabling, purchase, prompt/model/panel change, or publication.",
+    "maximumCalls": 20,
+    "concurrency": 4
+  },
+  "sources": [
+    {
+      "archiveDirectory": "/Users/erikhazzard/code/vasir/.agents/vasir-evals/dungeon-master-adventure-outline/completion-checkpoints/claude-bounded20-20260909T0048Z",
+      "archiveReceiptSha256": "704ba5c60d35dabc1f0b7c87e2bd2290fcf00e94ed027397ce847884a707f8e1",
+      "runSha256": "72f5e07e65341a484604e86a9809596ae55d2c4f64d92940b1c4dd97f045eeed",
+      "attemptKey": "claude:claude-fable-5-1@xhigh::salvage::trial-1::skill:dungeon-master",
+      "configurationId": "claude:claude-fable-5-1@xhigh",
+      "sessionId": "bf5e6a4e-5ebc-4afd-99f0-2fd3e3f7b283",
+      "stdout": {
+        "path": "expansion-evidence/writer/a16dbf6cb68a7246ba3961fb/attempt-1/stdout.jsonl",
+        "bytes": 161154,
+        "sha256": "afd78888fc875523ceb325b02ca2c4ac933d0375a053978e629a56f7da95c44d"
+      }
+    },
+    {
+      "archiveDirectory": "/Users/erikhazzard/code/vasir/.agents/vasir-evals/dungeon-master-adventure-outline/completion-checkpoints/claude-bounded20-20260909T0048Z",
+      "archiveReceiptSha256": "704ba5c60d35dabc1f0b7c87e2bd2290fcf00e94ed027397ce847884a707f8e1",
+      "runSha256": "72f5e07e65341a484604e86a9809596ae55d2c4f64d92940b1c4dd97f045eeed",
+      "attemptKey": "claude:claude-opus-5@medium::primary::trial-6::skill:dungeon-master",
+      "configurationId": "claude:claude-opus-5@medium",
+      "sessionId": "6aa2193f-3893-42fe-abac-8983cfa26c32",
+      "stdout": {
+        "path": "expansion-evidence/writer/141c3fe9c20967f8234a5693/attempt-1/stdout.jsonl",
+        "bytes": 83832,
+        "sha256": "6c0d4ed85466cb3eb0f5352b426aaa1e37ec7bb93e390657ef3dda873dbe831b"
+      }
+    }
+  ]
+}

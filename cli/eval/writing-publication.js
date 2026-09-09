@@ -4,11 +4,16 @@ import path from "node:path";
 
 import { isBenchmarkAgentRuntimeReceiptCompatible } from "./agent-runtime.js";
 import { createBenchmarkHash } from "./benchmark-source.js";
-import { buildDungeonMasterPublication, DUNGEON_MASTER_BENCHMARK_ID, validateDungeonMasterPublication } from "./dungeon-master-publication.js";
+import { DUNGEON_MASTER_BENCHMARK_ID, validateDungeonMasterPublication } from "./dungeon-master-publication.js";
 import { buildStorytellingCreationPublication, prepareStorytellingCreationPublicationSource, STORYTELLING_CREATION_BENCHMARK_ID, validateStorytellingCreationPublication } from "./storytelling-creation-publication.js";
 import { createStorytellingSkillInstruction, isStorytellingRequiredSkillReadReceiptCompatible, validateStorytellingSkillSnapshot } from "./storytelling-agent-runtime.js";
 import { serializeWritingCreationResponseArchive } from "./writing-response-archives.js";
 import { TWISTS_COMPLETION_VERSION, TWISTS_PARENT_SHA256, validateTwistsCompletion } from "./plot-twists-completion.js";
+import { buildWritingNavigationSummary } from "./writing-navigation.js";
+import { validateWritingCompactPublication, WRITING_COMPACT_BENCHMARKS, WRITING_ESTABLISHED_SCORE_BASIS } from "./writing-compact-publication.js";
+import { WRITING_ACTIVE_RELEASE } from "./writing-release-catalog.js";
+import { buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, PLOT_TWISTS_PAIRED_SOURCE_KIND,
+  validatePlotTwistsPairedPublication, WRITING_PAIRED_SCORE_BASIS } from "./plot-twists-paired-publication.js";
 
 export const WRITING_BENCHMARK_ID = "storytelling-core-idea";
 export const WRITING_SELECTION_PATH = "benchmarks/storytelling-core-idea/publication.json";
@@ -422,6 +427,22 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
 }
 
 export function validateWritingSummary(stub) {
+  requireEvidence(!stub?.publicRelease || Array.isArray(stub.catalog), "public Writing release catalog is missing.");
+  if (stub?.catalog) {
+    const { catalog, writingScoreBasis, compactBenchmarks, catalogCoverage, publicRelease, ...legacy } = stub;
+    validateWritingCatalog(catalog, writingScoreBasis, publicRelease);
+    if (publicRelease) requireEvidence(!compactBenchmarks && !legacy.additionalBenchmarks, "private Writing sources entered the public release summary.");
+    const compactIds = Object.keys(compactBenchmarks ?? {});
+    if (legacy.benchmarks) {
+      legacy.benchmarks = legacy.benchmarks.filter(benchmark => !compactIds.includes(benchmark.id));
+      legacy.benchmarkIds = legacy.benchmarks.map(benchmark => benchmark.id);
+    }
+    validateWritingSummary(legacy);
+    requireEvidence(compactIds.every(id => WRITING_COMPACT_BENCHMARKS.some(benchmark => benchmark.id === id) && compactBenchmarks[id].benchmarkId === id && compactBenchmarks[id].coverage.completedSettingCount > 0), "invalid compact Writing descriptor.");
+    const descriptors = [...(legacy.benchmarks ?? [{ coverage: legacy.coverage }]), ...Object.values(compactBenchmarks ?? {})];
+    requireEvidence(same(catalogCoverage, writingCollectionCoverage(descriptors)) && same(catalog.map(item => item.id), stub.benchmarkIds), "catalog coverage or descriptor inventory changed.");
+    return stub;
+  }
   if (stub?.additionalBenchmarks) {
     const { additionalBenchmarks, allWritingCoverage, ...existing } = stub;
     requireEvidence(same(Object.keys(additionalBenchmarks), [DUNGEON_MASTER_BENCHMARK_ID]), "unknown additional Writing benchmark.");
@@ -444,6 +465,27 @@ export function validateWritingSummary(stub) {
 }
 
 export function validateWritingPublication(projection, responseBundle) {
+  requireEvidence(!projection?.publicRelease || Array.isArray(projection.catalog), "public Writing release catalog is missing.");
+  if (projection?.catalog) {
+    const { catalog, writingScoreBasis, compactBenchmarks, catalogCoverage, publicRelease, ...legacy } = projection;
+    const { compactBenchmarks: compactResponses, ...legacyResponses } = responseBundle ?? {};
+    validateWritingCatalog(catalog, writingScoreBasis, publicRelease);
+    if (publicRelease) requireEvidence(!compactBenchmarks && !legacy.additionalBenchmarks && !compactResponses && !legacyResponses.additionalBenchmarks, "private Writing sources entered the public release.");
+    validateWritingPublication(legacy, responseBundle ? legacyResponses : undefined);
+    const ids = Object.keys(compactBenchmarks ?? {});
+    requireEvidence(!responseBundle || same(ids, Object.keys(compactResponses ?? {})), "compact Writing response selection changed.");
+    for (const id of ids) {
+      requireEvidence(compactBenchmarks[id].benchmarks?.[0]?.id === id && compactBenchmarks[id].coverage.completedSettingCount > 0, "unscored or misidentified compact source entered the catalog.");
+      validateWritingCompactPublication(compactBenchmarks[id], compactResponses?.[id]);
+    }
+    const publications = writingPublications(legacy).concat(Object.values(compactBenchmarks ?? {}));
+    if (writingScoreBasis.id === WRITING_PAIRED_SCORE_BASIS.id) requireEvidence(publications.find(item => item.benchmarks[0].id === PLOT_TWISTS_BENCHMARK_ID)?.scoreBasis.edition === PLOT_TWISTS_PAIRED_EDITION, "paired Writing basis requires the new Plot twists source.");
+    else requireEvidence(!publications.some(item => item.scoreBasis.edition === PLOT_TWISTS_PAIRED_EDITION), "new Plot twists source cannot enter the historical Writing basis.");
+    if (publicRelease) requireEvidence(publications.every(item => !item.compactBenchmarks && !item.additionalBenchmarks)
+      && (legacyResponses.benchmarkResponses ?? []).every(item => !item.responseBundle?.compactBenchmarks && !item.responseBundle?.additionalBenchmarks), "private Writing sources entered a public source archive.");
+    requireEvidence(same(catalog.map(item => item.id), publications.map(item => item.benchmarks[0].id)) && same(catalogCoverage, writingCollectionCoverage(publications)), "catalog coverage or source inventory changed.");
+    return projection;
+  }
   if (projection?.additionalBenchmarks) {
     const { additionalBenchmarks, allWritingCoverage, ...existing } = projection;
     const { additionalBenchmarks: additionalResponses, ...existingResponses } = responseBundle ?? {};
@@ -471,6 +513,7 @@ export function validateWritingPublication(projection, responseBundle) {
     return projection;
   }
   const benchmarkId = projection?.benchmarks?.[0]?.id;
+  if (benchmarkId === PLOT_TWISTS_BENCHMARK_ID && projection.scoreBasis?.edition === PLOT_TWISTS_PAIRED_EDITION) return validatePlotTwistsPairedPublication(projection, responseBundle);
   if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return validateStorytellingCreationPublication(projection, responseBundle);
   const panel = benchmarkId === PLOT_TWISTS_BENCHMARK_ID ? TWISTS_PANEL : PANEL;
   const trialCount = projection?.trialCount ?? 1;
@@ -571,12 +614,13 @@ export function validateWritingPublication(projection, responseBundle) {
   return projection;
 }
 
-function buildSelectedWritingPublication({ repoRootDirectory, benchmarkId, readFileSyncImplementation = fs.readFileSync }) {
+export function buildSelectedWritingPublication({ repoRootDirectory, benchmarkId, readFileSyncImplementation = fs.readFileSync }) {
   if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return buildStorytellingCreationPublication({ repoRootDirectory, readFileSyncImplementation });
   let selectionText;
   try { selectionText = readFileSyncImplementation(path.join(repoRootDirectory, writingSelectionPath(benchmarkId)), "utf8"); }
   catch (error) { if (error.code === "ENOENT") return null; throw error; }
   const selection = JSON.parse(selectionText);
+  if (benchmarkId === PLOT_TWISTS_BENCHMARK_ID && selection.kind === PLOT_TWISTS_PAIRED_SOURCE_KIND) return buildPlotTwistsPairedPublication({ repoRootDirectory, selection, readFileSyncImplementation });
   requireEvidence(selection.kind === "vasirbenchmark-writing-source" && selection.schemaVersion === 1, "invalid source selection.");
   const run = readPinned(repoRootDirectory, selection.run, readFileSyncImplementation);
   const snapshot = readPinned(repoRootDirectory, selection.skill, readFileSyncImplementation);
@@ -590,8 +634,11 @@ function writingCollectionCoverage(projections) {
   return coverage;
 }
 
-function buildStorytellingPublications(options) {
-  const selected = BENCHMARK_IDS.map(benchmarkId => buildSelectedWritingPublication({ ...options, benchmarkId })).filter(Boolean);
+/** Reconstruct historical or partial source evidence without declaring a public
+ * release. Current site publication must use buildWritingPublication. */
+export function buildWritingSourceCollection(options) {
+  const selected = WRITING_ACTIVE_RELEASE.benchmarks.filter(benchmark => benchmark.lifecycle === "published")
+    .map(({ id: benchmarkId }) => buildSelectedWritingPublication({ ...options, benchmarkId })).filter(Boolean);
   if (!selected.length) return null;
   requireEvidence(selected[0].projection.benchmarks[0].id !== STORYTELLING_CREATION_BENCHMARK_ID, "Creation publication is additive; preserve an existing Writing benchmark as the collection default.");
   if (selected.length === 1 && selected[0].projection.benchmarks[0].id === WRITING_BENCHMARK_ID) return selected[0];
@@ -617,25 +664,63 @@ function combinedWritingCoverage(existing, additional) {
   return coverage;
 }
 
+function writingPublications(collection) {
+  return [collection, ...(collection.benchmarkPublications ?? []).map(child => child.projection), ...Object.values(collection.additionalBenchmarks ?? {})];
+}
+
+function validateWritingCatalog(catalog, basis, publicRelease) {
+  requireEvidence(same(basis, WRITING_ESTABLISHED_SCORE_BASIS) || same(basis, WRITING_PAIRED_SCORE_BASIS), "declared Writing score basis changed.");
+  const paired = catalog?.find(item => item.id === PLOT_TWISTS_BENCHMARK_ID)?.edition === PLOT_TWISTS_PAIRED_EDITION;
+  requireEvidence(paired === (basis.id === WRITING_PAIRED_SCORE_BASIS.id), "Plot twists edition and Writing score basis differ.");
+  if (publicRelease) {
+    requireEvidence(same(publicRelease, { id: WRITING_ACTIVE_RELEASE.id, lifecycle: WRITING_ACTIVE_RELEASE.lifecycle }), "unknown Writing public release.");
+    const published = WRITING_ACTIVE_RELEASE.benchmarks.filter(benchmark => benchmark.lifecycle === "published");
+    requireEvidence(same(catalog?.map(item => item.id), published.map(item => item.id)) && same(catalog.map(item => item.id), basis.benchmarkIds), "public Writing catalog differs from its score inputs.");
+    requireEvidence(catalog.every((item, index) => item.lifecycle === "published" && item.archived === false && item.scoreBasisIncluded === true
+      && item.trackId === published[index].trackId && item.detailHref === `benchmark-report.html#${item.id}`), "public Writing catalog source lifecycle changed.");
+    return;
+  }
+  requireEvidence(Array.isArray(catalog) && new Set(catalog.map(item => item.id)).size === catalog.length && basis.benchmarkIds.every(id => catalog.some(item => item.id === id)), "Writing catalog lost an established source.");
+  for (const item of catalog) {
+    const compact = WRITING_COMPACT_BENCHMARKS.find(benchmark => benchmark.id === item.id);
+    const legacy = [...BENCHMARK_IDS, DUNGEON_MASTER_BENCHMARK_ID].includes(item.id);
+    requireEvidence((compact || legacy) && item.scoreBasisIncluded === basis.benchmarkIds.includes(item.id)
+      && item.archived === [PLOT_TWISTS_BENCHMARK_ID, DUNGEON_MASTER_BENCHMARK_ID].includes(item.id)
+      && (!compact || item.trackId === compact.trackId && item.status === "measured")
+      && item.detailHref === `benchmark-report.html#${item.id}`, "Writing catalog source metadata changed.");
+  }
+}
+
+/** Only sources explicitly included in the active release enter public data. */
 export function buildWritingPublication(options) {
-  const existing = buildStorytellingPublications(options);
-  const dungeonMaster = buildDungeonMasterPublication(options);
-  if (!dungeonMaster) return existing;
-  requireEvidence(existing, "Dungeon Master requires the existing Writing collection; its default must not be replaced.");
-  const id = DUNGEON_MASTER_BENCHMARK_ID;
-  const allWritingCoverage = combinedWritingCoverage(existing.projection, dungeonMaster.projection);
-  const projection = { ...existing.projection, additionalBenchmarks: { [id]: dungeonMaster.projection }, allWritingCoverage };
-  const responseBundle = { ...existing.responseBundle, additionalBenchmarks: { [id]: dungeonMaster.responseBundle } };
-  const existingDescriptors = existing.stub.benchmarks ?? [{ id: existing.stub.benchmarkId, title: existing.stub.benchmarkTitle, coverage: existing.stub.coverage, scoreBasisLabel: existing.stub.scoreBasisLabel }];
-  const benchmarks = [...existingDescriptors, { id, title: dungeonMaster.stub.benchmarkTitle, subcategory: "dungeon-master", coverage: dungeonMaster.stub.coverage, scoreBasisLabel: dungeonMaster.stub.scoreBasisLabel }];
-  const stub = { ...existing.stub, benchmarks, benchmarkIds: benchmarks.map(benchmark => benchmark.id), additionalBenchmarks: { [id]: dungeonMaster.stub }, allWritingCoverage, subsections: [...existing.stub.subsections, { id: "dungeon-master", title: "DUNGEON MASTER", benchmarkId: id, status: dungeonMaster.stub.status }] };
+  const selected = buildWritingSourceCollection(options);
+  if (!selected) return null;
+  const publications = writingPublications(selected.projection);
+  const missingIds = WRITING_ACTIVE_RELEASE.benchmarks.filter(item => item.lifecycle === "published"
+    && !publications.some(publication => publication.benchmarks[0].id === item.id)).map(item => item.id);
+  requireEvidence(!missingIds.length, `incomplete active release; restore the selected immutable sources for ${missingIds.join(", ")}.`);
+  const catalog = publications.map(publication => {
+    const benchmark = publication.benchmarks[0];
+    return { id: benchmark.id, name: benchmark.name, title: benchmark.title, trackId: benchmark.trackId,
+      trackTitle: publication.tracks.find(track => track.id === benchmark.trackId)?.title ?? benchmark.suite,
+      edition: publication.scoreBasis.edition ?? publication.scoreBasis.id, status: publication.coverage.scoredResponseCount > 0 ? "measured" : "unscored",
+      lifecycle: "published", archived: false, scoreBasisIncluded: true, detailHref: benchmark.detailHref };
+  });
+  const writingScoreBasis = catalog.find(item => item.id === PLOT_TWISTS_BENCHMARK_ID).edition === PLOT_TWISTS_PAIRED_EDITION
+    ? WRITING_PAIRED_SCORE_BASIS : WRITING_ESTABLISHED_SCORE_BASIS;
+  const metadata = { publicRelease: { id: WRITING_ACTIVE_RELEASE.id, lifecycle: WRITING_ACTIVE_RELEASE.lifecycle },
+    catalog, writingScoreBasis: structuredClone(writingScoreBasis), catalogCoverage: writingCollectionCoverage(publications) };
+  const projection = { ...selected.projection, ...metadata };
+  const responseBundle = selected.responseBundle;
+  const stub = { ...selected.stub, ...metadata };
+  stub.categoryIndex = buildWritingNavigationSummary(projection);
   validateWritingPublication(projection, responseBundle);
   validateWritingSummary(stub);
-  const counts = { ...(existing.counts ?? existing.projection.counts) };
-  for (const field of ["tracks", "benchmarks", "cases", "responses", "resultEntries", "developmentResultSets"]) counts[field] = (counts[field] ?? 0) + (dungeonMaster.projection.counts[field] ?? 0);
-  const settings = [...new Map([...(existing.settings ?? existing.projection.settings), ...dungeonMaster.projection.settings].map(setting => [setting.configurationId, setting])).values()];
+  const counts = { ...(selected.counts ?? selected.projection.counts) };
+  counts.tracks = new Set(catalog.map(item => item.trackId)).size;
+  const settings = [...new Map(publications.flatMap(publication => publication.settings).map(setting => [setting.configurationId, setting])).values()];
   counts.settings = settings.length;
-  return { projection, responseBundle, stub, counts, settings, basisSha256: digest(JSON.stringify({ existing: existing.basisSha256, dungeonMaster: dungeonMaster.basisSha256 })) };
+  return { projection, responseBundle, stub, counts, settings, basisSha256: digest(JSON.stringify({ sources: selected.basisSha256, metadata })) };
 }
 
 /** Pin an immutable checkpoint without editing any answer or judgment. */

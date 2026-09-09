@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAtApproximate": "2026-09-08T21:01:38Z",
+  "source": "Existing unchanged default Claude Code safe interactive /usage session; refreshed panel, no model call.",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "sessionUsedPercent": 78,
+  "sessionResetLabel": "9:40pm (America/New_York)",
+  "weekAllModelsUsedPercent": 47,
+  "weekFableUsedPercent": 88,
+  "usageCreditsEnabled": false,
+  "usageCreditsObservation": "Usage credits are off · /usage-credits to turn them on",
+  "resetCreditConsumptionAllowed": false,
+  "diagnosticModelCalls": 0,
+  "decision": "After current Twists judging drains, authorize only twenty original pending Claude slots at eight concurrent calls, with unchanged quota guards and no refusal retries. A later stage requires a new observation. Core's current original judge invocation continues under its existing circuit. Dungeon Master remains Codex-only."
+}

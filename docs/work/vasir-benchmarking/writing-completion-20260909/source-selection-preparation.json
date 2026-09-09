@@ -1,0 +1,277 @@
+{
+  "kind": "dm-twists-publication-source-preparation",
+  "schemaVersion": 1,
+  "status": "passed",
+  "verifiedAt": "2026-09-09T02:54:09.362Z",
+  "acceptanceReleaseId": "eca33af1915830a52be741e7300a37700b423d9066eac81c2ef92176a218c822",
+  "acceptanceSha256": "90c29b00e9c3150d1103ab0cb459542473ca8f1d1e0d60d5745680f9a404812e",
+  "proofs": [
+    {
+      "benchmarkId": "storytelling-core-idea",
+      "path": "benchmarks/storytelling-core-idea/publication.json",
+      "bytes": 583,
+      "sha256": "aef6e0383a1cc5f795f11dc6cb87b66131124790c745f1f6d2c46d2ccef36a25",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac/run.json",
+          "bytes": 57548422,
+          "sha256": "0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac/skill-snapshot.json",
+          "bytes": 453845,
+          "sha256": "a4db1b5ea3ae79e9655be2ab793fa71e153571359a88d098a383bf94cd4667e5"
+        }
+      ]
+    },
+    {
+      "benchmarkId": "storytelling-plot-twists",
+      "path": "benchmarks/storytelling-plot-twists/publication.json",
+      "bytes": 587,
+      "sha256": "d4824f0c70ba42e5064db1e4d0f73d87c5c3d13d5c378dfa5036c0eb9e2f7a77",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac/run.json",
+          "bytes": 49909455,
+          "sha256": "ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac/skill-snapshot.json",
+          "bytes": 470201,
+          "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+        }
+      ],
+      "lineage": {
+        "kind": "authorized-writing-score-completion",
+        "parentSourceSha256": "97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399",
+        "previousSelection": {
+          "path": "benchmarks/storytelling-plot-twists/publication.json",
+          "bytes": 587,
+          "sha256": "51f7b42f7a44bb50ef9303bc95fb8e1bb4052590246ffacdb2a2d18653f6ec05"
+        },
+        "previousSources": [
+          {
+            "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/7ae2b261eda8a368dc51c5df15b2d4e0c9aab78928149b90727530ceb31209ad/run.json",
+            "bytes": 47995455,
+            "sha256": "7ae2b261eda8a368dc51c5df15b2d4e0c9aab78928149b90727530ceb31209ad"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/7ae2b261eda8a368dc51c5df15b2d4e0c9aab78928149b90727530ceb31209ad/skill-snapshot.json",
+            "bytes": 470201,
+            "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+          }
+        ],
+        "answersAndCompletedReviewsPreserved": true
+      }
+    },
+    {
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "path": "benchmarks/dungeon-master-adventure-outline/publication.json",
+      "bytes": 610,
+      "sha256": "641332adabe333df813062c034f3305b0710db17be2de1c5d4157a5fc858fead",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/5827eb54dcb3794bc99dfc49cbdaa7e48c59bc259ba14ff4b54e2c09d15983de/run.json",
+          "bytes": 81833631,
+          "sha256": "5827eb54dcb3794bc99dfc49cbdaa7e48c59bc259ba14ff4b54e2c09d15983de"
+        },
+        {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/5827eb54dcb3794bc99dfc49cbdaa7e48c59bc259ba14ff4b54e2c09d15983de/skill-snapshot.json",
+          "bytes": 383221,
+          "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+        }
+      ],
+      "lineage": {
+        "kind": "authorized-writing-score-completion",
+        "parentSourceSha256": "0a78c5dba07da35e01448fcf6e2ab3ed16b248156089ecbb97b7e37ccbd0b95a",
+        "previousSelection": {
+          "path": "benchmarks/dungeon-master-adventure-outline/publication.json",
+          "bytes": 610,
+          "sha256": "6fb5f88d3070e1fe50adad0d76c38f0ec805a5bf8afb0f7a8cc4935e1393f7ea"
+        },
+        "previousSources": [
+          {
+            "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248/run.json",
+            "bytes": 80309233,
+            "sha256": "24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248"
+          },
+          {
+            "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248/skill-snapshot.json",
+            "bytes": 383221,
+            "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+          }
+        ],
+        "answersAndCompletedReviewsPreserved": true
+      }
+    },
+    {
+      "benchmarkId": "storytelling-magic-discovery",
+      "path": "benchmarks/storytelling-magic-discovery/publication.json",
+      "bytes": 1217,
+      "sha256": "3dc61c105531ed538f0f72a8c74b563bf48c7cfe3b667dd5c9720b8df28739ee",
+      "sources": [
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/run.json",
+          "bytes": 2306274,
+          "sha256": "233db3f8cf5c4db8ddd6432ff7323d7be567a46654213f9a00a148e04329a18f"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/skill-snapshot.json",
+          "bytes": 470201,
+          "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judging.json",
+          "bytes": 54200034,
+          "sha256": "927abaeb682628de190bc609bd999c23a5be33e260ce3a989b10283a2b49f138"
+        },
+        {
+          "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judge-context.json",
+          "bytes": 316721,
+          "sha256": "ecbc9f56410245065b6d160c0a6f411ed2a5dcafab13a805efd1950b43d3e9fe"
+        }
+      ]
+    }
+  ],
+  "coreAndMagicSelectorsUnchanged": true,
+  "providerCalls": 0,
+  "mutableBenchmarkRunWrites": 0,
+  "siteWrites": 0,
+  "published": false,
+  "preparedSources": [
+    {
+      "benchmarkId": "storytelling-plot-twists",
+      "archivePrepared": true,
+      "sourceDirectory": ".agents/vasir-evals/storytelling-plot-twists/storytelling-plot-twists-v1-completion-2026-09-08/operational-checkpoints/ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac",
+      "selection": {
+        "kind": "vasirbenchmark-writing-source",
+        "schemaVersion": 1,
+        "run": {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac/run.json",
+          "sha256": "ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac"
+        },
+        "skill": {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac/skill-snapshot.json",
+          "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+        }
+      },
+      "previousSelection": {
+        "kind": "vasirbenchmark-writing-source",
+        "schemaVersion": 1,
+        "run": {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/7ae2b261eda8a368dc51c5df15b2d4e0c9aab78928149b90727530ceb31209ad/run.json",
+          "sha256": "7ae2b261eda8a368dc51c5df15b2d4e0c9aab78928149b90727530ceb31209ad"
+        },
+        "skill": {
+          "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/7ae2b261eda8a368dc51c5df15b2d4e0c9aab78928149b90727530ceb31209ad/skill-snapshot.json",
+          "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+        }
+      },
+      "coverageBefore": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "settingCount": 33,
+        "completedSettingCount": 23,
+        "responseCount": 520,
+        "expectedResponseCount": 660,
+        "scoredResponseCount": 476,
+        "usablePairs": 238,
+        "expectedPairs": 330,
+        "judgmentCount": 952,
+        "expectedJudgmentCount": 1320,
+        "validResponseCount": 520,
+        "terminalGenerationFailureCount": 0,
+        "terminallyExcludedPairCount": 0,
+        "terminallyExcludedJudgmentCount": 0,
+        "pendingGenerationCount": 140,
+        "pendingJudgmentCount": 368,
+        "executionComplete": false,
+        "executionStatus": "in-progress"
+      },
+      "coverageAfter": {
+        "benchmarkCount": 1,
+        "caseCount": 1,
+        "settingCount": 33,
+        "completedSettingCount": 23,
+        "responseCount": 539,
+        "expectedResponseCount": 660,
+        "scoredResponseCount": 494,
+        "usablePairs": 247,
+        "expectedPairs": 330,
+        "judgmentCount": 988,
+        "expectedJudgmentCount": 1320,
+        "validResponseCount": 539,
+        "terminalGenerationFailureCount": 0,
+        "terminallyExcludedPairCount": 0,
+        "terminallyExcludedJudgmentCount": 0,
+        "pendingGenerationCount": 121,
+        "pendingJudgmentCount": 332,
+        "executionComplete": false,
+        "executionStatus": "in-progress"
+      },
+      "completeConfigurationsPreserved": 23,
+      "exactArmScoresAndRanksPreserved": 46,
+      "scoreIdentitySha256": "6dadb89bec509b3367142988d54c4c44e12ee29de428ba40e0ad4726cc1544b3"
+    },
+    {
+      "benchmarkId": "dungeon-master-adventure-outline",
+      "archivePrepared": true,
+      "sourceDirectory": ".agents/vasir-evals/dungeon-master-adventure-outline/completion-checkpoints/claude-quota-paused-20260909T0105Z",
+      "selection": {
+        "kind": "vasirbenchmark-dungeon-master-source",
+        "schemaVersion": 1,
+        "run": {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/5827eb54dcb3794bc99dfc49cbdaa7e48c59bc259ba14ff4b54e2c09d15983de/run.json",
+          "sha256": "5827eb54dcb3794bc99dfc49cbdaa7e48c59bc259ba14ff4b54e2c09d15983de"
+        },
+        "skill": {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/5827eb54dcb3794bc99dfc49cbdaa7e48c59bc259ba14ff4b54e2c09d15983de/skill-snapshot.json",
+          "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+        }
+      },
+      "previousSelection": {
+        "kind": "vasirbenchmark-dungeon-master-source",
+        "schemaVersion": 1,
+        "run": {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248/run.json",
+          "sha256": "24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248"
+        },
+        "skill": {
+          "path": ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/24f73ab5b2020eb3836b01121a5dac73f4589dc43adc5ba9af4358fbab16b248/skill-snapshot.json",
+          "sha256": "3780ebe726e61c96c18add20e4d1e436ee28c563735709834672c0c3831b2aa6"
+        }
+      },
+      "coverageBefore": {
+        "benchmarkCount": 1,
+        "caseCount": 16,
+        "promptCount": 6,
+        "settingCount": 33,
+        "completedSettingCount": 23,
+        "responseCount": 736,
+        "expectedResponseCount": 1056,
+        "scoredResponseCount": 736,
+        "usablePairs": 368,
+        "expectedPairs": 528,
+        "judgmentCount": 1472,
+        "expectedJudgmentCount": 2112
+      },
+      "coverageAfter": {
+        "benchmarkCount": 1,
+        "caseCount": 16,
+        "promptCount": 6,
+        "settingCount": 33,
+        "completedSettingCount": 23,
+        "responseCount": 784,
+        "expectedResponseCount": 1056,
+        "scoredResponseCount": 736,
+        "usablePairs": 368,
+        "expectedPairs": 528,
+        "judgmentCount": 1476,
+        "expectedJudgmentCount": 2112
+      },
+      "completeConfigurationsPreserved": 23,
+      "exactArmScoresAndRanksPreserved": 46,
+      "scoreIdentitySha256": "273271ad31384818eefffe1bba678ab36fe74cd807177b8fb12198b51afbe225"
+    }
+  ]
+}

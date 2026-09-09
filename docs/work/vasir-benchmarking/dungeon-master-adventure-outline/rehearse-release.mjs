@@ -10,8 +10,14 @@ export const SELECTION_PATHS = Object.freeze([
   "benchmarks/storytelling-core-idea/publication.json",
   "benchmarks/storytelling-plot-twists/publication.json",
   "benchmarks/dungeon-master-adventure-outline/publication.json",
+  "benchmarks/writing-compact-v1/publication.json",
+  "benchmarks/storytelling-magic-discovery/publication.json",
   "benchmarks/2d-jumping-demo/publication.json"
 ]);
+const LEGACY_SELECTION_PATHS = Object.freeze(SELECTION_PATHS.filter(file => ![
+  "benchmarks/writing-compact-v1/publication.json",
+  "benchmarks/storytelling-magic-discovery/publication.json"
+].includes(file)));
 const DM_SELECTION_PATH = "benchmarks/dungeon-master-adventure-outline/publication.json";
 const DM_SNAPSHOT_PREFIX = ".agents/vasir-evals/dungeon-master-adventure-outline/publication-snapshots/";
 const sha256 = bytes => crypto.createHash("sha256").update(bytes).digest("hex");
@@ -37,7 +43,7 @@ export function createSelectionSnapshot({ proofDirectory, publicationSourceRootD
     fs.writeFileSync(target, contents, { flag: "wx", mode: 0o444 });
     return { path: relative, present: true, bytes: contents.length, sha256: sha256(contents) };
   });
-  const manifest = { kind: "vasirbenchmark-selection-snapshot", schemaVersion: 1, createdAt: new Date().toISOString(),
+  const manifest = { kind: "vasirbenchmark-selection-snapshot", schemaVersion: 2, createdAt: new Date().toISOString(),
     publicationSourceRootDirectory: sourceRoot, preview, previewSourceRootDirectory: preview ? presentationRoot : null, files };
   manifest.snapshotId = snapshotIdentity(manifest);
   fs.writeFileSync(snapshotPath, JSON.stringify(manifest, null, 2) + "\n", { flag: "wx", mode: 0o444 });
@@ -51,11 +57,12 @@ export function loadSelectionSnapshot({ snapshotPath, publicationSourceRootDirec
   const manifestSha256 = sha256(manifestBytes);
   if (expectedSha256 && manifestSha256 !== expectedSha256) throw new Error("The selection snapshot manifest changed after review.");
   const manifest = JSON.parse(manifestBytes.toString("utf8"));
-  if (manifest.kind !== "vasirbenchmark-selection-snapshot" || manifest.schemaVersion !== 1 ||
+  const registeredPaths = manifest.schemaVersion === 2 ? SELECTION_PATHS : LEGACY_SELECTION_PATHS;
+  if (manifest.kind !== "vasirbenchmark-selection-snapshot" || ![1, 2].includes(manifest.schemaVersion) ||
       !/^[a-f0-9]{64}$/.test(manifest.snapshotId ?? "") || snapshotIdentity(manifest) !== manifest.snapshotId ||
       (expectedSnapshotId && manifest.snapshotId !== expectedSnapshotId) ||
       typeof manifest.publicationSourceRootDirectory !== "string" || !path.isAbsolute(manifest.publicationSourceRootDirectory) ||
-      typeof manifest.preview !== "boolean" || !Array.isArray(manifest.files) || manifest.files.length !== SELECTION_PATHS.length) {
+      typeof manifest.preview !== "boolean" || !Array.isArray(manifest.files) || manifest.files.length !== registeredPaths.length) {
     throw new Error("Invalid selection snapshot identity or manifest.");
   }
   const sourceRoot = path.resolve(manifest.publicationSourceRootDirectory);
@@ -64,7 +71,7 @@ export function loadSelectionSnapshot({ snapshotPath, publicationSourceRootDirec
   if (!manifest.preview && manifest.previewSourceRootDirectory !== null) throw new Error("A non-preview snapshot cannot redirect immutable evidence.");
   const frozen = new Map();
   for (const [index, file] of manifest.files.entries()) {
-    if (file.path !== SELECTION_PATHS[index] || typeof file.present !== "boolean") throw new Error("Selection snapshot paths differ from the fixed five-selection allowlist.");
+    if (file.path !== registeredPaths[index] || typeof file.present !== "boolean") throw new Error("Selection snapshot paths differ from the registered selection allowlist.");
     if (!file.present) {
       if (file.bytes !== null || file.sha256 !== null) throw new Error("Invalid absent selection record.");
       frozen.set(file.path, null); continue;

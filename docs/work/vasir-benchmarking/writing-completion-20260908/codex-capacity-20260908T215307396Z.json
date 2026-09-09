@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAt": "2026-09-08T21:53:07.396Z",
+  "source": "Directly parsed codex app-server account/rateLimits/read and account/read results; account ID and all credentials omitted.",
+  "authenticationContextDirectory": "/Users/erikhazzard/Library/Application Support/Ratatosk/workspace/agent-account-contexts/codex/acct_4FN9sIZ0pdLQv7Q1",
+  "account": {
+    "type": "chatgpt",
+    "planType": "pro",
+    "requiresOpenaiAuth": true
+  },
+  "rateLimits": {
+    "limitId": "codex",
+    "limitName": null,
+    "primary": {
+      "usedPercent": 64,
+      "windowDurationMins": 10080,
+      "resetsAt": 1789490915
+    },
+    "secondary": null,
+    "credits": {
+      "hasCredits": false,
+      "unlimited": false,
+      "balance": "0"
+    },
+    "individualLimit": null,
+    "spendControlReached": false,
+    "planType": "pro",
+    "rateLimitReachedType": null
+  },
+  "scope": "Current unchanged account only; no generation, account switch, purchase, or reset-credit consumption. Advertised capacity is not a guarantee of later model-call success; stop on new explicit quota failures."
+}

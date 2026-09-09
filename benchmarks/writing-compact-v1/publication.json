@@ -1,0 +1,8 @@
+{
+  "kind": "vasirbenchmark-writing-compact-source",
+  "schemaVersion": 1,
+  "snapshot": {
+    "path": ".agents/vasir-evals/writing-compact-v1/publication-snapshots/9674c20c2fe31662428b4648afa85e51e1140c1a9b41eb6912f230c8df641c27/snapshot.json",
+    "sha256": "9674c20c2fe31662428b4648afa85e51e1140c1a9b41eb6912f230c8df641c27"
+  }
+}

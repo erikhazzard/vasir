@@ -8,7 +8,106 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deriveExpectedWritingCategory, verifyCandidateCategoryProjection } from '../../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
+import { deriveExpectedWritingCategory, deriveExpectedOverallV3, verifyOverallV3Projection, verifyCandidateCategoryProjection } from '../../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
+import { inspectCompactWritingReportInDocument } from './writing-compact-browser-evidence.mjs';
+
+function writingOverallPresentation(overall) {
+  const included = overall?.scoreBasis?.edition === 'overall-v3';
+  return { included, presentationVariant: included ? 'writing-overall-v3-v1' : 'writing-benchmark-leaders-v1' };
+}
+
+function expectedWritingWeightToken(weight) {
+  const denominator = Math.round(1 / weight);
+  if (Number.isInteger(denominator) && denominator >= 1 && denominator <= 100 && Math.abs(weight - 1 / denominator) < 1e-12) return denominator === 1 ? '1' : `1/${denominator}`;
+  return String(Number(weight.toFixed(6)));
+}
+
+function expectedWritingBenchmarkTopModel(projection, publication) {
+  const candidates = projection.entries.filter(entry => entry.condition === 'skill' && entry.eligibleForRank && Number.isFinite(entry.exactScore)).map(skill => ({
+    skill, baseline: projection.entries.find(entry => entry.condition === 'baseline' && entry.configurationId === skill.configurationId && entry.eligibleForRank && Number.isFinite(entry.exactScore))
+  })).filter(pair => pair.baseline);
+  if (!candidates.length) return null;
+  const maximum = Math.max(...candidates.map(pair => pair.skill.exactScore));
+  const tied = candidates.filter(pair => pair.skill.exactScore === maximum).sort((a, b) => a.skill.configurationId < b.skill.configurationId ? -1 : a.skill.configurationId > b.skill.configurationId ? 1 : 0);
+  const { skill, baseline } = tied[0], setting = publication.settings.find(item => (item.configurationId || item.id) === skill.configurationId);
+  const exactDelta = skill.exactScore - baseline.exactScore;
+  const round = value => Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value)) * 2) * 10) / 10;
+  return { settingId: skill.settingId, configurationId: skill.configurationId,
+    label: setting?.label || [setting?.family, setting?.reasoning].filter(Boolean).join(' · ') || skill.settingId,
+    exactBaseline: baseline.exactScore, exactSkill: skill.exactScore, exactDelta, tiedCount: tied.length,
+    baseline: round(baseline.exactScore), skill: round(skill.exactScore), delta: round(exactDelta) };
+}
+
+// Runs in the category page; expected values come from the independently
+// derived, pinned collection rather than from the rendered category model.
+function inspectWritingBenchmarkOverviewInDocument(expected) {
+  const format = value => Number.isFinite(value) ? value.toFixed(1) : '';
+  const signed = value => value > 0 ? '+' + format(value) : value < 0 ? '−' + format(-value) : '±0.0';
+  const mismatches = [], scope = document.querySelector('#capability-benchmarks');
+  const visible = node => !!node && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0;
+  const noModelSelector = !scope?.querySelector('#writing-benchmark-model');
+  const noBreakdown = !scope?.querySelector('[data-writing-selected-setting],[data-writing-component]');
+  const noFormula = !scope?.querySelector('[data-writing-exact-aggregate]');
+  const noScoreSelector = !visible(document.querySelector('#writing-score-selection'));
+  const noInlineProvisional = !scope?.querySelector('[data-writing-provisional-benchmark]');
+  const noExplanationEssay = !scope?.querySelector('[data-writing-field-means],[data-writing-ledger-coverage]');
+  const noPartialFootnote = !visible(document.querySelector('[data-writing-partial-footnote]'));
+  const noVisibleNoise = !/provisional|score breakdown|exact calculation|weight|\d+\s*\/\s*\d+\s*(?:reviews|answers)/i.test(scope?.innerText || '');
+  if (!scope || scope.hidden || scope.dataset.writingPresentation !== (expected.presentationVariant || 'writing-benchmark-leaders-v1')) mismatches.push('clean-ledger-identity');
+  for (const [key, value] of Object.entries({ noModelSelector, noBreakdown, noFormula, noScoreSelector, noInlineProvisional, noExplanationEssay, noPartialFootnote, noVisibleNoise })) if (!value) mismatches.push(key);
+  const rendered = [...scope?.querySelectorAll('.benchmark-ledger__row') || []];
+  const groups = [...scope?.querySelectorAll('[data-writing-track]') || []].map(group => ({ trackId: group.dataset.writingTrack, benchmarkIds: [...group.querySelectorAll('.benchmark-ledger__row')].map(row => row.dataset.benchmarkId) }));
+  const rows = expected.fieldMeans.map(source => {
+    const row = rendered.find(node => node.dataset.benchmarkId === source.benchmarkId), link = scope?.querySelector('[data-writing-compare-models="' + source.benchmarkId + '"]');
+    const url = link ? new URL(link.href) : null, report = row ? new URL(row.href) : null;
+    const metadata = { settingCount: Number(row?.dataset.writingSettingCount), caseCount: Number(row?.dataset.writingCaseCount), trialCount: Number(row?.dataset.writingTrialCount), judgeCount: Number(row?.dataset.writingJudgeCount), text: row?.querySelector('.benchmark-ledger__evidence')?.textContent.trim() || '' };
+    const renderedDelta = row?.querySelector('.benchmark-ledger__comparison b')?.textContent.replace(/\s*pts\s*$/, '').trim();
+    if (!row || row.dataset.baselineScore !== format(source.baseline) || row.dataset.treatmentScore !== format(source.skill) || renderedDelta !== signed(source.delta) || row.dataset.scoreSource !== source.sourceKind) mismatches.push('field-mean-source:' + source.benchmarkId);
+    if (!row?.getAttribute('aria-label')?.includes('field mean') || source.provisional && !row.getAttribute('aria-label').includes('Provisional')) mismatches.push('accessible-score-basis:' + source.benchmarkId);
+    if (!report || !report.pathname.endsWith('/benchmark-report.html') || report.hash !== '#' + source.benchmarkId) mismatches.push('field-mean-report:' + source.benchmarkId);
+    if (!url || url.searchParams.get('score') !== source.selectionId || url.searchParams.get('setting') !== expected.selectedSettingId || url.hash !== '#capabilities/writing') mismatches.push('compare-model-link:' + source.benchmarkId);
+    if (!row?.closest('[data-writing-track]') || row.closest('[data-writing-track]').dataset.writingTrack !== source.trackId) mismatches.push('track-placement:' + source.benchmarkId);
+    for (const key of ['settingCount', 'caseCount', 'trialCount', 'judgeCount']) if (metadata[key] !== source[key]) mismatches.push('source-metadata:' + source.benchmarkId + ':' + key);
+    if (!metadata.text.includes(String(source.settingCount)) || !metadata.text.includes(String(source.judgeCount)) || !/settings?/.test(metadata.text) || !/judges?|reviews?/.test(metadata.text)) mismatches.push('visible-metadata:' + source.benchmarkId);
+    const blocks = [...row?.querySelectorAll('[data-benchmark-top-model]') || []], block = blocks[0], wanted = source.topModel;
+    let topModel = null;
+    if (!wanted) {
+      if (blocks.length) mismatches.push('top-model-unavailable:' + source.benchmarkId);
+    } else {
+      const local = [], fields = ['label', 'baseline', 'skill', 'delta'].map(name => ({ name, node: block?.querySelector('[data-top-model-' + name + ']') }));
+      const field = name => fields.find(item => item.name === name)?.node;
+      const actualNumber = key => block?.dataset[key] === undefined || block.dataset[key] === '' ? null : Number(block.dataset[key]);
+      const label = field('label')?.textContent.trim(), renderedBaseline = field('baseline')?.textContent.trim(), renderedSkill = field('skill')?.textContent.trim(), renderedDelta = field('delta')?.textContent.replace(/\s*pts\s*$/, '').trim();
+      const heading = block?.querySelector('.benchmark-ledger__leader-identity > small')?.textContent.trim().replace(/\s+/g, ' ');
+      const exactBaseline = actualNumber('exactBaseline'), exactSkill = actualNumber('exactSkill'), exactDelta = actualNumber('exactDelta'), tiedCount = actualNumber('tiedCount');
+      const equal = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) < 1e-9;
+      if (blocks.length !== 1 || block?.dataset.settingId !== wanted.settingId || block?.dataset.configurationId !== wanted.configurationId || label !== wanted.label) local.push('identity');
+      if (!equal(exactBaseline, wanted.exactBaseline) || !equal(exactSkill, wanted.exactSkill) || !equal(exactDelta, wanted.exactDelta) || !equal(exactDelta, exactSkill - exactBaseline)) local.push('paired-source-scores');
+      if (renderedBaseline !== format(wanted.baseline) || renderedSkill !== format(wanted.skill) || renderedDelta !== signed(wanted.delta)) local.push('rounded-paired-scores');
+      if (tiedCount !== wanted.tiedCount || heading?.toLowerCase() !== 'top with skill' + (wanted.tiedCount > 1 ? ' · ' + wanted.tiedCount + ' tied' : '')) local.push('top-skill-label-or-ties');
+      const nativeVisible = node => !!node && typeof node.checkVisibility === 'function' && node.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true, opacityProperty: true }) && visible(node);
+      const isVisible = nativeVisible(block) && fields.every(item => nativeVisible(item.node));
+      if (!isVisible) local.push('visibility');
+      const rect = node => { const box = node?.getBoundingClientRect(); return box ? { left: box.left, right: box.right, top: box.top, bottom: box.bottom, width: box.width, height: box.height } : null; };
+      const contains = (outer, inner) => !!outer && !!inner && inner.width > 0 && inner.height > 0 && inner.left >= outer.left - 1 && inner.right <= outer.right + 1 && inner.top >= outer.top - 1 && inner.bottom <= outer.bottom + 1;
+      const geometry = { viewportWidth: document.documentElement.clientWidth, row: rect(row), comparison: rect(row?.querySelector('.benchmark-ledger__comparison')), block: rect(block), fields: fields.map(item => ({ name: item.name, rect: rect(item.node) })) };
+      geometry.withinRow = contains(geometry.row, geometry.block);
+      geometry.withinComparison = contains(geometry.comparison, geometry.block);
+      geometry.withinViewport = !!geometry.block && geometry.block.left >= -1 && geometry.block.right <= geometry.viewportWidth + 1;
+      geometry.fieldsWithinBlock = geometry.fields.every(item => contains(geometry.block, item.rect));
+      geometry.fieldsNonOverlapping = geometry.fields.every((a, index) => geometry.fields.slice(index + 1).every(b => !a.rect || !b.rect ? false : Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left) <= 1 || Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top) <= 1));
+      geometry.noTextOverflow = fields.every(item => !!item.node && (!Number.isFinite(item.node.clientWidth) || item.node.scrollWidth <= item.node.clientWidth + 1));
+      for (const key of ['withinRow', 'withinComparison', 'withinViewport', 'fieldsWithinBlock', 'fieldsNonOverlapping', 'noTextOverflow']) if (!geometry[key]) local.push('geometry:' + key);
+      topModel = { settingId: block?.dataset.settingId || null, configurationId: block?.dataset.configurationId || null, label, heading, exactBaseline, exactSkill, exactDelta, tiedCount, renderedBaseline, renderedSkill, renderedDelta, visible: isVisible, geometry, mismatches: local };
+      mismatches.push(...local.map(item => 'top-model:' + source.benchmarkId + ':' + item));
+    }
+    return { ...source, topModel, renderedBaseline: row?.dataset.baselineScore, renderedSkill: row?.dataset.treatmentScore, renderedDelta, compareHref: link?.href || null, reportHref: row?.href || null, metadata };
+  });
+  if (rendered.length !== expected.fieldMeans.length || new Set(rendered.map(row => row.dataset.benchmarkId)).size !== rendered.length) mismatches.push('field-mean-inventory');
+  const expectedGroups = [...new Set(expected.fieldMeans.map(row => row.trackId))].map(trackId => ({ trackId, benchmarkIds: expected.fieldMeans.filter(row => row.trackId === trackId).map(row => row.benchmarkId) }));
+  if (JSON.stringify(groups) !== JSON.stringify(expectedGroups)) mismatches.push('grouped-benchmark-inventory');
+  return { selectionId: window.VASIR_WRITING_CATEGORY.writingCategory.selection.id, selectedSettingId: expected.selectedSettingId, rows, groups, noModelSelector, noBreakdown, noFormula, noScoreSelector, noInlineProvisional, noExplanationEssay, noPartialFootnote, noVisibleNoise, mismatches };
+}
 
 // Runs inside the real report page. Kept self-contained so isolated tests can
 // exercise this exact evidence collector without reimplementing its checks.
@@ -64,6 +163,134 @@ async function inspectWritingPredecessorArchiveInDocument() {
   return { parentSourceSha256, declaredCount: source.length, renderedCount: rendered.length, responses, mismatches };
 }
 
+// Independently inspect the fresh fixed edition, including the exact originals
+// opened through the shared report. Historical editions use their own checks.
+async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = {}) {
+  const data = window.VASIR_WRITING, archive = window.VASIR_WRITING_RESPONSES;
+  const mismatches = [], answers = [], requests = [], renderedRequests = new Set();
+  const fail = (key, valid) => { if (!valid) mismatches.push(key); };
+  const hash = async text => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))), byte => byte.toString(16).padStart(2, '0')).join('');
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const sameIds = (a, b) => same([...a].sort(), [...b].sort());
+  const mean = values => values.length && values.every(Number.isFinite) ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+  const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) < 1e-9;
+  const words = text => text.trim() ? text.trim().split(/\s+/u).length : 0;
+  const benchmarkId = 'storytelling-plot-twists', edition = 'storytelling-plot-twists-paired-v2';
+  const configurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium', 'claude:claude-opus-5@medium', 'claude:claude-fable-5-1@medium'];
+  const judges = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
+  if (data?.benchmarks?.[0]?.id !== benchmarkId || data.scoreBasis?.edition !== edition || !archive) return { mismatches: ['paired-edition-missing'] };
+  fail('fresh-fixed-inventory', data.benchmarks.length === 1 && data.cases.length === 1 && data.trialCount === 1
+    && data.scoreBasis.ratingMinimum === 0 && data.scoreBasis.ratingMaximum === 5
+    && data.scoreBasis.method === 'complete-paired-single-prompt-two-judge-mean-v2'
+    && data.scoreBasis.aggregation === 'mean-four-ratings-times-twenty-then-mean-two-judges' && data.scoreBasis.dimensions.every(dimension => dimension.weight === 25)
+    && sameIds(data.settings.map(setting => setting.configurationId), configurations)
+    && sameIds(data.scoreBasis.judges, judges) && !data.methodology?.completion && !archive.supersededResponses);
+  const task = data.cases[0], files = new Map(archive.promptFiles.map(file => [file.id, file]));
+  fail('unchanged-fixed-task', task.id === 'scifi-outline' && task.wordLimit === 550 && task.prompt === 'Create a brief outline of an original science-fiction story with one or more major plot twists. Include the ending. Maximum 550 words for the entire answer.');
+  fail('twelve-calls-twenty-four-assessments', data.coverage.pairedJudgeCallCount === 12 && data.coverage.expectedPairedJudgeCallCount === 12 && data.coverage.judgmentCount === 24 && data.coverage.expectedJudgmentCount === 24 && data.coverage.executionComplete === true);
+  const skillFiles = [];
+  for (const id of ['paired-skill-bundle', 'paired-skill-root', 'paired-skill-twists']) {
+    const file = files.get(id);
+    fail(id + ':frozen-bytes', Boolean(file) && await hash(file.content) === file.sha256 && new TextEncoder().encode(file.content).length === file.bytes);
+    skillFiles.push({ id, sha256: file?.sha256, bytes: file?.bytes });
+  }
+  for (const id of ['paired-skill-root', 'paired-skill-twists']) fail(id + ':inline-once', Boolean(files.get(id)?.content) && files.get('paired-skill-bundle')?.content.split(files.get(id).content).length === 2);
+  fail('unchanged-established-skill', files.get('paired-skill-root')?.sha256 === '551e0b710e8a60ea7e3f84208f81ec48402ba63f732278885fd13360b5c322c4' && files.get('paired-skill-twists')?.sha256 === 'cb68cc0f2df390bdbe1d11fe14634966a789e29b0281a226e55e477bbc8000b8');
+  fail('four-criteria', task.rubric?.length === 4 && sameIds(task.rubric.map(item => item.id), data.scoreBasis.dimensions.map(item => item.id)));
+  const requestMap = new Map(archive.judgeRequests.map(request => [request.id, request]));
+  fail('fresh-complete-archive', requestMap.size === 12 && archive.judgeRequests.length === 12
+    && sameIds(archive.responses.map(response => response.configurationId + '|' + response.condition), configurations.flatMap(id => ['baseline', 'skill'].map(condition => id + '|' + condition))));
+  for (const response of archive.responses) {
+    const key = response.configurationId + ':' + response.condition;
+    const messages = archive.messageSets.find(item => item.id === response.messageSetId)?.messages;
+    fail(key + ':answer-binding', response.caseId === task.id && response.trialNumber === 1 && Boolean(response.outputText.trim())
+      && await hash(response.outputText) === response.provenance.outputSha256
+      && response.provenance.sourceSha256 === data.scoreBasis.sourceSha256 && response.provenance.manifestSha256 === data.scoreBasis.manifestSha256
+      && response.provenance.questionSha256 === await hash(task.prompt)
+      && response.provenance.skillSha256 === (response.condition === 'skill' ? files.get('paired-skill-bundle')?.sha256 : null));
+    fail(key + ':exact-host-input', messages?.length === (response.condition === 'skill' ? 2 : 1)
+      && messages.at(-1).role === 'user' && messages.at(-1).content === task.prompt
+      && await hash(JSON.stringify(messages)) === response.messageSetId
+      && (response.condition !== 'skill' || messages[0].fileId === 'paired-skill-bundle' && messages[0].role === (response.configurationId.startsWith('claude:') ? 'system' : 'developer')));
+    if (messages) fail(key + ':exact-message-hash', await hash(JSON.stringify(messages.map(message => ({ role: message.role, content: message.fileId ? files.get(message.fileId)?.content : message.content })))) === response.provenance.exactMessagesSha256);
+    fail(key + ':word-count', response.wordCount === words(response.outputText));
+    fail(key + ':two-judge-panel', sameIds(response.judgments.map(judge => judge.judgeConfigurationId), judges));
+    const row = inspectDocument ? [...document.querySelectorAll('[data-report-setting-id]')].find(item => item.dataset.reportSettingId === response.settingId) : null;
+    const panel = row?.querySelector('[data-condition="' + response.condition + '"]');
+    if (inspectDocument) fail(key + ':rendered-answer', panel?.querySelector('[data-output-text]')?.textContent === response.outputText && !panel.querySelector('[data-output-absence]'));
+    const scores = [];
+    for (const judge of response.judgments) {
+      const request = requestMap.get(judge.requestId), reviewKey = key + ':' + judge.judgeConfigurationId;
+      fail(reviewKey + ':request-binding', Boolean(request) && request.configurationId === response.configurationId && request.caseId === task.id && request.trialNumber === 1
+        && request.judgeConfigurationId === judge.judgeConfigurationId && request.candidateMap[judge.candidateId] === response.condition
+        && request.candidateResponseHashes[judge.candidateId] === response.provenance.outputSha256
+        && judge.promptSha256 === request.promptSha256 && judge.answerSha256 === request.outputSha256);
+      if (!request) continue;
+      try {
+        const assessment = JSON.parse(request.outputText)['assessment' + judge.candidateId];
+        fail(reviewKey + ':original-ratings', assessment?.candidateLabel === judge.candidateId && sameIds(assessment.ratings.map(item => item.criterionId), task.rubric.map(item => item.id))
+          && assessment.ratings.every(rating => { const reading = judge.dimensions[rating.criterionId]; return Number.isInteger(rating.score) && rating.score >= 0 && rating.score <= 5 && reading?.rating === rating.score && reading.evidence === rating.evidence && reading.reason === rating.reason; }));
+        const score = 20 * mean(assessment.ratings.map(item => item.score));
+        fail(reviewKey + ':original-arithmetic', close(judge.score, score)); scores.push(score);
+      } catch { mismatches.push(reviewKey + ':invalid-original'); }
+      if (inspectDocument) {
+        const review = [...panel?.querySelectorAll('[data-judge-review]') || []].find(item => item.dataset.reviewerId === judge.judgeConfigurationId);
+        fail(reviewKey + ':rendered-ratings', Boolean(review) && task.rubric.every(criterion => {
+          const dimension = review.querySelector('[data-dimension-id="' + criterion.id + '"]'), reading = judge.dimensions[criterion.id];
+          return dimension?.querySelector('[data-dimension-reason]')?.textContent === reading.reason && dimension.querySelector('[data-cited-evidence]')?.textContent === reading.evidence;
+        }));
+        const original = [...review?.querySelectorAll('[data-creation-judge-evidence]') || []].find(item => item.tagName === 'DETAILS' && item.dataset.creationJudgeEvidence === request.id);
+        fail(reviewKey + ':original-disclosure', Boolean(original));
+        if (original && !renderedRequests.has(request.id)) {
+          const wasOpen = original.open; original.open = true; original.dispatchEvent(new Event('toggle'));
+          fail(request.id + ':rendered-original-review', original.querySelector('[data-creation-original-review]')?.textContent === request.outputText);
+          const prompt = original.querySelector('[data-creation-judge-prompt]');
+          if (prompt) {
+            const promptWasOpen = prompt.open; prompt.open = true; prompt.dispatchEvent(new Event('toggle'));
+            fail(request.id + ':rendered-original-prompt', prompt.querySelector('[data-creation-original-prompt]')?.textContent === request.promptText); prompt.open = promptWasOpen;
+          } else mismatches.push(request.id + ':rendered-original-prompt');
+          original.open = wasOpen; renderedRequests.add(request.id);
+        }
+      }
+    }
+    const exactScore = mean(scores);
+    for (const cells of [data.caseResults, data.benchmarkResults, data.entries]) {
+      const cell = cells.find(item => item.configurationId === response.configurationId && item.condition === response.condition);
+      fail(key + ':panel-arithmetic', cells.length === 12 && close(cell?.exactScore, exactScore));
+    }
+    answers.push({ configurationId: response.configurationId, condition: response.condition, outputSha256: response.provenance.outputSha256, messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore });
+  }
+  for (const request of archive.judgeRequests) {
+    fail(request.id + ':original-bytes', await hash(request.promptText) === request.promptSha256 && await hash(request.outputText) === request.outputSha256);
+    fail(request.id + ':anonymous-map', sameIds(Object.keys(request.candidateMap), ['A', 'B']) && sameIds(Object.values(request.candidateMap), ['baseline', 'skill']));
+    try {
+      const candidates = JSON.parse(request.promptText.split('Candidates (complete, untruncated):\n')[1]);
+      const criteria = JSON.parse(request.promptText.split('Task criteria:\n')[1].split('\n\n')[0]);
+      fail(request.id + ':exact-task-and-criteria', request.promptText.includes('Exact task:\n' + task.prompt) && same(criteria, task.rubric.map(({ id, criterion }) => ({ id, criterion }))));
+      fail(request.id + ':complete-candidates', candidates.length === 2 && ['A', 'B'].every(label => {
+        const answer = archive.responses.find(item => item.configurationId === request.configurationId && item.condition === request.candidateMap[label]);
+        const candidate = candidates.find(item => item.candidateLabel === label);
+        return answer && candidate && same(candidate, { candidateLabel: label, wordCount: words(answer.outputText), exceedsWordLimit: words(answer.outputText) > task.wordLimit, answer: answer.outputText }) && request.candidateResponseHashes[label] === answer.provenance.outputSha256;
+      }));
+    } catch { mismatches.push(request.id + ':original-prompt-json'); }
+    requests.push({ requestId: request.id, configurationId: request.configurationId, judgeConfigurationId: request.judgeConfigurationId, promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap, candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: inspectDocument ? renderedRequests.has(request.id) : true });
+  }
+  for (const configurationId of configurations) {
+    const pair = archive.judgeRequests.filter(request => request.configurationId === configurationId);
+    fail(configurationId + ':opposite-order-panel', sameIds(pair.map(request => request.judgeConfigurationId), judges) && sameIds(pair.map(request => request.candidateMap.A), ['baseline', 'skill']));
+    const firstBaseline = (parseInt((await hash(JSON.stringify(['storytelling-plot-twists-paired-v2-20260909', configurationId, task.id, 1]))).slice(0, 2), 16) & 1) === 0;
+    fail(configurationId + ':frozen-seeded-order', pair.find(request => request.judgeConfigurationId === judges[0])?.candidateMap.A === (firstBaseline ? 'baseline' : 'skill'));
+  }
+  if (inspectDocument) {
+    fail('six-complete-rendered-models', document.querySelectorAll('[data-report-setting-id]').length === 6 && !document.querySelector('[data-output-absence]'));
+    for (const criterion of task.rubric) {
+      const element = document.querySelector('[data-rubric-dimension="' + criterion.id + '"]');
+      fail(criterion.id + ':rubric-and-scale', element?.querySelector('[data-rubric-description]')?.textContent === criterion.criterion && Object.entries(data.methodology.ratingAnchors).every(([rating, text]) => element.querySelector('[data-rubric-anchor="' + rating + '"]')?.textContent === text));
+    }
+  }
+  return { kind: 'vasirbenchmark-paired-twists-browser-evidence', benchmarkId, edition, caseId: task.id, sourceSha256: data.scoreBasis.sourceSha256, manifestSha256: data.scoreBasis.manifestSha256, skillFiles, answers, requests, mismatches };
+}
+
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, argument, index, all) => {
   if (argument.startsWith('--')) pairs.push([argument.slice(2), all[index + 1]]);
   return pairs;
@@ -85,6 +312,7 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const harnessSha256 = sha256(fs.readFileSync(fileURLToPath(import.meta.url)));
 const acceptanceEvidencePath = new URL('../../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs', import.meta.url);
 const acceptanceEvidenceSha256 = sha256(fs.readFileSync(acceptanceEvidencePath));
+const compactEvidenceHarnessSha256 = sha256(fs.readFileSync(new URL('./writing-compact-browser-evidence.mjs', import.meta.url)));
 const chromePath = [process.env.CHROME_BIN, '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome', '/usr/bin/chromium'].filter(Boolean).find(file => fs.existsSync(file));
 assert.ok(chromePath, 'Chrome must be installed or CHROME_BIN set.');
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vasir-writing-browsercheck-'));
@@ -104,6 +332,26 @@ let socket;
 let nextId = 1;
 let coverage;
 let overallSha256;
+
+// Preserve the actual loaded bodies, including the expanded response archives,
+// outside the renderer across report navigation. These are CDP capture budgets,
+// not publication-size limits. No failed capture is replaced by a second fetch.
+// https://chromedevtools.github.io/devtools-protocol/tot/Network/#method-enable
+const networkCaptureOptions = Object.freeze({ maxTotalBufferSize: 128 * 1024 * 1024, maxResourceBufferSize: 32 * 1024 * 1024, enableDurableMessages: true });
+function recordLoadedFile(requestId, response) {
+  loadedFilePromises.push(send('Network.getResponseBody', { requestId }).then(result => {
+    const bytes = Buffer.from(result.body, result.base64Encoded ? 'base64' : 'utf8');
+    return { url:response.url, bytes:bytes.length, sha256:sha256(bytes) };
+  }).catch(error => { errors.push({kind:'loaded-byte-evidence',requestId,url:response.url,detail:error.message}); return null; }));
+}
+async function drainLoadedFiles() {
+  let count, files;
+  do {
+    count = loadedFilePromises.length;
+    files = await Promise.all(loadedFilePromises.slice());
+  } while (count !== loadedFilePromises.length);
+  return files.filter(Boolean);
+}
 
 async function waitFor(check, label, timeout = 20000) {
   const started = Date.now();
@@ -134,7 +382,10 @@ const check = (name, condition, detail) => {
   assert.ok(condition, `${name}${detail ? `: ${detail}` : ''}`);
   checks.push(name);
 };
-const click = selector => evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw Error('Control missing'); element.scrollIntoView({block:'center',behavior:'instant'}); element.click(); })()`);
+const click = async selector => {
+  await drainLoadedFiles();
+  return evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw Error('Control missing'); element.scrollIntoView({block:'center',behavior:'instant'}); element.click(); })()`);
+};
 const pageUrl = (name, fragment = '') => {
   const url = new URL(name, baseUrl);
   if (requestedBenchmark) url.searchParams.set('writing', requestedBenchmark);
@@ -142,9 +393,11 @@ const pageUrl = (name, fragment = '') => {
   return url.href;
 };
 const navigate = async (url, predicate) => {
+  await drainLoadedFiles();
   await send('Page.navigate', { url });
   await waitFor(() => evaluate(`document.readyState === 'complete' && (${predicate})`).catch(() => false), url);
   await evaluate('document.fonts.ready');
+  await drainLoadedFiles();
 };
 const capture = async (name, collection = screenshots, evidence = {}) => {
   // Capture the settled interface, not a transient navigation fade. Infinite
@@ -173,6 +426,7 @@ const noOverflow = async name => {
   check(`${name}: no horizontal page overflow`, result.scroll <= result.viewport + 1, JSON.stringify(result));
 };
 const verifyWritingAnswerLinkBounds = async scope => {
+  const temporarilyOpened=await evaluate(`(() => {const ids=[];for(const node of document.querySelectorAll('details[data-writing-selected-setting]')){const panel=node.closest('#capability-ranking,#capability-efficiency');if(panel&&!panel.hidden&&!node.open){ids.push(panel.id);node.open=true;}}return ids;})()`);
   const proof=await evaluate(`(() => {
     const links=[...document.querySelectorAll('.writing-selection a[data-writing-answer-benchmark]')].filter(link=>link.getBoundingClientRect().width>0&&link.getBoundingClientRect().height>0),viewport=document.documentElement.clientWidth,mismatches=[];
     const evidence=links.map(link=>{
@@ -190,6 +444,7 @@ const verifyWritingAnswerLinkBounds = async scope => {
     return {links:evidence,mismatches};
   })()`);
   check(`Writing ${scope}: answer-card children and actual text lines fit their cards and viewport`,!proof.mismatches.length,JSON.stringify(proof));
+  await evaluate(`(${ids=>{for(const id of ids){const node=document.querySelector('#'+id+' details[data-writing-selected-setting]');if(node)node.open=false;}}})(${JSON.stringify(temporarilyOpened)})`);
   return {scope,...proof};
 };
 const verifyWritingProgress = async scope => {
@@ -197,7 +452,9 @@ const verifyWritingProgress = async scope => {
     const data=window.VASIR_WRITING, coverage=data.coverage, element=document.querySelector('[data-writing-progress]'),creation=data.benchmarks[0].id==='storytelling-magic-discovery';
     const inProgress=typeof coverage.executionComplete==='boolean'?!coverage.executionComplete:coverage.judgmentCount<coverage.expectedJudgmentCount || coverage.completedSettingCount<coverage.settingCount;
     const excluded=coverage.executionStatus==='complete-with-exclusions';
-    const expected={answers:coverage.responseCount+'/'+coverage.expectedResponseCount+' final answers',reviews:coverage.judgmentCount+'/'+coverage.expectedJudgmentCount+' planned judge reviews',panels:coverage.scoredResponseCount+'/'+coverage.expectedResponseCount+' complete '+data.scoreBasis.judgeCount+'-judge answer panels'};
+    const paired=data.scoreBasis.edition==='storytelling-plot-twists-paired-v2';
+    const expected={answers:coverage.responseCount+'/'+coverage.expectedResponseCount+' final answers',reviews:coverage.judgmentCount+'/'+coverage.expectedJudgmentCount+(paired?' planned answer assessments':' planned judge reviews'),panels:coverage.scoredResponseCount+'/'+coverage.expectedResponseCount+' complete '+data.scoreBasis.judgeCount+'-judge answer panels'};
+    if(paired) expected['pair-reviews']=coverage.pairedJudgeCallCount+'/'+coverage.expectedPairs*data.scoreBasis.judgeCount+' blind pair reviews';
     const counts=Object.fromEntries(Object.keys(expected).map(key=>[key,element?.querySelector('[data-writing-progress-count="'+key+'"]')?.textContent]));
     const status=element?.querySelector('[data-writing-progress-status]')?.textContent;
     const disclosure=element?.querySelector('[data-writing-progress-disclosure]')?.textContent || '';
@@ -231,20 +488,27 @@ const layout = () => evaluateFunction(() => {
   const row=document.querySelector('#capability-ranking .capability-rank-row'),text=row?.querySelector('.capability-rank-row__model strong'),track=row?.querySelector('.capability-rank-row__track');
   return row&&text?{rowHeight:row.getBoundingClientRect().height,font:getComputedStyle(text).font,fontSize:getComputedStyle(text).fontSize,trackWidth:track?.getBoundingClientRect().width}:null;
 });
-const selectedProjectionExpression='(() => {const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING;return root.additionalBenchmarks?.['+JSON.stringify(requestedBenchmark)+'] || root.benchmarkPublications?.find(item=>item.benchmarkId==='+JSON.stringify(requestedBenchmark)+')?.projection || root;})()';
+const selectedProjectionExpression='(() => {const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING;return root.compactBenchmarks?.['+JSON.stringify(requestedBenchmark)+'] || root.additionalBenchmarks?.['+JSON.stringify(requestedBenchmark)+'] || root.benchmarkPublications?.find(item=>item.benchmarkId==='+JSON.stringify(requestedBenchmark)+')?.projection || root;})()';
 const inspectWritingComparison = async expected => {
   verifyCandidateCategoryProjection(await evaluate('window.VASIR_WRITING_CATEGORY'),expected);
-  return evaluateFunction(expected=>{
-    const close=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<1e-7,format=value=>Number.isFinite(value)?value.toFixed(1):'—';
+  const modelDisclosureEvidence=await evaluate(`(() => {const node=document.querySelector('#capability-ranking [data-writing-selected-setting]'),defaultClosed=node?.tagName==='DETAILS'&&!node.open;if(node)node.open=true;const component=node?.querySelector('[data-writing-component]');return {defaultClosed,opensForAudit:!!node?.open&&!!component?.getBoundingClientRect().width,mismatches:[]};})()`);
+  const evidence=await evaluateFunction(expected=>{
+    const close=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<1e-7,format=value=>Number.isFinite(value)?value.toFixed(1):'—',round=(value,scale=Math.abs(value))=>Math.round((value+2*Number.EPSILON*Math.max(1,scale))*10)/10;
     const rows=[...document.querySelectorAll('#capability-ranking .capability-ranking__rows > .capability-rank-row')],mismatches=[];
     const rowEvidence=rows.map(row=>{
       const baseline=expected.entries.find(entry=>entry.settingId===row.dataset.settingId&&entry.condition==='baseline'),skill=expected.entries.find(entry=>entry.settingId===row.dataset.settingId&&entry.condition==='skill');
       const track=row.querySelector('.capability-rank-row__track'),button=row.querySelector('.capability-rank-row__select');
       const readings=['baseline','full'].map(condition=>row.querySelector('.capability-rank-row__reading--'+condition+' strong')?.textContent.trim());
-      const evidence={settingId:row.dataset.settingId,exactBaseline:Number(row.dataset.exactBaseline),exactSkill:Number(row.dataset.exactSkill),exactDelta:Number(row.dataset.exactDelta),baselineRank:row.dataset.baselineRank==='null'?null:Number(row.dataset.baselineRank),skillRank:row.dataset.fullRank==='null'?null:Number(row.dataset.fullRank),baselinePosition:parseFloat(row.style.getPropertyValue('--baseline-score')),skillPosition:parseFloat(row.style.getPropertyValue('--full-score')),ariaLabel:button?.getAttribute('aria-label'),partial:row.dataset.partial==='true',asteriskRendered:readings.every(value=>value?.endsWith('*'))};
+      const setting=window.VASIR_WRITING_CATEGORY.settings.find(item=>item.id===row.dataset.settingId);
+      const label=[row.querySelector('.capability-rank-row__model strong')?.textContent.trim(),row.querySelector('.capability-rank-row__model small')?.textContent.trim()].filter(Boolean).join(' · ');
+      const evidence={settingId:row.dataset.settingId,configurationId:setting?.configurationId||setting?.id||null,label,exactBaseline:Number(row.dataset.exactBaseline),exactSkill:Number(row.dataset.exactSkill),exactDelta:Number(row.dataset.exactDelta),baselineRank:row.dataset.baselineRank==='null'?null:Number(row.dataset.baselineRank),skillRank:row.dataset.fullRank==='null'?null:Number(row.dataset.fullRank),baselinePosition:parseFloat(row.style.getPropertyValue('--baseline-score')),skillPosition:parseFloat(row.style.getPropertyValue('--full-score')),ariaLabel:button?.getAttribute('aria-label'),partial:row.dataset.partial==='true',asteriskRendered:readings.every(value=>value?.endsWith('*'))};
       if(!baseline||!skill||!Number.isFinite(baseline.exactScore)||!Number.isFinite(skill.exactScore)){mismatches.push('incomplete-row:'+evidence.settingId);return evidence;}
+      if(evidence.configurationId!==skill.configurationId||label!==expected.settingLabels[skill.configurationId])mismatches.push('row-source-identity:'+evidence.settingId);
       for(const [value,wanted]of[[evidence.exactBaseline,baseline.exactScore],[evidence.exactSkill,skill.exactScore],[evidence.exactDelta,skill.exactDelta],[evidence.baselinePosition,baseline.score],[evidence.skillPosition,skill.score]])if(!close(value,wanted))mismatches.push('row-math:'+evidence.settingId);
-      if(row.dataset.baselineScore!==format(baseline.score)||row.dataset.fullScore!==format(skill.score)||row.dataset.delta!==format(Math.round(skill.exactDelta*10)/10)||evidence.baselineRank!==baseline.rank||evidence.skillRank!==skill.rank)mismatches.push('row-readings:'+evidence.settingId);
+      // A difference can inherit cancellation error from two much larger scores.
+      // Bound the display-only half-tenth correction by those source operands;
+      // exact scores, deltas, rank eligibility and ranks were checked above.
+      if(row.dataset.baselineScore!==format(baseline.score)||row.dataset.fullScore!==format(skill.score)||row.dataset.delta!==format(round(skill.exactDelta,Math.max(Math.abs(baseline.exactScore),Math.abs(skill.exactScore))))||evidence.baselineRank!==baseline.rank||evidence.skillRank!==skill.rank)mismatches.push('row-readings:'+evidence.settingId);
       if(evidence.partial!==skill.partial||readings[0]!==format(baseline.score)+(skill.partial?'*':'')||readings[1]!==format(skill.score)+(skill.partial?'*':'')||/asterisk|some tests are missing/i.test(evidence.ariaLabel)!==skill.partial)mismatches.push('row-partial-marker:'+evidence.settingId);
       if(!evidence.ariaLabel?.includes(format(skill.score))||!track?.getAttribute('aria-label')?.includes('circle')||!track?.getAttribute('aria-label')?.includes('square'))mismatches.push('accessible-pair:'+evidence.settingId);
       const box=track?.getBoundingClientRect();
@@ -260,68 +524,141 @@ const inspectWritingComparison = async expected => {
     const rankedRows=rowEvidence.filter(row=>row.skillRank!==null),partialRows=rowEvidence.filter(row=>row.skillRank===null);
     for(let i=1;i<rankedRows.length;i++)if(rankedRows[i].exactSkill>rankedRows[i-1].exactSkill)mismatches.push('score-order');
     if(partialRows.some(row=>!row.partial)||rankedRows.some(row=>row.partial)||document.querySelectorAll('[data-writing-incomplete-results] .capability-rank-row').length!==partialRows.length)mismatches.push('ranked-partial-separation');
-    const panel=document.querySelector('[data-writing-selected-setting]'),selectedId=panel?.dataset.writingSelectedSetting;
+    const panel=document.querySelector('#capability-ranking [data-writing-selected-setting]'),selectedId=panel?.dataset.writingSelectedSetting;
     const componentEvidence=[...panel?.querySelectorAll('[data-writing-component]')||[]].map(node=>({settingId:selectedId,benchmarkId:node.dataset.writingComponent,exactBaseline:Number(node.dataset.exactBaseline),exactSkill:Number(node.dataset.exactSkill),weight:Number(node.dataset.weight)}));
     const selectedSkill=expected.entries.find(entry=>entry.settingId===selectedId&&entry.condition==='skill'),aggregateEvidence=[];
     if(Number.isFinite(selectedSkill?.exactScore)){
       if(componentEvidence.length!==selectedSkill.availableBenchmarkIds.length||componentEvidence.some(item=>!selectedSkill.availableBenchmarkIds.includes(item.benchmarkId)))mismatches.push('component-count');
-      for(const component of componentEvidence)if(!close(component.weight,selectedSkill.benchmarkWeights[component.benchmarkId]))mismatches.push('component-weight');
+      for(const component of componentEvidence){
+        if(!close(component.weight,selectedSkill.benchmarkWeights[component.benchmarkId]))mismatches.push('component-weight');
+        for(const [field,condition]of[['exactBaseline','baseline'],['exactSkill','skill']]){
+          const source=expected.entries.find(entry=>entry.settingId===selectedId&&entry.condition===condition)?.benchmarkComponents.find(item=>item.benchmarkId===component.benchmarkId);
+          if(!close(component[field],source?.exactScore))mismatches.push('component-source:'+component.benchmarkId+':'+condition);
+        }
+      }
       const total=panel.querySelector('[data-writing-exact-aggregate]'),baseline=expected.entries.find(entry=>entry.settingId===selectedId&&entry.condition==='baseline');
       if(!total||!close(Number(total.dataset.exactBaseline),baseline.exactScore)||!close(Number(total.dataset.exactSkill),selectedSkill.exactScore))mismatches.push('aggregate-total');
       for(const [field,wanted]of[['exactBaseline',baseline.exactScore],['exactSkill',selectedSkill.exactScore]])if(!close(componentEvidence.reduce((sum,item)=>sum+item[field]*item.weight,0),wanted))mismatches.push('component-sum:'+field);
       const formulas=[...total?.querySelectorAll(':scope > p')||[]].map(node=>node.textContent.trim());
       const divisors=formulas.map(text=>Number(text.match(/÷\s*(\d+)/)?.[1]||1));
-      const aggregate={settingId:selectedId,exactBaseline:Number(total?.dataset.exactBaseline),exactSkill:Number(total?.dataset.exactSkill),partial:total?.dataset.partial==='true',asteriskRendered:formulas.length===2&&formulas.every(text=>text.endsWith('*')),divisor:divisors[0]};
-      if(aggregate.partial!==selectedSkill.partial||formulas.length!==2||formulas.some(text=>text.endsWith('*')!==selectedSkill.partial)||divisors.some(divisor=>divisor!==selectedSkill.sourceCount))mismatches.push('aggregate-partial-formula');
+      const method=total?.dataset.calculationMethod,sourceCount=Number(total?.dataset.sourceCount),equalWeights=componentEvidence.every(item=>close(item.weight,1/selectedSkill.sourceCount));
+      const aggregate={settingId:selectedId,exactBaseline:Number(total?.dataset.exactBaseline),exactSkill:Number(total?.dataset.exactSkill),partial:total?.dataset.partial==='true',asteriskRendered:formulas.length===2&&formulas.every(text=>text.endsWith('*')),divisor:method==='weighted-sum'?null:divisors[0],method,sourceCount,componentWeights:Object.fromEntries(componentEvidence.map(item=>[item.benchmarkId,item.weight])),formulas};
+      if(aggregate.partial!==selectedSkill.partial||formulas.length!==2||formulas.some(text=>text.endsWith('*')!==selectedSkill.partial)||sourceCount!==selectedSkill.sourceCount)mismatches.push('aggregate-partial-formula');
+      if(method==='weighted-sum'){
+        if(formulas.some(text=>text.includes('÷')||text.includes('%')||!text.includes('×'))||componentEvidence.some(item=>formulas.some(text=>!text.includes('× '+expected.weightTokens[item.weight]))))mismatches.push('aggregate-weighted-formula');
+      }else if(method!=='arithmetic-mean'||!equalWeights||divisors.some(divisor=>divisor!==selectedSkill.sourceCount))mismatches.push('aggregate-mean-formula');
+      for(const [index,result,label]of[[0,baseline,'Plain'],[1,selectedSkill,'Skill']]){
+        const terms=result.benchmarkComponents.filter(item=>item.weight>0&&Number.isFinite(item.exactScore)),values=terms.map(item=>format(item.score));
+        const expression=equalWeights?values.length>1?'('+values.join(' + ')+') ÷ '+values.length:values[0]:terms.map((item,index)=>values[index]+' × '+expected.weightTokens[item.weight]).join(' + ');
+        if(formulas[index]!==label+' '+expression+' ≈ '+format(result.score)+(result.partial?'*':''))mismatches.push('visible-formula-terms:'+label);
+      }
       aggregateEvidence.push(aggregate);
     }else mismatches.push('selected-incomplete-setting');
     const noPlaceholderPanels=!document.querySelector('[data-writing-partial-coverage],[data-writing-coverage-gaps],.writing-provisional-overview');
     if(!noPlaceholderPanels)mismatches.push('placeholder-panels');
     const headerEvidence=[...document.querySelectorAll('.capability-canvas__header [data-writing-partial-indicator]')].map(node=>({condition:node.dataset.leaderCondition,entryId:node.dataset.entryId,partial:node.dataset.writingPartialIndicator==='true',asteriskRendered:[...node.querySelector('dd')?.childNodes||[]].filter(child=>child.nodeType===Node.TEXT_NODE).some(child=>child.textContent.includes('*'))}));
     for(const header of headerEvidence){const leaders=expected.entries.filter(entry=>entry.condition===header.condition&&entry.rank===1),displayed=leaders.find(entry=>entry.id===header.entryId);if(header.partial!==leaders.some(entry=>entry.partial)||!displayed||header.asteriskRendered!==displayed.partial)mismatches.push('header-partial-marker:'+header.condition);}
-    if(headerEvidence.length!==1||headerEvidence[0].condition!=='skill')mismatches.push('header-condition-count');
+    if(headerEvidence.length!==(expected.entries.some(entry=>entry.condition==='skill'&&entry.rank===1)?1:0)||headerEvidence.some(header=>header.condition!=='skill'))mismatches.push('header-condition-count');
     const sidebar=document.querySelector('#capability-category-writing'),sidebarPartial=sidebar?.dataset.writingSummaryPartial==='true',sidebarAsteriskRendered=sidebar?.querySelector('strong')?.textContent.includes('*')||false;
     if(sidebarPartial!==expected.sidebarPartial||sidebarAsteriskRendered!==expected.sidebarPartial)mismatches.push('sidebar-partial-marker');
+    const sidebarScore=[...sidebar?.querySelector('strong')?.childNodes||[]].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join('').trim(),sidebarLabel=sidebar?.getAttribute('aria-label')||'';
+    if(sidebarScore!==(expected.sidebarScore===null?'Results':format(expected.sidebarScore)+(expected.sidebarPartial?'*':''))||expected.sidebarScore!==null&&!sidebarLabel.includes('All Writing'))mismatches.push('sidebar-all-writing-leader');
     const footnotes=[...document.querySelectorAll('[data-writing-partial-footnote]')],partialFootnote=footnotes[0]?.textContent.trim();
-    if(footnotes.length!==1||partialFootnote!=='* Unranked mean of available scores, not a comparable aggregate. Missing tests are not zero. Only models with every selected test receive a rank.')mismatches.push('partial-footnote');
+    if(footnotes.length!==1||partialFootnote!=='* Incomplete results are shown separately, without a rank.')mismatches.push('partial-footnote');
     const coverage=window.VASIR_WRITING_CATEGORY.coverage;
-    return {selectionId:document.querySelector('#writing-score-selection')?.value,activeBenchmarkIds:expected.activeBenchmarkIds,benchmarkWeights:expected.benchmarkWeights,provisional:window.VASIR_WRITING_CATEGORY.writingCategory.selection?.provisional,completeSettings:coverage.completedSettingCount,rankedSettings:eligible.filter(entry=>entry.eligibleForRank).length,partialSettings:eligible.filter(entry=>entry.partial).length,rowEvidence,componentEvidence,aggregateEvidence,headerEvidence,sidebarPartial,sidebarAsteriskRendered,partialFootnote,noPlaceholderPanels,mismatches};
-  },{entries:expected.entries,activeBenchmarkIds:expected.activeBenchmarkIds,benchmarkWeights:expected.benchmarkWeights,sidebarPartial:deriveExpectedWritingCategory(expected.collection).entries.find(entry=>entry.condition==='skill'&&entry.rank===1)?.partial||false});
+    return {selectionId:document.querySelector('#writing-score-selection')?.value,activeBenchmarkIds:expected.activeBenchmarkIds,benchmarkWeights:expected.benchmarkWeights,provisional:window.VASIR_WRITING_CATEGORY.writingCategory.selection?.provisional,completeSettings:coverage.completedSettingCount,rankedSettings:eligible.filter(entry=>entry.eligibleForRank).length,partialSettings:eligible.filter(entry=>entry.partial).length,rowEvidence,componentEvidence,aggregateEvidence,headerEvidence,sidebarPartial,sidebarAsteriskRendered,sidebarScore,sidebarLabel,partialFootnote,noPlaceholderPanels,mismatches};
+  },{entries:expected.entries,settingLabels:Object.fromEntries([...expected.publications.values()].flatMap(publication=>publication.settings.map(setting=>[setting.configurationId||setting.id,setting.label||[setting.family,setting.reasoning].filter(Boolean).join(' · ')||setting.id]))),activeBenchmarkIds:expected.activeBenchmarkIds,benchmarkWeights:expected.benchmarkWeights,weightTokens:Object.fromEntries(expected.entries.flatMap(entry=>Object.values(entry.benchmarkWeights).map(weight=>[weight,expectedWritingWeightToken(weight)]))),sidebarPartial:deriveExpectedWritingCategory(expected.collection,'all-writing').entries.find(entry=>entry.condition==='skill'&&entry.rank===1)?.partial||false,sidebarScore:deriveExpectedWritingCategory(expected.collection,'all-writing').entries.find(entry=>entry.condition==='skill'&&entry.rank===1)?.score??null});
+  modelDisclosureEvidence.closesAfterAudit=await evaluate(`(() => {const node=document.querySelector('#capability-ranking [data-writing-selected-setting]');if(node)node.open=false;return node?.tagName==='DETAILS'&&!node.open;})()`);
+  for(const key of ['defaultClosed','opensForAudit','closesAfterAudit'])if(!modelDisclosureEvidence[key])modelDisclosureEvidence.mismatches.push(key);
+  evidence.mismatches.push(...modelDisclosureEvidence.mismatches.map(key=>'model-disclosure:'+key));
+  return {...evidence,modelDisclosureEvidence};
 };
 const chooseWritingScore = async selectionId => {
+  await drainLoadedFiles();
   await evaluateFunction(selectionId=>{const select=document.querySelector('#writing-score-selection');select.value=selectionId;select.dispatchEvent(new Event('change',{bubbles:true}));},selectionId);
-  await waitFor(()=>evaluateFunction(selectionId=>document.readyState==='complete'&&document.querySelector('#writing-score-selection')?.value===selectionId&&window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id===selectionId&&(selectionId==='storytelling'||new URLSearchParams(location.search).get('score')===selectionId),selectionId).catch(()=>false),'Selected '+selectionId);
+  await waitFor(()=>evaluateFunction(selectionId=>document.readyState==='complete'&&document.querySelector('#writing-score-selection')?.value===selectionId&&window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id===selectionId&&(selectionId==='all-writing'||new URLSearchParams(location.search).get('score')===selectionId),selectionId).catch(()=>false),'Selected '+selectionId);
   await evaluate('document.fonts.ready');
+  await drainLoadedFiles();
+};
+const inspectWritingSharedControls = async (mode, selectionId, expected, settingId = null) => {
+  const proof = await evaluateFunction(({mode,selectionId,settingId,sidebarScore}) => {
+    const control=document.querySelector('[data-writing-score-controls]'),select=control?.querySelector('#writing-score-selection'),box=select?.getBoundingClientRect(),mismatches=[];
+    const panelId=mode==='models'?'capability-ranking':mode==='benchmarks'?'capability-benchmarks':'capability-efficiency',panel=document.getElementById(panelId);
+    if(document.querySelectorAll('#writing-score-selection').length!==1||!control||control.closest('#capability-ranking,#capability-benchmarks,#capability-efficiency')||!box?.width||!box?.height||!panel||panel.hidden)mismatches.push('shared-selector-visibility');
+    if(select?.value!==selectionId||window.VASIR_WRITING_CATEGORY.writingCategory.selection.id!==selectionId)mismatches.push('shared-selector-value');
+    const route='#capabilities/writing'+(mode==='models'?'':'/'+mode);
+    if(location.hash!==route)mismatches.push('shared-selector-route');
+    const sidebar=document.querySelector('#capability-category-writing'),reading=[...sidebar?.querySelector('strong')?.childNodes||[]].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join('').trim();
+    if(reading!==(Number.isFinite(sidebarScore)?sidebarScore.toFixed(1):'Results')||Number.isFinite(sidebarScore)&&!sidebar?.getAttribute('aria-label')?.includes('All Writing'))mismatches.push('shared-sidebar-all-writing');
+    const selectedPanel=panel.querySelector('[data-writing-selected-setting]'),selectedSettingId=selectedPanel?.dataset.writingSelectedSetting;
+    if(settingId&&selectedSettingId!==settingId)mismatches.push('shared-selected-model');
+    return {mode,selectionId,hash:location.hash,selectedSettingId:selectedSettingId||null,sidebarScore:reading,visible:!!box?.width&&!!box?.height,mismatches};
+  },{mode,selectionId,settingId,sidebarScore:deriveExpectedWritingCategory(expected.collection,'all-writing').entries.find(entry=>entry.condition==='skill'&&entry.rank===1)?.score??null});
+  check(`Shared score selector ${mode}/${selectionId}: visible, correct route, stable category leader and selected model`,!proof.mismatches.length,JSON.stringify(proof));
+  return proof;
 };
 const verifyWritingCategory = async () => {
   await navigate(pageUrl('index.html','capabilities/overall'),'document.querySelector("#capability-category-overall[aria-selected=true]") && window.VASIR_DATA?.writing');
   const initial=await evaluate('({overall:JSON.stringify(window.VASIR_DATA.overall),lazy:!!window.VASIR_WRITING,available:!!document.querySelector("#capability-category-writing:not([disabled])")})');
+  const initialOverall=JSON.parse(initial.overall),{included:writingIncludedOverall,presentationVariant}=writingOverallPresentation(initialOverall);
   overallSha256=sha256(initial.overall);
   check('Writing appears in capability navigation',initial.available);
-  check('Overall loads without Writing data or answer bundles',!initial.lazy&&!requests.some(request=>/\/writing-(?:data|(?:creation-)?responses)\.js$/.test(new URL(request.url).pathname)));
-  check('Writing remains excluded from Overall',!JSON.parse(initial.overall).categories.some(category=>category.id==='writing'));
+  check('Overall loads without Writing data or answer bundles',!initial.lazy&&!requests.some(request=>/\/writing-data\.js$/.test(new URL(request.url).pathname)||writingArchiveRequest(request)));
+  check('Writing Overall participation matches the declared edition',initialOverall.categories.some(category=>category.id==='writing')===writingIncludedOverall);
   await click('#capability-category-engineering');
   await waitFor(()=>evaluate('document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector("#capability-ranking .capability-rank-row")'),'Engineering reference rows');
   const engineeringLayout=await layout();
   await click('#capability-category-writing');
   await waitFor(()=>evaluate('window.VASIR_WRITING_CATEGORY && document.querySelector("#capability-category-writing[aria-selected=true]") && document.activeElement?.id === "capability-category-writing"').catch(()=>false),'Writing loaded with selector focus');
-  const collection=await evaluate('window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING'),expected=deriveExpectedWritingCategory(collection,'storytelling');
+  const collection=await evaluate('window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING'),expected=deriveExpectedWritingCategory(collection,'all-writing');
+  let overallIntegrationEvidence;
+  if(writingIncludedOverall){
+    const originalSources=await evaluate('({engineering:window.VASIR_DATA,aiWorkflows:window.VASIR_DATA.aiWorkflows})');
+    const overallExpected=deriveExpectedOverallV3({...originalSources,writing:collection});
+    verifyOverallV3Projection(initialOverall,overallExpected);
+    overallIntegrationEvidence={edition:overallExpected.edition,includedCategoryIds:overallExpected.categories.map(category=>category.id),categoryWeights:overallExpected.categoryWeights,writingSelectionId:'all-writing',writingBenchmarkWeights:overallExpected.writingBenchmarkWeights,gamesExcluded:overallExpected.gamesExcluded,sourceOverallSha256:overallSha256,sourceScoreVerified:true,lazyBeforeWriting:!initial.lazy,answersLazy:!requests.some(writingArchiveRequest),benchmarkIds:overallExpected.benchmarkIds,eligibleSettingCount:overallExpected.settings.length,mismatches:[]};
+    check('Overall v3 reconstructs from original published tasks, including nested All Writing weights',true);
+  }
   const defaultEvidence=await inspectWritingComparison(expected);
-  check('Storytelling ranks only common-benchmark totals, retaining all incomplete means separately and unranked',!defaultEvidence.mismatches.length,JSON.stringify(defaultEvidence));
+  check('All Writing ranks complete equal-track totals, retaining incomplete weighted means separately and unranked',!defaultEvidence.mismatches.length,JSON.stringify(defaultEvidence));
   const metadata=await evaluateFunction(()=>{
     const root=window.VASIR_WRITING_COLLECTION||window.VASIR_WRITING,canvas=document.querySelector('.capability-browser__canvas'),header=canvas.querySelector('.capability-canvas__header'),nav=canvas.querySelector('.capability-mode'),selector=document.querySelector('#writing-score-selection');
-    return {overall:JSON.stringify(window.VASIR_DATA.overall),hash:location.hash,rawUnchanged:window.VASIR_WRITING===root,noPicker:!document.querySelector('.writing-subsections,.writing-benchmark-picker,[data-writing-benchmark-picker]'),tabsImmediatelyAfterHeader:header?.nextElementSibling===nav,answersLazy:!window.VASIR_WRITING_RESPONSES&&!window.VASIR_WRITING_CREATION_RESPONSES,disclosure:/development|exploratory|provisional/i.test(header.textContent)&&/excluded from overall/i.test(header.textContent),selectorInsideLeaderboard:!!selector?.closest('#capability-ranking'),selectorOptions:[...selector?.options||[]].map(option=>option.value)};
+    const included=window.VASIR_DATA.overall.scoreBasis?.edition==='overall-v3',participation=included?/included in Overall/i.test(header.textContent)&&/25%/.test(header.textContent)&&!/excluded from Overall/i.test(header.textContent):/excluded from Overall/i.test(header.textContent);
+    return {overall:JSON.stringify(window.VASIR_DATA.overall),hash:location.hash,rawUnchanged:window.VASIR_WRITING===root,noPicker:!document.querySelector('.writing-subsections,.writing-benchmark-picker,[data-writing-benchmark-picker]'),tabsImmediatelyAfterHeader:header?.nextElementSibling===nav,answersLazy:!window.VASIR_WRITING_RESPONSES&&!window.VASIR_WRITING_CREATION_RESPONSES,disclosure:/development|exploratory|provisional/i.test(header.textContent)&&participation,selectorInsideLeaderboard:!!selector?.closest('#capability-ranking'),sharedScoreSelector:!!selector&&canvas.contains(selector)&&!selector.closest('#capability-ranking,#capability-benchmarks,#capability-efficiency')&&selector.getBoundingClientRect().width>0,selectorOptions:[...selector?.options||[]].map(option=>option.value)};
   });
   const {publications,collection:_collection,entries,efficiencyEvidence:_expectedEfficiency,...expectedMetadata}=expected;
   const proof={...expectedMetadata,...metadata,visibleSettingIds:defaultEvidence.rowEvidence.map(row=>row.settingId),mismatches:defaultEvidence.mismatches};
   check('Writing uses the category route and preserves raw projections',proof.hash==='#capabilities/writing'&&proof.rawUnchanged);
   check('Writing preserves Overall bytes',sha256(proof.overall)===overallSha256);
   check('Shared category header is immediately followed by the shared view tabs',proof.tabsImmediatelyAfterHeader&&proof.noPicker);
-  check('Writing explicitly qualifies its provisional development aggregate and Overall exclusion',proof.disclosure&&defaultEvidence.provisional);
+  check('Writing qualifies its provisional development aggregate and edition-specific Overall participation',proof.disclosure&&defaultEvidence.provisional);
   check('Writing answers stay lazy on the category leaderboard',proof.answersLazy);
-  const selectionIds=['storytelling','storytelling-core-idea','storytelling-plot-twists','storytelling-magic-discovery','dungeon-master'];
-  check('Score selector exposes the aggregate, all tests and Dungeon Master',metadata.selectorInsideLeaderboard&&JSON.stringify(metadata.selectorOptions)===JSON.stringify(selectionIds));
-  const answerLinkBounds=[await verifyWritingAnswerLinkBounds('leaderboard')],writingLayout=await layout();
+  const leaderboardCleanEvidence=await evaluate(`(() => {const header=document.querySelector('.capability-canvas__header'),method=header.querySelector('[data-writing-index-method]'),text=header.innerText,mismatches=[];const noProvisionalBanner=!/provisional/i.test(header.querySelector('.capability-canvas__status').innerText),noVerboseCounts=!/incomplete settings|Core idea\\s*\\+\\s*Plot twists|\\d+\\s*\\/\\s*\\d+\\s*(?:reviews|answers)/i.test(text),methodologyAvailable=method?.tagName==='DETAILS'&&!!method.querySelector('summary');if(!noProvisionalBanner)mismatches.push('provisional-banner');if(!noVerboseCounts)mismatches.push('verbose-counts');if(!methodologyAvailable)mismatches.push('methodology-missing');return {noProvisionalBanner,noVerboseCounts,methodologyAvailable,mismatches};})()`);
+  check('Writing leaderboard keeps a quiet header with accessible methodology',!leaderboardCleanEvidence.mismatches.length,JSON.stringify(leaderboardCleanEvidence));
+  const provisionalMethodEvidence=await evaluateFunction(sources=>{
+    const method=document.querySelector('[data-writing-index-method]'),defaultClosed=method?.tagName==='DETAILS'&&!method.open;
+    if(method)method.open=true;
+    const text=method?.innerText||'',openedForAudit=!!method?.open&&!!method.getBoundingClientRect().width;
+    const records=sources.map(source=>{
+      const publication=window.VASIR_WRITING_CATEGORY.writingCategory.publications.find(item=>item.benchmarks[0].id===source.benchmarkId),actual=publication?.provisionalLeaderboard;
+      const report=document.querySelector('#capability-benchmarks [data-benchmark-id="'+source.benchmarkId+'"]'),reportHref=report?.href||null;
+      const provisional=/provisional/i.test(text),singleJudge=/single.judge/i.test(text)&&/Astra.only/i.test(text),excludedOverall=/excluded from Overall/i.test(text),includedOverall=/included in Overall/i.test(text),overallWeight=includedOverall&&/25%/.test(text)?0.25:0,mismatches=[];
+      const expectedInclusion=window.VASIR_DATA.overall.scoreBasis?.edition==='overall-v3',participation=expectedInclusion?includedOverall&&!excludedOverall&&overallWeight===0.25:excludedOverall&&!includedOverall;
+      if(actual?.sourceSha256!==source.sourceSha256||JSON.stringify(actual?.judgeConfigurationIds)!==JSON.stringify(source.judgeConfigurationIds)||actual?.judgeCount!==1)mismatches.push('provisional-source-basis');
+      if(!defaultClosed||!openedForAudit||!provisional||!singleJudge||!participation)mismatches.push('methodology-disclosure');
+      if(!reportHref||new URL(reportHref).hash!=='#'+source.benchmarkId)mismatches.push('original-report-link');
+      return {...source,scope:'category-methodology',defaultClosed,openedForAudit,provisional,singleJudge,excludedOverall,includedOverall,overallWeight,reportHref,mismatches};
+    });
+    if(method)method.open=false;
+    return records.map(record=>({...record,closedAfterAudit:method?.tagName==='DETAILS'&&!method.open}));
+  },[...expected.publications].filter(([id])=>expected.sources.get(id)?.provisional).map(([benchmarkId,publication])=>({benchmarkId,sourceSha256:publication.provisionalLeaderboard.sourceSha256,judgeConfigurationIds:publication.provisionalLeaderboard.judgeConfigurationIds})));
+  for(const item of provisionalMethodEvidence)check('Provisional source remains qualified in the closed-by-default Methodology disclosure',!item.mismatches.length&&item.closedAfterAudit,JSON.stringify(item));
+  await evaluate(`(() => {const node=document.querySelector('[data-writing-index-method]');node.open=true;node.scrollIntoView({block:'center',behavior:'instant'});})()`);
+  await capture('writing-index-method.png');
+  await evaluate(`document.querySelector('[data-writing-index-method]').open=false;scrollTo(0,0)`);
+  const selectionIds=expected.selectionIds;
+  check('Shared score selector exposes All Writing and every registered track and multi-test track benchmark',metadata.sharedScoreSelector&&!metadata.selectorInsideLeaderboard&&JSON.stringify(metadata.selectorOptions)===JSON.stringify(selectionIds));
+  const sharedSelectorEvidence=[await inspectWritingSharedControls('models','all-writing',expected)],answerLinkBounds=[await verifyWritingAnswerLinkBounds('leaderboard')],writingLayout=await layout();
   const presentationEvidence={noPlaceholderPanels:defaultEvidence.noPlaceholderPanels,engineeringLayout,writingLayout,
     matchedEngineeringFrame:writingLayout?.font===engineeringLayout?.font&&writingLayout?.fontSize===engineeringLayout?.fontSize&&Math.abs(writingLayout.rowHeight-engineeringLayout.rowHeight)<2&&Math.abs(writingLayout.trackWidth-engineeringLayout.trackWidth)<2,
     compactRows:Math.abs(writingLayout.rowHeight-engineeringLayout.rowHeight)<2,dumbbellGeometry:!defaultEvidence.mismatches.length,
@@ -333,17 +670,17 @@ const verifyWritingCategory = async () => {
   await capture('writing-comparison-rows.png');
   const selectionEvidence=[];
   for(const selectionId of selectionIds){
-    if(selectionId!=='storytelling')await chooseWritingScore(selectionId);
+    if(selectionId!=='all-writing')await chooseWritingScore(selectionId);
     const selectedExpected=deriveExpectedWritingCategory(collection,selectionId),evidence=await inspectWritingComparison(selectedExpected);
-    const represented=new Set(evidence.aggregateEvidence.map(item=>selectedExpected.entries.find(entry=>entry.settingId===item.settingId&&entry.condition==='skill').sourceCount));
+    const signature=entry=>JSON.stringify(entry.benchmarkWeights),represented=new Set(evidence.aggregateEvidence.map(item=>signature(selectedExpected.entries.find(entry=>entry.settingId===item.settingId&&entry.condition==='skill'))));
     for(const entry of selectedExpected.entries.filter(entry=>entry.condition==='skill'&&Number.isFinite(entry.exactScore))){
-      if(represented.has(entry.sourceCount))continue;
+      if(represented.has(signature(entry)))continue;
       await click('#capability-ranking .capability-rank-row__select[data-entry-id="'+entry.id+'"]');
       const additional=await inspectWritingComparison(selectedExpected);
       evidence.componentEvidence.push(...additional.componentEvidence);
       evidence.aggregateEvidence.push(...additional.aggregateEvidence);
       evidence.mismatches.push(...additional.mismatches);
-      represented.add(entry.sourceCount);
+      represented.add(signature(entry));
     }
     check('Selector '+selectionId+': all exact available-score averages, ranks, asterisks and representative component formulas',!evidence.mismatches.length,JSON.stringify(evidence));
     selectionEvidence.push(evidence);
@@ -351,7 +688,7 @@ const verifyWritingCategory = async () => {
     await evaluate('document.querySelector("#capability-ranking")?.scrollIntoView({block:"start",behavior:"instant"})');
     await capture('writing-selection-'+selectionId+'.png');
   }
-  await chooseWritingScore('storytelling');
+  await chooseWritingScore('all-writing');
   const inspectId=defaultEvidence.rowEvidence[0]?.settingId;
   if(inspectId){
     await click('#capability-ranking .capability-rank-row__select[data-entry-id="'+inspectId+'-skill"]');
@@ -363,64 +700,71 @@ const verifyWritingCategory = async () => {
     },inspectId));
     answerLinkBounds.push(await verifyWritingAnswerLinkBounds('selected setting'));
   }
-  await click('[data-capability-mode=benchmarks]');
-  check('Benchmark tests exposes original official means or explicitly qualified provisional means and report links', await evaluate(`(() => {
-    const publications=window.VASIR_WRITING_CATEGORY.writingCategory.publications,rows=[...document.querySelectorAll('#capability-benchmarks .benchmark-ledger__row')],format=value=>Number.isFinite(value)?value.toFixed(1):'';
-    return rows.length===publications.length&&publications.every(publication=>{
-      const official=publication.benchmarkSummaries[0],provisional=publication.provisionalLeaderboard,usesProvisional=!(Number.isFinite(official.baseline)&&Number.isFinite(official.treatment))&&!!provisional?.rankedSettingCount;
-      const summary=usesProvisional?provisional.summary:official,row=rows.find(row=>row.dataset.benchmarkId===official.benchmarkId);
-      return row&&row.dataset.baselineScore===format(summary.baseline)&&row.dataset.treatmentScore===format(summary.treatment)&&(!usesProvisional||/provisional/i.test(row.textContent))&&row.href.includes('benchmark-report.html#'+official.benchmarkId);
+  const benchmarkExpected = (selectionId, selectedSettingId) => {
+    const selected=deriveExpectedWritingCategory(collection,selectionId);
+    const fieldMeans=[...selected.publications].filter(([benchmarkId])=>!selected.listedBenchmarkIds||selected.listedBenchmarkIds.includes(benchmarkId)).map(([benchmarkId,publication])=>{
+      const official=publication.benchmarkSummaries[0],provisional=publication.provisionalLeaderboard;
+      const usesProvisional=!(Number.isFinite(official.baseline)&&Number.isFinite(official.treatment))&&provisional?.status==='provisional'&&!!provisional.rankedSettingCount;
+      const summary=usesProvisional?provisional.summary:official;
+      const perBenchmark = deriveExpectedWritingCategory(collection,benchmarkId);
+      return {benchmarkId,selectionId:perBenchmark.selectionId,topModel:expectedWritingBenchmarkTopModel(perBenchmark,publication),trackId:publication.benchmarks[0].trackId||publication.subcategory||'storytelling',baseline:summary.baseline,skill:summary.treatment,delta:summary.delta,provisional:!!usesProvisional,sourceKind:usesProvisional?'provisional-single-judge':Number.isFinite(official.baseline)&&Number.isFinite(official.treatment)?'official-panel':'answers',sourceSha256:publication.scoreBasis.sourceSha256,settingCount:usesProvisional?provisional.rankedSettingCount:publication.coverage.completedSettingCount,caseCount:publication.cases.length,trialCount:publication.trialCount||publication.scoreBasis?.trialsPerTask||1,judgeCount:usesProvisional?provisional.judgeCount:publication.scoreBasis.judgeCount};
     });
-  })()`));
+    return {selectionId,selectedSettingId,fieldMeans,presentationVariant};
+  };
+  const cleanLedgerEvidence=[];
+  const inspectOverview = async (selectionId,settingId) => {
+    const result=await evaluateFunction(inspectWritingBenchmarkOverviewInDocument,benchmarkExpected(selectionId,settingId));
+    if(result.mismatches.length)await capture('writing-benchmarks-failure.png',failureScreenshots,{scope:'clean-benchmark-ledger'});
+    check('Clean Benchmark tests '+selectionId+': unchanged field means, grouped inventory, quiet source metadata and direct links without model controls',!result.mismatches.length,JSON.stringify(result));
+    cleanLedgerEvidence.push(result);
+    return result;
+  };
+  await click('[data-capability-mode=benchmarks]');
+  await inspectOverview('all-writing',inspectId);
+  await click('[data-capability-mode=models]');
+  const alternate=expected.entries.find(entry=>entry.condition==='skill'&&entry.settingId!==inspectId&&entry.eligibleForRank)||expected.entries.find(entry=>entry.condition==='skill'&&entry.settingId!==inspectId);
+  if(alternate)await click('#capability-ranking .capability-rank-row__select[data-entry-id="'+alternate.id+'"]');
+  const retainedSettingId=alternate?.settingId||inspectId;
+  await click('[data-capability-mode=benchmarks]');
+  await inspectOverview('all-writing',retainedSettingId);
+  await click('[data-capability-mode=models]');
+  await chooseWritingScore('storytelling-magic-discovery');
+  sharedSelectorEvidence.push(await inspectWritingSharedControls('models','storytelling-magic-discovery',expected,retainedSettingId));
+  const historyEvidence=[];
+  for(const [direction,selectionId]of[['back','all-writing'],['forward','storytelling-magic-discovery']]){
+    await drainLoadedFiles();
+    const before=await send('Page.getNavigationHistory');
+    await evaluate('history.'+direction+'()');
+    try {
+      await waitFor(()=>evaluateFunction(selectionId=>document.readyState==='complete'&&window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id===selectionId&&document.querySelector('#writing-score-selection')?.value===selectionId,selectionId).catch(()=>false),'Writing score history '+direction);
+    } catch(error) {
+      const after=await send('Page.getNavigationHistory'),observed=await evaluate('({href:location.href,ready:document.readyState,selection:window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id,selector:document.querySelector("#writing-score-selection")?.value,selectedSetting:document.querySelector("#capability-ranking [data-writing-selected-setting]")?.dataset.writingSelectedSetting})');
+      fs.writeFileSync(path.join(output,'writing-history-failure.json'),JSON.stringify({direction,expectedSelectionId:selectionId,before,after,observed},null,2)+'\n');
+      await capture('writing-history-failure.png',failureScreenshots,{scope:'history-'+direction});
+      throw error;
+    }
+    historyEvidence.push({direction,...await inspectWritingSharedControls('models',selectionId,expected,retainedSettingId)});
+  }
+  await click('[data-capability-mode=benchmarks]');
+  await inspectOverview('storytelling-magic-discovery',retainedSettingId);
+  const comparedBenchmarkId=expected.listedBenchmarkIds[0];
+  await click('[data-writing-compare-models="'+comparedBenchmarkId+'"]');
+  await waitFor(()=>evaluateFunction(id=>document.readyState==='complete'&&location.hash==='#capabilities/writing'&&window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id===id,comparedBenchmarkId).catch(()=>false),'Benchmark compare-models link');
+  sharedSelectorEvidence.push(await inspectWritingSharedControls('models',comparedBenchmarkId,expected,retainedSettingId));
+  await click('[data-capability-mode=benchmarks]');
+  await inspectOverview(comparedBenchmarkId,retainedSettingId);
+  await evaluate('document.querySelector("#capability-benchmarks").scrollIntoView({block:"start",behavior:"instant"})');
   await noOverflow('Writing category benchmarks');
   await capture('writing-benchmarks.png');
-  const provisionalDisplayEvidence=[];
-  const provisionalIds=await evaluate('window.VASIR_WRITING_CATEGORY.writingCategory.publications.filter(publication=>publication.provisionalLeaderboard).map(publication=>publication.benchmarks[0].id)');
-  check('Only raw source provisional blocks appear inside Benchmark tests',await evaluate(`JSON.stringify([...document.querySelectorAll('#capability-benchmarks [data-writing-provisional-benchmark]')].map(node=>node.dataset.writingProvisionalBenchmark).sort())===${JSON.stringify(JSON.stringify([...provisionalIds].sort()))}`));
-  for(const benchmarkId of provisionalIds){
-    const selector=`#capability-benchmarks [data-writing-provisional-benchmark="${benchmarkId}"]`;
-    await click(`${selector} > summary`);
-    const displayed=await evaluate(`(() => {
-      const benchmarkId=${JSON.stringify(benchmarkId)},data=window.VASIR_WRITING_CATEGORY,publication=data.writingCategory.publications.find(item=>item.benchmarks[0].id===benchmarkId),source=publication.provisionalLeaderboard,node=document.querySelector(${JSON.stringify(selector)}),mismatches=[];
-      const format=value=>Number.isFinite(value)?value.toFixed(1):'—';
-      const rows=[...node.querySelectorAll('[data-writing-provisional-setting]')],eligible=source.entries.filter(entry=>entry.condition==='skill'&&entry.eligibleForRank);
-      const diagnostics=[...node.querySelectorAll('[data-writing-provisional-incomplete]')];
-      if(!node.open||!node.closest('#capability-benchmarks')||node.previousElementSibling?.dataset.benchmarkId!==benchmarkId)mismatches.push('benchmark-placement');
-      const text=node.textContent;
-      if(!/provisional/i.test(node.querySelector('summary').textContent)||!source.judgeConfigurationIds.every(id=>text.includes(id))||!/single.judge/i.test(text)||!text.includes(String(source.expectedCaseCount))||!/excluded|not included|do not enter|not part|never enter/i.test(text))mismatches.push('qualified-basis');
-      if(rows.length!==eligible.length||eligible.length!==source.rankedSettingCount)mismatches.push('ranked-count');
-      let previous=Infinity;
-      for(const row of rows){
-        const id=row.dataset.writingProvisionalSetting,skill=eligible.find(entry=>entry.settingId===id),baseline=source.entries.find(entry=>entry.settingId===id&&entry.condition==='baseline');
-        if(!skill||!baseline){mismatches.push('row-identity');continue;}
-        if(row.dataset.baselineScore!==format(baseline.score)||row.dataset.fullScore!==format(skill.score)||row.dataset.delta!==format(skill.delta)||row.dataset.baselineRank!==String(baseline.rank)||row.dataset.fullRank!==String(skill.rank))mismatches.push('row-readings:'+id);
-        if(skill.exactScore>previous)mismatches.push('exact-score-order');previous=skill.exactScore;
-        const link=row.querySelector('a[href*="benchmark-report.html"]'),url=link&&new URL(link.href);
-        if(!url||url.searchParams.get('setting')!==id||!url.hash.startsWith('#'+benchmarkId))mismatches.push('direct-original-report:'+id);
-      }
-      if(JSON.stringify(diagnostics.map(row=>row.dataset.writingProvisionalIncomplete).sort())!==JSON.stringify(source.incompleteSettings.map(item=>item.settingId).sort()))mismatches.push('incomplete-inventory');
-      for(const row of diagnostics){
-        const diagnostic=source.incompleteSettings.find(item=>item.settingId===row.dataset.writingProvisionalIncomplete);
-        if(row.hasAttribute('data-writing-provisional-setting')||!/(unranked|no rank|rank —|not ranked)/i.test(row.textContent)||row.dataset.baselineRank!==''||row.dataset.fullRank!=='')mismatches.push('incomplete-rank');
-        if(!diagnostic||row.dataset.baselineScore!==format(diagnostic.scores.baseline)||row.dataset.fullScore!==format(diagnostic.scores.skill)||row.dataset.delta!==format(diagnostic.delta)||!row.textContent.includes(diagnostic.completedPairCount+'/'+diagnostic.expectedPairCount))mismatches.push('incomplete-diagnostic-readings');
-      }
-      const ledger=node.previousElementSibling;
-      if(ledger.dataset.scoreSource==='provisional-single-judge'){
-        for(const [key,attribute] of [['baseline','baselineScore'],['treatment','treatmentScore']])if(ledger.dataset[attribute]!==format(source.summary[key]))mismatches.push('summary-'+key);
-        if(parseFloat(ledger.querySelector('.benchmark-ledger__comparison b')?.textContent)!==source.summary.delta)mismatches.push('summary-delta');
-      }
-      return {benchmarkId,judgeConfigurationIds:source.judgeConfigurationIds,rankedSettings:rows.length,incompleteSettings:diagnostics.length,sourceSha256:source.sourceSha256,activeBenchmarkIds:data.writingCategory.activeBenchmarkIds,mismatches};
-    })()`);
-    check(`Provisional ${benchmarkId}: separate qualified rows, exact published scores, ranks and unranked gaps`,!displayed.mismatches.length,JSON.stringify(displayed));
-    check('Opening provisional evidence never changes the primary category cohort',JSON.stringify(displayed.activeBenchmarkIds)===JSON.stringify(proof.activeBenchmarkIds));
-    await evaluate(`document.querySelector(${JSON.stringify(selector)})?.scrollIntoView({block:'start',behavior:'instant'})`);
-    await noOverflow('Writing provisional results');
-    await capture(provisionalDisplayEvidence.length?`writing-provisional-${benchmarkId}.png`:'writing-provisional.png');
-    await click(`${selector} > summary`);
-    provisionalDisplayEvidence.push(displayed);
-  }
+  await click('[data-capability-mode=models]');
+  await chooseWritingScore('all-writing');
   await click('[data-capability-mode=efficiency]');
   await waitFor(()=>evaluate('!document.querySelector("#capability-efficiency").hidden && !!document.querySelector("#efficiency-view").textContent'),'Writing category efficiency');
+  sharedSelectorEvidence.push(await inspectWritingSharedControls('efficiency','all-writing',expected));
+  await chooseWritingScore('storytelling-magic-discovery');
+  sharedSelectorEvidence.push(await inspectWritingSharedControls('efficiency','storytelling-magic-discovery',expected));
+  await chooseWritingScore('all-writing');
+  sharedSelectorEvidence.push(await inspectWritingSharedControls('efficiency','all-writing',expected));
   const efficiencyEvidence=[];
   for(const metric of ['latency','tokens']){
     await evaluate(`(() => {const axis=document.querySelector('#resource-axis');axis.value=${JSON.stringify(metric)};axis.dispatchEvent(new Event('change',{bubbles:true}));const entry=window.VASIR_WRITING_CATEGORY.entries.find(entry=>entry.eligibleForRank&&Number.isFinite(entry.score)&&Number.isFinite(entry[${JSON.stringify(metric)}])&&entry[${JSON.stringify(metric)}]>0);if(entry){const select=document.querySelector('#efficiency-entry');select.value=entry.id;select.dispatchEvent(new Event('change',{bubbles:true}));}})()`);
@@ -436,8 +780,21 @@ const verifyWritingCategory = async () => {
     await navigate(pageUrl('index.html',alias),'window.VASIR_WRITING_CATEGORY && document.querySelector("#capability-benchmarks:not([hidden])")');
     check(`Legacy ${alias} preserves the full category`,await evaluate(`location.hash==='#capabilities/writing/benchmarks' && JSON.stringify(window.VASIR_WRITING_CATEGORY.benchmarks.map(item=>item.id).sort())===${JSON.stringify(JSON.stringify([...proof.benchmarkIds].sort()))}`));
   }
+  if(writingIncludedOverall){
+    const stale=new URL(pageUrl('index.html','capabilities/overall'));stale.searchParams.set('score','storytelling');
+    await navigate(stale.href,'document.querySelector("#capability-category-overall[aria-selected=true]") && document.querySelector(".setting-row [data-source-condition=skill][data-category-id=writing]")');
+    const clicked=await evaluate(`(() => {const node=document.querySelector('.setting-row [data-source-condition="skill"][data-category-id="writing"]'),entry=window.VASIR_DATA.overall.entries.find(entry=>entry.id===node.dataset.entryId);return {entryId:entry.id,settingId:entry.settingId,configurationId:entry.configurationId,exactScore:Number(node.dataset.rawExactScore),weight:Number(node.dataset.weight),staleSelection:new URL(location.href).searchParams.get('score')};})()`);
+    await click('.setting-row [data-source-condition="skill"][data-category-id="writing"]');
+    await waitFor(()=>evaluate('window.VASIR_WRITING_CATEGORY?.writingCategory.selection.id === "all-writing" && document.querySelector("#capability-category-writing[aria-selected=true]")').catch(()=>false),'Overall Writing segment opens the exact All Writing model');
+    const destination=await evaluate(`(() => {const url=new URL(location.href),selected=document.querySelector('#capability-ranking [data-writing-selected-setting]'),aggregate=selected?.querySelector('[data-writing-exact-aggregate]');return {selectionId:url.searchParams.get('score'),configurationId:url.searchParams.get('setting'),hash:url.hash,settingId:selected?.dataset.writingSelectedSetting,exactScore:Number(aggregate?.dataset.exactSkill)};})()`);
+    const original=expected.entries.find(entry=>entry.condition==='skill'&&entry.configurationId===clicked.configurationId),mismatches=[];
+    if(!original?.eligibleForRank||clicked.staleSelection!=='storytelling'||clicked.weight!==0.25||!Number.isFinite(clicked.exactScore)||Math.abs(clicked.exactScore-original.exactScore)>1e-9)mismatches.push('source-segment');
+    if(destination.selectionId!=='all-writing'||destination.configurationId!==clicked.configurationId||destination.settingId!==original?.settingId||destination.hash!=='#capabilities/writing'||!Number.isFinite(destination.exactScore)||Math.abs(destination.exactScore-original.exactScore)>1e-9)mismatches.push('source-preserving-navigation');
+    overallIntegrationEvidence.writingSegmentNavigation={clicked,destination,mismatches};
+    check('Overall Writing segment preserves its same-model All Writing score despite a stale Storytelling selector',!mismatches.length,JSON.stringify(overallIntegrationEvidence.writingSegmentNavigation));
+  }
   check('Writing landing routes never download either answer archive', !requests.some(writingArchiveRequest));
-  return {...proof,presentationEvidence,selectionEvidence,answerLinkBounds,efficiencyEvidence,provisionalDisplayEvidence};
+  return {...proof,presentationVariant,overallIntegrationEvidence,presentationEvidence,selectionEvidence,sharedSelectorEvidence,cleanLedgerEvidence,historyEvidence,answerLinkBounds,efficiencyEvidence,modelDisclosureEvidence:defaultEvidence.modelDisclosureEvidence,leaderboardCleanEvidence,provisionalMethodEvidence};
 };
 
 // Check the single fixed judge against the actual answer archive, after reports
@@ -594,6 +951,37 @@ const verifyCreationExpandedReviews = async (caseId, trialNumber) => {
   return proof;
 };
 
+const ensureWritingReportAuditDetailsOpen = () => evaluate(`(() => {const node=document.querySelector('[data-report-judge-trial-details]');if(!node)throw Error('Judge & trial details missing');node.open=true;return node.open;})()`);
+const verifyWritingReportPresentation = async benchmarkId => {
+  const proof=await evaluateFunction(benchmarkId=>{
+    const hero=document.querySelector('.evidence-hero#overview'),ranking=document.querySelector('section#ranking'),details=document.querySelector('[data-report-judge-trial-details]');
+    const defaultClosed=details?.tagName==='DETAILS'&&!details.open,modelComparisonFirst=!!hero&&hero.nextElementSibling===ranking;
+    const modelComparisonHeading=ranking?.querySelector('header h2#ranking-title')?.textContent.trim();
+    // Native closed details can retain descendant layout boxes without painting
+    // them. Require browser visibility, not zero geometry, and verify the
+    // converse after opening so permanently hidden evidence cannot pass.
+    const secondaryTablesHidden=[...document.querySelectorAll('[data-writing-cohorts],[data-creation-context-comparison]')].every(node=>details?.contains(node)&&typeof node.checkVisibility==='function'&&!node.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}));
+    const mismatches=[];
+    if(!defaultClosed||details?.querySelector(':scope > summary')?.textContent.trim()!=='Judge & trial details')mismatches.push('judge-details-default');
+    if(!modelComparisonFirst||modelComparisonHeading!=='Model comparison')mismatches.push('model-comparison-first');
+    if(!secondaryTablesHidden)mismatches.push('secondary-table-default');
+    return {benchmarkId,defaultClosed,modelComparisonFirst,modelComparisonHeading,secondaryTablesHidden,mismatches};
+  },benchmarkId);
+  check('Writing report starts with the common model comparison and closed judge/trial details',!proof.mismatches.length,JSON.stringify(proof));
+  await evaluate('scrollTo(0,0)');
+  await capture('writing-report-default.png');
+  proof.opensForAudit=await evaluate(`(() => {const node=document.querySelector('[data-report-judge-trial-details]');if(node&&!node.open)node.querySelector(':scope > summary')?.click();return node?.tagName==='DETAILS'&&node.open;})()`);
+  check('Writing judge/trial details open for unchanged source audits',proof.opensForAudit);
+  proof.secondaryTablesVisibleForAudit=await waitFor(()=>evaluate(`(() => {const details=document.querySelector('[data-report-judge-trial-details]');return [...document.querySelectorAll('[data-writing-cohorts],[data-creation-context-comparison]')].every(node=>details?.contains(node)&&typeof node.checkVisibility==='function'&&node.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true})&&node.getBoundingClientRect().width>0&&node.getBoundingClientRect().height>0);})()`),'Writing secondary tables become visibly available after opening their disclosure',5000);
+  check('Writing secondary tables become visibly available after opening their disclosure',proof.secondaryTablesVisibleForAudit);
+  return proof;
+};
+const closeWritingReportAuditDetails = async proof => {
+  await evaluate(`(() => {const node=document.querySelector('[data-report-judge-trial-details]');if(node)node.open=false;})()`);
+  proof.closesAfterAudit=await waitFor(()=>evaluate(`(() => {const node=document.querySelector('[data-report-judge-trial-details]');return node?.tagName==='DETAILS'&&!node.open&&[...document.querySelectorAll('[data-writing-cohorts],[data-creation-context-comparison]')].every(table=>node.contains(table)&&typeof table.checkVisibility==='function'&&!table.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}));})()`),'Writing secondary tables become hidden after closing their disclosure',5000);
+  check('Writing judge/trial details return to their compact closed presentation',proof.closesAfterAudit);
+};
+
 const verifyDungeonMaster = async () => {
   const benchmarkId = 'dungeon-master-adventure-outline';
   const dataExpression = `(window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING).additionalBenchmarks[${JSON.stringify(benchmarkId)}]`;
@@ -604,7 +992,7 @@ const verifyDungeonMaster = async () => {
   await noOverflow('Writing category with Dungeon Master');
   await capture('dungeon-master-models.png');
   await click('[data-capability-mode=benchmarks]');
-  check('Writing benchmark tests expose Adventure outline and its report', await evaluate(`location.hash==='#capabilities/writing/benchmarks'&&[...document.querySelectorAll('#capability-benchmarks .benchmark-ledger__row')].some(row=>row.dataset.benchmarkId===${JSON.stringify(benchmarkId)}&&row.href.includes('benchmark-report.html#'+${JSON.stringify(benchmarkId)})&&row.textContent.includes('Adventure outline'))`));
+  check('Writing benchmark tests retain the original Adventure outline report in its declared current or past-edition location', await evaluate(`(() => {const id=${JSON.stringify(benchmarkId)},archive=window.VASIR_WRITING_CATEGORY.writingCategory.catalog?.find(item=>item.id===id)?.archived;const node=archive?document.querySelector('[data-writing-past-edition="'+id+'"]'):[...document.querySelectorAll('#capability-benchmarks .benchmark-ledger__row')].find(row=>row.dataset.benchmarkId===id);return location.hash==='#capabilities/writing/benchmarks'&&node?.href.includes('benchmark-report.html#'+id)&&(!archive||!document.querySelector('.benchmark-ledger__row[data-benchmark-id="'+id+'"]'));})()`));
   await noOverflow('Dungeon Master benchmark listing');
   await capture('dungeon-master-benchmarks.png');
   await click('[data-capability-mode=efficiency]');
@@ -612,6 +1000,7 @@ const verifyDungeonMaster = async () => {
   await noOverflow('Writing category efficiency');
   await capture('dungeon-master-efficiency.png');
   await navigate(pageUrl('benchmark-report.html',benchmarkId), `document.querySelector('[data-writing-case]')&&document.querySelector('[data-writing-rubric]')&&${archiveExpression}`);
+  const reportPresentationEvidence=await verifyWritingReportPresentation(benchmarkId);
   const provisionalArchiveEvidence=await verifyProvisionalArchive();
   const inventory = await evaluate(`(() => {
     const data=${dataExpression};
@@ -655,6 +1044,7 @@ const verifyDungeonMaster = async () => {
   for(const story of inventory.cases) {
     await evaluate(`(() => {const select=document.querySelector('[data-writing-case]');select.value=${JSON.stringify(story.id)};select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
     await waitFor(()=>evaluate(`document.querySelector('#report-page').dataset.activeWritingCase===${JSON.stringify(story.id)}`),`Dungeon Master ${story.id}`);
+    await ensureWritingReportAuditDetailsOpen();
     const proof=await evaluate(`(() => {
       const data=${dataExpression},archive=${archiveExpression},caseId=${JSON.stringify(story.id)},mismatches=[];
       const story=data.cases.find(story=>story.id===caseId),answers=archive.responses.filter(response=>response.caseId===caseId),format=value=>Number.isFinite(value)?value.toFixed(1):'—';
@@ -729,14 +1119,15 @@ const verifyDungeonMaster = async () => {
   }
   await evaluate(`window.scrollTo({top:0,behavior:'instant'})`);
   await noOverflow('Dungeon Master report');
+  await closeWritingReportAuditDetails(reportPresentationEvidence);
   await capture('dungeon-master-report.png');
   await click('[data-report-section=method]');
   await noOverflow('Dungeon Master method');
   await capture('dungeon-master-method.png');
   await click('.report-context__back');
   await waitFor(()=>evaluate(`location.hash==='#capabilities/writing/benchmarks'&&!!document.querySelector('#capability-benchmarks:not([hidden])')`).catch(()=>false),'Dungeon Master return to Writing benchmark list');
-  check('Dungeon Master return navigation retains every published Writing benchmark', await evaluate(`window.VASIR_WRITING_CATEGORY.benchmarks.length===${categoryEvidence.benchmarkIds.length}&&!!document.querySelector('[data-benchmark-id="${benchmarkId}"]')`));
-  return {benchmarkId,coverage:inventory.coverage,categoryEvidence,provisionalArchiveEvidence,caseEvidence,promptArchive,savedAnswer,savedAdherence};
+  check('Dungeon Master return navigation retains every published Writing benchmark', await evaluate(`window.VASIR_WRITING_CATEGORY.benchmarks.length===${categoryEvidence.benchmarkIds.length}&&!!document.querySelector('[data-benchmark-id="${benchmarkId}"],[data-writing-past-edition="${benchmarkId}"]')`));
+  return {benchmarkId,coverage:inventory.coverage,categoryEvidence,provisionalArchiveEvidence,reportPresentationEvidence,caseEvidence,promptArchive,savedAnswer,savedAdherence};
 };
 
 try {
@@ -763,24 +1154,21 @@ try {
       const requestId = message.params.requestId;
       const response = responses.get(requestId);
       if (response && /\/(?:app|benchmark-report|writing-data|writing-responses|writing-creation-responses|writing-twists-responses|writing-dungeon-master-responses)\.js$/.test(new URL(response.url).pathname)) {
-        loadedFilePromises.push(send('Network.getResponseBody', { requestId }).then(result => {
-          const bytes = Buffer.from(result.body, result.base64Encoded ? 'base64' : 'utf8');
-          return { url:response.url, bytes:bytes.length, sha256:sha256(bytes) };
-        }).catch(error => { errors.push({kind:'loaded-byte-evidence',url:response.url,detail:error.message}); return null; }));
+        recordLoadedFile(requestId, response);
       }
     }
     if (message.method === 'Network.loadingFailed' && !message.params.canceled) errors.push({ kind: 'network', detail: message.params.errorText });
   });
-  await Promise.all([send('Page.enable'), send('Runtime.enable'), send('Network.enable'), send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 700 }), send('Emulation.setTouchEmulationEnabled', { enabled: width < 700 })]);
+  await Promise.all([send('Page.enable'), send('Runtime.enable'), send('Network.enable', networkCaptureOptions), send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 700 }), send('Emulation.setTouchEmulationEnabled', { enabled: width < 700 })]);
   await send('Network.setCacheDisabled', { cacheDisabled:true });
 
   if (requestedBenchmark === 'dungeon-master-adventure-outline') {
     const result = await verifyDungeonMaster();
-    const loadedFiles = (await Promise.all(loadedFilePromises)).filter(Boolean);
+    const loadedFiles = await drainLoadedFiles();
     check('Dungeon Master has no browser runtime or network failures', errors.length === 0, JSON.stringify(errors));
     check('Dungeon Master has no failed HTTP responses', [...responses.values()].every(response => response.status < 400));
     check('Independent acceptance arithmetic did not change during browser verification',acceptanceEvidenceSha256===sha256(fs.readFileSync(acceptanceEvidencePath)));
-    const receipt = { kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'passed',...result,url:baseUrl.href,width,height,harnessSha256,acceptanceEvidenceSha256,overallSha256,checks,loadedFiles,screenshots,errors,completedAt:new Date().toISOString() };
+    const receipt = { kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'passed',...result,url:baseUrl.href,width,height,harnessSha256,networkCaptureOptions,acceptanceEvidenceSha256,overallSha256,checks,loadedFiles,screenshots,errors,completedAt:new Date().toISOString() };
     fs.writeFileSync(path.join(output, 'writing-browsercheck.json'), `${JSON.stringify(receipt,null,2)}\n`);
     process.stdout.write(`${JSON.stringify({status:'passed',benchmarkId:result.benchmarkId,checks:checks.length,cases:result.caseEvidence.length,width,height,receipt:path.join(output,'writing-browsercheck.json')})}\n`);
   } else {
@@ -797,6 +1185,7 @@ try {
   const selectedReportUrl=selectedReport.href;
 
   await navigate(selectedReportUrl, 'window.VASIR_WRITING_RESPONSES && document.querySelector("[data-writing-case]") && document.querySelector("[data-writing-rubric]")');
+  const reportPresentationEvidence=await verifyWritingReportPresentation(writing.benchmarks[0]);
   const provisionalArchiveEvidence=isCreation?[]:await verifyProvisionalArchive();
   check('Selected model opens directly in the report', await evaluate(`document.querySelector('[data-report-setting-id="${chosenSettingId}"] .model-run').open`));
   check('Writing report does not load unrelated response bundles', await evaluate('!window.VASIR_RESPONSES'));
@@ -805,6 +1194,7 @@ try {
   const creationArchiveEvidence=isCreation?await verifyCreationArchiveAndContexts():null;
   check('Writing case metadata and answer archive share the same pinned source', await evaluate(`(() => { const data=window.VASIR_WRITING, evidence=window.VASIR_WRITING_RESPONSES;return evidence.responses.filter(response=>response.outputText.length).length===data.coverage.responseCount && evidence.responses.every(response=>{ const cell=data.caseResults.find(cell=>cell.caseId===response.caseId && cell.settingId===response.settingId && cell.condition===response.condition && (cell.trialNumber || 1)===(response.trialNumber || 1));return response.provenance.sourceSha256===data.scoreBasis.sourceSha256 && cell?.status===response.status && cell.score===response.score && cell.wordCount===response.wordCount && cell.failureReason===response.failureReason;}); })()`));
   const verifyCase = async (caseId, trialNumber = 1) => {
+    await ensureWritingReportAuditDetailsOpen();
     const proof = await evaluate(`(() => {
       const data=window.VASIR_WRITING, evidence=window.VASIR_WRITING_RESPONSES,creation=data.benchmarks[0].id==='storytelling-magic-discovery';
       const caseId=${JSON.stringify(caseId)}, trialNumber=${trialNumber};
@@ -913,8 +1303,8 @@ try {
           dimensions.forEach(dimension=>{
             const reading=judgment.dimensions?.[dimension.dataset.dimensionId];
             const cells=dimension.querySelectorAll('td');
-            if(reading && (cells[0].textContent!==String(reading.rating) || (creation?dimension.querySelector('[data-dimension-reason]')?.textContent:cells[1].textContent)!==(reading.reason || '—'))) mismatches.push('dimension-evidence');
-            if(creation && dimension.querySelector('[data-cited-evidence]')?.textContent!==reading?.evidence) mismatches.push('creation-cited-evidence');
+            if(reading && (cells[0].textContent!==String(reading.rating) || dimension.querySelector('[data-dimension-reason]')?.textContent!==(reading.reason || '—'))) mismatches.push('dimension-evidence');
+            if(reading?.evidence && dimension.querySelector('[data-cited-evidence]')?.textContent!==reading.evidence) mismatches.push('cited-evidence');
           });
           if(element.querySelector('[data-judge-rationale]').textContent!==judgment.rationale) mismatches.push('judge-rationale');
           const resources=element.querySelector('[data-judge-resources]');
@@ -935,7 +1325,7 @@ try {
         const rank=creation?(Number.isFinite(aggregate?.exactScore)?1+data.benchmarkResults.filter(other=>other.condition==='skill'&&Number.isFinite(other.exactScore)&&other.exactScore>aggregate.exactScore).length:null):Number.isFinite(pair.skill)?1+pairs.filter(other=>Number.isFinite(other.skill)&&other.skill>pair.skill).length:null;
         const delta=Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill)?round(pair.skill-pair.baseline):null;
         const summary=row.querySelector('.model-preview__row');
-        if(summary.querySelector('.model-preview__identity small').textContent!==(rank?(creation?'Three-trial balanced skill':'Storytelling skill')+' rank #'+rank+' of '+data.settings.length:creation?'Three-trial aggregate incomplete':'Panel total not assessable')) mismatches.push('story-rank');
+        if(summary.querySelector('.model-preview__identity small').textContent!==(rank?(creation?'Three-trial balanced skill':data.conditions.find(condition=>condition.id==='skill').label)+' rank #'+rank+' of '+data.settings.length:creation?'Three-trial aggregate incomplete':'Panel total not assessable')) mismatches.push('story-rank');
         if(summary.querySelector('.model-preview__delta').textContent!==signed(delta)+' pts' || summary.classList.contains('is-regression')!==(delta<0)) mismatches.push('story-paired-delta');
       }
       const means={baseline:paired.length?round(paired.reduce((sum,pair)=>sum+pair.baseline,0)/paired.length):null,skill:paired.length?round(paired.reduce((sum,pair)=>sum+pair.skill,0)/paired.length):null,delta:paired.length?round(paired.reduce((sum,pair)=>sum+pair.skill-pair.baseline,0)/paired.length):null};
@@ -951,6 +1341,9 @@ try {
     await waitFor(() => evaluate(`Number(document.querySelector('[data-writing-trial]')?.value)===${trialNumber} && Number(document.querySelector('#report-page')?.dataset.activeWritingTrial)===${trialNumber}`), `Writing trial ${trialNumber}`);
   };
   const caseEvidence = [];
+  const compactCaseEvidence = [];
+  const isCompact = await evaluate("window.VASIR_WRITING.publication?.adapter==='writing-compact-v1'");
+  const isPairedTwists = await evaluate("window.VASIR_WRITING.scoreBasis?.edition==='storytelling-plot-twists-paired-v2'");
   const creationExpandedEvidence = [];
   for (const story of writing.cases) {
     if (await evaluate('document.querySelector("[data-writing-case]").value') !== story.id) {
@@ -963,9 +1356,16 @@ try {
     for (let trialNumber = 1; trialNumber <= writing.trialCount; trialNumber += 1) {
       await selectTrial(trialNumber);
       caseEvidence.push(await verifyCase(story.id, trialNumber));
+      if(isCompact){
+        const compactProof=await evaluateFunction(inspectCompactWritingReportInDocument,{caseId:story.id});
+        check(`Compact ${story.id}: original paired reviews, frozen inputs, task rubric and scores`,compactProof.mismatches.length===0,JSON.stringify(compactProof));
+        compactCaseEvidence.push(compactProof);
+      }
       if(isCreation) creationExpandedEvidence.push(await verifyCreationExpandedReviews(story.id,trialNumber));
     }
   }
+  const pairedTwistsEvidence = isPairedTwists ? await evaluateFunction(inspectPairedTwistsReportInDocument, {}) : null;
+  if (pairedTwistsEvidence) check('Fresh Plot twists: exact inline inputs, twelve original paired reviews and independent four-criterion arithmetic', pairedTwistsEvidence.mismatches.length === 0, JSON.stringify(pairedTwistsEvidence));
   const predecessorArchiveEvidence = await evaluate(`(${inspectWritingPredecessorArchiveInDocument.toString()})()`);
   if (predecessorArchiveEvidence) {
     check('Plot twists completion: both original failed attempts remain inspectable, unscored and exactly copyable', !predecessorArchiveEvidence.mismatches.length, JSON.stringify(predecessorArchiveEvidence));
@@ -976,18 +1376,20 @@ try {
       await capture(`writing-predecessor-${response.configurationId}-trial-${response.trialNumber}.png`.replace(/[^a-zA-Z0-9._-]/g, '-'), screenshots, { view: 'original-failed-predecessor', configurationId: response.configurationId, trialNumber: response.trialNumber, outputSha256: response.outputSha256 });
     }
   }
-  check('Every declared rubric dimension is present', await evaluate('document.querySelectorAll("[data-rubric-dimension]").length===window.VASIR_WRITING.scoreBasis.dimensions.length'));
-  check('Every rubric description and published 1/5/10 anchor matches the source', await evaluate(`window.VASIR_WRITING.scoreBasis.dimensions.every(dimension=>{ const element=document.querySelector('[data-rubric-dimension="'+dimension.id+'"]');return element.querySelector('[data-rubric-description]').textContent===(dimension.description || '') && ['1','5','10'].every(rating=>element.querySelector('[data-rubric-anchor="'+rating+'"]')?.textContent===dimension.anchors?.[rating]); })`));
+  const selectedRubricExpression=`(() => {const data=window.VASIR_WRITING,story=data.cases.find(item=>item.id===document.querySelector('#report-page').dataset.activeWritingCase);return story?.rubric?.length?story.rubric.map(item=>({...item,id:item.dimensionId||item.id,label:item.label||item.criterion,description:item.description||item.criterion||'',anchors:item.anchors||data.methodology?.ratingAnchors})):data.scoreBasis.dimensions;})()`;
+  check('Every declared rubric dimension is present', await evaluate('document.querySelectorAll("[data-rubric-dimension]").length==='+selectedRubricExpression+'.length'));
+  check('Every task rubric description and published rating anchor matches the source', await evaluate(`${selectedRubricExpression}.every(dimension=>{ const element=document.querySelector('[data-rubric-dimension="'+dimension.id+'"]');return element?.querySelector('[data-rubric-description]').textContent===(dimension.description || '') && element.querySelectorAll('[data-rubric-anchor]').length===Object.keys(dimension.anchors||{}).length && Object.entries(dimension.anchors||{}).every(([rating,text])=>element.querySelector('[data-rubric-anchor="'+rating+'"]')?.textContent===text); })`));
   check('Execution methodology and resource-accounting text match the source', await evaluate(`(() => { const method=window.VASIR_WRITING.methodology;const element=document.querySelector('[data-method-execution]');const expected=method.execution || {};return Boolean(element)===Boolean(method.execution || method.resourceAccounting) && (!method.resourceAccounting || element.querySelector('[data-resource-accounting]').textContent===method.resourceAccounting) && Object.entries(expected).every(([key,value])=>element.querySelector('[data-method-execution-field="'+key+'"]')?.textContent===(value===null?'Not reported':String(value))); })()`));
   check('Uncertainty disclosure preserves the selected benchmark protocol', await evaluate(`!window.VASIR_WRITING.scoreBasis.uncertainty?.protocol || document.querySelector('#method').textContent.includes(window.VASIR_WRITING.scoreBasis.uncertainty.reason)`));
   check('Shared prompt files render once with exact source text', await evaluate(`(() => { const files=window.VASIR_WRITING_RESPONSES.promptFiles || []; const elements=[...document.querySelectorAll('[data-prompt-file]')]; return elements.length===files.length && elements.every(element=>element.querySelector('[data-prompt-file-content]').textContent===files.find(file=>file.id===element.dataset.promptFile).content); })()`));
   await evaluate('window.scrollTo({top:0,behavior:"instant"})');
   await noOverflow('Writing report');
+  await closeWritingReportAuditDetails(reportPresentationEvidence);
   await capture('writing-report.png');
   await click('[data-report-section=method]');
   await noOverflow('Writing method');
   await capture('writing-method.png');
-  const rubricDimensions = await evaluate('window.VASIR_WRITING.scoreBasis.dimensions.map(dimension=>dimension.id)');
+  const rubricDimensions = await evaluate(selectedRubricExpression+'.filter(dimension=>dimension.anchors&&Object.keys(dimension.anchors).length).map(dimension=>dimension.id)');
   for (const dimensionId of rubricDimensions) {
     const selector = `[data-rubric-anchors="${dimensionId}"]`;
     await click(`${selector} > summary`);
@@ -1022,7 +1424,21 @@ try {
     await evaluate(`(() => { const select=document.querySelector('[data-writing-case]');select.value=${JSON.stringify(savedAnswer.caseId)};select.dispatchEvent(new Event('change',{bubbles:true})); })()`);
     await waitFor(() => evaluate(`document.querySelector('#report-page')?.dataset.activeWritingCase===${JSON.stringify(savedAnswer.caseId)}`), 'Saved answer story');
     await selectTrial(savedAnswer.trialNumber);
-    await evaluate(`(() => { const row=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"]');row.querySelector('.model-run').open=true;const condition=row.querySelector('[data-condition="${savedAnswer.condition}"]');condition.scrollIntoView({block:'start',behavior:'instant'}); })()`);
+    const visibleAnswer=await evaluate(`(async () => {
+      await document.fonts.ready;
+      const finite=document.getAnimations().filter(animation=>animation.playState==='running'&&Number.isFinite(animation.effect?.getComputedTiming()?.endTime)&&animation.effect.getComputedTiming().endTime<=2000);
+      await Promise.race([Promise.allSettled(finite.map(animation=>animation.finished)),new Promise(resolve=>setTimeout(resolve,2000))]);
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const row=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"]');
+      row.querySelector('.model-run').open=true;
+      const answer=row.querySelector('[data-condition="${savedAnswer.condition}"] [data-output-text]');
+      answer.closest('.model-run__section').scrollIntoView({block:'start',behavior:'instant'});
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const rect=answer.getBoundingClientRect();
+      const source=window.VASIR_WRITING_RESPONSES.responses.find(item=>item.caseId===${JSON.stringify(savedAnswer.caseId)}&&item.settingId===${JSON.stringify(savedAnswer.settingId)}&&item.condition===${JSON.stringify(savedAnswer.condition)}&&(item.trialNumber||1)===${savedAnswer.trialNumber});
+      return {visible:answer.checkVisibility()&&rect.top>=0&&rect.top<innerHeight,exact:answer.textContent===source.outputText};
+    })()`);
+    check('Saved answer capture shows the exact answer after route scrolling settles',visibleAnswer.visible&&visibleAnswer.exact,JSON.stringify(visibleAnswer));
     await noOverflow('Saved Writing answer');
     await capture('writing-answer.png');
     if (savedAnswer.judgments) {
@@ -1073,7 +1489,7 @@ try {
     }
   }
 
-  const loadedFiles = (await Promise.all(loadedFilePromises)).filter(Boolean);
+  const loadedFiles = await drainLoadedFiles();
   if(isCreation) {
     const creationFiles=loadedFiles.filter(file=>new URL(file.url).pathname.endsWith('/writing-creation-responses.js'));
     check('Creation archive response bytes and SHA-256 are recorded without downloading the legacy archive',creationFiles.length>0&&creationFiles.every(file=>file.bytes>0&&/^[a-f0-9]{64}$/.test(file.sha256))&&new Set(creationFiles.map(file=>file.sha256)).size===1&&!requests.some(request=>new URL(request.url).pathname.endsWith('/writing-responses.js')));
@@ -1084,12 +1500,12 @@ try {
   const scoredBranchCoverage = {required:requireScored,completeSettings:scoredCollection.completeSettings,rankedSettings:scoredCollection.rankedSettings,partialSettings:scoredCollection.partialSettings,unscoredSettings:scoredCollection.unscoredSettings,tiedRankEntries:scoredCollection.tiedRankEntries,regressionSettings:scoredCollection.regressionSettings,completePanels:caseEvidence.reduce((sum,story)=>sum+story.completePanelResponses,0),singleJudgeResponses:caseEvidence.reduce((sum,story)=>sum+story.singleJudgeResponses,0),scoredPairs:caseEvidence.reduce((sum,story)=>sum+story.scoredPairs,0),regressionPairs:caseEvidence.reduce((sum,story)=>sum+story.regressionPairs,0),tiedPairs:caseEvidence.reduce((sum,story)=>sum+story.tiedPairs,0),efficiency:efficiencyEvidence};
   if (requireScored) check('Scored reports retain complete panels; category efficiency uses available paired scores and complete resource readings on the same subset', scoredBranchCoverage.completePanels > 0 && efficiencyEvidence.every(proof => scoredCollection.rankedSettings > 0 ? proof.eligiblePoints > 0 && proof.frontierPoints > 0 : proof.eligiblePoints === 0 && proof.frontierPoints === 0), JSON.stringify(scoredBranchCoverage));
   check('Independent acceptance arithmetic did not change during browser verification',acceptanceEvidenceSha256===sha256(fs.readFileSync(acceptanceEvidencePath)));
-  const receipt = { kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'passed',benchmarkId:writing.benchmarks[0],trialCount:writing.trialCount,url:baseUrl.href,width,height,harnessSha256,acceptanceEvidenceSha256,overallSha256,coverage,categoryEvidence,provisionalArchiveEvidence,...(predecessorArchiveEvidence?{predecessorArchiveEvidence}:{}),...(isCreation?{creationArchiveEvidence,creationExpandedEvidence}:{}),checks,caseEvidence,scoredBranchCoverage,progressEvidence,promptArchive,savedAnswer,savedExecution,loadedFiles,screenshots,failureScreenshots,errors,completedAt:new Date().toISOString() };
+  const receipt = { kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'passed',benchmarkId:writing.benchmarks[0],trialCount:writing.trialCount,url:baseUrl.href,width,height,harnessSha256,networkCaptureOptions,acceptanceEvidenceSha256,overallSha256,coverage,categoryEvidence,provisionalArchiveEvidence,reportPresentationEvidence,...(predecessorArchiveEvidence?{predecessorArchiveEvidence}:{}),...(pairedTwistsEvidence?{pairedTwistsEvidence}:{}),...(isCreation?{creationArchiveEvidence,creationExpandedEvidence}:{}),...(isCompact?{compactCaseEvidence,compactEvidenceHarnessSha256}:{}),checks,caseEvidence,scoredBranchCoverage,progressEvidence,promptArchive,savedAnswer,savedExecution,loadedFiles,screenshots,failureScreenshots,errors,completedAt:new Date().toISOString() };
   fs.writeFileSync(path.join(output, 'writing-browsercheck.json'), `${JSON.stringify(receipt,null,2)}\n`);
   process.stdout.write(`${JSON.stringify({status:'passed',checks:checks.length,cases:caseEvidence.length,width,height,receipt:path.join(output,'writing-browsercheck.json')})}\n`);
   }
 } catch (error) {
-  fs.writeFileSync(path.join(output, 'writing-browsercheck.json'), `${JSON.stringify({kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'failed',url:baseUrl.href,width,height,harnessSha256,checks,screenshots,failureScreenshots,errors,error:error.stack},null,2)}\n`);
+  fs.writeFileSync(path.join(output, 'writing-browsercheck.json'), `${JSON.stringify({kind:'vasirbenchmark-writing-browsercheck',schemaVersion:1,status:'failed',url:baseUrl.href,width,height,harnessSha256,networkCaptureOptions,checks,screenshots,failureScreenshots,errors,error:error.stack},null,2)}\n`);
   process.stderr.write(`${error.stack}\n`);
   process.exitCode = 1;
 } finally {

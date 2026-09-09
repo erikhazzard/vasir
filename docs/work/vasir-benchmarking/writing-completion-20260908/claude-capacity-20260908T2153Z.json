@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAtApproximate": "2026-09-08T21:53:07Z",
+  "source": "Existing unchanged default Claude Code safe interactive /usage session; refreshed panel, no model prompt.",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "sessionUsedPercent": 100,
+  "sessionResetLabel": "9:40pm (America/New_York)",
+  "weekAllModelsUsedPercent": 53,
+  "weekFableUsedPercent": 100,
+  "weekFableResetLabel": "Sep 14 at 10pm (America/New_York)",
+  "usageCreditsEnabled": false,
+  "usageCreditsObservation": "Usage credits are off · /usage-credits to turn them on",
+  "resetCreditConsumptionAllowed": false,
+  "diagnosticModelCalls": 0,
+  "decision": "No Claude dispatch. Shared session and Fable weekly allowance are exhausted. Reset labels do not prove restored capacity, and a session reset will not reset the separate weekly allowance. Continue the already-running original Codex-only Dungeon Master phase; audit and publish drained checkpoints without changing models or buying capacity."
+}

@@ -1,12 +1,9 @@
 {
-  "kind": "vasirbenchmark-writing-source",
+  "kind": "vasirbenchmark-plot-twists-paired-source",
   "schemaVersion": 1,
-  "run": {
-    "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/cc357218c44344dc9d7e981e46e5c99d9f8ef8f9a77ebff3fb7c410555d28d24/run.json",
-    "sha256": "cc357218c44344dc9d7e981e46e5c99d9f8ef8f9a77ebff3fb7c410555d28d24"
-  },
-  "skill": {
-    "path": ".agents/vasir-evals/storytelling-plot-twists/publication-snapshots/cc357218c44344dc9d7e981e46e5c99d9f8ef8f9a77ebff3fb7c410555d28d24/skill-snapshot.json",
-    "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+  "edition": "storytelling-plot-twists-paired-v2",
+  "snapshot": {
+    "path": ".agents/vasir-evals/storytelling-plot-twists-paired-v2/publication-snapshots/d09ccaf1cbf3d15bb3d5861205c713c244ff3946127bdf7488f98d3c785e7631/snapshot.json",
+    "sha256": "d09ccaf1cbf3d15bb3d5861205c713c244ff3946127bdf7488f98d3c785e7631"
   }
 }

@@ -42,6 +42,8 @@
   "scripts": {
     "build:registry": "node registry/build.js --write",
     "check:registry": "node registry/build.js --check",
+    "benchmark:refresh": "node cli/benchmark-refresh.js",
+    "benchmark:check": "node cli/benchmark-refresh.js --check",
     "eval": "node ./cli/eval.js",
     "test": "node --test test/*.test.js"
   },

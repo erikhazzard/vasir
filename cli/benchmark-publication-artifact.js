@@ -8,6 +8,9 @@ import zlib from "node:zlib";
 import { VasirCliError } from "./cli-error.js";
 import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
 import { validateWritingPublication } from "./eval/writing-publication.js";
+import { WRITING_COMPACT_BENCHMARKS } from "./eval/writing-compact-publication.js";
+import { buildWritingNavigationSummary } from "./eval/writing-navigation.js";
+import { buildOverallWritingSource } from "./eval/overall-publication.js";
 import { WRITING_CREATION_ARCHIVE, WRITING_DM_ARCHIVE, WRITING_RESPONSE_ARCHIVES, hydrateWritingResponseArchives } from "./eval/writing-response-archives.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "./docs-ref.js";
 import {
@@ -24,6 +27,7 @@ const RELEASE_ID_PATTERN = /^[a-f0-9]{64}$/;
 const PRIVATE_LOCAL_PATH_PATTERN = /(?:^|[^A-Za-z0-9_])\.agents(?:[/\\]|$)|file:\/\/(?=[^'"`\s),;])|(?:^|[\s"'(=>])[A-Za-z]:[/\\]|(?:^|[^A-Za-z0-9_])vasir-evals(?:[/\\]|$)/i;
 const PRIVATE_PARENT_PATH_PATTERN = /(?:^|[^.])\.\.[/\\]/i;
 const ACCEPTANCE_QA_FILE_PATHS = Object.freeze(["capture.mjs", "capture.sh", "games-browsercheck.mjs", "writing-browsercheck.mjs"]);
+const COMPACT_ACCEPTANCE_QA_PATH = "writing-compact-browser-evidence.mjs";
 const FIXTURE_TOKEN_PATTERN = /\b(?:fake|illustrative|synthetic|simulated|fixture|mock)\b/i;
 const CACHE_CONTROL_BY_CLASS = Object.freeze({
   html: "public, max-age=0, s-maxage=31536000, must-revalidate",
@@ -186,6 +190,30 @@ export function writingCreationLocalPathScanSource(source, responses) {
     if (normalized !== answer) source = source.replaceAll(encoded, literal(normalized));
   }
   return source;
+}
+
+// Bind the small landing catalog to the full selected evidence. Compact sources
+// have separate descriptors; historical sources keep their existing validators.
+export function validateWritingArtifactBindings({ summary, writing, responses }) {
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const fail = message => { throw artifactError({ message, suggestion: 'Regenerate all Writing modules from the same immutable source selections.' }); };
+  for (const key of ['publicRelease', 'catalog', 'writingScoreBasis', 'catalogCoverage']) if (!same(summary[key], writing[key])) fail(`Writing ${key} differs between the landing catalog and lazy evidence.`);
+  const ids = Object.keys(writing.compactBenchmarks ?? {});
+  if (!same(ids, Object.keys(summary.compactBenchmarks ?? {})) || !same(ids, Object.keys(responses?.compactBenchmarks ?? {}))) fail('Compact Writing source selections differ across the landing and answer archives.');
+  for (const id of ids) {
+    const publication = writing.compactBenchmarks[id], descriptor = summary.compactBenchmarks[id];
+    if (!same(descriptor.coverage, publication.coverage) || descriptor.benchmarkId !== id || descriptor.edition !== publication.scoreBasis.edition
+      || descriptor.sourceSha256 !== publication.scoreBasis.sourceSha256 || descriptor.manifestSha256 !== publication.scoreBasis.manifestSha256
+      || descriptor.amendmentSha256 !== publication.scoreBasis.amendmentSha256 || descriptor.judgeValidationSha256 !== publication.scoreBasis.judgeValidationSha256
+      || descriptor.healthyContinuationSha256 !== publication.scoreBasis.healthyContinuationSha256) fail('Compact Writing coverage or immutable source provenance differs from its landing descriptor.');
+    if (responses.compactBenchmarks[id].responses.some(response => response.provenance.sourceSha256 !== descriptor.sourceSha256
+      || response.provenance.manifestSha256 !== descriptor.manifestSha256 || response.provenance.amendmentSha256 !== descriptor.amendmentSha256
+      || response.provenance.judgeValidationSha256 !== descriptor.judgeValidationSha256
+      || response.provenance.healthyContinuationSha256 !== descriptor.healthyContinuationSha256)) fail('Compact Writing response provenance differs from its selected source.');
+  }
+  const expectedIds = [writing.benchmarks[0].id, ...(writing.benchmarkPublications ?? []).map(child => child.benchmarkId), ...Object.keys(writing.additionalBenchmarks ?? {}), ...ids];
+  if (!same(expectedIds, summary.benchmarkIds ?? [summary.benchmarkId])) fail('Writing report identities differ from the selected benchmark collection.');
+  return true;
 }
 
 function artifactError({ code = "BENCHMARK_PUBLISH_ARTIFACT_INVALID", message, suggestion, stage = "artifact", context = {} }) {
@@ -469,6 +497,19 @@ export function validateBenchmarkAcceptance({ config, siteRootDirectory }) {
     inspectLockedPath({ siteRootDirectory, record, driftedPaths });
   }
 
+  const verification = lock.acceptance.verification;
+  const compactAcceptance = Boolean(verification?.compactSourceSelection) || WRITING_COMPACT_BENCHMARKS.some(({ id }) => lock.acceptance.scope?.benchmarkIds?.includes(id));
+  if (compactAcceptance) {
+    const harness = verification?.compactEvidenceHarness;
+    const sourceRecord = lock.files.find(record => record?.path === COMPACT_ACCEPTANCE_QA_PATH);
+    const validArchiveRoot = /^reviews\/writing-category\/[a-f0-9]{64}\/qa-[a-f0-9]{64}$/.test(verification?.freshCaptureRoot ?? "");
+    if (verification?.compactSourceSelection?.kind !== "vasirbenchmark-compact-writing-source-verification" ||
+        !validArchiveRoot || harness?.path !== `${verification.freshCaptureRoot}/${COMPACT_ACCEPTANCE_QA_PATH}` ||
+        !sourceRecord || harness.bytes !== sourceRecord.bytes || harness.sha256 !== sourceRecord.sha256) {
+      driftedPaths.push(TEMPLATE_LOCK_FILE_NAME);
+    } else inspectLockedPath({ siteRootDirectory, record: harness, driftedPaths });
+  }
+
   const lockedFilePaths = new Set([...lock.files, ...lock.captures]
     .filter((record) => !GENERATED_PUBLIC_FILE_PATHS.has(record.path))
     .map((record) => record.path));
@@ -476,7 +517,8 @@ export function validateBenchmarkAcceptance({ config, siteRootDirectory }) {
     ...config.publicFiles
       .map((fileConfig) => fileConfig.path)
       .filter((filePath) => !GENERATED_PUBLIC_FILE_PATHS.has(filePath)),
-    ...ACCEPTANCE_QA_FILE_PATHS
+    ...ACCEPTANCE_QA_FILE_PATHS,
+    ...(compactAcceptance ? [COMPACT_ACCEPTANCE_QA_PATH] : [])
   ];
   for (const requiredPath of requiredAcceptedPaths) {
     if (!lockedFilePaths.has(requiredPath)) driftedPaths.push(requiredPath);
@@ -804,7 +846,17 @@ export function buildBenchmarkPublicationArtifact({
     const writingResponses = hydrateWritingResponseArchives(primaryWritingResponses, writingCreationResponses, additionalWritingResponses);
     if (data.writing) {
       validateWritingPublication(writing, writingResponses);
+      if (data.overall?.scoreBasis?.edition === 'overall-v3') {
+        const expectedOverallSource = buildOverallWritingSource(writing, data, filesByPath.get('app.js').body.toString('utf8'));
+        if (JSON.stringify(data.writing.overallSource) !== JSON.stringify(expectedOverallSource)) throw artifactError({
+          message: "Overall Writing inputs differ from the complete published Writing sources.",
+          suggestion: "Regenerate the homepage and Writing modules together from the selected benchmark evidence."
+        });
+      }
+      const expectedNavigation = buildWritingNavigationSummary(writing, filesByPath.get('app.js').body.toString('utf8'));
+      if (JSON.stringify(data.writing.categoryIndex) !== JSON.stringify(expectedNavigation)) throw artifactError({ message: "Writing navigation score differs from its default All Writing aggregate.", suggestion: "Regenerate the compact summary and presentation from the same selected Writing sources." });
       const expectedResponseArchives = Object.fromEntries(WRITING_RESPONSE_ARCHIVES.filter(item => item === WRITING_CREATION_ARCHIVE ? writingCreationResponses : additionalWritingResponses[item.benchmarkId]).map(item => [item.benchmarkId, { href: item.href, globalName: item.globalName }]));
+      for (const id of Object.keys(writing.compactBenchmarks ?? {})) expectedResponseArchives[id] = { href: './writing-responses.js', globalName: 'VASIR_WRITING_RESPONSES' };
       if (JSON.stringify(data.writing.responseArchives ?? {}) !== JSON.stringify(expectedResponseArchives)) throw artifactError({ message: "Writing response archive descriptors differ from the generated evidence.", suggestion: "Regenerate the landing descriptor and all Writing archives from the same selected sources." });
       if (JSON.stringify(writing.coverage) !== JSON.stringify(data.writing.coverage)) throw artifactError({ message: "Writing lazy evidence and landing coverage differ.", suggestion: "Regenerate both bundles from the same pinned source." });
       if (JSON.stringify(Object.keys(writing.additionalBenchmarks ?? {})) !== JSON.stringify(Object.keys(data.writing.additionalBenchmarks ?? {})) || JSON.stringify(writing.allWritingCoverage) !== JSON.stringify(data.writing.allWritingCoverage)) throw artifactError({ message: "Additional Writing selections differ between landing and lazy evidence.", suggestion: "Regenerate the entire Writing collection from the same pinned sources." });
@@ -812,8 +864,7 @@ export function buildBenchmarkPublicationArtifact({
         if (JSON.stringify(additional.coverage) !== JSON.stringify(data.writing.additionalBenchmarks[id].coverage)) throw artifactError({ message: "Additional Writing coverage differs from its landing descriptor.", suggestion: "Regenerate all Writing bundles from the pinned source." });
       }
       if (JSON.stringify(writing.collectionCoverage) !== JSON.stringify(data.writing.collectionCoverage)) throw artifactError({ message: "Writing benchmark collection coverage differs from the landing summary.", suggestion: "Regenerate the collection and summary from the same selected sources." });
-      const writingBenchmarkIds = [writing.benchmarks[0].id, ...(writing.benchmarkPublications ?? []).map(child => child.benchmarkId), ...Object.keys(writing.additionalBenchmarks ?? {})];
-      if (JSON.stringify(writingBenchmarkIds) !== JSON.stringify(data.writing.benchmarkIds ?? [data.writing.benchmarkId])) throw artifactError({ message: "Writing report identities differ from the selected benchmark collection.", suggestion: "Preserve each selected Writing benchmark and its own report route." });
+      validateWritingArtifactBindings({ summary: data.writing, writing, responses: writingResponses });
     } else if (writing !== null || writingResponses !== null || writingCreationResponses !== null || Object.keys(additionalWritingResponses).length) throw artifactError({ message: "Unselected Writing evidence reached the artifact.", suggestion: "Keep lazy modules empty until the source is selected." });
     const benchmarkRoutes = buildBenchmarkPublicationRoutes(data);
     if (JSON.stringify(benchmarkRoutes) !== JSON.stringify(publicationProjection.routes)) {
@@ -838,7 +889,8 @@ export function buildBenchmarkPublicationArtifact({
         const parentPathSource = file.path === "writing-responses.js" ? writingParentPathScanSource(writing, primaryWritingResponses)
           : file.path === WRITING_DM_ARCHIVE.path ? writingParentPathScanSource(writing, { additionalBenchmarks: { [WRITING_DM_ARCHIVE.benchmarkId]: additionalWritingResponses[WRITING_DM_ARCHIVE.benchmarkId] } })
           : file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationParentPathScanSource(writing, writingCreationResponses) : source;
-        const localPathSource = file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationLocalPathScanSource(source, writingCreationResponses) : source;
+        const localPathSource = file.path === WRITING_CREATION_ARCHIVE.path ? writingCreationLocalPathScanSource(source, writingCreationResponses)
+          : file.path === WRITING_DM_ARCHIVE.path ? writingCreationLocalPathScanSource(source, additionalWritingResponses[WRITING_DM_ARCHIVE.benchmarkId]) : source;
         return PRIVATE_LOCAL_PATH_PATTERN.test(localPathSource) || source.includes("/Users/") || (!authoredResponseText && PRIVATE_PARENT_PATH_PATTERN.test(parentPathSource));
       })
       .map((file) => file.path);

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-read-only-capacity-receipt",
+  "checkedAtApproximate": "2026-09-08T20:52:39Z",
+  "source": "Existing unchanged default Claude Code safe interactive /usage session; refreshed panel, no model call.",
+  "accountContext": "unchanged default Claude context; no CLAUDE_CONFIG_DIR override",
+  "sessionUsedPercent": 37,
+  "sessionResetLabel": "9:39pm (America/New_York)",
+  "weekAllModelsUsedPercent": 38,
+  "weekFableUsedPercent": 70,
+  "usageCreditsEnabled": false,
+  "usageCreditsObservation": "Usage credits are off · /usage-credits to turn them on",
+  "resetCreditConsumptionAllowed": false,
+  "diagnosticModelCalls": 0,
+  "decision": "Existing original-model calls may continue under their quotas. Preserve provider/model circuit guards; do not enable credits or change accounts. Dungeon Master remains Codex-only."
+}

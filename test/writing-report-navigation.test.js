@@ -79,6 +79,9 @@ async function renderReport(source, hash) {
   const scrolled = [];
   const location = { href: 'https://vasirbenchmark.com/benchmark-report.html', hash, search: '', reload: () => { location.reloaded = true; } };
   const window = { VASIR_DATA: { settings: [], writing: { benchmarkId: CORE, benchmarkIds: [CORE, TWISTS], additionalBenchmarks: { [DM]: { subcategory: 'dungeon-master', title: 'Dungeon Master' } } } }, VASIR_WRITING: source.data, VASIR_WRITING_RESPONSES: source.archive, location, history: { replaceState: (_state, _title, target) => { location.hash = target; } }, addEventListener: (name, handler) => { handlers[name] = handler; }, requestAnimationFrame: callback => callback(), scrollTo: () => scrolled.push('top') };
+  if (source.data.catalog) window.VASIR_DATA.writing.catalog = source.data.catalog;
+  if (source.data.writingScoreBasis) window.VASIR_DATA.writing.writingScoreBasis = source.data.writingScoreBasis;
+  if (source.responseArchives) window.VASIR_DATA.writing.responseArchives = source.responseArchives;
   const document = { currentScript: { src: `${location.href.replace('html', 'js')}` }, getElementById: id => id === 'report-page' ? reportPage : id === 'report-view' ? reportView : { scrollIntoView: () => scrolled.push(id) }, querySelector: () => mast, querySelectorAll: () => links };
   await vm.runInNewContext(runtime, { window, document, URL, URLSearchParams });
   return { window, document, reportPage, reportView, links, scrolled, navigate(hash) { location.hash = hash; handlers.hashchange(); }, choose(selector, value) { viewHandlers.change({ target: { value, matches: candidate => candidate === selector } }); handlers.hashchange(); } };
@@ -109,6 +112,22 @@ test('Writing report selects every trial without collapsing the eighty response 
   }
   assert.match(page.reportView.innerHTML, /Scores cover plot twists on 1 published prompt with 10 trials per condition/);
   assert.doesNotMatch(page.reportView.innerHTML, /core-idea analysis|Corpus stratum/);
+});
+
+test('Core, Plot twists and Dungeon Master share the same single comparison and collapsed judge details', async () => {
+  const source = collections(), before = JSON.stringify(source);
+  for (const benchmarkId of [CORE, TWISTS, DM]) {
+    const page = await renderReport(source, `#${benchmarkId}/case-1${benchmarkId === TWISTS ? '/trial-1' : ''}`);
+    const html = page.reportView.innerHTML;
+    assert.match(html, /<h2 id="ranking-title">Model comparison<\/h2>/);
+    assert.match(html, /<details class="report-judge-details" data-report-judge-trial-details>/);
+    assert.equal((html.match(/<ol class="model-preview"/g) || []).length, 1);
+    assert.ok(html.indexOf('id="overview"') < html.indexOf('id="ranking"'));
+    assert.ok(html.indexOf('id="ranking"') < html.indexOf('data-report-judge-trial-details'));
+    assert.ok(html.indexOf('data-report-judge-trial-details') < html.indexOf('id="intent-title"'));
+    if (benchmarkId === DM) assert.ok(html.indexOf('data-report-judge-trial-details') < html.indexOf('data-writing-cohorts'));
+  }
+  assert.equal(JSON.stringify(source), before, 'Common presentation must preserve every original score and answer.');
 });
 
 test('Plot twists retains a separate inspectable failed-predecessor archive on every trial without adding score rows', async () => {
@@ -223,4 +242,84 @@ test('Repeated-trial reports reject missing per-trial summaries and mismatched a
   mismatched.twists.responseBundle.responses[0].trialNumber = 11;
   const badIdentity = await renderReport(mismatched, `#${TWISTS}/case-1/trial-1`);
   assert.match(badIdentity.reportView.innerHTML, /EXACT RUN MATRIX IS INCOMPLETE/);
+});
+
+test('declared reports share the frame and exact task rubric without public edition links', async () => {
+  const source = collections();
+  const ids = ['storytelling-plot-twists-compact-v2', 'writing-place-generation-v1', 'storytelling-one-shot-v1'];
+  source.data.compactBenchmarks = {};
+  source.archive.compactBenchmarks = {};
+  source.responseArchives = Object.fromEntries(ids.map(id => [id, { globalName: 'VASIR_WRITING_RESPONSES', href: './writing-responses.js' }]));
+  source.data.writingScoreBasis = { id: 'writing-established-storytelling-v1', benchmarkIds: [CORE, TWISTS] };
+  source.data.catalog = [{ id: TWISTS, name: 'Plot twists · original', edition: 'original', archived: true,
+    detailHref: `benchmark-report.html#${TWISTS}`, supersededByBenchmarkId: ids[0] }];
+  for (const [index, id] of ids.entries()) {
+    const compact = publication(id, { caseCount: index === 0 ? 3 : 1 });
+    compact.projection.caseLabel = 'prompt';
+    compact.projection.benchmarks[0].taskKind = 'compact-writing';
+    compact.projection.methodology = { execution: { hostAutomaticRetries: 0, creatorNetworkRetries: 0,
+      creatorOutputLimitRecoveryAttempts: 3, creatorOutputTokenLimitPerSegment: 8192, creatorWholeSessionTokenCap: null,
+      deliveryMode: 'frozen-inline-once' }, resourceAccounting: 'Count each paired judge request once.' };
+    compact.projection.benchmarks[0].name = ['Plot twists', 'Place generation', 'One-shot adventure outline'][index];
+    compact.projection.benchmarks[0].suite = index === 1 ? 'Worldbuilding' : 'Storytelling';
+    for (const story of compact.projection.cases) story.rubric = [{ id: `${story.id}-cause`, dimensionId: 'coherence',
+      criterion: `${story.id} exact causal criterion <original>`, weight: 100 }];
+    source.data.compactBenchmarks[id] = compact.projection;
+    source.archive.compactBenchmarks[id] = compact.responseBundle;
+    source.data.catalog.push({ id, name: compact.projection.benchmarks[0].name, edition: id, adapter: 'writing-compact-v1',
+      trackId: index === 1 ? 'worldbuilding' : 'storytelling', archived: false, detailHref: `benchmark-report.html#${id}`,
+      subjectTags: index ? ['dnd'] : [], ...(index === 0 ? { predecessorBenchmarkId: TWISTS } : {}) });
+  }
+  const before = JSON.stringify(source);
+  for (const [index, id] of ids.entries()) {
+    const page = await renderReport(source, `#${id}/case-1`);
+    assert.equal(page.window.VASIR_WRITING, source.data.compactBenchmarks[id]);
+    assert.equal(page.window.VASIR_WRITING_RESPONSES, source.archive.compactBenchmarks[id]);
+    assert.equal(page.reportPage.dataset.writingSubcategory, index === 1 ? 'worldbuilding' : 'storytelling');
+    for (const story of source.data.compactBenchmarks[id].cases) {
+      page.navigate(`#${id}/${story.id}`);
+      const html = page.reportView.innerHTML;
+      assert.doesNotMatch(html, /REPORT COULD NOT|EXACT RUN MATRIX IS INCOMPLETE/);
+      assert.doesNotMatch(html, /Story version|Corpus stratum|Training exposure|all 4 matched settings|All 4 matched settings|All 4 matched results/);
+      assert.match(html, /field · all 4 settings/);
+      for (const [key, value] of Object.entries(source.data.compactBenchmarks[id].methodology.execution)) {
+        assert.ok(html.includes(`data-method-execution-field="${key}"><code>${value === null ? 'Not reported' : value}</code>`));
+      }
+      assert.match(html, /data-resource-accounting>Count each paired judge request once\./);
+      assert.equal((html.match(/<ol class="model-preview"/g) || []).length, 1);
+      assert.equal((html.match(/<details class="report-judge-details" data-report-judge-trial-details>/g) || []).length, 1);
+      assert.equal((html.match(/data-report-setting-id=/g) || []).length, 4);
+      assert.ok(html.indexOf('id="ranking"') < html.indexOf('data-report-judge-trial-details'));
+      assert.ok(html.indexOf('data-report-judge-trial-details') < html.indexOf('data-writing-rubric'));
+      assert.ok(html.includes(`${story.id} exact causal criterion &lt;original&gt;`));
+      assert.doesNotMatch(html, />Coherence</, 'The selected task labels replace generic shared dimension labels.');
+      for (const response of source.archive.compactBenchmarks[id].responses) assert.equal(html.includes(response.outputText), response.caseId === story.id);
+      assert.doesNotMatch(html, /data-report-related-edition|data-report-edition|Past edition/);
+    }
+  }
+  const archive = await renderReport(source, `#${TWISTS}/case-1/trial-1`);
+  assert.match(archive.reportView.innerHTML, /data-report-unavailable/);
+  assert.doesNotMatch(archive.reportView.innerHTML, /data-report-setting-id|data-output-text|data-report-related-edition/);
+  assert.equal(JSON.stringify(source), before, 'Rendering current and archived editions preserves all original evidence.');
+});
+
+test('withdrawn and unknown report IDs never fall back to another benchmark or load unrelated response files', async () => {
+  const source = collections();
+  source.data.catalog = [{ id: CORE }, { id: TWISTS }];
+  const before = JSON.stringify(source);
+  for (const id of [DM, 'writing-place-generation-v1', 'storytelling-plot-twists-compact-v2', 'unknown-benchmark']) {
+    const page = await renderReport(source, `#${id}/case-1`);
+    assert.match(page.reportView.innerHTML, /data-report-unavailable/);
+    assert.match(page.reportView.innerHTML, /not part of the current published collection/);
+    assert.doesNotMatch(page.reportView.innerHTML, /SAVED |data-output-text|id="report-title"|REPORT COULD NOT BE LOADED/);
+    assert.equal(page.window.VASIR_WRITING, source.data, 'An unavailable route never swaps in an unrelated publication.');
+    assert.equal(page.window.location.hash, `#${id}/case-1`, 'The requested ID is not silently replaced.');
+  }
+  const page = await renderReport(source, `#${CORE}/case-1`);
+  page.navigate('#withdrawn-experiment');
+  assert.match(page.reportView.innerHTML, /data-report-unavailable/);
+  assert.equal(page.window.location.reloaded, undefined);
+  page.navigate(`#${CORE}/case-1`);
+  assert.match(page.reportView.innerHTML, /id="report-title"/);
+  assert.equal(JSON.stringify(source), before);
 });

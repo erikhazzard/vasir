@@ -32,7 +32,7 @@ function fixture(t) {
   return { directory, source, repo, write, config, template, artifact, stack };
 }
 
-test("five frozen selections survive canonical drift while immutable evidence retains its original root", t => {
+test("all seven frozen selections survive canonical drift while immutable evidence retains its original root", t => {
   const f = fixture(t);
   const snapshot = createSelectionSnapshot({ proofDirectory: path.join(f.directory, "proof"), publicationSourceRootDirectory: f.source, repoRootDirectory: f.repo });
   for (const selection of SELECTION_PATHS) {
@@ -40,11 +40,28 @@ test("five frozen selections survive canonical drift while immutable evidence re
     assert.equal(snapshot.readFileSyncImplementation(path.join(f.source, selection), "utf8"), JSON.stringify({ selection }));
   }
   const reloaded = loadSelectionSnapshot({ snapshotPath: snapshot.identity.path, expectedSha256: snapshot.identity.sha256, expectedSnapshotId: snapshot.identity.snapshotId });
-  assert.equal(reloaded.manifest.files.length, 5);
+  assert.equal(reloaded.manifest.schemaVersion, 2);
+  assert.equal(reloaded.manifest.files.length, 7);
+  assert.ok(reloaded.manifest.files.some(file => file.path === 'benchmarks/writing-compact-v1/publication.json'));
+  assert.ok(reloaded.manifest.files.some(file => file.path === 'benchmarks/storytelling-magic-discovery/publication.json'));
   const evidence = f.write(".agents/immutable.json", "original immutable evidence");
   assert.equal(reloaded.readFileSyncImplementation(evidence, "utf8"), "original immutable evidence");
   const buffer = reloaded.readFileSyncImplementation(path.join(f.source, SELECTION_PATHS[0])); buffer.fill(0);
   assert.match(reloaded.readFileSyncImplementation(path.join(f.source, SELECTION_PATHS[0]), "utf8"), /selection/);
+});
+
+test("historical five-selection snapshots retain their exact schema without admitting grafted selections", t => {
+  const f = fixture(t);
+  const snapshot = createSelectionSnapshot({ proofDirectory: path.join(f.directory, "proof"), publicationSourceRootDirectory: f.source, repoRootDirectory: f.repo });
+  const { snapshotId, ...legacy } = snapshot.manifest;
+  legacy.schemaVersion = 1;
+  legacy.files = legacy.files.filter(file => !['benchmarks/writing-compact-v1/publication.json', 'benchmarks/storytelling-magic-discovery/publication.json'].includes(file.path));
+  const save = manifest => f.write('proof/legacy.json', JSON.stringify({ ...manifest, snapshotId: crypto.createHash('sha256').update(JSON.stringify(manifest)).digest('hex') }), f.directory);
+  const legacyPath = save(legacy);
+  assert.equal(loadSelectionSnapshot({ snapshotPath: legacyPath }).manifest.files.length, 5);
+  legacy.files.push(snapshot.manifest.files.find(file => file.path === 'benchmarks/writing-compact-v1/publication.json'));
+  save(legacy);
+  assert.throws(() => loadSelectionSnapshot({ snapshotPath: legacyPath }), /Invalid selection snapshot/);
 });
 
 test("snapshot tampering, source-root substitution and newly created absent selections fail closed", t => {

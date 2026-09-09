@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "authorized-original-provider-output-capacity-evidence",
+  "authorization": "User requested: please try running the claude tests again, theres more usage now. Root authorizes at most 20 original recoverable Core idea Fable reviews at concurrency 4 after preservation tests pass.",
+  "accountContext": "Default Claude context; no configuration, token, API-key or provider endpoint override; no agent-initiated login or account switch",
+  "capacityEvidence": {
+    "benchmarkId": "dungeon-master-adventure-outline",
+    "archiveDirectory": ".agents/vasir-evals/dungeon-master-adventure-outline/completion-checkpoints/claude-first-success-20260909T0035Z",
+    "runSha256": "365ba80b08ddce85a1c5678ffc2ce6c1cdb623930304a30c87178917e142ffb1",
+    "rowKey": "claude:claude-fable-5-1@low::celebration::trial-1::skill:dungeon-master",
+    "completedAt": "2026-09-09T00:32:26.092Z",
+    "stdoutRelativePath": "expansion-evidence/writer/0012c7732ac061b7c7623444/attempt-1/stdout.jsonl",
+    "stdoutBytes": 78740,
+    "stdoutSha256": "774971ecec871a849651601abb1b34583ba95fe22d4c0f41e9e47190786851ca",
+    "model": "claude-fable-5-1",
+    "observations": {
+      "status": "allowed",
+      "isUsingOverage": false,
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "fiveHourUtilization": 0,
+      "sevenDayUtilization": 0.02,
+      "fableSpecificWeeklyWindow": null
+    }
+  },
+  "targetBenchmarkId": "storytelling-core-idea",
+  "targetRunId": "storytelling-core-idea-v1-2026-09-07",
+  "targetProvider": "claude",
+  "targetModel": "claude-fable-5-1",
+  "maximumCalls": 20,
+  "concurrency": 4,
+  "policy": "Use the exact original Fable judge configuration, prompts, schemas, candidate pairs and cohort. Exclude terminal policy failures and all completed reviews. Preserve protected and undispatched records at every checkpoint. This successful model-specific evidence is not a claim of unlimited capacity or availability of other Claude models. Stop on fresh quota/authentication failure; retain all attempts. Do not enable credits, purchase capacity, change accounts, substitute models, alter frozen experiments, or publish automatically."
+}

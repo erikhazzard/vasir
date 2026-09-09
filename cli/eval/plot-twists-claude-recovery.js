@@ -9,8 +9,9 @@ import { isStorytellingRequiredSkillReadReceiptCompatible } from './storytelling
 import { identifyStorytellingJudgeQuotaExhaustion } from './run-storytelling-benchmark.js';
 import { inspectRetainedWritingFailures } from './writing-provider-failures.js';
 import { retainedFailureIdentity, validateRecoveryConcurrency } from './plot-twists-operational-recovery.js';
+import { ARCHIVED_CLAUDE_CAPACITY_KIND, validateArchivedClaudeCapacityProof } from './writing-capacity-evidence.js';
 
-export const CLAUDE_RECOVERY_VERSION = 'plot-twists-claude-single-quota-recovery-v1';
+export const CLAUDE_RECOVERY_VERSION = 'plot-twists-claude-capacity-evidence-recovery-v2';
 export const CLAUDE_QUOTA_ROW = 'claude:claude-fable-5-1@high::scifi-outline::trial-3::skill:writing-storytelling';
 export const CLAUDE_QUOTA_STREAM = { path: 'provider-streams/5234239e-9886-485f-b14b-49d8e7d77650/stdout.jsonl',
   sha256: 'd220eef1a1175d835f860e55934d633ec31c0ba59de78798ea16dbd8caad984c', bytes: 146278 };
@@ -18,7 +19,11 @@ const REQUIRED = ['SKILL.md', 'references/twists-and-revelations.md'];
 const sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const generationEvidence = row => Object.fromEntries(Object.entries(row).filter(([key]) => !['score', 'scoreBasisHash'].includes(key)));
 
-export function validateClaudeCapacityProof(proof, { now = Date.now(), environmentVariables = process.env } = {}) {
+export function validateClaudeCapacityProof(proof, { now = Date.now(), environmentVariables = process.env, repoRootDirectory,
+  maximumCalls, concurrency } = {}) {
+  if (proof.kind === ARCHIVED_CLAUDE_CAPACITY_KIND) return validateArchivedClaudeCapacityProof(proof, {
+    now, environmentVariables, repoRootDirectory, maximumCalls, concurrency,
+    requiredModels: ['claude-fable-5-1', 'claude-opus-5'] }).verifiedAt;
   assert.equal(proof.kind, 'sanitized-read-only-capacity-receipt');
   assert.equal(proof.accountContext, 'unchanged default Claude context; no CLAUDE_CONFIG_DIR override');
   assert.equal(environmentVariables.CLAUDE_CONFIG_DIR, undefined, 'Claude context overrides are forbidden.');
@@ -178,7 +183,8 @@ export async function resumeTwistsAfterVerifiedClaudeCapacity({ repoRootDirector
   const priorInvocationIds = new Set(initial.executionHistory.map(item => item.id));
   const snapshot = JSON.parse(fs.readFileSync(path.join(directory, 'skill-snapshot.json')));
   validateTwistsCompletion({ run: initial, snapshot }); verifyFiles(initial, directory, repoRootDirectory);
-  const proofBytes = fs.readFileSync(proofPath), proof = JSON.parse(proofBytes), verifiedAt = validateClaudeCapacityProof(proof);
+  const proofBytes = fs.readFileSync(proofPath), proof = JSON.parse(proofBytes), verifiedAt = validateClaudeCapacityProof(proof, {
+    repoRootDirectory, maximumCalls: mode === 'quota-recovery' ? 1 : maxRows, concurrency });
   const failures = inspectRetainedWritingFailures({ run: initial, directory });
   const selected = mode === 'pending' ? selectClaudePendingPlans(initial, failures, maxRows)
     : [selectSingleClaudeQuotaPlan({ run: initial, failures, verifiedAt })];
@@ -193,7 +199,8 @@ export async function resumeTwistsAfterVerifiedClaudeCapacity({ repoRootDirector
   fs.mkdirSync(auditDirectory, { recursive: true, mode: 0o700 });
   const before = path.join(auditDirectory, `${id}.before.run.json`);
   fs.writeFileSync(before, initialBytes, { flag: 'wx', mode: 0o600 });
-  const sources = ['cli/eval/plot-twists-claude-recovery.js', 'cli/eval/plot-twists-operational-recovery.js', 'cli/eval/writing-provider-failures.js', 'benchmarks/storytelling-plot-twists/continue-claude.mjs'].map(file => {
+  const sources = ['cli/eval/plot-twists-claude-recovery.js', 'cli/eval/plot-twists-operational-recovery.js', 'cli/eval/writing-provider-failures.js',
+    'cli/eval/writing-capacity-evidence.js', 'cli/eval/dungeon-master-expansion-manifest.js', 'benchmarks/storytelling-plot-twists/continue-claude.mjs'].map(file => {
     const bytes = fs.readFileSync(path.join(repoRootDirectory, file)), retained = path.join(auditDirectory, `${id}.${path.basename(file)}`);
     fs.writeFileSync(retained, bytes, { flag: 'wx', mode: 0o600 });
     return { path: file, sha256: sha(bytes), retainedPath: path.relative(directory, retained) };

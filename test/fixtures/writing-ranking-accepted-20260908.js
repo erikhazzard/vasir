@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildWritingPublication } from '../../cli/eval/writing-publication.js';
+import { buildDungeonMasterPublication } from '../../cli/eval/dungeon-master-publication.js';
 
 // Preserve the exact four-ranked-model regression checkpoint independently of
 // later score backfills. These are retained immutable sources, not new scores.
@@ -30,8 +31,15 @@ selections.set(path.join(repo, `benchmarks/${magicId}/publication.json`), {
 });
 
 export function acceptedWritingRankingFixture() {
-  return buildWritingPublication({ repoRootDirectory: repo,
+  const options = { repoRootDirectory: repo,
     readFileSyncImplementation: (file, encoding) => selections.has(file)
       ? JSON.stringify(selections.get(file)) : fs.readFileSync(file, encoding)
-  }).projection;
+  };
+  const { publicRelease, catalog, catalogCoverage, writingScoreBasis, compactBenchmarks, ...projection } = buildWritingPublication(options).projection;
+  projection.additionalBenchmarks = {
+    'dungeon-master-adventure-outline': buildDungeonMasterPublication(options).projection
+  };
+  // The historical fixture predates the versioned catalog and compact editions.
+  // Keep its original score-selection semantics as well as its immutable scores.
+  return projection;
 }

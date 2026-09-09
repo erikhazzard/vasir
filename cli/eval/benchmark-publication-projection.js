@@ -10,7 +10,7 @@ import { normalizeBenchmarkReportData } from "./benchmark-report.js";
 import { VasirCliError } from "../cli-error.js";
 import { BENCHMARK_PUBLISH_TROUBLESHOOTING_DOCS_REF } from "../docs-ref.js";
 import { buildWorkSpecPublication, validateWorkSpecPublication, validateWorkSpecTrack, WORK_SPEC_TRACK_ID } from "./work-spec-publication.js";
-import { buildOverallPublication, validateOverallPublication } from "./overall-publication.js";
+import { buildOverallPublication, buildOverallWritingSource, validateOverallPublication } from "./overall-publication.js";
 import { buildGamesPublication, validateGamesPublication } from "./games-publication.js";
 import { buildWritingPublication, validateWritingSummary, serializeWritingModule } from "./writing-publication.js";
 import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE, WRITING_RESPONSE_ARCHIVES } from "./writing-response-archives.js";
@@ -1836,23 +1836,23 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
   });
 }
 
-export function validateBenchmarkPublicationProjection(projection) {
+export function validateBenchmarkPublicationProjection(projection, { writingSource = projection?.writing?.overallSource } = {}) {
   if (projection?.schemaVersion === 6 && projection.writing) {
     const { writing, ...existing } = projection;
-    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
     validateWritingSummary(writing);
     return projection;
   }
   if (projection?.schemaVersion === 5 && projection.games) {
     const { games, ...existing } = projection;
-    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
     validateGamesPublication(games);
     return projection;
   }
   if (projection?.schemaVersion === 4 && projection.overall && projection.aiWorkflows) {
     const { overall, ...sources } = projection;
     validateBenchmarkPublicationProjection({ ...sources, schemaVersion: 3 });
-    validateOverallPublication(overall, { engineering: sources, aiWorkflows: sources.aiWorkflows });
+    validateOverallPublication(overall, { engineering: sources, aiWorkflows: sources.aiWorkflows, ...(overall.scoreBasis?.edition === 'overall-v3' ? { writing: writingSource } : {}) });
     return projection;
   }
   if (projection?.schemaVersion === 3 && projection.aiWorkflows) {
@@ -2224,19 +2224,19 @@ export function validateBenchmarkPublicationProjection(projection) {
   return projection;
 }
 
-export function validateBenchmarkPublicationResponses(responseBundle, projection) {
+export function validateBenchmarkPublicationResponses(responseBundle, projection, { writingSource = projection?.writing?.overallSource } = {}) {
   if (projection?.schemaVersion === 6 && projection.writing) {
-    validateBenchmarkPublicationProjection(projection);
+    validateBenchmarkPublicationProjection(projection, { writingSource });
     const { writing, ...existing } = projection;
-    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
   }
   if (projection?.schemaVersion === 5 && projection.games) {
-    validateBenchmarkPublicationProjection(projection);
+    validateBenchmarkPublicationProjection(projection, { writingSource });
     const { games, ...existing } = projection;
-    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 });
+    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
   }
   if (projection?.schemaVersion === 4 && projection.overall) {
-    validateBenchmarkPublicationProjection(projection);
+    validateBenchmarkPublicationProjection(projection, { writingSource });
     const { overall, ...sources } = projection;
     return validateBenchmarkPublicationResponses(responseBundle, { ...sources, schemaVersion: 3 });
   }
@@ -2435,6 +2435,18 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
 
 export function serializeBenchmarkPublicationProjection(projection) {
   validateBenchmarkPublicationProjection(projection);
+  if (projection.overall?.scoreBasis.edition === 'overall-v3') {
+    // These are already validated, identical source collections. Store them
+    // once in the landing bundle, then restore the unchanged public shape.
+    // No fetch, score calculation, eligibility decision, or evidence omission
+    // occurs in the browser. Historical editions keep their original bytes.
+    const compact = structuredClone(projection);
+    const sourceCollections = ['families', 'tracks', 'benchmarks', 'results', 'benchmarkResults', 'benchmarkSummaries'];
+    delete compact.overall.program;
+    for (const key of sourceCollections) delete compact.overall[key];
+    const serialized = JSON.stringify(compact).replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
+    return `(function () {\n  'use strict';\n\n  const data = ${serialized};\n  const sources = [data, data.writing.overallSource, data.aiWorkflows];\n  data.overall.program = data.program;\n  for (const key of ${JSON.stringify(sourceCollections)}) data.overall[key] = sources.flatMap(source => source[key]);\n  window.VASIR_DATA = Object.freeze(data);\n}());\n`;
+  }
   const serialized = JSON.stringify(projection)
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
@@ -2542,6 +2554,11 @@ export function buildBenchmarkPublicationProjection({
     projection.schemaVersion = 6;
     projection.writing = writing.stub;
     projection.writing.responseArchives = Object.fromEntries(WRITING_RESPONSE_ARCHIVES.filter(item => item === WRITING_CREATION_ARCHIVE ? writingArchives.creation : writingArchives.additional?.[item.benchmarkId]).map(item => [item.benchmarkId, { href: item.href, globalName: item.globalName }]));
+    for (const id of Object.keys(writing.projection.compactBenchmarks ?? {})) projection.writing.responseArchives[id] = { href: './writing-responses.js', globalName: 'VASIR_WRITING_RESPONSES' };
+    if (workflows) {
+      projection.writing.overallSource = buildOverallWritingSource(writing.projection, projection);
+      projection.overall = buildOverallPublication({ engineering: projection, aiWorkflows: workflows.projection, writing: projection.writing.overallSource });
+    }
   }
 
   const basisSha256 = sha256(stableSerialize({

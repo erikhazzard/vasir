@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
+import { acceptedWritingRankingFixture } from './fixtures/writing-ranking-accepted-20260908.js';
 
 const app = fs.readFileSync(new URL("../site/vasirbenchmark.com/app.js", import.meta.url), "utf8");
 const CORE = "storytelling-core-idea";
@@ -133,24 +134,21 @@ test("changing the score keeps the current view, other query parameters and sele
   assert.match(app, /window\.location\.assign\(writingScoreHref\(event\.target\.value\)\)/);
 });
 
-test("the native score selector offers the aggregate, three tests and Dungeon Master inside the leaderboard", () => {
-  const fixtureContext = { window: {} };
-  vm.runInNewContext(fs.readFileSync(new URL('../site/vasirbenchmark.com/writing-data.js', import.meta.url), 'utf8'), fixtureContext);
-  const data = vm.runInNewContext(categorySource + '\nbuildWritingCategoryCollection(collection);', { collection: fixtureContext.window.VASIR_WRITING });
+test("the native score selector offers available scopes on scoring views without redundant basis text", () => {
+  const data = vm.runInNewContext(categorySource + '\nbuildWritingCategoryCollection(collection);', { collection: acceptedWritingRankingFixture() });
   const controlsSource = section('  const writingLeaderboardControlsMarkup', '  const capabilityHeaderFrameMarkup');
   const formatters = section('  const escapeHtml', '  const scoreFor');
   const html = vm.runInNewContext(formatters + controlsSource + '\nwritingLeaderboardControlsMarkup();', {
-    data, scoreBasis: data.scoreBasis, isWriting: true, TREATMENT_CONDITION_ID: 'skill',
+    data, scoreBasis: data.scoreBasis, isWriting: true, state: { capabilityMode: 'models' }, TREATMENT_CONDITION_ID: 'skill',
     RANKED_SETTING_COUNT: data.writingCategory.rankedSettingCount,
     benchmarkById: new Map(data.benchmarks.map(benchmark => [benchmark.id, benchmark]))
   });
-  assert.deepEqual([...html.matchAll(/<option value="([^"]+)"/g)].map(match => match[1]), ['storytelling', CORE, TWISTS, 'storytelling-magic-discovery', 'dungeon-master']);
+  assert.deepEqual([...html.matchAll(/<option value="([^"]+)"/g)].map(match => match[1]), ['all-writing', 'storytelling', CORE, TWISTS, 'storytelling-magic-discovery', 'dungeon-master']);
   assert.match(html, /<label[^>]*for="writing-score-selection"/);
-  assert.match(html, /<select[^>]*aria-describedby="writing-score-basis"/);
-  assert.match(html, /<option value="storytelling" selected>Storytelling aggregate/);
-  assert.match(html, /4 ranked · 3 equally weighted tests/);
-  assert.match(html, /Provisional/);
-  assert.doesNotMatch(html, /Outside cohort|Unranked settings|complete paired settings/);
+  assert.match(html, /<option value="storytelling" selected>Storytelling<\/option>/);
+  assert.doesNotMatch(html, /writing-score-basis|Past editions|3 equally weighted benchmarks/);
+  assert.doesNotMatch(html, /Provisional|Outside cohort|Unranked settings|complete paired settings|incomplete settings/);
+  assert.equal(vm.runInNewContext(controlsSource + '\nwritingLeaderboardControlsMarkup();', { isWriting: true, state: { capabilityMode: 'benchmarks' } }), '');
   const renderer = section('  const renderCapabilities', '  const plotPointSnapshot');
   assert.ok(renderer.indexOf('writingLeaderboardControlsMarkup()') > renderer.indexOf('id="capability-ranking"'));
 });

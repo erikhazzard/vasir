@@ -23,10 +23,13 @@ assert.equal(digest(fs.readFileSync(path.join(archive, 'skill-snapshot.json'))),
 assert.equal(digest(fs.readFileSync(path.join(directory, 'manifest.json'))), manifestHash, 'Frozen manifest changed.');
 const before = JSON.parse(beforeBytes), after = JSON.parse(afterBytes);
 verifyCoreJudgeOnlyRecovery(before, after);
+const plannedBatchIds = new Set(after.judging.batchPlan.batches.map(batch => batch.batchId));
 const judges = after.judging.judges.map(judge => ({
   configurationId: judge.configuration.id,
+  expectedPairReviews: plannedBatchIds.size,
   completedPairReviews: judge.batches.filter(batch => batch.status === 'complete').length,
-  missingPairReviews: judge.batches.filter(batch => batch.status !== 'complete').length,
+  missingPairReviews: [...plannedBatchIds].filter(id => !judge.batches.some(batch => batch.batchId === id && batch.status === 'complete')).length,
+  recordedUnsuccessfulPairReviews: judge.batches.filter(batch => batch.status !== 'complete').length,
   individualAssessments: judge.batches.reduce((sum, batch) => sum + (batch.status === 'complete' ? batch.evaluations.length : 0), 0)
 }));
 const { projection } = projectWritingRun({ run: after, snapshot: JSON.parse(skillBytes), sourceSha256: digest(afterBytes) });

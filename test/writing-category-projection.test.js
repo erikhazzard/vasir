@@ -70,6 +70,22 @@ function addProvisional(source, configurations) {
   return source;
 }
 
+test('half-tenth display rounding tolerates arithmetic ULPs without quantizing exact scores or ranks', () => {
+  const values = { below: [70, 81.1499999999], tieUlp: [70, 81.14999999999999], tie: [70, 81.15], above: [70, 81.1500000001] };
+  const collection = publication('a', 'storytelling', values);
+  collection.benchmarkPublications = ['b', 'c'].map(id => ({ projection: publication(id, 'storytelling', values) }));
+  const result = build(collection);
+  const expected = deriveExpectedWritingCategory(collection);
+  verifyCandidateCategoryProjection(result, expected);
+  for (const [identity, display] of [['below', 81.1], ['tieUlp', 81.2], ['tie', 81.2], ['above', 81.2]]) {
+    const actual = entryFor(result, identity);
+    assert.equal(actual.score, display);
+    near(actual.exactScore, values[identity][1]);
+  }
+  assert.ok(entryFor(result, 'above').rank < entryFor(result, 'tie').rank);
+  assert.ok(entryFor(result, 'tie').rank < entryFor(result, 'below').rank);
+});
+
 test('accepted regression checkpoint ranks four common-test settings and retains all 33 available means', () => {
   const before = JSON.stringify(published);
   const result = build(published);
@@ -167,9 +183,9 @@ test('accepted regression checkpoint ranks four common-test settings and retains
 test('accepted regression score choices retain Core 31, Twists 4, Magic 33 and Dungeon Master 1 without altering source totals', () => {
   const result = build(published);
   assert.deepEqual(result.writingCategory.selections.map(selection => [selection.id, selection.completedSettingCount]), [
-    ['storytelling', 4], [storyIds[0], 31], [storyIds[1], 4], [storyIds[2], 33], ['dungeon-master', 1]
+    ['all-writing', 1], ['storytelling', 4], [storyIds[0], 31], [storyIds[1], 4], [storyIds[2], 33], ['dungeon-master', 1]
   ]);
-  assert.deepEqual(result.writingCategory.selections.map(selection => [selection.rankedSettingCount, selection.partialSettingCount]), [[4, 29], [31, 0], [4, 0], [33, 0], [1, 0]]);
+  assert.deepEqual(result.writingCategory.selections.map(selection => [selection.rankedSettingCount, selection.partialSettingCount]), [[1, 32], [4, 29], [31, 0], [4, 0], [33, 0], [1, 0]]);
   for (const [id, count, provisional] of [[storyIds[0], 31, true], [storyIds[1], 4, false], [storyIds[2], 33, false], ['dungeon-master-adventure-outline', 1, false]]) {
     const selected = build(published, id);
     assert.equal(selected.coverage.completedSettingCount, count);

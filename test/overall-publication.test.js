@@ -12,7 +12,9 @@ import { buildBenchmarkPublicationProjection, validateBenchmarkPublicationProjec
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const built = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO });
 const sources = { engineering: built.projection, aiWorkflows: built.projection.aiWorkflows };
-const overall = built.projection.overall;
+// Retain the historical edition's full regression contract even though the
+// normal publication build now also supplies the registered Writing source.
+const overall = buildOverallPublication(sources);
 const expectedTasks = ["hyper-scale-chat", "personalized-home-feed", "device-telemetry", "work-spec-chat"];
 const within = (actual, expected) => assert.ok(Math.abs(actual - expected) <= Number.EPSILON * Math.max(1, Math.abs(actual), Math.abs(expected)) * 16, `${actual} differs from ${expected}`);
 const canonicalValue = value => Array.isArray(value)

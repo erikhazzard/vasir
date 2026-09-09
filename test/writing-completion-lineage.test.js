@@ -79,7 +79,12 @@ test('current Writing selections are unchanged or descend from retained original
     const previous = prior.find(item => item.benchmarkId === selected.benchmarkId);
     if (selected.sha256 === previous.sha256) assert.deepEqual(selected.sources, previous.sources);
     else {
-      assert.equal(selected.lineage.answersAndCompletedReviewsPreserved, true);
+      if (selected.lineage.kind === 'declared-writing-source-replacement') {
+        assert.equal(selected.benchmarkId, 'storytelling-plot-twists');
+        assert.equal(selected.lineage.edition, 'storytelling-plot-twists-paired-v2');
+        assert.equal(selected.lineage.originalEvidencePreserved, true);
+        assert.equal(selected.lineage.priorAnswersAndReviewsReused, false);
+      } else assert.equal(selected.lineage.answersAndCompletedReviewsPreserved, true);
       assert.equal(selected.lineage.previousSelection.sha256, previous.sha256);
       assert.deepEqual(selected.lineage.previousSources, previous.sources);
     }
@@ -87,8 +92,7 @@ test('current Writing selections are unchanged or descend from retained original
 });
 
 test('completion coverage derives 33-setting counts from actual cells, not historical constants', () => {
-  const selection = JSON.parse(fs.readFileSync('benchmarks/storytelling-plot-twists/publication.json', 'utf8'));
-  const snapshot = JSON.parse(fs.readFileSync(selection.skill.path, 'utf8'));
+  const snapshot = JSON.parse(fs.readFileSync('.agents/vasir-evals/storytelling-plot-twists/publication-snapshots/ac7128bdbeec86d7bb144c19f3fc778fda91ba4b9afdfea0a0c3f004ee3e8cac/skill-snapshot.json', 'utf8'));
   const parentPath = '.agents/vasir-evals/storytelling-plot-twists/publication-snapshots/97d1172df61311ca493c53ef99d193d607652de9bc0827bba2d3d6ca3fb41399/run.json';
   const { run } = createTwistsCompletion({ parentSource: fs.readFileSync(parentPath, 'utf8'), snapshot, runId: 'lineage-unit-test', frozenAt: '2026-09-08T00:00:00.000Z' });
   const projection = projectWritingRun({ run, snapshot, sourceSha256: 'unit-test' }).projection;
