@@ -1,288 +1,163 @@
 ---
 name: testing__enforcing-mandate
-description: Chooses durable test retention and the cheapest credible proof seam. Use when the requested work is test strategy or test authorship, not temporary bug reproduction or routine test execution.
-tools: Read, Grep, Glob, Edit, Write
+description: Designs and writes great tests. Use in conjuction when writing code, tests, or editing tests
 ---
 
-# S-Tier Testing & Shipping Prompt (Repo Agent)
- Your job is to ship **value** safely, quickly, and repeatedly.
-**Prime directive:** More **good** tests at the **right seam** increase shipping velocity. Bad, flaky, redundant, or implementation-coupled tests reduce it.
+# Prove Real Journeys and Make App States Reproducible
 
-**Place in the system.** This is the durable-test strategy layer. It independently chooses `reuse | tighten | add | no durable test`, then the cheapest credible seam/size. Root §5 owns proportional proof. A substantial journey uses an eval-plan gate only when durable proof coordination is genuinely warranted; defect reproduction is owned by `$code__fixing-bugs` and does not itself require permanent retention. This skill writes or tightens tests only when the stable risk warrants them; it is not an independent-review audit lens.
+**A useful test fails when the user's journey breaks. A useful test setup lets a human open the same real app in the same state.**
 
----
-## 0) Operating Principle
-Before touching code, state the outcome in one sentence:
-> **What capability must remain true for a user or downstream system after this change?**
-Everything else follows from that.
-Examples:
-- Good: `A player can reconnect mid-match and continue with correct state.`
-- Good: `A shopper can complete checkout and receive an order confirmation.`
-- Bad: `ReplayDecoder.parseEvents handles event type 7.`
-- Bad: `Added tests for CheckoutService.`
-Then frame the test work like this:
-> `This validates [user journey / system workflow]. Within that, it protects [critical step]. The next obvious thing a user or system will try is [next step].`
-If that next step is not already guarded, call it a gap.
----
-## 1) Reality Rules
-### Repo truth > everything
-- The repository is the source of truth.
-- Verify behavior in code, tests, docs, and configs before claiming it.
-- Follow root §1 precedence and explicit ownership. A local `AGENTS.md` may identify repo-specific risk/fidelity, but a lower authority does not win by accumulating stricter machinery.
-- Cite exact **file paths** and, when available, **line ranges** for claims about existing behavior or patterns.
-### Evidence-first thinking
-Before deciding:
-- Question the premise: what must stay true?
-- Separate facts from assumptions.
-- Label assumptions explicitly with risk.
-- Compare an alternative only when the proof choice materially changes confidence, cost, or product behavior; do not manufacture decision theater.
-### What before how
-Describe the observable outcome before mechanism.
-If someone could not build a different implementation from your description and still satisfy it, you described mechanism instead of outcome.
----
-## 2) What “Done” Means
-A meaningful change is “done” only when:
-1) The **core value path** has risk-proportionate confidence at the cheapest stable seam that preserves the behavior at risk.
-   - Reuse an existing sufficient guard before adding or tightening anything.
-   - A new test is optional when inspection or existing proof catches the plausible failure; “no new test” is a valid strategy decision, not a waiver.
-   - Browser, integration, contract, property, and small in-process tests are selected by failure mode, never by user visibility or code location alone.
-   - On a substantial lane, record only the surviving proof conclusion in the work spec; use an eval-plan gate only when durable coordination is warranted. Quick-change evidence stays inline unless later inspection or human review needs a retained artifact.
-2) Plausible material catastrophic regressions map to sufficient existing evidence, a warranted guard, or an authorized narrowed claim; applicable classes include:
-   - ordering
-   - idempotency
-   - retries
-   - auth/ACL
-   - bounds/TTL/pagination
-   - concurrency/races
-   - performance budgets
-   - migration/read-shape compatibility
-3) The code has one clear runtime path.
-   - Default: no lingering flags and no permanent dual implementations (root §9).
-   - Exception: a flag or dual path is allowed only if it is part of the public contract, or required for a bounded migration/release step.
-   - Every exception must include:
-     - why it exists
-     - what test covers each path
-     - who removes it
-     - when it is removed
-4) Operability is accounted for:
-   - how we know it’s healthy
-   - how we know it’s broken
-   - what rollback/recovery looks like
----
-## 3) Value Path ≠ Test Size
-Do not confuse **importance of outcome** with **size of test**.
-A **value-path proof** is the smallest credible proof that an important user or system outcome still works. It is not automatically a browser test, and it is not automatically a tiny in-process test.
-Choose the test size that proves the contract at lowest cost:
-- **Small**: in-process, no network, deterministic, fast.
-- **Medium**: local real services or realistic adapters, no external network.
-- **Large**: multi-process or browser / external-ish harness, highest confidence, highest cost.
-A new durable test is warranted only when all are true:
-- it protects a stable user/system contract;
-- a plausible regression would cause meaningful harm;
-- no existing guard already catches that failure;
-- the chosen seam is the cheapest one that preserves the risky semantics;
-- its expected confidence repays execution and maintenance cost.
+Optimize for continued correctness and fast iteration, not test counts. Protect the actual experience, make difficult states cheap to reach, and delete complexity that no longer earns its place. A green suite that bypasses the broken app is not evidence that the app works.
 
-Zero new tests is the correct answer when any condition fails. When a test is warranted, use **contract tests** for wire/service-contract risk, **property/invariant tests** for ordering, duplicates, replay safety, pagination, normalization, and state machines, and smaller tests where they improve speed or diagnosis without duplicating confidence. Browser automation is first-class only when the claim can fail because of browser-specific interaction, routing/history, hydration, accessibility semantics, responsive behavior, canvas/WebGL, or browser-owned orchestration. Static copy, markup, or styling does not earn Playwright merely because a user can see it.
----
-## 4) How to Choose the Right Test
-Use this decision order every time:
-### Step 1: Identify the value path
-Define:
-- actor
-- entrypoint
-- success condition
-- what a user/system would notice if it broke
-### Step 2: Decide whether a durable test is warranted
-Ask:
-- Is this already protected by an existing test?
-- Can I tighten or extend that test instead of adding a new one?
-- What realistic failure and harm would a new test catch?
-- Would inspection or an existing targeted check catch it more cheaply?
-### Step 3: Pick the cheapest stable seam that preserves the risk
-Prefer:
-- browser / full-screen eval for browser-specific experience risk
-- public API / route handler
-- worker / job entrypoint
-- CLI / message boundary
-- adapter / official contract boundary
-Avoid private helpers unless no real boundary exists.
-### Step 4: Pick the smallest size that preserves reality
-- Use browser/journey tests for real user workflows, orchestration, or visual/interaction truth.
-- Use public API/subcutaneous tests when they prove the same risk more cheaply.
-- Use contract tests for integrations you do not control.
-- Use smaller in-process behavior tests for stable domain modules with meaningful public interfaces.
-### Step 5: If the material failure needs one, add the right special guard
-- **External API**: contract test or sandbox record/replay; no routine live external calls.
-- **Concurrency / ordering / retries / idempotency**: invariant/property tests with fixed seeds and bounded cases.
-- **Failure containment**: report the exact bad subject and, for each independently valuable scope the fault could plausibly threaten, prove it remains usable—for example siblings, selected verified state, unrelated requests, or process health. Do not invent irrelevant scopes or preserve a broader outage merely because existing code or tests currently produce one.
-- **Legacy / hard-to-test code**: characterization only when behavior uncertainty is material, then the smallest seam.
-- **Migration**: test both old and new readable states if needed, with explicit removal plan.
-- **Hot path**: add or update performance proof only for a sourced budget or observed material symptom.
-- **Replay / kernel determinism** (root §2): prove identical replay from seed + intents across the restore boundary and a later checkpoint or final hash, not final state alone.
-Do not add a larger test only because it feels safer. Do not add a smaller test when the real risk is orchestration across boundaries.
----
-## 5) Test Philosophy
-### Test the outcome, not the implementation
-Good:
-- `player can relive their match and see accurate replay timing`
-- `host migrates when current host disconnects mid-match`
-Bad:
-- `calls ReplayParser.parseFrame 14 times`
-- `mocks StateStore and verifies setSnapshot was called`
-### Tests are living documentation
-A new engineer should be able to read the tests and understand:
-- what the feature does
-- what must never break
-- where the edges are
-### Interaction assertions are allowed only when the interaction is the contract
-Examples:
-- a message is emitted to an external queue with a required shape
-- a webhook is sent exactly once
-- a payment provider request has a required contract
-Otherwise prefer observable outputs and public reads.
-### No tombstone tests
-Do not add or preserve tests whose primary oracle is that a removed artifact stayed absent. This applies across UI, API, backend, data, infra, and internal code: removed buttons/pages/copy/classes, endpoints/routes/handlers, jobs/workers, events/messages, DB fields/tables/indexes, cache keys, config/flags, enum values, log/metric names, module boundaries, function calls, or implementation paths.
-Do not test source text, AST shape, private locals, variable names, function names, class names, component internals, or import paths just to prove a removed implementation detail is gone.
-When removing functionality, delete obsolete tests or rewrite them around the surviving/replacement value path. Do not memorialize the removed surface unless absence is itself the approved product, security, privacy, or compatibility contract.
-Allowed absence assertions must protect a named positive contract:
-- unauthorized action unavailable
-- PII/secrets not exposed
-- destructive or privileged mutation blocked
-- duplicate event/job/write not emitted
-- retired public endpoint returns the specified 404/410 behavior
-- deprecated input rejected at a public compatibility boundary
-Every negative assertion must state the positive contract it protects and the user/system harm it prevents. If it cannot, remove the assertion.
-### Watched-red and durable retention are separate
-Never “fix and hope.” `$code__fixing-bugs` first reproduces the escaped behavior faithfully at the real boundary when feasible, using the cheapest deterministic action: existing check, temporary script, replay, literal request, controlled manual action, or durable test. When pre-fix reproduction is unsafe or disproportionate, it preserves the exact observed failure and limitation. This skill separately chooses `reuse | tighten | add | no durable test` from stable-contract risk and maintenance value.
----
-## 6) Determinism and Signal Quality
-Determinism is mandatory.
-- No sleeps, busy-waits, or unbounded polling.
-- Bound retries, streams, scans, pagination, and generators.
-- No shared mutable fixtures across cases.
-- No leaked timers, sockets, servers, browser contexts, or clients.
-- No background fire-and-forget promises in tests.
-- Treat unhandled rejections as failures.
-- No real external network in routine CI tests.
-- Make randomness seeded and reproducible.
-- On property tests, print the seed on failure and bound case count, depth, and size.
-Every test must justify its **signal-to-cost** ratio:
-- What real risk does it catch?
-- Why is this seam the right seam?
-- Why is this not redundant with an existing test?
-- What would fail if this test were removed?
-If you cannot answer those, the test is probably low value.
-Flaky tests are system alarms, not background noise. Never normalize flake.
----
-## 7) Realism, Mocks, and Contracts
-Default posture (the full test-double fidelity ladder and the integration-test definition are single-homed in `$code__enforcing-principles`; this is the strategy-level summary):
-- Prefer real local services, realistic adapters, or high-fidelity fakes over mocks for core infrastructure semantics.
-- Use mocks/stubs narrowly for uncontrollable boundaries or to force rare failure modes that are otherwise impractical.
-- Any non-real dependency in a meaningful test must include:
-  - why it is not real
-  - where the real behavior is validated elsewhere
-For third-party APIs:
-- Prefer sandbox + record/replay or contract tests.
-- Store recorded fixtures with provenance and refresh guidance.
-- Lock request shape, required fields, response shape, and error semantics.
-In this repo, backend dependency selection resolves through the canonical adapter seam (root §2), not ad-hoc test wiring.
----
-## 8) Test Data and Isolation
-Treat test data like production design, not junk drawers.
-- Use minimal, explicit fixtures.
-- Prefer builders with domain meaning over generic plumbing.
-- Keep datasets bounded and easy to inspect.
-- Avoid hidden shared state and “mystery guest” fixtures.
-- Protect privacy: no secrets, no PII, no production dumps.
-- Namespace data so tests can run in parallel safely.
-- Clean up state or use isolated scopes per test.
----
-## 9) Legacy Code Protocol
-When code is hard to test, first identify whether behavior uncertainty is material and whether an existing guard is sufficient. Add characterization only for unknown behavior whose accidental change would matter; then use the smallest reachable boundary and seam needed for the approved refactor. Do not create a testability project merely because legacy code is awkward.
----
-## 10) Performance and Operability
-### Performance
-Before changing hot paths, state expected effect on:
-- network round trips
-- command count
-- allocations
-- serialization work
-- per-message / per-frame CPU
-Default posture:
-- batch first
-- avoid N×await
-- keep memory bounded
-- avoid unnecessary object churn in hot loops
+**Place in the system.** This skill owns test selection, authorship, reusable scenario setup, and bounded simplification within the approved change. Read the actual repository instructions and existing launch/test conventions before acting. The governing workflow owns approval, release policy, and defect investigation; independent review remains independent. Do not invent root section numbers, tools, commands, or neighboring policies. Feed conclusions into existing work artifacts rather than creating another gate or report.
 
-A wall-clock performance contract becomes a measurement-first gate in the eval plan (sourced budget, workload ladder, falsifier), not a fragile timing assertion in routine CI.
-### Operability
-Every meaningful change must specify:
-- **Healthy signals**: metrics, counters, logs, or observable outputs that prove the change works
-- **Broken signals**: the clearest failure indicators
-- **Rollback shape**: what reverting means and what data remains
-No per-message log spam on hot paths.
-No secrets or PII in logs.
----
-## 11) Coverage Policy
-Coverage is **mandated as a diagnostic**, not as the target.
-Use it to answer:
-- What critical path has no guard?
-- Which branch is untested in a risky area?
-- Where did a refactor create a blind spot?
-Do **not**:
-- chase percentages with low-value tests
-- claim a change is safe because coverage went up
-- optimize for line count over confidence
-A high-risk value path with poor coverage is a problem.
-A high coverage number with weak assertions is also a problem.
----
-## 12) Workflow
-Approval and lane sizing come from root §§3–4; this skill never creates an extra stop. Work in vertical behavior slices, but let proof ordering follow the change type (root §5):
+## 1. Define Correctness, Then Prove the Whole Journey
 
-1. **Frame the slice:** observable outcome, risky boundary, current guard, and whether a new durable test is warranted.
-2. **Choose potency:**
-   - defect → reproduce watched-red at the escaped boundary before fixing when feasible and proportionate; otherwise preserve the exact observed failure and run the strongest focused post-fix check;
-   - refactor → run an existing sufficient guard or add characterization only for unknown behavior before restructuring;
-   - new/intentionally changed behavior → implement in the natural order; do not manufacture an absence-red;
-   - critical new invariant → after the guard exists, demonstrate a realistic falsifier through targeted mutation, adversarial input, property, or invariant proof.
-3. **Implement the smallest coherent slice.** Do not anticipate tests or machinery that the material risk does not warrant.
-4. **Rerun the chosen proof after each meaningful refactor.** Keep the guard behavior-first, deterministic, at the risk-preserving seam, and resilient to internal restructuring.
+Describe the claim in one sentence:
 
-No-new-test slices still name the existing proof or inspection that carries confidence and why a durable test would be redundant or uneconomic.
----
-## 13) Required Result, Proportional
-Return the smallest form that preserves the decision:
+> Given [meaningful starting state], [actor] enters through [real entrypoint], performs [action], and can observe [successful result].
 
-- observable outcome and risky boundary;
-- current guard and the test decision (`reuse | tighten | add | no new test`);
-- chosen seam/size and why it is the cheapest credible proof;
-- proof ordering (`watched-red | characterization | natural-order + mutation/falsifier if critical | existing evidence`);
-- exact commands/results, anything not run, and remaining risk.
+**Define correctness before implementing behavior.** Establish the observable contract, plausible consequential failures, and the outcomes that distinguish them from success. Keep this local to the behavior slice, not an exhaustive failure catalog or separate planning document.
 
-For a substantial lane, place only the surviving conclusion in the owning work spec and use an eval plan only when durable proof coordination is warranted; do not repeat it as chat ceremony. When tests changed, name each test and whether it was reused, tightened, added, replaced, or deleted.
----
-## 14) Anti-Patterns: Stop and Rethink
-- Writing tests that assert private methods or internal calls by default
-- Adding a new browser/E2E test when an existing journey test already proves the path
-- Adding a tiny unit test when the real risk is orchestration across boundaries
-- Claiming safety from coverage numbers alone
-- Accepting flaky tests as normal
-- Unbounded loops, waits, scans, or generators in tests or code
-- Creating new dependencies without explicit approval
-- Keeping migration flags or dual paths without removal ownership
-- Fixing a production bug without the cheapest faithful pre-fix reproduction that is feasible, or treating watched-red as automatic permanent-test retention
-- Manufacturing a failing test that proves only a new surface does not exist
-- Requiring browser or integration proof because the change is user-visible or backend code
-- Adding a durable test whose stable risk and maintenance value do not warrant it
-- Writing a test whose removal would not meaningfully reduce confidence
-- Writing tombstone tests that only prove removed UI/API/backend/data/implementation artifacts stayed absent
----
-## 15) North Star
-You are not paid in test count.
-You are paid in **continued correctness under change**.
-Protect the core value path.
-Use the cheapest stable seam that preserves the risk.
-Choose the cheapest credible proof.
-Prefer real user behavior when it matters.
-Make the suite fast enough to trust and strong enough to matter.
+**Never let the implementation define its own correctness.** Do not finish code and then generate unit tests that mirror its branches, methods, mocks, or current output. Expected results must come from the approved contract or independent evidence. Tests for newly discovered failures are welcome: establish the correct outcome independently, then add or tighten the appropriate guard. Existing code or tests do not authorize preserving a defect.
+
+**Default to E2E as the sole automated behavioral-test layer for application features.** Reuse or extend an existing real journey first. Unit, component, and integration tests are not default companion deliverables; a focused test must earn an exception under Section 5. This default does not replace repository-required static checks or other governing obligations.
+
+Trace that path through the actual app before choosing tests. Find the normal boot path, state authority, relevant boundaries, existing scenario setup, and assertions that already protect the result. Repository facts require repository evidence; cite actual paths when reporting them.
+
+**For a meaningful changed app journey, exercise the real app from the relevant starting state through the result.** Do this early enough to expose a broken boot or disconnected flow before investing in lower-level tests. Reuse an existing journey first. UI claims need the actual UI runtime; a route-handler test cannot establish that a screen loads, submits correctly, or renders the response. A service-only or CLI claim starts at that system's real entrypoint; do not invent a UI to call it end-to-end.
+
+Keep the application's own wiring real: startup, routing, hydration, state management, rendering, action handling, orchestration, and persistence where relevant. Do not mount a disconnected component, inject the expected final store, or mock the request being investigated and call that proof of the journey. Use isolated local infrastructure and controlled external boundaries; live production dependencies are not a prerequisite for meaningful end-to-end proof.
+
+Assert the user's result and the consequential system effect, not merely a click, HTTP success, callback, or nonempty DOM. When persistence is part of the claim, refresh, reconnect, or read through a public boundary to distinguish saved state from optimistic UI. Include the next action when it is necessary to establish that success is usable, not as an excuse to test unrelated journeys.
+
+For UI work, inspect the rendered experience as well as functional assertions. Check the relevant screen for blank or broken rendering, hidden or blocked controls, missing assets, and material runtime errors. Canvas, WebGL, native, and device-dependent behavior require evidence from an appropriate runtime; DOM presence alone does not prove pixels or interaction. A screenshot alone does not prove the workflow either. Name any runtime or visual limitation rather than silently substituting a weaker claim.
+
+**Fidelity wins first. Optimize speed among proofs that preserve the failure mechanism.** A focused test cannot replace the app journey or silently narrow its claim. Prepare irrelevant history directly instead of clicking through it; do not send every input permutation through the UI.
+
+## 2. Make the Starting State Launchable
+
+Treat state setup as shared development infrastructure, not disposable test boilerplate:
+
+> Prepare an isolated scenario → boot the normal app → exercise the real behavior → observe the result.
+
+The same scenario preparation must support **automated assertions and an interactive app a person can use**. Tests may tear it down; a development launch must keep it available until explicitly reset or stopped. Do not maintain separate fictional worlds for tests and manual debugging.
+
+**Make any relevant state constructible on demand; do not enumerate every possible combination.** Use small, explicit recipes and domain parameters. State includes more than database rows: identity and permissions, session, route, local storage or cached state, authoritative server state, and—when the failure depends on them—time, randomness, other actors, connectivity, or event history. Distinguish valid reachable states from intentionally invalid or partial states used to prove recovery.
+
+**Seed prerequisites, never the result under test.** Direct setup can skip irrelevant history; it must not skip the behavior being proved. Seed an account to test purchasing, but perform the purchase through the actual app. To test account creation, start before account creation. A race, transition, or reconnect failure needs the relevant events and ordering, not just a snapshot of the eventual state.
+
+Reuse or simplify the repository's canonical fixtures, seed mechanism, normal launcher, and dependency seams. When the capability is missing, implement the smallest shared setup entrypoint and human-launch path needed for the current slice. Expose ordinary domain parameters rather than a new scenario language, registry service, dashboard, or second application architecture. Add concrete states as work needs them; do not turn one journey into a platform rewrite.
+
+Setup may write through existing domain builders, supported APIs, or schema-valid persistence fixtures when those writes are not the behavior under test. After preparation, the app must use its normal runtime behavior. Avoid test-only business branches, alternate stores, pre-rendered success screens, and doubles that erase the risky semantics.
+
+Keep preparation explicitly non-production, isolated, repeatable, and safe to reset. Use synthetic data and test identities; never expose an unrestricted seed/reset/auth-bypass endpoint or wipe shared data. Seed on explicit preparation/reset, **not on every page load**: automatic reseeding can conceal failed persistence. Return the actual launch command or URL, scenario identity, relevant parameters, and reset/cleanup instructions. Never fabricate a command because the repo lacks a launcher.
+
+Read [App-state scenarios](references/app-state-scenarios.md) when building or changing preparation, interactive launch, reset, stateful reproduction, or evidence capture. A reusable launcher can be worth retaining even when no additional automated test is warranted: count the repeated navigation and data-preparation work it eliminates.
+
+## 3. Simplify the System, Not Just the Test
+
+Within the approved slice, **remove unnecessary production code as well as tests and fixtures**. When redundant state, an obsolete fallback, duplicate implementations, or needless coordination creates the testing difficulty, prefer eliminating that difficulty over adding another seam, adapter, mock, or synchronization layer around it. Preserve approved observable behavior and supported contracts; do not redefine the product merely to make proof easy.
+
+Before a behavior-preserving refactor, use an existing sufficient guard. Add narrowly scoped characterization only when important existing behavior is uncertain. Then simplify, rerun the surviving journey, and remove the obsolete tests and supporting machinery together. Do not turn awkward legacy code into an unrelated testability project.
+
+Inspect the affected proof surface for subtraction even when adding no tests. A test of a deleted invalidation mechanism does not earn retention because it already exists. Keep overlapping tests only when they catch a distinct failure, materially improve diagnosis, or provide a meaningfully faster feedback loop.
+
+Do not write tombstone tests whose main assertion is that removed source code, routes, buttons, fields, flags, or private calls stayed absent. Protect the surviving contract instead. Absence remains legitimate when it is the product, security, privacy, or compatibility obligation—for example no unauthorized mutation, no secret disclosure, no duplicate charge, or an explicitly retired public endpoint's specified response.
+
+Reduce concepts and maintenance, not just lines. Share irrelevant construction; keep the distinguishing inputs and expected results visible. Several readable tests can be simpler than a configurable scenario engine with hidden assertions. Do not chase negative line counts by deleting distinct protection.
+
+Bounded migration machinery needs an explicit removal condition and owner under repository policy. A deliberately supported public contract does not acquire an artificial expiration date just because it has more than one path.
+
+## 4. Decide What Proof Earns Retention
+
+Before crediting an existing guard, ask:
+
+> What materially wrong implementation could still pass this test?
+
+The setup must activate the risk, the assertion must observe its harm, and the expected result must come from the approved contract—not from running the same production logic again. Exercising a function, route, or screen is not the same as distinguishing correct behavior from a plausible failure.
+
+Choose `reuse | tighten | add | no new test`:
+
+- **Reuse** when an existing guard actually detects the relevant failure in the relevant state.
+- **Tighten** when an existing journey or assertion has a specific hole. Repair its setup, action, or oracle rather than adding another superficially similar test.
+- **Add** when a stable, materially valuable contract remains unprotected and the guard repays its execution and maintenance cost. Include saved reproduction and interactive-development effort in that judgment.
+- **No new test** when current proof is sufficient, the change does not alter a meaningful behavior, or durable retention genuinely costs more than the protection it buys. Name the evidence and limitation. Inspection can support a bounded internal or nonbehavioral change; it cannot establish an unexercised app journey.
+
+Pruning obsolete proof is part of every option, not a fifth workflow. A new scenario recipe and a new test are separate retention decisions; neither automatically requires the other.
+
+When deciding whether today's observation needs a durable guard, weigh future consequences: severity, plausible recurrence or edits, how easily wiring can drift, how hard the state is to reconstruct, and whether people would have to rediscover the failure manually. Favor a durable guard for important, repeatedly changed, non-obvious journeys. Favor existing proof or bounded inspection for low-consequence changes already caught cheaply. No invented score, test-count target, or probability threshold is required.
+
+A faithful temporary reproduction does not automatically deserve permanent retention. Conversely, calling a guard expensive does not authorize declaring a consequential, unproved journey safe. Use the governing workflow for an explicitly narrowed claim when credible proof cannot be obtained.
+
+## 5. Make Isolated Tests Earn an Exception
+
+**Do not add unit, component, or integration tests by habit.** Before writing a focused test, name the material failure the E2E scenarios cannot expose with adequate determinism, precision, or input coverage. Identify the missing observation or control. A class, a coverage target, or cheaper execution alone does not justify another layer. If the journey already proves the risk, stop.
+
+**For an isolated behavior slice: failure model → tests → implementation.** First establish its public contract, plausible consequential failure modes, and the outcome that distinguishes each failure from correct behavior. Write the corresponding tests before implementing or changing that slice. Work incrementally, not through every imagined failure upfront. When a new failure is discovered, update the contract or cases before changing the implementation. For existing code, establish intended behavior before modifying it; do not confuse characterization with approval of a defect.
+
+The focused proof supplements the real journey; it does not replace it. The following are exception cues, not a menu of mandatory companion suites:
+
+| Risk | Proof choice and boundary |
+|---|---|
+| App startup, navigation, interaction, rendering, or cross-boundary state flow | Keep this at the normal app entrypoint with real actions. Isolating a component cannot prove missing wiring. |
+| Material rule violations outside the sampled journey inputs | Use contract-derived examples or bounded properties at the public domain boundary for the named input-coverage gap. |
+| Storage transactions, ordering, retries, concurrency | Use controlled overlap or action sequences when E2E cannot reliably expose the material failure. Preserve real storage/protocol semantics; sequential calls against a fake do not prove race safety. |
+| An external service you do not control | Validate a changed or unproved provider-contract assumption at the canonical boundary. Use existing representative evidence and a controlled local substitute where appropriate; state what remains unverified against the provider. |
+| Performance or resource limits | Use a representative launchable workload and a sourced budget or observed symptom. Do not invent a fragile wall-clock CI assertion. |
+
+An end-to-end claim ends at explicitly identified substituted boundaries. Never describe a mocked provider integration as verified against that provider. Inherit trustworthy repository fidelity evidence rather than demanding new paperwork for every established fixture. Add validation when the changed assumption or missing evidence actually requires it.
+
+Use existing test-size conventions only to describe execution requirements and cost; a larger harness does not automatically provide stronger evidence. Do not add a second large journey when the existing one already proves the same failure.
+
+Read [Proof patterns](references/proof-patterns.md) for an earned exception involving concurrency, properties, replay, containment, migration, external contracts, performance, or a difficult retention decision.
+
+## 6. Execute for Fast, Trustworthy Feedback
+
+For a defect, preserve a faithful pre-fix reproduction when feasible and proportionate through the governing defect workflow. Do not replace the observed failure with a convenient smaller one. New contract tests may precede runnable code, but a missing symbol, scaffold failure, or absent feature is not an observed behavioral failure. Do not manufacture one as proof; verify that the assertions discriminate correct behavior once the path is executable. For a critical new invariant, demonstrate a realistic counterexample when practical: a targeted fault, adversarial case, or bounded mutation must fail for the intended reason. Do not institute a mutation-testing program for every assertion.
+
+Control causes rather than elapsed time. Use existing controllable clocks, completion signals, bounded condition waits, and explicit interleavings where needed. Avoid arbitrary sleeps, busy-waits, shared mutable fixtures, leaked resources, and unhandled asynchronous work. A fixed random seed does not control a concurrent schedule. Capture the state recipe, seed or minimized case, and relevant action order when generated testing fails.
+
+Routine regression proof should be bounded, isolated, reproducible, and independent of live external services. Separate broader exploratory generation from the stable regression loop. Reuse existing generators when useful; do not create fuzzing infrastructure unless discovery is part of the approved work. A valuable discovered failure should reduce to a small reproducible scenario or example.
+
+Run the focused journey and affected supporting checks after meaningful changes. Optimize setup, reuse safe application processes, and isolate per-scenario state before deleting relevant fidelity or papering over flake with retries. Do not share mutable accounts or caches to make parallel tests appear faster. Follow existing suite policy rather than inventing a full-suite gate for every edit.
+
+Run the interactive launch too when adding or changing that capability: open the prepared state, verify the real action, and check that explicit reset reproduces it. A headless test passing does not establish that a person can open the scenario. Do not report a launcher, test, reset, renderer, or device path as verified unless it was exercised.
+
+## 7. Leave Evidence and a Runnable Reproduction
+
+**Every E2E run produces a machine-generated result linked to its reproducible scenario.** Record the actual code/build identity, relevant runtime, scenario recipe and parameters, and exact rerun command. Preserve the seed and action ordering when they affect reproduction. Use native runner metadata and attachments, not a parallel reporting system. Incomplete execution is not a pass.
+
+**Feature-verification runs leave inspectable evidence of the actual journey and result.** Use the existing report, trace, relevant screenshots, public effects, or equivalent runtime evidence sufficient to inspect the claim. Capture during execution, not only after the final assertion. Register finalization before the journey, preserve diagnostics on preparation, startup, action, assertion, or teardown failure, and save evidence before disposing of state where possible. Evidence capture must not suppress the test failure or prevent cleanup.
+
+**Evidence shows what happened; reproduction makes it happen again.** Link the same scenario's working interactive launch and reset path. A trace or screenshot is not a substitute for reconstructible state and executable actions. A seed without the relevant runtime, state, or event history is not a complete reproduction.
+
+Keep a lightweight result for every run and richer evidence for feature verification and failures. Do not mandate full videos or traces for every passing test forever, create a reporting framework, or expose secrets in artifacts. State any unavailable evidence or unexercised rerun path rather than inventing it. See [App-state scenarios](references/app-state-scenarios.md) for capture, finalization, and rerun details.
+
+## 8. Recognize the Difference
+
+**Green internals, broken app.** A mocked state store returns a running match and a component test sees a score. This proves neither app startup nor reconnection. Instead, prepare a running server-side match plus the relevant stale client state, boot the normal app, reconnect through the real interaction, and observe the authoritative score and next valid action. Use that same preparation to open the scenario interactively. Add focused protocol tests only for named material gaps in the journey's determinism, precision, or input coverage.
+
+**Preparation is not proof.** A scenario inserts a completed order and a browser sees confirmation. That can prove confirmation rendering; it cannot prove checkout. For checkout, prepare the cart and identity, act through checkout, then establish the approved order effect and displayed result. Keep third-party substitution limits explicit.
+
+**Deletion instead of compensation.** An approved refactor removes a redundant cache and its invalidation coordination. Protect the surviving read-after-write journey, delete obsolete invalidation tests and unused fixtures, and reuse the launchable state. Do not add a mock cache layer to preserve the removed design or a source-text test to celebrate its absence.
+
+## Anti-Patterns
+
+- **Green mocks, broken app** → the test removed the risky assembly → boot the real app and exercise the journey.
+- **Implementation first, mirror tests afterward** → the code chose its own definition of correctness → establish the contract and failures independently; for isolated slices, write tests before implementation.
+- **Every feature gets every test layer** → companion suites accumulate without a distinct risk → default to E2E only and require a named gap before adding a focused test.
+- **Seeded success** → setup performed the action being tested → seed only prerequisites, then perform the action for real.
+- **Tests and dev use different worlds** → failures cannot be inspected faithfully → share preparation and normal runtime paths.
+- **Everything through clicks** → slow, brittle setup hides the useful action → prepare irrelevant history directly and keep the tested behavior real.
+- **A new layer to test the previous layer** → complexity compounds → simplify or remove the unnecessary mechanism within scope.
+- **Arbitrary-state framework before a useful state** → imagined generality replaces leverage → ship a small launchable scenario with ordinary parameters first.
+- **"Covered" without a discriminating assertion** → execution is mistaken for evidence → identify the wrong result that must make the guard fail.
+- **Screenshots without a runnable state** → evidence cannot be reproduced → preserve the scenario, actions, runtime, and working launch/reset path.
+- **Artifacts only after success** → the failure destroys its own evidence → capture during execution and finalize before cleanup.
+
+## Result
+
+Return the smallest useful account of the journey and state, retention decision, relevant deletions, exact commands and observed results, native artifact paths, and unverified boundaries. Name the concrete gap for any added isolated test. For E2E or scenario work, include the scenario's working interactive launch and reset path with the necessary non-secret parameters. Distinguish authored from executed, observed evidence from runnable reproduction, and automated from visually or manually verified. Keep durable conclusions in the existing owning artifact; the runner's result and evidence do not require a separate prose testing report.
+
+**Define the behavior and its failures first. Prove it through the real app. Leave evidence you can inspect and a scenario you can run. Delete what no longer earns its cost.**
