@@ -1105,15 +1105,15 @@
     },
     {
       "name": "testing__enforcing-mandate",
-      "description": "Chooses durable test retention and the cheapest credible proof seam. Use when the requested work is test strategy or test authorship, not temporary bug reproduction or routine test execution.",
+      "description": "Designs and writes great tests. Use in conjuction when writing code, tests, or editing tests",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
         "SKILL.md",
-        "evals/README.md",
-        "evals/suite.json"
+        "references/app-state-scenarios.md",
+        "references/proof-patterns.md"
       ],
       "path": ".agents/skills/testing__enforcing-mandate",
       "entry": "SKILL.md"
@@ -1155,7 +1155,7 @@
     },
     {
       "name": "writing__authorial-voice",
-      "description": "Establishes opinionated authorial voice. Use when writing player facing content",
+      "description": "Writes in an opinionated authorial voice. Use when writing player / user facing content",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
