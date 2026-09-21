@@ -1,5 +1,5 @@
 ---
-name: writing
+name: writing__authorial-voice
 description: Establishes opinionated authorial voice. Use when writing player facing content
 ---
 

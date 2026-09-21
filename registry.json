@@ -129,13 +129,16 @@
     },
     {
       "name": "code__auditing",
-      "description": "Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, it owns the canonical report while invoking mandatory domain handoffs. Explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.",
+      "description": "Audits code for causal simplification, perf, dev ux, risk. Use when reviewing code or changes",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "README.md",
+        "SKILL.md",
+        "evals/cases.md",
+        "references/calibration-examples.md"
       ],
       "path": ".agents/skills/code__auditing",
       "entry": "SKILL.md"
@@ -168,13 +171,14 @@
     },
     {
       "name": "code__fixing-bugs",
-      "description": "Fixes defects through the escaped user or system boundary, using the cheapest faithful reproduction that is feasible and a focused post-fix check. Trigger: confirmed defects, regressions, flaky/heisenbug hunts, or replay/kernel divergence; not speculative hardening or new behavior.",
+      "description": "Diagnoses and repairs bug. Use when fixing bugs, regressions, intermittent failures",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "references/special-cases.md"
       ],
       "path": ".agents/skills/code__fixing-bugs",
       "entry": "SKILL.md"
@@ -1072,7 +1076,7 @@
     },
     {
       "name": "skills__create-skill",
-      "description": "Designs, rewrites, audits, and debugs reusable agent skills through precise routing and decision-changing expertise. Use when creating skills, fixing triggers, choosing granularity, pruning manifests, or extracting durable doctrine.",
+      "description": "Designs, rewrites, audits, and debugs reusable agent skills by encoding expert judgment into decision steering. Use when creating skills, extracting durable doctrine, fixing triggers, choosing granularity, or pruning manifests.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1147,6 +1151,19 @@
         "SKILL.md"
       ],
       "path": ".agents/skills/ui__revamping-game-shell-ui",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "writing__authorial-voice",
+      "description": "Establishes opinionated authorial voice. Use when writing player facing content",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md"
+      ],
+      "path": ".agents/skills/writing__authorial-voice",
       "entry": "SKILL.md"
     },
     {

@@ -1,5 +1,5 @@
 ---
-name: create-skill
+name: skills__create-skill
 description: Designs, rewrites, audits, and debugs reusable agent skills by encoding expert judgment into decision steering. Use when creating skills, extracting durable doctrine, fixing triggers, choosing granularity, or pruning manifests.
 ---
 
