@@ -1,6 +1,6 @@
 ---
-name: audit-code
-description: Audits implemented code for correctness, causal simplification, performance, developer experience, and release risk. Use when reviewing code or changes, assessing merge safety or production readiness, or finding a better maintained design. Explicitly named specialist-only audits stay with that specialist. Review only, not implementation.
+name: code__auditing
+description: Audits code for causal simplification, perf, dev ux, risk. Use when reviewing code or changes
 ---
 
 # Auditing Code for Simplicity, Performance, and Correctness

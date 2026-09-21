@@ -1,96 +1,80 @@
 ---
 name: code__fixing-bugs
-description: >-
-  Fixes defects through the escaped user or system boundary, using the cheapest faithful reproduction that is feasible and a focused post-fix check.
-  Trigger: confirmed defects, regressions, flaky/heisenbug hunts, or replay/kernel divergence; not speculative hardening or new behavior.
+description: Diagnoses and repairs bug. Use when fixing bugs, regressions, intermittent failures
 ---
 
-# Fixing Bugs — The Journey Contract
+# Fixing Bugs
 
-Bugs are contract breaches, not broken functions: players feel broken flows. Name the breached user/system outcome, reproduce it faithfully at the escaped public boundary when feasible, make the smallest fix, and check that same outcome now works. The reproduction may be an existing check, temporary script, replay, literal request, log-correlated action, controlled manual action, or durable test; test creation is a separate decision.
+**Restore the breached contract, not merely a green check. Reproduction strengthens evidence; it is not permission to fix.**
 
-**Place in the system.** This skill owns defect reproduction, evidence-led localization, the minimal fix, and the focused post-fix result. It never creates a durable test, eval plan, harness, raw bundle, or postmortem merely because a bug exists. Use `$testing__enforcing-mandate` only when tests will change or durable-retention judgment is genuinely non-obvious. Preserve a postmortem only when the user asks or the multi-hypothesis diagnosis would be materially expensive or dangerous to re-derive.
+A bug is a broken user or system outcome. Locate its cause, make the simplest complete repair, and verify that outcome without suppressing legitimate behavior. Minimize lasting complexity, not just the number of changed lines.
 
----
+**Place in the system.** This skill owns diagnosis, repair, and focused verification. Honor diagnosis-only requests; repair guidance does not authorize mutations beyond the task. Follow the governing repository instructions for operational authority, canonical backend selection, simulation policy, and close-out. Read any needed rule not already in context; do not infer unavailable rules or numbered sections. Missing context limits only the decisions that depend on it.
 
-## The Journey Contract
+## Name the breach
 
-For a simple bug, actor, port, and Trigger → Expected → Actual may be one compact sentence. Expand only when the diagnosis needs it:
+For a simple bug, one sentence is enough: **actor and goal; real entry point; trigger → expected → actual**. Inspect available code, state, and traces before asking for missing evidence. Ask only when an unknown contract or fact actually changes the repair.
 
-- **Actor + Goal:** who is harmed; what outcome is broken.
-- **Port:** the real entry point the repro will drive — API route, message topic, SDK method, CLI/job, kernel tick sequence, UI action. Never internal functions.
-- **Trigger → Expected → Actual:** the breach, one line each.
-- **Disallowed outcomes:** add only material harms beyond the symptom — data loss, duplicate side effects, stale state, silent corruption.
-- **Proof points:** the public observation that shows the defect and the focused post-fix result.
+Add disallowed harms or protocol guarantees only when material: duplicate effects, data loss, ordering, acknowledgment after commit, isolation, recovery, or time bounds. Do not fill out a worksheet or list irrelevant guarantees.
 
-**Required only when the bug touches a pipeline, queue, or stateful flow:** name *only* the relevant guarantees from the protocol's contract vocabulary — delivery, idempotency, ordering, atomicity/ack ordering, isolation, recovery, time bounds. Omit the rest; never scaffold with N/A.
+Distinguish product, environment/configuration, dependency, and harness failures. A broken harness establishes neither product failure nor product success. If harm is ongoing or state is already damaged, apply the [containment guidance](references/special-cases.md#containment-and-damaged-state); do not assume a code fix repairs existing damage.
 
-If actor, port, and breach are unclear, inspect logs/code or request the missing evidence before guessing.
+## Establish the cause
 
-```md
-Example — avatar not rendering after match join:
-- Actor + Goal: player expects their custom avatar visible on match join.
-- Port: MatchLobby.onPlayerJoin() client callback.
-- Trigger: join with a custom avatar equipped.
-- Expected: avatar mesh loads and renders within 2s. Actual: default avatar; asset never requested.
-- Disallowed: crash, stale avatar from a previous match, invisible player.
-- Proof: asset request fired for the correct avatar ID; render callback invoked; visual capture matches.
-(No pipeline semantics — this is a client asset-loading bug.)
-```
+**Observe red when feasible and safe.** Choose the smallest faithful action through the affected real entry point: an existing check, literal API/CLI/job request, replay, temporary script, controlled manual action, integration check, or full user journey. These are alternatives, not stages to exhaust. The failure must be the reported contract breach, not missing setup or a broken harness.
 
----
+Do not bypass the failed path by invoking an internal helper. A lower seam is sufficient only when it includes the causal behavior and observes the breached outcome. Use the simulation harness first for kernel/replay faults; use the browser or actual UI when presentation, browser behavior, or user-flow wiring is implicated. An asset request succeeding does not establish that the player's avatar is visible.
 
-## Reproduction Selection (commit to one smallest faithful seam)
+Preserve the relevant initial data state and execution conditions. Reuse existing fixtures, scenario setup, and canonical dependency wiring instead of creating parallel infrastructure. Once a faithful failure exists, shrink inputs and steps without removing the mechanism that makes it fail.
 
-Choose the lowest seam that drives the real port, reproduces the breach for the intended reason, observes outcome/invariants, and stays deterministic: existing failing check; literal API/CLI/job request; replay or simulation; temporary script; controlled manual user action with correlated terminal evidence; contract/service/workflow integration; journey E2E only when the defect exists solely there. Never default to E2E or bypass the port to call internals. Kernel/replay bugs use the simulation harness first; the browser is authority only when presentation/browser semantics are implicated. Record whether the reproduction is temporary or proposed for durable retention.
+**Patch unreproduced defects when the evidence supports the cause and repair.** Code against a known contract, correlated traces, recorded state, or direct observations can justify a fix without recreating the original occurrence. Explain which transition violates the invariant and why the proposed change corrects it. Do not build a harness merely to manufacture a pre-fix red.
 
----
+A credible competing explanation matters when it would require a different repair. In that case, gather evidence that separates the explanations; do not demand exhaustive elimination of every imaginable cause. Scale investigation to uncertainty and blast radius, not a fixed evidence quota.
 
-## Hard Rules
+When the cause remains unsupported, do not make a speculative behavior change. Identify the next discriminating fact or add narrowly scoped diagnostic instrumentation within the repository's rules. Inability to reproduce does not erase an observed defect, and a quiet rerun does not establish a fix.
 
-1. **Watched-red when feasible and safe.** Before the fix, prefer the smallest deterministic action that drives the escaped port and fails for the intended reason. A missing-API or broken-harness red proves nothing. If the escaped failure is already directly observed but cannot be reproduced safely or deterministically without disproportionate machinery, preserve that exact observation, make the smallest evidence-backed fix, and run the strongest focused post-fix check available. Do not build a harness merely to satisfy ordering.
-2. **No imaginary semantics.** Assertions are externally observable — response, persisted state, emitted events, queue outcomes. Never assert internal calls, log lines, or timing quirks; never certify behavior that cannot happen in production.
-3. **Real dependencies, honest exceptions.** Real local backing services by default (the fidelity ladder decides); backend selection resolves through the repo's canonical seam (root §2), never ad-hoc test wiring. For a true third-party dependency: move the boundary to the nearest port you control, test that contract faithfully, and state explicitly which semantics are covered vs. deferred.
-4. **Determinism over drama.** No sleeps — bounded polling with explicit deadlines. Seed randomness, control time, use barriers/latches for concurrency. Isolate state (unique ids/namespaces); teardown always runs.
-5. **Minimal fix, one path** (root §9). The smallest change that satisfies the contract. Never "fix" by widening timeouts or adding generic retries unless the contract requires it and the test proves it. Refactor only after green, only where it increases durability, never as drive-by cleanup (root §8).
-6. **Preserve the causal scar** (root §9). When a non-obvious fix leaves a reasonable-looking change that would reopen the escaped failure, put the required causal-history comment beside the surviving constraint before close-out.
+### Choose experiments that change the next decision
 
----
+Separate observations from explanations. Name the difference to explain between working and failing cases. For the live explanations, identify what would disprove them and choose the cheapest safe observation or intervention whose outcomes distinguish them. Predict the relevant outcomes before running it; when none fits, revisit the assumptions instead of layering on a patch.
 
-## Diagnosis Discipline (no narrative debugging)
+Use known-good comparisons, boundary pre/postconditions, selective instrumentation, controlled interleavings, or regression bisection when they discriminate. Do not require a hypothesis table for an obvious defect or continue reducing a reproduction after the cause and repair are clear.
 
-- **Attribute before fixing** (root §3): an environment artifact "fixed" as a product bug is a wasted lane.
-- Separate **verified facts** from **hypotheses**; every hypothesis carries its falsifier — what observation would disprove it. Name the **difference to explain**: what differs between the working and failing cases.
-- Locate the fault line with evidence — confirm pre/postconditions at boundaries, rule alternatives out with falsifiers; don't feel your way.
-- **Minimize after red** (delta-debugging): shrink payloads, setup, and steps; reduce concurrency to the minimal pattern that still fails, or prove the race is required. Preserve the minimal trigger and critical public observations; encode them as a durable test only when the stable regression risk warrants it.
-- When the hunt exposes several ruled-out causes or misleading signals, preserve the compact diagnosis facts in the work spec; create a postmortem only when the user asks or re-deriving the diagnosis would be materially costly or dangerous.
+Internal logs, assertions, counters, and call traces are useful **diagnostic evidence**. They do not substitute for **acceptance evidence** at the breached boundary. The place that reveals the fault, the place that owns the repair, and the place that proves the outcome need not be the same.
 
----
+*Example — supported without reproducing the incident:* the contract requires acknowledgment after commit; reachable code and a correlated operation trace establish the reverse order. Repair the ordering and check it through the real request path with a controlled delayed commit. Report that the incident itself was not replayed. An unexplained error-rate spike alone would not justify that patch.
 
-## Special Bug Classes
+## Make the simplest complete repair
 
-- **Concurrency / distributed / async:** the reproduction must contain the race or fault — parallel calls, concurrent messages, worker restart, retry delivery, crash mid-flight. Deterministic concurrency (barriers, latches, bounded deadlines); assert invariants over outcomes (no duplicates, no early ack, no partial commit), never "the timing happened to work."
-- **Performance regressions:** prefer **structural cost invariants** over wall-clock — bounded external calls ("no N+1: query count ≤ N"), bounded allocations, bounded payload sizes. A true wall-clock contract becomes a measurement-first gate via the eval plan (controlled workload, warmup, statistical threshold, non-default lane) — never a single fragile timing in default CI.
-- **Replay / kernel divergence** (this repo's signature class — root §2): the reproduction is a recorded seed + tick-indexed intents through the simulation harness, asserting at the restore boundary **and** a later checkpoint or final hash — final-state-only equality hides reconverged drift. Watch for the guardrail signals (`[idv deterministic math] Redirected Math.*`, `DET_NONDETERMINISM_FORBIDDEN_API`): they localize the illegal callsite. The fix never relaxes determinism; presentation-only nondeterminism escapes exist solely per root §2's list.
-- **Heisenbugs:** first make the system reproducible — seed, freeze time, add barriers, minimize. If it remains irreproducible, report `Diagnosis: UNRESOLVED — no mutation made`, never a pass or a successful fix: do not guess and do not patch. Keep the product claim `RED` when the escaped defect is directly evidenced, otherwise `UNVERIFIED`; an unresolved diagnosis does not erase known harm or invent proof. Preserve the best-known journey contract and escaped observation; list the exact missing inputs (payloads, call/message sequence with concurrency, env/config, versions/commits, correlated logs/traces, data fixtures, timing constraints), the specific instrumentation needed to capture them, and the recovery owner/next action that can make another attempt evidentially meaningful.
+Fix the state transition or invariant at its owner, rather than compensating at each caller. Prefer deleting an invalid branch, duplicated state, or obsolete workaround over adding another guard, retry, cache, or fallback. Remove superseded paths where they belong to this repair; preserve required behavior and compatibility.
 
----
+A larger local change can be simpler than a tiny patch that adds a second mechanism. Restructure what the causal repair requires, but do not turn a bug fix into a speculative redesign. Optional adjacent cleanup waits until verification; unrelated cleanup stays out.
 
-## Durable Retention After Green
+Never obtain green by swallowing an error, skipping required work, serializing away a required concurrency case, or silently weakening the contract. Retries and changed timeouts are repairs only when the contract and diagnosis justify them, with their relevant failure semantics checked.
 
-Invoke `$testing__enforcing-mandate` only when tests will change or the durable-retention choice is materially non-obvious. It may reuse or tighten an existing guard, add one durable journey-shaped test, or choose no durable test when the temporary reproduction plus existing evidence is sufficient. Nearby failure modes are added only when they protect the same plausible material harm. When a test is warranted, contract-first names remain preferred:
+**Check the valid behavior your patch could exclude.** When changing rejection, deduplication, caching, fallback, exception suppression, or early-return logic, exercise the closest legitimate case newly at risk. A deduplication fix must still permit distinct valid work; a rejection fix must still admit the adjacent valid input. Otherwise expand checks only for plausible material harm from this change—not an exhaustive neighboring-case matrix. These checks need not become permanent tests.
 
-- `does_not_acknowledge_message_until_side_effects_committed`
-- `delivers_purchase_receipt_once_for_idempotency_key`
-- `rejects_invalid_payload_without_poisoning_queue`
-- `replays_identically_across_restore_boundary_and_final_hash`
+When a necessary, reasonable-looking constraint would be easy to remove and reopen the defect, leave a concise causal comment beside it: the failure condition and why the constraint is necessary. Do not narrate obvious code or preserve a dead workaround as a historical monument.
 
----
+## Verify the outcome faithfully
 
-## Done (bug-specific instance of root §5's checklist)
+Rerun the same faithful reproduction after the repair when available. Otherwise run the strongest focused post-fix check possible and state which part of the escaped failure was not recreated. Do not call an unrun check passed or a substitute check an incident reproduction.
 
-- When feasible, the same faithful reproduction went red before the fix and green after it. Otherwise the exact escaped observation and strongest focused post-fix check are both recorded with their limitation.
-- Every claimed invariant maps to a public observation; deferred semantics are explicit.
-- When durable retention needed a decision, record `reuse | tighten | add | no durable test` and why. Any changed test is deterministic, isolated, bounded, and run with its relevant command.
-- Update the work spec only when the diagnosis changes a durable contract, blocker, rung boundary, or claim boundary. Harness defects are not product red.
-- Close-out per root §5, including commands/actions not run and reviewer focus.
+Observe the required outcome or contract invariant: response, persisted state, emitted effect, queue result, replay state, or visible behavior. Check affected guarantees, not only disappearance of an error. Retain existing relevant checks; extend verification when the repair's reach warrants it.
+
+Use real local backing services by default through the repository's canonical selection mechanism. If a true third-party dependency is unavailable, exercise the nearest controlled port faithfully and identify the semantics that remain unverified. Stubs or internal measurements cannot silently certify the deferred behavior.
+
+Control nondeterminism without deleting the triggering conditions. Use seeded randomness, relevant clock control, barriers/latches, isolated state, and bounded polling with explicit deadlines—not arbitrary sleeps. Cleanup must run even when a check fails. Temporal, replay, and performance claims need the applicable evidence described in the reference below.
+
+## Finish without manufacturing work
+
+Use `$testing__enforcing-mandate` when tests will change or durable retention is genuinely non-obvious; read it before relying on its rules. Reuse or tighten an existing guard when sufficient. A durable test is warranted by lasting regression risk, not by the existence of a bug. A temporary reproduction plus existing coverage can be enough. If the sibling is unavailable, follow accessible repository testing rules and state only the affected limitation.
+
+Use the existing work context. No automatic new spec, harness, eval plan, raw evidence bundle, postmortem, or mandatory report. Preserve costly-to-rederive diagnosis compactly where the work is already tracked; create a separate postmortem only when requested or when that compact record cannot preserve materially costly or dangerous findings. Persist contract or claim-boundary changes only where the repository already owns them.
+
+Close out in the repository's normal form. Make clear what was broken, why this repair addresses it, what actions actually ran and showed, and any meaningful unchecked behavior or remaining damage. Include reviewer focus when useful. A simple repair should have a simple close-out; do not manufacture statuses, evidence tables, or empty headings.
+
+**Missing reproduction limits the verification claim—not an evidence-backed repair. No machinery merely to satisfy a ritual.**
+
+## Specialist reference
+
+Read only the applicable section of [Special-case debugging](references/special-cases.md) when dealing with intermittent failures, concurrency/retries/recovery, replay/kernel divergence, performance regressions, or ongoing harm. Ordinary defects do not require the reference. It supplies diagnostic techniques, not another workflow or required artifact.
