@@ -1,283 +1,165 @@
 ---
-name: code__auditing
-description: Audits a scoped code change for practical release readiness using concrete evidence, supported user journeys, current deployment reality, change attribution, and cost-both-ways severity calibration. Use as the lead for unqualified code-audit requests, paired with audit-ai-code-accretion under root §6; for focused code review, merge safety, production readiness, correctness, general performance, or hardening requests, it owns the canonical report while invoking mandatory domain handoffs. Explicitly named specialist audits stay with their specialist. Exhaustive hypothetical hardening is opt-in only.
-tools: Read, Grep, Glob, Write
+name: audit-code
+description: Audits implemented code for correctness, causal simplification, performance, developer experience, and release risk. Use when reviewing code or changes, assessing merge safety or production readiness, or finding a better maintained design. Explicitly named specialist-only audits stay with that specialist. Review only, not implementation.
 ---
 
-# Auditing Code for Proportionate Release Risk
+# Auditing Code for Simplicity, Performance, and Correctness
 
-Find defects worth acting on. Possibility is not priority. A release blocker must be reachable in supported reality, materially threaten the declared unlock, and justify the remediation cost.
+Review as the engineer who will inherit the system and make its next consequential change. Reconstruct the supported outcome and its constraints before accepting the implementation's explanation. Look for the decision that creates the need for downstream machinery, not merely defects inside that machinery. The target is excellent maintained code—not the smallest diff, a passing happy path, or the most elaborate architecture.
 
-This is an audit skill, not a code-writing skill. Inspect and report; never rewrite the audited product code.
+**Core principle: before improving a mechanism, ask what would make it unnecessary. Prefer the smallest faithful system, not the smallest patch.**
 
-## Place in the audit family
+## Quality priorities
 
-Root §6 owns first-match request classification; do not duplicate its phrase matrix here. When it selects the standard paired audit, or an explicitly combined review containing both code/release and accretion:
+Preserve required behavior, security, privacy, data integrity, determinism where contracted, lifecycle ownership, recovery, compatibility, and evidenced performance constraints. Within those obligations, prefer fewer independently maintained concepts, clearer ownership, less unnecessary work, and a more direct developer path.
 
-- this skill owns the canonical report, severity, and `SHIP` / `SHIP WITH NOTES` / `NO-SHIP` recommendation;
-- invoke `$audit-ai-code-accretion` in `EMBEDDED` mode against the same boundary;
-- use its `CHANGESET` mode for a scoped change, or the narrowest explicitly named journey, subsystem, or repository mode; never widen coverage merely because the request says "code audit";
-- structural findings remain simplification recommendations unless their underlying harm independently passes this skill's release-severity gate.
+- **Lasting design over immediate convenience.** Accept more investigation and a broader causal slice to find the right design. Do not invent deadline pressure, recommend a stopgap to ship sooner, or defer a demonstrated material improvement merely because it requires more work. Implementation effort informs safe sequencing; it is not evidence that the current design is good.
+- **Total burden over line count.** Judge state, authorities, paths, modes, dependencies, runtime work, operational obligations, and knowledge callers must carry. More local code can be simpler when it removes hidden coupling. Less local code can be worse when it exports complexity to callers, configuration, infrastructure, or tests.
+- **Concrete excellence over theoretical perfection.** Demand a named improvement to the supported system. Do not create frameworks, mandatory benchmarks, scorecards, or speculative hardening to make a review look rigorous. A clean audit is valid; no deletion quota exists.
 
-A focused request selected by root §6 uses this skill alone except for the mandatory domain handoff below. A named specialist audit routes to that specialist. Other additional lenses run only when the user explicitly names them; do not load every installed audit skill merely because it exists.
+Use four competing perspectives, not four separate reports: the **maintainer** asks what can disappear; the **invariant reviewer** asks what must survive; the **performance reviewer** asks what work is actually required; the **API consumer** asks what the next developer must understand, coordinate, and wait for. Resolve disagreements with the supported constraints and inspected evidence, not an average score.
 
-One narrow domain handoff is mandatory: when the inspected diff touches Three.js / Rapier per-frame or per-tick work, invoke `$code__threejs-rapier-performance` as the static hot-path guard against the same boundary. It returns domain evidence into this audit rather than a separate report; this skill retains the canonical findings, severity, and `SHIP` / `SHIP WITH NOTES` / `NO-SHIP` recommendation.
+## Authority, composition, and inputs
 
-## Operating lenses
+This is a read-only review. Do not modify audited code, tests, specs, configuration, generated sources, or gate state. Audit permission does not authorize implementation or deletion. Use the existing repository; preserve parallel work. The orchestrator owns final acceptance and any report persistence.
 
-Apply all six together:
+Read the actual governing `AGENTS.md` / `CLAUDE.md` and applicable scoped contracts. They own routing, approval, custody, proof obligations, and completion. Do not assume section numbers or runtime rules from another repository. Preserve an explicit caller restriction; report a material conflict rather than silently expanding authority.
 
-- **User-journey value:** Does the issue break the actual unlock or a supported caller contract?
-- **Evidence and reachability:** Can the claimed failure occur in the current code, topology, and product path?
-- **Systems correctness:** Are state ownership, concurrency, I/O, recovery, security, and bounds sound for the declared risk tier?
-- **Failure truth:** Under root §9, does each failure preserve valid state and independent value while exposing the honest unavailable, degraded, pending, denied, or failed outcome—or does empty data, hidden UI, a swallowed error, blocked work, or a successful no-op falsely look green?
-- **Proportionality and simplicity:** Is the proposed remedy cheaper and safer than the expected harm?
-- **Expert counterfactual and skeptical review:** Apply root §9 to every implemented choice under review: name why the best expert in that field would reject it, if they would, and report the concrete gap through the ordinary evidence and severity gates. State every trade-off the implementation takes. Finding no rejection reason is valid; inventing one is not.
+**Default composition once this audit is selected:** apply `$audit-ai-code-accretion` to the same declared outcome and causal boundary, including focused correctness, merge-safety, and performance reviews. This is a required structural pass, not a requirement to spawn another agent. A caller explicitly requesting only a named specialist remains with that specialist. An explicitly limited terminal handoff stays limited; return findings to its existing owner without a rival report.
 
-## Select the audit mode
+- The accretion specialist owns its definitions, consumer checks, justification-island method, classifications, and report card. Read and apply its actual instructions; do not clone its rubric here. Use its supported `CHANGESET`, `JOURNEY`, `SUBSYSTEM`, or repository-sweep mode to match actual coverage. Embed its evidence in this report; use an `EMBEDDED` interface only when the installed skill defines one.
+- When the inspected boundary contains Three.js / Rapier per-frame or per-tick work, apply `$code__threejs-rapier-performance` as the domain static guard. Its evidence feeds this review; it does not independently set release severity.
+- Other specialist reviews are selected by a material domain uncertainty or an explicit request, not by listing every installed skill. Record what each applied lens resolved.
+- If a required specialist cannot be resolved, state the missing coverage. Continue the analysis supported by available evidence; never claim the specialist ran, reconstruct its private rubric, or issue an unqualified acceptance over its unreviewed material boundary.
 
-Use **Release Audit** by default.
+Independent reviewers receive the candidate code/diff, repository location, supported outcomes, constraints, relevant proof, and explicit exclusions—not the author's trajectory or preferred verdict. Treat any supplied diagnosis as a hypothesis. Independent review requires an actually independent reviewer context; applying multiple lenses in one context is not independent corroboration.
 
-Use **Deep Hardening Audit** only when the caller explicitly asks for exhaustive, paranoid, adversarial, red-team, God-tier, or theoretical hardening. Production-readiness, merge-safety, and code-audit requests alone do not activate it.
+## Establish the boundary from behavior
 
-### Release Audit — default
+Begin with the user or engineering outcome, real entrypoints and consumers, supported operating conditions, terminal truth, and nearby behavior that must survive. For a changeset, identify the base/candidate and distinguish changed, affected, and pre-existing code. For a journey or subsystem audit, review the existing system without pretending every finding is a new regression.
 
-Judge whether the scoped change is fit for its declared unlock and current risk tier. Prioritize reachable regressions and material defects. Keep hypothetical, future-topology, and defense-in-depth concerns non-blocking unless evidence makes them current.
+Trace the normal path and materially distinct failure, recovery, concurrency, migration, or lifecycle paths. Identify authoritative state, derived representations, mutation points, I/O, trust boundaries, and existing mitigations. Inspect current proof and its blind spots.
 
-### Deep Hardening Audit — explicit opt-in
+**The diff is an entry point, not a fence.** Follow an implicated mechanism to its owner, consumers, generators, configuration, and proof—even across modules—when that can change the diagnosis or enable removal of the chain. State why the added slice is relevant. Broader read-only investigation is encouraged when it resolves that question; unrelated repository cleanup is not. Respect explicit exclusions and separately identify any excluded dependency that prevents a conclusion.
 
-Explore low-probability combinations, future scale/topology, defense in depth, and resilience beyond the current contract. Still distinguish release blockers from hardening opportunities. Opting into deeper exploration does not inflate severity or automatically justify architecture.
+Stop expanding when material chains terminate in evidenced requirements and the remedy's consumers and obligations are accounted for. Do not stop merely because the right owner is outside the diff; do not keep expanding merely because more code exists.
 
-State the selected mode in the report.
+Label consequential claims **FACT**, **INFERENCE**, **ASSUMPTION**, or **UNKNOWN**. Cite exact current files, symbols, and useful line ranges. Distinguish finding confidence from coverage confidence. Missing evidence is a specific uncertainty, not proof of absence or permission to invent a cause.
 
-## Independent review and scope
+## Find the cause-eliminating alternative
 
-- Review independently using the same existing repo folder (root §7). Re-derive conclusions from the candidate, lane boundary, and proof gates; do not inherit the author's conclusions.
-- When invoked as a terminal handoff overlay, require the caller to name the exact material blind spot, audit only that slice, and return findings into the one `$handoff__final-quality-gate` report. Do not create a second report or expand into a general hardening audit.
-- An unqualified user-requested code audit uses the paired report shape below. Write one canonical report to `tmp/<datetime>__<slug>__code-audit/report.md`; the embedded accretion lens writes no second report.
-- A focused standalone review may report inline unless the user, root contract, or handoff needs a durable artifact. Skill availability alone never warrants this lens.
-- Audit the provided scope. Briefly record adjacent hazards, but do not let unrelated pre-existing debt hijack the lane.
-- A pre-existing issue may block this change only when the change worsens it, makes it newly reachable, or the active unlock directly depends on that boundary.
-- When a durable report is warranted, return its path and verdict.
-- The auditor recommends; the orchestrator judges and resolves findings.
+Apply the accretion specialist's cluster analysis before settling material remedies. Look especially at guards, retries, reconcilers, caches, fallback paths, flags, adapters, repeated conversions, and test scaffolding. These are investigation cues, not evidence of waste.
 
-## Hard constraints
+For each material cluster, establish:
 
-- Do not modify the audited product code.
-- Do not output large code blocks. Quote at most 10 lines only when needed as evidence.
-- Never claim runtime, test, benchmark, traffic, topology, or incident evidence that was not observed or provided.
-- Label important claims as **FACT**, **INFERENCE**, or **ASSUMPTION**.
-- An unverified assumption cannot create a P0, P1, or `NO-SHIP` verdict. Put it under **Needs Validation** and state the cheapest discriminator.
-- Do not require S-tier perfection. The standard is fit for the declared unlock, supported journey, deployment reality, and risk tier.
-- An accretion grade or deletion opportunity never changes the release verdict unless the same underlying issue independently meets this skill's P0/P1 gate.
-- A guard, fallback, harness, or handler completing its own control flow never proves the promised user/system terminal outcome. Qualify subsystem evidence and flag any false-green promotion against root §9.
-- It is valid—and often correct—to report no material finding, no performance hotspot, or no naming problem.
+1. **The external obligation.** Which supported outcome, real consumer, trust boundary, invariant, recovery scenario, compatibility commitment, or performance constraint requires the behavior? “C calls B” establishes dependency, not purpose.
+2. **The creating decision.** Which ownership, representation, lifecycle, API, or capability choice makes this particular machinery necessary? Name the invariant and its enforcement point before asserting root cause. Do not invent a historical patch sequence from current structure.
+3. **The surviving design.** Could the owning boundary produce the outcome directly, reuse an existing mechanism, remove an unsupported capability, derive state, or collapse the cluster? Name the owner, path, and obligations that remain.
+4. **The counter-case.** What is the strongest evidenced reason to retain the current design? What fact would reverse the simplification? Check actual consumers and failure semantics, not just static references or passing mechanism-pinned tests.
 
-## Audit method
+Integrate the result into the defect's remedy. Do not recommend another downstream guard while relegating the owner-level fix that eliminates it to an unrelated cleanup note. Group symptoms with the same established cause into one finding and one repair sequence.
 
-### 1. Establish the real boundary
+**Constructed contrast:** A duplicates independently writable state; B reconciles drift; C retries B; D deduplicates C. Each component may be necessary given A. Investigate whether A's independent ownership is required. If one owner can enforce the contract, recommend that convergence and identify B/C/D that disappear. If offline writes or a real distributed contract require reconciliation, keep the needed mechanism and improve it on those terms.
 
-Identify:
+When several causes fit the evidence and imply different remedies, state the fork and the smallest decisive inspection or experiment. Do not choose the cause that produces the most satisfying deletion story.
 
-- the declared user journey or engineering-system unlock;
-- the exact change and nearby behavior that must not regress;
-- public entry points, terminal state, I/O edges, state owners, and recovery paths;
-- supported callers and normal retry/concurrency behavior;
-- current deployment topology and existing mitigations, when relevant;
-- proof supplied, proof missing, and what this static audit cannot see.
+## Inspect work and developer friction
 
-If the unlock or deployment fact is absent, make the narrowest conservative assumption and label it. Ask a validator only when the answer could materially change the verdict.
+### Runtime performance
 
-### 2. Generate candidate findings
+Start from useful work per supported outcome. Inspect operation counts, collection bounds, frequency, fan-out, allocation, retention, repeated I/O, serialization, scheduling, synchronization, and crossings of expensive boundaries. Separate initialization from repeated execution and worst-case supported input from speculative future scale.
 
-Inspect correctness, data integrity, security, authorization, concurrency, recovery, bounds, performance, observability, testability, API misuse resistance, maintainability, and false-green failure semantics as relevant to the change.
+Prefer eliminating work, redundant traversals, conversions, or synchronization before adding caches, queues, workers, pools, or parallelism. Validate semantic equivalence: removing polling may lose recovery, sharing a result may violate freshness, and moving work off a hot path may increase latency elsewhere.
 
-Do not turn every improvement idea into a finding. A candidate becomes a reported finding only after impact calibration.
+- Source can prove duplicated or avoidable work without a benchmark. State exactly what work disappears and what assumptions the equivalence requires.
+- Source cardinality is not elapsed time. Do not convert “two scans become one” into a claimed frame-rate or end-to-end speedup.
+- Measure when choosing between designs depends on latency, throughput, memory, contention, GC, I/O, or a stated budget. Request the representative workload and smallest discriminating measurement, not an automatic benchmark project. Label estimates and unmeasured effects.
+- A cache, index, projection, or specialized data structure can earn its additional state through a concrete constraint. Removing it is not simplification if it breaks that constraint or transfers disproportionate work elsewhere.
 
-**Causal claim boundary.** Be specific about the observed trigger, broken contract, and impact, but remain agnostic about cause when several mechanisms fit the evidence. Name a causal mechanism only when current evidence distinguishes it. If plausible mechanisms require different remedies, put the causal fork and cheapest discriminator under **Needs Validation**; do not choose the cause that yields the cleanest story.
+### Developer experience
 
-### 3. Run the impact calibration gate
+Trace a relevant developer task through the changed boundary: using the API correctly, adding a supported variant, changing a policy, reproducing a failure, or running the useful feedback loop. Find the actual ownership and coordination burden.
 
-For every candidate, answer:
+Prefer interfaces that make the normal operation obvious, carry necessary context explicitly, localize dangerous decisions, and make misuse difficult. Look for hidden call ordering, flags standing in for domain decisions, scattered registrations, repeated policy edits, pass-through navigation, non-actionable failures, and unrelated setup required for a focused check.
 
-1. **Current reachability:** What exact supported entry point and event sequence triggers it today?
-2. **Likelihood and exposure:** Is it normal operation, an ordinary retry/race, or several independent rare conditions?
-3. **Blast radius:** One request, one session, one user, shared data, security boundary, or service-wide?
-4. **Existing mitigations:** What guards, retries, stickiness, idempotency, isolation, monitoring, or recovery already reduce risk?
-5. **Change attribution:** Was it introduced, worsened, or newly exposed by this candidate change?
-6. **Evidence confidence:** Which parts are facts, inferences, or assumptions?
-7. **Cost of inaction:** What realistic harm occurs, how often, and to whom?
-8. **Cost of fix:** What engineering effort, runtime overhead, migration risk, operational burden, or new failure mode does the remedy add?
-9. **Forcing requirement:** What explicit contract makes the proposed architecture necessary?
+Name the task and the burden removed. “One canonical declaration replaces three manually synchronized registrations” is evidence-grounded; “more elegant” is not. Do not invent elapsed developer time or productivity gains. Documentation may preserve a non-obvious reason; it must not substitute for repairing a needlessly confusing API or control flow. A rename is material when it resolves demonstrated ambiguity or misuse, not because the reviewer prefers another noun.
 
-If the trigger path cannot be stated concretely, report a validation need or hardening note—not a blocker.
+## Choose the maintained result
 
-### 4. Assign severity without inflation
+Compare the current shape, the credible cause-eliminating alternative, and a local repair only when it is a real contender. Do not manufacture an option matrix for trivial changes.
 
-- **P0 — Critical blocker:** A currently reachable path can plausibly cause catastrophic security compromise, broad data corruption/loss, or service-wide outage. Evidence is strong enough to act immediately.
-- **P1 — Release blocker:** A credible supported journey or ordinary operational condition materially breaks the active unlock, security boundary, data integrity, or reliability contract. The candidate change introduces/worsens it or depends on it, evidence is strong, and a proportionate remedy exists.
-- **P2 — Non-blocking issue:** A real defect or weakness with limited blast radius, low frequency, meaningful mitigation, incomplete attribution, or a primarily maintainability/observability impact.
-- **Advisory — Hardening/residual risk:** A theoretical combination, future-topology concern, defense-in-depth idea, style preference, or improvement whose expected harm does not justify blocking work.
-- **Needs Validation:** A potentially important claim whose reachability or impact depends on an unverified assumption. Give the cheapest test, log, topology check, or product fact that would resolve it.
+For material recommendations, explain what disappears, what remains, what is introduced, which behavior is preserved, and the consequential tradeoff. Evaluate one-time change risk and continuing runtime, maintenance, operational, and developer costs separately. **A simplification's positive value is its justification; it does not need an invented failure scenario. New machinery does need a concrete reason that a simpler alternative fails.**
 
-Severity caps:
+Prefer deletion, direct ownership, consolidation, or an existing capability when they satisfy the constraints. This is a reasoning order, not a mandatory operation or a ban on new code. Keep a useful abstraction when it hides a volatile or dangerous decision. Reject an abstraction that merely renames calls or centralizes unrelated policy. Do not introduce a generator, registry, coordinator, or validation framework simply to remove modest duplication.
 
-- Three or more independent rare conditions must coincide: maximum P2 unless the plausible blast radius is catastrophic.
-- Not introduced or worsened by the change: maximum P2 unless the active unlock cannot work safely without resolving it.
-- No observed hotspot, scale evidence, or stated budget: do not invent timing impact or a performance blocker. Directly inspected Three.js / Rapier topology or work-cardinality facts remain admissible only as structural/change-scope evidence; calibrate their severity through the ordinary release gate, and leave runtime impact unmeasured until proven.
-- No explicit cross-process ownership, exact-once, linearizability, or split-brain requirement: do not prescribe a new service, queue, distributed lock, lease, token fence, or consensus-like mechanism.
-- A remedy whose complexity or operational cost exceeds the realistic expected harm must be downgraded, narrowed, or rejected.
-- Existing mitigations reduce severity even when they do not constitute a mathematical guarantee. State what residual risk remains.
+More investigation is preferable to preserving a knowable wrong design. Incremental, behavior-preserving steps can still be the safest route to the lasting shape. A broad rewrite must demonstrate why incremental convergence is materially worse; ambition and lack of deadlines do not establish that.
 
-### 5. Choose the verdict
+### Deletion and retirement
 
-- **SHIP:** No substantiated P0/P1 finding. Any notes are informational or trivial.
-- **SHIP WITH NOTES:** No substantiated P0/P1 finding, but there are P2, advisory, or validation items worth recording.
-- **NO-SHIP:** At least one substantiated P0/P1 finding blocks the active unlock.
+Before recommending removal, account for supported static, dynamic, configuration-driven, persisted, and external consumers using the specialist's evidence rules. A clean text search proves only the search performed. Unknown public consumers prevent an unconditional deletion claim; they do not automatically justify another compatibility layer.
 
-Grades, issue counts, and hardening opportunities never determine the verdict. Findings do.
+For every material removal or collapse, identify the supported outcome and protections that remain, existing faithful proof, any decisive proof gap, and the actual evidence required to close it. Protect behavior and invariants, not obsolete internal choreography. Retarget or remove mechanism-pinned tests when appropriate; do not delete needed outcome coverage or create tombstone tests merely to celebrate missing symbols.
 
-### 6. Prune before reporting
+Where safe migration requires coexistence, name the lasting owner/path, migration obligation, remaining consumers, removal condition, and temporary flags, adapters, workers, tests, or tooling that must retire. Sequence by dependency and risk, not imagined dates. A genuinely permanent compatibility contract stays; not every old path is temporary.
 
-For each remaining candidate, ask:
+**Replacement is not retirement.** Do not call a simplification complete while its removable old implementation and cleanup machinery remain. Every intermediate step should move toward the lasting design, not create another fallback to preserve the wrong one.
 
-- Would a reasonable senior engineer change the release decision or schedule work because of this?
-- Does the proposed action have a forcing requirement?
-- Is this the smallest remedy that protects the unlock?
-- Am I escalating uncertainty instead of evidence?
+## Calibrate risk without lowering the quality bar
 
-Delete noise. Move worthwhile but non-urgent concerns to advisory. Preserve an especially tempting rejected candidate only when explaining its downgrade prevents architecture churn.
+Release risk and design acceptance answer different questions. A material simplification can warrant rework without being a P1. A structural grade or an unverified assumption never establishes P0, P1, or `NO-SHIP`.
 
-## Required report shape
+For a defect, establish the concrete supported trigger, violated contract, impact and exposure, existing mitigations, change attribution, evidence confidence, and remedy. For a performance claim, separate inspected work structure from measured budget or outcome impact. For a design finding, establish current avoidable burden, the faithful alternative, its counter-case, and the concrete benefit—not a hypothetical outage.
 
-Use Markdown and keep the default Release Audit concise.
+A design finding is material when inspected evidence shows an avoidable independent concept, recurring coordination or change burden, meaningful unnecessary work, misuse risk, or operational obligation, and a credible alternative improves it without sacrificing a supported constraint. A stylistic preference, fewer lines, or a tiny unmeasured allocation alone does not establish that bar.
 
-### 0) Audit Context
+| Risk class | Admission |
+| --- | --- |
+| **P0** | Strong evidence of a currently reachable path to catastrophic compromise, broad data corruption/loss, or service-wide outage. |
+| **P1** | Strong evidence that a supported journey or ordinary operating condition materially breaks the declared outcome, security, integrity, or reliability contract. In a changeset, the change introduces, worsens, exposes, or directly depends on the defect. |
+| **P2** | Substantiated defect with limited impact, material mitigation, low exposure, or insufficient change attribution to block this release. It can still require design rework. |
+| **Advisory** | Worthwhile context, an accepted tradeoff, or explicitly requested hypothetical/future hardening. Not a home for a demonstrated material design defect merely because it is non-blocking for release. |
+| **Needs validation** | A material conclusion depends on an unverified premise. State the discriminator and how its results would change the recommendation. |
 
-- Selected mode
-- Composition: `FOCUSED CODE` or `PAIRED CODE + ACCRETION`
-- Declared unlock and scoped change
-- Evidence inspected
-- Current deployment/caller assumptions
-- Static-audit blind spots
+Three or more genuinely independent rare conditions normally cap a defect at P2 unless the evidenced consequence is catastrophic. Do not multiply correlated events or call ordinary retries rare. Existing mitigations reduce risk even when imperfect; state residual risk. Pre-existing debt does not block a changeset unless worsened, newly exposed, or necessary to its supported outcome. It can still justify causal design rework within the inspected boundary.
 
-### 1) Executive Verdict
+Do not invent a timing impact, hotspot, traffic level, deployment topology, incident, or test result. Absence of a benchmark does not hide statically provable redundant work or an independently established violation; it limits quantitative performance claims. Do not prescribe a service, queue, distributed lock, lease, fence, or consensus mechanism without a real requirement that simpler ownership cannot satisfy.
 
-- `SHIP`, `SHIP WITH NOTES`, or `NO-SHIP`
-- One short paragraph explaining why
-- Release blockers, if any, with exact evidence
+Deep adversarial or future-topology hardening is explicit opt-in. “S-tier,” “thorough,” and “production-ready” do not by themselves authorize speculative infrastructure. Greater depth improves evidence; it does not inflate severity.
 
-### 2) Release Findings
+## One report, one action plan
 
-Include only P0/P1 findings. `None` is a valid section.
+Lead with the recommendation. Preserve both judgments explicitly:
 
-For each finding provide:
+- **Recommendation — `ACCEPT`, `REWORK`, or `NEEDS VALIDATION`.** `REWORK` means a substantiated defect or material design shortfall has a concrete warranted correction, including a demonstrated simplification, avoidable runtime burden, or developer-journey problem. Do not relabel that work “later” because release safety permits shipping. `NEEDS VALIDATION` means an unresolved material question prevents acceptance and no already-proven issue establishes rework. `ACCEPT` requires sufficient coverage and no remaining material correction justified by evidence; it is scoped, not a claim of global optimality.
+- **Release risk — `SHIP`, `SHIP WITH NOTES`, or `NO-SHIP`.** `NO-SHIP` requires a substantiated P0/P1. `SHIP WITH NOTES` has no such blocker but has meaningful issues or uncertainty. `SHIP` has no substantiated blocker and only trivial or informational notes. These labels classify demonstrated release risk; they do not independently grant design acceptance, authorize deployment, or prove an uninspected boundary safe.
 
-- Severity, title, and confidence
-- Concrete current trigger path
-- Evidence with file/symbol/line references
-- User/system impact and blast radius
-- Existing mitigations and residual risk
-- Change attribution
-- Cost of inaction versus cost/complexity of fix
-- Smallest proportionate remedy
-- Proof that would close it
+A result such as **`REWORK` / `SHIP WITH NOTES`** is coherent: no substantiated release blocker, but the implementation is not yet the design to accept. Explain the exact gap. The orchestrator makes the final decision; this report does not alter another gate's authority.
 
-### 3) Non-Blocking Findings
+Use readable Markdown, omit empty sections, and expose conclusions and decisive evidence rather than a reasoning transcript. Include:
 
-Include P2 and Advisory items, ordered by expected value. Default maximum: five. `None` is valid.
+1. **Recommendation and context:** the two judgments, supported outcome, exact boundary, applied lenses, coverage confidence, exclusions, and material blind spots. Lead with the strongest finding or positive keep-case, not an issue count.
+2. **Findings:** group by root cause. Each material item needs exact evidence, epistemic status/confidence, burden or impact, strongest keep-case, preferred maintained shape, and proof that closes it. Defects additionally need trigger, mitigations, attribution, and calibrated risk class. Design findings state whether they require rework. Do not repeat one finding in multiple sections.
+3. **Accretion evidence:** preserve the specialist's structural disposition, coverage, smallest faithful shape, deletion dividend, what must remain, and required report-card elements according to its actual mode. Integrate or cross-reference shared findings rather than duplicating them. No second ship verdict and no averaged grade.
+4. **Validation or important rejected alternatives:** include only uncertainty or a tempting rejected remedy that changes the next decision. A validation item names its discriminator; a rejected remedy names why it loses.
+5. **Action plan — final section:** order by safety, causal dependencies, and maintained-system value. For each action, name target, final owner/path, what disappears or is introduced, behavior preserved, proof, and material change risk. Include a retirement condition when transitional machinery is involved. Deduplicate specialist and defect actions. Do not split implementation, deletion, and required proof into unrelated cleanup projects.
 
-Each item needs evidence, realistic impact, why it does not block, and the smallest worthwhile action—or `accept residual risk`.
+A short clean audit may be a few paragraphs. Never truncate material findings to meet an arbitrary count. Keep a large audit decision-focused rather than printing an exhaustive smell inventory. Do not output implementation patches or long code blocks; a short quotation is sufficient for evidence.
 
-### 4) Structural Accretion
+Return findings inline or to the calling handoff. When a durable standalone report is requested or required, the orchestrator persists one canonical `tmp/<datetime>__<slug>__code-audit/report.md` and returns its actual path. Embedded specialists create no rival durable report.
 
-Include this section only for the standard paired audit or an explicitly combined review containing both code/release and accretion. Apply `$audit-ai-code-accretion`; do not recreate its rubric from memory. Preserve its owned output elements inside this report:
+## Failure anchors
 
-- structural disposition `NO MATERIAL ACCRETION`, `ACCRETION FOUND`, or `INCONCLUSIVE`—a summary label, not a second verdict;
-- selected accretion mode, named boundary, finding confidence, and coverage confidence;
-- material justification-island findings with exact evidence, strongest keep case, falsifier, smallest surviving shape, and deletion dividend;
-- the ten-dimension report card without averaging;
-- what must not be deleted because current evidence forces it;
-- structural actions to merge into the final Plan of Action.
+- **Patch staircase:** improving B/C/D while leaving avoidable A untouched → compare the cause-eliminating design before choosing a remedy.
+- **Small-diff bias:** accepting another flag because the owner-level change touches more files → optimize the maintained result.
+- **Ship-now bias:** demoting warranted rework because it is not P1 → separate release risk from quality acceptance.
+- **Deletion theater:** removing safeguards, useful caches, or real compatibility → preserve the forcing contract and prove the smaller faithful alternative.
+- **Cleanup accretion:** adding a framework to simplify a cluster → apply the same necessity test to the proposed repair.
+- **Evidence inflation:** converting static work counts, passing tests, or specialist agreement into runtime or terminal proof → state only what the evidence establishes.
+- **Scope evasion or drift:** stopping at the diff, or chasing the whole repository → follow the material causal boundary and state coverage.
+- **Paper simplicity:** fewer lines but more hidden knowledge, runtime work, or external machinery → count obligations, not appearances.
 
-This section has no ship/no-ship verdict. `None observed at this coverage` is valid.
+**Close on the lasting shape: what no longer needs to exist, what must remain, and what evidence distinguishes them.**
 
-### 5) Needs Validation
+## Reference
 
-List assumption-sensitive claims separately with the cheapest discriminator and how each possible result would affect severity. `None` is valid.
-
-### 6) Rejected or Downgraded Candidates
-
-Include only candidates whose rejection prevents likely confusion or overbuilding. State the missing forcing requirement, existing mitigation, rarity stack, lack of attribution, or unfavorable cost ledger. `None` is valid.
-
-### 7) Plan of Action
-
-The final section. Deduplicate release work and embedded accretion actions, preserve their different authority, and include only actions justified by the audit in priority order. Mark simplification recommendations as non-blocking unless their underlying harm independently meets the release-severity gate. `None—ship the scoped change` is valid.
-
-For each action include:
-
-- Objective and exact scope
-- Success evidence
-- Effort: S / M / L
-- Unlock protected
-- Change risk and runtime/operational overhead
-
-## Deep Hardening Audit additions
-
-Only in explicit Deep Hardening mode, optionally add:
-
-- a report card across testability, simplicity, naming, API design, algorithmic efficiency, allocation/memory, data structures, I/O/concurrency, correctness, recovery, security, and observability;
-- low-probability failure trees and future-topology assumptions;
-- benchmark or chaos-test proposals;
-- a gap-to-exceptional-quality discussion.
-
-These additions may say `no material issue observed`. Never force a lowest-three deep dive, generic-name list, or CPU/RAM hotspot. Deep coverage expands search breadth, not severity.
-
-## Calibration examples
-
-### Rare multi-condition ownership race
-
-Two backend tasks use process-local admission, but the client enforces one in-flight resume, load-balancer stickiness lasts 24 hours, and failure requires a second independent caller during task replacement.
-
-- Report the process-local limitation as P2 or Advisory residual risk.
-- Use `SHIP WITH NOTES` unless incident evidence, ordinary automatic retry behavior, or an explicit cross-task single-owner contract makes the path credible.
-- Do not prescribe token-fenced claims merely because stickiness is not a formal guarantee.
-
-### Ordinary retry can corrupt shared state
-
-A normal client retry can reach two tasks, both perform a non-idempotent balance mutation, and there is no deduplication or transactional guard.
-
-- This is a credible supported path with material data impact: P1 or P0 depending on blast radius.
-- A cross-task idempotency mechanism has a forcing requirement: one logical mutation must commit at most once.
-
-### No demonstrated performance issue
-
-A changed function is linear over a bounded list, no budget or production symptom suggests pressure, and the simpler implementation allocates a small temporary array.
-
-- Do not manufacture a hotspot.
-- Mention it only if evidence shows the bound or call frequency makes the allocation material.
-
-## Anti-patterns
-
-- **Possibility equals priority:** escalating any technically possible race to P1.
-- **Assumption laundering:** presenting an inferred topology or caller behavior as fact.
-- **S-tier cosplay:** blocking a fit-for-purpose change because it is not theoretically perfect.
-- **Architecture as prophylaxis:** proposing coordination infrastructure without a forcing contract.
-- **Forced findings:** inventing a hotspot, naming issue, or bottom-three weakness to satisfy a template.
-- **Inherited-debt hijacking:** making the current lane fix unrelated pre-existing flaws.
-- **Mitigation erasure:** treating a non-absolute guard as meaningless rather than calibrating residual risk.
-- **Cost-blind remediation:** recommending a complex fix without comparing it to expected harm.
-
-## Final self-check
-
-Before returning the audit, verify:
-
-- Every P0/P1 has a concrete current trigger path, material impact, strong evidence, change attribution, and proportionate remedy.
-- No unverified assumption affects the release verdict.
-- Existing mitigations and residual risk are both represented.
-- Rare-condition stacks and pre-existing issues obey the severity caps.
-- Every architecture recommendation names its forcing requirement.
-- A standard paired or explicitly combined code-plus-accretion audit actually applied `$audit-ai-code-accretion` to the same boundary, included its owned section, and emitted no second report or rival ship verdict.
-- A focused or named audit did not silently widen into the paired or expanded audit family.
-- The report permits `none` wherever evidence found nothing material.
-- The verdict reflects the declared unlock—not an abstract ideal of perfect infrastructure.
+- [Calibration examples](references/calibration-examples.md) — read when a remedy involves a compensation chain, apparent duplication, performance-sensitive state, compatibility retirement, or a conflict between release safety and design acceptance.
