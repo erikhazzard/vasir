@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
-import { PAIRED_TWISTS_EDITION, PAIRED_WRITING_SCORE_BASIS, deriveExpectedPairedTwistsEvidence, deriveExpectedOverallV3, verifyOverallV3Projection, deriveExpectedWritingCategory, deriveExpectedProvisionalEvidence, verifyWritingProofEvidence } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
+import { PAIRED_NATIVE_CONFIGURATION_IDS, PAIRED_TWISTS_EDITION, PAIRED_WRITING_SCORE_BASIS, deriveExpectedPairedTwistsEvidence, deriveExpectedOverallV3, verifyOverallV3Projection, deriveExpectedWritingCategory, deriveExpectedProvisionalEvidence, verifyWritingProofEvidence } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 import { WRITING_COMPACT_BENCHMARKS, WRITING_ESTABLISHED_SCORE_BASIS, projectWritingCompactRun } from '../cli/eval/writing-compact-publication.js';
 import { WRITING_RESPONSE_ARCHIVES, WRITING_CREATION_ARCHIVE, hydrateWritingResponseArchives } from '../cli/eval/writing-response-archives.js';
 import { projectPlotTwistsPairedRun } from '../cli/eval/plot-twists-paired-publication.js';
-import { completePairedFixture, completeSupplementalPairedFixture } from './helpers/plot-twists-paired-fixture.js';
+import { completePairedFixture, completeSupplementalPairedFixture, mockPairedProvider } from './helpers/plot-twists-paired-fixture.js';
+import { preparePairedRun, runPairedGenerations, runPairedJudgments } from '../cli/eval/plot-twists-paired-runtime.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const siteRoot = join(repoRoot, 'site', 'vasirbenchmark.com');
@@ -153,15 +154,46 @@ function selectedSourceReferences(value, found = []) {
 const pairedOriginalConfigurations = ['codex:gpt-6-astra@medium', 'codex:gpt-5.6-sol@medium', 'codex:gpt-5.6-terra@medium', 'codex:gpt-5.6-luna@medium', 'claude:claude-fable-5-1@medium', 'claude:claude-opus-5@medium'];
 const pairedAddedConfigurations = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
   'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max', 'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
-function assertPairedCoverageExtension(extension) {
-  assert.equal(extension.version, 'paired-reasoning-coverage-extension-v1');
+function assertPairedCoverageExtension(extension, retained = pairedOriginalConfigurations) {
+  assert.ok(['paired-reasoning-coverage-extension-v1', 'paired-declared-coverage-extension-v2'].includes(extension.version));
   assert.ok(typeof extension.purpose === 'string' && extension.purpose.trim());
   for (const field of ['parentSnapshotSha256', 'parentManifestSha256']) assert.match(extension[field], /^[a-f0-9]{64}$/);
-  assert.deepEqual(extension.addedConfigurations, pairedAddedConfigurations);
-  assert.equal(extension.retainedConfigurationCount, pairedOriginalConfigurations.length);
-  assert.equal(extension.additionalGenerationCount, pairedAddedConfigurations.length * 2);
-  assert.equal(extension.additionalJudgeRequestCount, pairedAddedConfigurations.length * 2);
+  if (extension.version === 'paired-reasoning-coverage-extension-v1') {
+    assert.deepEqual(retained, pairedOriginalConfigurations);
+    assert.deepEqual(extension.addedConfigurations, pairedAddedConfigurations);
+  }
+  assert.ok(extension.addedConfigurations.length > 0 && extension.addedConfigurations.every(id => PAIRED_NATIVE_CONFIGURATION_IDS.includes(id) && !retained.includes(id)));
+  assert.equal(new Set(extension.addedConfigurations).size, extension.addedConfigurations.length);
+  assert.equal(extension.retainedConfigurationCount, retained.length);
+  assert.equal(extension.additionalGenerationCount, extension.addedConfigurations.length * 2);
+  assert.equal(extension.additionalJudgeRequestCount, extension.addedConfigurations.length * 2);
 }
+
+function assertPairedEvidenceCohorts(fresh) {
+  const { sourceCohorts: cohorts, coverageHistory: history } = fresh;
+  assert.ok(Array.isArray(cohorts) && cohorts.length >= 2 && history?.length === cohorts.length - 1);
+  assert.deepEqual(cohorts[0].configurationIds, pairedOriginalConfigurations);
+  const retained = [];
+  for (const [index, cohort] of cohorts.entries()) {
+    assert.equal(cohort.sourceCohort, index ? 'supplement' : 'original');
+    for (const field of ['sourceSnapshotSha256', 'sourceManifestSha256']) assert.match(cohort[field], /^[a-f0-9]{64}$/);
+    if (index) {
+      const step = history[index - 1], parent = cohorts[index - 1];
+      assertPairedCoverageExtension(step, retained);
+      assert.deepEqual(cohort.configurationIds, step.addedConfigurations);
+      assert.equal(step.parentSnapshotSha256, parent.sourceSnapshotSha256); assert.equal(step.parentManifestSha256, parent.sourceManifestSha256);
+      assert.equal(step.sourceSnapshotSha256, cohort.sourceSnapshotSha256); assert.equal(step.sourceManifestSha256, cohort.sourceManifestSha256);
+    }
+    retained.push(...cohort.configurationIds);
+  }
+  assert.equal(new Set(cohorts.map(cohort => cohort.sourceSnapshotSha256)).size, cohorts.length);
+  const { sourceSnapshotSha256, sourceManifestSha256, ...latest } = history.at(-1);
+  assert.deepEqual(latest, fresh.coverageExtension); assert.equal(sourceSnapshotSha256, fresh.technicalRecovery?.sourceSnapshotSha256 ?? fresh.sourceSha256); assert.equal(sourceManifestSha256, fresh.technicalRecovery?.sourceManifestSha256 ?? fresh.manifestSha256);
+  return retained;
+}
+
+const lineageConfigurations = lineage => lineage?.kind === 'declared-writing-coverage-extension'
+  ? [...lineageConfigurations(lineage.previousLineage), ...lineage.coverageExtension.addedConfigurations] : pairedOriginalConfigurations;
 
 async function assertSelectedSourceEvidence(selection, readLockedFile = assertLockedFile) {
   assert.equal(selection.path, `benchmarks/${selection.benchmarkId}/publication.json`);
@@ -175,8 +207,22 @@ async function assertSelectedSourceEvidence(selection, readLockedFile = assertLo
     assert.equal(selection.sources.length, 1);
     assert.equal(selected.snapshot.path, `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${selected.snapshot.sha256}/snapshot.json`);
     let replacement = selection.lineage;
-    if (replacement?.kind === 'declared-writing-coverage-extension') {
-      assertPairedCoverageExtension(replacement.coverageExtension);
+    if (replacement?.kind === 'declared-writing-technical-recovery') {
+      assert.equal(replacement.edition, PAIRED_TWISTS_EDITION);
+      for (const field of ['originalEvidencePreserved', 'cleanAnswersAndCompletedReviewsPreserved', 'supersededOriginalAttemptsPreserved', 'originalSettingsRerun']) assert.equal(replacement[field], true);
+      assert.equal(replacement.scoreBasedReplacementSelection, false);
+      assert.equal(replacement.technicalRecovery.version, 'paired-tool-isolation-recovery-v1');
+      assert.equal(replacement.technicalRecoverySha256, createHash('sha256').update(JSON.stringify(replacement.technicalRecovery)).digest('hex'));
+      assert.equal(replacement.stoppedSourceSha256, replacement.technicalRecovery.sourceSnapshotSha256);
+      assert.notEqual(replacement.stoppedSourceSha256, selected.snapshot.sha256);
+      assert.equal(replacement.previousSelection.path, selection.path);
+      assert.equal(replacement.previousSources.length, 1);
+      assert.equal(replacement.previousSources[0].sha256, replacement.parentSourceSha256);
+      assert.equal(replacement.previousSources[0].path, `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${replacement.parentSourceSha256}/snapshot.json`);
+      replacement = replacement.previousLineage;
+    }
+    while (replacement?.kind === 'declared-writing-coverage-extension') {
+      assertPairedCoverageExtension(replacement.coverageExtension, lineageConfigurations(replacement.previousLineage));
       assert.equal(replacement.edition, PAIRED_TWISTS_EDITION);
       assert.equal(replacement.originalEvidencePreserved, true);
       assert.equal(replacement.answersAndCompletedReviewsPreserved, true);
@@ -211,7 +257,7 @@ async function assertSelectedSourceEvidence(selection, readLockedFile = assertLo
     }
   }
   if (paired) for (let lineage = selection.lineage; lineage; lineage = lineage.previousLineage) for (const source of lineage.previousSources) {
-    const sourceEdition = lineage.kind === 'declared-writing-coverage-extension' ? PAIRED_TWISTS_EDITION : 'storytelling-plot-twists';
+    const sourceEdition = ['declared-writing-coverage-extension', 'declared-writing-technical-recovery'].includes(lineage.kind) ? PAIRED_TWISTS_EDITION : 'storytelling-plot-twists';
     assert.ok(source.path.startsWith(`.agents/vasir-evals/${sourceEdition}/publication-snapshots/`), 'retained evidence must remain in its original immutable archive');
     try { await readLockedFile(source, repoRoot); } catch (error) { if (error.code !== 'ENOENT') throw error; unavailable.push(source.path); }
   }
@@ -903,9 +949,10 @@ function assertSharedFrameInventory(manifest, candidate, canonical, writing, gam
         assert.equal(fresh?.kind, 'vasirbenchmark-paired-twists-browser-evidence');
         assert.equal(fresh.edition, PAIRED_TWISTS_EDITION);
         assert.equal(fresh.benchmarkId, benchmarkId);
-        const extension = fresh.coverageExtension;
-        if (extension) assertPairedCoverageExtension(extension);
-        const configurations = extension ? [...pairedOriginalConfigurations, ...pairedAddedConfigurations] : pairedOriginalConfigurations;
+        const extension = fresh.coverageExtension, recovery = fresh.technicalRecovery;
+        const declaredAppend = extension?.version === 'paired-declared-coverage-extension-v2';
+        if (extension && !declaredAppend) assertPairedCoverageExtension(extension);
+        const configurations = declaredAppend ? assertPairedEvidenceCohorts(fresh) : extension ? [...pairedOriginalConfigurations, ...pairedAddedConfigurations] : pairedOriginalConfigurations;
         assert.equal(fresh.answers.length, configurations.length * 2);
         assert.equal(fresh.requests.length, configurations.length * 2);
         const judges = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
@@ -917,16 +964,35 @@ function assertSharedFrameInventory(manifest, candidate, canonical, writing, gam
           assert.deepEqual(pair.map(request => request.candidateMap.A).sort(), ['baseline', 'skill']);
         }
         const selected = verification.sourceSelections.find(selection => selection.benchmarkId === benchmarkId);
-        assert.equal(selected.lineage?.kind, extension ? 'declared-writing-coverage-extension' : 'declared-writing-source-replacement');
+        assert.equal(selected.lineage?.kind, recovery ? 'declared-writing-technical-recovery' : extension ? 'declared-writing-coverage-extension' : 'declared-writing-source-replacement');
         assert.equal(selected.lineage.edition, PAIRED_TWISTS_EDITION);
         if (extension) {
-          assert.deepEqual(selected.lineage.coverageExtension, extension);
+          if (recovery) {
+            const { sha256, acceptedParentSnapshotSha256, ...authorization } = recovery;
+            assert.deepEqual(selected.lineage.technicalRecovery, authorization);
+            assert.equal(selected.lineage.technicalRecoverySha256, sha256);
+            assert.equal(selected.lineage.stoppedSourceSha256, recovery.sourceSnapshotSha256);
+            assert.equal(acceptedParentSnapshotSha256, extension.parentSnapshotSha256);
+            assert.equal(fresh.recordSources.length, configurations.length * 4);
+            assert.equal(fresh.toolIsolationPolicy?.historicalResultsReclassified, false);
+          } else assert.deepEqual(selected.lineage.coverageExtension, extension);
           assert.equal(selected.lineage.parentSourceSha256, extension.parentSnapshotSha256);
           assert.equal(fresh.executionValidationPolicy?.version, 'paired-one-turn-last-message-validation-v1');
           assert.match(fresh.executionValidationPolicy.sha256, /^[a-f0-9]{64}$/);
           for (const item of [...fresh.answers, ...fresh.requests]) {
+            if (recovery) {
+              const kind = item.requestId ? 'judgment' : 'generation';
+              const id = item.requestId || 'generation-' + createHash('sha256').update(JSON.stringify([item.configurationId, fresh.caseId, item.condition])).digest('hex').slice(0, 24);
+              const record = fresh.recordSources.find(row => row.kind === kind && row.id === id);
+              assert.ok(record);
+              const { kind: _kind, id: _id, disposition, ...origin } = record;
+              assert.deepEqual(item.provenance, { ...origin, recordDisposition: disposition,
+                ...(disposition !== 'retained' ? { technicalRecoverySha256: recovery.sha256 } : {}) });
+              continue;
+            }
             const original = pairedOriginalConfigurations.includes(item.configurationId);
-            assert.deepEqual(item.provenance, { sourceCohort: original ? 'original' : 'supplement',
+            const { configurationIds, ...provenance } = declaredAppend ? fresh.sourceCohorts.find(cohort => cohort.configurationIds.includes(item.configurationId)) : {};
+            assert.deepEqual(item.provenance, declaredAppend ? provenance : { sourceCohort: original ? 'original' : 'supplement',
               sourceSnapshotSha256: original ? extension.parentSnapshotSha256 : fresh.sourceSha256,
               sourceManifestSha256: original ? extension.parentManifestSha256 : fresh.manifestSha256 });
           }
@@ -1343,6 +1409,32 @@ test('fresh source selection accepts one independently pinned snapshot only with
     parentSourceSha256: parent.sha256, previousSelection: selection.lineage.previousSelection, previousSources: [parent],
     previousLineage: selection.lineage, originalEvidencePreserved: true, answersAndCompletedReviewsPreserved: true, originalSettingsRerun: false };
   assert.deepEqual(await assertSelectedSourceEvidence(expanded, reader), [snapshot.path, parent.path, ...previousSources.map(source => source.path)]);
+  const chained = structuredClone(expanded);
+  const immediateParent = { ...parent, sha256: 'f'.repeat(64), path: `.agents/vasir-evals/${PAIRED_TWISTS_EDITION}/publication-snapshots/${'f'.repeat(64)}/snapshot.json` };
+  chained.lineage = { ...structuredClone(expanded.lineage), parentSourceSha256: immediateParent.sha256,
+    previousSources: [immediateParent], previousLineage: expanded.lineage,
+    coverageExtension: { ...expanded.lineage.coverageExtension, version: 'paired-declared-coverage-extension-v2',
+      parentSnapshotSha256: immediateParent.sha256, addedConfigurations: ['codex:gpt-6-astra@high'],
+      retainedConfigurationCount: pairedOriginalConfigurations.length + pairedAddedConfigurations.length,
+      additionalGenerationCount: 2, additionalJudgeRequestCount: 2 } };
+  assert.deepEqual(await assertSelectedSourceEvidence(chained, reader), [snapshot.path, immediateParent.path, parent.path, ...previousSources.map(source => source.path)]);
+  const recovered = structuredClone(expanded);
+  const technicalRecovery = { version: 'paired-tool-isolation-recovery-v1', sourceSnapshotSha256: immediateParent.sha256,
+    sourceManifestSha256: 'd'.repeat(64), purpose: 'Explicit approved technical recovery.' };
+  recovered.lineage = { kind: 'declared-writing-technical-recovery', edition: PAIRED_TWISTS_EDITION,
+    parentSourceSha256: parent.sha256, stoppedSourceSha256: immediateParent.sha256, technicalRecovery,
+    technicalRecoverySha256: createHash('sha256').update(JSON.stringify(technicalRecovery)).digest('hex'),
+    previousSelection: selection.lineage.previousSelection, previousSources: [parent], previousLineage: selection.lineage,
+    originalEvidencePreserved: true, cleanAnswersAndCompletedReviewsPreserved: true, supersededOriginalAttemptsPreserved: true,
+    originalSettingsRerun: true, scoreBasedReplacementSelection: false };
+  assert.deepEqual(await assertSelectedSourceEvidence(recovered, reader), [snapshot.path, parent.path, ...previousSources.map(source => source.path)]);
+  for (const mutate of [
+    value => { value.lineage.scoreBasedReplacementSelection = true; },
+    value => { value.lineage.cleanAnswersAndCompletedReviewsPreserved = false; },
+    value => { value.lineage.supersededOriginalAttemptsPreserved = false; },
+    value => { value.lineage.technicalRecoverySha256 = 'a'.repeat(64); },
+    value => { value.lineage.stoppedSourceSha256 = snapshot.sha256; }
+  ]) { const changed = structuredClone(recovered); mutate(changed); await assert.rejects(assertSelectedSourceEvidence(changed, reader)); }
   for (const mutate of [
     value => { value.lineage.originalSettingsRerun = true; },
     value => { value.lineage.parentSourceSha256 = '0'.repeat(64); },
@@ -1993,7 +2085,15 @@ test('published Storytelling lock requires exactly three public tests, five sele
 });
 
 test('paired-edition lock requires the complete declared original or coverage-append source and actual review proofs', async t => {
-  for (const factory of [completePairedFixture, completeSupplementalPairedFixture]) await t.test(factory.name, async t => {
+  const completeDeclaredFixture = async t => {
+    const parent = await completeSupplementalPairedFixture(t), root = dirname(parent.runDirectoryPath);
+    const parentSnapshotPath = join(root, 'lock-accepted-parent.json'), runDirectoryPath = join(root, 'lock-declared-append');
+    await writeFile(parentSnapshotPath, JSON.stringify(parent.snapshot, null, 2) + '\n', { flag: 'wx' });
+    preparePairedRun({ runDirectoryPath, parentSnapshotPath, addedConfigurations: ['codex:gpt-6-astra@high'] });
+    await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider() });
+    return runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider() });
+  };
+  for (const factory of [completePairedFixture, completeSupplementalPairedFixture, completeDeclaredFixture]) await t.test(factory.name, async t => {
   const { snapshot } = await factory(t), sourceSha256 = sha256(JSON.stringify(snapshot));
   const built = projectPlotTwistsPairedRun({ snapshot, sourceSha256 });
   const evidence = deriveExpectedPairedTwistsEvidence(built.projection, built.responseBundle);

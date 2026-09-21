@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict';
 import { createHash, webcrypto } from 'node:crypto';
 import fs from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
 import vm from 'node:vm';
-import { completePairedFixture, completeSupplementalPairedFixture } from './helpers/plot-twists-paired-fixture.js';
+import { completePairedFixture, completeSupplementalPairedFixture, createPairedFixture, mockPairedProvider } from './helpers/plot-twists-paired-fixture.js';
+import { exportPairedRun, preparePairedTechnicalRecovery, preparePairedRun, runPairedGenerations, runPairedJudgments } from '../cli/eval/plot-twists-paired-runtime.js';
+import { fileURLToPath } from 'node:url';
 import { projectPlotTwistsPairedRun } from '../cli/eval/plot-twists-paired-publication.js';
-import { deriveExpectedPairedTwistsEvidence } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
+import { PAIRED_NATIVE_CONFIGURATION_IDS, deriveExpectedPairedTwistsEvidence } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 const runtime = fs.readFileSync(new URL('../site/vasirbenchmark.com/writing-browsercheck.mjs', import.meta.url), 'utf8');
@@ -14,8 +17,8 @@ const collector = runtime.slice(start, runtime.indexOf('\nconst options = ', sta
 assert.ok(start >= 0 && collector.length > 1000);
 async function inspect({ projection, responseBundle }, document = null) {
   const context = vm.createContext({ window: { VASIR_WRITING: projection, VASIR_WRITING_RESPONSES: responseBundle },
-    crypto: webcrypto, TextEncoder, Event, document });
-  return JSON.parse(JSON.stringify(await vm.runInContext(collector + `\ninspectPairedTwistsReportInDocument({inspectDocument:${Boolean(document)}})`, context)));
+    crypto: webcrypto, TextEncoder, Event, document, registeredConfigurationIds: PAIRED_NATIVE_CONFIGURATION_IDS });
+  return JSON.parse(JSON.stringify(await vm.runInContext(collector + `\ninspectPairedTwistsReportInDocument({inspectDocument:${Boolean(document)},registeredConfigurationIds})`, context)));
 }
 
 function renderedDocument({ projection, responseBundle }, { omitPrompt = false, replaceOutput = false } = {}) {
@@ -44,6 +47,48 @@ function renderedDocument({ projection, responseBundle }, { omitPrompt = false, 
       : projection.methodology.ratingAnchors[key.match(/data-rubric-anchor="([^"]+)"/)[1]]) } : null;
   } };
 }
+
+test('recovery browser and oracle bind authorized replacements, retained originals and effective paired reviews', async t => {
+  const sourceDirectory = fileURLToPath(new URL('../.agents/vasir-evals/storytelling-plot-twists-paired-v2/remaining-writing-coverage-20260909T2257Z', import.meta.url));
+  if (!fs.existsSync(sourceDirectory)) return t.skip('Private stopped-run evidence is not installed.');
+  const source = exportPairedRun({ runDirectoryPath: sourceDirectory });
+  const root = path.dirname(createPairedFixture(t)), sourceSnapshotPath = path.join(root, 'stopped-source.json');
+  fs.writeFileSync(sourceSnapshotPath, JSON.stringify(source, null, 2) + '\n', { flag: 'wx' });
+  const runDirectoryPath = path.join(root, 'recovery-oracle');
+  preparePairedTechnicalRecovery({ runDirectoryPath, sourceSnapshotPath, authorization: { approvedAt: '2026-09-10T00:00:00.000Z',
+    userInstruction: 'please do it', scope: 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.' } });
+  const calls = [];
+  await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  const { snapshot } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  const built = projectPlotTwistsPairedRun({ snapshot, sourceSha256: hash(JSON.stringify(snapshot)) });
+  const expected = deriveExpectedPairedTwistsEvidence(built.projection, built.responseBundle);
+  assert.equal(calls.length, 57);
+  assert.equal(expected.recordSources.filter(row => row.disposition === 'technical-replacement').length, 5);
+  assert.deepEqual(await inspect(built), expected);
+  assert.deepEqual(await inspect(built, renderedDocument(built)), expected);
+  for (const [name, mutate] of [
+    ['rewritten stopped source', contract => { contract.technicalRecovery.sourceSnapshotSha256 = contract.sourceSha256; }],
+    ['new score selected as replacement', contract => { contract.technicalRecovery.replacementGenerationIds[0] = contract.technicalRecovery.pendingGenerationIds[0]; }],
+    ['retained answer relabeled', contract => { contract.recordSources.find(row => row.disposition === 'retained').sourceCohort = 'recovery'; }],
+    ['superseded original omitted', contract => { delete contract.recordSources.find(row => row.disposition === 'technical-replacement').supersedesRecordSha256; }],
+    ['historical calls recertified', contract => { contract.toolIsolationPolicy.historicalResultsReclassified = true; }],
+    ['missing isolated call', contract => { contract.toolIsolationPolicy.generationIds.pop(); }]
+  ]) await t.test(name, async () => {
+    const changed = structuredClone(built); mutate(changed.projection.methodology.sourceContract);
+    changed.responseBundle.sourceContract = structuredClone(changed.projection.methodology.sourceContract);
+    assert.throws(() => deriveExpectedPairedTwistsEvidence(changed.projection, changed.responseBundle));
+    assert.ok((await inspect(changed)).mismatches.length);
+  });
+  for (const mutate of [
+    value => { value.responseBundle.responses.find(answer => answer.provenance.recordDisposition === 'technical-replacement').runtime.attemptNumber = 1; },
+    value => { value.responseBundle.judgeRequests.find(request => request.provenance.recordDisposition === 'technical-replacement').provenance.supersedesRecordSha256 = '0'.repeat(64); },
+    value => { value.responseBundle.responses.find(answer => answer.provenance.recordDisposition === 'retained').provenance.technicalRecoverySha256 = expected.technicalRecovery.sha256; }
+  ]) {
+    const changed = structuredClone(built); mutate(changed);
+    assert.throws(() => deriveExpectedPairedTwistsEvidence(changed.projection, changed.responseBundle));
+    assert.ok((await inspect(changed)).mismatches.length);
+  }
+});
 
 test('fresh paired evidence binds every original answer, exact input, paired review and rating to the six-model source', async t => {
   const { snapshot } = await completePairedFixture(t);
@@ -104,6 +149,39 @@ test('same-edition coverage proof requires all fourteen settings and the origina
     ['undeclared append', value => { delete value.projection.methodology.sourceContract.coverageExtension; delete value.responseBundle.sourceContract.coverageExtension; }],
     ['altered declared roster', value => { value.projection.methodology.sourceContract.coverageExtension.addedConfigurations.pop(); }],
     ['changed independent score', value => { value.projection.entries.at(-1).exactScore++; }]
+  ]) await t.test(label, async () => {
+    const changed = structuredClone(built); mutate(changed);
+    assert.throws(() => deriveExpectedPairedTwistsEvidence(changed.projection, changed.responseBundle));
+    assert.ok((await inspect(changed)).mismatches.length, label);
+  });
+});
+
+test('generic append proof derives its roster from disjoint pinned cohorts without assuming a final size', async t => {
+  const parent = await completeSupplementalPairedFixture(t);
+  const directory = path.dirname(parent.runDirectoryPath), parentSnapshotPath = path.join(directory, 'qa-accepted-parent.json');
+  fs.writeFileSync(parentSnapshotPath, JSON.stringify(parent.snapshot, null, 2) + '\n', { flag: 'wx' });
+  const runDirectoryPath = path.join(directory, 'qa-declared-append');
+  preparePairedRun({ runDirectoryPath, parentSnapshotPath, addedConfigurations: ['codex:gpt-6-astra@high'] });
+  await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider() });
+  const { snapshot } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider() });
+  const built = projectPlotTwistsPairedRun({ snapshot, sourceSha256: hash(JSON.stringify(snapshot)) });
+  const expected = deriveExpectedPairedTwistsEvidence(built.projection, built.responseBundle);
+  assert.deepEqual(expected.sourceCohorts.map(cohort => cohort.configurationIds.length), [6, 8, 1]);
+  assert.equal(expected.answers.length, 30); assert.equal(expected.requests.length, 30);
+  const document = renderedDocument(built);
+  assert.deepEqual(await inspect(built, document), expected); assert.equal(document.opened.size, 30);
+  for (const [label, mutate] of [
+    ['omitted old cohort', value => { value.projection.methodology.sourceContract.sourceCohorts.splice(1, 1); }],
+    ['rewritten original pin', value => { value.projection.methodology.sourceContract.sourceCohorts[0].sourceSnapshotSha256 = '0'.repeat(64); }],
+    ['history parent replaced', value => { value.projection.methodology.sourceContract.coverageHistory.at(-1).parentSnapshotSha256 = '0'.repeat(64); }],
+    ['latest history differs', value => { value.projection.methodology.sourceContract.coverageHistory.at(-1).purpose += ' changed'; }],
+    ['duplicate configuration', value => { value.projection.methodology.sourceContract.sourceCohorts.at(-1).configurationIds[0] = 'codex:gpt-6-astra@medium'; }],
+    ['unknown native mode', value => { value.projection.methodology.sourceContract.sourceCohorts.at(-1).configurationIds[0] = 'codex:gpt-5.6-luna@ultra'; }],
+    ['new cohort count inflated', value => { value.projection.methodology.sourceContract.coverageHistory.at(-1).additionalGenerationCount++; }],
+    ['first supplement relabeled', value => { value.responseBundle.responses[12].provenance.sourceSnapshotSha256 = value.projection.scoreBasis.sourceSha256; }],
+    ['retained review relabeled', value => { value.responseBundle.judgeRequests[12].provenance.sourceManifestSha256 = value.projection.scoreBasis.manifestSha256; }],
+    ['missing declared answer', value => { value.responseBundle.responses.pop(); }],
+    ['invented new score', value => { value.projection.entries.at(-1).exactScore++; }]
   ]) await t.test(label, async () => {
     const changed = structuredClone(built); mutate(changed);
     assert.throws(() => deriveExpectedPairedTwistsEvidence(changed.projection, changed.responseBundle));

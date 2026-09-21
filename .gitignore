@@ -1,6 +1,8 @@
-# OS
+# OS-generated files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+desktop.ini
 
 # Editors
 .vscode/
@@ -26,3 +28,143 @@ tmp
 # Tool-local config (don't commit)
 .claude/settings.local.json
 .codex/config.local.toml
+
+site/vasirbenchmark.com/reviews/
+
+# Stray empty artifact: the colon makes this root filename invalid on Windows.
+/Workload:
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug_output.txt
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Husky (Git hooks - local only)
+.husky
+
+# Built files
+.out/
+
+# ===================================================================
+# Local Configurations & Environment
+# ===================================================================
+# Environment variables
+.env
+.env.*
+!.env.example
+env.json
+config.local.json
+.python-version
+google.json
+
+# ===================================================================
+# IDEs & Editors
+# ===================================================================
+.vscode/
+.idea/
+*.swp
+
+# ===================================================================
+# Dependencies
+# ===================================================================
+node_modules/
+/node_modules
+jspm_packages/
+bower_components/
+
+# ===================================================================
+# Framework & Build Specific
+# ===================================================================
+# Package artifacts
+product.tar
+*.tgz
+*.zip
+
+# CDK synthesized output (generated)
+cdk.out/
+infra/cdk-island/cdk.out/
+
+# ===================================================================
+# Testing & Caching
+# ===================================================================
+# Test results and logs
+test-results/
+tmp__battle-test-logs/
+.nyc_output/
+vitest-output.json
+test-results/
+vitest_report.html
+vitest_report.json
+vitest_min.json
+vreport.json
+uireport.json
+coverage/
+
+# Caching
+tmp
+tmp/
+tmp-output/
+tmp-artifacts
+tmp/qa
+tmp/qa/
+# Human desktop perf certification artifacts live under tmp/qa and must stay local.
+tmp-artifacts/
+scripts/tmp-output
+scripts/tmp
+scripts/scripts/tmp-output
+.eslintcache
+.parcel-cache
+.cache
+
+out/
+
+dummy-data/
+
+# ===================================================================
+# Terraform
+# ===================================================================
+**/.terraform/
+**/terraform.tfstate*
+
+infra/terraform/**/*.tfvars
+!infra/terraform/**/*.tfvars.example
+infra/terraform/**/backend.hcl
+
+# ===================================================================
+# Miscellaneous
+# ===================================================================
+# Redis local database
+dump.rdb
+
+# Authentication keys
+*.p8
+*.key
+
+# AWS credentials (project-local). Track only example files.
+.aws/credentials
+.aws/config
+!.aws/credentials.example
+!.aws/config.example
+
+# Tool-local config (don't commit)
+
+.zellij-layout.kdl
+
+*workspace.tar.gz
+workspace.tar.gz
+
+
+.codex-tmp
+*.__studio_sync*
+
+.idv/
+__pycache__
+__pycache__/

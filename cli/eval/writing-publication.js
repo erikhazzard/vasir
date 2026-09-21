@@ -17,6 +17,12 @@ import { buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, PLOT_TWIS
 
 export const WRITING_BENCHMARK_ID = "storytelling-core-idea";
 export const WRITING_SELECTION_PATH = "benchmarks/storytelling-core-idea/publication.json";
+export const CORE_IDEA_COMMON_11_SCORE_BASIS = "core-idea-astra-common-11-v1";
+export const CORE_IDEA_ORIGINAL_CASE_IDS = Object.freeze([
+  "breaking-bad", "the-matrix", "parasite", "frankenstein-1818", "things-fall-apart", "a-dolls-house",
+  "a-separation", "close-up", "convenience-store-woman", "the-memory-police", "death-and-the-kings-horseman", "my-mister"
+]);
+export const CORE_IDEA_COMMON_11_CASE_IDS = Object.freeze(CORE_IDEA_ORIGINAL_CASE_IDS.filter(id => id !== "the-matrix"));
 const HASH = /^[a-f0-9]{64}$/;
 const PANEL = ["codex:gpt-6-astra@xhigh", "claude:claude-fable-5-1@max"];
 export const PLOT_TWISTS_BENCHMARK_ID = "storytelling-plot-twists";
@@ -129,10 +135,21 @@ function summarizePairs(cells, configurationIds, caseIds) {
 
 // This explicitly separate view holds the judge and corpus constant while the
 // original two-judge panel is unfinished. It never fills official score fields.
+function coreIdeaDerivedScoreBasis(projection, id) {
+  requireEvidence(id === CORE_IDEA_COMMON_11_SCORE_BASIS && projection.benchmarks[0].id === WRITING_BENCHMARK_ID
+    && same(projection.cases.map(story => story.id), CORE_IDEA_ORIGINAL_CASE_IDS), "derived Core idea score basis requires the unchanged original twelve-story corpus.");
+  return { id, method: "equal-case-paired-common-11-single-judge-mean-v1", caseIds: [...CORE_IDEA_COMMON_11_CASE_IDS],
+    expectedCaseCount: 11, originalCaseCount: 12, originalCaseIds: [...CORE_IDEA_ORIGINAL_CASE_IDS], excludedCaseIds: ["the-matrix"],
+    scoredCorpusSha256: digest(JSON.stringify(projection.cases.filter(story => CORE_IDEA_COMMON_11_CASE_IDS.includes(story.id)))),
+    selectionTiming: "post-run-user-approved", exclusionReason: "The Matrix is excluded globally after two provider-blocked skill answers, not separately by model or score. All twelve original stories, answers, failures and available reviews remain in the source and report. No blocked answer was retried for this derived score basis.",
+    limitations: "The corpus restriction was approved after results existed, not preregistered. Scores and generation-efficiency means use the same fixed eleven stories for every setting and condition. One Astra xhigh judge and one answer per story and condition; human calibration is pending." };
+}
+
 function coreIdeaProvisionalLeaderboard(projection, responses) {
-  if (projection.benchmarks[0].id !== WRITING_BENCHMARK_ID || !responses.some(response => response.judgments.length === 1)) return null;
+  const derived = projection.methodology.derivedScoreBasis;
+  if (projection.benchmarks[0].id !== WRITING_BENCHMARK_ID || !derived && !responses.some(response => response.judgments.length === 1)) return null;
   const judgeConfigurationIds = [PANEL[0]];
-  const caseIds = projection.cases.map(story => story.id);
+  const caseIds = derived?.caseIds ?? projection.cases.map(story => story.id);
   const byResponse = new Map(responses.map(response => [`${response.settingId}:${response.caseId}:${response.condition}`, response]));
   const cohorts = projection.settings.map(setting => {
     const pairs = caseIds.map(caseId => ({ caseId, ...Object.fromEntries(CONDITIONS.map(condition => {
@@ -154,6 +171,9 @@ function coreIdeaProvisionalLeaderboard(projection, responses) {
     const exactDelta = cohort.eligibleForRank ? condition.id === "baseline" ? 0 : cohort.exactDelta : null;
     const original = projection.entries.find(entry => entry.settingId === cohort.settingId && entry.condition === condition.id);
     const exactBaseline = cohort.eligibleForRank ? cohort.exactScores.baseline : null;
+    const selectedMetrics = !cohort.eligibleForRank ? null : derived
+      ? metrics(projection.caseResults.filter(cell => cell.settingId === cohort.settingId && cell.condition === condition.id && caseIds.includes(cell.caseId)))
+      : original.metrics;
     return { ...Object.fromEntries(["modelId", "provider", "family", "reasoning", "label", "conditionLabel"].map(field => [field, original[field]])),
       id: `${cohort.settingId}-${condition.id}`, settingId: cohort.settingId, configurationId: cohort.configurationId,
       condition: condition.id, score: round(exactScore), exactScore,
@@ -161,19 +181,20 @@ function coreIdeaProvisionalLeaderboard(projection, responses) {
       delta: round(exactDelta), exactDelta,
       categories: [{ category: "writing", score: round(exactScore), exactScore }],
       baselineCategories: [{ category: "writing", score: round(exactBaseline), exactScore: exactBaseline }],
-      metrics: cohort.eligibleForRank ? original.metrics : null, latency: cohort.eligibleForRank ? original.latency : null,
-      tokens: cohort.eligibleForRank ? original.tokens : null, cost: null,
+      metrics: selectedMetrics, latency: finite(selectedMetrics?.meanLatencyMs) ? selectedMetrics.meanLatencyMs / 1000 : null,
+      tokens: selectedMetrics?.meanOutputTokens ?? null, cost: null,
       rank: cohort.eligibleForRank ? 1 + eligible.filter(other => other.exactScores[condition.id] > exactScore).length : null,
       eligibleForRank: cohort.eligibleForRank, completedPairCount: cohort.completedPairCount, expectedPairCount: cohort.expectedPairCount };
   }));
   const exactBaseline = mean(eligible.map(cohort => cohort.exactScores.baseline));
   const exactTreatment = mean(eligible.map(cohort => cohort.exactScores.skill));
   const exactDelta = mean(eligible.map(cohort => cohort.exactDelta));
-  return { status: "provisional", label: "Astra-only provisional results", benchmarkId: WRITING_BENCHMARK_ID,
+  return { ...(derived ?? {}), status: "provisional", label: "Astra-only provisional results", benchmarkId: WRITING_BENCHMARK_ID,
     sourceSha256: projection.scoreBasis.sourceSha256, corpusSha256: projection.methodology.corpusSha256, skillSha256: projection.methodology.skillSha256,
     officialScoreBasisId: projection.scoreBasis.id, judgeConfigurationIds, judgeCount: 1, caseIds,
-    method: "equal-case-paired-complete-corpus-single-judge-mean-v1", unit: "rubric-points", range: { minimum: 10, maximum: 100 },
-    detail: "GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results are provisional; the original two-judge scores remain separate. Incomplete story cohorts have diagnostics but no rank.",
+    method: derived?.method ?? "equal-case-paired-complete-corpus-single-judge-mean-v1", unit: "rubric-points", range: { minimum: 10, maximum: 100 },
+    detail: derived ? "GPT-6 Astra at xhigh reviews both conditions on the same fixed eleven stories for every setting. The Matrix is excluded globally by a post-run user-approved corpus restriction after two provider-blocked skill answers. All twelve original stories and their outcomes remain inspectable; the original two-judge scores remain separate. These single-judge results are provisional, not human-calibrated. A missing included story prevents ranking; no per-model available-case mean is used."
+      : "GPT-6 Astra at xhigh reviews both conditions on the same complete story corpus. These single-judge results are provisional; the original two-judge scores remain separate. Incomplete story cohorts have diagnostics but no rank.",
     expectedCaseCount: caseIds.length, rankedSettingCount: eligible.length, expectedSettingCount: cohorts.length,
     entries, incompleteSettings: cohorts.filter(cohort => !cohort.eligibleForRank),
     summary: { baseline: round(exactBaseline), treatment: round(exactTreatment), delta: round(exactDelta), exactBaseline, exactTreatment, exactDelta,
@@ -225,7 +246,7 @@ function publicJudgments(run, row, dimensions, panel = PANEL) {
  * Configuration totals require both conditions on the same complete case cohort.
  * The source run stays private; public records use an explicit field allowlist.
  */
-export function projectWritingRun({ run, snapshot, sourceSha256 }) {
+export function projectWritingRun({ run, snapshot, sourceSha256, derivedScoreBasis = null }) {
   const benchmarkId = run?.benchmark?.definition?.id;
   const isTwists = benchmarkId === PLOT_TWISTS_BENCHMARK_ID;
   const isTwistsCompletion = isTwists && run.storytelling?.runnerVersion === TWISTS_COMPLETION_VERSION;
@@ -421,9 +442,11 @@ export function projectWritingRun({ run, snapshot, sourceSha256 }) {
       methodology.generationContract += " This completion edition expands the original four settings to 33 after the original run. Original valid responses and reviews remain byte-identical; two failed mandatory-read predecessors remain in the superseded-response archive. New Codex answers use a local read-only MCP chunk tool and new Claude answers use Read-tool frames, with separately frozen instructions and identical skill bytes. Both new arms explicitly disable host skill discovery, project instructions and external resources; inherited calls retain their original isolation evidence. Raw streams are retained for new calls only; inherited calls retain their original receipts and stream hashes.";
     }
   }
+  if (derivedScoreBasis !== null) methodology.derivedScoreBasis = coreIdeaDerivedScoreBasis(projection, derivedScoreBasis);
   if (!isTwists) projection.provisionalLeaderboard = coreIdeaProvisionalLeaderboard(projection, responses);
   validateWritingPublication(projection, responseBundle);
-  return { projection, responseBundle, stub, basisSha256: digest(JSON.stringify({ sourceSha256, skillSha256: snapshot.hash, corpusSha256: run.benchmark.hash })) };
+  return { projection, responseBundle, stub, basisSha256: digest(JSON.stringify({ sourceSha256, skillSha256: snapshot.hash, corpusSha256: run.benchmark.hash,
+    ...(methodology.derivedScoreBasis ? { derivedScoreBasis: methodology.derivedScoreBasis } : {}) })) };
 }
 
 export function validateWritingSummary(stub) {
@@ -553,15 +576,18 @@ export function validateWritingPublication(projection, responseBundle) {
     const rank = finite(aggregate.exactScore) ? 1 + projection.benchmarkResults.filter(cell => cell.condition === entry.condition && finite(cell.exactScore) && cell.exactScore > aggregate.exactScore).length : null;
     requireEvidence(entry.rank === rank, "a leaderboard rank ignores an exact tie or missing score.");
   }
+  const derived = projection.methodology.derivedScoreBasis;
+  if (derived) requireEvidence(same(derived, coreIdeaDerivedScoreBasis(projection, derived.id)), "derived Core idea score basis metadata changed.");
   if (projection.provisionalLeaderboard) {
     const provisional = projection.provisionalLeaderboard;
+    if (derived) requireEvidence(Object.entries(derived).every(([field, value]) => same(provisional[field], value)), "provisional derived corpus metadata changed.");
     requireEvidence(benchmarkId === WRITING_BENCHMARK_ID && provisional.status === "provisional" && provisional.benchmarkId === benchmarkId
       && same(provisional.judgeConfigurationIds, [PANEL[0]]) && provisional.judgeCount === 1
       && provisional.sourceSha256 === projection.scoreBasis.sourceSha256 && provisional.corpusSha256 === projection.methodology.corpusSha256
       && provisional.skillSha256 === projection.methodology.skillSha256 && provisional.officialScoreBasisId === projection.scoreBasis.id
-      && same(provisional.caseIds, projection.cases.map(story => story.id)) && provisional.expectedCaseCount === projection.cases.length
+      && same(provisional.caseIds, derived?.caseIds ?? projection.cases.map(story => story.id)) && provisional.expectedCaseCount === (derived?.expectedCaseCount ?? projection.cases.length)
       && provisional.expectedSettingCount === projection.settings.length
-      && provisional.method === "equal-case-paired-complete-corpus-single-judge-mean-v1", "provisional judge, corpus or source basis changed.");
+      && provisional.method === (derived?.method ?? "equal-case-paired-complete-corpus-single-judge-mean-v1"), "provisional judge, corpus or source basis changed.");
     requireEvidence(Array.isArray(provisional.entries) && provisional.entries.length === projection.entries.length
       && new Set(provisional.entries.map(entry => entry.id)).size === provisional.entries.length, "provisional entry inventory changed.");
     for (const entry of provisional.entries) {
@@ -572,6 +598,11 @@ export function validateWritingPublication(projection, responseBundle) {
       const rank = entry.eligibleForRank ? 1 + provisional.entries.filter(other => other.condition === entry.condition && other.eligibleForRank && other.exactScore > entry.exactScore).length : null;
       requireEvidence(entry.rank === rank && entry.score === round(entry.exactScore)
         && (entry.eligibleForRank ? finite(entry.exactScore) && finite(entry.delta) : entry.exactScore === null && entry.delta === null && entry.exactDelta === null && entry.baselineScore === null), "provisional rank includes an incomplete corpus or changes an exact tie.");
+      const expectedMetrics = !entry.eligibleForRank ? null : derived
+        ? metrics(cells.filter(cell => cell.settingId === entry.settingId && cell.condition === entry.condition && derived.caseIds.includes(cell.caseId)))
+        : original.metrics;
+      requireEvidence(same(entry.metrics, expectedMetrics) && entry.latency === (finite(expectedMetrics?.meanLatencyMs) ? expectedMetrics.meanLatencyMs / 1000 : null)
+        && entry.tokens === (expectedMetrics?.meanOutputTokens ?? null) && entry.cost === null, "provisional efficiency differs from its fixed scored corpus.");
     }
     requireEvidence(provisional.rankedSettingCount === provisional.entries.filter(entry => entry.condition === "skill" && entry.eligibleForRank).length, "provisional ranked coverage changed.");
   }
@@ -625,7 +656,7 @@ export function buildSelectedWritingPublication({ repoRootDirectory, benchmarkId
   const run = readPinned(repoRootDirectory, selection.run, readFileSyncImplementation);
   const snapshot = readPinned(repoRootDirectory, selection.skill, readFileSyncImplementation);
   requireEvidence(run.benchmark?.definition?.id === benchmarkId, "selected source belongs to another Writing benchmark.");
-  return projectWritingRun({ run, snapshot, sourceSha256: selection.run.sha256 });
+  return projectWritingRun({ run, snapshot, sourceSha256: selection.run.sha256, derivedScoreBasis: selection.derivedScoreBasis ?? null });
 }
 
 function writingCollectionCoverage(projections) {

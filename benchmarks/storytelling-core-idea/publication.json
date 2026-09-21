@@ -1,12 +1,13 @@
 {
   "kind": "vasirbenchmark-writing-source",
   "schemaVersion": 1,
+  "derivedScoreBasis": "core-idea-astra-common-11-v1",
   "run": {
-    "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac/run.json",
-    "sha256": "0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac"
+    "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/bdf31f6ba88a720057da05d31597dd80a35606201dff7c73a6a741a4cefe4280/run.json",
+    "sha256": "bdf31f6ba88a720057da05d31597dd80a35606201dff7c73a6a741a4cefe4280"
   },
   "skill": {
-    "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/0b47f5bfa55fdce4c3fba9044bac1270ec57df9ee1ae85030a9970c8cfb156ac/skill-snapshot.json",
+    "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/bdf31f6ba88a720057da05d31597dd80a35606201dff7c73a6a741a4cefe4280/skill-snapshot.json",
     "sha256": "a4db1b5ea3ae79e9655be2ab793fa71e153571359a88d098a383bf94cd4667e5"
   }
 }

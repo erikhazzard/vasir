@@ -99,7 +99,19 @@ test('compact adapter retains full benchmark rosters and exact original field me
   assert.deepEqual(twists.settings.map(setting => setting.configurationId),
     twists.methodology.sourceContract.configurations.map(setting => setting.id));
   assert.equal(twists.settings.length, twists.coverage.settingCount);
-  assert.equal(overall.benchmarkSummaries.find(item => item.benchmarkId === 'storytelling-core-idea').treatment, 84);
+  const core = writingOriginals.get('storytelling-core-idea');
+  const selectedCore = core.provisionalLeaderboard;
+  assert.equal(selectedCore.id, 'core-idea-astra-common-11-v1');
+  assert.equal(core.cases.length, 12, 'all original stories remain in the report');
+  assert.deepEqual(selectedCore.caseIds, core.cases.filter(story => story.id !== 'the-matrix').map(story => story.id));
+  assert.equal(selectedCore.expectedCaseCount, 11);
+  assert.equal(selectedCore.rankedSettingCount, core.settings.length, 'every declared setting uses the same complete scored corpus');
+  const coreSummary = overall.benchmarkSummaries.find(item => item.benchmarkId === 'storytelling-core-idea');
+  for (const [field, value] of Object.entries(selectedCore.summary)) assert.equal(coreSummary[field], value, `Core summary ${field} must use the selected uniform basis`);
+  assert.equal(coreSummary.usablePairs, core.settings.length * selectedCore.expectedCaseCount);
+  assert.equal(coreSummary.expectedPairs, coreSummary.usablePairs);
+  assert.equal(overall.benchmarkDisplays['storytelling-core-idea'].caseCount, selectedCore.expectedCaseCount);
+  assert.equal(overall.benchmarkDisplays['storytelling-core-idea'].cohort, `${selectedCore.expectedCaseCount} stories`);
   for (const setting of adapter.settings) {
     const canonical = sources.engineering.settings.find(item => item.configurationId === setting.configurationId);
     if (canonical) assert.equal(setting.id, canonical.id);

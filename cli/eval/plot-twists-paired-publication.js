@@ -3,9 +3,13 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { buildPairedJudgePrompt, exportPairedRun, PAIRED_RUNTIME_VERSION, PAIRED_VALIDATION_ERRATUM_VERSION, validatePairedAssessment, validatePairedRunExport } from './plot-twists-paired-runtime.js';
+import { resolveBenchmarkConfiguration } from './benchmark-models.js';
 
 export const PLOT_TWISTS_PAIRED_EDITION = 'storytelling-plot-twists-paired-v2';
 export const PLOT_TWISTS_PAIRED_SOURCE_KIND = 'vasirbenchmark-plot-twists-paired-source';
+export const PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_PATH = 'benchmarks/storytelling-plot-twists/head-to-head-astra-fable-v1.json';
+export const PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256 = 'f747f36bbddf08f0f6f4f65a7cbe9b16745967baebfc5edd9642b4327c3e3637';
+const HEAD_TO_HEAD_SOURCE_SHA256 = 'f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7';
 export const WRITING_PAIRED_SCORE_BASIS = Object.freeze({
   id: 'writing-storytelling-paired-v2',
   benchmarkIds: Object.freeze(['storytelling-core-idea', 'storytelling-plot-twists', 'storytelling-magic-discovery']),
@@ -21,8 +25,14 @@ const ADDED_MODELS = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex
   'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max',
   'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
 const EXTENSION_VERSION = 'paired-reasoning-coverage-extension-v1';
+const DECLARED_EXTENSION_VERSION = 'paired-declared-coverage-extension-v2';
 const EXECUTION_VALIDATION_VERSION = 'paired-one-turn-last-message-validation-v1';
 const EXECUTION_VALIDATION_PURPOSE = 'Supplemental calls use the pinned one-turn validation policy: the exact pre-turn disabled-Code-Mode notice is allowed, tools are forbidden, and the last completed assistant message is the answer.';
+const TOOL_ISOLATION_POLICY = { version: 'explicit-agent-tool-isolation-v1', codexConfig: { 'agents.enabled': false },
+  rejectToolRouterErrors: true, appliesTo: 'newly-prepared-runs-only', historicalResultsReclassified: false };
+const TOOL_ISOLATION_PURPOSE = 'Only newly attempted calls in this manifest use the explicit Codex agents.enabled=false override and reject tool-router errors. Retained historical answers and reviews are not retrospectively certified or reclassified by this policy.';
+const TECHNICAL_RECOVERY_VERSION = 'paired-tool-isolation-recovery-v1';
+const RECOVERY_MODELS = ['codex:gpt-6-astra@ultra', 'codex:gpt-5.6-sol@ultra', 'codex:gpt-5.6-terra@ultra'];
 const LABELS = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-5.6-sol': 'GPT-5.6 Sol', 'gpt-5.6-terra': 'GPT-5.6 Terra',
   'gpt-5.6-luna': 'GPT-5.6 Luna', 'claude-fable-5-1': 'Claude Fable 5.1', 'claude-opus-5': 'Claude Opus 5' };
 const CONDITIONS = [{ id: 'baseline', sourceId: 'baseline', label: 'Plain answer', short: 'Plain', color: '#72777f', shape: 'circle' },
@@ -32,6 +42,11 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const mean = values => values.length && values.every(Number.isFinite) ? values.reduce((a, b) => a + b, 0) / values.length : null;
 const round = value => Number.isFinite(value) ? Math.round((value + Number.EPSILON) * 10) / 10 : null;
 const words = text => text.trim() ? text.trim().split(/\s+/u).length : 0;
+const publicToolIsolationPolicy = (policy, sha256, configurationIds, recovery = null) => ({ ...policy, sha256,
+  purpose: TOOL_ISOLATION_PURPOSE, ...(recovery ? {
+    generationIds: [...recovery.replacementGenerationIds, ...recovery.pendingGenerationIds],
+    judgmentIds: [...recovery.replacementJudgmentIds, ...recovery.pendingJudgmentIds]
+  } : { configurationIds }) });
 const requireEvidence = (value, message) => { if (!value) throw new Error(`Paired Plot twists publication: ${message}`); };
 const usage = value => Object.fromEntries(['inputTokens', 'cachedInputTokens', 'cacheWriteInputTokens', 'cacheCreationInputTokens', 'cacheReadInputTokens', 'outputTokens', 'reasoningOutputTokens', 'totalTokens']
   .map(key => [key, Number.isFinite(value?.[key]) && value[key] >= 0 ? value[key] : null]));
@@ -47,15 +62,182 @@ const dimensionsFor = contract => contract.task.rubric.map(item => ({ id: item.i
   label: item.criterion ?? item.title, description: item.description ?? item.criterion ?? item.title, weight: 25, anchors: contract.anchors }));
 const cohortProvenance = (contract, configurationId) => {
   if (!contract.coverageExtension) return {};
+  if (contract.sourceCohorts) {
+    const cohort = contract.sourceCohorts.find(item => item.configurationIds.includes(configurationId));
+    requireEvidence(cohort, 'answer has no declared source cohort.');
+    const { configurationIds, ...provenance } = cohort;
+    return provenance;
+  }
   const original = MODELS.includes(configurationId);
   return { sourceCohort: original ? 'original' : 'supplement',
     sourceSnapshotSha256: original ? contract.coverageExtension.parentSnapshotSha256 : contract.sourceSha256,
     sourceManifestSha256: original ? contract.coverageExtension.parentManifestSha256 : contract.manifestSha256 };
 };
+const recordProvenance = (contract, kind, id, configurationId) => {
+  if (!contract.technicalRecovery) return cohortProvenance(contract, configurationId);
+  const record = contract.recordSources.find(item => item.kind === kind && item.id === id);
+  requireEvidence(record, 'effective answer or review has no original record source.');
+  const { kind: _kind, id: _id, disposition, ...source } = record;
+  return { ...source, recordDisposition: disposition,
+    ...(disposition !== 'retained' ? { technicalRecoverySha256: contract.technicalRecovery.sha256 } : {}) };
+};
+const slotId = (kind, configurationId, caseId, conditionOrSeat) => `${kind}-` + hash(JSON.stringify([configurationId, caseId, conditionOrSeat])).slice(0, 24);
+
+// This explicitly authorized, non-scoring sidecar is pinned independently of
+// the unchanged benchmark snapshot. Never discover mutable experiments or
+// reinterpret a failed original record inside the benchmark scoring pipeline.
+function validateHeadToHeads(projection, responseBundle) {
+  const heads = projection.headToHeads;
+  if (!heads) {
+    requireEvidence(!responseBundle?.headToHeads, 'head-to-head response evidence has no corresponding public comparison.');
+    return;
+  }
+  requireEvidence(Array.isArray(heads) && heads.length === 1, 'head-to-head inventory changed.');
+  const { evidenceSha256, ...head } = heads[0];
+  const originalSidecar = { kind: 'vasirbenchmark-writing-head-to-head-evidence', schemaVersion: 1, headToHead: head };
+  requireEvidence(evidenceSha256 === PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256
+    && hash(JSON.stringify(originalSidecar, null, 2) + '\n') === evidenceSha256, 'head-to-head evidence differs from its explicitly pinned source.');
+  requireEvidence(head.sourceSnapshotSha256 === HEAD_TO_HEAD_SOURCE_SHA256
+    && projection.scoreBasis.sourceSha256 === head.sourceSnapshotSha256
+    && head.benchmarkId === ID && head.caseId === projection.cases[0].id && head.condition === 'skill'
+    && head.scoreEffect === 'none', 'head-to-head comparison changes source identity or scoring scope.');
+  for (const candidate of head.candidates) {
+    const setting = projection.settings.find(item => item.id === candidate.settingId);
+    requireEvidence(setting?.configurationId === candidate.configurationId && setting.label === candidate.label,
+      'head-to-head candidate setting changed.');
+    if (responseBundle) {
+      const response = responseBundle.responses.find(item => item.settingId === candidate.settingId && item.condition === head.condition);
+      requireEvidence(response?.provenance.outputSha256 === candidate.outputSha256
+        && hash(response.outputText) === candidate.outputSha256 && response.wordCount === candidate.wordCount,
+      'head-to-head candidate differs from the original published answer.');
+    }
+  }
+  for (const review of head.reviews) {
+    requireEvidence(hash(review.rawText) === review.rawTextSha256, 'head-to-head original review text changed.');
+    let parsed = null;
+    try { parsed = JSON.parse(review.rawText); } catch { /* Preserve invalid original JSON verbatim. */ }
+    const label = review.preferredCandidateId === 'tie' ? 'tie'
+      : review.preferredCandidateId === review.firstCandidateId ? 'A'
+      : review.preferredCandidateId === review.secondCandidateId ? 'B' : null;
+    requireEvidence(label !== null, 'head-to-head preference is not explicitly mapped to an original candidate.');
+    const preference = { candidate: label, reason: review.reason, confidence: review.confidence };
+    if (review.interpretation === 'structured-preference') {
+      requireEvidence(parsed && review.originalValidation.schemaValid && review.originalValidation.status === 'succeeded'
+        && review.originalValidation.error === null && same(parsed.preference, preference), 'head-to-head structured preference differs from its original review.');
+      validatePairedAssessment(parsed, JSON.parse(JSON.stringify(projection.methodology.sourceContract.task)));
+    } else {
+      requireEvidence(review.id === 'review-04' && review.interpretation === 'explicit-text-transcription'
+        && parsed === null && review.originalValidation.schemaValid === false && review.originalValidation.status === 'failed'
+        && typeof review.originalValidation.error === 'string'
+        && review.rawText.includes('"preference":' + JSON.stringify(preference)),
+      'head-to-head clear-text transcription changed or its original schema failure was concealed.');
+    }
+  }
+  const judges = head.judges.map(judge => {
+    const reviews = head.reviews.filter(review => review.judgeId === judge.id);
+    requireEvidence(reviews.length === 2 && same(judge.reviewIds, reviews.map(review => review.id))
+      && reviews[0].firstCandidateId === reviews[1].secondCandidateId && reviews[0].secondCandidateId === reviews[1].firstCandidateId,
+    'head-to-head reversed-order judge coverage changed.');
+    const consistent = reviews[0].preferredCandidateId === reviews[1].preferredCandidateId;
+    requireEvidence(judge.orderConsistent === consistent && judge.preferredCandidateId === (consistent ? reviews[0].preferredCandidateId : null),
+      'head-to-head order consistency differs from the explicit preferences.');
+    return judge;
+  });
+  requireEvidence(same(head.summary, { preferredCandidateId: judges.every(judge => judge.orderConsistent
+      && judge.preferredCandidateId === judges[0].preferredCandidateId) ? judges[0].preferredCandidateId : null,
+    judgeCount: judges.length, reviewCount: head.reviews.length,
+    orderConsistentJudgeCount: judges.filter(judge => judge.orderConsistent).length,
+    structuredReviewCount: head.reviews.filter(review => review.interpretation === 'structured-preference').length,
+    transcribedReviewCount: head.reviews.filter(review => review.interpretation === 'explicit-text-transcription').length }),
+  'head-to-head summary does not preserve every explicit preference and interpretation.');
+  if (responseBundle) requireEvidence(same(heads, responseBundle.headToHeads), 'head-to-head projection and response evidence differ.');
+}
+
+function originalRecordSource(snapshot, sourceSha256, kind, id) {
+  const collection = kind === 'generation' ? 'generations' : 'judgments';
+  if (snapshot.parentSnapshot?.[collection].some(row => row.id === id))
+    return originalRecordSource(snapshot.parentSnapshot, snapshot.coverageExtension.parentSnapshotSha256, kind, id);
+  return { sourceCohort: snapshot.coverageExtension ? 'supplement' : 'original', sourceSnapshotSha256: sourceSha256,
+    sourceManifestSha256: snapshot.manifestSha256 };
+}
+
+function publicRecoveryRecordSources(snapshot, sourceSha256) {
+  const recovery = snapshot.manifest.technicalRecovery, source = snapshot.recoverySourceSnapshot;
+  return ['generation', 'judgment'].flatMap(kind => {
+    const rows = source[kind === 'generation' ? 'generations' : 'judgments'];
+    const replacements = recovery[kind === 'generation' ? 'replacementGenerationIds' : 'replacementJudgmentIds'];
+    const pending = recovery[kind === 'generation' ? 'pendingGenerationIds' : 'pendingJudgmentIds'];
+    return rows.map(row => {
+      const disposition = replacements.includes(row.id) ? 'technical-replacement' : pending.includes(row.id) ? 'previously-unattempted' : 'retained';
+      return { kind, id: row.id, disposition, ...(disposition === 'retained'
+        ? originalRecordSource(source, recovery.sourceSnapshotSha256, kind, row.id)
+        : { sourceCohort: 'recovery', sourceSnapshotSha256: sourceSha256, sourceManifestSha256: snapshot.manifestSha256 }),
+      ...(disposition === 'technical-replacement' ? { supersedesRecordSha256: hash(JSON.stringify(row)) } : {}) };
+    });
+  });
+}
+
+function publicCoverageHistory(snapshot, sourceSha256) {
+  const extension = snapshot.coverageExtension;
+  const inherited = extension ? publicCoverageHistory(snapshot.parentSnapshot, extension.parentSnapshotSha256)
+    : { sourceCohorts: [], coverageHistory: [] };
+  const configurationIds = extension ? extension.addedConfigurations : snapshot.manifest.configurations.map(item => item.id);
+  const sourceIdentity = { sourceSnapshotSha256: sourceSha256, sourceManifestSha256: snapshot.manifestSha256 };
+  return { sourceCohorts: [...inherited.sourceCohorts,
+    { configurationIds, sourceCohort: extension ? 'supplement' : 'original', ...sourceIdentity }],
+  coverageHistory: [...inherited.coverageHistory, ...(extension ? [{ ...extension, ...sourceIdentity }] : [])] };
+}
+
+function validateDeclaredConfigurations(added, retained) {
+  requireEvidence(Array.isArray(added) && added.length > 0 && new Set(added).size === added.length,
+    'coverage append requires unique explicit new configurations.');
+  for (const id of added) {
+    const configuration = resolveBenchmarkConfiguration(id);
+    requireEvidence(configuration.id === id && Object.hasOwn(LABELS, configuration.model)
+      && configuration.reasoning !== 'ultracode' && !retained.includes(id), 'coverage append changed a canonical identity or reran a retained setting.');
+  }
+}
+
+function validateCoverageHistory(contract) {
+  const cohorts = contract.sourceCohorts, history = contract.coverageHistory;
+  requireEvidence(Array.isArray(cohorts) && cohorts.length > 1 && Array.isArray(history) && history.length === cohorts.length - 1,
+    'declared coverage history is missing.');
+  const seen = [];
+  for (const [index, cohort] of cohorts.entries()) {
+    requireEvidence(same(Object.keys(cohort), ['configurationIds', 'sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256'])
+      && ['sourceSnapshotSha256', 'sourceManifestSha256'].every(key => /^[a-f0-9]{64}$/.test(cohort[key] ?? '')),
+    'source cohort identity changed.');
+    if (index === 0) requireEvidence(cohort.sourceCohort === 'original' && same(cohort.configurationIds, MODELS), 'original cohort changed.');
+    else {
+      const step = history[index - 1], previous = cohorts[index - 1];
+      validateDeclaredConfigurations(cohort.configurationIds, seen);
+      requireEvidence([EXTENSION_VERSION, DECLARED_EXTENSION_VERSION].includes(step.version)
+        && typeof step.purpose === 'string' && step.purpose.trim()
+        && (step.version !== EXTENSION_VERSION || index === 1 && same(cohort.configurationIds, ADDED_MODELS))
+        && cohort.sourceCohort === 'supplement' && same(step.addedConfigurations, cohort.configurationIds)
+        && step.retainedConfigurationCount === seen.length && step.additionalGenerationCount === cohort.configurationIds.length * CONDITIONS.length
+        && step.additionalJudgeRequestCount === cohort.configurationIds.length * PANEL.length
+        && step.parentSnapshotSha256 === previous.sourceSnapshotSha256 && step.parentManifestSha256 === previous.sourceManifestSha256
+        && step.sourceSnapshotSha256 === cohort.sourceSnapshotSha256 && step.sourceManifestSha256 === cohort.sourceManifestSha256,
+      'coverage history no longer binds each append to its complete parent.');
+    }
+    seen.push(...cohort.configurationIds);
+  }
+  requireEvidence(new Set(seen).size === seen.length && same(seen, contract.configurations.map(item => item.id))
+    && new Set(cohorts.map(item => item.sourceSnapshotSha256)).size === cohorts.length
+    && new Set(cohorts.map(item => item.sourceManifestSha256)).size === cohorts.length,
+  'source cohorts overlap or differ from the declared roster.');
+  const { sourceSnapshotSha256, sourceManifestSha256, ...latest } = history.at(-1);
+  requireEvidence(same(latest, contract.coverageExtension)
+    && sourceSnapshotSha256 === (contract.technicalRecovery?.sourceSnapshotSha256 ?? contract.sourceSha256)
+    && sourceManifestSha256 === (contract.technicalRecovery?.sourceManifestSha256 ?? contract.manifestSha256),
+  'latest coverage history differs from the selected source or its declared recovery predecessor.');
+}
 
 function publicContract(snapshot, sourceSha256) {
   const { manifest } = snapshot, specification = manifest.specification;
-  const erratumSource = snapshot.parentSnapshot ?? snapshot;
+  let erratumSource = snapshot;
+  while (erratumSource.parentSnapshot) erratumSource = erratumSource.parentSnapshot;
   return { edition: PLOT_TWISTS_PAIRED_EDITION, benchmarkId: ID, runId: snapshot.runId,
     runtimeVersion: manifest.runtimePolicy.version, runtimeInventory: manifest.runtimeInventory,
     ...(erratumSource.runtimeValidationErratum ? { runtimeValidationErratum: {
@@ -64,6 +246,13 @@ function publicContract(snapshot, sourceSha256) {
     ...(snapshot.coverageExtension ? { coverageExtension: { ...snapshot.coverageExtension },
       executionValidationPolicy: { version: manifest.executionValidationPolicy.version,
         sha256: manifest.executionValidationPolicySha256, purpose: EXECUTION_VALIDATION_PURPOSE } } : {}),
+    ...(snapshot.coverageExtension?.version === DECLARED_EXTENSION_VERSION ? publicCoverageHistory(snapshot.recoverySourceSnapshot ?? snapshot,
+      manifest.technicalRecovery?.sourceSnapshotSha256 ?? sourceSha256) : {}),
+    ...(manifest.technicalRecovery ? { technicalRecovery: { ...manifest.technicalRecovery, sha256: manifest.technicalRecoverySha256,
+      acceptedParentSnapshotSha256: snapshot.coverageExtension.parentSnapshotSha256 },
+    recordSources: publicRecoveryRecordSources(snapshot, sourceSha256) } : {}),
+    ...(manifest.toolIsolationPolicy ? { toolIsolationPolicy: publicToolIsolationPolicy(manifest.toolIsolationPolicy,
+      manifest.toolIsolationPolicySha256, snapshot.coverageExtension?.addedConfigurations ?? manifest.configurations.map(item => item.id), manifest.technicalRecovery) } : {}),
     sourceSha256, manifestSha256: snapshot.manifestSha256,
     specificationSha256: manifest.specificationSha256 ?? hash(JSON.stringify(specification)),
     task: { id: specification.benchmark.caseId, title: specification.benchmark.title, prompt: specification.benchmark.prompt,
@@ -71,25 +260,86 @@ function publicContract(snapshot, sourceSha256) {
     configurations: manifest.configurations, judges: specification.judging.panel,
     anchors: specification.scoring.anchors, judgeInstructions: specification.judging.instructions,
     bundleSha256: manifest.frozenBundle.sha256,
-    skillFiles: manifest.frozenBundle.files.map(file => ({ path: file.path, sha256: file.sha256, bytes: file.bytes ?? Buffer.byteLength(file.content) })) };
+      skillFiles: manifest.frozenBundle.files.map(file => ({ path: file.path, sha256: file.sha256, bytes: file.bytes ?? Buffer.byteLength(file.content) })) };
+}
+
+function validateTechnicalRecovery(contract) {
+  const recovery = contract.technicalRecovery;
+  if (!recovery) {
+    requireEvidence(!contract.recordSources, 'per-record recovery provenance lacks its authorization.');
+    return;
+  }
+  const { sha256, acceptedParentSnapshotSha256, ...original } = recovery;
+  requireEvidence(recovery.version === TECHNICAL_RECOVERY_VERSION && contract.coverageExtension?.version === DECLARED_EXTENSION_VERSION
+    && same(Object.keys(original), ['version', 'sourceSnapshotSha256', 'sourceManifestSha256', 'authorization',
+      'replacementGenerationIds', 'replacementJudgmentIds', 'pendingGenerationIds', 'pendingJudgmentIds',
+      'retainedGenerationCount', 'retainedJudgmentCount', 'purpose'])
+    && hash(JSON.stringify(original)) === sha256
+    && ['sourceSnapshotSha256', 'sourceManifestSha256', 'sha256', 'acceptedParentSnapshotSha256'].every(key => /^[a-f0-9]{64}$/.test(recovery[key] ?? ''))
+    && recovery.sourceSnapshotSha256 !== contract.sourceSha256 && recovery.sourceManifestSha256 !== contract.manifestSha256
+    && acceptedParentSnapshotSha256 === contract.coverageExtension.parentSnapshotSha256,
+  'technical recovery lost its exact predecessor or authorization identity.');
+  requireEvidence(Number.isFinite(Date.parse(recovery.authorization?.approvedAt))
+    && same(Object.keys(recovery.authorization).sort(), ['approvedAt', 'scope', 'userInstruction'])
+    && recovery.authorization.userInstruction === 'please do it'
+    && recovery.authorization.scope === 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.'
+    && typeof recovery.purpose === 'string' && recovery.purpose.trim(), 'technical recovery approval changed.');
+  requireEvidence(same(recovery.replacementGenerationIds, RECOVERY_MODELS.map(id => slotId('generation', id, contract.task.id, 'skill')))
+    && same(recovery.replacementJudgmentIds, [1, 2].map(seat => slotId('judgment', RECOVERY_MODELS[0], contract.task.id, seat))),
+  'technical recovery replaced an unauthorized answer or completed review.');
+  const expected = ['generation', 'judgment'].flatMap(kind => contract.configurations.flatMap(configuration =>
+    (kind === 'generation' ? ['baseline', 'skill'] : [1, 2]).map(part => ({ kind,
+      id: slotId(kind, configuration.id, contract.task.id, part), configurationId: configuration.id }))));
+  requireEvidence(Array.isArray(contract.recordSources) && same(contract.recordSources.map(({ kind, id }) => ({ kind, id })),
+    expected.map(({ kind, id }) => ({ kind, id }))), 'technical recovery record inventory changed.');
+  for (const kind of ['generation', 'judgment']) {
+    const replacements = recovery[kind === 'generation' ? 'replacementGenerationIds' : 'replacementJudgmentIds'];
+    const pending = recovery[kind === 'generation' ? 'pendingGenerationIds' : 'pendingJudgmentIds'];
+    const all = expected.filter(item => item.kind === kind), newIds = [...replacements, ...(pending ?? [])];
+    requireEvidence(Array.isArray(pending) && new Set(newIds).size === newIds.length && newIds.every(id => all.some(item => item.id === id))
+      && recovery[kind === 'generation' ? 'retainedGenerationCount' : 'retainedJudgmentCount'] === all.length - newIds.length,
+    'technical recovery changed the retained or previously unattempted inventory.');
+    for (const item of all) {
+      const record = contract.recordSources.find(row => row.kind === kind && row.id === item.id);
+      const disposition = replacements.includes(item.id) ? 'technical-replacement' : pending.includes(item.id) ? 'previously-unattempted' : 'retained';
+      const origin = disposition === 'retained' ? cohortProvenance(contract, item.configurationId)
+        : { sourceCohort: 'recovery', sourceSnapshotSha256: contract.sourceSha256, sourceManifestSha256: contract.manifestSha256 };
+      requireEvidence(disposition !== 'technical-replacement' || /^[a-f0-9]{64}$/.test(record.supersedesRecordSha256 ?? ''),
+        'replacement lost its immutable original attempt identity.');
+      requireEvidence(same(record, { kind, id: item.id, disposition, ...origin,
+        ...(disposition === 'technical-replacement' ? { supersedesRecordSha256: record.supersedesRecordSha256 } : {}) }),
+      'technical recovery reclassified or relabeled original record provenance.');
+    }
+  }
+  requireEvidence(contract.toolIsolationPolicy, 'technical recovery requires explicit new-call tool isolation.');
 }
 
 function validateContract(contract) {
+  const declared = contract?.coverageExtension?.version === DECLARED_EXTENSION_VERSION;
   requireEvidence(contract?.edition === PLOT_TWISTS_PAIRED_EDITION && contract.benchmarkId === ID
     && contract.runtimeVersion === PAIRED_RUNTIME_VERSION
-    && same(contract.configurations?.map(item => item.id), contract.coverageExtension ? [...MODELS, ...ADDED_MODELS] : MODELS)
+    && (declared || same(contract.configurations?.map(item => item.id), contract.coverageExtension ? [...MODELS, ...ADDED_MODELS] : MODELS))
     && same(contract.judges, PANEL), 'declared edition, creator roster, or panel changed.');
+  if (declared) {
+    requireEvidence(same(contract.configurations, contract.configurations.map(item => resolveBenchmarkConfiguration(item.id))), 'declared configuration metadata changed.');
+    validateCoverageHistory(contract);
+  } else requireEvidence(!contract.sourceCohorts && !contract.coverageHistory, 'historical cohort cannot claim undeclared append history.');
   if (contract.coverageExtension) {
     const extension = contract.coverageExtension;
-    requireEvidence(extension.version === EXTENSION_VERSION && typeof extension.purpose === 'string' && extension.purpose.trim()
+    requireEvidence([EXTENSION_VERSION, DECLARED_EXTENSION_VERSION].includes(extension.version) && typeof extension.purpose === 'string' && extension.purpose.trim()
       && ['parentSnapshotSha256', 'parentManifestSha256'].every(key => /^[a-f0-9]{64}$/.test(extension[key] ?? ''))
-      && same(extension.addedConfigurations, ADDED_MODELS) && extension.retainedConfigurationCount === MODELS.length
-      && extension.additionalGenerationCount === ADDED_MODELS.length * CONDITIONS.length
-      && extension.additionalJudgeRequestCount === ADDED_MODELS.length * PANEL.length, 'declared coverage extension changed.');
+      && (declared || same(extension.addedConfigurations, ADDED_MODELS) && extension.retainedConfigurationCount === MODELS.length)
+      && extension.additionalGenerationCount === extension.addedConfigurations.length * CONDITIONS.length
+      && extension.additionalJudgeRequestCount === extension.addedConfigurations.length * PANEL.length, 'declared coverage extension changed.');
     requireEvidence(contract.executionValidationPolicy?.version === EXECUTION_VALIDATION_VERSION
       && /^[a-f0-9]{64}$/.test(contract.executionValidationPolicy.sha256 ?? '')
       && contract.executionValidationPolicy.purpose === EXECUTION_VALIDATION_PURPOSE, 'supplemental execution validation identity changed.');
   } else requireEvidence(!contract.executionValidationPolicy, 'supplemental execution policy lacks a declared extension.');
+  validateTechnicalRecovery(contract);
+  if (Object.hasOwn(contract, 'toolIsolationPolicy')) requireEvidence(same(contract.toolIsolationPolicy,
+    publicToolIsolationPolicy(TOOL_ISOLATION_POLICY, hash(JSON.stringify(TOOL_ISOLATION_POLICY)),
+      contract.coverageExtension?.addedConfigurations ?? contract.configurations.map(item => item.id), contract.technicalRecovery)),
+  'tool isolation policy or its new-call-only scope changed.');
   requireEvidence(contract.task?.id === 'scifi-outline' && contract.task.wordLimit === 550 && typeof contract.task.prompt === 'string'
     && contract.task.rubric?.length === 4 && new Set(contract.task.rubric.map(item => item.id)).size === 4, 'single-prompt task or rubric changed.');
   requireEvidence(['sourceSha256', 'manifestSha256', 'specificationSha256', 'bundleSha256'].every(key => /^[a-f0-9]{64}$/.test(contract[key] ?? '')),
@@ -165,12 +415,20 @@ function buildProjection(contract, responses, judgeRequests) {
     judgmentCount: responses.reduce((sum, response) => sum + response.judgments.length, 0), expectedJudgmentCount: expectedResponseCount * PANEL.length,
     pairedJudgeCallCount: judgeRequests.filter(request => request.status === 'succeeded').length, expectedPairedJudgeCallCount,
     executionComplete: pairs.length === settingCount, executionStatus: pairs.length === settingCount ? 'complete' : 'in-progress' };
-  const limitations = ['One prompt and one generation per condition describe this task, not general storytelling ability or repeated-run reliability.',
+  const recovery = contract.technicalRecovery;
+  const limitations = [recovery
+    ? 'One prompt and one selected generation per condition describe this task, not general storytelling ability or repeated-run reliability. The disclosed technical replacements are not independent repeated trials.'
+    : 'One prompt and one generation per condition describe this task, not general storytelling ability or repeated-run reliability.',
     'The two model judges share a provider and overlap with creator families; no human calibration or population confidence interval is claimed.',
     'The skill condition includes the complete frozen root and twists reference once. This does not isolate their separate effects or control for added input length.',
     'All declared settings and outcomes are retained. Missing responses and reviews do not become zero or enter a comparable rank.',
-    `The ${expectedResponseCount + expectedPairedJudgeCallCount} planned top-level benchmark CLI calls comprise ${expectedResponseCount} creator calls and ${expectedPairedJudgeCallCount} paired reviewer calls, not a verified count of underlying provider inference requests. Host automatic retries are zero; provider-internal retries and built-in instructions are not independently verified.`,
-    ...(contract.coverageExtension ? ['The original six-setting cohort is retained unchanged. Eight declared model-and-effort settings append 16 creator calls and 16 paired reviewer calls; no original setting was rerun or replaced.'] : [])];
+    recovery
+      ? `The selected results occupy ${expectedResponseCount} answer slots and ${expectedPairedJudgeCallCount} paired-review slots. Technical recovery authorizes ${recovery.replacementGenerationIds.length + recovery.pendingGenerationIds.length} creator calls and ${recovery.replacementJudgmentIds.length + recovery.pendingJudgmentIds.length} paired reviewer calls; ${recovery.replacementGenerationIds.length + recovery.replacementJudgmentIds.length} superseded original attempts remain in immutable evidence, outside current scores. These are top-level benchmark CLI calls, not a verified count of underlying provider inference requests. Host automatic retries are zero; provider-internal retries and built-in instructions are not independently verified.`
+      : `The ${expectedResponseCount + expectedPairedJudgeCallCount} planned top-level benchmark CLI calls comprise ${expectedResponseCount} creator calls and ${expectedPairedJudgeCallCount} paired reviewer calls, not a verified count of underlying provider inference requests. Host automatic retries are zero; provider-internal retries and built-in instructions are not independently verified.`,
+    ...(recovery ? [`User-approved technical recovery replaces only the three skill answers with recorded tool errors and the two previously completed Astra ultra paired reviews. Every clean answer and review is retained unchanged, including the Astra ultra plain answer. Previously unattempted slots complete the declared roster. The original stopped run and all superseded attempts remain byte-preserved; replacement selection is not based on scores.`]
+      : contract.coverageExtension ? [contract.sourceCohorts
+      ? `All ${contract.coverageExtension.retainedConfigurationCount} previously published settings are retained unchanged. ${contract.coverageExtension.addedConfigurations.length} explicitly declared settings append ${contract.coverageExtension.additionalGenerationCount} creator calls and ${contract.coverageExtension.additionalJudgeRequestCount} paired reviewer calls; no retained setting was rerun or replaced.`
+      : 'The original six-setting cohort is retained unchanged. Eight declared model-and-effort settings append 16 creator calls and 16 paired reviewer calls; no original setting was rerun or replaced.'] : [])];
   const availability = { status: 'development', verification: 'unverified', code: 'development-uncalibrated', message: 'Exploratory model-judged results',
     detail: `One prompt, ${settingCount} declared GPT and Claude model-and-effort settings, one plain/skill pair each, and two blinded paired judges.`,
     blockers: [{ code: 'human-calibration-pending', message: 'Human calibration pending.' }] };
@@ -196,7 +454,7 @@ function buildProjection(contract, responses, judgeRequests) {
     resultEntries: expectedResponseCount, responses: coverage.responseCount, developmentResultSets: 1, eligibleResultSets: 0, withheldResultSets: 0 };
   return { kind: 'vasirbenchmark-writing-projection', schemaVersion: 1, trialCount: 1, caseLabel: 'prompt', trialLabel: 'Trial',
     program: { id: 'vasirbench', title: 'VasirBench', status: 'development', evidenceStatus: 'development', verification: 'unverified' },
-    meta: { release: 'Plot twists · September 2026', status: availability.message, categories: 1, benchmarks: 1, settings: settingCount, conditions: 2, trials: 1, aggregateCells: expectedResponseCount, runs: contract.coverageExtension ? 2 : 1, calibration: 0 },
+    meta: { release: 'Plot twists · September 2026', status: availability.message, categories: 1, benchmarks: 1, settings: settingCount, conditions: 2, trials: 1, aggregateCells: expectedResponseCount, runs: recovery ? contract.sourceCohorts.length + 1 : contract.sourceCohorts?.length ?? (contract.coverageExtension ? 2 : 1), calibration: 0 },
     scoreBasis, conditions: CONDITIONS, categories: [{ id: 'writing', name: 'Writing', title: 'Writing', short: 'WRITE', weight: 1, color: '#b65a31', trackIds: ['storytelling'] }],
     families: [{ id: 'writing', title: 'Writing', description: 'Task-specific writing benchmarks.', trackIds: ['storytelling'] }],
     tracks: [{ id: 'storytelling', familyId: 'writing', title: 'Storytelling', description: 'Understanding and creating narrative.', benchmarkIds: [ID], resultAvailability: availability }],
@@ -221,14 +479,32 @@ function buildProjection(contract, responses, judgeRequests) {
           retainedSettingCount: contract.coverageExtension.retainedConfigurationCount, additionalSettingCount: contract.coverageExtension.addedConfigurations.length,
           additionalCreatorCalls: contract.coverageExtension.additionalGenerationCount, additionalPairedReviewerCalls: contract.coverageExtension.additionalJudgeRequestCount,
           executionValidationPolicyVersion: contract.executionValidationPolicy.version, executionValidationPolicySha256: contract.executionValidationPolicy.sha256,
-          executionValidationPolicyPurpose: contract.executionValidationPolicy.purpose } : {}) },
+          executionValidationPolicyPurpose: contract.executionValidationPolicy.purpose } : {}),
+        ...(contract.sourceCohorts ? { sourceCohorts: JSON.stringify(contract.sourceCohorts), coverageHistory: JSON.stringify(contract.coverageHistory) } : {}),
+        ...(contract.toolIsolationPolicy ? { toolIsolationPolicyVersion: contract.toolIsolationPolicy.version,
+          toolIsolationPolicySha256: contract.toolIsolationPolicy.sha256, toolIsolationPolicyPurpose: contract.toolIsolationPolicy.purpose,
+          toolIsolationCodexConfig: JSON.stringify(contract.toolIsolationPolicy.codexConfig),
+          ...(recovery ? { toolIsolationGenerationIds: JSON.stringify(contract.toolIsolationPolicy.generationIds),
+            toolIsolationJudgmentIds: JSON.stringify(contract.toolIsolationPolicy.judgmentIds) }
+            : { toolIsolationConfigurationIds: JSON.stringify(contract.toolIsolationPolicy.configurationIds) }),
+          toolIsolationRejectToolRouterErrors: contract.toolIsolationPolicy.rejectToolRouterErrors,
+          toolIsolationAppliesTo: contract.toolIsolationPolicy.appliesTo,
+          toolIsolationHistoricalResultsReclassified: contract.toolIsolationPolicy.historicalResultsReclassified } : {}),
+        ...(recovery ? { technicalRecoveryVersion: recovery.version, technicalRecoverySha256: recovery.sha256,
+          technicalRecoverySourceSha256: recovery.sourceSnapshotSha256, technicalRecoverySourceManifestSha256: recovery.sourceManifestSha256,
+          technicalRecoveryPurpose: recovery.purpose, technicalRecoveryApprovedAt: recovery.authorization.approvedAt,
+          technicalRecoveryAuthorizationScope: recovery.authorization.scope,
+          replacementGenerationIds: JSON.stringify(recovery.replacementGenerationIds), replacementJudgmentIds: JSON.stringify(recovery.replacementJudgmentIds),
+          retainedGenerationCount: recovery.retainedGenerationCount, retainedJudgmentCount: recovery.retainedJudgmentCount,
+          previouslyUnattemptedGenerationCount: recovery.pendingGenerationIds.length, previouslyUnattemptedJudgmentCount: recovery.pendingJudgmentIds.length,
+          supersededOriginalAttemptsPreserved: true, scoreBasedReplacementSelection: false } : {}) },
       resourceAccounting: 'Generation resources belong to each answer. Each judge request assesses a pair; count requestId once when totaling judge usage. Missing usage remains unknown. Raw provider usage is retained in source artifacts; Claude receipts may include auxiliary claude-haiku-4-5 activity, which is not a scored story answer or another declared benchmark call.' },
     coverage, categoryLeaders: [], efficientFrontier: [], regressions: entries.filter(entry => entry.condition === 'skill' && entry.delta < 0),
     callouts: { overall: 'Plot twists contributes one equally weighted benchmark to the current Writing basis.', value: 'Quality, length and resources are separate outcomes.', regression: `All ${settingCount} declared settings and paired losses remain visible.`, category: 'One prompt; one plain/skill pair per declared model-and-effort setting.' },
     availability, counts };
 }
 
-export function projectPlotTwistsPairedRun({ snapshot, sourceSha256 }) {
+export function projectPlotTwistsPairedRun({ snapshot, sourceSha256, headToHeadEvidence = null }) {
   validatePairedRunExport(snapshot);
   const contract = publicContract(snapshot, sourceSha256), dimensions = dimensionsFor(contract);
   const bundle = snapshot.manifest.frozenBundle;
@@ -237,7 +513,7 @@ export function projectPlotTwistsPairedRun({ snapshot, sourceSha256 }) {
       content: file.content, sha256: file.sha256, bytes: Buffer.byteLength(file.content) }))];
   const judgeRequests = snapshot.judgments.map(judge => ({ id: judge.id, caseId: contract.task.id, trialNumber: 1,
     configurationId: judge.configurationId, judgeConfigurationId: judge.judgeConfigurationId, status: judge.status,
-    ...(contract.coverageExtension ? { provenance: cohortProvenance(contract, judge.configurationId) } : {}),
+    ...(contract.coverageExtension ? { provenance: recordProvenance(contract, 'judgment', judge.id, judge.configurationId) } : {}),
     candidateMap: judge.candidateMap, candidateResponseHashes: judge.candidateResponseHashes,
     promptText: judge.promptText ?? null, promptSha256: judge.promptSha256 ?? null,
     outputText: judge.responseText ?? null, outputSha256: judge.outputSha256 ?? null,
@@ -271,27 +547,37 @@ export function projectPlotTwistsPairedRun({ snapshot, sourceSha256 }) {
       disagreement: judgments.length === 2 ? { scoreSpread: Math.abs(judgments[0].score - judgments[1].score),
         dimensionRanges: dimensions.map(item => ({ id: item.id, spread: Math.abs(judgments[0].dimensions[item.id].rating - judgments[1].dimensions[item.id].rating) })) } : null,
       provenance: { sourceSha256, manifestSha256: snapshot.manifestSha256, generationId: row.id, outputSha256: succeeded ? row.outputSha256 : null,
-        ...cohortProvenance(contract, row.configurationId),
+        ...recordProvenance(contract, 'generation', row.id, row.configurationId),
         questionSha256: hash(contract.task.prompt), skillSha256: row.condition === 'skill' ? bundle.sha256 : null,
         exactMessagesSha256: hash(JSON.stringify(exactMessages)), inputPayloadSha256: row.inputPayloadSha256 ?? null },
       runtime: succeeded ? { freshSession: true, durationMs: row.durationMs ?? null, usage: usage(row.usage), rawProviderStreamRetained: true,
+        ...(contract.technicalRecovery ? { attemptNumber: row.attempt.number } : {}),
         modelVerification: row.runtimeReceipt?.terminalEvidence?.modelVerification ?? row.runtimeReceipt?.modelVerification ?? 'explicit-cli-request-only', reasoningVerification: 'explicit-cli-request-only',
         skillDelivery: row.condition === 'skill' ? 'frozen-inline-once' : null } : null };
   });
   const responseBundle = { kind: 'vasirbenchmark-writing-responses', schemaVersion: 1, benchmarkId: ID, edition: PLOT_TWISTS_PAIRED_EDITION,
     sourceContract: contract, promptFiles, messageSets: [...messageSets.values()], responses, judgeRequests };
   const projection = buildProjection(contract, responses, judgeRequests);
+  if (headToHeadEvidence !== null) {
+    requireEvidence(hash(JSON.stringify(headToHeadEvidence, null, 2) + '\n') === PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256,
+      'head-to-head evidence artifact changed.');
+    projection.headToHeads = [{ ...headToHeadEvidence.headToHead, evidenceSha256: PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256 }];
+    responseBundle.headToHeads = structuredClone(projection.headToHeads);
+  }
   const stub = { kind: 'vasirbenchmark-writing-summary', schemaVersion: 1, status: projection.coverage.scoredResponseCount ? 'measured' : 'unscored',
     dataHref: './writing-data.js', responsesHref: './writing-responses.js', category: { id: 'writing', name: 'Writing', short: 'WRITE' },
     benchmarkId: ID, benchmarkTitle: 'Plot twists', subsections: [{ id: 'storytelling', title: 'Storytelling', status: 'measured' }],
     coverage: projection.coverage, scoreBasisLabel: projection.scoreBasis.label, treatmentLabel: 'Storytelling skill' };
   validatePlotTwistsPairedPublication(projection, responseBundle);
-  return { projection, responseBundle, stub, basisSha256: hash(JSON.stringify({ sourceSha256, manifestSha256: snapshot.manifestSha256, edition: PLOT_TWISTS_PAIRED_EDITION })) };
+  return { projection, responseBundle, stub, basisSha256: hash(JSON.stringify({ sourceSha256, manifestSha256: snapshot.manifestSha256, edition: PLOT_TWISTS_PAIRED_EDITION,
+    ...(headToHeadEvidence ? { headToHeadEvidenceSha256: PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256 } : {}) })) };
 }
 
 export function validatePlotTwistsPairedPublication(projection, responseBundle) {
   const contract = projection?.methodology?.sourceContract;
   validateContract(contract);
+  validateHeadToHeads(projection, responseBundle);
+  const { headToHeads: _headToHeads, ...scoredProjection } = projection;
   const models = contract.configurations.map(item => item.id), answerCount = models.length * CONDITIONS.length;
   const requestCount = models.length * PANEL.length;
   requireEvidence(projection.scoreBasis?.edition === PLOT_TWISTS_PAIRED_EDITION && same(projection.scoreBasis.dimensions, dimensionsFor(contract))
@@ -321,7 +607,7 @@ export function validatePlotTwistsPairedPublication(projection, responseBundle) 
       judgments: Array.from({ length: cell.coverage.completedJudgments }, () => ({ score: cell.exactScore,
         dimensions: Object.fromEntries(Object.entries(cell.dimensions).map(([id, rating]) => [id, { rating }])) })) }));
     const requests = Array.from({ length: requestCount }, (_, index) => ({ status: index < projection.coverage.pairedJudgeCallCount ? 'succeeded' : 'pending' }));
-    requireEvidence(same(projection, buildProjection(contract, evidence, requests)), 'public aggregates differ from their retained dimension means and coverage.');
+    requireEvidence(same(scoredProjection, buildProjection(contract, evidence, requests)), 'public aggregates differ from their retained dimension means and coverage.');
     return projection;
   }
   requireEvidence(responseBundle.kind === 'vasirbenchmark-writing-responses' && responseBundle.edition === PLOT_TWISTS_PAIRED_EDITION
@@ -334,7 +620,11 @@ export function validatePlotTwistsPairedPublication(projection, responseBundle) 
     && new Set(responseBundle.judgeRequests.map(item => `${item.configurationId}:${item.judgeConfigurationId}`)).size === requestCount
     && responseBundle.judgeRequests.every(item => models.includes(item.configurationId) && PANEL.includes(item.judgeConfigurationId)), 'public judge inventory changed.');
   if (contract.coverageExtension) for (const request of responseBundle.judgeRequests)
-    requireEvidence(same(request.provenance, cohortProvenance(contract, request.configurationId)), 'paired review parent or supplement provenance changed.');
+    requireEvidence(same(request.provenance, recordProvenance(contract, 'judgment', request.id, request.configurationId)), 'paired review original record provenance changed.');
+  if (contract.technicalRecovery) for (const request of responseBundle.judgeRequests) {
+    const expectedAttempt = request.status === 'pending' ? 0 : request.provenance.recordDisposition === 'technical-replacement' ? 2 : 1;
+    requireEvidence(request.attemptNumber === expectedAttempt, 'paired review technical-recovery attempt number changed.');
+  }
   const files = new Map(responseBundle.promptFiles.map(file => [file.id, file]));
   requireEvidence(files.size === 3 && files.get('paired-skill-bundle')?.sha256 === contract.bundleSha256, 'inline treatment identity changed.');
   for (const file of files.values()) requireEvidence(hash(file.content) === file.sha256 && Buffer.byteLength(file.content) === file.bytes, 'frozen skill bytes changed.');
@@ -371,8 +661,17 @@ export function validatePlotTwistsPairedPublication(projection, responseBundle) 
     requireEvidence(same(originals, expectedMessages) && response.provenance.skillSha256 === (response.condition === 'skill' ? contract.bundleSha256 : null), 'plain or skill input contract changed.');
     requireEvidence(response.provenance.sourceSha256 === contract.sourceSha256 && response.provenance.manifestSha256 === contract.manifestSha256
       && response.provenance.questionSha256 === hash(contract.task.prompt), 'answer source identity changed.');
-    if (contract.coverageExtension) for (const [key, value] of Object.entries(cohortProvenance(contract, response.configurationId)))
-      requireEvidence(response.provenance[key] === value, 'answer parent or supplement provenance changed.');
+    if (contract.coverageExtension) for (const [key, value] of Object.entries(recordProvenance(contract, 'generation', response.provenance.generationId, response.configurationId)))
+      requireEvidence(response.provenance[key] === value, 'answer original record provenance changed.');
+    if (contract.technicalRecovery) {
+      requireEvidence(response.provenance.generationId === slotId('generation', response.configurationId, contract.task.id, response.condition),
+        'technical recovery changed an answer slot identity.');
+      requireEvidence(same(Object.keys(response.provenance), ['sourceSha256', 'manifestSha256', 'generationId', 'outputSha256',
+        ...Object.keys(recordProvenance(contract, 'generation', response.provenance.generationId, response.configurationId)),
+        'questionSha256', 'skillSha256', 'exactMessagesSha256', 'inputPayloadSha256']), 'technical recovery answer provenance has undeclared claims.');
+      if (response.runtime) requireEvidence(response.runtime.attemptNumber === (response.provenance.recordDisposition === 'technical-replacement' ? 2 : 1),
+        'answer technical-recovery attempt number changed.');
+    }
     if (response.runtime) requireEvidence(hash(response.outputText) === response.provenance.outputSha256 && words(response.outputText) === response.wordCount
       && Array.from(response.outputText).length === response.characterCount && response.wordLimitExceeded === (response.wordCount > 550), 'original answer bytes changed.');
     else requireEvidence(response.outputText === '' && response.score === null && response.judgments.length === 0, 'failed or pending generation became a scored answer.');
@@ -392,7 +691,7 @@ export function validatePlotTwistsPairedPublication(projection, responseBundle) 
     }
     requireEvidence(response.score === (response.status === 'scored' ? round(mean(response.judgments.map(item => item.score))) : null), 'public response panel total changed.');
   }
-  requireEvidence(same(projection, buildProjection(contract, responseBundle.responses, responseBundle.judgeRequests)), 'public projection differs from original paired evidence.');
+  requireEvidence(same(scoredProjection, buildProjection(contract, responseBundle.responses, responseBundle.judgeRequests)), 'public projection differs from original paired evidence.');
   return projection;
 }
 
@@ -404,7 +703,13 @@ export function buildPlotTwistsPairedPublication({ repoRootDirectory, selection,
     && pin.path.split('/').every(part => part && part !== '..' && part !== '.') && /^[a-f0-9]{64}$/.test(pin.sha256 ?? ''), 'unsafe or unpinned paired source.');
   const bytes = readFileSyncImplementation(path.join(repoRootDirectory, pin.path), 'utf8');
   requireEvidence(hash(bytes) === pin.sha256, 'selected immutable paired source changed.');
-  const built = projectPlotTwistsPairedRun({ snapshot: JSON.parse(bytes), sourceSha256: pin.sha256 });
+  let headToHeadEvidence = null;
+  if (pin.sha256 === HEAD_TO_HEAD_SOURCE_SHA256) {
+    const evidenceBytes = readFileSyncImplementation(path.join(repoRootDirectory, PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_PATH), 'utf8');
+    requireEvidence(hash(evidenceBytes) === PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256, 'pinned head-to-head sidecar bytes changed.');
+    headToHeadEvidence = JSON.parse(evidenceBytes);
+  }
+  const built = projectPlotTwistsPairedRun({ snapshot: JSON.parse(bytes), sourceSha256: pin.sha256, headToHeadEvidence });
   requireEvidence(built.projection.coverage.completedSettingCount === built.projection.settings.length,
     'the public measurement requires all declared pairs to be complete.');
   return built;

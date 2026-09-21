@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import { buildSelectedWritingPublication } from '../cli/eval/writing-publication.js';
+import { fileURLToPath } from 'node:url';
 
 const source = fs.readFileSync(new URL('../site/vasirbenchmark.com/benchmark-report.js', import.meta.url), 'utf8');
 const declaration = name => {
@@ -19,6 +21,31 @@ test('Writing report sample labels pluralize stories without changing prompt or 
   }
 });
 
+test('common Core report derives included story scores from Astra while preserving every original panel cell', t => {
+  const repoRootDirectory = fileURLToPath(new URL('../', import.meta.url));
+  const selection = JSON.parse(fs.readFileSync(new URL('../benchmarks/storytelling-core-idea/publication.json', import.meta.url)));
+  if (!fs.existsSync(repoRootDirectory + selection.run.path)) return t.skip('Private original Core evidence is not installed.');
+  const { projection: data, responseBundle } = buildSelectedWritingPublication({ repoRootDirectory, benchmarkId: 'storytelling-core-idea' });
+  const before = JSON.stringify({ data, responseBundle });
+  const responseKey = (benchmarkId, settingId, condition, caseId) => [benchmarkId, settingId, condition, caseId].join('|');
+  const context = vm.createContext({ data, commonCoreScope: data.provisionalLeaderboard, reportResults: data.caseResults, scoreBasis: data.scoreBasis,
+    REQUIRED_CONDITION_IDS: ['baseline', 'skill'], actualTrialNumber: () => 1, responseKey,
+    responseByKey: new Map(responseBundle.responses.map(answer => [responseKey(answer.benchmarkId, answer.settingId, answer.condition, answer.caseId), answer])) });
+  vm.runInContext(declaration('commonCoreResults') + '\n' + declaration('commonCoreSummary') + '\nglobalThis.cells = commonCoreResults; globalThis.summary = commonCoreSummary;', context);
+  assert.equal(context.cells.length, 33 * 11 * 2);
+  for (const cell of context.cells) {
+    const answer = responseBundle.responses.find(answer => answer.settingId === cell.settingId && answer.caseId === cell.caseId && answer.condition === cell.condition);
+    assert.equal(cell.exactScore, answer.judgments.find(judge => judge.judgeConfigurationId === 'codex:gpt-6-astra@xhigh').score);
+  }
+  assert.equal(context.summary('the-matrix'), null);
+  assert.equal(context.summary(data.provisionalLeaderboard.caseIds[0]).usablePairs, 33);
+  assert.equal(JSON.stringify({ data, responseBundle }), before);
+  assert.match(declaration('modelPreviewRows'), /commonCoreScope\?\.caseIds\.includes\(activeCaseId\) \? commonCoreResults : reportResults/);
+  assert.match(declaration('judgingMarkup'), /One Astra xhigh review determines this score/);
+  assert.match(declaration('heroMarkup'), /archived story · excluded from aggregate/);
+  assert.match(declaration('writingCasePickerMarkup'), /archived, excluded/);
+});
+
 test('all benchmark reports reuse one model comparison before one closed judge and trial disclosure', () => {
   const render = declaration('render');
   assert.match(render, /\$\{heroMarkup\(benchmark, summary\)\}\s*\$\{rankingMarkup\(benchmark\)\}\s*\$\{judgeTrialDetailsMarkup\(benchmark, summary\)\}/);
@@ -26,11 +53,127 @@ test('all benchmark reports reuse one model comparison before one closed judge a
   assert.equal((render.match(/judgeTrialDetailsMarkup\(benchmark, summary\)/g) || []).length, 1);
   for (const name of ['writingProgressMarkup', 'truthMarkup', 'writingCohortsMarkup', 'creationContextComparisonMarkup', 'overviewMarkup', 'methodMarkup']) assert.ok(!render.includes(`${name}(`), `${name} must not escape the common disclosure`);
   const ranking = declaration('rankingMarkup');
+  assert.match(ranking, /\$\{headToHeadMarkup\(benchmark\)\}/);
   assert.match(ranking, /<h2 id="ranking-title">Model comparison<\/h2>/);
   assert.equal((ranking.match(/<ol class="model-preview"/g) || []).length, 1);
   assert.match(ranking, /modelPreviewRows\(benchmark\)\.map\(modelRowMarkup\)/);
   assert.match(source, /revealReportTarget\(document\.getElementById\(section\)\)\?\.scrollIntoView/);
   assert.match(source, /revealReportTarget\(promptFile\)\.scrollIntoView/);
+});
+
+test('Magic displays the existing three-trial aggregate regardless of a legacy trial link', () => {
+  const data = { settings: [{ id: 'one', label: 'One' }, { id: 'two', label: 'Two' }], benchmarkResults: [
+    { benchmarkId: 'magic', settingId: 'one', condition: 'baseline', score: 60, exactScore: 60 },
+    { benchmarkId: 'magic', settingId: 'one', condition: 'skill', score: 90, exactScore: 90 },
+    { benchmarkId: 'magic', settingId: 'two', condition: 'baseline', score: 70, exactScore: 70 },
+    { benchmarkId: 'magic', settingId: 'two', condition: 'skill', score: 80, exactScore: 80 }
+  ] };
+  const reportResults = [1, 2, 3].flatMap(trialNumber => data.benchmarkResults.map(cell => ({ ...cell, caseId: 'prompt', trialNumber,
+    score: cell.score + (trialNumber - 2) * 10, exactScore: cell.exactScore + (trialNumber - 2) * 10 })));
+  const context = vm.createContext({ data, reportResults, isCreation: true, isWriting: true, isWorkSpec: false,
+    commonCoreScope: null, activeCaseId: 'prompt', activeTrialNumber: 1, actualTrialNumber: cell => cell.trialNumber,
+    settingById: new Map(data.settings.map(setting => [setting.id, setting])), responseByKey: new Map(), responseKey: () => '' });
+  vm.runInContext(declaration('modelPreviewRows') + '\n' + declaration('creationAggregateSummary') + '\nglobalThis.rows=modelPreviewRows;globalThis.summary=creationAggregateSummary;', context);
+  for (const trial of [1, 2, 3]) {
+    context.activeTrialNumber = trial;
+    assert.equal(JSON.stringify(context.rows({ id: 'magic' }).map(row => [row.setting.id, row.baseline, row.treatment, row.delta, row.rank])), JSON.stringify([['one', 60, 90, 30, 1], ['two', 70, 80, 10, 2]]));
+    assert.equal(JSON.stringify(context.summary({ id: 'magic' })), JSON.stringify({ baseline: 65, treatment: 85, delta: 20, wins: 2, ties: 0, losses: 0 }));
+  }
+  assert.match(declaration('writingCasePickerMarkup'), /if \(!isWriting \|\| isCreation\) return ''/);
+  assert.match(declaration('render'), /isCreation \? creationAggregateSummary\(benchmark\)/);
+  assert.match(declaration('modelRowMarkup'), /isCreation \? trialComparisonsMarkup\(row, index\)/);
+  assert.doesNotMatch(declaration('rankingMarkup'), /Values and transcripts below describe the selected trial/);
+});
+
+test('Writing shows only useful prompt and trial selectors', () => {
+  const data = { cases: [{ benchmarkId: 'writing', id: 'one', title: 'Only prompt' }] };
+  const context = vm.createContext({ data, isWriting: true, isCreation: false, hasWritingTrialPicker: false,
+    activeCaseId: 'one', activeTrialNumber: 1, writingTrialCount: 3, writingCaseLabel: 'prompt',
+    writingCasePlural: 'prompts', commonCoreScope: null, SETTING_COUNT: 33, escapeHTML: String });
+  vm.runInContext(declaration('writingCasePickerMarkup') + '\nglobalThis.picker=writingCasePickerMarkup;', context);
+  const benchmark = { id: 'writing', name: 'Plot twists' };
+  assert.equal(context.picker(benchmark), '', 'A single prompt needs neither a selector nor its instruction row.');
+  data.cases.push({ benchmarkId: 'unrelated', id: 'elsewhere', title: 'Other benchmark' });
+  assert.equal(context.picker(benchmark), '', 'Only the current benchmark contributes choices.');
+  context.hasWritingTrialPicker = true;
+  assert.doesNotMatch(context.picker(benchmark), /data-writing-case|Choose a prompt/);
+  assert.match(context.picker(benchmark), /data-writing-trial/);
+  assert.match(context.picker(benchmark), /Choose a trial to inspect/);
+  data.cases.push({ benchmarkId: 'writing', id: 'two', title: 'Another prompt' });
+  assert.match(context.picker(benchmark), /data-writing-case/);
+  assert.match(context.picker(benchmark), /Choose a prompt and trial/);
+  context.hasWritingTrialPicker = false;
+  assert.match(context.picker(benchmark), /data-writing-case/);
+  assert.doesNotMatch(context.picker(benchmark), /data-writing-trial/);
+  context.isCreation = true;
+  assert.equal(context.picker(benchmark), '');
+  context.isCreation = false;
+  context.isWriting = false;
+  assert.equal(context.picker(benchmark), '');
+  assert.match(declaration('render'), /\$\{writingCasePickerMarkup\(benchmark\)\}/);
+});
+
+test('Magic keeps every original trial inside model details with its own scores and unique heading IDs', () => {
+  const responseKey = (benchmark, setting, condition, story, trial) => `${setting}/${condition}/${trial}`;
+  const responseByKey = new Map(), benchmarkResultByKey = new Map();
+  for (const trial of [1, 2, 3]) for (const condition of ['baseline', 'skill']) {
+    const key = responseKey('magic', 'one', condition, 'prompt', trial);
+    responseByKey.set(key, { outputText: `Original ${condition} ${trial}` }); benchmarkResultByKey.set(key, { score: 70 + trial });
+  }
+  const contexts = [];
+  const render = vm.runInNewContext(declaration('trialComparisonsMarkup') + '\ntrialComparisonsMarkup', {
+    writingTrialCount: 3, activeBenchmarkId: 'magic', activeCaseId: 'prompt', responseKey, responseByKey, benchmarkResultByKey,
+    BASELINE_SHORT: 'Plain', formatScore: String, escapeHTML: String,
+    conditionTranscriptMarkup: value => { contexts.push(value); return value.response.outputText; }
+  });
+  const html = render({ setting: { id: 'one', label: 'One' } }, 7);
+  assert.equal((html.match(/data-report-trial=/g) || []).length, 3);
+  assert.equal(contexts.length, 6);
+  for (const trial of [1, 2, 3]) for (const condition of ['baseline', 'skill']) {
+    assert.ok(html.includes(`Original ${condition} ${trial}`));
+    assert.ok(contexts.some(context => context.rowIndex === `7-trial-${trial}` && context.condition === condition && context.score === 70 + trial));
+  }
+  assert.doesNotMatch(html, /<select|<details[^>]*\bopen\b/);
+});
+
+test('shared head-to-head makes every judge preference visible and retains readable non-JSON reviews', () => {
+  const candidates = [
+    { id: 'first', label: 'Model One · max', settingId: 'one', title: 'Story <one>', wordCount: 12 },
+    { id: 'second', label: 'Model Two · high', settingId: 'two', title: 'Story two', wordCount: 14 }
+  ];
+  const reviews = ['judge-one', 'judge-two'].flatMap(judgeId => candidates.map((candidate, index) => ({
+    id: `${judgeId}-${index}`, judgeId, firstCandidateId: candidate.id, preferredCandidateId: 'first',
+    reason: 'Exact reason <not HTML>', rawText: 'Original malformed {text', confidence: 'medium',
+    interpretation: judgeId === 'judge-two' && index === 1 ? 'explicit-text-transcription' : 'structured-preference'
+  })));
+  const comparison = { id: 'pair', benchmarkId: 'writing', caseId: 'selected', condition: 'skill', candidates, reviews,
+    judges: ['judge-one', 'judge-two'].map(id => ({ id, label: id, orderConsistent: true })) };
+  const responseData = { headToHeads: [comparison] }, before = JSON.stringify(responseData);
+  const escapeHTML = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  const context = { responseData, isWriting: true, activeCaseId: 'selected', escapeHTML,
+    responseKey: (_benchmarkId, settingId) => settingId,
+    responseByKey: new Map([['one', { outputText: 'Actual <first> answer' }], ['two', { outputText: 'Actual second answer' }]]) };
+  const render = vm.runInNewContext(declaration('headToHeadMarkup') + '\nheadToHeadMarkup', context);
+  const html = render({ id: 'writing' });
+  assert.match(html, /Which story did the judges prefer\?/);
+  assert.equal((html.match(/data-head-to-head-judge=/g) || []).length, 2);
+  assert.equal((html.match(/data-head-to-head-preference="first"/g) || []).length, 4);
+  assert.equal((html.match(/Same choice in both orders/g) || []).length, 2);
+  assert.match(html, /Exact reason &lt;not HTML&gt;/);
+  assert.match(html, /Actual &lt;first&gt; answer/);
+  assert.match(html, /Preference and reason transcribed from the judge’s explicit answer/);
+  assert.match(html, /Original malformed \{text/);
+  assert.doesNotMatch(html.split('<details')[0], /malformed|invalid|JSON/);
+  assert.equal(JSON.stringify(responseData), before, 'Display interpretation must not alter original evidence.');
+  assert.equal(render({ id: 'different-benchmark' }), '');
+  responseData.headToHeads = [{ ...comparison, caseId: 'different-case' }];
+  assert.equal(render({ id: 'writing' }), '');
+  responseData.headToHeads = [{ ...comparison, judges: [{ id: 'judge-one', label: 'Judge One', orderConsistent: false }],
+    reviews: [{ ...reviews[0], preferredCandidateId: 'tie' }, { ...reviews[1], preferredCandidateId: 'second' }] }];
+  const split = render({ id: 'writing' });
+  assert.match(split, /No consistent choice across orders/);
+  assert.match(split, /data-head-to-head-preference="tie"><strong>Tie/);
+  assert.match(split, /data-head-to-head-preference="second"><strong>Model Two/);
 });
 
 test('the same disclosure retains optional context, cohort, predecessor and method evidence without altering it', () => {

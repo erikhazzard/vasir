@@ -13,7 +13,7 @@ function render(data, { isCreation = false, judgeCount = 2 } = {}) {
   const before = JSON.stringify(data);
   const writingFinalExclusions = data.coverage.executionStatus === 'complete-with-exclusions';
   const html = vm.runInNewContext(`${renderer}\nwritingProgressMarkup()`, {
-    data, isWriting: true, isCreation, JUDGE_COUNT: judgeCount, writingFinalExclusions,
+    data, isWriting: true, isCreation, JUDGE_COUNT: judgeCount, writingFinalExclusions, commonCoreScope: null,
     writingInProgress: !data.coverage.executionComplete,
     writingProgressStatus: writingFinalExclusions ? 'FINAL SNAPSHOT' : data.coverage.executionComplete ? 'COMPLETE SNAPSHOT' : 'INCOMPLETE SNAPSHOT',
     escapeHTML: value => String(value)

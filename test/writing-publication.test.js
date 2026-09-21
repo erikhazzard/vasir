@@ -12,8 +12,10 @@ import { STORYTELLING_RUNTIME_VERSION, STORYTELLING_REQUIRED_SKILL_READ_POLICY_V
 import {
   buildWritingPublication, buildWritingSourceCollection, prepareWritingPublicationSource, projectWritingRun,
   serializeWritingModule, validateWritingPublication, validateWritingSummary,
-  WRITING_BENCHMARK_ID, WRITING_SELECTION_PATH, PLOT_TWISTS_BENCHMARK_ID, writingSelectionPath
+  WRITING_BENCHMARK_ID, WRITING_SELECTION_PATH, PLOT_TWISTS_BENCHMARK_ID, writingSelectionPath,
+  CORE_IDEA_COMMON_11_SCORE_BASIS, CORE_IDEA_COMMON_11_CASE_IDS, CORE_IDEA_ORIGINAL_CASE_IDS
 } from "../cli/eval/writing-publication.js";
+import { buildOverallWritingSource } from "../cli/eval/overall-writing-source.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CORPUS = JSON.parse(fs.readFileSync(path.join(REPO, "benchmarks/storytelling-core-idea/benchmark.json"), "utf8"));
@@ -111,7 +113,7 @@ async function fixture(t, { models = [CONFIG], fail = () => false, missingJudge 
   const runText = fs.readFileSync(path.join(result.outputDirectory, "run.json"), "utf8");
   const snapshotText = fs.readFileSync(path.join(result.outputDirectory, "skill-snapshot.json"), "utf8");
   const run = JSON.parse(runText), snapshot = JSON.parse(snapshotText);
-  const project = (source = run, frozen = snapshot) => projectWritingRun({ run: source, snapshot: frozen, sourceSha256: hash(JSON.stringify(source)) });
+  const project = (source = run, frozen = snapshot, derivedScoreBasis = null) => projectWritingRun({ run: source, snapshot: frozen, sourceSha256: hash(JSON.stringify(source)), derivedScoreBasis });
   return { root, run, snapshot, runText, snapshotText, outputDirectory: result.outputDirectory, project, agentCalls, answers };
 }
 
@@ -417,6 +419,115 @@ test("completed but not-yet-judged answers remain available without scores or le
   assert.equal(stub.status, "unscored");
   assert.equal(stub.leader, undefined);
   assert.equal(projection.provisionalLeaderboard, null);
+});
+
+test("explicit common-eleven Core scoring retains all twelve stories and fixes the corpus for both arms and every model", async t => {
+  const f = await fixture(t, { definitionOverride: CORPUS, models: [CONFIG, SECOND_CONFIG], missingJudge: true,
+    fail: answer => answer.provider === "claude" && answer.caseIndex === 1 && answer.treatment });
+  for (const row of f.run.rows.filter(row => row.rowStatus === "complete" && row.caseId === "the-matrix")) {
+    row.durationMs = 99000;
+    row.usage = { inputTokens: 90000, outputTokens: 9000, totalTokens: 99000 };
+  }
+  const retained = JSON.stringify(f.run);
+  const original = f.project();
+  const derived = f.project(f.run, f.snapshot, CORE_IDEA_COMMON_11_SCORE_BASIS);
+  const { projection, responseBundle } = derived;
+  const provisional = projection.provisionalLeaderboard;
+  assert.equal(JSON.stringify(f.run), retained, "No source row, review, usage or failure is changed.");
+  assert.deepEqual(projection.cases.map(story => story.id), CORE_IDEA_ORIGINAL_CASE_IDS);
+  assert.deepEqual(projection.caseResults, original.projection.caseResults);
+  assert.deepEqual(projection.entries, original.projection.entries, "The original full-panel aggregates stay separate.");
+  assert.deepEqual(responseBundle, original.responseBundle, "All original answers and reviews remain inspectable, including the excluded story.");
+  assert.equal(responseBundle.responses.length, 48);
+  assert.equal(responseBundle.responses.filter(response => response.caseId === "the-matrix").length, 4);
+  assert.equal(original.projection.provisionalLeaderboard.rankedSettingCount, 1);
+  assert.equal(provisional.rankedSettingCount, 2);
+  assert.equal(provisional.id, CORE_IDEA_COMMON_11_SCORE_BASIS);
+  assert.equal(provisional.method, "equal-case-paired-common-11-single-judge-mean-v1");
+  assert.deepEqual(provisional.caseIds, CORE_IDEA_COMMON_11_CASE_IDS);
+  assert.deepEqual(provisional.excludedCaseIds, ["the-matrix"]);
+  assert.equal(provisional.originalCaseCount, 12);
+  assert.equal(provisional.expectedCaseCount, 11);
+  assert.equal(provisional.selectionTiming, "post-run-user-approved");
+  assert.equal(provisional.scoredCorpusSha256, hash(JSON.stringify(projection.cases.filter(story => story.id !== "the-matrix"))));
+  assert.match(provisional.limitations, /not preregistered/);
+  assert.notEqual(derived.basisSha256, original.basisSha256);
+  const exact = configurationId => provisional.entries.filter(entry => entry.configurationId === configurationId).map(entry => entry.exactScore);
+  assert.deepEqual(exact(CONFIG), [655 / 11, 380 / 11]);
+  assert.deepEqual(exact(SECOND_CONFIG), [80, 90]);
+  assert.equal(provisional.summary.usablePairs, 22);
+  assert.equal(provisional.summary.expectedPairs, 22);
+  assert.deepEqual(provisional.incompleteSettings, []);
+  for (const entry of provisional.entries) {
+    assert.equal(entry.completedPairCount, 11);
+    assert.equal(entry.expectedPairCount, 11);
+    assert.deepEqual(entry.metrics, { meanLatencyMs: 1250, meanInputTokens: 300, meanOutputTokens: 50, meanTotalTokens: 350,
+      meanCostUsd: null, costCoverage: "not-comparable", meanWordCount: Math.round((projection.caseResults.filter(cell => cell.settingId === entry.settingId && cell.condition === entry.condition && cell.caseId !== "the-matrix").reduce((sum, cell) => sum + cell.wordCount, 0) / 11 + Number.EPSILON) * 10) / 10 });
+    assert.equal(entry.latency, 1.25);
+    assert.equal(entry.tokens, 50);
+  }
+  assert.equal(validateWritingPublication(projection), projection);
+  assert.equal(validateWritingPublication(projection, responseBundle), projection);
+  const overall = buildOverallWritingSource(projection);
+  assert.equal(overall.benchmarkDisplays[WRITING_BENCHMARK_ID].caseCount, 11);
+  assert.equal(overall.benchmarkDisplays[WRITING_BENCHMARK_ID].cohort, "11 stories");
+  assert.ok(overall.benchmarkResults.every(result => result.latencyMs === 1250 && result.inputTokens === 300));
+});
+
+test("common-eleven never substitutes a per-model available-story mean or mixes Fable reviews", async t => {
+  const f = await fixture(t, { definitionOverride: CORPUS, models: [CONFIG, SECOND_CONFIG],
+    fail: answer => answer.provider === "codex" && answer.caseIndex === 2 && answer.treatment });
+  const built = f.project(f.run, f.snapshot, CORE_IDEA_COMMON_11_SCORE_BASIS);
+  const provisional = built.projection.provisionalLeaderboard;
+  assert.equal(provisional.rankedSettingCount, 1);
+  assert.equal(provisional.expectedCaseCount, 11);
+  assert.equal(provisional.incompleteSettings[0].configurationId, CONFIG);
+  assert.equal(provisional.incompleteSettings[0].completedPairCount, 10);
+  assert.deepEqual(provisional.incompleteSettings[0].missingCaseIds, ["parasite"]);
+  assert.ok(provisional.entries.filter(entry => entry.configurationId === CONFIG).every(entry => entry.exactScore === null && entry.rank === null && entry.metrics === null));
+  assert.equal(provisional.summary.usablePairs, 11);
+  assert.equal(provisional.summary.expectedPairs, 22);
+  const withoutFable = structuredClone(f.run);
+  withoutFable.judging.judges[1].batches = [];
+  for (const row of withoutFable.rows) row.score = null;
+  const alternate = f.project(withoutFable, f.snapshot, CORE_IDEA_COMMON_11_SCORE_BASIS).projection.provisionalLeaderboard;
+  assert.deepEqual(alternate.entries, provisional.entries);
+  assert.deepEqual(alternate.summary, provisional.summary);
+});
+
+test("common-eleven remains explicit with a completed full panel and rejects altered corpus, hashes and efficiency", async t => {
+  const f = await fixture(t, { definitionOverride: CORPUS });
+  assert.equal(f.project().projection.provisionalLeaderboard, null);
+  const built = f.project(f.run, f.snapshot, CORE_IDEA_COMMON_11_SCORE_BASIS);
+  assert.equal(built.projection.provisionalLeaderboard.rankedSettingCount, 1);
+  const changes = [
+    ["excluded story", projection => { projection.provisionalLeaderboard.excludedCaseIds = ["parasite"]; }],
+    ["included story", projection => { projection.provisionalLeaderboard.caseIds[0] = "the-matrix"; }],
+    ["post-run timing", projection => { projection.methodology.derivedScoreBasis.selectionTiming = "preregistered"; }],
+    ["scored corpus hash", projection => { projection.provisionalLeaderboard.scoredCorpusSha256 = hash("other corpus"); }],
+    ["both hashes", projection => { projection.provisionalLeaderboard.scoredCorpusSha256 = projection.methodology.derivedScoreBasis.scoredCorpusSha256 = hash("other corpus"); }],
+    ["original inventory", projection => { projection.methodology.derivedScoreBasis.originalCaseIds.pop(); }],
+    ["full-twelve metrics", projection => { projection.provisionalLeaderboard.entries[0].metrics.meanInputTokens += 1; }],
+    ["latency mismatch", projection => { projection.provisionalLeaderboard.entries[0].latency += 1; }],
+    ["token mismatch", projection => { projection.provisionalLeaderboard.entries[0].tokens += 1; }],
+    ["score", projection => { projection.provisionalLeaderboard.entries[0].exactScore += 1; }],
+    ["missing derived view", projection => { projection.provisionalLeaderboard = null; }]
+  ];
+  for (const [name, change] of changes) await t.test(name, () => {
+    const altered = structuredClone(built);
+    change(altered.projection);
+    assert.throws(() => validateWritingPublication(altered.projection, altered.responseBundle), /provisional|derived Core idea/);
+  });
+  assert.throws(() => f.project(f.run, f.snapshot, "unrecognized-corpus-selection"), /derived Core idea/);
+  const short = await fixture(t);
+  assert.throws(() => short.project(short.run, short.snapshot, CORE_IDEA_COMMON_11_SCORE_BASIS), /unchanged original twelve-story/);
+  const reader = selectedReader(f);
+  const pins = structuredClone({ run: reader.selection.run, skill: reader.selection.skill });
+  reader.selection.derivedScoreBasis = CORE_IDEA_COMMON_11_SCORE_BASIS;
+  const selected = reader.build();
+  assert.equal(selected.projection.provisionalLeaderboard.id, CORE_IDEA_COMMON_11_SCORE_BASIS);
+  assert.deepEqual({ run: reader.selection.run, skill: reader.selection.skill }, pins);
+  assert.deepEqual(selected.responseBundle, projectWritingRun({ run: f.run, snapshot: f.snapshot, sourceSha256: reader.selection.run.sha256 }).responseBundle);
 });
 
 test("frozen task, skill, answer, receipt, and judge-source tampering are rejected", async t => {

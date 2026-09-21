@@ -74,12 +74,14 @@
   const writingCasePlural = writingCaseLabel === 'story' ? 'stories' : `${writingCaseLabel}s`;
   const writingTrialCount = isWriting ? Number(data?.trialCount ?? data?.scoreBasis?.trialsPerTask ?? 1) : 1;
   const hasWritingTrialPicker = isWriting && writingTrialCount > 1;
+  const commonCoreScope = isWriting && initialBenchmarkId === 'storytelling-core-idea'
+    && data.provisionalLeaderboard?.id === 'core-idea-astra-common-11-v1' ? data.provisionalLeaderboard : null;
   const TREATMENT_LABEL = data?.conditions?.find((condition) => condition.id === 'skill')?.label || 'Architecture skill';
   const BASELINE_LABEL = data?.conditions?.find(condition => condition.id === 'baseline')?.label || 'Minimal baseline';
   const BASELINE_SHORT = data?.conditions?.find(condition => condition.id === 'baseline')?.short || 'Minimal';
   const reportView = document.getElementById('report-view');
   const reportPage = document.getElementById('report-page');
-  const routeSections = new Set(['overview', 'ranking', 'method', 'limitations', 'top']);
+  const routeSections = new Set(['overview', 'head-to-head', 'ranking', 'method', 'limitations', 'top']);
   const REQUIRED_CONDITION_IDS = ['baseline', 'skill'];
   const requiredCollections = ['conditions', 'benchmarks', 'benchmarkSummaries', 'benchmarkResults', 'categories', 'settings'];
   const hasRequiredCollections = Boolean(data) && requiredCollections.every((key) => Array.isArray(data[key]));
@@ -308,8 +310,9 @@
   const UNCERTAINTY_REASON = typeof scoreBasis.uncertainty?.reason === 'string' && scoreBasis.uncertainty.reason.trim()
     ? scoreBasis.uncertainty.reason.trim()
     : 'Only one trial per task and condition is published.';
-  const taskCoverageLabel = isWriting && data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.coverage.expectedPairs} matched pairs` : `${isWriting ? data.cases.length : TASK_COUNT} ${isWriting ? writingCasePlural : TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
-  const developmentDisclosure = `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isWriting ? ' · Uncalibrated development' : ''}`;
+  const taskCoverageLabel = commonCoreScope ? `${data.cases.length} archived stories · ${commonCoreScope.expectedCaseCount}-story aggregate` : isWriting && data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.coverage.expectedPairs} matched pairs` : `${isWriting ? data.cases.length : TASK_COUNT} ${isWriting ? writingCasePlural : TASK_COUNT === 1 ? 'task' : 'tasks'} × ${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`;
+  const developmentDisclosure = commonCoreScope ? `Core idea · ${taskCoverageLabel} · 1 Astra xhigh judge · Uncalibrated`
+    : `${SCORE_EDITION_LABEL} · ${taskCoverageLabel} · ${JUDGE_COUNT} judges${isWorkSpec || isWriting ? ' · Uncalibrated development' : ''}`;
   const writingInProgress = isWriting && (typeof data.coverage.executionComplete === 'boolean' ? !data.coverage.executionComplete : data.coverage.judgmentCount < data.coverage.expectedJudgmentCount || data.coverage.completedSettingCount < data.coverage.settingCount);
   const writingFinalExclusions = isWriting && data.coverage.executionStatus === 'complete-with-exclusions';
   const writingProgressStatus = writingFinalExclusions ? isCreation ? 'FINAL SNAPSHOT · INCOMPLETE PANELS RETAINED' : `FINAL SNAPSHOT · ${data.coverage.terminallyExcludedPairCount} EXCLUDED ${data.coverage.terminallyExcludedPairCount === 1 ? 'PAIR' : 'PAIRS'}` : writingInProgress ? 'INCOMPLETE SNAPSHOT' : 'COMPLETE SNAPSHOT';
@@ -382,7 +385,7 @@
   const selectedTrialFor = (caseId, trialNumber) => hasWritingTrialPicker
     ? Number.isInteger(trialNumber) && trialNumber >= 1 && trialNumber <= writingTrialCount ? trialNumber : 1
     : caseById.get(caseId)?.trialNumber ?? 1;
-  const reportHash = (benchmarkId, caseId = activeCaseId, trialNumber = activeTrialNumber, section = null) => `#${benchmarkId}${isWriting ? `/${caseId}${hasWritingTrialPicker ? `/trial-${trialNumber}` : ''}` : ''}${section ? `/${section}` : ''}`;
+  const reportHash = (benchmarkId, caseId = activeCaseId, trialNumber = activeTrialNumber, section = null) => `#${benchmarkId}${isWriting ? `/${caseId}${hasWritingTrialPicker && !isCreation ? `/trial-${trialNumber}` : ''}` : ''}${section ? `/${section}` : ''}`;
   const parseRoute = () => {
     const [benchmarkId, caseOrSection, caseSection, trialSection] = decodeURIComponent(window.location.hash.slice(1)).split('/');
     const caseId = isWriting && caseById.has(caseOrSection) ? caseOrSection : null;
@@ -399,7 +402,7 @@
   const categoryBenchmarks = (categoryId) => data.benchmarks.filter((benchmark) => benchmark.category === categoryId);
 
   const hydrateSectionLinks = (benchmarkId, requestedSection = 'overview') => {
-    const currentSection = ['ranking', 'method', 'limitations'].includes(requestedSection)
+    const currentSection = ['head-to-head', 'ranking', 'method', 'limitations'].includes(requestedSection)
       ? requestedSection
       : 'overview';
     document.querySelectorAll('[data-report-section]').forEach((link) => {
@@ -427,12 +430,33 @@
     });
   };
 
+  // Display-only view of the approved common corpus. Original panel cells and
+  // all answer/review records remain untouched and independently validated.
+  const commonCoreResults = commonCoreScope ? reportResults.filter(cell => commonCoreScope.caseIds.includes(cell.caseId)).map(cell => {
+    const answer = responseByKey.get(responseKey(cell.benchmarkId, cell.settingId, cell.condition, cell.caseId, actualTrialNumber(cell)));
+    const reviews = (answer?.judgments || []).filter(judge => judge.judgeConfigurationId === 'codex:gpt-6-astra@xhigh');
+    const exactScore = reviews.length === 1 && scoreBasis.dimensions.every(dimension => Number.isInteger(reviews[0].dimensions?.[dimension.id]?.rating))
+      ? scoreBasis.dimensions.reduce((sum, dimension) => sum + reviews[0].dimensions[dimension.id].rating * dimension.weight / 10, 0) : null;
+    return { ...cell, exactScore, score: Number.isFinite(exactScore) ? Math.round((exactScore + Number.EPSILON) * 10) / 10 : null };
+  }) : [];
+  const commonCoreSummary = caseId => {
+    if (!commonCoreScope?.caseIds.includes(caseId)) return null;
+    const pairs = data.settings.map(setting => Object.fromEntries(REQUIRED_CONDITION_IDS.map(condition => [condition,
+      commonCoreResults.find(cell => cell.caseId === caseId && cell.settingId === setting.id && cell.condition === condition)?.exactScore ?? null])))
+      .filter(pair => REQUIRED_CONDITION_IDS.every(condition => Number.isFinite(pair[condition])));
+    const average = values => values.length ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length + Number.EPSILON) * 10) / 10 : null;
+    return { baseline: average(pairs.map(pair => pair.baseline)), treatment: average(pairs.map(pair => pair.skill)), delta: average(pairs.map(pair => pair.skill - pair.baseline)),
+      wins: pairs.filter(pair => pair.skill > pair.baseline).length, ties: pairs.filter(pair => pair.skill === pair.baseline).length,
+      losses: pairs.filter(pair => pair.skill < pair.baseline).length, usablePairs: pairs.length, expectedPairs: data.settings.length };
+  };
+
   const modelPreviewRows = (benchmark) => {
-    const baselineRows = reportResults.filter((result) => (
-      result.benchmarkId === benchmark.id && result.condition === 'baseline' && (!isWriting || (result.caseId === activeCaseId && actualTrialNumber(result) === activeTrialNumber))
+    const displayResults = isCreation ? data.benchmarkResults : commonCoreScope?.caseIds.includes(activeCaseId) ? commonCoreResults : reportResults;
+    const baselineRows = displayResults.filter((result) => (
+      result.benchmarkId === benchmark.id && result.condition === 'baseline' && (!isWriting || isCreation || (result.caseId === activeCaseId && actualTrialNumber(result) === activeTrialNumber))
     ));
-    const treatmentRows = reportResults.filter((result) => (
-      result.benchmarkId === benchmark.id && result.condition === 'skill' && (!isWriting || (result.caseId === activeCaseId && actualTrialNumber(result) === activeTrialNumber))
+    const treatmentRows = displayResults.filter((result) => (
+      result.benchmarkId === benchmark.id && result.condition === 'skill' && (!isWriting || isCreation || (result.caseId === activeCaseId && actualTrialNumber(result) === activeTrialNumber))
     ));
 
     const rows = isWriting ? data.settings.map(setting => treatmentRows.find(result => result.settingId === setting.id) || { settingId: setting.id, score: null, exactScore: null }) : treatmentRows;
@@ -484,6 +508,15 @@
 
   const writingProgressMarkup = () => {
     if (!isWriting) return '';
+    if (commonCoreScope) {
+      const expected = commonCoreScope.expectedCaseCount * SETTING_COUNT * CONDITION_COUNT;
+      const assessed = commonCoreResults.filter(cell => Number.isFinite(cell.exactScore)).length;
+      return `<aside class="writing-progress" data-writing-progress data-writing-derived-scope="${escapeHTML(commonCoreScope.id)}" aria-label="Core idea scoring scope">
+        <div class="writing-progress__heading"><strong class="writing-progress__status" data-writing-progress-status>${assessed === expected ? 'COMPLETE' : 'INCOMPLETE'} · 1 ASTRA JUDGE</strong><a class="writing-progress__link" data-writing-browse-answers href="#ranking" data-report-section="ranking">Browse answers &amp; reviews ↓</a></div>
+        <p class="writing-progress__counts"><span data-writing-progress-count="answers">${commonCoreResults.filter(cell => responseByKey.get(responseKey(cell.benchmarkId, cell.settingId, cell.condition, cell.caseId, actualTrialNumber(cell)))?.outputText).length}/${expected} scored-corpus answers</span><span data-writing-progress-count="reviews">${assessed}/${expected} Astra reviews</span><span data-writing-progress-count="panels">${commonCoreScope.rankedSettingCount}/${SETTING_COUNT} complete ${commonCoreScope.expectedCaseCount}-story settings</span></p>
+        <p data-writing-progress-disclosure>The same ${commonCoreScope.expectedCaseCount} stories and one Astra xhigh review per answer determine every Core idea aggregate. The Matrix is globally excluded after a post-run user-approved decision. All ${data.cases.length} original stories and all saved panel reviews remain archived; additional Fable reviews do not determine this score.</p>
+      </aside>`;
+    }
     const coverage = data.coverage;
     const pairedTwists = data.scoreBasis?.edition === 'storytelling-plot-twists-paired-v2';
     const pending = data.caseResults.filter(cell => cell.status === 'pending').length;
@@ -529,19 +562,30 @@
     </section>`;
   };
 
+  const creationAggregateSummary = (benchmark) => {
+    const pairs = modelPreviewRows(benchmark).filter(row => Number.isFinite(row.baselineRankingScore) && Number.isFinite(row.treatmentRankingScore));
+    const mean = values => values.length ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length + Number.EPSILON) * 10) / 10 : null;
+    return { baseline: mean(pairs.map(row => row.baselineRankingScore)), treatment: mean(pairs.map(row => row.treatmentRankingScore)),
+      delta: mean(pairs.map(row => row.treatmentRankingScore - row.baselineRankingScore)),
+      wins: pairs.filter(row => row.treatmentRankingScore > row.baselineRankingScore).length,
+      ties: pairs.filter(row => row.treatmentRankingScore === row.baselineRankingScore).length,
+      losses: pairs.filter(row => row.treatmentRankingScore < row.baselineRankingScore).length };
+  };
+
   const heroMarkup = (benchmark, summary) => {
     const record = `${summary.wins}W · ${summary.ties}T · ${summary.losses}L`;
     const regressionClass = summary.delta < 0 ? ' is-regression' : '';
     const story = isWriting ? caseById.get(activeCaseId) : null;
-    const sampleLabel = hasWritingTrialPicker ? 'trial' : data.cohortSummaries ? 'repetition' : writingCaseLabel;
+    const sampleLabel = isCreation ? `${writingTrialCount}-trial average` : hasWritingTrialPicker ? 'trial' : data.cohortSummaries ? 'repetition' : writingCaseLabel;
     const measuredSettingCount = isWriting ? modelPreviewRows(benchmark).filter(row => Number.isFinite(row.baseline) && Number.isFinite(row.treatment)).length : SETTING_COUNT;
     return `
       <section class="evidence-hero" id="overview" aria-labelledby="report-title">
         <div class="evidence-hero__identity">
-          <p class="evidence-hero__eyebrow">${escapeHTML(benchmark.suite)} · benchmark result</p>
+          <p class="evidence-hero__eyebrow">${escapeHTML(benchmark.suite)} · ${commonCoreScope ? commonCoreScope.caseIds.includes(activeCaseId) ? 'Story result · 1 Astra judge' : 'archived story · excluded from aggregate' : 'benchmark result'}</p>
           <h1 id="report-title">${escapeHTML(benchmark.name)}</h1>
           ${story ? `<p class="writing-case-title" data-writing-case-title>${escapeHTML(story.title)}</p>` : ''}
-          <p class="evidence-hero__description">${escapeHTML(benchmark.description)}</p>
+          <p class="evidence-hero__description">${escapeHTML(commonCoreScope?.caseIds.includes(activeCaseId)
+            ? `An open-knowledge comparison of explanations of a story’s core idea. The aggregate uses the same ${commonCoreScope.expectedCaseCount} stories for every setting; the original ${data.cases.length}-story archive is retained.` : benchmark.description)}</p>
           <p class="evidence-hero__prompt" data-exact-question><span>Prompt under test</span>${escapeHTML(story?.prompt || benchmark.prompt)}</p>
         </div>
 
@@ -562,10 +606,10 @@
             <dd>${signed(summary.delta)} pts</dd>
           </dl>
           <dl class="evidence-facts">
-            <div><dt>Coverage</dt><dd>${SETTING_COUNT} settings × ${CONDITION_COUNT} conditions × ${hasWritingTrialPicker ? '1 selected trial' : `${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`}${isWriting ? ` · ${measuredSettingCount} assessable pairs on this ${escapeHTML(sampleLabel)}` : ''}</dd></div>
+            <div><dt>Coverage</dt><dd>${SETTING_COUNT} settings × ${CONDITION_COUNT} conditions × ${hasWritingTrialPicker && !isCreation ? '1 selected trial' : `${TRIALS_PER_TASK} ${TRIALS_PER_TASK === 1 ? 'trial' : 'trials'}`}${isCreation ? ` · ${measuredSettingCount} complete model comparisons` : isWriting ? ` · ${measuredSettingCount} assessable pairs on this ${escapeHTML(sampleLabel)}` : ''}</dd></div>
             <div><dt>Matched record</dt><dd>${record}</dd></div>
             <div><dt>Source run</dt><dd>${escapeHTML(summary.runId || 'Not published')}</dd></div>
-            ${hasWritingTrialPicker ? `<div><dt>${escapeHTML(data.trialLabel || 'Trial')}</dt><dd data-writing-trial-title>${activeTrialNumber} of ${writingTrialCount}</dd></div>` : ''}
+            ${hasWritingTrialPicker && !isCreation ? `<div><dt>${escapeHTML(data.trialLabel || 'Trial')}</dt><dd data-writing-trial-title>${activeTrialNumber} of ${writingTrialCount}</dd></div>` : ''}
             ${story && data.cohortSummaries ? `<div><dt>Prompt group</dt><dd>${escapeHTML(story.cohort || story.group || 'See study summaries')}</dd></div><div><dt>${escapeHTML(data.trialLabel || 'Repetition')}</dt><dd>${escapeHTML(story.trialNumber)}</dd></div>` : ''}
             ${story && !data.cohortSummaries && !['story-outline', 'compact-writing'].includes(benchmark.taskKind) ? `<div><dt>Story version</dt><dd>${escapeHTML([story.creator, story.medium, story.version].filter(Boolean).join(' · '))}</dd></div><div><dt>Corpus stratum</dt><dd>${escapeHTML(story.familiarity || 'Not classified')}${story.familiarityBasis ? ` · ${escapeHTML(story.familiarityBasis)}` : ''}. Training exposure: ${escapeHTML(story.trainingExposure || 'unknown')}.</dd></div>` : ''}
           </dl>
@@ -756,7 +800,7 @@
     if (isWriting) {
       const dimensions = writingDimensions();
       return `<li class="model-run__judge" data-judge-review${judgment.reviewerId ? ` data-reviewer-id="${escapeHTML(judgment.reviewerId)}"` : ''}>
-        <header class="model-run__judge-header"><span class="model-run__judge-identity"><strong class="model-run__judge-index">Judge ${String(judgmentIndex + 1).padStart(2, '0')}</strong><span class="model-run__judge-configuration" data-judge-configuration>${escapeHTML(judgeLabel)}</span></span><span class="model-run__judge-score"><strong class="model-run__judge-score-value" data-judge-score>${formatScore(judgment.score)}</strong>${Number.isFinite(judgment.score) ? `<small class="model-run__judge-score-unit">/${SCORE_MAXIMUM}</small>` : ''}</span></header>
+        <header class="model-run__judge-header"><span class="model-run__judge-identity"><strong class="model-run__judge-index">${commonCoreScope?.caseIds.includes(activeCaseId) ? judgment.judgeConfigurationId === 'codex:gpt-6-astra@xhigh' ? 'Score source' : 'Archived review' : `Judge ${String(judgmentIndex + 1).padStart(2, '0')}`}</strong><span class="model-run__judge-configuration" data-judge-configuration>${escapeHTML(judgeLabel)}</span></span><span class="model-run__judge-score"><strong class="model-run__judge-score-value" data-judge-score>${formatScore(judgment.score)}</strong>${Number.isFinite(judgment.score) ? `<small class="model-run__judge-score-unit">/${SCORE_MAXIMUM}</small>` : ''}</span></header>
         ${judgment.contextMode ? `<p class="model-run__aggregation-note" data-judge-context="${escapeHTML(judgment.contextMode)}">${judgment.contextMode === 'informed' ? 'Skill-informed: the frozen skill root and eight references were supplied.' : 'Skill-naive: no storytelling skill context was supplied.'}</p>` : ''}
         ${judgment.assessmentStatus ? `<p class="model-run__aggregation-note">${escapeHTML(judgment.assessmentStatus)}</p>` : ''}
         ${!isCreation && dimensions.every(dimension => !judgment.dimensions?.[dimension.id]?.reason) ? '<p class="model-run__aggregation-note">This saved review has one overall rationale, shown below the ratings. Separate dimension reasons were not recorded.</p>' : ''}
@@ -830,6 +874,7 @@
   };
 
   const judgingMarkup = ({ judgments, notScored = false, response }) => {
+    const commonActive = commonCoreScope?.caseIds.includes(activeCaseId);
     const scores = judgments.map((judgment) => judgment.score).filter(Number.isFinite);
     const scoreRange = scores.length > 0 && scores.length === judgments.length
       ? `${Math.min(...scores).toFixed(1)}–${Math.max(...scores).toFixed(1)}`
@@ -838,12 +883,12 @@
       <details class="model-run__judging">
         <summary class="model-run__judging-summary">
           <strong class="model-run__judging-title">${isWriting ? judgments.length ? 'Saved judge reviews' : notScored ? 'Not scored' : 'Judgments pending' : 'Why this score'}</strong>
-          <span class="model-run__judging-meta">${isWriting ? `${judgments.length}/${JUDGE_COUNT} judges · ${judgments.length === JUDGE_COUNT ? scoreRange : 'Panel incomplete'}` : `${judgments.length} judges · ${scoreRange}`}</span>
+          <span class="model-run__judging-meta">${commonActive ? `Score: 1 Astra judge · ${judgments.length} saved ${judgments.length === 1 ? 'review' : 'reviews'}` : isWriting ? `${judgments.length}/${JUDGE_COUNT} judges · ${judgments.length === JUDGE_COUNT ? scoreRange : 'Panel incomplete'}` : `${judgments.length} judges · ${scoreRange}`}</span>
           <i class="model-run__judging-mark" aria-hidden="true">↓</i>
         </summary>
         <div class="model-run__judging-body">
-          <p class="model-run__aggregation-note">${escapeHTML(panelMethod)} There is no synthesizer. ${isWorkSpec || isWriting ? 'The independent assessments and cited reasons remain available below. Findings are each judge’s conclusions. Judge spread is disagreement, not a confidence interval.' : 'Each note is the saved answer-specific rationale from one independent review, bounded to 600 characters.'}</p>
-          ${isWriting ? `<p class="model-run__aggregation-note" data-judge-coverage>${judgments.length}/${JUDGE_COUNT} saved assessments. ${scores.length === JUDGE_COUNT ? `Score disagreement: ${(Math.max(...scores) - Math.min(...scores)).toFixed(1)} rubric points.` : 'A complete score requires the full panel.'}</p>` : ''}
+          <p class="model-run__aggregation-note">${commonActive ? 'The displayed score uses the original Astra xhigh review only, on the same basis as the 11-story Core idea aggregate. Additional saved panel reviews are archived evidence and do not change that score.' : escapeHTML(panelMethod)} There is no synthesizer. ${isWorkSpec || isWriting ? 'The independent assessments and cited reasons remain available below. Findings are each judge’s conclusions. Judge spread is disagreement, not a confidence interval.' : 'Each note is the saved answer-specific rationale from one independent review, bounded to 600 characters.'}</p>
+          ${isWriting ? `<p class="model-run__aggregation-note" data-judge-coverage>${commonActive ? 'One Astra xhigh review determines this score; all saved reviews are preserved below.' : `${judgments.length}/${JUDGE_COUNT} saved assessments. ${scores.length === JUDGE_COUNT ? `Score disagreement: ${(Math.max(...scores) - Math.min(...scores)).toFixed(1)} rubric points.` : 'A complete score requires the full panel.'}`}</p>` : ''}
           <ol class="model-run__judges">
             ${judgments.map((judgment, judgmentIndex) => judgeReviewMarkup({ judgment, judgmentIndex })).join('')}
           </ol>
@@ -903,6 +948,22 @@
     `;
   };
 
+  const trialComparisonsMarkup = (row, index) => `<div class="writing-trial-answers" data-writing-trial-answers>
+    <p class="writing-trial-answers__intro">The score above averages all ${writingTrialCount} trials. Open a trial to read its original answers and reviews.</p>
+    ${Array.from({ length: writingTrialCount }, (_, trialIndex) => {
+      const trialNumber = trialIndex + 1;
+      const key = condition => responseKey(activeBenchmarkId, row.setting.id, condition, activeCaseId, trialNumber);
+      const baseline = responseByKey.get(key('baseline')), treatment = responseByKey.get(key('skill'));
+      const trialScore = condition => benchmarkResultByKey.get(key(condition))?.score ?? null;
+      return `<details class="work-spec-assessment writing-trial-answers__trial" data-report-trial="${trialNumber}">
+        <summary class="work-spec-assessment__summary">Trial ${trialNumber}<span>${escapeHTML(BASELINE_SHORT)} ${formatScore(trialScore('baseline'))} → Skill ${formatScore(trialScore('skill'))}</span></summary>
+        <div class="model-run__comparison">${conditionTranscriptMarkup({ condition: 'baseline', response: baseline, pairedResponse: treatment,
+          score: trialScore('baseline'), rowIndex: `${index}-trial-${trialNumber}`, settingLabel: row.setting.label })}
+        ${conditionTranscriptMarkup({ condition: 'skill', response: treatment, pairedResponse: baseline,
+          score: trialScore('skill'), rowIndex: `${index}-trial-${trialNumber}`, settingLabel: row.setting.label })}</div>
+      </details>`;
+    }).join('')}</div>`;
+
   const modelRowMarkup = (row, index) => {
     const comparable = Number.isFinite(row.baseline) && Number.isFinite(row.treatment);
     const start = Math.min(row.baseline, row.treatment);
@@ -929,7 +990,7 @@
             <span class="model-preview__delta">${signed(row.delta)} pts</span>
             <span class="model-preview__action">Inspect run <i class="model-preview__action-mark" aria-hidden="true">↓</i></span>
           </summary>
-          <div class="model-run__comparison">
+          ${isCreation ? trialComparisonsMarkup(row, index) : `<div class="model-run__comparison">
             ${conditionTranscriptMarkup({
               condition: 'baseline',
               response: row.baselineResponse,
@@ -946,23 +1007,69 @@
               rowIndex: index,
               settingLabel
             })}
-          </div>
+          </div>`}
         </details>
       </li>
     `;
   };
 
+  const headToHeadMarkup = (benchmark) => {
+    const comparisons = (responseData.headToHeads || []).filter(comparison => comparison.benchmarkId === benchmark.id
+      && (!isWriting || comparison.caseId === activeCaseId));
+    if (!comparisons.length) return '';
+    return `<section class="report-section report-head-to-head" id="head-to-head" aria-labelledby="head-to-head-title">
+      <header class="report-section__heading"><div><p class="ui-eyebrow">Blind head-to-head · judge preferences</p>
+        <h2 id="head-to-head-title">Which story did the judges prefer?</h2></div>
+        <p>Same prompt, anonymous answers. Each judge read both answer orders in separate sessions.</p></header>
+      ${comparisons.map(comparison => {
+        const candidates = new Map(comparison.candidates.map(candidate => [candidate.id, candidate]));
+        const preferenceLabel = id => id === 'tie' ? 'Tie' : candidates.get(id)?.label || 'No preference stated';
+        return `<article data-head-to-head="${escapeHTML(comparison.id)}">
+          <p class="head-to-head__pair">${comparison.candidates.map(candidate => escapeHTML(candidate.label)).join('<span aria-label="versus"> vs </span>')}</p>
+          <p class="head-to-head__scope">${comparison.condition === 'skill' ? 'Both answers used the skill.' : 'Both answers used the same condition.'} One saved story per model; these preferences do not change the rubric scores below or establish an overall model winner.</p>
+          <table class="head-to-head__table"><caption class="visually-hidden">Judge preferences with the answer order reversed</caption>
+            <thead><tr><th scope="col">Judge</th>${comparison.candidates.map(candidate => `<th scope="col">${escapeHTML(candidate.label)}<small>shown first</small></th>`).join('')}</tr></thead>
+            <tbody>${comparison.judges.map(judge => `<tr data-head-to-head-judge="${escapeHTML(judge.id)}"><th scope="row">${escapeHTML(judge.label)}<small>${judge.orderConsistent ? 'Same choice in both orders' : 'No consistent choice across orders'}</small></th>
+              ${comparison.candidates.map(candidate => {
+                const review = comparison.reviews.find(review => review.judgeId === judge.id && review.firstCandidateId === candidate.id);
+                return `<td data-head-to-head-order="${escapeHTML(candidate.id)}" data-head-to-head-preference="${escapeHTML(review?.preferredCandidateId || '')}"><strong>${escapeHTML(preferenceLabel(review?.preferredCandidateId))}</strong></td>`;
+              }).join('')}</tr>`).join('')}</tbody>
+          </table>
+          <details class="work-spec-assessment head-to-head__reasons"><summary class="work-spec-assessment__summary">Why each judge chose it · read the reviews</summary>
+            <div class="work-spec-assessment__body">${comparison.judges.map(judge => `<section class="head-to-head__judge-reasons"><h3>${escapeHTML(judge.label)}</h3>
+              ${comparison.reviews.filter(review => review.judgeId === judge.id).map(review => `<article data-head-to-head-review="${escapeHTML(review.id)}">
+                <h4>${escapeHTML(preferenceLabel(review.preferredCandidateId))}${review.preferredCandidateId === 'tie' ? '' : ' preferred'}</h4>
+                <p class="head-to-head__scope">${escapeHTML(candidates.get(review.firstCandidateId)?.label || '')} shown first${review.confidence ? ` · ${escapeHTML(review.confidence)} confidence` : ''}</p>
+                <p data-head-to-head-reason>${escapeHTML(review.reason)}</p>
+                <details class="work-spec-assessment"><summary class="work-spec-assessment__summary">Original judge response</summary><div class="work-spec-assessment__body">
+                  ${review.interpretation === 'explicit-text-transcription' ? '<p>Preference and reason transcribed from the judge’s explicit answer. Its JSON formatting was malformed; no new review was generated and the original text is retained below.</p>' : ''}
+                  <pre class="model-run__text" data-head-to-head-original><code>${escapeHTML(review.rawText)}</code></pre>
+                </div></details></article>`).join('')}</section>`).join('')}</div>
+          </details>
+          <details class="work-spec-assessment head-to-head__stories"><summary class="work-spec-assessment__summary">Read the two stories</summary>
+            <div class="model-run__comparison">${comparison.candidates.map(candidate => {
+              const response = responseByKey.get(responseKey(comparison.benchmarkId, candidate.settingId, comparison.condition, comparison.caseId));
+              return `<section class="model-run__condition"><h3>${escapeHTML(candidate.label)}</h3><p>${escapeHTML(candidate.title)} · ${candidate.wordCount} words</p>
+                <pre class="model-run__text model-run__text--output" data-head-to-head-story="${escapeHTML(candidate.id)}"><code>${escapeHTML(response?.outputText || 'Original answer unavailable.')}</code></pre></section>`;
+            }).join('')}</div>
+          </details>
+        </article>`;
+      }).join('')}
+    </section>`;
+  };
+
   const rankingMarkup = (benchmark) => `
     <section class="report-section" id="ranking" aria-labelledby="ranking-title">
+      ${headToHeadMarkup(benchmark)}
       <header class="report-section__heading">
         <div>
           <p class="ui-eyebrow">${escapeHTML(SCORE_EDITION_LABEL)} field · all ${SETTING_COUNT} settings</p>
           <h2 id="ranking-title">Model comparison</h2>
         </div>
-        <p>${isCreation ? `All ${SETTING_COUNT} settings, ordered by the complete three-trial balanced skill score. Values and transcripts below describe the selected trial. Incomplete three-trial configurations have no rank.` : `All ${SETTING_COUNT} settings, ordered by ${escapeHTML(TREATMENT_LABEL)} task score. Rank is secondary and can change as the field grows.`}</p>
+        <p>${isCreation ? `One score per model, averaged across all ${writingTrialCount} trials. Open a model to read the individual trials and judge reviews.` : `All ${SETTING_COUNT} settings, ordered by ${escapeHTML(TREATMENT_LABEL)} task score. Rank is secondary and can change as the field grows.`}</p>
       </header>
       <details class="preview-disclosure" open>
-        <summary class="preview-disclosure__summary">All ${SETTING_COUNT} settings · ${isCreation ? 'selected trial' : 'task'} score /${SCORE_MAXIMUM}</summary>
+        <summary class="preview-disclosure__summary">All ${SETTING_COUNT} settings · ${isCreation ? `${writingTrialCount}-trial average` : 'task'} score /${SCORE_MAXIMUM}</summary>
         <ol class="model-preview" aria-label="All ${SETTING_COUNT} settings for ${escapeHTML(TREATMENT_LABEL)} and ${escapeHTML(BASELINE_LABEL)}, ordered by ${isCreation ? 'three-trial balanced skill score' : `${escapeHTML(TREATMENT_LABEL)} task score`}">
           ${modelPreviewRows(benchmark).map(modelRowMarkup).join('')}
         </ol>
@@ -995,12 +1102,14 @@
   const methodMarkup = (benchmark, summary) => {
     const limitations = Array.isArray(benchmark.limitations) ? benchmark.limitations : [];
     const scoreBasis = isWriting ? { ...data.scoreBasis, dimensions: writingDimensions() } : data.scoreBasis;
-    const writingScoreScope = !isWriting ? '' : data.cohortSummaries
+    const writingScoreScope = !isWriting ? '' : commonCoreScope
+      ? `For the ${commonCoreScope.expectedCaseCount} included stories, the hero and model rows use each original Astra xhigh review, on the same single-judge basis as the Core idea aggregate. The Matrix archive view retains its original panel scores and is excluded globally. All ${data.cases.length} original stories and every saved review remain available here.` : data.cohortSummaries
       ? 'The hero shows the selected repetition. The leaderboard uses the primary prompt only; secondary prompts are summarized separately below. Each answer needs the complete judge panel.'
-      : hasWritingTrialPicker
+      : isCreation ? `The hero averages the same complete ${writingTrialCount}-trial scores shown for each model. Individual trial answers and reviews remain inside each model's details.` : hasWritingTrialPicker
         ? `The hero shows the selected trial’s field means over assessable pairs; each row shows one model setting. The ${writingTitle} leaderboard requires all ${writingTrialCount} predeclared trials in both conditions.`
         : `The hero shows the selected ${writingCaseLabel}’s field means over assessable pairs; each row shows one model setting. The ${writingTitle} leaderboard requires scored coverage across the same complete corpus in both conditions.`;
-    const writingRubricScope = !isWriting ? '' : data.cohortSummaries
+    const writingRubricScope = !isWriting ? '' : commonCoreScope
+      ? `The Core idea aggregate covers ${commonCoreScope.expectedCaseCount} common stories, following a post-run user-approved exclusion of The Matrix for every setting. This report preserves all ${data.cases.length} original stories, including the excluded evidence. These results do not establish general writing ability. ${writingOverallScope}` : data.cohortSummaries
       ? `Scores cover the published adventure prompts and repetitions. The primary prompt and secondary prompts are reported separately. ${writingOverallScope}`
       : `Scores cover ${benchmark.name.toLowerCase()} on ${data.cases.length} published ${data.cases.length === 1 ? writingCaseLabel : writingCasePlural}${hasWritingTrialPicker ? ` with ${writingTrialCount} trials per condition` : ''}. They do not establish general writing ability. ${writingOverallScope}`;
     const judgingScope = summary.judgingScope;
@@ -1025,7 +1134,7 @@
           </section>
           <section>
             <h3>Score /${SCORE_MAXIMUM}</h3>
-            <p>Each value is the fixed ${JUDGE_COUNT}-judge panel result for this benchmark's rubric and does not depend on which other models are displayed. ${isWriting ? escapeHTML(writingScoreScope) : `The hero shows field means across ${SETTING_COUNT} settings; each row shows one model setting.`}${isWorkSpec || isWriting ? ' Scores and paired uplifts are rounded separately from the underlying totals.' : ''}</p>
+            <p>${commonCoreScope ? 'Included stories use one original Astra xhigh review per answer; additional panel reviews do not enter the displayed score.' : `Each value is the fixed ${JUDGE_COUNT}-judge panel result for this benchmark's rubric and does not depend on which other models are displayed.`} ${isWriting ? escapeHTML(writingScoreScope) : `The hero shows field means across ${SETTING_COUNT} settings; each row shows one model setting.`}${isWorkSpec || isWriting ? ' Scores and paired uplifts are rounded separately from the underlying totals.' : ''}</p>
           </section>
           <section>
             <h3>Run details</h3>
@@ -1079,6 +1188,18 @@
     </details>
   `;
 
+  const writingCasePickerMarkup = benchmark => {
+    if (!isWriting || isCreation) return '';
+    const cases = data.cases.filter(story => story.benchmarkId === benchmark.id);
+    const hasCasePicker = cases.length > 1;
+    if (!hasCasePicker && !hasWritingTrialPicker) return '';
+    return `<section class="writing-case-picker" aria-label="${escapeHTML(hasCasePicker ? writingCaseLabel : 'Trial')}">
+      ${hasCasePicker ? `<label class="field-control field-control--wide"><span>${escapeHTML(writingCaseLabel.charAt(0).toUpperCase() + writingCaseLabel.slice(1))}</span><select data-writing-case aria-label="Choose a ${escapeHTML(writingCaseLabel)}">${cases.map(story => `<option value="${escapeHTML(story.id)}"${story.id === activeCaseId ? ' selected' : ''}>${escapeHTML(story.title)}${commonCoreScope && !commonCoreScope.caseIds.includes(story.id) ? ' · archived, excluded' : ''}</option>`).join('')}</select></label>` : ''}
+      ${hasWritingTrialPicker ? `<label class="field-control"><span>${escapeHTML(data.trialLabel || 'Trial')}</span><select data-writing-trial aria-label="Choose a trial">${Array.from({ length: writingTrialCount }, (_, index) => index + 1).map(trial => `<option value="${trial}"${trial === activeTrialNumber ? ' selected' : ''}>Trial ${trial} of ${writingTrialCount}</option>`).join('')}</select></label>` : ''}
+      <p>One ${escapeHTML(benchmark.name)} benchmark · ${commonCoreScope ? `${commonCoreScope.expectedCaseCount}-story aggregate · 1 Astra judge · ${cases.length} archived stories` : data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.coverage.expectedPairs} matched pairs` : `${cases.length} ${escapeHTML(cases.length === 1 ? writingCaseLabel : writingCasePlural)}`}${hasWritingTrialPicker ? ` · ${writingTrialCount} trials per condition` : ''} · ${SETTING_COUNT} model settings. Choose a ${hasCasePicker ? `${escapeHTML(writingCaseLabel)}${hasWritingTrialPicker ? ' and trial' : ''}` : 'trial'} to inspect its paired answers and judgments.</p>
+    </section>`;
+  };
+
   const render = (benchmarkId, options = {}) => {
     const benchmark = benchmarkId ? benchmarkById.get(benchmarkId) : data.benchmarks[0];
     if (!benchmark) {
@@ -1089,8 +1210,8 @@
       activeCaseId = caseById.has(options.caseId) ? options.caseId : activeCaseId;
       activeTrialNumber = selectedTrialFor(activeCaseId, options.trialNumber);
     }
-    const selectedWritingSummary = trialSummaryByKey.get(trialSummaryKey(activeCaseId, activeTrialNumber)) || (!hasWritingTrialPicker ? caseSummaryById.get(activeCaseId) : null);
-    const summary = isWriting ? { ...summaryById.get(benchmark.id), ...selectedWritingSummary } : summaryById.get(benchmark.id);
+    const selectedWritingSummary = isCreation ? creationAggregateSummary(benchmark) : trialSummaryByKey.get(trialSummaryKey(activeCaseId, activeTrialNumber)) || (!hasWritingTrialPicker ? caseSummaryById.get(activeCaseId) : null);
+    const summary = isWriting ? { ...summaryById.get(benchmark.id), ...selectedWritingSummary, ...commonCoreSummary(activeCaseId) } : summaryById.get(benchmark.id);
     const category = categoryById.get(benchmark.category);
     const returnContext = returnFieldId === 'overall'
       ? { id: 'overall', name: 'Overall' }
@@ -1105,11 +1226,14 @@
       reportPage.dataset.activeWritingBenchmark = benchmark.id;
       reportPage.dataset.writingSubcategory = writingSubcategory;
       reportPage.dataset.activeWritingCase = activeCaseId;
-      reportPage.dataset.activeWritingTrial = String(activeTrialNumber);
+      reportPage.dataset.activeWritingTrial = isCreation ? 'all' : String(activeTrialNumber);
+      if (commonCoreScope) reportPage.dataset.writingScoreScope = commonCoreScope.caseIds.includes(activeCaseId) ? commonCoreScope.id : 'archived-excluded';
     }
     document.title = `${benchmark.name} · VasirBench`;
-    if (isWriting) document.title = `${caseById.get(activeCaseId).title}${hasWritingTrialPicker ? ` · Trial ${activeTrialNumber}` : ''} · ${benchmark.name} · VasirBench`;
-    if (isWriting) document.querySelector('.benchmark-mast__issue').textContent = `Writing · ${writingFinalExclusions ? 'Final snapshot with exclusions' : writingInProgress ? 'Incomplete snapshot' : 'Complete snapshot'}`;
+    if (isWriting) document.title = isCreation ? `${benchmark.name} · ${writingTrialCount}-trial average · VasirBench` : `${caseById.get(activeCaseId).title}${hasWritingTrialPicker ? ` · Trial ${activeTrialNumber}` : ''} · ${benchmark.name} · VasirBench`;
+    if (isWriting) document.querySelector('.benchmark-mast__issue').textContent = commonCoreScope
+      ? commonCoreScope.caseIds.includes(activeCaseId) ? `Writing · 1 Astra judge · ${commonCoreScope.rankedSettingCount}/${SETTING_COUNT} complete settings` : 'Writing · Archived story · excluded from aggregate'
+      : `Writing · ${writingFinalExclusions ? 'Final snapshot with exclusions' : writingInProgress ? 'Incomplete snapshot' : 'Complete snapshot'}`;
 
     reportView.innerHTML = `
       <div class="report-shell">
@@ -1128,7 +1252,7 @@
             <span class="report-context__back-short">← ${escapeHTML(benchmark.suite)}</span>
           </a>
         </div>
-        ${isWriting ? `<section class="writing-case-picker" aria-label="${escapeHTML(writingCaseLabel)}"><label class="field-control field-control--wide"><span>${escapeHTML(writingCaseLabel.charAt(0).toUpperCase() + writingCaseLabel.slice(1))}</span><select data-writing-case aria-label="Choose a ${escapeHTML(writingCaseLabel)}">${data.cases.filter(story => story.benchmarkId === benchmark.id).map(story => `<option value="${escapeHTML(story.id)}"${story.id === activeCaseId ? ' selected' : ''}>${escapeHTML(story.title)}</option>`).join('')}</select></label>${hasWritingTrialPicker ? `<label class="field-control"><span>${escapeHTML(data.trialLabel || 'Trial')}</span><select data-writing-trial aria-label="Choose a trial">${Array.from({ length: writingTrialCount }, (_, index) => index + 1).map(trial => `<option value="${trial}"${trial === activeTrialNumber ? ' selected' : ''}>Trial ${trial} of ${writingTrialCount}</option>`).join('')}</select></label>` : ''}<p>One ${escapeHTML(benchmark.name)} benchmark · ${data.cohortSummaries ? `${data.coverage.promptCount} prompts · ${data.coverage.expectedPairs} matched pairs` : `${data.cases.length} ${escapeHTML(data.cases.length === 1 ? writingCaseLabel : writingCasePlural)}`}${hasWritingTrialPicker ? ` · ${writingTrialCount} trials per condition` : ''} · ${SETTING_COUNT} model settings. Choose a ${escapeHTML(writingCaseLabel)}${hasWritingTrialPicker ? ' and trial' : ''} to inspect its paired answers and judgments.</p></section>` : ''}
+        ${writingCasePickerMarkup(benchmark)}
         ${heroMarkup(benchmark, summary)}
         ${rankingMarkup(benchmark)}
         ${judgeTrialDetailsMarkup(benchmark, summary)}
@@ -1142,6 +1266,8 @@
       syncOpenState();
     });
 
+    const preferenceLink = document.querySelector('.report-mast__nav [data-report-section="head-to-head"]');
+    if (preferenceLink) preferenceLink.hidden = !reportView.querySelector('[data-head-to-head]');
     const canonicalHash = reportHash(benchmark.id, activeCaseId, activeTrialNumber, options.section);
     if (!benchmarkById.has(benchmarkId) || (isWriting && window.location.hash !== canonicalHash)) {
       window.history.replaceState(null, '', canonicalHash);

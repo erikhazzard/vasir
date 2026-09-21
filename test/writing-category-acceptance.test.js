@@ -8,6 +8,7 @@ import { buildDungeonMasterPublication } from '../cli/eval/dungeon-master-public
 import { acceptedWritingRankingFixture } from './fixtures/writing-ranking-accepted-20260908.js';
 import { PAIRED_TWISTS_EDITION, deriveExpectedPairedTwistsEvidence, deriveExpectedWritingCategory, deriveExpectedLegacyWritingCategory, deriveExpectedProvisionalEvidence, deriveExpectedWritingBenchmarkLeader, deriveExpectedOverallV3, verifyOverallV3Projection, verifyCandidateCategoryProjection, verifyWritingProofEvidence, WRITING_PARTIAL_FOOTNOTE, WRITING_LEDGER_PRESENTATION, WRITING_LEADERS_PRESENTATION, WRITING_OVERALL_PRESENTATION, WRITING_LEDGER_PARTIAL_FOOTNOTE } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 import { buildOverallPublication } from '../cli/eval/overall-publication.js';
+import { buildSelectedWritingPublication } from '../cli/eval/writing-publication.js';
 
 const app = fs.readFileSync(new URL('../site/vasirbenchmark.com/app.js', import.meta.url), 'utf8');
 const boundary = app.indexOf('(async function () {');
@@ -74,7 +75,8 @@ function sharedViewEvidence(expected) {
         exactBaseline: baseline.benchmarkComponents.find(item => item.benchmarkId === benchmarkId).exactScore, exactSkill: skill.benchmarkComponents.find(item => item.benchmarkId === benchmarkId).exactScore })),
       fieldMeans: [...expected.publications].map(([benchmarkId, source]) => {
         const official = source.benchmarkSummaries?.[0] || {}, provisional = source.provisionalLeaderboard;
-        const usesProvisional = !(Number.isFinite(official.baseline) && Number.isFinite(official.treatment)) && provisional?.status === 'provisional' && Boolean(provisional.rankedSettingCount);
+        const pinned = benchmarkId === 'storytelling-core-idea' && expected.collection.writingScoreBasis?.coreIdeaScoring === 'published-single-judge-provisional';
+        const usesProvisional = (pinned || !(Number.isFinite(official.baseline) && Number.isFinite(official.treatment))) && provisional?.status === 'provisional' && Boolean(provisional.rankedSettingCount);
         const summary = usesProvisional ? provisional.summary : official, fieldSelection = deriveExpectedWritingCategory(expected.collection, benchmarkId).selectionId;
         const baseline = Number.isFinite(summary.baseline) ? summary.baseline : null, skill = Number.isFinite(summary.treatment) ? summary.treatment : null;
         return { benchmarkId, selectionId: fieldSelection, baseline, skill, provisional: Boolean(usesProvisional), renderedBaseline: baseline?.toFixed(1) ?? '', renderedSkill: skill?.toFixed(1) ?? '',
@@ -98,6 +100,8 @@ function receipt(expected, benchmarkId) {
       presentationEvidence: { noPlaceholderPanels: true, compactRows: true, matchedEngineeringFrame: true, dumbbellGeometry: true, mismatches: [], numericPairedSettingIds: expected.entries.filter(entry => entry.condition === 'skill' && Number.isFinite(entry.exactScore)).map(entry => entry.settingId), dumbbellRows: rowEvidence(expected) } },
     provisionalArchiveEvidence: (expected.provisionalEvidence || []).map(record => ({ ...record, mismatches: [] })),
     scoredBranchCoverage: { ...Object.fromEntries(['completeSettings', 'rankedSettings', 'partialSettings', 'unscoredSettings', 'tiedRankEntries', 'regressionSettings'].map(key => [key, expected[key]])), efficiency: clone(expected.efficiencyEvidence), required: true } };
+  const commonCore = expected.provisionalEvidence?.find(item => item.benchmarkId === benchmarkId && item.scoringScope);
+  if (commonCore) result.caseEvidence = commonCore.reportCases.map(story => ({ ...clone(story), mismatches: [] }));
   if (benchmarkId === 'dungeon-master-adventure-outline') {
     delete result.trialCount;
     delete result.scoredBranchCoverage;
@@ -188,7 +192,7 @@ function cleanReceipt(expected, benchmarkId) {
       const row = { benchmarkId, trackId: expected.sources.get(benchmarkId).track, provisional: Boolean(usesProvisional), sourceKind: usesProvisional ? 'provisional-single-judge' : hasOfficial ? 'official-panel' : 'answers', sourceSha256: usesProvisional ? provisional.sourceSha256 : publication.scoreBasis?.sourceSha256 ?? null,
         compareHref: 'https://example.test/index.html?' + new URLSearchParams({ score: deriveExpectedWritingCategory(expected.collection, benchmarkId).selectionId, setting: selectedSettingId }) + '#capabilities/writing',
         reportHref: 'https://example.test/benchmark-report.html#' + benchmarkId,
-        metadata: { settingCount: usesProvisional ? provisional.rankedSettingCount : publication.coverage.completedSettingCount, caseCount: publication.cases.length, trialCount: publication.trialCount || publication.scoreBasis?.trialsPerTask || 1, judgeCount: usesProvisional ? provisional.judgeCount : publication.scoreBasis?.judgeCount || publication.scoreBasis?.judges?.length || 0 } };
+        metadata: { settingCount: usesProvisional ? provisional.rankedSettingCount : publication.coverage.completedSettingCount, caseCount: usesProvisional ? provisional.expectedCaseCount : publication.cases.length, trialCount: publication.trialCount || publication.scoreBasis?.trialsPerTask || 1, judgeCount: usesProvisional ? provisional.judgeCount : publication.scoreBasis?.judgeCount || publication.scoreBasis?.judges?.length || 0 } };
       for (const [field, key] of [['baseline', 'baseline'], ['skill', 'treatment'], ['delta', 'delta']]) {
         row[field] = Number.isFinite(summary[key]) ? summary[key] : null;
         row['rendered' + field[0].toUpperCase() + field.slice(1)] = row[field] === null ? '' : field === 'delta' && expected.fixedBasis
@@ -200,7 +204,7 @@ function cleanReceipt(expected, benchmarkId) {
   }));
   delete category.benchmarkOverviewEvidence;
   category.provisionalDisplayEvidence = [];
-  category.provisionalMethodEvidence = (expected.provisionalEvidence || []).map(original => ({ benchmarkId: original.benchmarkId, sourceSha256: original.sourceSha256, judgeConfigurationIds: [original.judgeConfigurationId], scope: 'category-methodology', defaultClosed: true, openedForAudit: true, provisional: true, singleJudge: true, excludedOverall: true, reportHref: 'https://example.test/benchmark-report.html#' + original.benchmarkId, closedAfterAudit: true, mismatches: [] }));
+  category.provisionalMethodEvidence = (expected.provisionalEvidence || []).map(original => ({ benchmarkId: original.benchmarkId, sourceSha256: original.sourceSha256, judgeConfigurationIds: [original.judgeConfigurationId], ...(original.scoringScope ? { scoringScope: clone(original.scoringScope) } : {}), scope: 'category-methodology', defaultClosed: true, openedForAudit: true, provisional: true, singleJudge: true, excludedOverall: true, reportHref: 'https://example.test/benchmark-report.html#' + original.benchmarkId, closedAfterAudit: true, mismatches: [] }));
   return result;
 }
 
@@ -908,12 +912,37 @@ test('provisional acceptance independently rejects altered original ratings, ran
   for (const mutate of [
     ({ source }) => { source.provisionalLeaderboard.entries.find(entry => entry.eligibleForRank).rank++; },
     ({ source }) => { source.provisionalLeaderboard.entries.find(entry => entry.eligibleForRank).exactScore++; },
-    ({ source }) => { source.provisionalLeaderboard.incompleteSettings[0].missingCaseIds = []; },
+    ({ source }) => { if (source.provisionalLeaderboard.incompleteSettings.length) source.provisionalLeaderboard.incompleteSettings[0].missingCaseIds = [];
+      else source.provisionalLeaderboard.incompleteSettings.push({ settingId: source.settings[0].id, missingCaseIds: [] }); },
     ({ source }) => { source.provisionalLeaderboard.summary.exactDelta++; },
     ({ archive }) => { const judgment = archive.responses.flatMap(answer => answer.judgments).find(judge => judge.judgeConfigurationId === 'codex:gpt-6-astra@xhigh'); judgment.score++; }
   ]) {
     const data = clone(originals); mutate(data);
     assert.throws(() => deriveExpectedProvisionalEvidence(deriveExpectedWritingCategory(data.source), data.archive));
+  }
+});
+
+test('common-eleven acceptance recomputes the fixed scored corpus, resources and all original story displays', t => {
+  const repoRootDirectory = fileURLToPath(new URL('../', import.meta.url));
+  const selection = JSON.parse(fs.readFileSync(new URL('../benchmarks/storytelling-core-idea/publication.json', import.meta.url)));
+  if (!fs.existsSync(repoRootDirectory + selection.run.path)) return t.skip('Private original Core evidence is not installed.');
+  const { projection, responseBundle } = buildSelectedWritingPublication({ repoRootDirectory, benchmarkId: 'storytelling-core-idea' });
+  const evidence = () => deriveExpectedProvisionalEvidence(deriveExpectedWritingCategory(projection), responseBundle);
+  const observed = evidence()[0];
+  assert.equal(observed.rankedSettings, 33); assert.equal(observed.reviewedAnswers, 33 * 11 * 2);
+  assert.equal(observed.reportCases.length, 12);
+  assert.equal(observed.reportCases.find(story => story.caseId === 'the-matrix').scoringScope.excluded, true);
+  assert.ok(observed.reportCases.filter(story => story.caseId !== 'the-matrix').every(story => story.scoringScope.rows.every(row => Number.isFinite(row.baseline) && Number.isFinite(row.skill))));
+  for (const mutate of [
+    ({ projection }) => { projection.provisionalLeaderboard.caseIds[0] = 'the-matrix'; },
+    ({ projection }) => { projection.methodology.derivedScoreBasis.selectionTiming = 'preregistered'; },
+    ({ projection }) => { projection.provisionalLeaderboard.scoredCorpusSha256 = '0'.repeat(64); },
+    ({ projection }) => { projection.provisionalLeaderboard.entries[0].metrics.meanLatencyMs++; },
+    ({ responseBundle }) => { responseBundle.responses = responseBundle.responses.filter(answer => answer.caseId !== 'the-matrix'); },
+    ({ responseBundle }) => { responseBundle.responses.find(answer => answer.caseId !== 'the-matrix').judgments.find(judge => judge.judgeConfigurationId === 'codex:gpt-6-astra@xhigh').score++; }
+  ]) {
+    const changed = clone({ projection, responseBundle }); mutate(changed);
+    assert.throws(() => deriveExpectedProvisionalEvidence(deriveExpectedWritingCategory(changed.projection), changed.responseBundle));
   }
 });
 

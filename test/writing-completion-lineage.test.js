@@ -132,7 +132,25 @@ test('current Writing selections are unchanged or descend from retained original
         assert.equal(selected.lineage.edition, 'storytelling-plot-twists-paired-v2');
         assert.equal(selected.lineage.originalEvidencePreserved, true);
         assert.equal(selected.lineage.priorAnswersAndReviewsReused, false);
+      } else if (selected.lineage.kind === 'declared-writing-technical-recovery') {
+        assert.equal(selected.benchmarkId, 'storytelling-plot-twists');
+        assert.equal(selected.lineage.technicalRecovery.version, 'paired-tool-isolation-recovery-v1');
+        assert.equal(selected.lineage.technicalRecovery.replacementGenerationIds.length, 3);
+        assert.equal(selected.lineage.technicalRecovery.replacementJudgmentIds.length, 2);
+        assert.equal(selected.lineage.cleanAnswersAndCompletedReviewsPreserved, true);
+        assert.equal(selected.lineage.supersededOriginalAttemptsPreserved, true);
+        assert.equal(selected.lineage.originalSettingsRerun, true);
+        assert.equal(selected.lineage.scoreBasedReplacementSelection, false);
       } else assert.equal(selected.lineage.answersAndCompletedReviewsPreserved, true);
+      if (selected.lineage.kind === 'authorized-writing-common-corpus') {
+        assert.equal(selected.benchmarkId, 'storytelling-core-idea');
+        assert.equal(selected.lineage.scoreBasis.id, 'core-idea-astra-common-11-v1');
+        assert.equal(selected.lineage.scoreBasis.expectedCaseCount, 11);
+        assert.equal(selected.lineage.scoreBasis.originalCaseCount, 12);
+        assert.deepEqual(selected.lineage.scoreBasis.excludedCaseIds, ['the-matrix']);
+        assert.equal(selected.lineage.scoreBasis.selectionTiming, 'post-run-user-approved');
+        assert.equal(selected.lineage.originalSettingsRerun, false);
+      }
       assert.equal(selected.lineage.previousSelection.sha256, previous.sha256);
       assert.deepEqual(selected.lineage.previousSources, previous.sources);
     }

@@ -38,7 +38,7 @@ async function loadOverallV3Oracle(evaluate) {
   });
   const benchmarkDisplays = Object.fromEntries(overallWritingPublications.map(([benchmarkId, publication]) => {
     const basis = sourceProjection.sources.get(benchmarkId);
-    return [benchmarkId, { settingCount: basis.completedSettingCount, caseCount: publication.cases.length,
+    return [benchmarkId, { settingCount: basis.completedSettingCount, caseCount: basis.provisional ? publication.provisionalLeaderboard.expectedCaseCount : publication.cases.length,
       trials: publication.trialCount || publication.scoreBasis.trialsPerTask || 1, judgeCount: basis.judgeCount, provisional: basis.provisional }];
   }));
   return { ...oracle, availableCategoriesBySetting: Object.fromEntries(oracle.coverage.records.map(record => [record.id, deriveExpectedOverallAvailableCategories(oracle, record.configurationId)])), benchmarkSummaries: [...context.root.benchmarkSummaries, ...writingSummaries, ...context.root.aiWorkflows.benchmarkSummaries],

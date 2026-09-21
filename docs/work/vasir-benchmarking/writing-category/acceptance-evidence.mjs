@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
+import { resolveBenchmarkConfigurations } from '../../../../cli/eval/benchmark-models.js';
 
 // Independent arithmetic for the acceptance boundary. Do not call the app's
 // category builder here: the candidate implementation is what we are checking.
@@ -8,6 +9,9 @@ const conditions = ['baseline', 'skill'];
 export const WRITING_CATEGORY_METHOD = 'common-benchmark-ranking-with-visible-partials-v5';
 export const VERSIONED_WRITING_CATEGORY_METHOD = 'versioned-common-benchmark-ranking-v6';
 export const PAIRED_TWISTS_EDITION = 'storytelling-plot-twists-paired-v2';
+export const PAIRED_NATIVE_CONFIGURATION_IDS = resolveBenchmarkConfigurations({ requestedModelArguments: [
+  'codex:gpt-6-astra', 'codex:gpt-5.6-sol', 'codex:gpt-5.6-terra', 'codex:gpt-5.6-luna', 'claude:claude-fable-5-1', 'claude:claude-opus-5'
+] }).filter(configuration => configuration.reasoning !== 'ultracode').map(configuration => configuration.id);
 export const PAIRED_WRITING_SCORE_BASIS = {
   id: 'writing-storytelling-paired-v2',
   benchmarkIds: ['storytelling-core-idea', 'storytelling-plot-twists', 'storytelling-magic-discovery'],
@@ -411,6 +415,14 @@ function verifySelectionEvidence(evidence, expected, presentationVariant) {
   exact(evidence.benchmarkWeights, expected.benchmarkWeights, 'Selected fixed test weights');
   assert.equal(evidence.provisional, expected.provisional, 'Selected provisional basis is hidden');
   for (const field of ['completeSettings', 'rankedSettings', 'partialSettings']) assert.equal(evidence[field], expected[field], `Selected ${field}`);
+  if (evidence.coverageDisclosureEvidence) {
+    const disclosure = evidence.coverageDisclosureEvidence;
+    assert.equal(disclosure.present, expected.partialSettings > 0);
+    assert.equal(disclosure.rowCount, expected.partialSettings);
+    assert.equal(disclosure.defaultOpen, disclosure.selectedPartial, 'Only an explicitly selected partial may open coverage initially.');
+    assert.equal(disclosure.opensForAudit, true); assert.equal(disclosure.restored, true);
+    exact(disclosure.mismatches, [], 'Partial coverage disclosure failed.');
+  }
   exact(evidence.mismatches, [], 'Selected comparison browser checks failed');
   verifyDumbbellRows(evidence.rowEvidence, expected, expected.selectionId);
   assert.equal(evidence.partialFootnote, isCleanWritingPresentation(presentationVariant) ? WRITING_LEDGER_PARTIAL_FOOTNOTE : WRITING_PARTIAL_FOOTNOTE, 'Available-score qualification changed');
@@ -554,7 +566,8 @@ function verifySharedWritingViews(category, expected) {
     for (const field of overview.fieldMeans) {
       const publication = expected.publications.get(field.benchmarkId), official = publication.benchmarkSummaries?.[0] || {};
       const provisional = publication.provisionalLeaderboard;
-      const usesProvisional = !(finite(official.baseline) && finite(official.treatment)) && provisional?.status === 'provisional' && Boolean(provisional.rankedSettingCount);
+      const pinned = field.benchmarkId === 'storytelling-core-idea' && expected.collection.writingScoreBasis?.coreIdeaScoring === 'published-single-judge-provisional';
+      const usesProvisional = (pinned || !(finite(official.baseline) && finite(official.treatment))) && provisional?.status === 'provisional' && Boolean(provisional.rankedSettingCount);
       const summary = usesProvisional ? provisional.summary : official;
       const selectionId = deriveExpectedWritingCategory(expected.collection, field.benchmarkId).selectionId;
       close(field.baseline, finite(summary.baseline) ? summary.baseline : null, 'Original all-model field baseline');
@@ -917,7 +930,7 @@ function verifyCleanWritingLedger(category, expected) {
       assert.equal(row.sourceKind, usesProvisional ? 'provisional-single-judge' : hasOfficial ? 'official-panel' : 'answers', 'Clean ledger original score basis');
       assert.equal(row.sourceSha256, usesProvisional ? provisional.sourceSha256 : publication.scoreBasis?.sourceSha256 ?? null, 'Clean ledger original score source');
       const metadata = { settingCount: usesProvisional ? provisional.rankedSettingCount : publication.coverage.completedSettingCount,
-        caseCount: publication.cases.length, trialCount: publication.trialCount || publication.scoreBasis?.trialsPerTask || 1,
+        caseCount: usesProvisional ? provisional.expectedCaseCount : publication.cases.length, trialCount: publication.trialCount || publication.scoreBasis?.trialsPerTask || 1,
         judgeCount: usesProvisional ? provisional.judgeCount : publication.scoreBasis?.judgeCount || publication.scoreBasis?.judges?.length || 0 };
       for (const [key, value] of Object.entries(metadata)) assert.equal(row.metadata?.[key], value, 'Clean ledger original ' + key);
       for (const [field, key] of [['baseline', 'baseline'], ['skill', 'treatment'], ['delta', 'delta']]) {
@@ -965,7 +978,8 @@ export function deriveExpectedProvisionalEvidence(expected, responseCollection) 
     if (!source) continue;
     assert.equal(benchmarkId, 'storytelling-core-idea', 'Unexpected provisional benchmark.');
     assert.equal(source.status, 'provisional', 'Provisional source status.');
-    assert.equal(source.method, 'equal-case-paired-complete-corpus-single-judge-mean-v1', 'Provisional source method.');
+    const commonEleven = source.id === 'core-idea-astra-common-11-v1';
+    assert.equal(source.method, commonEleven ? 'equal-case-paired-common-11-single-judge-mean-v1' : 'equal-case-paired-complete-corpus-single-judge-mean-v1', 'Provisional source method.');
     const judgeConfigurationId = 'codex:gpt-6-astra@xhigh';
     exact(source.judgeConfigurationIds, [judgeConfigurationId], 'Provisional fixed judge roster');
     assert.equal(source.judgeCount, 1, 'Provisional judge count.');
@@ -973,7 +987,18 @@ export function deriveExpectedProvisionalEvidence(expected, responseCollection) 
     assert.equal(source.corpusSha256, publication.methodology.corpusSha256, 'Provisional corpus hash.');
     assert.equal(source.skillSha256, publication.methodology.skillSha256, 'Provisional skill hash.');
     assert.equal(source.officialScoreBasisId, publication.scoreBasis.id, 'Provisional official score basis.');
-    exact(source.caseIds, publication.cases.map(story => story.id), 'Provisional original case inventory');
+    const scoredCases = commonEleven ? publication.cases.filter(story => story.id !== 'the-matrix') : publication.cases;
+    exact(source.caseIds, scoredCases.map(story => story.id), 'Provisional common scored case inventory');
+    if (commonEleven) {
+      assert.equal(publication.cases.length, 12); assert.equal(scoredCases.length, 11);
+      assert.equal(source.originalCaseCount, publication.cases.length);
+      exact(source.originalCaseIds, publication.cases.map(story => story.id), 'All original Core stories remain declared.');
+      exact(source.excludedCaseIds, ['the-matrix'], 'Only the globally declared story exclusion is authorized.');
+      assert.ok(typeof source.exclusionReason === 'string' && source.exclusionReason.trim());
+      assert.equal(source.selectionTiming, 'post-run-user-approved');
+      for (const field of ['id', 'method', 'caseIds', 'expectedCaseCount', 'originalCaseCount', 'originalCaseIds', 'excludedCaseIds', 'scoredCorpusSha256', 'selectionTiming', 'exclusionReason', 'limitations']) exact(publication.methodology.derivedScoreBasis?.[field], source[field], 'Derived Core method disclosure differs from its scoring policy: ' + field);
+      assert.equal(source.scoredCorpusSha256, crypto.createHash('sha256').update(JSON.stringify(scoredCases)).digest('hex'), 'Common scored corpus hash changed.');
+    }
     assert.equal(source.expectedCaseCount, source.caseIds.length, 'Provisional expected case count.');
     assert.equal(source.expectedSettingCount, publication.settings.length, 'Provisional expected setting count.');
     const archive = responseCollection?.additionalBenchmarks?.[benchmarkId] || responseCollection?.benchmarkResponses?.find(item => item.benchmarkId === benchmarkId)?.responseBundle || responseCollection;
@@ -984,9 +1009,10 @@ export function deriveExpectedProvisionalEvidence(expected, responseCollection) 
       assert.ok(!answers.has(key), 'Duplicate provisional archive answer identity.');
       answers.set(key, answer);
     }
+    if (commonEleven) sameIds([...answers.keys()], publication.settings.flatMap(setting => publication.cases.flatMap(story => conditions.map(condition => [setting.id, story.id, condition].join('|')))), 'Original twelve-story answer inventory must remain accessible.');
     let reviewedAnswers = 0;
     const cohorts = publication.settings.map(setting => {
-      const pairs = publication.cases.map(story => {
+      const pairs = scoredCases.map(story => {
         const pair = { caseId: story.id };
         for (const condition of conditions) {
           const answer = answers.get([setting.id, story.id, condition].join('|'));
@@ -1023,6 +1049,20 @@ export function deriveExpectedProvisionalEvidence(expected, responseCollection) 
       assert.equal(entry.eligibleForRank, cohort.complete, 'Provisional incomplete cohort was ranked.');
       assert.equal(entry.completedPairCount, cohort.pairs.length, 'Provisional completed pair count.');
       assert.equal(entry.expectedPairCount, source.expectedCaseCount, 'Provisional expected pair count.');
+      if (commonEleven) {
+        const cells = publication.caseResults.filter(cell => cell.settingId === cohort.settingId && cell.condition === condition && source.caseIds.includes(cell.caseId));
+        assert.equal(cells.length, source.expectedCaseCount, 'Common Core resources require exactly the scored stories.');
+        for (const [field, read] of [['meanLatencyMs', cell => cell.latencyMs], ['meanInputTokens', cell => cell.inputTokens],
+          ['meanOutputTokens', cell => cell.outputTokens], ['meanTotalTokens', cell => cell.totalTokens], ['meanWordCount', cell => cell.wordCount]]) {
+          const values = cells.map(read);
+          const value = cohort.complete && values.every(finite) ? round(mean(values)) : null;
+          close(entry.metrics?.[field] ?? null, value, 'Common Core resource scope: ' + field);
+        }
+        assert.equal(entry.metrics?.meanCostUsd ?? null, null);
+        if (entry.metrics) assert.equal(entry.metrics.costCoverage, 'not-comparable');
+        close(entry.latency, finite(entry.metrics?.meanLatencyMs) ? entry.metrics.meanLatencyMs / 1000 : null, 'Common Core latency scope.');
+        close(entry.tokens, entry.metrics?.meanOutputTokens ?? null, 'Common Core token scope.');
+      }
     }
     sameIds(source.incompleteSettings.map(item => item.settingId), cohorts.filter(cohort => !cohort.complete).map(cohort => cohort.settingId), 'Provisional incomplete cohort inventory');
     for (const diagnostic of source.incompleteSettings) {
@@ -1048,7 +1088,22 @@ export function deriveExpectedProvisionalEvidence(expected, responseCollection) 
     assert.equal(source.rankedSettingCount, eligible.length, 'Provisional ranked setting count.');
     assert.equal(source.summary.usablePairs, eligible.length * source.expectedCaseCount, 'Provisional summary complete pairs.');
     assert.equal(source.summary.expectedPairs, cohorts.length * source.expectedCaseCount, 'Provisional summary planned pairs.');
-    records.push({ benchmarkId, judgeConfigurationId, sourceSha256: source.sourceSha256, reviewedAnswers, rankedSettings: eligible.length, incompleteSettings: cohorts.length - eligible.length });
+    records.push({ benchmarkId, judgeConfigurationId, sourceSha256: source.sourceSha256, reviewedAnswers, rankedSettings: eligible.length, incompleteSettings: cohorts.length - eligible.length,
+      ...(commonEleven ? { scoringScope: { id: source.id, caseIds: source.caseIds, excludedCaseIds: source.excludedCaseIds,
+        originalCaseIds: source.originalCaseIds, scoredCorpusSha256: source.scoredCorpusSha256 },
+      reportCases: publication.cases.map(story => {
+        const excluded = !source.caseIds.includes(story.id);
+        const exactScore = (settingId, condition) => {
+          const reviews = (answers.get([settingId, story.id, condition].join('|'))?.judgments || []).filter(judge => excluded || judge.judgeConfigurationId === judgeConfigurationId);
+          if (reviews.length !== (excluded ? publication.scoreBasis.judgeCount : 1)) return null;
+          return mean(reviews.map(judge => {
+            const score = publication.scoreBasis.dimensions.reduce((sum, dimension) => sum + judge.dimensions[dimension.id].rating * dimension.weight / 10, 0);
+            close(judge.score, score, 'Original story review arithmetic'); return score;
+          }));
+        };
+        return { caseId: story.id, scoringScope: { id: source.id, excluded, judgeConfigurationId: excluded ? null : judgeConfigurationId,
+          rows: publication.settings.map(setting => ({ settingId: setting.id, baseline: exactScore(setting.id, 'baseline'), skill: exactScore(setting.id, 'skill') })) } };
+      }) } : {}) });
   }
   return records;
 }
@@ -1114,17 +1169,57 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
   const addedConfigurations = ['codex:gpt-6-astra@low', 'codex:gpt-6-astra@xhigh', 'codex:gpt-6-astra@ultra',
     'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max',
     'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
-  const contract = publication.methodology?.sourceContract, extension = contract?.coverageExtension;
-  const configurations = extension ? [...originalConfigurations, ...addedConfigurations] : originalConfigurations;
+  const contract = publication.methodology?.sourceContract, extension = contract?.coverageExtension, recovery = contract?.technicalRecovery;
+  const declaredAppend = extension?.version === 'paired-declared-coverage-extension-v2';
+  const cohorts = declaredAppend ? contract.sourceCohorts : null, history = declaredAppend ? contract.coverageHistory : null;
+  let configurations = extension ? [...originalConfigurations, ...addedConfigurations] : originalConfigurations;
+  if (declaredAppend) {
+    assert.ok(Array.isArray(cohorts) && cohorts.length >= 2 && Array.isArray(history) && history.length === cohorts.length - 1, 'Declared append requires the complete cohort history.');
+    sameIds(cohorts[0].configurationIds, originalConfigurations, 'Original paired cohort changed.');
+    const retained = [];
+    for (const [index, cohort] of cohorts.entries()) {
+      sameIds(Object.keys(cohort), ['configurationIds', 'sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256'], 'Cohort metadata fields');
+      assert.equal(cohort.sourceCohort, index ? 'supplement' : 'original');
+      assert.ok(cohort.configurationIds.length > 0 && cohort.configurationIds.every(id => PAIRED_NATIVE_CONFIGURATION_IDS.includes(id) && !retained.includes(id)), 'Append must add canonical native settings without rerunning a retained setting.');
+      assert.equal(new Set(cohort.configurationIds).size, cohort.configurationIds.length);
+      for (const field of ['sourceSnapshotSha256', 'sourceManifestSha256']) assert.match(cohort[field], /^[a-f0-9]{64}$/);
+      if (index) {
+        const step = history[index - 1], parent = cohorts[index - 1];
+        assert.ok(['paired-reasoning-coverage-extension-v1', 'paired-declared-coverage-extension-v2'].includes(step.version));
+        assert.ok(typeof step.purpose === 'string' && step.purpose.trim());
+        if (step.version === 'paired-reasoning-coverage-extension-v1') {
+          assert.equal(index, 1); sameIds(step.addedConfigurations, addedConfigurations, 'Historical first append changed.');
+        }
+        assert.equal(step.parentSnapshotSha256, parent.sourceSnapshotSha256); assert.equal(step.parentManifestSha256, parent.sourceManifestSha256);
+        assert.equal(step.sourceSnapshotSha256, cohort.sourceSnapshotSha256); assert.equal(step.sourceManifestSha256, cohort.sourceManifestSha256);
+        exact(step.addedConfigurations, cohort.configurationIds, 'Append roster differs from its source cohort.');
+        assert.equal(step.retainedConfigurationCount, retained.length);
+        assert.equal(step.additionalGenerationCount, cohort.configurationIds.length * conditions.length);
+        assert.equal(step.additionalJudgeRequestCount, cohort.configurationIds.length * judges.length);
+      }
+      retained.push(...cohort.configurationIds);
+    }
+    assert.equal(new Set(cohorts.map(cohort => cohort.sourceSnapshotSha256)).size, cohorts.length, 'Each append requires its own pinned source.');
+    const { sourceSnapshotSha256, sourceManifestSha256, ...lastExtension } = history.at(-1);
+    exact(lastExtension, extension, 'Latest append differs from its retained history.');
+    assert.equal(sourceSnapshotSha256, recovery?.sourceSnapshotSha256 ?? contract.sourceSha256); assert.equal(sourceManifestSha256, recovery?.sourceManifestSha256 ?? contract.manifestSha256);
+    configurations = retained;
+    exact(contract.configurations.map(item => item.id), configurations, 'Declared configuration order differs from cohort union.');
+  } else {
+    assert.equal(contract?.sourceCohorts, undefined, 'Historical source cannot acquire undeclared cohorts.');
+    assert.equal(contract?.coverageHistory, undefined, 'Historical source cannot acquire undeclared history.');
+  }
   const settingCount = configurations.length, answerCount = settingCount * conditions.length, requestCount = settingCount * judges.length;
   if (extension) {
-    assert.equal(extension.version, 'paired-reasoning-coverage-extension-v1');
+    assert.ok(declaredAppend || extension.version === 'paired-reasoning-coverage-extension-v1');
     assert.ok(typeof extension.purpose === 'string' && extension.purpose.trim());
     for (const field of ['parentSnapshotSha256', 'parentManifestSha256']) assert.match(extension[field], /^[a-f0-9]{64}$/);
-    sameIds(extension.addedConfigurations, addedConfigurations, 'Declared additional Plot twists configurations');
-    assert.equal(extension.retainedConfigurationCount, originalConfigurations.length);
-    assert.equal(extension.additionalGenerationCount, addedConfigurations.length * conditions.length);
-    assert.equal(extension.additionalJudgeRequestCount, addedConfigurations.length * judges.length);
+    if (!declaredAppend) {
+      sameIds(extension.addedConfigurations, addedConfigurations, 'Declared additional Plot twists configurations');
+      assert.equal(extension.retainedConfigurationCount, originalConfigurations.length);
+      assert.equal(extension.additionalGenerationCount, addedConfigurations.length * conditions.length);
+      assert.equal(extension.additionalJudgeRequestCount, addedConfigurations.length * judges.length);
+    }
     assert.equal(contract.executionValidationPolicy?.version, 'paired-one-turn-last-message-validation-v1');
     assert.match(contract.executionValidationPolicy.sha256, /^[a-f0-9]{64}$/);
     assert.ok(typeof contract.executionValidationPolicy.purpose === 'string' && contract.executionValidationPolicy.purpose.trim());
@@ -1133,10 +1228,72 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
     assert.equal(contract.manifestSha256, publication.scoreBasis.manifestSha256);
   } else assert.equal(contract?.executionValidationPolicy, undefined, 'Supplemental policy requires a declared extension.');
   const cohortProvenance = configurationId => {
+    if (declaredAppend) {
+      const cohort = cohorts.find(item => item.configurationIds.includes(configurationId));
+      assert.ok(cohort, 'A response lacks its declared source cohort.');
+      const { configurationIds, ...provenance } = cohort;
+      return provenance;
+    }
     const original = originalConfigurations.includes(configurationId);
     return { sourceCohort: original ? 'original' : 'supplement',
       sourceSnapshotSha256: original ? extension.parentSnapshotSha256 : publication.scoreBasis.sourceSha256,
       sourceManifestSha256: original ? extension.parentManifestSha256 : publication.scoreBasis.manifestSha256 };
+  };
+  const slotId = (kind, configurationId, part) => kind + '-' + hash(JSON.stringify([configurationId, 'scifi-outline', part])).slice(0, 24);
+  if (recovery) {
+    assert.ok(declaredAppend, 'Recovery must preserve a declared append, not invent a new cohort.');
+    const { sha256, acceptedParentSnapshotSha256, ...original } = recovery;
+    sameIds(Object.keys(original), ['version', 'sourceSnapshotSha256', 'sourceManifestSha256', 'authorization', 'replacementGenerationIds', 'replacementJudgmentIds', 'pendingGenerationIds', 'pendingJudgmentIds', 'retainedGenerationCount', 'retainedJudgmentCount', 'purpose'], 'Recovery authorization fields');
+    assert.equal(recovery.version, 'paired-tool-isolation-recovery-v1');
+    assert.equal(hash(JSON.stringify(original)), sha256, 'Recovery authorization hash changed.');
+    for (const field of ['sha256', 'sourceSnapshotSha256', 'sourceManifestSha256', 'acceptedParentSnapshotSha256']) assert.match(recovery[field], /^[a-f0-9]{64}$/);
+    assert.equal(acceptedParentSnapshotSha256, extension.parentSnapshotSha256);
+    assert.notEqual(recovery.sourceSnapshotSha256, contract.sourceSha256); assert.notEqual(recovery.sourceManifestSha256, contract.manifestSha256);
+    assert.ok(Number.isFinite(Date.parse(recovery.authorization?.approvedAt)) && typeof recovery.purpose === 'string' && recovery.purpose.trim());
+    exact(Object.keys(recovery.authorization).sort(), ['approvedAt', 'scope', 'userInstruction'], 'Recovery approval fields');
+    assert.equal(recovery.authorization.userInstruction, 'please do it');
+    assert.equal(recovery.authorization.scope, 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.');
+    const replacedModels = ['codex:gpt-6-astra@ultra', 'codex:gpt-5.6-sol@ultra', 'codex:gpt-5.6-terra@ultra'];
+    exact(recovery.replacementGenerationIds, replacedModels.map(id => slotId('generation', id, 'skill')), 'Only three authorized skill answers may be replaced.');
+    exact(recovery.replacementJudgmentIds, [1, 2].map(seat => slotId('judgment', replacedModels[0], seat)), 'Only the two invalidated Astra ultra reviews may be replaced.');
+    const inventory = ['generation', 'judgment'].flatMap(kind => configurations.flatMap(configurationId =>
+      (kind === 'generation' ? conditions : [1, 2]).map(part => ({ kind, id: slotId(kind, configurationId, part), configurationId }))));
+    exact(contract.recordSources?.map(({ kind, id }) => ({ kind, id })), inventory.map(({ kind, id }) => ({ kind, id })), 'Recovery effective record inventory');
+    for (const kind of ['generation', 'judgment']) {
+      const replacements = recovery[kind === 'generation' ? 'replacementGenerationIds' : 'replacementJudgmentIds'];
+      const pending = recovery[kind === 'generation' ? 'pendingGenerationIds' : 'pendingJudgmentIds'];
+      assert.ok(Array.isArray(pending));
+      const added = [...replacements, ...pending], all = inventory.filter(item => item.kind === kind);
+      assert.equal(new Set(added).size, added.length, 'Recovery cannot retry a pending or replacement slot twice.');
+      assert.ok(added.every(id => all.some(item => item.id === id)), 'Unknown recovered record.');
+      assert.equal(recovery[kind === 'generation' ? 'retainedGenerationCount' : 'retainedJudgmentCount'], all.length - added.length);
+      for (const item of all) {
+        const row = contract.recordSources.find(record => record.kind === kind && record.id === item.id);
+        const disposition = replacements.includes(item.id) ? 'technical-replacement' : pending.includes(item.id) ? 'previously-unattempted' : 'retained';
+        const origin = disposition === 'retained' ? cohortProvenance(item.configurationId)
+          : { sourceCohort: 'recovery', sourceSnapshotSha256: contract.sourceSha256, sourceManifestSha256: contract.manifestSha256 };
+        if (disposition === 'technical-replacement') assert.match(row.supersedesRecordSha256, /^[a-f0-9]{64}$/);
+        exact(row, { kind, id: item.id, disposition, ...origin, ...(disposition === 'technical-replacement' ? { supersedesRecordSha256: row.supersedesRecordSha256 } : {}) }, 'Recovery cannot relabel retained records or omit original attempt pins.');
+      }
+    }
+    assert.ok(contract.toolIsolationPolicy, 'Recovery requires new-call isolation disclosure.');
+  } else assert.equal(contract?.recordSources, undefined, 'Undeclared per-record recovery.');
+  if (contract?.toolIsolationPolicy) {
+    const { sha256, purpose, configurationIds, generationIds, judgmentIds, ...policy } = contract.toolIsolationPolicy;
+    exact(policy, { version: 'explicit-agent-tool-isolation-v1', codexConfig: { 'agents.enabled': false }, rejectToolRouterErrors: true,
+      appliesTo: 'newly-prepared-runs-only', historicalResultsReclassified: false }, 'New-call tool isolation cannot certify retained historical calls.');
+    assert.equal(sha256, hash(JSON.stringify(policy))); assert.ok(typeof purpose === 'string' && purpose.trim());
+    if (recovery) {
+      assert.equal(configurationIds, undefined);
+      exact(generationIds, [...recovery.replacementGenerationIds, ...recovery.pendingGenerationIds], 'Isolation scope must match new creator calls.');
+      exact(judgmentIds, [...recovery.replacementJudgmentIds, ...recovery.pendingJudgmentIds], 'Isolation scope must match new reviewer calls.');
+    } else { exact(configurationIds, extension?.addedConfigurations ?? contract.configurations.map(item => item.id), 'Isolation must remain scoped to the new cohort.'); assert.equal(generationIds, undefined); assert.equal(judgmentIds, undefined); }
+  }
+  const recordProvenance = (kind, id, configurationId) => {
+    if (!recovery) return cohortProvenance(configurationId);
+    const { kind: _kind, id: _id, disposition, ...origin } = contract.recordSources.find(row => row.kind === kind && row.id === id) || {};
+    assert.ok(disposition, 'Effective record has no original source.');
+    return { ...origin, recordDisposition: disposition, ...(disposition !== 'retained' ? { technicalRecoverySha256: recovery.sha256 } : {}) };
   };
   assert.equal(publication.benchmarks?.[0]?.id, benchmarkId);
   assert.equal(publication.scoreBasis.edition, PAIRED_TWISTS_EDITION);
@@ -1187,8 +1344,14 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
     assert.equal(hash(response.outputText), response.provenance.outputSha256, 'Fresh original answer hash');
     assert.equal(response.provenance.sourceSha256, publication.scoreBasis.sourceSha256);
     assert.equal(response.provenance.manifestSha256, publication.scoreBasis.manifestSha256);
-    if (extension) for (const [field, value] of Object.entries(cohortProvenance(response.configurationId))) assert.equal(response.provenance[field], value, 'Paired answer cohort ' + field);
+    assert.equal(response.provenance.generationId, slotId('generation', response.configurationId, response.condition), 'Original generation identity');
+    const provenance = extension ? recordProvenance('generation', response.provenance.generationId, response.configurationId) : null;
+    if (extension) for (const [field, value] of Object.entries(provenance)) assert.equal(response.provenance[field], value, 'Paired answer cohort ' + field);
     else for (const field of ['sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256']) assert.equal(response.provenance[field], undefined, 'Undeclared answer cohort.');
+    if (recovery) {
+      assert.equal(response.runtime.attemptNumber, provenance.recordDisposition === 'technical-replacement' ? 2 : 1);
+      for (const field of ['technicalRecoverySha256', 'supersedesRecordSha256']) assert.equal(response.provenance[field], provenance[field]);
+    }
     assert.equal(response.provenance.questionSha256, hash(task.prompt));
     assert.equal(response.provenance.skillSha256, response.condition === 'skill' ? files.get('paired-skill-bundle').sha256 : null);
     const messages = archive.messageSets.find(item => item.id === response.messageSetId)?.messages;
@@ -1229,13 +1392,16 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
       assert.ok(cell); close(cell.exactScore, exactScore, 'Fresh panel arithmetic');
     }
     return { configurationId: response.configurationId, condition: response.condition, outputSha256: response.provenance.outputSha256,
-      ...(extension ? { provenance: cohortProvenance(response.configurationId) } : {}),
+      ...(extension ? { provenance } : {}),
       messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore };
   });
   const requests = archive.judgeRequests.map(request => {
     assert.ok(judges.includes(request.judgeConfigurationId));
-    if (extension) exact(request.provenance, cohortProvenance(request.configurationId), 'Paired original request cohort changed.');
+    assert.equal(request.id, slotId('judgment', request.configurationId, judges.indexOf(request.judgeConfigurationId) + 1), 'Original paired request identity');
+    const provenance = extension ? recordProvenance('judgment', request.id, request.configurationId) : null;
+    if (extension) exact(request.provenance, provenance, 'Paired original request cohort changed.');
     else assert.equal(request.provenance, undefined, 'Undeclared request cohort.');
+    if (recovery) assert.equal(request.attemptNumber, provenance.recordDisposition === 'technical-replacement' ? 2 : 1);
     assert.equal(hash(request.promptText), request.promptSha256, 'Fresh original judge prompt hash');
     assert.equal(hash(request.outputText), request.outputSha256, 'Fresh original judge output hash');
     sameIds(Object.keys(request.candidateMap), ['A', 'B'], 'Fresh anonymous labels');
@@ -1252,7 +1418,7 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
       exact(candidate, { candidateLabel: label, wordCount: count, exceedsWordLimit: count > task.wordLimit, answer: answer.outputText }, 'Fresh judge candidate bytes and word-count facts');
     }
     return { requestId: request.id, configurationId: request.configurationId, judgeConfigurationId: request.judgeConfigurationId,
-      ...(extension ? { provenance: cohortProvenance(request.configurationId) } : {}),
+      ...(extension ? { provenance } : {}),
       promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap,
       candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: true };
   });
@@ -1266,6 +1432,9 @@ export function deriveExpectedPairedTwistsEvidence(publication, archive) {
   return { kind: 'vasirbenchmark-paired-twists-browser-evidence', benchmarkId, edition: PAIRED_TWISTS_EDITION, caseId: task.id,
     sourceSha256: publication.scoreBasis.sourceSha256, manifestSha256: publication.scoreBasis.manifestSha256,
     ...(extension ? { coverageExtension: extension, executionValidationPolicy: contract.executionValidationPolicy } : {}),
+    ...(declaredAppend ? { sourceCohorts: cohorts, coverageHistory: history } : {}),
+    ...(recovery ? { technicalRecovery: recovery, recordSources: contract.recordSources } : {}),
+    ...(contract?.toolIsolationPolicy ? { toolIsolationPolicy: contract.toolIsolationPolicy } : {}),
     skillFiles, answers, requests, mismatches: [] };
 }
 
@@ -1430,6 +1599,18 @@ export function verifyWritingProofEvidence(proof, expected) {
       exact(display.judgeConfigurationIds, [original.judgeConfigurationId], 'Provisional display fixed judge');
       if (!isCreation) assert.equal(archive.judgeConfigurationId, original.judgeConfigurationId, 'Provisional archived fixed judge.');
       if (!isCreation) assert.equal(archive.reviewedAnswers, original.reviewedAnswers, 'Provisional original reviewed-answer count.');
+      if (original.scoringScope) {
+        exact(display.scoringScope, original.scoringScope, 'Common Core scope must remain explicit in Methodology.');
+        if (!isCreation) exact(archive.scoringScope, original.scoringScope, 'Original reviews must use the same common Core scope.');
+        if (proof.benchmarkId === original.benchmarkId) {
+          sameIds(proof.caseEvidence?.map(item => item.caseId), original.reportCases.map(item => item.caseId), 'All original Core report stories remain inspectable.');
+          for (const story of original.reportCases) {
+            const observed = proof.caseEvidence.find(item => item.caseId === story.caseId);
+            exact(observed.scoringScope, story.scoringScope, 'Core report must use original Astra ratings for included stories and explicitly archive the excluded story.');
+            exact(observed.mismatches, [], 'Common Core story report checks failed.');
+          }
+        }
+      }
       if (cleanLedger) {
         assert.equal(display.scope, 'category-methodology', 'Derived provisional qualification must name its actual disclosure');
         for (const field of ['defaultClosed', 'openedForAudit', 'provisional', 'singleJudge', 'closedAfterAudit']) assert.equal(display[field], true, 'Provisional Methodology ' + field);

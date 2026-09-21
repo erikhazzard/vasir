@@ -2,14 +2,14 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-test("the longer creation disclosure cannot starve the comparison text of grid width", () => {
+test("the shared report disclosure cannot starve the comparison text of grid width", () => {
   const css = fs.readFileSync(new URL("../site/vasirbenchmark.com/benchmark-report.css", import.meta.url), "utf8");
-  const selector = ':where([data-active-writing-benchmark="storytelling-magic-discovery"]) .evidence-truth';
-  const offset = css.indexOf(selector);
-  assert.ok(offset >= 0, "The disclosure change is creation-only and retains the base selector specificity.");
-  assert.match(css.slice(offset, css.indexOf('}', offset)), /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto\s+auto\s*;/u);
+  const rule = css.match(/^\.evidence-truth\s*\{([^}]+)\}/mu);
+  assert.ok(rule, "Every report uses the shared disclosure grid without a benchmark-only prefix.");
+  assert.match(rule[1], /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto\s+auto\s*;/u);
+  assert.doesNotMatch(rule[1], /overflow(?:-x)?:\s*(?:hidden|clip)|text-overflow:\s*ellipsis/u);
   const mobileOffset = css.indexOf('@media (max-width: 46rem)');
-  assert.ok(mobileOffset > offset, "The existing mobile single-column rule continues to win.");
+  assert.ok(mobileOffset > rule.index, "The existing mobile single-column rule continues to win.");
   assert.match(css.slice(mobileOffset), /\.evidence-truth\s*\{[^}]*grid-template-columns:\s*1fr\s*;/u);
 });
 

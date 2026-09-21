@@ -578,7 +578,7 @@ function validateHtmlTargets({ filesByPath, releaseId, routes }) {
   const allowedStableTargets = new Set(["/", "/index.html", "/benchmark-report.html", "/games.html"]);
   const allowedDocumentFragments = new Map([
     ["index.html", new Set(["#top", "#benchmark-results"])],
-    ["benchmark-report.html", new Set(["#top", "#overview", "#ranking", "#method", "#limitations"])],
+    ["benchmark-report.html", new Set(["#top", "#overview", "#head-to-head", "#ranking", "#method", "#limitations"])],
     ["games.html", new Set(["#top", "#game-comparison", "#game-results", "#game-reference", "#game-method"])]
   ]);
   const allowedFragmentTargets = new Set([

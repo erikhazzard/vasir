@@ -73,7 +73,7 @@ async function renderReport(source, hash) {
   const handlers = {};
   const viewHandlers = {};
   const reportPage = { dataset: {}, style: { setProperty() {} } };
-  const reportView = { innerHTML: '', querySelectorAll: () => [], addEventListener: (name, handler) => { viewHandlers[name] = handler; } };
+  const reportView = { innerHTML: '', querySelector: () => null, querySelectorAll: () => [], addEventListener: (name, handler) => { viewHandlers[name] = handler; } };
   const links = ['overview', 'ranking', 'method', 'limitations', 'top'].map(section => ({ dataset: { reportSection: section }, closest: () => null }));
   const mast = {};
   const scrolled = [];
@@ -112,6 +112,25 @@ test('Writing report selects every trial without collapsing the eighty response 
   }
   assert.match(page.reportView.innerHTML, /Scores cover plot twists on 1 published prompt with 10 trials per condition/);
   assert.doesNotMatch(page.reportView.innerHTML, /core-idea analysis|Corpus stratum/);
+});
+
+test('single-prompt reports omit redundant controls without changing their answers or deep links', async () => {
+  const source = collections({ trials: 1, exclusions: false }), before = JSON.stringify(source);
+  const page = await renderReport(source, `#${TWISTS}/case-1/ranking`);
+  assert.doesNotMatch(page.reportView.innerHTML, /writing-case-picker|data-writing-case aria-label|Choose a prompt to inspect/);
+  assert.equal(page.reportPage.dataset.activeWritingCase, 'case-1');
+  assert.equal(page.window.location.hash, `#${TWISTS}/case-1/ranking`);
+  for (const response of source.twists.responseBundle.responses) assert.ok(page.reportView.innerHTML.includes(response.outputText));
+  const core = await renderReport(source, `#${CORE}/case-1`);
+  assert.match(core.reportView.innerHTML, /data-writing-case aria-label/);
+  core.choose('[data-writing-case]', 'case-2');
+  assert.equal(core.reportPage.dataset.activeWritingCase, 'case-2');
+  const trials = await renderReport(collections(), `#${TWISTS}/case-1/trial-1`);
+  assert.doesNotMatch(trials.reportView.innerHTML, /data-writing-case aria-label/);
+  assert.match(trials.reportView.innerHTML, /data-writing-trial/);
+  trials.choose('[data-writing-trial]', '10');
+  assert.equal(trials.reportPage.dataset.activeWritingTrial, '10');
+  assert.equal(JSON.stringify(source), before);
 });
 
 test('Core, Plot twists and Dungeon Master share the same single comparison and collapsed judge details', async () => {

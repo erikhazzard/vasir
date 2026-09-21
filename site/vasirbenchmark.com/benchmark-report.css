@@ -45,6 +45,10 @@
   color: var(--sdk-ink);
 }
 
+.report-mast__nav a[hidden] { display: none; }
+
+.report-mast__nav { flex-wrap: wrap; }
+
 .report-shell {
   min-width: 0;
 }
@@ -394,6 +398,67 @@
   line-height: 1.5;
 }
 
+.report-section > .report-head-to-head {
+  padding: 0 0 2rem;
+  margin-bottom: 2rem;
+}
+
+.head-to-head__pair {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.head-to-head__pair > span { color: var(--ink-muted); font-weight: 400; }
+
+.head-to-head__scope {
+  margin: 0 0 1rem;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.head-to-head__table {
+  width: 100%;
+  margin-block: 1.25rem;
+  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.head-to-head__table th,
+.head-to-head__table td {
+  padding: 1rem 0.8rem;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+
+.head-to-head__table thead th {
+  border-top: 1px solid var(--line-strong);
+  color: var(--ink-muted);
+  font-family: var(--font-data);
+  font-size: 0.78rem;
+}
+
+.head-to-head__table small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.head-to-head__table td strong { color: var(--sdk-blue); }
+.head-to-head__judge-reasons + .head-to-head__judge-reasons { margin-top: 2rem; }
+.head-to-head__judge-reasons article { margin-top: 1.5rem; }
+.head-to-head__judge-reasons h4 { margin-bottom: 0.35rem; }
+
+@media (max-width: 600px) {
+  .head-to-head__table th, .head-to-head__table td { padding: 0.8rem 0.35rem; font-size: 0.8rem; }
+  .head-to-head__table thead th, .head-to-head__table small { font-size: 0.7rem; }
+}
+
 .report-overview {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
@@ -638,6 +703,12 @@
   border-top: 1px solid var(--line-strong);
   background: var(--field);
 }
+
+.writing-trial-answers__intro { margin: 0; padding: 1rem 1.5rem; color: var(--ink-muted); font-size: 0.875rem; }
+.writing-trial-answers__trial > summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; padding: 1rem 1.5rem; }
+.writing-trial-answers__trial > summary::before { content: '▸'; }
+.writing-trial-answers__trial[open] > summary::before { content: '▾'; }
+.writing-trial-answers__trial > summary span { margin-left: auto; color: var(--sdk-blue); font-family: var(--font-data); }
 
 .model-run__condition {
   min-width: 0;

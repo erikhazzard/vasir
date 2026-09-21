@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { preparePairedRun, exportPairedRun, validatePairedRunExport, runPairedGenerations, runPairedJudgments,
+import { preparePairedRun, preparePairedTechnicalRecovery, exportPairedRun, validatePairedRunExport, runPairedGenerations, runPairedJudgments,
   pairedCandidateMap, pairedDigest, pairedWordCount, validatePairedAssessment, PAIRED_CREATORS, PAIRED_JUDGES, PAIRED_RUNTIME_POLICY,
   PAIRED_ADDED_CREATORS, PAIRED_EXPANDED_CREATORS, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY } from '../cli/eval/plot-twists-paired-runtime.js';
 import { main } from '../benchmarks/storytelling-plot-twists-paired-v2/run.mjs';
@@ -229,4 +229,103 @@ test('supplement preparation refuses incomplete parents and changed pinned paren
   const calls = [];
   await assert.rejects(() => runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) }), /parent snapshot bytes changed/);
   assert.equal(calls.length, 0);
+});
+
+test('declared coverage append chains complete parents and only executes missing native settings', async t => {
+  const { snapshot: parent, runDirectoryPath: previousDirectory } = await completeSupplementalPairedFixture(t);
+  const parentSnapshotPath = path.join(path.dirname(previousDirectory), 'expanded-parent.json');
+  fs.writeFileSync(parentSnapshotPath, JSON.stringify(parent, null, 2) + '\n', { flag: 'wx' });
+  const runDirectoryPath = path.join(path.dirname(previousDirectory), 'declared-append');
+  const added = ['codex:gpt-6-astra@high', 'claude:claude-opus-5@max'];
+  const prepared = await main(['prepare', '--run-dir', runDirectoryPath, '--parent-snapshot', parentSnapshotPath,
+    '--add-configurations', added.join(',')]);
+  assert.equal(prepared.generationCount, 4); assert.equal(prepared.pairedJudgeRequestCount, 4);
+  assert.equal(prepared.coverageExtension.retainedConfigurationCount, 14);
+  const calls = [];
+  await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  const { snapshot } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(calls.length, 8);
+  assert.deepEqual(snapshot.parentSnapshot, parent);
+  assert.deepEqual(snapshot.manifest.specification.configurations, [...PAIRED_EXPANDED_CREATORS, ...added]);
+  for (const kind of ['generations', 'judgments']) {
+    assert.deepEqual(snapshot[kind].slice(0, 28), parent[kind]);
+    assert.equal(snapshot[kind].length, 32);
+    assert.equal(fs.readdirSync(path.join(runDirectoryPath, kind)).length, 4);
+    assert.ok(snapshot[kind].every(row => row.status === 'succeeded'));
+  }
+  assert.equal((await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal(calls.length, 8);
+  for (const addedConfigurations of [[], [added[0], added[0]], [PAIRED_CREATORS[0]], ['claude:claude-fable-5-1@ultracode'], ['astra@high']]) {
+    assert.throws(() => preparePairedRun({ runDirectoryPath: path.join(path.dirname(previousDirectory), 'refused-append'), parentSnapshotPath, addedConfigurations }));
+  }
+  for (const mutate of [
+    value => { value.parentSnapshot.parentSnapshot.generations[0].responseText += ' changed'; },
+    value => { value.generations[12].responseText += ' changed'; },
+    value => { value.manifest.coverageExtension.additionalGenerationCount = 2; },
+    value => { value.manifest.specification.judging.instructions += ' changed'; },
+    value => { value.manifest.specification.configurations.reverse(); }
+  ]) {
+    const changed = structuredClone(snapshot); mutate(changed);
+    changed.manifestSha256 = pairedDigest(changed.manifest);
+    assert.throws(() => validatePairedRunExport(changed));
+  }
+});
+
+test('approved tool-error recovery preserves all clean evidence and runs only the exact five replacements plus untouched slots', async t => {
+  const sourceDirectory = path.resolve('.agents/vasir-evals/storytelling-plot-twists-paired-v2/remaining-writing-coverage-20260909T2257Z');
+  if (!fs.existsSync(sourceDirectory)) return t.skip('Retained private stopped-run evidence is not installed.');
+  const source = exportPairedRun({ runDirectoryPath: sourceDirectory }), sourceText = JSON.stringify(source, null, 2) + '\n';
+  const fixture = createPairedFixture(t), directory = path.dirname(fixture), sourceSnapshotPath = path.join(directory, 'stopped-source.json');
+  fs.writeFileSync(sourceSnapshotPath, sourceText, { flag: 'wx' });
+  const runDirectoryPath = path.join(directory, 'approved-recovery');
+  const authorization = { approvedAt: '2026-09-10T00:00:00.000Z', userInstruction: 'please do it',
+    scope: 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.' };
+  assert.throws(() => preparePairedTechnicalRecovery({ runDirectoryPath, sourceSnapshotPath, authorization: null }), /Explicit user approval/);
+  const prepared = preparePairedTechnicalRecovery({ runDirectoryPath, sourceSnapshotPath, authorization });
+  const plan = prepared.technicalRecovery;
+  assert.equal(plan.replacementGenerationIds.length, 3); assert.equal(plan.replacementJudgmentIds.length, 2);
+  assert.equal(plan.pendingGenerationIds.length, 14); assert.equal(plan.pendingJudgmentIds.length, 38);
+  assert.equal(plan.retainedGenerationCount, 49); assert.equal(plan.retainedJudgmentCount, 26);
+  const calls = [], generated = await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(generated.dispatched, 17);
+  const { snapshot, dispatched } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(dispatched, 40); assert.equal(calls.length, 57); assert.equal(snapshot.globalStop, null);
+  assert.deepEqual(snapshot.recoverySourceSnapshot, source);
+  for (const kind of ['generations', 'judgments']) for (const row of snapshot[kind]) {
+    assert.equal(row.status, 'succeeded');
+    const original = source[kind].find(item => item.id === row.id);
+    const replaced = plan[kind === 'generations' ? 'replacementGenerationIds' : 'replacementJudgmentIds'].includes(row.id);
+    if (original.status === 'pending' || replaced) {
+      assert.equal(row.attempt.number, replaced ? 2 : 1);
+      assert.equal(row.attempt.technicalRecoverySha256, snapshot.manifest.technicalRecoverySha256);
+      assert.equal(row.attempt.supersedesRecordSha256, replaced ? pairedDigest(original) : undefined);
+      if (row.invocation.command === 'codex') assert.ok(row.invocation.arguments.includes('agents.enabled=false'));
+    } else assert.deepEqual(row, original);
+  }
+  assert.equal((await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal((await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal(calls.length, 57);
+  assert.equal(JSON.stringify(exportPairedRun({ runDirectoryPath: sourceDirectory }), null, 2) + '\n', sourceText);
+  for (const mutate of [value => { value.generations[0].responseText += ' changed'; },
+    value => { value.manifest.technicalRecovery.replacementGenerationIds.push(value.generations[0].id); },
+    value => { value.generations.find(row => row.attempt.number === 2).attempt.supersedesRecordSha256 = '0'.repeat(64); },
+    value => { delete value.recoverySourceSnapshot; }, value => { value.manifest.technicalRecovery.authorization.scope = 'Rerun low scores'; }]) {
+    const value = structuredClone(snapshot); mutate(value); assert.throws(() => validatePairedRunExport(value));
+  }
+});
+
+test('new runs explicitly disable agent tools and fail on stderr-only tool-router attempts', async t => {
+  const runDirectoryPath = createPairedFixture(t), calls = [];
+  const result = await runPairedGenerations({ runDirectoryPath, limit: 2, concurrency: 1,
+    spawnImplementation: mockPairedProvider({ calls, stderr: 'ERROR codex_core::tools::router: error=collab spawn failed: no thread with id: synthetic\n' }) });
+  assert.equal(calls.length, 1);
+  assert.ok(calls[0].args.includes('agents.enabled=false'));
+  assert.equal(result.snapshot.manifest.toolIsolationPolicy.codexConfig['agents.enabled'], false);
+  assert.equal(result.snapshot.generations[0].status, 'failed');
+  assert.match(result.snapshot.generations[0].error.message, /Tool-router errors/);
+  assert.ok(result.snapshot.generations[0].responseText, 'Retain the answer even though its runtime evidence disqualifies it');
+  assert.equal(result.snapshot.generations[1].status, 'pending');
+  assert.equal(result.snapshot.globalStop.reason, 'runtime-contract-failure');
+  await assert.rejects(() => runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) }), /Run is stopped/);
+  assert.equal(calls.length, 1, 'A runtime fix does not silently authorize retries');
 });

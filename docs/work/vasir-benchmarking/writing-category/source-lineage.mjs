@@ -5,6 +5,8 @@ import path from 'node:path';
 import { validateTwistsCompletion, TWISTS_PARENT_SHA256 } from '../../../../cli/eval/plot-twists-completion.js';
 import { validateDungeonMasterExpansion, DM_ORIGINAL_RUN_SHA256 } from '../../../../cli/eval/dungeon-master-expansion-manifest.js';
 import { buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, PLOT_TWISTS_PAIRED_SOURCE_KIND } from '../../../../cli/eval/plot-twists-paired-publication.js';
+import { validatePairedRunExport } from '../../../../cli/eval/plot-twists-paired-runtime.js';
+import { buildSelectedWritingPublication, CORE_IDEA_COMMON_11_SCORE_BASIS } from '../../../../cli/eval/writing-publication.js';
 
 export const CORE_PARENT_SHA256 = '0f29483fa808cf70d7431ff6a257b73e6d055585bbceab91c7183ba1bdc433e5';
 const digest = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -62,8 +64,11 @@ export function verifyCoreJudgeOnlyRecovery(before, after) {
 
 export function verifyPairedTwistsCoverageAppend(before, after, parentSnapshotSha256) {
   const extension = after.coverageExtension;
-  assert.equal(extension?.version, 'paired-reasoning-coverage-extension-v1', 'A changed paired snapshot requires the declared coverage append.');
-  assert.ok(!before.coverageExtension && !before.parentSnapshot, 'Only the original paired cohort can be extended.');
+  assert.ok(['paired-reasoning-coverage-extension-v1', 'paired-declared-coverage-extension-v2'].includes(extension?.version),
+    'A changed paired snapshot must retain original paired source history through a declared coverage append.');
+  if (extension.version === 'paired-reasoning-coverage-extension-v1')
+    assert.ok(!before.coverageExtension && !before.parentSnapshot, 'Only the original paired cohort can use the historical first append.');
+  validatePairedRunExport(after);
   assert.equal(extension.parentSnapshotSha256, parentSnapshotSha256, 'Coverage append must retain the accepted paired source.');
   assert.equal(extension.parentManifestSha256, before.manifestSha256, 'Coverage append changed the accepted parent manifest.');
   assert.deepEqual(after.parentSnapshot, before, 'Coverage append rewrote the accepted parent snapshot.');
@@ -77,6 +82,36 @@ export function verifyPairedTwistsCoverageAppend(before, after, parentSnapshotSh
     const added = after[kind].filter(row => !before[kind].some(original => original.id === row.id));
     assert.equal(added.length, kind === 'generations' ? extension.additionalGenerationCount : extension.additionalJudgeRequestCount);
     assert.ok(added.every(row => extension.addedConfigurations.includes(row.configurationId)), 'Coverage append reran an original setting.');
+  }
+}
+
+export function verifyPairedTwistsTechnicalRecovery(before, after, parentSnapshotSha256) {
+  const recovery = after.manifest?.technicalRecovery, source = after.recoverySourceSnapshot;
+  assert.equal(recovery?.version, 'paired-tool-isolation-recovery-v1', 'A replacement requires the explicit approved technical recovery.');
+  validatePairedRunExport(after);
+  assert.equal(digest(JSON.stringify(source, null, 2) + '\n'), recovery.sourceSnapshotSha256, 'Recovery changed the stopped source bytes.');
+  assert.equal(source.manifestSha256, recovery.sourceManifestSha256, 'Recovery changed the stopped source manifest.');
+  verifyPairedTwistsCoverageAppend(before, source, parentSnapshotSha256);
+  assert.deepEqual(after.parentSnapshot, before, 'Recovery changed the accepted original source.');
+  assert.deepEqual(after.coverageExtension, source.coverageExtension, 'Recovery changed declared coverage.');
+  assert.deepEqual(after.manifest.specification, source.manifest.specification, 'Recovery changed the original experiment.');
+  assert.deepEqual(after.manifest.frozenBundle, source.manifest.frozenBundle, 'Recovery changed the original treatment.');
+  for (const kind of ['generations', 'judgments']) {
+    const replacements = recovery[kind === 'generations' ? 'replacementGenerationIds' : 'replacementJudgmentIds'];
+    const pending = recovery[kind === 'generations' ? 'pendingGenerationIds' : 'pendingJudgmentIds'];
+    assert.equal(after[kind].length, source[kind].length, 'Recovery changed the declared record inventory.');
+    for (const original of source[kind]) {
+      const current = after[kind].find(row => row.id === original.id);
+      assert.ok(current, 'Recovery lost an original slot.');
+      if (!replacements.includes(original.id) && !pending.includes(original.id))
+        assert.deepEqual(current, original, 'Recovery changed a clean original result.');
+      else if (current.status !== 'pending') {
+        assert.equal(current.attempt.number, replacements.includes(original.id) ? 2 : 1, 'Recovery changed an authorized attempt count.');
+        assert.equal(current.attempt.technicalRecoverySha256, after.manifest.technicalRecoverySha256, 'Recovery attempt lost its approval identity.');
+        assert.equal(current.attempt.supersedesRecordSha256, replacements.includes(original.id) ? digest(JSON.stringify(original)) : undefined,
+          'Recovery replacement lost its exact original record.');
+      }
+    }
   }
 }
 
@@ -113,14 +148,26 @@ export function verifyWritingSourceSelections({ repo, previousSelections }) {
       assert.equal(selectedSources.length, 1, 'Paired replacement must select one complete immutable snapshot.');
       buildPlotTwistsPairedPublication({ repoRootDirectory: repo, selection: selected });
       if (unchanged) {
-        assert.ok(['declared-writing-source-replacement', 'declared-writing-coverage-extension'].includes(previous.lineage?.kind), 'The paired edition lost its original source history.');
+        assert.ok(['declared-writing-source-replacement', 'declared-writing-coverage-extension', 'declared-writing-technical-recovery'].includes(previous.lineage?.kind), 'The paired edition lost its original source history.');
         record.lineage = structuredClone(previous.lineage);
       } else {
         const previousSnapshot = previous.sources.find(source => path.basename(source.path) === 'snapshot.json');
         if (previousSnapshot) {
           assert.equal(previous.sources.length, 1, 'The accepted paired source must have one immutable snapshot.');
-          assert.equal(previous.lineage?.kind, 'declared-writing-source-replacement', 'Coverage append requires the original paired source history.');
+          assert.ok(['declared-writing-source-replacement', 'declared-writing-coverage-extension'].includes(previous.lineage?.kind),
+            'Coverage append requires the retained paired source history.');
           const before = pinnedJson(previousSnapshot), after = pinnedJson(selected.snapshot);
+          if (after.manifest.technicalRecovery) {
+            verifyPairedTwistsTechnicalRecovery(before, after, previousSnapshot.sha256);
+            record.lineage = { kind: 'declared-writing-technical-recovery', edition: PLOT_TWISTS_PAIRED_EDITION,
+              parentSourceSha256: previousSnapshot.sha256, stoppedSourceSha256: after.manifest.technicalRecovery.sourceSnapshotSha256,
+              technicalRecoverySha256: after.manifest.technicalRecoverySha256, technicalRecovery: structuredClone(after.manifest.technicalRecovery),
+              previousSelection: { path: previous.path, bytes: previous.bytes, sha256: previous.sha256 },
+              previousSources: previous.sources, previousLineage: previous.lineage,
+              originalEvidencePreserved: true, cleanAnswersAndCompletedReviewsPreserved: true,
+              supersededOriginalAttemptsPreserved: true, originalSettingsRerun: true, scoreBasedReplacementSelection: false };
+            return record;
+          }
           verifyPairedTwistsCoverageAppend(before, after, previousSnapshot.sha256);
           record.lineage = { kind: 'declared-writing-coverage-extension', edition: PLOT_TWISTS_PAIRED_EDITION,
             parentSourceSha256: previousSnapshot.sha256, coverageExtension: structuredClone(after.coverageExtension),
@@ -138,6 +185,29 @@ export function verifyWritingSourceSelections({ repo, previousSelections }) {
       return record;
     }
     assert.equal(selectedSources.length, previous.sources.length, 'Selected source inventory changed.');
+    if (Object.hasOwn(selected, 'derivedScoreBasis')) {
+      assert.equal(previous.benchmarkId, 'storytelling-core-idea', 'Only Core idea has an approved common-corpus restriction.');
+      assert.equal(selected.derivedScoreBasis, CORE_IDEA_COMMON_11_SCORE_BASIS, 'Unapproved Core idea score basis.');
+      assert.deepEqual(Object.keys(selected).sort(), ['derivedScoreBasis', 'kind', 'run', 'schemaVersion', 'skill'], 'Common-corpus selection added an undeclared override.');
+      const built = buildSelectedWritingPublication({ repoRootDirectory: repo, benchmarkId: previous.benchmarkId });
+      const derived = built.projection.methodology.derivedScoreBasis;
+      assert.equal(derived.id, CORE_IDEA_COMMON_11_SCORE_BASIS);
+      assert.equal(derived.selectionTiming, 'post-run-user-approved');
+      assert.deepEqual(derived.excludedCaseIds, ['the-matrix']);
+      const oldRun = previous.sources.find(source => path.basename(source.path) === 'run.json');
+      const oldSkill = previous.sources.find(source => path.basename(source.path) === 'skill-snapshot.json');
+      assert.ok(oldRun && oldSkill, 'Common-corpus restriction lost original run and treatment sources.');
+      verifyCoreJudgeOnlyRecovery(pinnedJson(oldRun), pinnedJson(selected.run));
+      assert.equal(selected.skill.sha256, oldSkill?.sha256, 'Common-corpus restriction cannot change frozen treatment.');
+      if (unchanged) {
+        assert.equal(previous.lineage?.kind, 'authorized-writing-common-corpus', 'Common-corpus authorization history disappeared.');
+        record.lineage = structuredClone(previous.lineage);
+      } else record.lineage = { kind: 'authorized-writing-common-corpus', scoreBasis: structuredClone(derived),
+        parentSourceSha256: oldRun.sha256, previousSelection: { path: previous.path, bytes: previous.bytes, sha256: previous.sha256 },
+        previousSources: previous.sources, ...(previous.lineage ? { previousLineage: previous.lineage } : {}),
+        originalEvidencePreserved: true, answersAndCompletedReviewsPreserved: true, originalSettingsRerun: false };
+      return record;
+    }
     if (unchanged) return record;
     assert.ok(Object.hasOwn(parentHashes, previous.benchmarkId), 'Magic discovery must remain byte-identical; no backfill is authorized.');
     const oldRunSource = previous.sources.find(source => path.basename(source.path) === 'run.json');

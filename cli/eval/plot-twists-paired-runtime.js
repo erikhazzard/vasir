@@ -18,7 +18,9 @@ export const PAIRED_ADDED_CREATORS = Object.freeze(['codex:gpt-6-astra@low', 'co
   'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh']);
 export const PAIRED_EXPANDED_CREATORS = Object.freeze([...PAIRED_CREATORS, ...PAIRED_ADDED_CREATORS]);
 export const PAIRED_COVERAGE_EXTENSION_VERSION = 'paired-reasoning-coverage-extension-v1';
+export const PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION = 'paired-declared-coverage-extension-v2';
 const extensionPurpose = 'Later user-requested reasoning coverage expansion. Retain all six original medium pairs and their reviews unchanged; generate and judge only the eight declared additional settings. This expanded roster was not prespecified before the original cohort outcomes.';
+const declaredExtensionPurpose = 'User-requested coverage completion. Retain every previously published answer and review unchanged; generate and judge only the explicitly declared additional model-and-effort settings. These additions were declared after earlier cohort outcomes.';
 export const PAIRED_VALIDATION_ERRATUM_VERSION = 'paired-code-mode-diagnostic-and-final-message-v1';
 const disabledCodeModeNotice = 'Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.';
 const validationErratumPolicy = Object.freeze({ version: PAIRED_VALIDATION_ERRATUM_VERSION,
@@ -31,6 +33,12 @@ export const PAIRED_SUPPLEMENTAL_VALIDATION_POLICY = Object.freeze({ version: 'p
   allowedStartupDiagnostic: disabledCodeModeNotice, maximumStartupDiagnosticCount: 1, startupDiagnosticMustPrecedeTurn: true,
   completedTurnsRequired: 1, toolsAllowed: false, finalAnswerSelection: 'last-completed-agent-message-as-already-selected-by-generic-parser',
   preserveAllAssistantMessagesInRawStream: true, appliesTo: 'new-supplemental-attempts-only', additionalInferenceCallsForValidation: 0 });
+export const PAIRED_TOOL_ISOLATION_POLICY = Object.freeze({ version: 'explicit-agent-tool-isolation-v1',
+  codexConfig: { 'agents.enabled': false }, rejectToolRouterErrors: true,
+  appliesTo: 'newly-prepared-runs-only', historicalResultsReclassified: false });
+export const PAIRED_TECHNICAL_RECOVERY_VERSION = 'paired-tool-isolation-recovery-v1';
+const recoveryConfigurations = ['codex:gpt-6-astra@ultra', 'codex:gpt-5.6-sol@ultra', 'codex:gpt-5.6-terra@ultra'];
+const recoveryPurpose = 'User-approved technical recovery of three skill answers with recorded forbidden tool attempts, and their affected reviews. Preserve every original attempt and every clean result. Complete untouched pending slots with explicit agent-tool isolation; no selection or retries based on scores.';
 export const PAIRED_RUNTIME_POLICY = Object.freeze({ version: PAIRED_RUNTIME_VERSION, concurrency: 2,
   automaticHostRetries: 0, previouslyAttemptedSlotsMayBeRepeated: false, freshSession: true,
   creatorTools: [], judgeTools: [], timeoutMs: 600000, terminationGraceMs: 5000,
@@ -67,13 +75,34 @@ function expandedSpecification(original) {
     coverageExpansion: { version: PAIRED_COVERAGE_EXTENSION_VERSION, purpose: extensionPurpose,
       inheritedProtocol: 'The original specification below remains historical evidence. Its six-medium-only counts, original no-reuse declaration, and original roster-freeze limitation describe the first cohort; this explicit amendment changes coverage only. Task, treatment delivery, rubric, anchors, judge panel, ordering, and runtime limits remain identical.' } };
 }
-function validateSpecification(specification, expanded = false) {
+function validateAddedConfigurations(added, retained) {
+  assert.ok(Array.isArray(added) && added.length > 0, 'Explicit nonempty additional configurations required.');
+  assert.equal(new Set(added).size, added.length, 'Additional configurations must be unique.');
+  const models = new Set(PAIRED_CREATORS.map(id => resolveBenchmarkConfiguration(id).model));
+  for (const id of added) {
+    const configuration = resolveBenchmarkConfiguration(id);
+    assert.equal(configuration.id, id, 'Use exact canonical configuration IDs.');
+    assert.ok(models.has(configuration.model) && configuration.reasoning !== 'ultracode', 'Only native effort levels of the declared model families are supported.');
+    assert.ok(!retained.includes(id), 'A retained configuration cannot be rerun.');
+  }
+}
+function declaredSpecification(original, added) {
+  validateAddedConfigurations(added, original.configurations);
+  const configurations = [...original.configurations, ...added];
+  return { ...original, configurations, coverage: coverageFor(configurations.length),
+    coverageExpansion: { version: PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION, purpose: declaredExtensionPurpose,
+      inheritedProtocol: 'Coverage-only append to the complete pinned parent. Task, treatment delivery, rubric, anchors, judge panel, ordering, and runtime limits remain identical. Historical cohort declarations are retained in the parent snapshot.' } };
+}
+function validateSpecification(specification, extension = null) {
   assert.equal(specification.edition, 'storytelling-plot-twists-paired-v2');
   assert.equal(specification.benchmark.id, 'storytelling-plot-twists');
   assert.equal(specification.benchmark.caseId, 'scifi-outline');
   assert.equal(specification.benchmark.prompt, 'Create a brief outline of an original science-fiction story with one or more major plot twists. Include the ending. Maximum 550 words for the entire answer.');
   assert.equal(specification.benchmark.wordLimit, 550);
-  assert.deepEqual(specification.configurations, [...(expanded ? PAIRED_EXPANDED_CREATORS : PAIRED_CREATORS)]);
+  if (extension?.version === PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION) {
+    assert.ok(Array.isArray(specification.configurations));
+    assert.equal(new Set(specification.configurations).size, specification.configurations.length);
+  } else assert.deepEqual(specification.configurations, [...(extension ? PAIRED_EXPANDED_CREATORS : PAIRED_CREATORS)]);
   assert.deepEqual(conditionIds(specification), ['baseline', 'skill']);
   assert.deepEqual(specification.judging.panel, [...PAIRED_JUDGES]);
   assert.ok(specification.judging.orderSeed && specification.judging.instructions);
@@ -83,7 +112,7 @@ function validateSpecification(specification, expanded = false) {
   assert.equal(specification.treatment.existingSnapshotHash, '06a52744c28f5e7ec367edd5c07d0d0720071eeb835d128d2fa07f3d43b5e8ca');
   assert.equal(specification.treatment.rootSha256, '551e0b710e8a60ea7e3f84208f81ec48402ba63f732278885fd13360b5c322c4');
   assert.equal(specification.treatment.deliveryMode, 'frozen-inline-once');
-  assert.deepEqual(specification.coverage, coverageFor(expanded ? 14 : 6));
+  assert.deepEqual(specification.coverage, coverageFor(specification.configurations.length));
   for (const [key, value] of Object.entries({ concurrency: 2, timeoutMs: 600000, terminationGraceMs: 5000, automaticRetries: 0,
     claudeMaxTurns: 1, claudeMaxOutputTokens: 32768, claudeMaxRetries: 0, creatorTools: [], judgeTools: [], freshSession: true, stopOnQuotaOrAuthentication: true })) {
     assert.deepEqual(specification.runtimeLimits[key], value, 'Declared runtime limit is unsupported: ' + key);
@@ -130,26 +159,35 @@ function inventories(specification) {
 }
 
 export function preparePairedRun({ runDirectoryPath, specificationPath = path.join(root, 'benchmarks/storytelling-plot-twists-paired-v2/specification.json'), sourceRoot = root,
-  parentSnapshotPath = null, now = new Date().toISOString() }) {
+  parentSnapshotPath = null, addedConfigurations = null, now = new Date().toISOString() }) {
   const parentText = parentSnapshotPath ? fs.readFileSync(parentSnapshotPath, 'utf8') : null;
   const parentSnapshot = parentText ? validatePairedRunExport(JSON.parse(parentText)) : null;
+  assert.ok(!addedConfigurations || parentSnapshot, 'Additional configurations require a complete parent snapshot.');
   if (parentSnapshot) {
-    assert.ok(!parentSnapshot.coverageExtension && !parentSnapshot.parentSnapshot, 'Only the original six-setting cohort can be extended.');
+    assert.ok(addedConfigurations || !parentSnapshot.coverageExtension && !parentSnapshot.parentSnapshot, 'Extending beyond the original six-setting cohort requires explicit additional configurations.');
     assert.ok(!parentSnapshot.globalStop && [...parentSnapshot.generations, ...parentSnapshot.judgments].every(row => row.status === 'succeeded'), 'The original cohort must be complete.');
     assert.equal(parentText, JSON.stringify(parentSnapshot, null, 2) + '\n', 'Parent snapshot must use the immutable export serialization.');
   }
-  const specificationFileText = parentSnapshot ? JSON.stringify(expandedSpecification(parentSnapshot.manifest.specification), null, 2) + '\n' : fs.readFileSync(specificationPath, 'utf8');
+  const coverageExtension = parentSnapshot ? {
+    version: addedConfigurations ? PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION : PAIRED_COVERAGE_EXTENSION_VERSION,
+    purpose: addedConfigurations ? declaredExtensionPurpose : extensionPurpose,
+    parentSnapshotSha256: pairedDigest(parentText), parentManifestSha256: parentSnapshot.manifestSha256,
+    addedConfigurations: [...(addedConfigurations || PAIRED_ADDED_CREATORS)], retainedConfigurationCount: parentSnapshot.manifest.configurations.length,
+    additionalGenerationCount: (addedConfigurations || PAIRED_ADDED_CREATORS).length * 2,
+    additionalJudgeRequestCount: (addedConfigurations || PAIRED_ADDED_CREATORS).length * 2 } : null;
+  const specificationFileText = parentSnapshot ? JSON.stringify(addedConfigurations
+    ? declaredSpecification(parentSnapshot.manifest.specification, addedConfigurations)
+    : expandedSpecification(parentSnapshot.manifest.specification), null, 2) + '\n' : fs.readFileSync(specificationPath, 'utf8');
   const specification = JSON.parse(specificationFileText);
-  validateSpecification(specification, Boolean(parentSnapshot));
+  validateSpecification(specification, coverageExtension);
   const runId = path.basename(path.resolve(runDirectoryPath)); safeId(runId);
   const manifest = { schemaVersion: 1, runId, createdAt: now, specification, specificationFileText,
     specificationSha256: pairedDigest(specification), specificationFileSha256: pairedDigest(specificationFileText),
     configurations: specification.configurations.map(resolveBenchmarkConfiguration), frozenBundle: parentSnapshot?.manifest.frozenBundle || freezeBundle(specification, sourceRoot),
-    runtimePolicy: PAIRED_RUNTIME_POLICY, runtimeInventory: runtimeInventory(), ...inventories(specification),
+    runtimePolicy: PAIRED_RUNTIME_POLICY, runtimeInventory: runtimeInventory(),
+    toolIsolationPolicy: PAIRED_TOOL_ISOLATION_POLICY, toolIsolationPolicySha256: pairedDigest(PAIRED_TOOL_ISOLATION_POLICY), ...inventories(specification),
     sourceHashes: sourcePaths.map(filename => ({ path: filename, sha256: pairedDigest(fs.readFileSync(path.join(root, filename))) })),
-    ...(parentSnapshot ? { coverageExtension: { version: PAIRED_COVERAGE_EXTENSION_VERSION, purpose: extensionPurpose,
-      parentSnapshotSha256: pairedDigest(parentText), parentManifestSha256: parentSnapshot.manifestSha256,
-      addedConfigurations: [...PAIRED_ADDED_CREATORS], retainedConfigurationCount: 6, additionalGenerationCount: 16, additionalJudgeRequestCount: 16 },
+    ...(parentSnapshot ? { coverageExtension,
       executionValidationPolicy: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY, executionValidationPolicySha256: pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY) } : {}) };
   if (parentSnapshot) validatePairedRunExport({ kind: 'storytelling-plot-twists-paired-run', schemaVersion: 1, runId,
     manifest, manifestSha256: pairedDigest(manifest), parentSnapshot, coverageExtension: manifest.coverageExtension, globalStop: null,
@@ -162,8 +200,61 @@ export function preparePairedRun({ runDirectoryPath, specificationPath = path.jo
   writeOnce(path.join(runDirectoryPath, 'manifest.sha256'), pairedDigest(manifest) + '\n');
   if (parentSnapshot) writeOnce(path.join(runDirectoryPath, 'parent-snapshot.json'), parentText);
   for (const kind of ['generations', 'judgments']) fs.mkdirSync(path.join(runDirectoryPath, kind));
-  return { runId, runDirectoryPath: path.resolve(runDirectoryPath), manifestSha256: pairedDigest(manifest), generationCount: parentSnapshot ? 16 : 12,
-    pairedJudgeRequestCount: parentSnapshot ? 16 : 12, ...(parentSnapshot ? { coverageExtension: manifest.coverageExtension } : {}), status: 'prepared' };
+  return { runId, runDirectoryPath: path.resolve(runDirectoryPath), manifestSha256: pairedDigest(manifest), generationCount: coverageExtension?.additionalGenerationCount ?? 12,
+    pairedJudgeRequestCount: coverageExtension?.additionalJudgeRequestCount ?? 12, ...(parentSnapshot ? { coverageExtension } : {}), status: 'prepared' };
+}
+
+function technicalRecoveryPlan(source, sourceText, authorization) {
+  assert.ok(!source.manifest.technicalRecovery && source.coverageExtension?.version === PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION,
+    'Technical recovery requires the original declared coverage run, not a repeated recovery.');
+  assert.equal(source.globalStop?.reason, 'runtime-contract-failure', 'Only the audited runtime stop is recoverable.');
+  assert.ok(authorization && Object.keys(authorization).sort().join(',') === 'approvedAt,scope,userInstruction'
+    && Number.isFinite(Date.parse(authorization.approvedAt)) && authorization.userInstruction === 'please do it'
+    && authorization.scope === 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.',
+  'Explicit user approval of this exact technical recovery is required.');
+  const replacements = recoveryConfigurations.map(configurationId => {
+    const row = source.generations.find(item => item.configurationId === configurationId && item.condition === 'skill');
+    assert.ok(row?.attempt && ['succeeded', 'failed'].includes(row.status)
+      && /codex_core::tools::router[^\n]*error=/i.test(row.rawStderr), 'Each approved replacement must have original tool-router evidence.');
+    return row;
+  });
+  const replacementGenerationIds = replacements.map(row => row.id);
+  const replacementJudgmentIds = source.judgments.filter(row => replacements.some(item => item.pairId === row.pairId) && row.status === 'succeeded').map(row => row.id);
+  for (const kind of ['generations', 'judgments']) for (const row of source[kind]) {
+    const replaced = (kind === 'generations' ? replacementGenerationIds : replacementJudgmentIds).includes(row.id);
+    if (!replaced) assert.ok(row.status === 'succeeded' || row.status === 'pending', 'Unaudited failed or incomplete attempts cannot be retried.');
+  }
+  return { version: PAIRED_TECHNICAL_RECOVERY_VERSION, sourceSnapshotSha256: pairedDigest(sourceText), sourceManifestSha256: source.manifestSha256,
+    authorization, replacementGenerationIds, replacementJudgmentIds,
+    pendingGenerationIds: source.generations.filter(row => row.status === 'pending').map(row => row.id),
+    pendingJudgmentIds: source.judgments.filter(row => row.status === 'pending').map(row => row.id),
+    retainedGenerationCount: source.generations.filter(row => row.status === 'succeeded' && !replacementGenerationIds.includes(row.id)).length,
+    retainedJudgmentCount: source.judgments.filter(row => row.status === 'succeeded' && !replacementJudgmentIds.includes(row.id)).length,
+    purpose: recoveryPurpose };
+}
+const recoveryReplaces = (manifest, kind, id) => Boolean(manifest.technicalRecovery?.[kind === 'generations' ? 'replacementGenerationIds' : 'replacementJudgmentIds'].includes(id));
+const recoveryRetains = (manifest, kind, row) => row && row.status !== 'pending' && !recoveryReplaces(manifest, kind, row.id);
+
+export function preparePairedTechnicalRecovery({ runDirectoryPath, sourceSnapshotPath, authorization, now = new Date().toISOString() }) {
+  const sourceText = fs.readFileSync(sourceSnapshotPath, 'utf8'), source = validatePairedRunExport(JSON.parse(sourceText));
+  assert.equal(sourceText, JSON.stringify(source, null, 2) + '\n', 'Recovery source must preserve immutable export serialization.');
+  const technicalRecovery = technicalRecoveryPlan(source, sourceText, authorization), runId = path.basename(path.resolve(runDirectoryPath)); safeId(runId);
+  assert.deepEqual(runtimeInventory(), source.manifest.runtimeInventory, 'Recovery must preserve native CLI versions.');
+  const manifest = { ...source.manifest, runId, createdAt: now, technicalRecovery, technicalRecoverySha256: pairedDigest(technicalRecovery),
+    toolIsolationPolicy: PAIRED_TOOL_ISOLATION_POLICY, toolIsolationPolicySha256: pairedDigest(PAIRED_TOOL_ISOLATION_POLICY),
+    sourceHashes: sourcePaths.map(filename => ({ path: filename, sha256: pairedDigest(fs.readFileSync(path.join(root, filename))) })) };
+  validatePairedRunExport({ ...source, runId, manifest, manifestSha256: pairedDigest(manifest), recoverySourceSnapshot: source, globalStop: null,
+    ...Object.fromEntries(['generations', 'judgments'].map(kind => [kind, manifest[kind === 'generations' ? 'generationPlan' : 'judgmentPlan'].map(slot => {
+      const prior = source[kind].find(row => row.id === slot.id);
+      return recoveryRetains(manifest, kind, prior) ? prior : { ...slot, status: 'pending' };
+    })])) });
+  fs.mkdirSync(path.dirname(path.resolve(runDirectoryPath)), { recursive: true }); fs.mkdirSync(runDirectoryPath);
+  writeOnce(path.join(runDirectoryPath, 'specification.json'), manifest.specificationFileText);
+  writeOnce(path.join(runDirectoryPath, 'manifest.json'), manifest); writeOnce(path.join(runDirectoryPath, 'manifest.sha256'), pairedDigest(manifest) + '\n');
+  writeOnce(path.join(runDirectoryPath, 'parent-snapshot.json'), source.parentSnapshot);
+  writeOnce(path.join(runDirectoryPath, 'recovery-source-snapshot.json'), sourceText);
+  for (const kind of ['generations', 'judgments']) fs.mkdirSync(path.join(runDirectoryPath, kind));
+  return { runId, runDirectoryPath: path.resolve(runDirectoryPath), manifestSha256: pairedDigest(manifest), technicalRecovery, status: 'prepared' };
 }
 
 function inputPayload(configuration, promptText, bundleText = null) {
@@ -175,7 +266,8 @@ function exactMessages(payload) {
     ...(payload.developerInstructions ? [{ role: 'developer', content: payload.developerInstructions }] : []), { role: 'user', content: payload.user }];
 }
 
-function validateInvocation(invocation, configuration, bundleText, isJudge) {
+function validateInvocation(invocation, configuration, bundleText, isJudge, toolIsolationPolicy = null) {
+  if (toolIsolationPolicy) assert.deepEqual(toolIsolationPolicy, PAIRED_TOOL_ISOLATION_POLICY);
   assert.ok(invocation && path.isAbsolute(invocation.currentWorkingDirectory)
     && /^vasir-benchmark-agent-/.test(path.basename(invocation.currentWorkingDirectory)), 'Fresh isolated workspace required.');
   assert.equal(invocation.timeoutMs, PAIRED_RUNTIME_POLICY.timeoutMs);
@@ -185,6 +277,7 @@ function validateInvocation(invocation, configuration, bundleText, isJudge) {
     '--model', configuration.model, '--config', `model_reasoning_effort="${configuration.reasoning}"`, '--color', 'never', '--json',
     ...(isJudge ? ['--output-schema', path.join(invocation.currentWorkingDirectory, 'output-schema.json')] : []),
     '--enable', 'skip_host_skill_discovery', ...disabledFeatures.flatMap(feature => ['--disable', feature]),
+    ...(toolIsolationPolicy ? ['--config', 'agents.enabled=false'] : []),
     '--config', 'suppress_unstable_features_warning=true', '--config', 'project_doc_max_bytes=0', '--config', 'approval_policy="never"',
     '--config', 'developer_instructions=' + JSON.stringify(bundleText || ''), '--config', 'web_search="disabled"', '-'
   ] : ['--print', '--safe-mode', '--disable-slash-commands', '--tools', '', '--permission-mode', 'dontAsk',
@@ -241,6 +334,11 @@ export function buildPairedJudgePrompt({ specification, candidateMap, generation
 }
 
 function terminalEvidence(raw, configuration, responseText, receipt) {
+  if (receipt?.toolIsolationPolicyVersion) {
+    assert.equal(receipt.toolIsolationPolicyVersion, PAIRED_TOOL_ISOLATION_POLICY.version);
+    assert.equal(receipt.toolIsolationPolicySha256, pairedDigest(PAIRED_TOOL_ISOLATION_POLICY));
+    assert.ok(!/codex_core::tools::router[^\n]*error=/i.test(raw.stderr || ''), 'Tool-router errors invalidate a tool-isolated result, including failed delegation attempts.');
+  }
   assert.equal(raw.exitCode, 0, 'Provider exited unsuccessfully.'); assert.equal(raw.signal, null, 'Provider was terminated.');
   assert.ok(responseText.trim(), 'Empty final answer.');
   if (configuration.provider === 'claude') {
@@ -302,11 +400,14 @@ export function pairedStopReason(raw, error = null) {
 
 export async function runPairedAgent({ configuration, promptText, bundleText = null, outputSchema = null, artifactDirectoryPath,
   spawnImplementation = childProcess.spawn, environmentVariables = process.env, signal = null, timeoutMs = PAIRED_RUNTIME_POLICY.timeoutMs,
-  validationErratumSha256 = null, executionValidationPolicy = null }) {
+  validationErratumSha256 = null, executionValidationPolicy = null, toolIsolationPolicy = null }) {
+  if (toolIsolationPolicy) assert.deepEqual(toolIsolationPolicy, PAIRED_TOOL_ISOLATION_POLICY);
   if (executionValidationPolicy) assert.deepEqual(executionValidationPolicy, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY);
   assert.ok(!(validationErratumSha256 && executionValidationPolicy), 'Historical correction and new-attempt validation authorities cannot be combined.');
   const supplementalReceipt = executionValidationPolicy ? { executionValidationPolicyVersion: executionValidationPolicy.version,
     executionValidationPolicySha256: pairedDigest(executionValidationPolicy) } : {};
+  const isolationReceipt = toolIsolationPolicy ? { toolIsolationPolicyVersion: toolIsolationPolicy.version,
+    toolIsolationPolicySha256: pairedDigest(toolIsolationPolicy) } : {};
   const startedAt = Date.now(), raw = { stdout: '', stderr: '', exitCode: null, signal: null };
   let invocation = null, result = null, error = null, terminal = null, child = null, killTimer = null;
   const abort = () => child?.kill('SIGTERM');
@@ -319,6 +420,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
       if (bundleText) args.push('--append-system-prompt', bundleText);
     } else {
       args.splice(args.lastIndexOf('-'), 0, '--enable', 'skip_host_skill_discovery', ...disabledFeatures.flatMap(feature => ['--disable', feature]),
+        ...(toolIsolationPolicy ? ['--config', 'agents.enabled=false'] : []),
         '--config', 'suppress_unstable_features_warning=true', '--config', 'project_doc_max_bytes=0', '--config', 'approval_policy="never"',
         '--config', 'developer_instructions=' + JSON.stringify(bundleText || ''), '--config', 'web_search="disabled"');
     }
@@ -340,7 +442,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
     assert.ok(!signal?.aborted, 'Dispatch interrupted before launch.');
     result = await runBenchmarkAgent({ configuration, promptText, outputSchema, spawnImplementation: spawnIsolated, environmentVariables, timeoutMs });
     terminal = terminalEvidence(raw, configuration, result.text, { ...result.runtimeReceipt,
-      ...supplementalReceipt,
+      ...supplementalReceipt, ...isolationReceipt,
       ...(validationErratumSha256 ? { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256 } : {}) });
   } catch (failure) { error = normalizeError(failure); }
   finally { signal?.removeEventListener('abort', abort); clearTimeout(killTimer); }
@@ -352,7 +454,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
     requestedReasoning: configuration.reasoning, freshSession: true, persistedSession: false,
     cliArguments: invocation?.arguments || null, rawStreamsRetained: true, rawStdoutSha256: pairedDigest(raw.stdout), rawStderrSha256: pairedDigest(raw.stderr),
     exitCode: raw.exitCode, signal: raw.signal, terminalEvidence: terminal, hiddenProviderInstructionsVerified: false,
-    providerInternalRetriesVerified: false, runtimePolicy: PAIRED_RUNTIME_POLICY, ...supplementalReceipt,
+    providerInternalRetriesVerified: false, runtimePolicy: PAIRED_RUNTIME_POLICY, ...supplementalReceipt, ...isolationReceipt,
     ...(validationErratumSha256 ? { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256 } : {}) };
   return { status: error ? 'failed' : 'succeeded', responseText, outputSha256: pairedDigest(responseText), promptText, promptSha256: pairedDigest(promptText),
     inputPayload: payload, inputPayloadSha256: pairedDigest(payload), exactMessages: exactMessages(payload), exactMessagesSha256: pairedDigest(exactMessages(payload)), bundleSha256: bundleText ? pairedDigest(bundleText) : null,
@@ -433,6 +535,8 @@ function loadManifest(runDirectoryPath, execution = false) {
     assert.ok(!correction, 'Supplemental runs do not reuse the historical correction authority.');
     assert.equal(pairedDigest(fs.readFileSync(path.join(runDirectoryPath, 'parent-snapshot.json'))), manifest.coverageExtension.parentSnapshotSha256, 'Original parent snapshot bytes changed.');
   }
+  if (manifest.technicalRecovery) assert.equal(pairedDigest(fs.readFileSync(path.join(runDirectoryPath, 'recovery-source-snapshot.json'))),
+    manifest.technicalRecovery.sourceSnapshotSha256, 'Recovery source bytes changed.');
   if (execution) for (const source of correction?.erratum.correctedSourceHashes || manifest.sourceHashes) assert.equal(pairedDigest(fs.readFileSync(path.join(root, source.path))), source.sha256, 'Executor source changed after preparation: ' + source.path);
   if (execution) assert.deepEqual(runtimeInventory(), manifest.runtimeInventory, 'Installed CLI changed after preparation.');
   return manifest;
@@ -455,19 +559,42 @@ export function validatePairedRunExport(snapshot) {
   assert.equal(snapshot.kind, 'storytelling-plot-twists-paired-run'); assert.equal(snapshot.schemaVersion, 1);
   const manifest = snapshot.manifest, specification = manifest.specification;
   const extension = manifest.coverageExtension, parent = snapshot.parentSnapshot;
-  validateSpecification(specification, Boolean(extension)); assert.equal(snapshot.runId, manifest.runId);
+  const recovery = manifest.technicalRecovery, recoverySource = snapshot.recoverySourceSnapshot;
+  if (recovery) {
+    assert.ok(recoverySource, 'Immutable recovery source is required.'); validatePairedRunExport(recoverySource);
+    assert.deepEqual(recovery, technicalRecoveryPlan(recoverySource, JSON.stringify(recoverySource, null, 2) + '\n', recovery.authorization));
+    assert.equal(manifest.technicalRecoverySha256, pairedDigest(recovery));
+    assert.deepEqual(manifest.toolIsolationPolicy, PAIRED_TOOL_ISOLATION_POLICY);
+    const { runId: oldRun, createdAt: oldAt, sourceHashes: oldHashes, toolIsolationPolicy: oldIsolation,
+      toolIsolationPolicySha256: oldIsolationSha, ...oldProtocol } = recoverySource.manifest;
+    const { runId: newRun, createdAt: newAt, sourceHashes: newHashes, toolIsolationPolicy: newIsolation,
+      toolIsolationPolicySha256: newIsolationSha, technicalRecovery: amendment, technicalRecoverySha256: amendmentSha, ...newProtocol } = manifest;
+    assert.deepEqual(newProtocol, oldProtocol, 'Recovery cannot change the task, treatment, rubric, roster, panel or runtime limits.');
+    assert.deepEqual(parent, recoverySource.parentSnapshot, 'Recovery cannot rewrite the published parent.');
+    assert.equal(snapshot.runtimeValidationErratum, undefined);
+  } else assert.ok(!recoverySource && !manifest.technicalRecoverySha256);
+  validateSpecification(specification, extension); assert.equal(snapshot.runId, manifest.runId);
   assert.equal(snapshot.manifestSha256, pairedDigest(manifest)); assert.equal(manifest.specificationSha256, pairedDigest(specification));
   assert.equal(manifest.specificationFileSha256, pairedDigest(manifest.specificationFileText)); assert.deepEqual(JSON.parse(manifest.specificationFileText), specification);
   assert.deepEqual(manifest.runtimePolicy, PAIRED_RUNTIME_POLICY);
+  if (manifest.toolIsolationPolicy) {
+    assert.deepEqual(manifest.toolIsolationPolicy, PAIRED_TOOL_ISOLATION_POLICY);
+    assert.equal(manifest.toolIsolationPolicySha256, pairedDigest(PAIRED_TOOL_ISOLATION_POLICY));
+  } else assert.ok(!manifest.toolIsolationPolicySha256);
   if (extension) {
-    assert.ok(parent && !parent.coverageExtension && !parent.parentSnapshot, 'A single original cohort is required.');
+    const declared = extension.version === PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION;
+    assert.ok(parent && (declared || !parent.coverageExtension && !parent.parentSnapshot), 'A complete pinned parent cohort is required.');
     validatePairedRunExport(parent);
     assert.ok(!parent.globalStop && [...parent.generations, ...parent.judgments].every(row => row.status === 'succeeded'), 'The retained original cohort must be complete.');
-    assert.deepEqual(extension, { version: PAIRED_COVERAGE_EXTENSION_VERSION, purpose: extensionPurpose,
+    const added = declared ? extension.addedConfigurations : [...PAIRED_ADDED_CREATORS];
+    validateAddedConfigurations(added, parent.manifest.specification.configurations);
+    assert.deepEqual(extension, { version: declared ? PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION : PAIRED_COVERAGE_EXTENSION_VERSION,
+      purpose: declared ? declaredExtensionPurpose : extensionPurpose,
       parentSnapshotSha256: pairedDigest(JSON.stringify(parent, null, 2) + '\n'), parentManifestSha256: parent.manifestSha256,
-      addedConfigurations: [...PAIRED_ADDED_CREATORS], retainedConfigurationCount: 6, additionalGenerationCount: 16, additionalJudgeRequestCount: 16 });
+      addedConfigurations: added, retainedConfigurationCount: parent.manifest.configurations.length,
+      additionalGenerationCount: added.length * 2, additionalJudgeRequestCount: added.length * 2 });
     assert.deepEqual(snapshot.coverageExtension, extension);
-    assert.deepEqual(specification, expandedSpecification(parent.manifest.specification), 'Only declared reasoning coverage may change.');
+    assert.deepEqual(specification, declared ? declaredSpecification(parent.manifest.specification, added) : expandedSpecification(parent.manifest.specification), 'Only declared reasoning coverage may change.');
     assert.deepEqual(manifest.frozenBundle, parent.manifest.frozenBundle, 'The original frozen treatment must remain unchanged.');
     assert.deepEqual(manifest.runtimeInventory, parent.manifest.runtimeInventory, 'Provider CLI versions must match the original cohort.');
     assert.deepEqual(manifest.executionValidationPolicy, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY);
@@ -499,12 +626,13 @@ export function validatePairedRunExport(snapshot) {
     assert.equal(bundle.sourceSnapshotInventory.find(row => row.relativePath === file.path)?.sha256, file.sha256); }
   assert.equal(bundle.text, bundle.files.map(file => `--- Frozen skill file: ${file.path} ---\n${file.content}`).join('\n\n')); assert.equal(bundle.sha256, pairedDigest(bundle.text));
   for (const kind of ['generations', 'judgments']) {
-    const count = extension ? 28 : 12;
+    const count = specification.configurations.length * 2;
     assert.equal(snapshot[kind].length, count); assert.equal(new Set(snapshot[kind].map(row => row.id)).size, count);
     for (const [index, row] of snapshot[kind].entries()) {
       const slot = expected[kind === 'generations' ? 'generationPlan' : 'judgmentPlan'][index];
       for (const [key, value] of Object.entries(slot)) assert.deepEqual(row[key], value, 'Attempt identity changed: ' + key);
-      const original = parent?.[kind].find(item => item.id === row.id);
+      const prior = recoverySource?.[kind].find(item => item.id === row.id);
+      const original = recovery ? (recoveryRetains(manifest, kind, prior) ? prior : null) : parent?.[kind].find(item => item.id === row.id);
       if (original) { assert.deepEqual(row, original, 'A retained original record changed.'); continue; }
       if (row.validationCorrection) {
         assert.ok(erratum, 'Original reclassification requires an explicit erratum.');
@@ -512,7 +640,13 @@ export function validatePairedRunExport(snapshot) {
       }
       assert.ok(['pending', 'incomplete', 'succeeded', 'failed'].includes(row.status));
       if (['pending', 'incomplete'].includes(row.status)) continue;
-      assert.equal(row.attempt.number, 1); assert.equal(row.attempt.automaticRetries, 0); assert.equal(row.attempt.inputPayloadSha256, row.inputPayloadSha256);
+      const replaced = recoveryReplaces(manifest, kind, row.id);
+      assert.equal(row.attempt.number, replaced ? prior.attempt.number + 1 : 1);
+      if (recovery) {
+        assert.equal(row.attempt.technicalRecoverySha256, manifest.technicalRecoverySha256);
+        assert.equal(row.attempt.supersedesRecordSha256, replaced ? pairedDigest(prior) : undefined);
+      } else assert.ok(!row.attempt.technicalRecoverySha256 && !row.attempt.supersedesRecordSha256);
+      assert.equal(row.attempt.automaticRetries, 0); assert.equal(row.attempt.inputPayloadSha256, row.inputPayloadSha256);
       for (const [key, value] of Object.entries(slot)) assert.deepEqual(row.attempt[key], value, 'Reserved attempt identity changed.');
       assert.equal(row.artifactDirectory, `${kind}/${slot.id}`);
       const configuration = resolveBenchmarkConfiguration(kind === 'generations' ? row.configurationId : row.judgeConfigurationId);
@@ -527,6 +661,10 @@ export function validatePairedRunExport(snapshot) {
       assert.equal(row.runtimeReceipt.requestedModel, configuration.model); assert.equal(row.runtimeReceipt.requestedReasoning, configuration.reasoning);
       assert.equal(row.runtimeReceipt.freshSession, true); assert.equal(row.runtimeReceipt.persistedSession, false);
       assert.equal(row.runtimeReceipt.hiddenProviderInstructionsVerified, false); assert.equal(row.runtimeReceipt.providerInternalRetriesVerified, false);
+      if (manifest.toolIsolationPolicy) {
+        assert.equal(row.runtimeReceipt.toolIsolationPolicyVersion, manifest.toolIsolationPolicy.version);
+        assert.equal(row.runtimeReceipt.toolIsolationPolicySha256, manifest.toolIsolationPolicySha256);
+      } else assert.ok(!row.runtimeReceipt.toolIsolationPolicyVersion && !row.runtimeReceipt.toolIsolationPolicySha256);
       if (extension) {
         assert.equal(row.runtimeReceipt.executionValidationPolicyVersion, manifest.executionValidationPolicy.version);
         assert.equal(row.runtimeReceipt.executionValidationPolicySha256, manifest.executionValidationPolicySha256);
@@ -538,7 +676,7 @@ export function validatePairedRunExport(snapshot) {
         assert.equal(row.runtimeReceipt.validationErratumSha256, snapshot.runtimeValidationErratumSha256);
       }
       if (row.invocation) { assert.deepEqual(row.invocation.configuration, configuration); assert.deepEqual(row.invocation.arguments, row.runtimeReceipt.cliArguments);
-        validateInvocation(row.invocation, configuration, deliveredBundle, kind === 'judgments'); }
+        validateInvocation(row.invocation, configuration, deliveredBundle, kind === 'judgments', manifest.toolIsolationPolicy); }
       if (kind === 'generations') { assert.equal(row.wordCount, pairedWordCount(row.responseText)); assert.equal(row.wordLimitExceeded, row.wordCount > specification.benchmark.wordLimit); }
       else { assert.deepEqual(row.outputSchema, pairedJudgeSchema(specification.benchmark));
         assert.deepEqual(row.candidateResponseHashes, Object.fromEntries(['A', 'B'].map(label => [label, generations.find(item => item.condition === row.candidateMap[label]).outputSha256]))); }
@@ -556,8 +694,10 @@ export function validatePairedRunExport(snapshot) {
 export function exportPairedRun({ runDirectoryPath }) {
   const manifest = loadManifest(runDirectoryPath), correction = readErratum(runDirectoryPath, manifest);
   const parentSnapshot = manifest.coverageExtension ? readJson(path.join(runDirectoryPath, 'parent-snapshot.json')) : null;
+  const recoverySourceSnapshot = manifest.technicalRecovery ? readJson(path.join(runDirectoryPath, 'recovery-source-snapshot.json')) : null;
   const retainedOrLocal = (kind, slot) => {
-    const retained = parentSnapshot?.[kind].find(row => row.id === slot.id);
+    const prior = recoverySourceSnapshot?.[kind].find(row => row.id === slot.id);
+    const retained = recoverySourceSnapshot ? (recoveryRetains(manifest, kind, prior) ? prior : null) : parentSnapshot?.[kind].find(row => row.id === slot.id);
     if (retained) {
       assert.ok(!fs.existsSync(path.join(runDirectoryPath, kind, slot.id)), 'A retained parent slot must never be reserved or replaced.');
       return retained;
@@ -575,6 +715,7 @@ export function exportPairedRun({ runDirectoryPath }) {
     judgments: manifest.judgmentPlan.map(slot => retainedOrLocal('judgments', slot)),
     globalStop: fs.existsSync(path.join(runDirectoryPath, stopFilename)) ? readJson(path.join(runDirectoryPath, stopFilename)) : null,
     ...(correction ? { runtimeValidationErratum: correction.erratum, runtimeValidationErratumSha256: correction.sha256, supersededStop: correction.erratum.originalStop } : {}),
+    ...(recoverySourceSnapshot ? { recoverySourceSnapshot } : {}),
     ...(parentSnapshot ? { parentSnapshot, coverageExtension: manifest.coverageExtension } : {}) });
 }
 
@@ -598,15 +739,19 @@ async function dispatch({ runDirectoryPath, kind, limit = Infinity, concurrency 
         const generations = snapshot.generations.filter(row => row.pairId === slot.pairId);
         const promptText = kind === 'generations' ? manifest.specification.benchmark.prompt : buildPairedJudgePrompt({ specification: manifest.specification, candidateMap: slot.candidateMap, generations });
         const directory = path.join(runDirectoryPath, kind, slot.id); fs.mkdirSync(directory);
-        const payload = inputPayload(configuration, promptText, bundleText), attempt = { ...slot, number: 1, automaticRetries: 0,
-          startedAt: new Date().toISOString(), inputPayloadSha256: pairedDigest(payload) };
+        const prior = snapshot.recoverySourceSnapshot?.[kind].find(row => row.id === slot.id), replaced = recoveryReplaces(manifest, kind, slot.id);
+        const payload = inputPayload(configuration, promptText, bundleText), attempt = { ...slot, number: replaced ? prior.attempt.number + 1 : 1, automaticRetries: 0,
+          startedAt: new Date().toISOString(), inputPayloadSha256: pairedDigest(payload),
+          ...(manifest.technicalRecovery ? { technicalRecoverySha256: manifest.technicalRecoverySha256,
+            ...(replaced ? { supersedesRecordSha256: pairedDigest(prior) } : {}) } : {}) };
         writeOnce(path.join(directory, 'attempted.json'), attempt); writeOnce(path.join(directory, 'prompt.txt'), promptText);
         writeOnce(path.join(directory, 'input-payload.json'), payload); if (bundleText) writeOnce(path.join(directory, 'skill-bundle.txt'), bundleText);
         const outputSchema = kind === 'judgments' ? pairedJudgeSchema(manifest.specification.benchmark) : null;
         if (outputSchema) writeOnce(path.join(directory, 'output-schema.json'), outputSchema);
         onProgress({ event: 'started', kind, id: slot.id, configurationId: configuration.id });
         const result = await runPairedAgent({ configuration, promptText, bundleText, outputSchema, artifactDirectoryPath: directory, spawnImplementation, environmentVariables, signal,
-          validationErratumSha256: snapshot.runtimeValidationErratumSha256 || null, executionValidationPolicy: manifest.executionValidationPolicy || null });
+          validationErratumSha256: snapshot.runtimeValidationErratumSha256 || null, executionValidationPolicy: manifest.executionValidationPolicy || null,
+          toolIsolationPolicy: manifest.toolIsolationPolicy || null });
         const record = { ...slot, ...result, attempt, artifactDirectory: `${kind}/${slot.id}`, finishedAt: new Date().toISOString() };
         if (kind === 'generations') { record.wordCount = pairedWordCount(record.responseText); record.wordLimitExceeded = record.wordCount > manifest.specification.benchmark.wordLimit;
           record.blindingWarnings = /\b(?:Claude|Fable|Opus|GPT-[\d.]|skill[- ]assisted|baseline condition)\b/i.test(record.responseText) ? ['Candidate may disclose identity or treatment; original text retained.'] : []; }

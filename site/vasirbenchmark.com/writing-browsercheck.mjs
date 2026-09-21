@@ -8,8 +8,23 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deriveExpectedWritingCategory, deriveExpectedOverallV3, verifyOverallV3Projection, verifyCandidateCategoryProjection } from '../../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
+import { PAIRED_NATIVE_CONFIGURATION_IDS, deriveExpectedWritingCategory, deriveExpectedOverallV3, verifyOverallV3Projection, verifyCandidateCategoryProjection } from '../../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 import { inspectCompactWritingReportInDocument } from './writing-compact-browser-evidence.mjs';
+
+function inspectWritingCaseControlsInDocument(expected) {
+  const mismatches = [], page = document.querySelector('#report-page');
+  const cases = document.querySelector('[data-writing-case]'), trials = document.querySelector('[data-writing-trial]');
+  const needsCases = expected.caseIds.length > 1, needsTrials = expected.trialCount > 1 && !expected.aggregateTrials;
+  const caseOptions = [...cases?.options || []].map(option => option.value);
+  const trialOptions = [...trials?.options || []].map(option => Number(option.value));
+  const activeCaseId = page?.dataset.activeWritingCase;
+  if (!expected.caseIds.includes(activeCaseId)) mismatches.push('active-case-identity');
+  if (needsCases ? !cases || JSON.stringify(caseOptions) !== JSON.stringify(expected.caseIds) || cases.value !== activeCaseId : !!cases) mismatches.push('case-selector-inventory');
+  if (needsTrials ? !trials || JSON.stringify(trialOptions) !== JSON.stringify(Array.from({ length: expected.trialCount }, (_, index) => index + 1))
+    || Number(trials.value) !== Number(page?.dataset.activeWritingTrial) : !!trials) mismatches.push('trial-selector-inventory');
+  if (!!document.querySelector('.writing-case-picker') !== (needsCases || needsTrials)) mismatches.push('redundant-or-missing-picker-row');
+  return { activeCaseId, caseOptions, trialOptions, mismatches };
+}
 
 function writingOverallPresentation(overall) {
   const included = overall?.scoreBasis?.edition === 'overall-v3';
@@ -165,7 +180,7 @@ async function inspectWritingPredecessorArchiveInDocument() {
 
 // Independently inspect the fresh fixed edition, including the exact originals
 // opened through the shared report. Historical editions use their own checks.
-async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = {}) {
+async function inspectPairedTwistsReportInDocument({ inspectDocument = true, registeredConfigurationIds = [] } = {}) {
   const data = window.VASIR_WRITING, archive = window.VASIR_WRITING_RESPONSES;
   const mismatches = [], answers = [], requests = [], renderedRequests = new Set();
   const fail = (key, valid) => { if (!valid) mismatches.push(key); };
@@ -181,16 +196,49 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
     'claude:claude-fable-5-1@low', 'claude:claude-fable-5-1@xhigh', 'claude:claude-fable-5-1@max', 'claude:claude-opus-5@low', 'claude:claude-opus-5@xhigh'];
   const judges = ['codex:gpt-6-astra@xhigh', 'codex:gpt-5.6-sol@xhigh'];
   if (data?.benchmarks?.[0]?.id !== benchmarkId || data.scoreBasis?.edition !== edition || !archive) return { mismatches: ['paired-edition-missing'] };
-  const contract = data.methodology?.sourceContract, extension = contract?.coverageExtension;
-  const configurations = extension ? [...originalConfigurations, ...addedConfigurations] : originalConfigurations;
+  const contract = data.methodology?.sourceContract, extension = contract?.coverageExtension, recovery = contract?.technicalRecovery;
+  const declaredAppend = extension?.version === 'paired-declared-coverage-extension-v2';
+  const cohorts = declaredAppend ? contract.sourceCohorts : null, history = declaredAppend ? contract.coverageHistory : null;
+  let configurations = extension ? [...originalConfigurations, ...addedConfigurations] : originalConfigurations;
+  if (declaredAppend) {
+    try {
+      const require = valid => { if (!valid) throw new Error('Invalid declared cohort history'); };
+      require(Array.isArray(cohorts) && cohorts.length >= 2 && Array.isArray(history) && history.length === cohorts.length - 1);
+      require(sameIds(cohorts[0].configurationIds, originalConfigurations));
+      const retained = [];
+      for (const [index, cohort] of cohorts.entries()) {
+        require(sameIds(Object.keys(cohort), ['configurationIds', 'sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256'])
+          && cohort.sourceCohort === (index ? 'supplement' : 'original') && cohort.configurationIds.length > 0
+          && new Set(cohort.configurationIds).size === cohort.configurationIds.length
+          && cohort.configurationIds.every(id => registeredConfigurationIds.includes(id) && !retained.includes(id))
+          && ['sourceSnapshotSha256', 'sourceManifestSha256'].every(field => /^[a-f0-9]{64}$/.test(cohort[field] || '')));
+        if (index) {
+          const step = history[index - 1], parent = cohorts[index - 1];
+          require(['paired-reasoning-coverage-extension-v1', 'paired-declared-coverage-extension-v2'].includes(step.version)
+            && typeof step.purpose === 'string' && Boolean(step.purpose.trim())
+            && (step.version !== 'paired-reasoning-coverage-extension-v1' || index === 1 && sameIds(step.addedConfigurations, addedConfigurations))
+            && step.parentSnapshotSha256 === parent.sourceSnapshotSha256 && step.parentManifestSha256 === parent.sourceManifestSha256
+            && step.sourceSnapshotSha256 === cohort.sourceSnapshotSha256 && step.sourceManifestSha256 === cohort.sourceManifestSha256
+            && same(step.addedConfigurations, cohort.configurationIds) && step.retainedConfigurationCount === retained.length
+            && step.additionalGenerationCount === cohort.configurationIds.length * 2 && step.additionalJudgeRequestCount === cohort.configurationIds.length * judges.length);
+        }
+        retained.push(...cohort.configurationIds);
+      }
+      require(new Set(cohorts.map(cohort => cohort.sourceSnapshotSha256)).size === cohorts.length);
+      const { sourceSnapshotSha256, sourceManifestSha256, ...lastExtension } = history.at(-1);
+      require(same(lastExtension, extension) && sourceSnapshotSha256 === (recovery?.sourceSnapshotSha256 ?? contract.sourceSha256) && sourceManifestSha256 === (recovery?.sourceManifestSha256 ?? contract.manifestSha256)
+        && same(contract.configurations.map(item => item.id), retained));
+      configurations = retained;
+    } catch { return { mismatches: ['declared-cohort-history'] }; }
+  } else fail('no-undeclared-cohort-history', !contract?.sourceCohorts && !contract?.coverageHistory);
   const settingCount = configurations.length, answerCount = settingCount * 2, requestCount = settingCount * judges.length;
   fail('matching-source-contract', same(archive.sourceContract, contract));
   if (extension) {
-    fail('declared-coverage-extension', extension.version === 'paired-reasoning-coverage-extension-v1'
+    fail('declared-coverage-extension', (declaredAppend || extension.version === 'paired-reasoning-coverage-extension-v1')
       && typeof extension.purpose === 'string' && Boolean(extension.purpose.trim())
       && ['parentSnapshotSha256', 'parentManifestSha256'].every(field => /^[a-f0-9]{64}$/.test(extension[field] || ''))
-      && sameIds(extension.addedConfigurations, addedConfigurations) && extension.retainedConfigurationCount === originalConfigurations.length
-      && extension.additionalGenerationCount === addedConfigurations.length * 2 && extension.additionalJudgeRequestCount === addedConfigurations.length * judges.length
+      && (declaredAppend || sameIds(extension.addedConfigurations, addedConfigurations) && extension.retainedConfigurationCount === originalConfigurations.length
+        && extension.additionalGenerationCount === addedConfigurations.length * 2 && extension.additionalJudgeRequestCount === addedConfigurations.length * judges.length)
       && sameIds(contract.configurations.map(item => item.id), configurations)
       && contract.sourceSha256 === data.scoreBasis.sourceSha256 && contract.manifestSha256 === data.scoreBasis.manifestSha256);
     fail('supplemental-validation-policy', contract.executionValidationPolicy?.version === 'paired-one-turn-last-message-validation-v1'
@@ -198,10 +246,60 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
       && typeof contract.executionValidationPolicy.purpose === 'string' && Boolean(contract.executionValidationPolicy.purpose.trim()));
   } else fail('no-undeclared-supplemental-policy', !contract?.executionValidationPolicy);
   const cohortProvenance = configurationId => {
+    if (declaredAppend) {
+      const { configurationIds, ...provenance } = cohorts.find(item => item.configurationIds.includes(configurationId)) || {};
+      return provenance;
+    }
     const original = originalConfigurations.includes(configurationId);
     return { sourceCohort: original ? 'original' : 'supplement',
       sourceSnapshotSha256: original ? extension.parentSnapshotSha256 : data.scoreBasis.sourceSha256,
       sourceManifestSha256: original ? extension.parentManifestSha256 : data.scoreBasis.manifestSha256 };
+  };
+  const slotId = async (kind, configurationId, part) => kind + '-' + (await hash(JSON.stringify([configurationId, 'scifi-outline', part]))).slice(0, 24);
+  if (recovery) {
+    try {
+      const require = valid => { if (!valid) throw new Error('Invalid recovery provenance'); };
+      const { sha256, acceptedParentSnapshotSha256, ...original } = recovery;
+      require(declaredAppend && recovery.version === 'paired-tool-isolation-recovery-v1'
+        && sameIds(Object.keys(original), ['version', 'sourceSnapshotSha256', 'sourceManifestSha256', 'authorization', 'replacementGenerationIds', 'replacementJudgmentIds', 'pendingGenerationIds', 'pendingJudgmentIds', 'retainedGenerationCount', 'retainedJudgmentCount', 'purpose'])
+        && await hash(JSON.stringify(original)) === sha256 && ['sha256', 'sourceSnapshotSha256', 'sourceManifestSha256', 'acceptedParentSnapshotSha256'].every(field => /^[a-f0-9]{64}$/.test(recovery[field] || ''))
+        && acceptedParentSnapshotSha256 === extension.parentSnapshotSha256 && recovery.sourceSnapshotSha256 !== contract.sourceSha256 && recovery.sourceManifestSha256 !== contract.manifestSha256
+        && Number.isFinite(Date.parse(recovery.authorization?.approvedAt)) && typeof recovery.purpose === 'string' && Boolean(recovery.purpose.trim())
+        && sameIds(Object.keys(recovery.authorization), ['approvedAt', 'scope', 'userInstruction']) && recovery.authorization.userInstruction === 'please do it'
+        && recovery.authorization.scope === 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.');
+      require(same(recovery.replacementGenerationIds, await Promise.all(['codex:gpt-6-astra@ultra', 'codex:gpt-5.6-sol@ultra', 'codex:gpt-5.6-terra@ultra'].map(id => slotId('generation', id, 'skill'))))
+        && same(recovery.replacementJudgmentIds, await Promise.all([1, 2].map(seat => slotId('judgment', 'codex:gpt-6-astra@ultra', seat)))));
+      const inventory = [];
+      for (const kind of ['generation', 'judgment']) for (const configurationId of configurations) for (const part of kind === 'generation' ? ['baseline', 'skill'] : [1, 2]) inventory.push({ kind, id: await slotId(kind, configurationId, part), configurationId });
+      require(same(contract.recordSources?.map(({ kind, id }) => ({ kind, id })), inventory.map(({ kind, id }) => ({ kind, id }))));
+      for (const kind of ['generation', 'judgment']) {
+        const replacements = recovery[kind === 'generation' ? 'replacementGenerationIds' : 'replacementJudgmentIds'], pending = recovery[kind === 'generation' ? 'pendingGenerationIds' : 'pendingJudgmentIds'];
+        require(Array.isArray(pending));
+        const added = [...replacements, ...pending], all = inventory.filter(item => item.kind === kind);
+        require(new Set(added).size === added.length && added.every(id => all.some(item => item.id === id))
+          && recovery[kind === 'generation' ? 'retainedGenerationCount' : 'retainedJudgmentCount'] === all.length - added.length);
+        for (const item of all) {
+          const row = contract.recordSources.find(record => record.kind === kind && record.id === item.id);
+          const disposition = replacements.includes(item.id) ? 'technical-replacement' : pending.includes(item.id) ? 'previously-unattempted' : 'retained';
+          const origin = disposition === 'retained' ? cohortProvenance(item.configurationId) : { sourceCohort: 'recovery', sourceSnapshotSha256: contract.sourceSha256, sourceManifestSha256: contract.manifestSha256 };
+          require((disposition !== 'technical-replacement' || /^[a-f0-9]{64}$/.test(row.supersedesRecordSha256 || ''))
+            && same(row, { kind, id: item.id, disposition, ...origin, ...(disposition === 'technical-replacement' ? { supersedesRecordSha256: row.supersedesRecordSha256 } : {}) }));
+        }
+      }
+      require(Boolean(contract.toolIsolationPolicy));
+    } catch { return { mismatches: ['technical-recovery-provenance'] }; }
+  } else fail('no-undeclared-record-recovery', !contract?.recordSources);
+  if (contract?.toolIsolationPolicy) {
+    const { sha256, purpose, configurationIds, generationIds, judgmentIds, ...policy } = contract.toolIsolationPolicy;
+    fail('new-call-isolation-policy', same(policy, { version: 'explicit-agent-tool-isolation-v1', codexConfig: { 'agents.enabled': false }, rejectToolRouterErrors: true, appliesTo: 'newly-prepared-runs-only', historicalResultsReclassified: false })
+      && sha256 === await hash(JSON.stringify(policy)) && typeof purpose === 'string' && Boolean(purpose.trim())
+      && (recovery ? configurationIds === undefined && same(generationIds, [...recovery.replacementGenerationIds, ...recovery.pendingGenerationIds]) && same(judgmentIds, [...recovery.replacementJudgmentIds, ...recovery.pendingJudgmentIds])
+        : same(configurationIds, extension?.addedConfigurations ?? contract.configurations.map(item => item.id)) && generationIds === undefined && judgmentIds === undefined));
+  }
+  const recordProvenance = (kind, id, configurationId) => {
+    if (!recovery) return cohortProvenance(configurationId);
+    const { kind: _kind, id: _id, disposition, ...origin } = contract.recordSources.find(row => row.kind === kind && row.id === id) || {};
+    return { ...origin, recordDisposition: disposition, ...(disposition !== 'retained' ? { technicalRecoverySha256: recovery.sha256 } : {}) };
   };
   fail('fresh-fixed-inventory', data.benchmarks.length === 1 && data.cases.length === 1 && data.trialCount === 1
     && data.scoreBasis.ratingMinimum === 0 && data.scoreBasis.ratingMaximum === 5
@@ -229,8 +327,12 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
     && sameIds(archive.responses.map(response => response.configurationId + '|' + response.condition), configurations.flatMap(id => ['baseline', 'skill'].map(condition => id + '|' + condition))));
   for (const response of archive.responses) {
     const key = response.configurationId + ':' + response.condition;
-    fail(key + ':source-cohort', extension ? Object.entries(cohortProvenance(response.configurationId)).every(([field, value]) => response.provenance[field] === value)
+    const provenance = extension ? recordProvenance('generation', response.provenance.generationId, response.configurationId) : null;
+    fail(key + ':generation-identity', response.provenance.generationId === await slotId('generation', response.configurationId, response.condition));
+    fail(key + ':source-cohort', extension ? Object.entries(provenance).every(([field, value]) => response.provenance[field] === value)
       : ['sourceCohort', 'sourceSnapshotSha256', 'sourceManifestSha256'].every(field => response.provenance[field] === undefined));
+    if (recovery) fail(key + ':recovery-attempt', response.runtime?.attemptNumber === (provenance.recordDisposition === 'technical-replacement' ? 2 : 1)
+      && ['technicalRecoverySha256', 'supersedesRecordSha256'].every(field => response.provenance[field] === provenance[field]));
     const messages = archive.messageSets.find(item => item.id === response.messageSetId)?.messages;
     fail(key + ':answer-binding', response.caseId === task.id && response.trialNumber === 1 && Boolean(response.outputText.trim())
       && await hash(response.outputText) === response.provenance.outputSha256
@@ -288,10 +390,13 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
       fail(key + ':panel-arithmetic', cells.length === answerCount && close(cell?.exactScore, exactScore));
     }
     answers.push({ configurationId: response.configurationId, condition: response.condition, outputSha256: response.provenance.outputSha256,
-      ...(extension ? { provenance: cohortProvenance(response.configurationId) } : {}), messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore });
+      ...(extension ? { provenance } : {}), messageSetId: response.messageSetId, requestIds: response.judgments.map(judge => judge.requestId), exactScore });
   }
   for (const request of archive.judgeRequests) {
-    fail(request.id + ':source-cohort', extension ? same(request.provenance, cohortProvenance(request.configurationId)) : request.provenance === undefined);
+    const provenance = extension ? recordProvenance('judgment', request.id, request.configurationId) : null;
+    fail(request.id + ':request-identity', request.id === await slotId('judgment', request.configurationId, judges.indexOf(request.judgeConfigurationId) + 1));
+    fail(request.id + ':source-cohort', extension ? same(request.provenance, provenance) : request.provenance === undefined);
+    if (recovery) fail(request.id + ':recovery-attempt', request.attemptNumber === (provenance.recordDisposition === 'technical-replacement' ? 2 : 1));
     fail(request.id + ':original-bytes', await hash(request.promptText) === request.promptSha256 && await hash(request.outputText) === request.outputSha256);
     fail(request.id + ':anonymous-map', sameIds(Object.keys(request.candidateMap), ['A', 'B']) && sameIds(Object.values(request.candidateMap), ['baseline', 'skill']));
     try {
@@ -305,7 +410,7 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
       }));
     } catch { mismatches.push(request.id + ':original-prompt-json'); }
     requests.push({ requestId: request.id, configurationId: request.configurationId, judgeConfigurationId: request.judgeConfigurationId,
-      ...(extension ? { provenance: cohortProvenance(request.configurationId) } : {}), promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap, candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: inspectDocument ? renderedRequests.has(request.id) : true });
+      ...(extension ? { provenance } : {}), promptSha256: request.promptSha256, outputSha256: request.outputSha256, candidateMap: request.candidateMap, candidateResponseHashes: request.candidateResponseHashes, renderedOriginal: inspectDocument ? renderedRequests.has(request.id) : true });
   }
   for (const configurationId of configurations) {
     const pair = archive.judgeRequests.filter(request => request.configurationId === configurationId);
@@ -321,7 +426,10 @@ async function inspectPairedTwistsReportInDocument({ inspectDocument = true } = 
     }
   }
   return { kind: 'vasirbenchmark-paired-twists-browser-evidence', benchmarkId, edition, caseId: task.id, sourceSha256: data.scoreBasis.sourceSha256, manifestSha256: data.scoreBasis.manifestSha256,
-    ...(extension ? { coverageExtension: extension, executionValidationPolicy: contract.executionValidationPolicy } : {}), skillFiles, answers, requests, mismatches };
+    ...(extension ? { coverageExtension: extension, executionValidationPolicy: contract.executionValidationPolicy } : {}),
+    ...(declaredAppend ? { sourceCohorts: cohorts, coverageHistory: history } : {}),
+    ...(recovery ? { technicalRecovery: recovery, recordSources: contract.recordSources } : {}),
+    ...(contract?.toolIsolationPolicy ? { toolIsolationPolicy: contract.toolIsolationPolicy } : {}), skillFiles, answers, requests, mismatches };
 }
 
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, argument, index, all) => {
@@ -483,6 +591,19 @@ const verifyWritingAnswerLinkBounds = async scope => {
 const verifyWritingProgress = async scope => {
   const proof = await evaluate(`(() => {
     const data=window.VASIR_WRITING, coverage=data.coverage, element=document.querySelector('[data-writing-progress]'),creation=data.benchmarks[0].id==='storytelling-magic-discovery';
+    const common=data.provisionalLeaderboard?.id==='core-idea-astra-common-11-v1'?data.provisionalLeaderboard:null;
+    if(common){
+      const answers=window.VASIR_WRITING_RESPONSES.responses.filter(answer=>common.caseIds.includes(answer.caseId));
+      const assessed=answers.filter(answer=>answer.judgments.filter(judge=>judge.judgeConfigurationId==='codex:gpt-6-astra@xhigh'&&Number.isFinite(judge.score)).length===1).length;
+      const expected=common.expectedCaseCount*data.settings.length*2,complete=assessed===expected;
+      const counts=Object.fromEntries(['answers','reviews','panels'].map(key=>[key,element?.querySelector('[data-writing-progress-count="'+key+'"]')?.textContent]));
+      const status=element?.querySelector('[data-writing-progress-status]')?.textContent,disclosure=element?.querySelector('[data-writing-progress-disclosure]')?.textContent||'',browse=element?.querySelector('[data-writing-browse-answers]'),rect=browse?.getBoundingClientRect(),mismatches=[];
+      if(element?.dataset.writingDerivedScope!==common.id||status!==(complete?'COMPLETE':'INCOMPLETE')+' · 1 ASTRA JUDGE')mismatches.push('common-core-progress-scope');
+      if(counts.answers!==answers.filter(answer=>answer.outputText).length+'/'+expected+' scored-corpus answers'||counts.reviews!==assessed+'/'+expected+' Astra reviews'||counts.panels!==common.rankedSettingCount+'/'+data.settings.length+' complete '+common.expectedCaseCount+'-story settings')mismatches.push('common-core-progress-counts');
+      if(!disclosure.includes('The Matrix is globally excluded')||!disclosure.includes('post-run user-approved')||!disclosure.includes('All '+data.cases.length+' original stories')||!disclosure.includes('additional Fable reviews do not determine this score'))mismatches.push('common-core-progress-disclosure');
+      if(!rect||rect.width<=0||rect.height<44||browse?.getAttribute('data-report-section')!=='ranking')mismatches.push('browse-answers-link');
+      return {inProgress:!complete,status,counts,failedGenerations:coverage.terminalGenerationFailureCount||0,browseHref:browse?.href||null,scoringScope:common.id,mismatches};
+    }
     const inProgress=typeof coverage.executionComplete==='boolean'?!coverage.executionComplete:coverage.judgmentCount<coverage.expectedJudgmentCount || coverage.completedSettingCount<coverage.settingCount;
     const excluded=coverage.executionStatus==='complete-with-exclusions';
     const paired=data.scoreBasis.edition==='storytelling-plot-twists-paired-v2';
@@ -524,6 +645,7 @@ const layout = () => evaluateFunction(() => {
 const selectedProjectionExpression='(() => {const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING;return root.compactBenchmarks?.['+JSON.stringify(requestedBenchmark)+'] || root.additionalBenchmarks?.['+JSON.stringify(requestedBenchmark)+'] || root.benchmarkPublications?.find(item=>item.benchmarkId==='+JSON.stringify(requestedBenchmark)+')?.projection || root;})()';
 const inspectWritingComparison = async expected => {
   verifyCandidateCategoryProjection(await evaluate('window.VASIR_WRITING_CATEGORY'),expected);
+  const coverageDisclosureEvidence=await evaluate(`(() => {const node=document.querySelector('[data-writing-incomplete-results]'),rows=node?.querySelectorAll('.capability-rank-row'),selectedPartial=!!node?.querySelector('.capability-rank-row.is-selected'),defaultOpen=!!node?.open,mismatches=[];if(node&&(node.tagName!=='DETAILS'||node.dataset.writingCoverageDisplay!=='coverage-summary-v1'||defaultOpen!==selectedPartial))mismatches.push('default-state');if(node)node.open=true;return {present:!!node,selectedPartial,defaultOpen,rowCount:rows?.length||0,opensForAudit:!node||!!rows?.[0]?.getBoundingClientRect().width,mismatches};})()`);
   const modelDisclosureEvidence=await evaluate(`(() => {const node=document.querySelector('#capability-ranking [data-writing-selected-setting]'),defaultClosed=node?.tagName==='DETAILS'&&!node.open;if(node)node.open=true;const component=node?.querySelector('[data-writing-component]');return {defaultClosed,opensForAudit:!!node?.open&&!!component?.getBoundingClientRect().width,mismatches:[]};})()`);
   const evidence=await evaluateFunction(expected=>{
     const close=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<1e-7,format=value=>Number.isFinite(value)?value.toFixed(1):'—',round=(value,scale=Math.abs(value))=>Math.round((value+2*Number.EPSILON*Math.max(1,scale))*10)/10;
@@ -602,9 +724,12 @@ const inspectWritingComparison = async expected => {
     return {selectionId:document.querySelector('#writing-score-selection')?.value,activeBenchmarkIds:expected.activeBenchmarkIds,benchmarkWeights:expected.benchmarkWeights,provisional:window.VASIR_WRITING_CATEGORY.writingCategory.selection?.provisional,completeSettings:coverage.completedSettingCount,rankedSettings:eligible.filter(entry=>entry.eligibleForRank).length,partialSettings:eligible.filter(entry=>entry.partial).length,rowEvidence,componentEvidence,aggregateEvidence,headerEvidence,sidebarPartial,sidebarAsteriskRendered,sidebarScore,sidebarLabel,partialFootnote,noPlaceholderPanels,mismatches};
   },{entries:expected.entries,settingLabels:Object.fromEntries([...expected.publications.values()].flatMap(publication=>publication.settings.map(setting=>[setting.configurationId||setting.id,setting.label||[setting.family,setting.reasoning].filter(Boolean).join(' · ')||setting.id]))),activeBenchmarkIds:expected.activeBenchmarkIds,benchmarkWeights:expected.benchmarkWeights,weightTokens:Object.fromEntries(expected.entries.flatMap(entry=>Object.values(entry.benchmarkWeights).map(weight=>[weight,expectedWritingWeightToken(weight)]))),sidebarPartial:deriveExpectedWritingCategory(expected.collection,'all-writing').entries.find(entry=>entry.condition==='skill'&&entry.rank===1)?.partial||false,sidebarScore:deriveExpectedWritingCategory(expected.collection,'all-writing').entries.find(entry=>entry.condition==='skill'&&entry.rank===1)?.score??null});
   modelDisclosureEvidence.closesAfterAudit=await evaluate(`(() => {const node=document.querySelector('#capability-ranking [data-writing-selected-setting]');if(node)node.open=false;return node?.tagName==='DETAILS'&&!node.open;})()`);
+  coverageDisclosureEvidence.restored=await evaluateFunction(wasOpen=>{const node=document.querySelector('[data-writing-incomplete-results]');if(node)node.open=wasOpen;return !node||node.open===wasOpen;},coverageDisclosureEvidence.defaultOpen);
+  if(coverageDisclosureEvidence.rowCount!==expected.partialSettings||coverageDisclosureEvidence.present!==(expected.partialSettings>0)||!coverageDisclosureEvidence.opensForAudit||!coverageDisclosureEvidence.restored)coverageDisclosureEvidence.mismatches.push('complete-inspectable-coverage');
   for(const key of ['defaultClosed','opensForAudit','closesAfterAudit'])if(!modelDisclosureEvidence[key])modelDisclosureEvidence.mismatches.push(key);
   evidence.mismatches.push(...modelDisclosureEvidence.mismatches.map(key=>'model-disclosure:'+key));
-  return {...evidence,modelDisclosureEvidence};
+  evidence.mismatches.push(...coverageDisclosureEvidence.mismatches.map(key=>'coverage-disclosure:'+key));
+  return {...evidence,modelDisclosureEvidence,coverageDisclosureEvidence};
 };
 const chooseWritingScore = async selectionId => {
   await drainLoadedFiles();
@@ -678,13 +803,14 @@ const verifyWritingCategory = async () => {
       const provisional=/provisional/i.test(text),singleJudge=/single.judge/i.test(text)&&/Astra.only/i.test(text),excludedOverall=/excluded from Overall/i.test(text),includedOverall=/included in Overall/i.test(text),overallWeight=includedOverall&&/25%/.test(text)?0.25:0,mismatches=[];
       const expectedInclusion=window.VASIR_DATA.overall.scoreBasis?.edition==='overall-v3',participation=expectedInclusion?includedOverall&&!excludedOverall&&overallWeight===0.25:excludedOverall&&!includedOverall;
       if(actual?.sourceSha256!==source.sourceSha256||JSON.stringify(actual?.judgeConfigurationIds)!==JSON.stringify(source.judgeConfigurationIds)||actual?.judgeCount!==1)mismatches.push('provisional-source-basis');
+      if(source.scoringScope){const scope=method.querySelector('[data-writing-derived-scope="'+source.scoringScope.id+'"]');if(!scope||!scope.innerText.includes(actual.expectedCaseCount+' stories')||!scope.innerText.includes('The Matrix')||!scope.innerText.includes('post-run user-approved')||!scope.innerText.includes(actual.originalCaseCount+' original stories'))mismatches.push('common-core-scope-disclosure');}
       if(!defaultClosed||!openedForAudit||!provisional||!singleJudge||!participation)mismatches.push('methodology-disclosure');
       if(!reportHref||new URL(reportHref).hash!=='#'+source.benchmarkId)mismatches.push('original-report-link');
       return {...source,scope:'category-methodology',defaultClosed,openedForAudit,provisional,singleJudge,excludedOverall,includedOverall,overallWeight,reportHref,mismatches};
     });
     if(method)method.open=false;
     return records.map(record=>({...record,closedAfterAudit:method?.tagName==='DETAILS'&&!method.open}));
-  },[...expected.publications].filter(([id])=>expected.sources.get(id)?.provisional).map(([benchmarkId,publication])=>({benchmarkId,sourceSha256:publication.provisionalLeaderboard.sourceSha256,judgeConfigurationIds:publication.provisionalLeaderboard.judgeConfigurationIds})));
+  },[...expected.publications].filter(([id])=>expected.sources.get(id)?.provisional).map(([benchmarkId,publication])=>{const source=publication.provisionalLeaderboard;return {benchmarkId,sourceSha256:source.sourceSha256,judgeConfigurationIds:source.judgeConfigurationIds,...(source.id==='core-idea-astra-common-11-v1'?{scoringScope:{id:source.id,caseIds:source.caseIds,excludedCaseIds:source.excludedCaseIds,originalCaseIds:source.originalCaseIds,scoredCorpusSha256:source.scoredCorpusSha256}}:{})};}));
   for(const item of provisionalMethodEvidence)check('Provisional source remains qualified in the closed-by-default Methodology disclosure',!item.mismatches.length&&item.closedAfterAudit,JSON.stringify(item));
   await evaluate(`(() => {const node=document.querySelector('[data-writing-index-method]');node.open=true;node.scrollIntoView({block:'center',behavior:'instant'});})()`);
   await capture('writing-index-method.png');
@@ -737,10 +863,11 @@ const verifyWritingCategory = async () => {
     const selected=deriveExpectedWritingCategory(collection,selectionId);
     const fieldMeans=[...selected.publications].filter(([benchmarkId])=>!selected.listedBenchmarkIds||selected.listedBenchmarkIds.includes(benchmarkId)).map(([benchmarkId,publication])=>{
       const official=publication.benchmarkSummaries[0],provisional=publication.provisionalLeaderboard;
-      const usesProvisional=!(Number.isFinite(official.baseline)&&Number.isFinite(official.treatment))&&provisional?.status==='provisional'&&!!provisional.rankedSettingCount;
+      const pinnedCore=benchmarkId==='storytelling-core-idea'&&selected.fixedBasis?.coreIdeaScoring==='published-single-judge-provisional';
+      const usesProvisional=(pinnedCore||!(Number.isFinite(official.baseline)&&Number.isFinite(official.treatment)))&&provisional?.status==='provisional'&&!!provisional.rankedSettingCount;
       const summary=usesProvisional?provisional.summary:official;
       const perBenchmark = deriveExpectedWritingCategory(collection,benchmarkId);
-      return {benchmarkId,selectionId:perBenchmark.selectionId,topModel:expectedWritingBenchmarkTopModel(perBenchmark,publication),trackId:publication.benchmarks[0].trackId||publication.subcategory||'storytelling',baseline:summary.baseline,skill:summary.treatment,delta:summary.delta,provisional:!!usesProvisional,sourceKind:usesProvisional?'provisional-single-judge':Number.isFinite(official.baseline)&&Number.isFinite(official.treatment)?'official-panel':'answers',sourceSha256:publication.scoreBasis.sourceSha256,settingCount:usesProvisional?provisional.rankedSettingCount:publication.coverage.completedSettingCount,caseCount:publication.cases.length,trialCount:publication.trialCount||publication.scoreBasis?.trialsPerTask||1,judgeCount:usesProvisional?provisional.judgeCount:publication.scoreBasis.judgeCount};
+      return {benchmarkId,selectionId:perBenchmark.selectionId,topModel:expectedWritingBenchmarkTopModel(perBenchmark,publication),trackId:publication.benchmarks[0].trackId||publication.subcategory||'storytelling',baseline:summary.baseline,skill:summary.treatment,delta:summary.delta,provisional:!!usesProvisional,sourceKind:usesProvisional?'provisional-single-judge':Number.isFinite(official.baseline)&&Number.isFinite(official.treatment)?'official-panel':'answers',sourceSha256:publication.scoreBasis.sourceSha256,settingCount:usesProvisional?provisional.rankedSettingCount:publication.coverage.completedSettingCount,caseCount:usesProvisional?provisional.expectedCaseCount:publication.cases.length,trialCount:publication.trialCount||publication.scoreBasis?.trialsPerTask||1,judgeCount:usesProvisional?provisional.judgeCount:publication.scoreBasis.judgeCount};
     });
     return {selectionId,selectedSettingId,fieldMeans,presentationVariant};
   };
@@ -841,31 +968,37 @@ const verifyProvisionalArchive = async () => {
     window.VASIR_WRITING_RESPONSES_COLLECTION = window.VASIR_WRITING_RESPONSES;
     window.VASIR_WRITING_RESPONSES = selected;
   })()`);
-  const proof=await evaluate(`(() => {
+  const proof=await evaluate(`(async () => {
     const root=window.VASIR_WRITING_COLLECTION || window.VASIR_WRITING,archiveRoot=window.VASIR_WRITING_RESPONSES_COLLECTION || window.VASIR_WRITING_RESPONSES;
     const publications=[root,...(root.benchmarkPublications || []).map(item=>item.projection),...Object.values(root.additionalBenchmarks || {})].filter(item=>item.provisionalLeaderboard);
     const mean=values=>values.length?values.reduce((sum,value)=>sum+value,0)/values.length:null,round=value=>Number.isFinite(value)?Math.round((value+Number.EPSILON)*10)/10:null,close=(left,right)=>right===null?left===null:Number.isFinite(left)&&Math.abs(left-right)<1e-8;
-    return publications.map(publication=>{
+    const hash=async text=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    return await Promise.all(publications.map(async publication=>{
       const source=publication.provisionalLeaderboard,id=publication.benchmarks[0].id,archive=archiveRoot.additionalBenchmarks?.[id]||archiveRoot.benchmarkResponses?.find(item=>item.benchmarkId===id)?.responseBundle||archiveRoot,mismatches=[];
+      const commonEleven=source.id==='core-idea-astra-common-11-v1',scoredCases=commonEleven?publication.cases.filter(story=>story.id!=='the-matrix'):publication.cases;
       if(source.judgeCount!==1||JSON.stringify(source.judgeConfigurationIds)!==JSON.stringify(['codex:gpt-6-astra@xhigh']))mismatches.push('fixed-judge-basis');
-      if(source.sourceSha256!==publication.scoreBasis.sourceSha256||JSON.stringify(source.caseIds)!==JSON.stringify(publication.cases.map(story=>story.id)))mismatches.push('source-and-corpus');
+      if(source.sourceSha256!==publication.scoreBasis.sourceSha256||JSON.stringify(source.caseIds)!==JSON.stringify(scoredCases.map(story=>story.id)))mismatches.push('source-and-corpus');
+      if(commonEleven&&(source.method!=='equal-case-paired-common-11-single-judge-mean-v1'||source.expectedCaseCount!==11||publication.cases.length!==12||source.originalCaseCount!==12||JSON.stringify(source.originalCaseIds)!==JSON.stringify(publication.cases.map(story=>story.id))||JSON.stringify(source.excludedCaseIds)!==JSON.stringify(['the-matrix'])||source.selectionTiming!=='post-run-user-approved'||source.scoredCorpusSha256!==await hash(JSON.stringify(scoredCases))))mismatches.push('common-core-scope');
+      if(commonEleven)for(const field of ['id','method','caseIds','expectedCaseCount','originalCaseCount','originalCaseIds','excludedCaseIds','scoredCorpusSha256','selectionTiming','exclusionReason','limitations'])if(JSON.stringify(publication.methodology.derivedScoreBasis?.[field])!==JSON.stringify(source[field]))mismatches.push('derived-method:'+field);
       const judgeId=source.judgeConfigurationIds[0],answerMap=new Map(archive.responses.map(answer=>[answer.settingId+'|'+answer.caseId+'|'+answer.condition,answer]));
+      if(commonEleven&&(answerMap.size!==publication.settings.length*publication.cases.length*2||publication.settings.some(setting=>publication.cases.some(story=>['baseline','skill'].some(condition=>!answerMap.has(setting.id+'|'+story.id+'|'+condition))))))mismatches.push('retained-twelve-story-archive');
       let reviewedAnswers=0;
       const cohorts=publication.settings.map(setting=>{
-        const pairs=publication.cases.map(story=>{const values={caseId:story.id};for(const condition of ['baseline','skill']){const answer=answerMap.get(setting.id+'|'+story.id+'|'+condition),judgments=answer?.judgments.filter(judge=>judge.judgeConfigurationId===judgeId)||[];if(judgments.length>1)mismatches.push('duplicate-fixed-review');const judge=judgments[0];values[condition]=judge?.score??null;if(judge){reviewedAnswers++;const calculated=publication.scoreBasis.dimensions.reduce((sum,dimension)=>sum+judge.dimensions[dimension.id].rating,0);if(!close(judge.score,calculated))mismatches.push('original-rating-total');}}return values;}).filter(pair=>Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill));
-        return {settingId:setting.id,pairs,complete:pairs.length===publication.cases.length,baseline:mean(pairs.map(pair=>pair.baseline)),skill:mean(pairs.map(pair=>pair.skill)),delta:mean(pairs.map(pair=>pair.skill-pair.baseline))};
+        const pairs=scoredCases.map(story=>{const values={caseId:story.id};for(const condition of ['baseline','skill']){const answer=answerMap.get(setting.id+'|'+story.id+'|'+condition),judgments=answer?.judgments.filter(judge=>judge.judgeConfigurationId===judgeId)||[];if(judgments.length>1)mismatches.push('duplicate-fixed-review');const judge=judgments[0];values[condition]=judge?.score??null;if(judge){reviewedAnswers++;const calculated=publication.scoreBasis.dimensions.reduce((sum,dimension)=>sum+judge.dimensions[dimension.id].rating*dimension.weight/10,0);if(!close(judge.score,calculated))mismatches.push('original-rating-total');}}return values;}).filter(pair=>Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill));
+        return {settingId:setting.id,pairs,complete:pairs.length===scoredCases.length,baseline:mean(pairs.map(pair=>pair.baseline)),skill:mean(pairs.map(pair=>pair.skill)),delta:mean(pairs.map(pair=>pair.skill-pair.baseline))};
       });
       const eligible=cohorts.filter(cohort=>cohort.complete);
       for(const cohort of cohorts)for(const condition of ['baseline','skill']){
         const entry=source.entries.find(item=>item.settingId===cohort.settingId&&item.condition===condition),score=cohort.complete?cohort[condition]:null,delta=cohort.complete?condition==='skill'?cohort.delta:0:null,rank=cohort.complete?1+eligible.filter(other=>other[condition]>score).length:null;
         if(!entry||!close(entry.exactScore,score)||!close(entry.score,round(score))||!close(entry.exactDelta,delta)||!close(entry.delta,round(delta))||entry.rank!==rank||entry.eligibleForRank!==cohort.complete||entry.completedPairCount!==cohort.pairs.length)mismatches.push('fixed-review-cohort:'+cohort.settingId+':'+condition);
+        if(commonEleven){const cells=publication.caseResults.filter(cell=>cell.settingId===cohort.settingId&&cell.condition===condition&&source.caseIds.includes(cell.caseId));if(cells.length!==scoredCases.length)mismatches.push('common-resource-count');for(const[field,key]of[['meanLatencyMs','latencyMs'],['meanInputTokens','inputTokens'],['meanOutputTokens','outputTokens'],['meanTotalTokens','totalTokens'],['meanWordCount','wordCount']]){const values=cells.map(cell=>cell[key]),wanted=cohort.complete&&values.every(Number.isFinite)?round(mean(values)):null;if(!close(entry?.metrics?.[field]??null,wanted))mismatches.push('common-resource-scope:'+field);}}
       }
-      for(const diagnostic of source.incompleteSettings){const cohort=cohorts.find(item=>item.settingId===diagnostic.settingId),missing=publication.cases.map(story=>story.id).filter(caseId=>!cohort.pairs.some(pair=>pair.caseId===caseId));if(cohort.complete||JSON.stringify(diagnostic.missingCaseIds)!==JSON.stringify(missing)||!close(diagnostic.exactScores.baseline,cohort.baseline)||!close(diagnostic.exactScores.skill,cohort.skill)||!close(diagnostic.exactDelta,cohort.delta))mismatches.push('unranked-diagnostic:'+diagnostic.settingId);}
+      for(const diagnostic of source.incompleteSettings){const cohort=cohorts.find(item=>item.settingId===diagnostic.settingId),missing=source.caseIds.filter(caseId=>!cohort.pairs.some(pair=>pair.caseId===caseId));if(cohort.complete||JSON.stringify(diagnostic.missingCaseIds)!==JSON.stringify(missing)||!close(diagnostic.exactScores.baseline,cohort.baseline)||!close(diagnostic.exactScores.skill,cohort.skill)||!close(diagnostic.exactDelta,cohort.delta))mismatches.push('unranked-diagnostic:'+diagnostic.settingId);}
       const expectedSummary={exactBaseline:mean(eligible.map(cohort=>cohort.baseline)),exactTreatment:mean(eligible.map(cohort=>cohort.skill)),exactDelta:mean(eligible.map(cohort=>cohort.delta))};
       for(const [key,value] of Object.entries(expectedSummary))if(!close(source.summary[key],value))mismatches.push('field-mean:'+key);
       if(source.rankedSettingCount!==eligible.length||source.incompleteSettings.length!==cohorts.length-eligible.length)mismatches.push('corpus-count');
-      return {benchmarkId:id,judgeConfigurationId:judgeId,sourceSha256:source.sourceSha256,reviewedAnswers,rankedSettings:eligible.length,incompleteSettings:cohorts.length-eligible.length,mismatches};
-    });
+      return {benchmarkId:id,judgeConfigurationId:judgeId,sourceSha256:source.sourceSha256,reviewedAnswers,rankedSettings:eligible.length,incompleteSettings:cohorts.length-eligible.length,...(commonEleven?{scoringScope:{id:source.id,caseIds:source.caseIds,excludedCaseIds:source.excludedCaseIds,originalCaseIds:source.originalCaseIds,scoredCorpusSha256:source.scoredCorpusSha256}}:{}),mismatches};
+    }));
   })()`);
   for(const result of proof)check(`Provisional ${result.benchmarkId}: original fixed-judge reviews independently reproduce complete-corpus means, ranks and diagnostics`,!result.mismatches.length,JSON.stringify(result));
   return proof;
@@ -953,7 +1086,7 @@ const verifyCreationExpandedReviews = async (caseId, trialNumber) => {
     for(const profile of archive.judgeProfiles){
       const answer=archive.responses.find(answer=>answer.caseId===caseId&&answer.trialNumber===trial&&answer.judgments.some(judge=>judge.reviewerId===profile.id));
       if(!answer)continue;
-      const judge=answer.judgments.find(judge=>judge.reviewerId===profile.id),request=archive.judgeRequests.find(request=>request.id===judge.requestId),row=document.querySelector('[data-report-setting-id="'+answer.settingId+'"]'),panel=row?.querySelector('[data-condition="'+answer.condition+'"]'),review=panel?.querySelector('[data-reviewer-id="'+profile.id+'"]'),details=review?.querySelector('[data-creation-judge-evidence]');
+      const judge=answer.judgments.find(judge=>judge.reviewerId===profile.id),request=archive.judgeRequests.find(request=>request.id===judge.requestId),row=document.querySelector('[data-report-setting-id="'+answer.settingId+'"]'),panel=row?.querySelector('[data-report-trial="'+trial+'"] [data-condition="'+answer.condition+'"]'),review=panel?.querySelector('[data-reviewer-id="'+profile.id+'"]'),details=review?.querySelector('[data-creation-judge-evidence]');
       if(!details||details.dataset.creationJudgeEvidence!==request.id||review.querySelector('[data-judge-context]')?.dataset.judgeContext!==profile.contextMode){mismatches.push('expand-review-identity');continue;}
       row.querySelector('.model-run').open=true;panel.querySelector('.model-run__judging').open=true;details.open=true;await settle();
       const original=details.querySelector('[data-creation-original-review]')?.textContent;
@@ -988,7 +1121,9 @@ const ensureWritingReportAuditDetailsOpen = () => evaluate(`(() => {const node=d
 const verifyWritingReportPresentation = async benchmarkId => {
   const proof=await evaluateFunction(benchmarkId=>{
     const hero=document.querySelector('.evidence-hero#overview'),ranking=document.querySelector('section#ranking'),details=document.querySelector('[data-report-judge-trial-details]');
-    const defaultClosed=details?.tagName==='DETAILS'&&!details.open,modelComparisonFirst=!!hero&&hero.nextElementSibling===ranking;
+    const head=document.querySelector('#head-to-head');
+    const hasPublishedHead=window.VASIR_WRITING_RESPONSES?.headToHeads?.some(item=>item.benchmarkId===benchmarkId);
+    const defaultClosed=details?.tagName==='DETAILS'&&!details.open,modelComparisonFirst=!!hero&&(hero.nextElementSibling===ranking||Boolean(hasPublishedHead&&hero.nextElementSibling===head&&head.nextElementSibling===ranking));
     const modelComparisonHeading=ranking?.querySelector('header h2#ranking-title')?.textContent.trim();
     // Native closed details can retain descendant layout boxes without painting
     // them. Require browser visibility, not zero geometry, and verify the
@@ -1217,7 +1352,13 @@ try {
   selectedReport.searchParams.set('setting',chosenSettingId);
   const selectedReportUrl=selectedReport.href;
 
-  await navigate(selectedReportUrl, 'window.VASIR_WRITING_RESPONSES && document.querySelector("[data-writing-case]") && document.querySelector("[data-writing-rubric]")');
+  await navigate(selectedReportUrl, 'window.VASIR_WRITING_RESPONSES && document.querySelector("#report-page[data-active-writing-case]") && document.querySelector("[data-writing-rubric]")');
+  const caseControls = await evaluateFunction(inspectWritingCaseControlsInDocument, { caseIds: writing.cases.map(story => story.id), trialCount: writing.trialCount, aggregateTrials: isCreation });
+  check('Writing report exposes only meaningful case and trial controls', caseControls.mismatches.length === 0, JSON.stringify(caseControls));
+  const selectCase = async caseId => {
+    if(writing.cases.length===1){check('Single-task Writing report keeps its active case without a prompt selector',await evaluate(`document.querySelector('#report-page').dataset.activeWritingCase===${JSON.stringify(caseId)}&&!document.querySelector('[data-writing-case]')`));return;}
+    await evaluate(`(() => {const select=document.querySelector('[data-writing-case]');select.value=${JSON.stringify(caseId)};select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  };
   const reportPresentationEvidence=await verifyWritingReportPresentation(writing.benchmarks[0]);
   const provisionalArchiveEvidence=isCreation?[]:await verifyProvisionalArchive();
   check('Selected model opens directly in the report', await evaluate(`document.querySelector('[data-report-setting-id="${chosenSettingId}"] .model-run').open`));
@@ -1232,6 +1373,7 @@ try {
       const data=window.VASIR_WRITING, evidence=window.VASIR_WRITING_RESPONSES,creation=data.benchmarks[0].id==='storytelling-magic-discovery';
       const caseId=${JSON.stringify(caseId)}, trialNumber=${trialNumber};
       const story=data.cases.find(story=>story.id===caseId);
+      const common=data.provisionalLeaderboard?.id==='core-idea-astra-common-11-v1'?data.provisionalLeaderboard:null,commonActive=common?.caseIds.includes(caseId);
       const source=evidence.responses.filter(response=>response.caseId===caseId && (response.trialNumber || 1)===trialNumber);
       const rows=[...document.querySelectorAll('[data-report-setting-id]')];
       const mismatches=[];
@@ -1242,9 +1384,21 @@ try {
       const signed=value=>Number.isFinite(value)?(value>0?'+':'')+value.toFixed(1):'—';
       const close=(actual,expected)=>expected===null?actual===null:Number.isFinite(actual)&&Math.abs(actual-expected)<1e-8;
       const caseCells=data.caseResults.filter(cell=>cell.caseId===caseId && (cell.trialNumber || 1)===trialNumber);
+      const displayExact=response=>{
+        if(!commonActive)return caseCells.find(cell=>cell.settingId===response?.settingId&&cell.condition===response?.condition)?.exactScore??null;
+        const judges=(response?.judgments||[]).filter(judge=>judge.judgeConfigurationId==='codex:gpt-6-astra@xhigh');
+        return judges.length===1&&data.scoreBasis.dimensions.every(dimension=>Number.isInteger(judges[0].dimensions?.[dimension.id]?.rating))?data.scoreBasis.dimensions.reduce((sum,dimension)=>sum+judges[0].dimensions[dimension.id].rating*dimension.weight/10,0):null;
+      };
+      if(common){
+        if(document.getElementById('report-page').dataset.writingScoreScope!==(commonActive?common.id:'archived-excluded'))mismatches.push('common-core-report-scope');
+        const mast=document.querySelector('.benchmark-mast__issue').textContent;
+        if(mast!==(commonActive?'Writing · 1 Astra judge · '+common.rankedSettingCount+'/'+data.settings.length+' complete settings':'Writing · Archived story · excluded from aggregate'))mismatches.push('common-core-masthead');
+        const excluded=document.querySelector('[data-writing-case] option[value="the-matrix"]');
+        if(!excluded?.textContent.endsWith(' · archived, excluded'))mismatches.push('excluded-core-story-option');
+      }
       for (const row of rows) for (const condition of data.conditions) {
         const response=source.find(response=>response.settingId===row.dataset.reportSettingId && response.condition===condition.id);
-        const panel=row.querySelector('[data-condition="'+condition.id+'"]');
+        const panel=row.querySelector((creation?'[data-report-trial="'+trialNumber+'"] ':'')+'[data-condition="'+condition.id+'"]');
         const output=panel.querySelector('[data-output-text]')?.textContent || '';
         if(output !== (response?.outputText || '')) mismatches.push('output:'+row.dataset.reportSettingId+':'+condition.id);
         if(!output && panel.querySelector('.writing-answer-status')?.textContent!==(response?.failureReason || response?.status || 'No completed answer recorded')) mismatches.push('failure-reason:'+row.dataset.reportSettingId+':'+condition.id);
@@ -1300,7 +1454,8 @@ try {
         const words=output.trim()?output.trim().split(/\\s+/u).length:0;
         if(Number(panel.querySelector('[data-output-word-count]').dataset.outputWordCount)!==words) mismatches.push('word-count');
         const aggregate=panel.querySelector('.model-run__condition-score').textContent.trim();
-        if(aggregate!==(Number.isFinite(response?.score)?response.score.toFixed(1)+'/100':'—')) mismatches.push('aggregate-score');
+        const displayed=commonActive?displayExact(response):response?.score;
+        if(aggregate!==(Number.isFinite(displayed)?round(displayed).toFixed(1)+'/100':'—')) mismatches.push('aggregate-score');
         const judgments=response?.judgments || [];
         const pairedResponse=source.find(other=>other.settingId===response?.settingId && other.condition!==condition.id);
         const terminalFailure=candidate=>['error','unavailable'].includes(candidate?.status);
@@ -1318,7 +1473,9 @@ try {
         const cell=caseCells.find(cell=>cell.settingId===row.dataset.reportSettingId && cell.condition===condition.id);
         if(!close(cell.exactScore,exactScore) || !close(response.score,exactScore===null?null:round(exactScore))) mismatches.push('panel-mean-arithmetic');
         const judgeCoverage=panel.querySelector('[data-judge-coverage]').textContent;
-        if(completePanel) {
+        if(commonActive) {
+          if(judgeCoverage!=='One Astra xhigh review determines this score; all saved reviews are preserved below.')mismatches.push('common-core-judge-disclosure');
+        } else if(completePanel) {
           const spread=Math.max(...judgments.map(judgment=>judgment.score))-Math.min(...judgments.map(judgment=>judgment.score));
           if(!judgeCoverage.includes('Score disagreement: '+spread.toFixed(1)+' rubric points.')) mismatches.push('complete-panel-disagreement');
         } else if(!judgeCoverage.includes('A complete score requires the full panel.')) mismatches.push('incomplete-panel-disclosure');
@@ -1326,6 +1483,7 @@ try {
         if(rendered.length!==judgments.length) mismatches.push('judge-count');
         rendered.forEach((element,index)=>{
           const judgment=judgments[index];
+          if(commonActive&&element.querySelector('.model-run__judge-index')?.textContent!==(judgment.judgeConfigurationId==='codex:gpt-6-astra@xhigh'?'Score source':'Archived review'))mismatches.push('common-core-review-role');
           if(Number.isFinite(judgment.score)) {
             const derived=data.scoreBasis.dimensions.reduce((sum,dimension)=>sum+judgment.dimensions[dimension.id].rating*dimension.weight/data.scoreBasis.ratingMaximum,0);
             if(!close(judgment.score,derived)) mismatches.push('judge-dimension-arithmetic');
@@ -1350,26 +1508,45 @@ try {
           }
         });
       }
-      const pairs=data.settings.map(setting=>({settingId:setting.id,baseline:caseCells.find(cell=>cell.settingId===setting.id && cell.condition==='baseline')?.exactScore??null,skill:caseCells.find(cell=>cell.settingId===setting.id && cell.condition==='skill')?.exactScore??null}));
+      const pairs=data.settings.map(setting=>({settingId:setting.id,baseline:displayExact(source.find(answer=>answer.settingId===setting.id&&answer.condition==='baseline')),skill:displayExact(source.find(answer=>answer.settingId===setting.id&&answer.condition==='skill'))}));
       const paired=pairs.filter(pair=>Number.isFinite(pair.baseline) && Number.isFinite(pair.skill));
       for(const row of rows) {
-        const pair=pairs.find(pair=>pair.settingId===row.dataset.reportSettingId);
+        const originalPair=pairs.find(pair=>pair.settingId===row.dataset.reportSettingId);
+        const pair=creation?{settingId:originalPair.settingId,baseline:data.benchmarkResults.find(cell=>cell.settingId===originalPair.settingId&&cell.condition==='baseline')?.exactScore??null,skill:data.benchmarkResults.find(cell=>cell.settingId===originalPair.settingId&&cell.condition==='skill')?.exactScore??null}:originalPair;
         const aggregate=data.benchmarkResults.find(result=>result.settingId===pair.settingId&&result.condition==='skill');
         const rank=creation?(Number.isFinite(aggregate?.exactScore)?1+data.benchmarkResults.filter(other=>other.condition==='skill'&&Number.isFinite(other.exactScore)&&other.exactScore>aggregate.exactScore).length:null):Number.isFinite(pair.skill)?1+pairs.filter(other=>Number.isFinite(other.skill)&&other.skill>pair.skill).length:null;
         const delta=Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill)?round(pair.skill-pair.baseline):null;
         const summary=row.querySelector('.model-preview__row');
+        if(creation){
+          for(const [condition,score] of [['baseline',pair.baseline],['skill',pair.skill]]){
+            const trials=data.caseResults.filter(cell=>cell.settingId===pair.settingId&&cell.caseId===caseId&&cell.condition===condition);
+            const exact=trials.length===data.coverage.trialCount&&trials.every(cell=>Number.isFinite(cell.exactScore))?trials.reduce((sum,cell)=>sum+cell.exactScore,0)/trials.length:null;
+            if(!close(score,exact))mismatches.push('three-trial-aggregate-arithmetic:'+pair.settingId+':'+condition);
+            const scoreElement=summary.querySelector(condition==='skill'?'.model-preview__score--treatment':'.model-preview__score:not(.model-preview__score--treatment)');
+            const displayed=[...scoreElement.childNodes].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join('').trim();
+            if(displayed!==format(Number.isFinite(score)?round(score):null))mismatches.push('three-trial-displayed-score:'+pair.settingId+':'+condition);
+            const position=summary.querySelector('.model-preview__plot')?.style.getPropertyValue(condition==='skill'?'--preview-treatment':'--preview-baseline');
+            if(Number.isFinite(score)&&position!==round(score)+'%')mismatches.push('three-trial-plot-position:'+pair.settingId+':'+condition);
+          }
+        }
         if(summary.querySelector('.model-preview__identity small').textContent!==(rank?(creation?'Three-trial balanced skill':data.conditions.find(condition=>condition.id==='skill').label)+' rank #'+rank+' of '+data.settings.length:creation?'Three-trial aggregate incomplete':'Panel total not assessable')) mismatches.push('story-rank');
         if(summary.querySelector('.model-preview__delta').textContent!==signed(delta)+' pts' || summary.classList.contains('is-regression')!==(delta<0)) mismatches.push('story-paired-delta');
       }
-      const means={baseline:paired.length?round(paired.reduce((sum,pair)=>sum+pair.baseline,0)/paired.length):null,skill:paired.length?round(paired.reduce((sum,pair)=>sum+pair.skill,0)/paired.length):null,delta:paired.length?round(paired.reduce((sum,pair)=>sum+pair.skill-pair.baseline,0)/paired.length):null};
+      const headlinePairs=creation?data.settings.map(setting=>({baseline:data.benchmarkResults.find(cell=>cell.settingId===setting.id&&cell.condition==='baseline')?.exactScore??null,skill:data.benchmarkResults.find(cell=>cell.settingId===setting.id&&cell.condition==='skill')?.exactScore??null})).filter(pair=>Number.isFinite(pair.baseline)&&Number.isFinite(pair.skill)):paired;
+      const means={baseline:headlinePairs.length?round(headlinePairs.reduce((sum,pair)=>sum+pair.baseline,0)/headlinePairs.length):null,skill:headlinePairs.length?round(headlinePairs.reduce((sum,pair)=>sum+pair.skill,0)/headlinePairs.length):null,delta:headlinePairs.length?round(headlinePairs.reduce((sum,pair)=>sum+pair.skill-pair.baseline,0)/headlinePairs.length):null};
       if(document.querySelector('.matched-result__condition--baseline strong').textContent!==format(means.baseline) || document.querySelector('.matched-result__condition--treatment strong').textContent!==format(means.skill) || document.querySelector('.matched-result__delta dd').textContent!==signed(means.delta)+' pts') mismatches.push('story-paired-field-means');
-      return {caseId,trialNumber,selectedTrial:Number(document.querySelector('[data-writing-trial]')?.value || 1),selected:document.querySelector('[data-writing-case]').value,title:document.querySelector('[data-writing-case-title]').textContent,prompt:document.querySelector('[data-exact-question]').textContent.endsWith(story.prompt || data.benchmarks[0].prompt),rows:rows.length,sourceResponses:source.length,outputCount:source.filter(response=>response.outputText.length).length,runtimeCount:source.filter(response=>response.runtime).length,judgments:source.reduce((total,response)=>total+response.judgments.length,0),singleJudgeResponses:source.filter(response=>response.judgments.length===1).length,completePanelResponses:source.filter(response=>response.judgments.length===data.scoreBasis.judgeCount && response.judgments.every(judgment=>Number.isFinite(judgment.score))).length,scoredPairs:paired.length,regressionPairs:paired.filter(pair=>pair.skill<pair.baseline).length,tiedPairs:paired.filter(pair=>pair.skill===pair.baseline).length,failures,terminalJudgmentLabels,mismatches};
+      return {caseId,trialNumber,...(common?{scoringScope:{id:common.id,excluded:!commonActive,judgeConfigurationId:commonActive?'codex:gpt-6-astra@xhigh':null,rows:pairs}}:{}),selectedTrial:creation?Number(document.querySelector('[data-report-trial][open]')?.dataset.reportTrial):Number(document.querySelector('[data-writing-trial]')?.value || 1),selected:document.querySelector('[data-writing-case]')?.value||document.querySelector('#report-page').dataset.activeWritingCase,title:document.querySelector('[data-writing-case-title]').textContent,prompt:document.querySelector('[data-exact-question]').textContent.endsWith(story.prompt || data.benchmarks[0].prompt),rows:rows.length,sourceResponses:source.length,outputCount:source.filter(response=>response.outputText.length).length,runtimeCount:source.filter(response=>response.runtime).length,judgments:source.reduce((total,response)=>total+response.judgments.length,0),singleJudgeResponses:source.filter(response=>response.judgments.length===1).length,completePanelResponses:source.filter(response=>response.judgments.length===data.scoreBasis.judgeCount && response.judgments.every(judgment=>Number.isFinite(judgment.score))).length,scoredPairs:paired.length,regressionPairs:paired.filter(pair=>pair.skill<pair.baseline).length,tiedPairs:paired.filter(pair=>pair.skill===pair.baseline).length,failures,terminalJudgmentLabels,mismatches};
     })()`);
     check(`Case ${caseId}, trial ${trialNumber}: exact question, answers, failure labels, word counts and judge evidence`, proof.selectedTrial === trialNumber && proof.selected === caseId && proof.title === writing.cases.find(story => story.id === caseId).title && proof.prompt && proof.rows === writing.settings.length && proof.mismatches.length === 0, JSON.stringify(proof));
     return proof;
   };
   const selectTrial = async trialNumber => {
     if (writing.trialCount <= 1) return;
+    if(isCreation){
+      await evaluate(`(() => {for(const trial of document.querySelectorAll('[data-report-trial]'))trial.open=Number(trial.dataset.reportTrial)===${trialNumber};})()`);
+      check(`Magic trial ${trialNumber} remains available inside every model`,await evaluate(`document.querySelectorAll('[data-report-trial="${trialNumber}"][open]').length===window.VASIR_WRITING.settings.length&&!document.querySelector('[data-writing-trial]')&&document.querySelector('#report-page').dataset.activeWritingTrial==='all'`));
+      return;
+    }
     await evaluate(`(() => {const select=document.querySelector('[data-writing-trial]');if(!select)throw Error('Trial selector missing');select.value=${JSON.stringify(String(trialNumber))};select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
     await waitFor(() => evaluate(`Number(document.querySelector('[data-writing-trial]')?.value)===${trialNumber} && Number(document.querySelector('#report-page')?.dataset.activeWritingTrial)===${trialNumber}`), `Writing trial ${trialNumber}`);
   };
@@ -1379,8 +1556,9 @@ try {
   const isPairedTwists = await evaluate("window.VASIR_WRITING.scoreBasis?.edition==='storytelling-plot-twists-paired-v2'");
   const creationExpandedEvidence = [];
   for (const story of writing.cases) {
-    if (await evaluate('document.querySelector("[data-writing-case]").value') !== story.id) {
-      await evaluate(`(() => { const select=document.querySelector('[data-writing-case]'); select.value=${JSON.stringify(story.id)}; select.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+    if (writing.cases.length === 1) await selectCase(story.id);
+    else if (await evaluate('document.querySelector("[data-writing-case]").value') !== story.id) {
+      await selectCase(story.id);
       await waitFor(() => evaluate(`document.querySelector('#report-page')?.dataset.activeWritingCase===${JSON.stringify(story.id)} && document.querySelector('[data-writing-case]')?.value===${JSON.stringify(story.id)} && location.hash.includes(${JSON.stringify(story.id)})`).catch(() => false), `Story ${story.id}`).catch(async error => {
         error.message += `: ${JSON.stringify(await evaluate('({hash:location.hash,rendered:document.querySelector("#report-page")?.dataset.activeWritingCase,selected:document.querySelector("[data-writing-case]")?.value,title:document.querySelector("[data-writing-case-title]")?.textContent})'))}`;
         throw error;
@@ -1397,7 +1575,7 @@ try {
       if(isCreation) creationExpandedEvidence.push(await verifyCreationExpandedReviews(story.id,trialNumber));
     }
   }
-  const pairedTwistsEvidence = isPairedTwists ? await evaluateFunction(inspectPairedTwistsReportInDocument, {}) : null;
+  const pairedTwistsEvidence = isPairedTwists ? await evaluateFunction(inspectPairedTwistsReportInDocument, { registeredConfigurationIds: PAIRED_NATIVE_CONFIGURATION_IDS }) : null;
   if (pairedTwistsEvidence) check('Paired Plot twists: exact inline inputs, all declared original paired reviews and independent four-criterion arithmetic', pairedTwistsEvidence.mismatches.length === 0, JSON.stringify(pairedTwistsEvidence));
   const predecessorArchiveEvidence = await evaluate(`(${inspectWritingPredecessorArchiveInDocument.toString()})()`);
   if (predecessorArchiveEvidence) {
@@ -1454,7 +1632,7 @@ try {
   }
   const savedAnswer = await evaluate(`(() => { const responses=window.VASIR_WRITING_RESPONSES.responses; const answer=responses.find(response=>response.outputText.length && Number.isFinite(response.score)) || responses.find(response=>response.outputText.length && response.judgments.length) || responses.find(response=>response.outputText.length); return answer ? {caseId:answer.caseId,trialNumber:answer.trialNumber || 1,settingId:answer.settingId,condition:answer.condition,judgments:answer.judgments.length} : null; })()`);
   if (savedAnswer) {
-    await evaluate(`(() => { const select=document.querySelector('[data-writing-case]');select.value=${JSON.stringify(savedAnswer.caseId)};select.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+    await selectCase(savedAnswer.caseId);
     await waitFor(() => evaluate(`document.querySelector('#report-page')?.dataset.activeWritingCase===${JSON.stringify(savedAnswer.caseId)}`), 'Saved answer story');
     await selectTrial(savedAnswer.trialNumber);
     const visibleAnswer=await evaluate(`(async () => {
@@ -1464,7 +1642,7 @@ try {
       await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
       const row=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"]');
       row.querySelector('.model-run').open=true;
-      const answer=row.querySelector('[data-condition="${savedAnswer.condition}"] [data-output-text]');
+      const answer=row.querySelector('${isCreation ? '[data-report-trial="' + savedAnswer.trialNumber + '"] ' : ''}[data-condition="${savedAnswer.condition}"] [data-output-text]');
       answer.closest('.model-run__section').scrollIntoView({block:'start',behavior:'instant'});
       await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
       const rect=answer.getBoundingClientRect();
@@ -1475,11 +1653,11 @@ try {
     await noOverflow('Saved Writing answer');
     await capture('writing-answer.png');
     if (savedAnswer.judgments) {
-      await evaluate(`(() => { const judge=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"] [data-condition="${savedAnswer.condition}"] .model-run__judging');judge.open=true;judge.scrollIntoView({block:'start',behavior:'instant'}); })()`);
+      await evaluate(`(() => { const judge=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"] ${isCreation ? '[data-report-trial="' + savedAnswer.trialNumber + '"] ' : ''}[data-condition="${savedAnswer.condition}"] .model-run__judging');judge.open=true;judge.scrollIntoView({block:'start',behavior:'instant'}); })()`);
       await noOverflow('Writing judge dimensions');
-      check('Sparse Writing judgments remain visibly separate from aggregate scores', await evaluate(`(() => { const panel=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"] [data-condition="${savedAnswer.condition}"]');const response=window.VASIR_WRITING_RESPONSES.responses.find(response=>response.caseId===${JSON.stringify(savedAnswer.caseId)} && response.settingId===${JSON.stringify(savedAnswer.settingId)} && response.condition===${JSON.stringify(savedAnswer.condition)} && (response.trialNumber || 1)===${savedAnswer.trialNumber});return response.judgments.length===window.VASIR_WRITING.scoreBasis.judgeCount || (panel.querySelector('.model-run__condition-score').textContent.trim()==='—' && panel.querySelector('.model-run__judging-meta').textContent.includes('Panel incomplete') && panel.querySelector('[data-judge-coverage]').textContent.includes('A complete score requires the full panel.'));})()`));
+      check('Sparse Writing judgments remain visibly separate from aggregate scores', await evaluate(`(() => { const panel=document.querySelector('[data-report-setting-id="${savedAnswer.settingId}"] ${isCreation ? '[data-report-trial="' + savedAnswer.trialNumber + '"] ' : ''}[data-condition="${savedAnswer.condition}"]');const response=window.VASIR_WRITING_RESPONSES.responses.find(response=>response.caseId===${JSON.stringify(savedAnswer.caseId)} && response.settingId===${JSON.stringify(savedAnswer.settingId)} && response.condition===${JSON.stringify(savedAnswer.condition)} && (response.trialNumber || 1)===${savedAnswer.trialNumber});return response.judgments.length===window.VASIR_WRITING.scoreBasis.judgeCount || (panel.querySelector('.model-run__condition-score').textContent.trim()==='—' && panel.querySelector('.model-run__judging-meta').textContent.includes('Panel incomplete') && panel.querySelector('[data-judge-coverage]').textContent.includes('A complete score requires the full panel.'));})()`));
       await capture('writing-judgments.png');
-      const judgeResources = `[data-report-setting-id="${savedAnswer.settingId}"] [data-condition="${savedAnswer.condition}"] [data-judge-resources]`;
+      const judgeResources = `[data-report-setting-id="${savedAnswer.settingId}"] ${isCreation ? '[data-report-trial="' + savedAnswer.trialNumber + '"] ' : ''}[data-condition="${savedAnswer.condition}"] [data-judge-resources]`;
       if (await evaluate(`!!document.querySelector(${JSON.stringify(judgeResources)})`)) {
         await click(`${judgeResources} > summary`);
         await noOverflow('Writing shared judge-batch resources');
@@ -1489,10 +1667,10 @@ try {
   }
   const savedExecution = await evaluate(`(() => { const responses=window.VASIR_WRITING_RESPONSES.responses;const answer=responses.find(response=>response.runtime?.observedCollaborationEvents>0 && response.runtime.referenceFilesRead?.length) || responses.find(response=>response.runtime);return answer ? {caseId:answer.caseId,trialNumber:answer.trialNumber || 1,settingId:answer.settingId,condition:answer.condition,runtime:answer.runtime} : null; })()`);
   if (savedExecution) {
-    await evaluate(`(() => { const select=document.querySelector('[data-writing-case]');select.value=${JSON.stringify(savedExecution.caseId)};select.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+    await selectCase(savedExecution.caseId);
     await waitFor(() => evaluate(`document.querySelector('#report-page')?.dataset.activeWritingCase===${JSON.stringify(savedExecution.caseId)}`), 'Saved execution story');
     await selectTrial(savedExecution.trialNumber);
-    const selector = `[data-report-setting-id="${savedExecution.settingId}"] [data-condition="${savedExecution.condition}"] [data-writing-execution]`;
+    const selector = `[data-report-setting-id="${savedExecution.settingId}"] ${isCreation ? '[data-report-trial="' + savedExecution.trialNumber + '"] ' : ''}[data-condition="${savedExecution.condition}"] [data-writing-execution]`;
     await evaluate(`document.querySelector('[data-report-setting-id="${savedExecution.settingId}"] .model-run').open=true`);
     await click(`${selector} > summary`);
     check('Recorded execution opens with literal labels and no inferred agent count', await evaluate(`(() => { const element=document.querySelector(${JSON.stringify(selector)});return element.open && element.textContent.includes('do not establish the number of underlying agents'); })()`));
@@ -1508,13 +1686,13 @@ try {
 
   // Supplementary evidence only: keep the canonical 13 presentation captures stable.
   for (const failure of caseEvidence.flatMap(story => story.failures)) {
-    await evaluate(`(() => { const select=document.querySelector('[data-writing-case]');select.value=${JSON.stringify(failure.caseId)};select.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+    await selectCase(failure.caseId);
     await waitFor(() => evaluate(`document.querySelector('#report-page')?.dataset.activeWritingCase===${JSON.stringify(failure.caseId)}`), 'Failed answer story');
     await selectTrial(failure.trialNumber);
     const states = [{ condition:failure.condition, view:'failed-response' }];
     if (failure.pairedResponse?.hasOutput) states.push({ condition:failure.pairedResponse.condition, view:'retained-paired-response' });
     for (const state of states) {
-      const selector = `[data-report-setting-id="${failure.settingId}"] [data-condition="${state.condition}"]`;
+      const selector = `[data-report-setting-id="${failure.settingId}"] ${isCreation ? '[data-report-trial="' + failure.trialNumber + '"] ' : ''}[data-condition="${state.condition}"]`;
       await evaluate(`(() => {document.querySelector('[data-report-setting-id="${failure.settingId}"] .model-run').open=true;document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'start',behavior:'instant'});})()`);
       await noOverflow(`Writing ${failure.configurationId} ${failure.caseId} ${state.view}`);
       const name = `writing-failure-${failure.caseId}-trial-${failure.trialNumber}-${failure.settingId}-${state.condition}-${state.view}.png`.replace(/[^a-zA-Z0-9._-]/g, '-');

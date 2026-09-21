@@ -2,24 +2,32 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { preparePairedRun, exportPairedRun, runPairedGenerations, runPairedJudgments, applyPairedRuntimeValidationErratum } from '../../cli/eval/plot-twists-paired-runtime.js';
+import { preparePairedRun, preparePairedTechnicalRecovery, exportPairedRun, runPairedGenerations, runPairedJudgments, applyPairedRuntimeValidationErratum } from '../../cli/eval/plot-twists-paired-runtime.js';
 
 export async function main(args = process.argv.slice(2)) {
   const [command, ...rest] = args;
-  assert.ok(['prepare', 'status', 'export', 'generate', 'judge', 'apply-runtime-erratum'].includes(command),
-    'Usage: run.mjs <prepare|status|export|generate|judge|apply-runtime-erratum> --run-dir PATH [--parent-snapshot FILE] [--limit N] [--concurrency 1|2] [--output FILE]');
+  assert.ok(['prepare', 'prepare-technical-recovery', 'status', 'export', 'generate', 'judge', 'apply-runtime-erratum'].includes(command),
+    'Usage: run.mjs <prepare|prepare-technical-recovery|status|export|generate|judge|apply-runtime-erratum> --run-dir PATH [--parent-snapshot FILE] [--add-configurations ID,ID] [--source-snapshot FILE --authorization FILE] [--limit N] [--concurrency 1|2] [--output FILE]');
   const options = {};
   for (let index = 0; index < rest.length; index += 2) {
     const key = rest[index], value = rest[index + 1];
-    assert.ok(['--run-dir', '--parent-snapshot', '--limit', '--concurrency', '--output'].includes(key) && value && !value.startsWith('--'), 'Unknown option or missing value.');
+    assert.ok(['--run-dir', '--parent-snapshot', '--add-configurations', '--source-snapshot', '--authorization', '--limit', '--concurrency', '--output'].includes(key) && value && !value.startsWith('--'), 'Unknown option or missing value.');
     assert.ok(!Object.hasOwn(options, key), 'Duplicate option.'); options[key] = value;
   }
   assert.ok(options['--run-dir'], '--run-dir is required.');
   const runDirectoryPath = path.resolve(options['--run-dir']);
+  if (command === 'prepare-technical-recovery') {
+    assert.equal(Object.keys(options).length, 3); assert.ok(options['--source-snapshot'] && options['--authorization']);
+    return preparePairedTechnicalRecovery({ runDirectoryPath, sourceSnapshotPath: path.resolve(options['--source-snapshot']),
+      authorization: JSON.parse(fs.readFileSync(path.resolve(options['--authorization']), 'utf8')) });
+  }
+  assert.ok(!options['--source-snapshot'] && !options['--authorization'], 'Recovery authority is a preparation-only option.');
   assert.ok(command === 'prepare' || !options['--parent-snapshot'], 'Parent snapshot is a preparation-only option.');
+  assert.ok(command === 'prepare' || !options['--add-configurations'], 'Additional configurations are a preparation-only option.');
   if (command === 'apply-runtime-erratum') { assert.equal(Object.keys(options).length, 1); return applyPairedRuntimeValidationErratum({ runDirectoryPath }); }
-  if (command === 'prepare') { assert.equal(Object.keys(options).length, options['--parent-snapshot'] ? 2 : 1);
-    return preparePairedRun({ runDirectoryPath, parentSnapshotPath: options['--parent-snapshot'] ? path.resolve(options['--parent-snapshot']) : null }); }
+  if (command === 'prepare') { assert.equal(Object.keys(options).length, 1 + Number(Boolean(options['--parent-snapshot'])) + Number(Boolean(options['--add-configurations'])));
+    return preparePairedRun({ runDirectoryPath, parentSnapshotPath: options['--parent-snapshot'] ? path.resolve(options['--parent-snapshot']) : null,
+      addedConfigurations: options['--add-configurations'] ? options['--add-configurations'].split(',') : null }); }
   if (['status', 'export'].includes(command)) {
     assert.ok(!options['--limit'] && !options['--concurrency'], 'Read-only commands cannot dispatch.');
     const snapshot = exportPairedRun({ runDirectoryPath });
@@ -43,6 +51,7 @@ function summarize(snapshot) {
   return { runId: snapshot.runId, manifestSha256: snapshot.manifestSha256, globalStop: snapshot.globalStop,
     runtimeValidationErratumSha256: snapshot.runtimeValidationErratumSha256 || null,
     ...(snapshot.coverageExtension ? { coverageExtension: snapshot.coverageExtension } : {}),
+    ...(snapshot.manifest.technicalRecovery ? { technicalRecovery: snapshot.manifest.technicalRecovery } : {}),
     ...Object.fromEntries(['generations', 'judgments'].map(kind => [kind, snapshot[kind].reduce((counts, row) => {
       counts[row.status] = (counts[row.status] || 0) + 1; return counts;
     }, {})])) };

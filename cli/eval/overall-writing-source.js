@@ -74,7 +74,7 @@ export function buildOverallWritingSource(collection, engineering, applicationSo
     }
     const originalSummary = publication.benchmarkSummaries.find(item => item.benchmarkId === benchmarkId) || {};
     benchmarkSummaries.push({ ...clone(originalSummary), ...(source.provisional ? clone(selected.summary) : {}), benchmarkId });
-    const caseCount = publication.cases.length;
+    const caseCount = source.provisional ? selected.expectedCaseCount : publication.cases.length;
     const trials = publication.trialCount || publication.scoreBasis.trialsPerTask || 1;
     const caseLabel = publication.caseLabel || 'story';
     const casesLabel = caseCount === 1 ? caseLabel : caseLabel === 'story' ? 'stories' : `${caseLabel}s`;

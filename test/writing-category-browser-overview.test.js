@@ -14,6 +14,62 @@ assert.ok(weightStart >= 0 && weightEnd > weightStart);
 const weightToken = vm.runInNewContext(runtime.slice(weightStart, weightEnd) + '\nexpectedWritingWeightToken');
 const expectedTopModel = vm.runInNewContext(runtime.slice(weightStart, weightEnd) + '\nexpectedWritingBenchmarkTopModel');
 
+function caseControlFixture({ caseIds = ['prompt'], trialCount = 1, aggregateTrials = false } = {}) {
+  const expected = { caseIds, trialCount, aggregateTrials };
+  const nodes = { '#report-page': { dataset: { activeWritingCase: caseIds[0], activeWritingTrial: aggregateTrials ? 'all' : '1' } } };
+  if (caseIds.length > 1) nodes['[data-writing-case]'] = { value: caseIds[0], options: caseIds.map(value => ({ value })) };
+  if (trialCount > 1 && !aggregateTrials) nodes['[data-writing-trial]'] = { value: '1', options: Array.from({ length: trialCount }, (_, index) => ({ value: String(index + 1) })) };
+  if (nodes['[data-writing-case]'] || nodes['[data-writing-trial]']) nodes['.writing-case-picker'] = {};
+  const start = runtime.indexOf('function inspectWritingCaseControlsInDocument(expected)');
+  const end = runtime.indexOf('\nfunction writingOverallPresentation', start);
+  const inspect = () => JSON.parse(JSON.stringify(vm.runInNewContext(runtime.slice(start, end) + '\ninspectWritingCaseControlsInDocument(expected)', {
+    expected, document: { querySelector: selector => nodes[selector] || null }
+  })));
+  return { nodes, inspect };
+}
+
+test('single-prompt browser proof requires active case identity and rejects redundant selectors or rows', () => {
+  const f = caseControlFixture();
+  assert.deepEqual(f.inspect(), { activeCaseId: 'prompt', caseOptions: [], trialOptions: [], mismatches: [] });
+  f.nodes['.writing-case-picker'] = {};
+  assert.ok(f.inspect().mismatches.includes('redundant-or-missing-picker-row'));
+  delete f.nodes['.writing-case-picker'];
+  f.nodes['[data-writing-case]'] = { value: 'prompt', options: [{ value: 'prompt' }] };
+  assert.ok(f.inspect().mismatches.includes('case-selector-inventory'));
+  delete f.nodes['[data-writing-case]'];
+  f.nodes['#report-page'].dataset.activeWritingCase = 'other';
+  assert.ok(f.inspect().mismatches.includes('active-case-identity'));
+});
+
+test('multi-case browser proof preserves exact selectable inventory and selected case identity', () => {
+  const f = caseControlFixture({ caseIds: ['one', 'two'] });
+  assert.deepEqual(f.inspect().mismatches, []);
+  f.nodes['#report-page'].dataset.activeWritingCase = 'two';
+  assert.ok(f.inspect().mismatches.includes('case-selector-inventory'));
+  f.nodes['[data-writing-case]'].value = 'two';
+  assert.deepEqual(f.inspect().mismatches, []);
+  f.nodes['[data-writing-case]'].options.pop();
+  assert.ok(f.inspect().mismatches.includes('case-selector-inventory'));
+  delete f.nodes['[data-writing-case]'];
+  assert.ok(f.inspect().mismatches.includes('case-selector-inventory'));
+});
+
+test('single-prompt browser proof independently retains real trial controls but not Magic aggregate selectors', () => {
+  const f = caseControlFixture({ trialCount: 3 });
+  assert.deepEqual(f.inspect().mismatches, []);
+  assert.deepEqual(f.inspect().trialOptions, [1, 2, 3]);
+  f.nodes['[data-writing-trial]'].value = '2';
+  assert.ok(f.inspect().mismatches.includes('trial-selector-inventory'));
+  f.nodes['#report-page'].dataset.activeWritingTrial = '2';
+  assert.deepEqual(f.inspect().mismatches, []);
+  delete f.nodes['[data-writing-trial]'];
+  assert.ok(f.inspect().mismatches.includes('trial-selector-inventory'));
+  const magic = caseControlFixture({ trialCount: 3, aggregateTrials: true });
+  assert.deepEqual(magic.inspect().mismatches, []);
+  magic.nodes['[data-writing-trial]'] = { value: '1', options: [] };
+  assert.ok(magic.inspect().mismatches.includes('trial-selector-inventory'));
+});
+
 function topModelFixture() {
   const entries = [], settings = [];
   const pair = (configurationId, baseline, skill, eligibleForRank = true) => {
@@ -279,8 +335,10 @@ function reportFixture() {
   const captures = [], ranking = { querySelector: () => ({ textContent: 'Model comparison' }) }, hero = { nextElementSibling: ranking };
   const details = { tagName: 'DETAILS', open: false, contains: () => true, querySelector: () => ({ textContent: 'Judge & trial details', click: () => { details.open = !details.open; } }) };
   const table = { getBoundingClientRect: () => ({ width: 600, height: 200 }), checkVisibility: () => details.open };
+  const elements = { '.evidence-hero#overview': hero, 'section#ranking': ranking, '[data-report-judge-trial-details]': details };
   const context = vm.createContext({
-    document: { querySelector: selector => selector === '.evidence-hero#overview' ? hero : selector === 'section#ranking' ? ranking : details, querySelectorAll: () => [table] },
+    window: {},
+    document: { querySelector: selector => elements[selector] ?? null, querySelectorAll: () => [table] },
     scrollTo() {}, check: (label, condition) => assert.ok(condition, label), capture: async name => { captures.push({ name, open: details.open }); },
     waitFor: async (predicate, label, timeout) => { assert.equal(timeout, 5000); for (let attempt = 0; attempt < 3; attempt++) { const result = await predicate(); if (result) return result; } throw Error('Timed out: ' + label); },
     evaluateFunction: async (fn, argument) => fn(argument), ensureWritingReportAuditDetailsOpen: async () => { details.open = true; return true; }

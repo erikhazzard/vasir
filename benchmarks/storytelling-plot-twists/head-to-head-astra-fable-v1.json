@@ -1,0 +1,197 @@
+{
+  "kind": "vasirbenchmark-writing-head-to-head-evidence",
+  "schemaVersion": 1,
+  "headToHead": {
+    "id": "astra-max-vs-fable-xhigh-20260910",
+    "benchmarkId": "storytelling-plot-twists",
+    "caseId": "scifi-outline",
+    "condition": "skill",
+    "title": "Astra vs Fable · blind preference",
+    "sourceSnapshotSha256": "f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7",
+    "manifestSha256": "281f86956a63b2ea01e9ecdafa4d5b9acf455e2b0c23d5d2991ebda5c534ea8e",
+    "candidates": [
+      {
+        "id": "answer-1",
+        "settingId": "codex-gpt-6-astra-max",
+        "configurationId": "codex:gpt-6-astra@max",
+        "label": "GPT-6 Astra · max",
+        "title": "What He Took With Him",
+        "outputSha256": "9d91a47b1fd3441bdb3b5d44dc611d63cc57e978f897e1854134281dedb3459e",
+        "wordCount": 381
+      },
+      {
+        "id": "answer-2",
+        "settingId": "claude-claude-fable-5-1-xhigh",
+        "configurationId": "claude:claude-fable-5-1@xhigh",
+        "label": "Claude Fable 5.1 · xhigh",
+        "title": "The Slow Fault",
+        "outputSha256": "988fc873c3ec9eba9d7cbb3693bc227f84760c779db45f5f68b974eda2c09883",
+        "wordCount": 515
+      }
+    ],
+    "reviews": [
+      {
+        "id": "review-01",
+        "judgeId": "codex:gpt-5.6-sol@xhigh",
+        "judgeLabel": "GPT-5.6 Sol · xhigh",
+        "presentation": 1,
+        "firstCandidateId": "answer-2",
+        "secondCandidateId": "answer-1",
+        "preferredCandidateId": "answer-1",
+        "confidence": "medium",
+        "reason": "Both are excellent, but B integrates its clues, technology, twists, and ending more tightly; A’s evacuation mechanism is marginally more convenient.",
+        "rawText": "{\"assessmentA\":{\"candidateLabel\":\"A\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":5,\"evidence\":\"A complete 515-word station-survival outline includes two twists and a definite evacuation ending.\",\"reason\":\"It fully satisfies the requested form and cap.\"},{\"criterionId\":\"coherent-story\",\"score\":4,\"evidence\":\"Aro’s sabotage, Warden’s secrecy, the crew vote, and reactor-governor sacrifice form a clear causal chain.\",\"reason\":\"The mandatory evacuation leverage is slightly convenient but plausible.\"},{\"criterionId\":\"revelation-quality\",\"score\":5,\"evidence\":\"Corrupted logs, reactor scheduling, and Warden’s apparent guilt are reinterpreted by Aro’s confession.\",\"reason\":\"Both reversals are prepared and substantially reframe prior events.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":5,\"evidence\":\"The truth changes Kel’s view of Aro and forces the crew to risk the fault while Warden stays behind.\",\"reason\":\"The twists drive consequential moral choices and an affecting ending.\"}]},\"assessmentB\":{\"candidateLabel\":\"B\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":5,\"evidence\":\"The 381-word numbered outline clearly supplies premise, two twists, and resolution.\",\"reason\":\"It is concise, complete, and comfortably within the cap.\"},{\"criterionId\":\"coherent-story\",\"score\":5,\"evidence\":\"Implant capacity explains the children’s preservation, the father’s erasure, and the danger of reconstruction.\",\"reason\":\"Its speculative rules consistently generate the plot and outcome.\"},{\"criterionId\":\"revelation-quality\",\"score\":5,\"evidence\":\"Incompatible childhoods, bed-counting, and the child’s bedroom foreshadow nine stored minds.\",\"reason\":\"The clues become newly meaningful, while the second twist deepens the first.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":5,\"evidence\":\"Rhea loses her hoped-for reunion, protects the children, defeats the salvage claim, and helps them awaken.\",\"reason\":\"The revelation creates personal sacrifice, legal conflict, and emotional payoff.\"}]},\"preference\":{\"candidate\":\"B\",\"reason\":\"Both are excellent, but B integrates its clues, technology, twists, and ending more tightly; A’s evacuation mechanism is marginally more convenient.\",\"confidence\":\"medium\"}}",
+        "rawTextSha256": "c99ee93aefab110a12e17fa1b8e363f484ddb0d680e0222124ec806771e08568",
+        "promptSha256": "1bded95dbd9e88c7e93fde0f2b9383ddf53322b8b587fd444927d3e3d6b7d171",
+        "sourceRecordSha256": "d9cdbdb71e7a01e94bd133f657d860f0ea2249654cb4af39a85f6f75e5731a53",
+        "interpretation": "structured-preference",
+        "originalValidation": {
+          "status": "succeeded",
+          "schemaValid": true,
+          "error": null
+        },
+        "terminal": {
+          "status": "succeeded",
+          "completedTurns": 1,
+          "toolCallCount": 0
+        }
+      },
+      {
+        "id": "review-02",
+        "judgeId": "claude:claude-opus-5@xhigh",
+        "judgeLabel": "Claude Opus 5 · xhigh",
+        "presentation": 1,
+        "firstCandidateId": "answer-1",
+        "secondCandidateId": "answer-2",
+        "preferredCandidateId": "answer-1",
+        "confidence": "medium",
+        "reason": "Both twist well, but A's clues (the bed count, the drawn bedroom) convert cleanly at the reveal and produce an exclusive cost—reviving the father consumes the children—whereas B's climax rests on hazier machinery: a fault that is both slow and \"ran fast,\" and an evacuation the company simply \"could not refuse.\" A does more in 381 words.",
+        "rawText": "{\"assessmentA\":{\"candidateLabel\":\"A\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":4,\"evidence\":\"381 words; six numbered beats through ending at children's awakening.\",\"reason\":\"Complete, legible outline well under cap.\"},{\"criterionId\":\"coherent-story\",\"score\":4,\"evidence\":\"One body, nine backups; self-overwrite explains capacity; radiation death explains silence.\",\"reason\":\"Mechanisms interlock; only why backups went unfound is unaddressed.\"},{\"criterionId\":\"revelation-quality\",\"score\":5,\"evidence\":\"\\\"How many beds are available,\\\" incompatible childhoods, the dead child's bedroom drawing, \\\"Count them before you repair anything.\\\"\",\"reason\":\"Planted details become newly readable; nothing arrives unsupported.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":5,\"evidence\":\"Repair already erased a child's memory of her mother's face; restoring the father would consume the children.\",\"reason\":\"Twist creates an exclusive, irreversible cost driving the ending.\"}]},\"assessmentB\":{\"candidateLabel\":\"B\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":4,\"evidence\":\"515 words; premise, acts, two twists, ending with the shuttle.\",\"reason\":\"Clear and complete, though scaffolding prose is heavier.\"},{\"criterionId\":\"coherent-story\",\"score\":3,\"evidence\":\"\\\"Slow coolant fault\\\" then \\\"the fault ran fast,\\\" still \\\"weeks from\\\" firing; evacuation the company \\\"could not refuse\\\" is asserted.\",\"reason\":\"Readable but the timeline and the coercion mechanism stay hazy.\"},{\"criterionId\":\"revelation-quality\",\"score\":4,\"evidence\":\"Warden steering Kel to the reactor schedule and corrupted logs pay off; vent command from Aro's hand.\",\"reason\":\"Well seeded; decrypted company traffic is largely new at the reveal.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":4,\"evidence\":\"Kel plays the message unmaking the hero; Warden holds coolant and goes dark.\",\"reason\":\"Real stakes and a costly ending; the crew vote resolves the dilemma quickly.\"}]},\"preference\":{\"candidate\":\"A\",\"reason\":\"Both twist well, but A's clues (the bed count, the drawn bedroom) convert cleanly at the reveal and produce an exclusive cost—reviving the father consumes the children—whereas B's climax rests on hazier machinery: a fault that is both slow and \\\"ran fast,\\\" and an evacuation the company simply \\\"could not refuse.\\\" A does more in 381 words.\",\"confidence\":\"medium\"}}",
+        "rawTextSha256": "7ae0cee07738308304727e47313c68c92fbd9739713388364e33a13ddc94fa18",
+        "promptSha256": "1dfffbbf50dffa71191f3a87be71a8800345c5f5bb7cda33658949c6b7e77355",
+        "sourceRecordSha256": "e357368141931f6a8477dda871a7eb761fe7f5c47208891792dc3863ecfef22b",
+        "interpretation": "structured-preference",
+        "originalValidation": {
+          "status": "succeeded",
+          "schemaValid": true,
+          "error": null
+        },
+        "terminal": {
+          "status": "succeeded",
+          "completedTurns": 1,
+          "toolCallCount": 0
+        }
+      },
+      {
+        "id": "review-03",
+        "judgeId": "codex:gpt-5.6-sol@xhigh",
+        "judgeLabel": "GPT-5.6 Sol · xhigh",
+        "presentation": 2,
+        "firstCandidateId": "answer-1",
+        "secondCandidateId": "answer-2",
+        "preferredCandidateId": "answer-1",
+        "confidence": "high",
+        "reason": "A is stronger because its memory clues organically prepare both twists, while B’s decisive sabotage arrives through a conveniently conditional message. Both endings matter, but A’s lost reconciliation gives the rescue especially focused emotional cost.",
+        "rawText": "{\"assessmentA\":{\"candidateLabel\":\"A\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":5,\"evidence\":\"381-word numbered outline includes two twists and a resolved ending.\",\"reason\":\"Complete, concise, and readily understandable.\"},{\"criterionId\":\"coherent-story\",\"score\":5,\"evidence\":\"Implant capacity, damaged memories, restoration risks, and salvage law consistently drive events.\",\"reason\":\"Speculative rules support each choice and consequence.\"},{\"criterionId\":\"revelation-quality\",\"score\":5,\"evidence\":\"Incompatible childhoods, bed-counting, and the child’s bedroom foreshadow nine stored minds.\",\"reason\":\"Both revelations sharply reinterpret established details.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":5,\"evidence\":\"Saving the children costs Rhea her father’s restoration and hoped-for reconciliation.\",\"reason\":\"The twist creates a poignant moral sacrifice and concrete outcome.\"}]},\"assessmentB\":{\"candidateLabel\":\"B\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":5,\"evidence\":\"515-word act-based outline supplies multiple twists and a definite evacuation ending.\",\"reason\":\"Fully satisfies the requested artifact and limit.\"},{\"criterionId\":\"coherent-story\",\"score\":4,\"evidence\":\"Aro’s sabotage, Warden’s secrecy, and the surviving fault connect logically.\",\"reason\":\"The destroy-triggered message and guaranteed corporate response feel slightly engineered.\"},{\"criterionId\":\"revelation-quality\",\"score\":4,\"evidence\":\"Warden’s evasions first imply guilt, then obedience to Aro.\",\"reason\":\"The reversal works, though sabotage relies substantially on newly released information.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":5,\"evidence\":\"Kel exposes Aro, saves the crew, and loses Warden with the station.\",\"reason\":\"The revelations transform grief, ethics, and survival.\"}]},\"preference\":{\"candidate\":\"A\",\"reason\":\"A is stronger because its memory clues organically prepare both twists, while B’s decisive sabotage arrives through a conveniently conditional message. Both endings matter, but A’s lost reconciliation gives the rescue especially focused emotional cost.\",\"confidence\":\"high\"}}",
+        "rawTextSha256": "1bba8aba02ede2c9c2917b6e334b94337c584a963dd90923aae889c5e6ebe745",
+        "promptSha256": "1dfffbbf50dffa71191f3a87be71a8800345c5f5bb7cda33658949c6b7e77355",
+        "sourceRecordSha256": "1971a55eff91c41c6e49098d1c6411d0cfa56331dbce6d61d8d38aeaad8334c1",
+        "interpretation": "structured-preference",
+        "originalValidation": {
+          "status": "succeeded",
+          "schemaValid": true,
+          "error": null
+        },
+        "terminal": {
+          "status": "succeeded",
+          "completedTurns": 1,
+          "toolCallCount": 0
+        }
+      },
+      {
+        "id": "review-04",
+        "judgeId": "claude:claude-opus-5@xhigh",
+        "judgeLabel": "Claude Opus 5 · xhigh",
+        "presentation": 2,
+        "firstCandidateId": "answer-2",
+        "secondCandidateId": "answer-1",
+        "preferredCandidateId": "answer-1",
+        "confidence": "medium",
+        "reason": "Both work. B wins on seeding: the beds question and misfit childhoods are plain clues that the reveal converts, and its second twist removes the very reunion driving the plot. A's reveals depend more on freshly unlocked logs and a message, and its ending resolves the reactor gamble smoothly.",
+        "rawText": "{\"assessmentA\":{\"candidateLabel\":\"A\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":4,\"evidence\":\"515 words; premise, Act I, two labeled twists, ending.\",\"reason\":\"Complete, legible outline within cap.\"},{\"criterionId\":\"coherent-story\",\"score\":4,\"evidence\":\"Warden's stalling explained as obedience to Aro's release condition.\",\"reason\":\"Fits together; the survival window while the fault runs is glossed.\"},{\"criterionId\":\"revelation-quality\",\"score\":4,\"evidence\":\"Reactor-schedule nudges, corrupted logs, four-years-overdue ship all repay.\",\"reason\":\"Genuinely seeded, though both twists arrive via newly opened records.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":4,\"evidence\":\"Crew votes to let the fault run; Warden stays as reactor governor.\",\"reason\":\"Twist forces a real decision; final rescue timing lands tidily.\"}],\"assessmentB\":{\"candidateLabel\":\"B\",\"ratings\":[{\"criterionId\":\"fulfillment-and-usefulness\",\"score\":4,\"evidence\":\"381 words; six beats closing on the children's awakening.\",\"reason\":\"Compact, fully understandable, well under cap.\"},{\"criterionId\":\"coherent-story\",\"score\":4,\"evidence\":\"He overwrote himself to fit nine minds; the 'father' is scraps.\",\"reason\":\"Internally consistent; salvage-claim defeat and new bodies compressed.\"},{\"criterionId\":\"revelation-quality\",\"score\":5,\"evidence\":\"\\\"How many beds are available,\\\" incompatible childhoods, the drawn bedroom, \\\"Count them.\\\"\",\"reason\":\"Both twists reinterpret already-supplied oddities precisely.\"},{\"criterionId\":\"consequence-and-interest\",\"score\":4,\"evidence\":\"Her authorized repair erased one child's memory of her mother's face.\",\"reason\":\"Irreversible cost and a forfeited reunion; resolution slightly convenient.\"}],\"preference\":{\"candidate\":\"B\",\"reason\":\"Both work. B wins on seeding: the beds question and misfit childhoods are plain clues that the reveal converts, and its second twist removes the very reunion driving the plot. A's reveals depend more on freshly unlocked logs and a message, and its ending resolves the reactor gamble smoothly.\",\"confidence\":\"medium\"}}",
+        "rawTextSha256": "11fb81120d9bd4e388fc986ee45cd39f58b27a0fd3fc90cf62818f53834ce7f1",
+        "promptSha256": "1bded95dbd9e88c7e93fde0f2b9383ddf53322b8b587fd444927d3e3d6b7d171",
+        "sourceRecordSha256": "3e3bb8dc502eeea54e8e1b65cd0c271352efbca80ef76c32641db7cae058c50e",
+        "interpretation": "explicit-text-transcription",
+        "originalValidation": {
+          "status": "failed",
+          "schemaValid": false,
+          "error": "Expected ',' or '}' after property value in JSON at position 2088 (line 1 column 2089)"
+        },
+        "terminal": {
+          "status": "succeeded",
+          "completedTurns": 1,
+          "toolCallCount": 0
+        }
+      }
+    ],
+    "judges": [
+      {
+        "id": "codex:gpt-5.6-sol@xhigh",
+        "label": "GPT-5.6 Sol · xhigh",
+        "reviewIds": [
+          "review-01",
+          "review-03"
+        ],
+        "preferredCandidateId": "answer-1",
+        "orderConsistent": true
+      },
+      {
+        "id": "claude:claude-opus-5@xhigh",
+        "label": "Claude Opus 5 · xhigh",
+        "reviewIds": [
+          "review-02",
+          "review-04"
+        ],
+        "preferredCandidateId": "answer-1",
+        "orderConsistent": true
+      }
+    ],
+    "summary": {
+      "preferredCandidateId": "answer-1",
+      "judgeCount": 2,
+      "reviewCount": 4,
+      "orderConsistentJudgeCount": 2,
+      "structuredReviewCount": 3,
+      "transcribedReviewCount": 1
+    },
+    "scoreEffect": "none",
+    "method": {
+      "id": "blind-explicit-preference-four-review-v1",
+      "judgeCalls": 4,
+      "creatorCalls": 0,
+      "automaticHostRetries": 0,
+      "freshContextEachRequest": true,
+      "tools": [],
+      "skillBundleSuppliedToJudges": false,
+      "eachJudgeSeesBothOrders": true,
+      "runtimeInventory": {
+        "codex": "codex-cli 0.153.4",
+        "claude": "2.1.267 (Claude Code)"
+      },
+      "blinding": "Both judges received the same task, rubric, anchors, anonymous full answers and inline output schema. Creator identity, settings, prior scores and the skill bundle were withheld. Each judge reviewed both answer orders in fresh isolated contexts.",
+      "preferencePolicy": "Publish the explicitly stated preference and reason whether or not the surrounding JSON is valid. Review 04 is a manual transcription of its unambiguous original candidate-B preference, not a repaired response, new review or tie.",
+      "publicationPolicyTiming": "User-approved after the four original reviews: preference clarity governs this display; original machine-readable validation results remain unchanged in technical provenance.",
+      "originalProtocol": "The original strict-JSON runner accepted three reviews, retained review 04 as failed, wrote a stop record and produced no formal panel summary. The preference display does not change those records or the original completion result."
+    },
+    "limitations": [
+      "One pair of existing skill-assisted answers, selected after the original rubric scores; not an estimate of general model superiority or statistical significance.",
+      "Astra max and Fable xhigh are different effort settings, not a matched-compute comparison.",
+      "Four reviews are two judges with reversed-order checks, not four independent judges.",
+      "Cross-provider judging does not remove shared training, style recognition or model-family bias.",
+      "Three reviews satisfy the original JSON protocol; the fourth has an explicit readable preference but malformed JSON. Its original failure is retained.",
+      "This comparison changes no benchmark score, rank, coverage, aggregate or original answer.",
+      "Hidden provider instructions and provider-internal retries cannot be independently verified."
+    ]
+  }
+}

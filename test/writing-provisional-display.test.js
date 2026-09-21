@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
 import { acceptedWritingRankingFixture } from './fixtures/writing-ranking-accepted-20260908.js';
+import { buildSelectedWritingPublication } from '../cli/eval/writing-publication.js';
+import { fileURLToPath } from 'node:url';
 
 const app = fs.readFileSync(new URL('../site/vasirbenchmark.com/app.js', import.meta.url), 'utf8');
 // Preserve the originally accepted partial/provisional examples as later
@@ -63,6 +65,29 @@ test('Core field means appear in the benchmark ledger with their exact provision
   assert.equal(JSON.stringify(source), before, 'Presentation must not rewrite the official null totals or source evidence.');
 });
 
+test('the selected common-eleven Core card, field mean and method share one fixed single-judge scope', t => {
+  const repoRootDirectory = fileURLToPath(new URL('../', import.meta.url));
+  const selection = JSON.parse(fs.readFileSync(new URL('../benchmarks/storytelling-core-idea/publication.json', import.meta.url)));
+  if (!fs.existsSync(repoRootDirectory + selection.run.path)) return t.skip('Private original Core evidence is not installed.');
+  const { projection } = buildSelectedWritingPublication({ repoRootDirectory, benchmarkId: 'storytelling-core-idea' });
+  assert.equal(projection.provisionalLeaderboard.id, 'core-idea-astra-common-11-v1');
+  projection.writingScoreBasis = { id: 'pinned-core-test', benchmarkIds: ['storytelling-core-idea'], coreIdeaScoring: 'published-single-judge-provisional' };
+  const originalDescription = projection.benchmarks[0].description;
+  const { display, ledger, method } = render(projection);
+  assert.equal(display.caseCount, 11); assert.equal(projection.cases.length, 12);
+  assert.equal(display.settingCount, 33); assert.equal(display.judgeCount, 1);
+  assert.match(ledger, /data-writing-case-count="11"/);
+  assert.match(ledger, /33 settings · 11 stories/);
+  assert.match(ledger, /data-benchmark-top-model/);
+  assert.match(ledger, /The aggregate uses the same 11 stories for every setting; the original 12-story archive is retained\./);
+  assert.doesNotMatch(ledger, /across twelve specified/);
+  assert.equal(projection.benchmarks[0].description, originalDescription, 'Display copy cannot rewrite the original benchmark description.');
+  assert.match(method, /data-writing-derived-scope="core-idea-astra-common-11-v1"/);
+  assert.match(method, /The Matrix/); assert.match(method, /post-run user-approved/);
+  assert.match(method, /12 original stories/);
+  assert.equal(display.summary.baseline, projection.provisionalLeaderboard.summary.baseline);
+});
+
 test('Core keeps its uniform source and incomplete records without an inline duplicate leaderboard', () => {
   const { data, display } = render();
   assert.equal(display.availableProvisional.rankedSettingCount, 31);
@@ -85,6 +110,18 @@ test('source selection prefers official means, including a real zero, as soon as
   assert.equal(attribute(ledger, 'data-treatment-score'), '0.0');
   assert.ok(display.availableProvisional, 'The declared provisional evidence is retained even when official means become available.');
   assert.doesNotMatch(ledger, /Provisional single-judge/);
+});
+
+test('an explicitly pinned Core single-judge basis controls field means even after incidental official pairs arrive', () => {
+  const publication = clone(source);
+  publication.writingScoreBasis = { id: 'pinned-core-test', benchmarkIds: [publication.benchmarks[0].id], coreIdeaScoring: 'published-single-judge-provisional' };
+  Object.assign(publication.benchmarkSummaries[0], { baseline: 0, treatment: 100, delta: 100 });
+  const { display, ledger } = render(publication);
+  assert.equal(display.sourceKind, 'provisional-single-judge');
+  assert.equal(display.settingCount, publication.provisionalLeaderboard.rankedSettingCount);
+  assert.equal(attribute(ledger, 'data-baseline-score'), publication.provisionalLeaderboard.summary.baseline.toFixed(1));
+  assert.equal(attribute(ledger, 'data-treatment-score'), publication.provisionalLeaderboard.summary.treatment.toFixed(1));
+  assert.equal(attribute(ledger, 'data-writing-judge-count'), '1');
 });
 
 test('selected model components retain exact source scores and escaped source-qualified answer links', () => {

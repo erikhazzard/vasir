@@ -36,7 +36,9 @@ test('Pinned capture and acceptance controllers preserve the original alias poli
 
 test('Available-category oracle uses complete paired leaf scores, nested weights and original alias links without inventing partial means', () => {
   const expected = aliased(fixture());
-  const readings = deriveExpectedOverallAvailableCategories(expected, 'claude:opus@high');
+  const missingWriting = clone(expected);
+  for (const cell of missingWriting.sourceCells.filter(cell => cell.configurationId === 'claude:opus@high' && cell.category === 'writing')) cell.value = null;
+  const readings = deriveExpectedOverallAvailableCategories(missingWriting, 'claude:opus@high');
   assert.deepEqual(readings.map(reading => reading.weight), [.5, .25, .25]);
   assert.equal(readings[0].complete, true); assert.equal(readings[2].complete, true);
   assert.equal(readings[1].complete, false); assert.deepEqual(readings[1].scores, { baseline: null, skill: null });
@@ -63,9 +65,22 @@ test('The independent Opus allowlist is backed by the runtime registry, never di
 test('Legacy Overall v3 keeps distinct identities while the declared alias policy merges exactly five original Opus configurations', () => {
   const sources = fixture(), legacy = deriveExpectedOverallV3(sources), current = aliased(sources);
   assert.equal(legacy.coverage.totalSettings, 44); assert.equal(legacy.identityAliases.length, 0);
-  assert.equal(current.coverage.totalSettings, 39); assert.equal(current.coverage.eligibleSettings, 19); assert.equal(current.coverage.incompleteSettings, 20);
-  assert.equal(current.coverage.observedResponseCount, 532); assert.equal(current.coverage.expectedResponseCount, 624);
-  assert.deepEqual(current.entries, legacy.entries, 'Alias correction must not change the current complete-cohort scores or ranks');
+  assert.equal(current.coverage.totalSettings, 39);
+  const completeIdentities = current.coverage.records.filter(record => ['baseline', 'skill'].every(condition =>
+    current.benchmarkIds.every(benchmarkId => current.sourceCells.some(cell => cell.configurationId === record.configurationId
+      && cell.condition === condition && cell.benchmarkId === benchmarkId && Number.isFinite(cell.value)))));
+  assert.equal(current.coverage.eligibleSettings, completeIdentities.length);
+  assert.equal(current.coverage.incompleteSettings, 39 - completeIdentities.length);
+  assert.equal(current.coverage.observedResponseCount, current.sourceCells.length);
+  assert.equal(current.coverage.expectedResponseCount, 39 * current.benchmarkIds.length * 2);
+  for (const entry of legacy.entries) {
+    const retained = current.entries.find(candidate => candidate.configurationId === entry.configurationId && candidate.condition === entry.condition);
+    assert.ok(retained, 'Alias correction must retain every previously complete identity');
+    assert.equal(retained.exactScore, entry.exactScore, 'Alias correction cannot change retained scores');
+    assert.deepEqual(retained.categories, entry.categories);
+    // Newly complete aliases may change ranks, but never the underlying scores.
+    assert.equal(retained.rank, 1 + current.entries.filter(candidate => candidate.condition === retained.condition && candidate.exactScore > retained.exactScore).length);
+  }
   assert.equal(current.identityAliases.length, 5);
   for (const alias of current.identityAliases) {
     const effort = alias.sourceConfigurationId.split('@')[1];
@@ -73,7 +88,8 @@ test('Legacy Overall v3 keeps distinct identities while the declared alias polic
     assert.equal(alias.targetCanonicalModel, 'claude-opus-5');
     assert.equal(alias.policy, OVERALL_OPUS_ALIAS_POLICY);
     const cells = current.sourceCells.filter(cell => cell.configurationId === alias.configurationId && cell.category === 'writing');
-    assert.equal(cells.length, 8);
+    assert.equal(cells.length, publications(sources.writing).filter(publication => Object.hasOwn(current.writingBenchmarkWeights, publication.benchmarks[0].id)
+      && publication.settings.some(setting => setting.configurationId === alias.sourceConfigurationId)).length * 2);
     for (const cell of cells) assert.equal(cell.sourceConfigurationId, alias.sourceConfigurationId);
   }
   assert.ok(current.coverage.records.some(record => record.configurationId === 'claude:fable@max'));

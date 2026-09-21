@@ -120,7 +120,8 @@ test('partial Writing means mark both score labels and retain finite marker geom
   assert.match(partial, /Asterisk: available-score mean; some tests are missing/);
   assert.doesNotMatch(dumbbellRow(false, false, true), /71\.2\*/);
   assert.doesNotMatch(declaration('writingLeaderboardControlsMarkup'), /Unranked settings|complete paired settings|2\/3|writing-leaderboard-coverage/);
-  assert.match(declaration('renderCapabilities'), /\* Unranked mean of available scores, not a comparable aggregate\. Missing tests are not zero\. Only models with every selected test receive a rank\./);
+  assert.match(declaration('renderCapabilities'), /\* Incomplete results are shown separately, without a rank\./);
+  assert.match(declaration('writingIncompleteResultsMarkup'), /partial means are not comparable to the ranked aggregate/);
 });
 
 test('measured zero remains a numeric total and bar; rejected placeholder and provisional overview layouts are absent', () => {
@@ -176,4 +177,22 @@ test('partial means cannot determine leaderboard ranks, headline uplift or the e
   assert.match(partial, /data-full-rank="null"/);
   assert.match(partial, /data-baseline-rank="null"/);
   assert.doesNotMatch(partial, /<small>#\d/);
+});
+
+test('Writing partial coverage is closed by default but keeps selected partials and inspection rows accessible', () => {
+  const entries = [{ id: 'partial-skill', settingId: 'partial', condition: 'skill', partial: true, family: 'Writer', reasoning: 'high' }];
+  const context = vm.createContext({ data: { entries }, TREATMENT_CONDITION_ID: 'skill', selectedEntry: () => ({ settingId: 'complete' }),
+    capabilityRankRowMarkup: entry => `<li data-setting-id="${entry.settingId}"><button>Inspect exact scores and missing tests</button></li>` });
+  vm.runInContext(declaration('writingIncompleteResultsMarkup'), context);
+  const render = () => vm.runInContext("writingIncompleteResultsMarkup({id:'writing'})", context);
+  const closed = render();
+  assert.match(closed, /<details class="overall-coverage writing-incomplete-results"/);
+  assert.match(closed, /<summary[^>]*>Model coverage <span>1 settings have partial coverage/);
+  assert.doesNotMatch(closed.split('>')[0], /\sopen(?:\s|$)/);
+  assert.match(closed, /data-setting-id="partial"/);
+  assert.match(closed, /Inspect exact scores and missing tests/);
+  context.selectedEntry = () => ({ settingId: 'partial' });
+  assert.match(render().split('>')[0], /\sopen$/);
+  context.data.entries = [];
+  assert.equal(render(), '');
 });

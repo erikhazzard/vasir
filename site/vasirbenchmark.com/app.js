@@ -948,6 +948,7 @@ function buildOverallAvailableCategories(data, setting) {
 
   const writingMethodMarkup = () => {
     const comparison = data.writingCategory;
+    const coreScope = comparison.publications.find(publication => publication.benchmarks.some(benchmark => benchmark.id === 'storytelling-core-idea'))?.provisionalLeaderboard;
     const otherTests = categoryBenchmarks('writing').filter(benchmark => !comparison.activeBenchmarkIds.includes(benchmark.id));
     const hasContextBalancedReviews = comparison.activeBenchmarkIds.some(id => comparison.publications.find(publication => publication.benchmarks.some(benchmark => benchmark.id === id))?.scoreBasis?.reviewers?.length === 4);
     return `
@@ -956,6 +957,7 @@ function buildOverallAvailableCategories(data, setting) {
         <p>${escapeHtml(comparison.selection.title)} uses ${comparison.selection.type === 'category' && !comparison.writingScoreBasis ? 'an equal-weight average of tracks; each track averages its own benchmarks equally' : comparison.activeBenchmarkIds.length === 1 ? 'one benchmark' : 'an equal-weight average of all selected benchmark scores'}. Every ranked model uses the same tests and weights in both conditions. Incomplete means remain visible but unranked. Each benchmark retains its published scoring basis.</p>
         ${comparison.writingScoreBasis ? `<p data-writing-fixed-basis="${escapeHtml(comparison.writingScoreBasis.id)}">All Writing includes ${comparison.writingScoreBasis.benchmarkIds.map(id => `<a href="${escapeHtml(benchmarkSummaryById.get(id).detailHref)}">${escapeHtml(benchmarkById.get(id).name)}</a>`).join(', ')}, equally weighted.</p>` : ''}
         <p>${scoreBasis.provisional ? 'Core idea uses the same published Astra-only single-judge basis for every model. Scores that include Core idea inherit its provisional status. ' : ''}Different task rubrics remain uncalibrated. Scores describe these named tests.</p>
+        ${coreScope?.id === 'core-idea-astra-common-11-v1' ? `<p data-writing-derived-scope="${escapeHtml(coreScope.id)}">Core idea scores use the same ${coreScope.expectedCaseCount} stories for every setting. The Matrix is excluded globally by a post-run user-approved scope change; all ${coreScope.originalCaseCount} original stories, answers and reviews remain available in the report.</p>` : ''}
         ${hasContextBalancedReviews ? '<p>First discovery of magic averages four reviews per answer: two judge models, each with a naive and informed context. The result averages all three predeclared trials in both conditions.</p>' : ''}
         ${otherTests.length ? `<p>Additional published tests: ${otherTests.map(benchmark => `<a href="${escapeHtml(benchmarkSummaryById.get(benchmark.id).detailHref)}">${escapeHtml(benchmark.name)}</a>`).join(' · ')}. Their own cohorts and scoring sources are shown under Benchmark tests.</p>` : ''}
         <p>${overallWritingCategory ? `All Writing is included in Overall at ${formatWeight(overallWritingCategory.weight)} weight.` : 'Writing is excluded from Overall.'} Each report retains the original answers, reviews, exclusions, and trial details.</p>
@@ -965,26 +967,29 @@ function buildOverallAvailableCategories(data, setting) {
   const writingBenchmarkDisplay = (benchmark) => {
     const publication = data.writingCategory.publications.find(item => item.benchmarks.some(source => source.id === benchmark.id));
     const original = publication.benchmarkSummaries.find(summary => summary.benchmarkId === benchmark.id);
-    const hasOfficialMeans = Number.isFinite(original.baseline) && Number.isFinite(original.treatment);
+    const pinnedProvisional = benchmark.id === 'storytelling-core-idea'
+      && data.writingCategory.writingScoreBasis?.coreIdeaScoring === 'published-single-judge-provisional';
+    const hasOfficialMeans = !pinnedProvisional && Number.isFinite(original.baseline) && Number.isFinite(original.treatment);
     const availableProvisional = publication.provisionalLeaderboard?.status === 'provisional' && publication.provisionalLeaderboard.rankedSettingCount
       ? publication.provisionalLeaderboard : null;
     const provisional = hasOfficialMeans ? null : availableProvisional;
+    const caseCount = provisional?.expectedCaseCount ?? publication.cases.length;
     const trials = publication.trialCount || publication.scoreBasis?.trialsPerTask || 1;
     const caseLabel = publication.caseLabel || 'story';
-    const casesLabel = publication.cases.length === 1 ? caseLabel : caseLabel === 'story' ? 'stories' : `${caseLabel}s`;
+    const casesLabel = caseCount === 1 ? caseLabel : caseLabel === 'story' ? 'stories' : `${caseLabel}s`;
     const cohort = publication.cohortSummaries
       ? `${publication.cohortSummaries.primary.expectedPairs} primary repetitions`
-      : `${publication.cases.length} ${casesLabel}${trials > 1 ? ` × ${trials} trials` : ''}`;
+      : `${caseCount} ${casesLabel}${trials > 1 ? ` × ${trials} trials` : ''}`;
     const settingCount = provisional ? provisional.rankedSettingCount : publication.coverage.completedSettingCount;
     const judgeCount = provisional ? provisional.judgeConfigurationIds?.length || 1 : publication.scoreBasis?.judgeCount || publication.scoreBasis?.judges?.length;
-    const provisionalSourceLabel = availableProvisional ? `${availableProvisional.label.replace(/ provisional results$/i, '')} · ${availableProvisional.rankedSettingCount} settings · ${availableProvisional.expectedCaseCount} stories` : '';
+    const provisionalSourceLabel = availableProvisional ? `${availableProvisional.id === 'core-idea-astra-common-11-v1' ? '1 Astra judge' : availableProvisional.label.replace(/ provisional results$/i, '')} · ${availableProvisional.rankedSettingCount} settings · ${availableProvisional.expectedCaseCount} stories` : '';
     const sourceLabel = provisional
       ? provisionalSourceLabel
       : `${judgeCount ? `${judgeCount}-review panel · ` : ''}${settingCount} ${settingCount === 1 ? 'setting' : 'settings'} · ${cohort}`;
     return {
-      publication, provisional, availableProvisional, provisionalSourceLabel, settingCount, sourceLabel, judgeCount, trials, cohort,
+      publication, provisional, availableProvisional, provisionalSourceLabel, settingCount, sourceLabel, judgeCount, caseCount, trials, cohort,
       sourceKind: provisional ? 'provisional-single-judge' : hasOfficialMeans ? 'official-panel' : 'answers',
-      summary: provisional ? { ...original, ...provisional.summary } : original
+      summary: provisional ? { ...original, ...provisional.summary } : pinnedProvisional ? { ...original, baseline: null, treatment: null, delta: null } : original
     };
   };
 
@@ -1182,7 +1187,8 @@ function buildOverallAvailableCategories(data, setting) {
     if (display?.publication) {
       // Scope the existing ranking policy to this benchmark, irrespective of
       // the category score selected on the other tab. Cache, do not rewrite it.
-      source = buildWritingCategoryCollection(display.publication, benchmark.id);
+      const basis = data.writingCategory?.writingScoreBasis;
+      source = buildWritingCategoryCollection(basis ? { ...display.publication, writingScoreBasis: { ...basis, benchmarkIds: [benchmark.id] } } : display.publication, benchmark.id);
       const expectedType = display.provisional ? 'provisional' : 'official';
       entries = source.scoreBasis.sources[0]?.type === expectedType ? source.entries : [];
     } else {
@@ -1211,6 +1217,10 @@ function buildOverallAvailableCategories(data, setting) {
     const display = isWriting ? writingBenchmarkDisplay(benchmark) : isOverall ? data.benchmarkDisplays?.[benchmark.id] : null;
     const summary = display?.summary || benchmarkSummaryById.get(benchmark.id);
     const publication = display?.publication;
+    const commonCore = benchmark.id === 'storytelling-core-idea' && display?.sourceKind === 'provisional-single-judge' && display.caseCount === 11;
+    const description = commonCore
+      ? `An open-knowledge comparison of explanations of a story’s core idea. The aggregate uses the same ${display.caseCount} stories for every setting; the original ${publication?.cases.length ?? 12}-story archive is retained.`
+      : benchmark.description;
     const catalogEntry = isWriting ? data.writingCategory.catalog.find(item => item.id === benchmark.id) : null;
     const writingBenchmark = isWriting || benchmark.category === 'writing';
     const baselineShort = writingBenchmark ? 'Plain' : BASELINE_SHORT;
@@ -1228,7 +1238,7 @@ function buildOverallAvailableCategories(data, setting) {
         data-benchmark-id="${escapeHtml(benchmark.id)}"
         ${isWriting ? `data-writing-score-weight="${data.writingCategory.benchmarkWeights[benchmark.id] || 0}"` : ''}
         data-evidence-kind="development"
-        ${display ? `data-score-source="${display.sourceKind}" data-writing-setting-count="${display.settingCount}" data-writing-case-count="${publication?.cases.length ?? display.caseCount}" data-writing-trial-count="${display.trials}" data-writing-judge-count="${display.judgeCount || 0}"` : ''}
+        ${display ? `data-score-source="${display.sourceKind}" data-writing-setting-count="${display.settingCount}" data-writing-case-count="${display.caseCount}" data-writing-trial-count="${display.trials}" data-writing-judge-count="${display.judgeCount || 0}"` : ''}
         data-baseline-score="${formatScore(summary.baseline)}"
         data-treatment-score="${formatScore(summary.treatment)}"
         data-report-href="${escapeHtml(reportHref)}"
@@ -1237,7 +1247,7 @@ function buildOverallAvailableCategories(data, setting) {
         <span class="benchmark-ledger__identity">
           <span>${String(categoryIndex + 1).padStart(2, '0')} / ${escapeHtml(isWriting ? benchmark.suite : categoryById.get(benchmark.category)?.name || 'Benchmark')}</span>
           <strong>${escapeHtml(benchmark.name)}</strong>
-          <small>${escapeHtml(benchmark.description)}</small>
+          <small>${escapeHtml(description)}</small>
           ${catalogEntry?.subjectTags?.length ? `<small>${catalogEntry.subjectTags.map(tag => escapeHtml(tag.toLowerCase() === 'dnd' ? 'D&D' : tag)).join(' · ')}</small>` : ''}
         </span>
         ${Number.isFinite(summary.baseline) && Number.isFinite(summary.treatment) ? `<span class="benchmark-ledger__comparison">
@@ -1700,10 +1710,12 @@ function buildOverallAvailableCategories(data, setting) {
       .sort((a, b) => a.family.localeCompare(b.family) || a.reasoning.localeCompare(b.reasoning));
     if (!entries.length) return '';
     const unranked = { ranks: new Map() };
-    return `<section class="writing-incomplete-results" data-writing-incomplete-results aria-labelledby="writing-incomplete-title">
-      <header class="writing-incomplete-results__header"><h4 id="writing-incomplete-title">Available scores · not ranked</h4><p>These models have missing tests. Their available-score means are shown for reference, not compared with the full aggregate above. Alphabetical order; select a model to see its scores and missing tests.</p></header>
+    const selectedPartial = entries.some(entry => entry.settingId === selectedEntry()?.settingId);
+    return `<details class="overall-coverage writing-incomplete-results" data-writing-incomplete-results data-writing-coverage-display="coverage-summary-v1" aria-labelledby="writing-incomplete-title"${selectedPartial ? ' open' : ''}>
+      <summary id="writing-incomplete-title">Model coverage <span>${entries.length} settings have partial coverage</span></summary>
+      <p class="overall-coverage__note">Ranks require all selected tests in both conditions. Expand to inspect these settings’ available scores and missing tests. These partial means are not comparable to the ranked aggregate.</p>
       <ul class="capability-ranking__rows" aria-label="Incomplete model results, alphabetical and unranked">${entries.map(entry => capabilityRankRowMarkup(entry, unranked, unranked, category)).join('')}</ul>
-    </section>`;
+    </details>`;
   };
 
   const animateCapabilityHandoff = (skipMotion = false) => {
