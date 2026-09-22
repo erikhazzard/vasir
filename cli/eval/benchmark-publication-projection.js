@@ -41,7 +41,8 @@ const PUBLIC_FAMILIES_BY_TRACK = Object.freeze({
 const PUBLIC_CLAUDE_MODEL_LABELS = Object.freeze({
   "claude:fable": "Claude Fable 5",
   "claude:claude-fable-5-1": "Claude Fable 5.1",
-  "claude:opus": "Claude Opus 5"
+  "claude:opus": "Claude Opus 5",
+  "claude:claude-opus-5-5": "Claude Opus 5.5"
 });
 const PUBLIC_CONDITIONS = Object.freeze([
   Object.freeze({
@@ -2046,7 +2047,7 @@ export function validateBenchmarkPublicationProjection(projection, { writingSour
     ) {
       throw projectionError({
         message: `Public Claude model identity omits or changes its release number: ${setting.configurationId}`,
-        suggestion: "Render Claude Fable 5, Claude Fable 5.1, or Claude Opus 5 explicitly on every public surface."
+        suggestion: "Render Claude Fable 5, Claude Fable 5.1, Claude Opus 5, or Claude Opus 5.5 explicitly on every public surface."
       });
     }
     assertScore(setting.scores?.baseline, `${setting.id}.scores.baseline`);

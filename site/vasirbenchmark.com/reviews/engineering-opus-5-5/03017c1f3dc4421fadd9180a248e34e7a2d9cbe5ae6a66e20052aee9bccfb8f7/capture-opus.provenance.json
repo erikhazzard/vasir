@@ -1,0 +1,32 @@
+{
+  "kind": "vasirbenchmark-engineering-cohort-browser-harness",
+  "createdAt": "2026-09-22T19:09:48.156082+00:00",
+  "basis": "Scoped temporary derivative of accepted browser harness for explicitly authorized additive Opus 5.5 Engineering publication. Canonical presentation, harness and acceptance are unchanged.",
+  "source": {
+    "path": "site/vasirbenchmark.com/capture.mjs",
+    "bytes": 195051,
+    "sha256": "f3776b49920fdd74b816d689d514373ad90a269c11260290604b34e30929991e"
+  },
+  "derived": {
+    "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+    "bytes": 196243,
+    "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+  },
+  "patch": {
+    "path": "tmp/opus-5-5-engineering-20260922/capture-opus.patch",
+    "sha256": "f00f9c7d5edde6d24d296ce7d3aa153fd9ddeee50a880e7e824555ee3e3ec7d7"
+  },
+  "changes": [
+    "Extend exact Engineering roster from 36 to 41 settings, 13 to 18 Claude settings.",
+    "Require exact five Opus 5.5 efforts: low, medium, high, xhigh, max.",
+    "Require explicit Claude Opus 5.5 public labels.",
+    "Preserve first/middle/last transcript probes and additionally inspect all five Opus 5.5 transcripts per benchmark; deduplicate repeated positions.",
+    "Scope retired-evidence chrome language check away from original answer/prompt/judge text after observed source-evidence false positive. All exact transcript, rationale, and score assertions remain."
+  ],
+  "productionOrCanonicalFilesChanged": false,
+  "observedInitialFailures": {
+    "mainPages": "Static canonical HTML footer still says 36 settings / 216 responses; owner repairing to 41/246. Footer assertion preserved.",
+    "report": "Feed baseline Claude Opus 5.5 high original answer: an item is omitted rather than shown unverified. Whole report textContent incorrectly classified this as obsolete UI chrome.",
+    "receiptDirectory": "tmp/opus-5-5-engineering-20260922/publication/local-initial-failed"
+  }
+}

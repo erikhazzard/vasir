@@ -12,6 +12,7 @@ import { GAME_ARTIFACT_ORIGIN } from "../cli/eval/games-publication.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONFIG = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "site/vasirbenchmark.com/deployment.json"), "utf8"));
+const EXPECTED_PUBLIC_FILE_COUNT = CONFIG.publicFiles.length;
 const PRIOR_RELEASE = "a".repeat(64);
 const CANDIDATE_RELEASE = "b".repeat(64);
 const LOCK_KEY = "_deploy/control/publish-lock.json";
@@ -211,11 +212,11 @@ test("fast publish request count stays bounded with 527 previously verified arti
     const startedAt = performance.now();
     const result = await fixture.publish();
     const elapsedMs = performance.now() - startedAt;
-    assert.equal(result.artifact.fileCount, 15);
+    assert.equal(result.artifact.fileCount, EXPECTED_PUBLIC_FILE_COUNT);
     assert.equal(result.verification.mode, "fast");
     assert.equal(result.verification.browserAuditPerformed, false);
     assert.equal(result.verification.reusedArtifactFiles, artifactCount - 1);
-    assert.equal(result.verification.verifiedFiles, 16);
+    assert.equal(result.verification.verifiedFiles, EXPECTED_PUBLIC_FILE_COUNT + 1);
     assert.equal(result.deployment.activeReleaseId, CANDIDATE_RELEASE);
     assert.equal(artifactCalls(fixture).length, 0);
     assert.equal(publicArtifactCalls(fixture).length, 1);
@@ -237,7 +238,7 @@ test("fast publish uploads and publicly verifies only the changed artifact plus 
   const result = await fixture.publish();
   assert.deepEqual(artifactCalls(fixture).map(({ operation, key }) => ({ operation, key })), [{ operation: "put-object", key: changed.key }]);
   assert.deepEqual(publicArtifactCalls(fixture).sort(), [fixture.artifact.artifactFiles[0].publicUrl, changed.publicUrl].sort());
-  assert.equal(result.verification.verifiedFiles, 17);
+  assert.equal(result.verification.verifiedFiles, EXPECTED_PUBLIC_FILE_COUNT + 2);
   assert.equal(result.verification.reusedArtifactFiles, 525);
   assert.ok(fixture.peakRequests <= 8);
 });
@@ -252,7 +253,7 @@ test("full audit retains all artifact HEADs, public proofs, and browser checks",
   assert.ok(fixture.browserCalls.length > 0);
   assert.equal(result.verification.mode, "full-audit");
   assert.equal(result.verification.browserAuditPerformed, true);
-  assert.equal(result.verification.verifiedFiles, 542);
+  assert.equal(result.verification.verifiedFiles, EXPECTED_PUBLIC_FILE_COUNT + 527);
   assert.equal(result.verification.reusedArtifactFiles, 0);
   assert.ok(fixture.peakRequests <= 8);
   context.diagnostic(JSON.stringify({ awsCommands: fixture.awsCalls.length, httpRequests: fixture.httpCalls.length, browserChecks: fixture.browserCalls.length, peakConcurrency: fixture.peakRequests, elapsedMs: Number((performance.now() - startedAt).toFixed(1)) }));

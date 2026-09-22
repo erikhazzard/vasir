@@ -1,0 +1,631 @@
+{
+  "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-suite",
+  "mode": "local",
+  "completedAt": "2026-09-22T20:01:56.199Z",
+  "status": "passed",
+  "sourceUnchanged": true,
+  "harness": {
+    "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+    "bytes": 197071,
+    "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+  },
+  "sourcePins": [
+    {
+      "path": "site/vasirbenchmark.com/data.js",
+      "bytes": 929148,
+      "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+    },
+    {
+      "path": "site/vasirbenchmark.com/responses.js",
+      "bytes": 6907491,
+      "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+    },
+    {
+      "path": "site/vasirbenchmark.com/index.html",
+      "bytes": 2284,
+      "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+    },
+    {
+      "path": "site/vasirbenchmark.com/app.js",
+      "bytes": 218131,
+      "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.html",
+      "bytes": 2210,
+      "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.js",
+      "bytes": 122267,
+      "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+    }
+  ],
+  "results": [
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "capabilities",
+      "width": 1440,
+      "height": 1000,
+      "startedAt": "2026-09-22T20:01:07.554Z",
+      "completedAt": "2026-09-22T20:01:15.224Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/capabilities-1440.png",
+        "1440",
+        "1000",
+        "capabilities"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capabilities-1440.png · #capabilities/engineering · 1440×1000 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/capabilities-1440.png",
+        "bytes": 140088,
+        "sha256": "cf8740b329ca0106cafbee90212b53313efe31c86aef6b3968f6a8cb23b267b1"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "capability-benchmarks",
+      "width": 1440,
+      "height": 1000,
+      "startedAt": "2026-09-22T20:01:07.570Z",
+      "completedAt": "2026-09-22T20:01:15.233Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/capability-benchmarks-1440.png",
+        "1440",
+        "1000",
+        "capability-benchmarks"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capability-benchmarks-1440.png · #capabilities/engineering/benchmarks · 1440×1000 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/capability-benchmarks-1440.png",
+        "bytes": 198507,
+        "sha256": "c1bd7a8b85731a85b5597bd38693c114a24bddcf3c8778be9378d112ed6da3ce"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "capability-benchmarks",
+      "width": 390,
+      "height": 844,
+      "startedAt": "2026-09-22T20:01:15.235Z",
+      "completedAt": "2026-09-22T20:01:19.978Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/capability-benchmarks-390.png",
+        "390",
+        "844",
+        "capability-benchmarks"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capability-benchmarks-390.png · #capabilities/engineering/benchmarks · 390×844 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/capability-benchmarks-390.png",
+        "bytes": 69593,
+        "sha256": "32288c33b7c16e9621abc9be5bbb3e9b7bb15c8dcfe852f18c702535ee51c644"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "capabilities",
+      "width": 390,
+      "height": 844,
+      "startedAt": "2026-09-22T20:01:15.227Z",
+      "completedAt": "2026-09-22T20:01:20.207Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/capabilities-390.png",
+        "390",
+        "844",
+        "capabilities"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capabilities-390.png · #capabilities/engineering · 390×844 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/capabilities-390.png",
+        "bytes": 68569,
+        "sha256": "eb30b40dca22f4089f417e617aa42afa016df9734afa648e7891257f770cc43f"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "capabilities",
+      "width": 820,
+      "height": 1000,
+      "startedAt": "2026-09-22T20:01:20.207Z",
+      "completedAt": "2026-09-22T20:01:25.530Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/capabilities-820.png",
+        "820",
+        "1000",
+        "capabilities"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capabilities-820.png · #capabilities/engineering · 820×1000 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/capabilities-820.png",
+        "bytes": 100810,
+        "sha256": "8a8c647682dea13b97398379a404fd667e11e660c7d82ea4a2fed23f1ba54b81"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "capability-benchmarks",
+      "width": 820,
+      "height": 1000,
+      "startedAt": "2026-09-22T20:01:25.533Z",
+      "completedAt": "2026-09-22T20:01:32.338Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/capability-benchmarks-820.png",
+        "820",
+        "1000",
+        "capability-benchmarks"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capability-benchmarks-820.png · #capabilities/engineering/benchmarks · 820×1000 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/capability-benchmarks-820.png",
+        "bytes": 114201,
+        "sha256": "7d7603e2454ff2d0f454e65148da60dfb8fa3eccb5cc0be82d22d89e165961e1"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "report",
+      "width": 1440,
+      "height": 1000,
+      "startedAt": "2026-09-22T20:01:07.574Z",
+      "completedAt": "2026-09-22T20:01:33.880Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/report-1440.png",
+        "1440",
+        "1000",
+        "report"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "report-1440.png · #hyper-scale-chat · 1440×1000 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/report-1440.png",
+        "bytes": 146731,
+        "sha256": "efaebd1ef0a309d3e0b5f307084a0d47755ba7d784282d693b9ab8669aec656b"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "report",
+      "width": 390,
+      "height": 844,
+      "startedAt": "2026-09-22T20:01:19.979Z",
+      "completedAt": "2026-09-22T20:01:43.733Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/report-390.png",
+        "390",
+        "844",
+        "report"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "report-390.png · #hyper-scale-chat · 390×844 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/report-390.png",
+        "bytes": 60013,
+        "sha256": "b86a3f5d79b567e6d286fb624a7268e7fe498d6b005bad497a243c34a65efba0"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-gpt6-sol-luna-browser-check",
+      "mode": "local",
+      "target": "report",
+      "width": 820,
+      "height": 1000,
+      "startedAt": "2026-09-22T20:01:32.342Z",
+      "completedAt": "2026-09-22T20:01:56.191Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+        "/Users/erikhazzard/code/vasir/tmp/gpt6-sol-luna-engineering-20260922/publication/local/report-820.png",
+        "820",
+        "1000",
+        "report"
+      ],
+      "harness": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+        "bytes": 197071,
+        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 929148,
+          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6907491,
+          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "e44c9ad3a04794f1b6d29527b432e2e35297f59f63ea194b6e7fe2e27c4c6a60"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "report-820.png · #hyper-scale-chat · 820×1000 · 1 categories / 3 benchmarks / 52 settings / 104 condition entries / 312 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local/report-820.png",
+        "bytes": 102245,
+        "sha256": "9d96e11b64e91e1563fbc94ab74447e3950e11d484e1b3760a5cf794b437dcfc"
+      }
+    }
+  ]
+}

@@ -27,6 +27,10 @@ const CLAUDE_CANONICAL_TARGETS = Object.freeze({
   "claude-opus-5": Object.freeze({
     targetCanonicalModel: "claude-opus-5",
     displayName: "Opus 5"
+  }),
+  "claude-opus-5-5": Object.freeze({
+    targetCanonicalModel: "claude-opus-5-5",
+    displayName: "Opus 5.5"
   })
 });
 const CLAUDE_ULTRACODE_MINIMUM_CLI_VERSION = "2.1.257";

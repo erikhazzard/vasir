@@ -394,6 +394,13 @@ test("preserves explicit release numbers for every Claude report model", () => {
       model: "opus",
       reasoning: "xhigh",
       expectedLabel: "Claude Opus 5"
+    },
+    {
+      configurationId: "claude:claude-opus-5-5@max",
+      modelId: "claude:claude-opus-5-5",
+      model: "claude-opus-5-5",
+      reasoning: "max",
+      expectedLabel: "Claude Opus 5.5"
     }
   ];
 
@@ -408,7 +415,7 @@ test("preserves explicit release numbers for every Claude report model", () => {
     for (const row of run.rows) {
       row.configurationId = candidate.configurationId;
       row.modelId = candidate.modelId;
-      row.modelLabel = candidate.model === "opus" ? "Opus" : "Fable";
+      row.modelLabel = candidate.model.includes("opus") ? "Opus" : "Fable";
       row.provider = "claude";
       row.model = candidate.model;
       row.reasoning = candidate.reasoning;

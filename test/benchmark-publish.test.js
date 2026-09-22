@@ -15,7 +15,7 @@ import {
 } from "../cli/benchmark-publication-artifact.js";
 import { calculateProjectedPublicationBytes, publishBenchmarkSite } from "../cli/benchmark-publish.js";
 import { runCommandLine } from "../cli/command-runner.js";
-import { resolveBenchmarkConfigurations } from "../cli/eval/benchmark-models.js";
+import { resolveBenchmarkConfiguration, resolveBenchmarkConfigurations } from "../cli/eval/benchmark-models.js";
 import {
   buildBenchmarkPublicationProjection,
   validateBenchmarkPublicationResponses
@@ -26,7 +26,7 @@ const SITE_ROOT = path.join(REPO_ROOT, "site", "vasirbenchmark.com");
 const WORKFLOW_SELECTED = Boolean(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "benchmarks/public-results.json"))).workSpecRun);
 const EXPECTED_BENCHMARK_COUNT = 3;
 const EXPECTED_CONDITION_COUNT = 2;
-const EXPECTED_SETTING_COUNT = 36;
+const EXPECTED_SETTING_COUNT = 52;
 const EXPECTED_RESULT_ENTRY_COUNT = EXPECTED_SETTING_COUNT * EXPECTED_CONDITION_COUNT;
 const EXPECTED_RESPONSE_COUNT = EXPECTED_RESULT_ENTRY_COUNT * EXPECTED_BENCHMARK_COUNT;
 const CANONICAL_CAPTURE_RECORDS = [
@@ -171,13 +171,15 @@ function createPublicationRepoCopy(prefix) {
 }
 
 test("public Engineering cohort preserves selected historical evidence while remaining registered", () => {
-  const registeredConfigurationIds = resolveBenchmarkConfigurations().map(({ id }) => id);
+  const defaultConfigurationIds = resolveBenchmarkConfigurations().map(({ id }) => id);
   const { projection } = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
   const publicConfigurationIds = projection.settings.map(({ configurationId }) => configurationId);
   assert.equal(publicConfigurationIds.length, EXPECTED_SETTING_COUNT);
   assert.equal(new Set(publicConfigurationIds).size, EXPECTED_SETTING_COUNT);
-  assert.ok(publicConfigurationIds.every((id) => registeredConfigurationIds.includes(id)));
-  assert.ok(registeredConfigurationIds.includes("claude:claude-fable-5-1@low"));
+  for (const configurationId of publicConfigurationIds) {
+    assert.equal(resolveBenchmarkConfiguration(configurationId).id, configurationId);
+  }
+  assert.ok(defaultConfigurationIds.includes("claude:claude-fable-5-1@low"));
   assert.ok(!publicConfigurationIds.includes("claude:claude-fable-5-1@low"),
     "Newly advertised reasoning settings do not retroactively enter frozen Engineering evidence");
   assert.deepEqual(
@@ -188,6 +190,13 @@ test("public Engineering cohort preserves selected historical evidence while rem
       "claude:claude-fable-5-1@xhigh",
       "claude:claude-fable-5-1@max",
       "claude:claude-fable-5-1@ultracode"
+    ].sort()
+  );
+  assert.deepEqual(
+    publicConfigurationIds.filter((configurationId) => /^codex:gpt-6-(?:sol|luna)@/.test(configurationId)).sort(),
+    [
+      ...["low", "medium", "high", "xhigh", "max", "ultra"].map((reasoning) => `codex:gpt-6-sol@${reasoning}`),
+      ...["low", "medium", "high", "xhigh", "max"].map((reasoning) => `codex:gpt-6-luna@${reasoning}`)
     ].sort()
   );
 });
@@ -281,16 +290,16 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     );
     assert.deepEqual(publicResponses.counts, {
       benchmarks: 3,
-      settings: 36,
+      settings: 52,
       conditions: 2,
-      responses: 216,
+      responses: 312,
       messageSets: 12,
-      judgments: 432
+      judgments: 624
     });
     assert.equal(publicResponses.responses.length, EXPECTED_RESPONSE_COUNT);
     assert.equal(
       publicResponses.responses.reduce((total, response) => total + response.judgments.length, 0),
-      432
+      624
     );
     assert.ok(publicResponses.messageSets.length < publicResponses.responses.length);
     assert.doesNotMatch(dataFile.body.toString("utf8"), /VASIR_RESPONSES|"outputText"|"exactMessages"/);

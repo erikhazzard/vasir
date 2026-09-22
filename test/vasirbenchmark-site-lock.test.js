@@ -128,12 +128,12 @@ function pngDimensions(contents) {
   };
 }
 
-async function assertLockedFile(record, root = siteRoot) {
+async function assertLockedFile(record, root = siteRoot, reader = readFile) {
   assert.equal(typeof record.path, 'string');
   assert.ok(record.path && !record.path.includes('\\') && record.path.split('/').every(part => part && part !== '.' && part !== '..'), 'locked evidence must use a contained relative path');
   assert.match(record.sha256, /^[a-f0-9]{64}$/);
   assert.ok(Number.isInteger(record.bytes) && record.bytes >= 0);
-  const contents = await readFile(join(root, record.path));
+  const contents = await reader(join(root, record.path));
   assert.equal(contents.length, record.bytes, `${record.path} byte length drifted`);
   assert.equal(sha256(contents), record.sha256, `${record.path} SHA-256 drifted`);
   return contents;
@@ -1306,20 +1306,150 @@ function assertReleasePresentationFile(accepted, source, released, contents, rel
   assert.equal(released.sha256, sha256(published), `release transform SHA-256: ${accepted.path}`);
 }
 
+async function assertEngineeringRefreshEvidence(manifest, reader = readFile, visited = new Set()) {
+  assert.ok(!visited.has(manifest.version), 'Engineering acceptance lineage cycle');
+  visited.add(manifest.version);
+  const readLocked = (record, root = siteRoot) => assertLockedFile(record, root, reader);
+  const benchmarkIds = ['hyper-scale-chat', 'personalized-home-feed', 'device-telemetry'];
+  const isGpt6 = manifest.acceptance.scope.configurationIds?.[0] === 'codex:gpt-6-sol@low';
+  const configurationIds = isGpt6
+    ? [...['low', 'medium', 'high', 'xhigh', 'max', 'ultra'].map(effort => `codex:gpt-6-sol@${effort}`), ...['low', 'medium', 'high', 'xhigh', 'max'].map(effort => `codex:gpt-6-luna@${effort}`)]
+    : ['low', 'medium', 'high', 'xhigh', 'max'].map(effort => `claude:claude-opus-5-5@${effort}`);
+  const counts = isGpt6 ? { settings: 52, responses: 312, judgments: 624 } : { settings: 41, responses: 246, judgments: 492 };
+  const previousCounts = isGpt6 ? { settings: 41, responses: 246 } : { settings: 36, responses: 216 };
+  assert.deepEqual(manifest.acceptance.scope, { kind: 'engineering-data-refresh', schemaVersion: 1, benchmarkIds, configurationIds, viewports: focusedViewports });
+  const verification = manifest.acceptance.verification;
+  assert.deepEqual(verification.counts, counts);
+  assert.equal(verification.localBrowserChecks, 9);
+  const previous = JSON.parse(await readLocked(verification.previousAcceptance));
+  assert.equal(previous.acceptance.scope.kind, isGpt6 ? 'engineering-data-refresh' : 'shared-writing-category-frame');
+  assert.equal(manifest.retainedCaptureEvidence.version, previous.version);
+  assert.deepEqual(manifest.retainedCaptureEvidence.receipt, verification.previousAcceptance);
+  const historical = previous.acceptance.verification;
+  let candidate;
+  if (!isGpt6) {
+    candidate = JSON.parse(await readLocked(historical.candidate));
+    const canonical = JSON.parse(await readLocked(historical.canonicalRun));
+    const writing = await Promise.all(historical.writingBrowserProofs.map(async record => JSON.parse(await readLocked(record))));
+    const games = await Promise.all(historical.gamesBrowserProofs.map(async record => JSON.parse(await readLocked(record))));
+    // These receipts retain their historical candidate identity; they are never
+    // substituted for fresh checks of the current Engineering pages.
+    assertSharedFrameInventory(previous, candidate, canonical, writing, games);
+  }
+  for (const capture of previous.captures) await assertCapture(capture);
+  assert.deepEqual(manifest.files.map(file => file.path), previous.files.map(file => file.path));
+  for (const file of manifest.files) if (file.path !== 'index.html') {
+    assert.deepEqual(file, previous.files.find(prior => prior.path === file.path));
+  }
+  const oldIndex = await readLocked(verification.previousIndex);
+  assert.equal(sha256(oldIndex), previous.files.find(file => file.path === 'index.html').sha256);
+  assert.equal(await reader(join(siteRoot, 'index.html'), 'utf8'), oldIndex.toString('utf8')
+    .replace(`${previousCounts.settings} model settings`, `${counts.settings} model settings`)
+    .replace(`${previousCounts.responses} responses`, `${counts.responses} responses`)
+    .replace(`3 benchmarks × ${previousCounts.settings} settings × 2 conditions = ${previousCounts.responses} responses`, `3 benchmarks × ${counts.settings} settings × 2 conditions = ${counts.responses} responses`));
+  const currentGlobals = { window: {} }, previousGlobals = { window: {} };
+  const previousFiles = new Map([[join(siteRoot, 'index.html'), oldIndex]]);
+  assert.deepEqual(verification.generatedFiles.map(file => file.path), ['data.js', 'responses.js']);
+  for (const [index, name] of ['data.js', 'responses.js'].entries()) {
+    const oldPin = index === 0 ? verification.previousData : verification.previousResponses;
+    const oldSource = await readLocked(oldPin);
+    const priorPin = (isGpt6 ? historical.generatedFiles : candidate.siteFiles).find(file => file.path === name);
+    assert.equal(sha256(oldSource), priorPin.sha256); assert.equal(oldSource.length, priorPin.bytes);
+    previousFiles.set(join(siteRoot, name), oldSource);
+    vm.runInNewContext(oldSource.toString('utf8'), previousGlobals);
+    vm.runInNewContext((await readLocked(verification.generatedFiles[index])).toString('utf8'), currentGlobals);
+  }
+  const oldData = JSON.parse(JSON.stringify(previousGlobals.window.VASIR_DATA));
+  const data = JSON.parse(JSON.stringify(currentGlobals.window.VASIR_DATA));
+  const oldResponses = JSON.parse(JSON.stringify(previousGlobals.window.VASIR_RESPONSES));
+  const responses = JSON.parse(JSON.stringify(currentGlobals.window.VASIR_RESPONSES));
+  for (const key of ['writing', 'games', 'aiWorkflows']) assert.deepEqual(data[key], oldData[key], `${key} evidence remains unchanged`);
+  for (const file of (candidate?.siteFiles ?? []).filter(file => generatedPublicFiles.has(file.path) && !['data.js', 'responses.js'].includes(file.path))) await readLocked(file);
+  assert.equal(data.settings.length, counts.settings); assert.equal(data.benchmarkResults.length, counts.responses);
+  assert.equal(oldData.settings.length, previousCounts.settings);
+  assert.deepEqual(data.settings.filter(setting => configurationIds.includes(setting.configurationId)).map(setting => setting.configurationId).sort(), [...configurationIds].sort());
+  assert.deepEqual(data.overall.settings, oldData.overall.settings, 'Incomplete new settings do not enter Overall rankings');
+  assert.deepEqual(data.overall.entries, oldData.overall.entries);
+  assert.equal(responses.responses.length, counts.responses);
+  assert.equal(responses.responses.reduce((count, response) => count + response.judgments.length, 0), counts.judgments);
+  assert.equal(oldResponses.responses.length, previousCounts.responses);
+  assert.deepEqual(responses.responses.filter(response => !configurationIds.includes(response.configurationId)), oldResponses.responses);
+  assert.deepEqual(responses.messageSets, oldResponses.messageSets);
+  const suite = JSON.parse(await readLocked(verification.browserSuite));
+  assert.equal(suite.kind, isGpt6 ? 'vasirbenchmark-engineering-gpt6-sol-luna-browser-suite' : 'vasirbenchmark-engineering-opus-5-5-browser-suite');
+  assert.equal(suite.mode, 'local'); assert.equal(suite.status, 'passed'); assert.equal(suite.sourceUnchanged, true);
+  assert.equal(suite.results.length, 9); assert.equal(manifest.captures.length, 9);
+  const harness = await readLocked(verification.browserHarness);
+  assert.equal(sha256(harness), suite.harness.sha256); assert.equal(harness.length, suite.harness.bytes);
+  const jobs = focusedViewports.flatMap(viewport => ['capabilities', 'capability-benchmarks', 'report'].map(target => ({ ...viewport, target })));
+  assert.deepEqual(suite.results.map(({ target, width, height }) => ({ target, width, height })).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))), jobs.map(({ target, width, height }) => ({ target, width, height })).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))));
+  assert.deepEqual(suite.sourcePins.map(record => record.path), ['data.js', 'responses.js', 'index.html', 'app.js', 'benchmark-report.html', 'benchmark-report.js'].map(name => `site/vasirbenchmark.com/${name}`));
+  for (const record of suite.sourcePins) await readLocked(record, repoRoot);
+  for (const result of suite.results) {
+    assert.equal(result.status, 'passed'); assert.equal(result.exitCode, 0); assert.equal(result.stderr, '');
+    assert.deepEqual(result.harness, suite.harness); assert.deepEqual(result.sourcePins, suite.sourcePins);
+    assert.ok(result.stdout.includes(`${counts.settings} settings / ${counts.settings * 2} condition entries / ${counts.responses} result cells`));
+    assert.match(result.stdout, /QA clean/);
+    if (result.target === 'report') assert.match(result.stdout, /report evidence checked/);
+    const capture = manifest.captures.find(record => record.path.endsWith(`/${result.target}-${result.width}.png`));
+    assert.ok(capture); assert.equal(capture.sha256, result.screenshot.sha256); assert.equal(capture.bytes, result.screenshot.bytes);
+    assert.equal(capture.width, result.width); assert.equal(capture.height, result.height);
+  }
+  assert.equal(verification.selection.path, 'benchmarks/public-results.json');
+  const selected = JSON.parse(await readLocked(verification.selection, repoRoot));
+  assert.deepEqual(verification.selectedRuns.map(record => record.benchmarkId), benchmarkIds);
+  const unavailable = [];
+  if (isGpt6) {
+    const previousSelection = await readLocked(verification.previousSelection);
+    assert.equal(sha256(previousSelection), historical.selection.sha256);
+    assert.equal(previousSelection.length, historical.selection.bytes);
+    previousFiles.set(join(repoRoot, historical.selection.path), previousSelection);
+    // Resolve the previous candidate's mutable public paths to the archived
+    // bytes captured before this append, while retaining all original pins.
+    const previousReader = async (filePath, encoding) => {
+      const bytes = previousFiles.get(resolve(filePath));
+      return bytes ? (encoding ? bytes.toString(encoding) : bytes) : reader(filePath, encoding);
+    };
+    unavailable.push(...await assertEngineeringRefreshEvidence(previous, previousReader, visited));
+  }
+  for (const record of verification.selectedRuns) {
+    const selection = selected.selectedRuns.find(item => item.benchmarkId === record.benchmarkId);
+    assert.equal(record.path, selection.runPath); assert.equal(record.sha256, selection.sha256);
+    let run;
+    try { run = JSON.parse(await readLocked(record, repoRoot)); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; unavailable.push(record.path); continue; }
+    assert.deepEqual(run.extension.extendedConfigurationIds, configurationIds);
+    assert.equal(record.source.path, `.agents/vasir-evals/${record.benchmarkId}/${run.extension.sourceRunId}/run.json`);
+    try {
+      const source = JSON.parse(await readLocked(record.source, repoRoot));
+      assert.equal(source.rows.length, previousCounts.responses / 3); assert.equal(run.rows.length, counts.responses / 3);
+      for (const row of source.rows) assert.deepEqual(run.rows.find(current => current.rowKey === row.rowKey), row);
+    } catch (error) { if (error.code !== 'ENOENT') throw error; unavailable.push(record.source.path); }
+    for (const row of run.rows.filter(row => configurationIds.includes(row.configurationId))) {
+      const response = responses.responses.find(item => item.benchmarkId === record.benchmarkId && item.configurationId === row.configurationId && item.condition === (row.conditionId === 'clean' ? 'baseline' : 'skill'));
+      assert.ok(response); assert.equal(response.outputText, row.outputText);
+      assert.deepEqual(responses.messageSets.find(messages => messages.id === response.messageSetId).messages, row.exactMessages);
+      assert.equal(response.judgments.length, 2);
+    }
+  }
+  return unavailable;
+}
+
 test('canonical VasirBench site matches its accepted template lock', async t => {
   const manifest = JSON.parse(await readFile(join(siteRoot, 'template-lock.json'), 'utf8'));
   const deployment = JSON.parse(await readFile(join(siteRoot, 'deployment.json'), 'utf8'));
   const focused = manifest.acceptance.scope?.kind === 'focused-writing-benchmark';
   const shared = manifest.acceptance.scope?.kind === 'shared-writing-category-frame';
+  const engineeringRefresh = manifest.acceptance.scope?.kind === 'engineering-data-refresh';
   const versioned = shared && manifest.acceptance.verification?.categoryIndex?.method === versionedMethod;
-  assert.ok(!manifest.acceptance.scope || focused || shared, 'unrecognized acceptance scope');
+  assert.ok(!manifest.acceptance.scope || focused || shared || engineeringRefresh, 'unrecognized acceptance scope');
   const expectedFiles = [...new Set([
     ...deployment.publicFiles.map(({ path }) => path).filter((path) => !generatedPublicFiles.has(path)),
     ...acceptanceOnlyFiles,
     // The shared browser harness still imports this byte-pinned audit helper;
     // its presence never authorizes compact source data or public reports.
-    ...(versioned ? [compactHarness] : []),
-    ...(focused || shared ? ['deployment.json', 'infra/production.yml'] : [])
+    ...(versioned || engineeringRefresh ? [compactHarness] : []),
+    ...(focused || shared || engineeringRefresh ? ['deployment.json', 'infra/production.yml'] : [])
   ])].sort();
 
   assert.equal(manifest.kind, 'vasirbenchmark-site-template-lock');
@@ -1340,8 +1470,8 @@ test('canonical VasirBench site matches its accepted template lock', async t => 
   });
 
   assert.deepEqual(manifest.files.map(({ path }) => path).sort(), expectedFiles);
-  if (focused || shared) {
-    const unavailable = await (shared ? assertSharedFrameEvidence(manifest, deployment) : assertFocusedEvidence(manifest, deployment));
+  if (focused || shared || engineeringRefresh) {
+    const unavailable = await (engineeringRefresh ? assertEngineeringRefreshEvidence(manifest) : shared ? assertSharedFrameEvidence(manifest, deployment) : assertFocusedEvidence(manifest, deployment));
     if (unavailable.length) t.diagnostic(`Tracked selection hashes and archived source metadata verified; ${unavailable.length} gitignored private source files are absent. Restore their exact selected publication-snapshots to repeat private-byte verification or rebuild/publish. Their byte assertions were not performed; presentation and portable browser-evidence assertions remain mandatory.`);
   }
   else assert.deepEqual(manifest.captures.map(({ path }) => path), expectedCaptures);

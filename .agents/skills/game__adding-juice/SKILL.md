@@ -12,6 +12,8 @@ Use three competing lenses: the **controller** protects agency and dependable ru
 
 **Ownership.** This skill owns response timing, acting and feedback behavior. `$game__art-directing` owns material/shape language, composition and visual hierarchy; use its direction to judge what a response should look like. `$game__orchestrating-playable-build` owns the integrated play-and-repair loop and acceptance record. `$game__genre-routing` owns genre rules and authored control commitments; `$design__animating-interfaces` owns isolated interface transitions. Route Three.js/Rapier hot-path implementation through `$code__threejs-rapier-performance`; observed performance symptoms through `$threejs__improve-performance`. Do not install a new engine to avoid directing existing motion.
 
+For the construction of a specific telegraph, particle effect, beam, trail, or evolving effect material, use `$game__making-vfx`; this skill retains ownership of the whole response phrase and its timing across channels.
+
 ## Choose the response before the effect
 
 For the action being improved, identify **intent → acknowledgment → consequence → aftermath → next action** from actual play. Name the experienced failure: cannot tell whether the card was accepted, charge looks like normal fire, collision barely registers, morph looks pasted on, or previous effects conceal the next decision. If input or outcomes are broken, repair that boundary with the owning gameplay skill before embellishing it. Do not change rules merely to fit an animation.

@@ -1,0 +1,44 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { spawn } from 'node:child_process';
+const repo = process.cwd();
+const mode = process.argv[2] || 'local';
+if (!['local', 'live'].includes(mode)) throw new Error('Expected local or live mode.');
+const root = path.join(repo, 'tmp/gpt6-sol-luna-engineering-20260922');
+const output = path.join(root, 'publication', mode);
+fs.mkdirSync(output, { recursive: true });
+const harness = path.join(root, 'capture-gpt6.mjs');
+const pin = file => { const bytes = fs.readFileSync(file); return { path: path.relative(repo, file), bytes: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex') }; };
+const sourcePins = ['data.js', 'responses.js', 'index.html', 'app.js', 'benchmark-report.html', 'benchmark-report.js'].map(name => pin(path.join(repo, 'site/vasirbenchmark.com', name)));
+const jobs = [1440, 390, 820].flatMap(width => ['capabilities', 'capability-benchmarks', 'report'].map(target => ({ target, width, height: width === 390 ? 844 : 1000 })));
+const results = [];
+let next = 0;
+async function run(job) {
+  const name = `${job.target}-${job.width}`;
+  const screenshot = path.join(output, name + '.png');
+  const receiptPath = path.join(output, name + '.json');
+  if (fs.existsSync(receiptPath)) throw new Error('Refusing to overwrite browser evidence: ' + receiptPath);
+  const page = mode === 'local' ? path.join(repo, 'site/vasirbenchmark.com', job.target === 'report' ? 'benchmark-report.html' : 'index.html') : 'https://vasirbenchmark.com/' + (job.target === 'report' ? 'benchmark-report.html' : '');
+  const args = [harness, page, screenshot, String(job.width), String(job.height), job.target];
+  const startedAt = new Date().toISOString();
+  console.log('START ' + mode + ' ' + name);
+  const result = await new Promise(resolve => {
+    let stdout = '', stderr = '';
+    const child = spawn(process.execPath, args, { cwd: repo, stdio: ['ignore', 'pipe', 'pipe'] });
+    child.stdout.on('data', bytes => { stdout += bytes; });
+    child.stderr.on('data', bytes => { stderr += bytes; });
+    child.on('error', error => { stderr += String(error); });
+    child.on('close', (exitCode, signal) => resolve({ exitCode, signal, stdout, stderr }));
+  });
+  const receipt = { kind: 'vasirbenchmark-engineering-gpt6-sol-luna-browser-check', mode, ...job, startedAt, completedAt: new Date().toISOString(), command: [process.execPath, ...args], harness: pin(harness), sourcePins, ...result, status: result.exitCode === 0 ? 'passed' : 'failed', screenshot: fs.existsSync(screenshot) ? pin(screenshot) : null };
+  fs.writeFileSync(receiptPath, JSON.stringify(receipt, null, 2) + '\n');
+  results.push(receipt);
+  console.log(receipt.status.toUpperCase() + ' ' + name + ' ' + result.stdout.trim() + ' ' + result.stderr.trim());
+}
+await Promise.all(Array.from({ length: 3 }, async () => { while (next < jobs.length) await run(jobs[next++]); }));
+const unchanged = sourcePins.every(record => pin(path.join(repo, record.path)).sha256 === record.sha256);
+const receipt = { kind: 'vasirbenchmark-engineering-gpt6-sol-luna-browser-suite', mode, completedAt: new Date().toISOString(), status: results.every(result => result.status === 'passed') && unchanged ? 'passed' : 'failed', sourceUnchanged: unchanged, harness: pin(harness), sourcePins, results };
+fs.writeFileSync(path.join(output, 'suite.json'), JSON.stringify(receipt, null, 2) + '\n');
+console.log('SUITE ' + receipt.status + ' ' + results.length + '/' + jobs.length);
+process.exitCode = receipt.status === 'passed' ? 0 : 1;

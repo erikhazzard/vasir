@@ -1,0 +1,323 @@
+{
+  "kind": "vasirbenchmark-site-template-lock",
+  "version": "2026-09-22-engineering-opus-5-5-03017c1f3dc4",
+  "status": "accepted",
+  "canonicalPath": "site/vasirbenchmark.com",
+  "acceptance": {
+    "scope": {
+      "kind": "engineering-data-refresh",
+      "schemaVersion": 1,
+      "benchmarkIds": [
+        "hyper-scale-chat",
+        "personalized-home-feed",
+        "device-telemetry"
+      ],
+      "configurationIds": [
+        "claude:claude-opus-5-5@low",
+        "claude:claude-opus-5-5@medium",
+        "claude:claude-opus-5-5@high",
+        "claude:claude-opus-5-5@xhigh",
+        "claude:claude-opus-5-5@max"
+      ],
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 1000
+        },
+        {
+          "width": 820,
+          "height": 1000
+        },
+        {
+          "width": 390,
+          "height": 844
+        }
+      ]
+    },
+    "authority": "user",
+    "acceptedAt": "2026-09-22T19:18:45.052Z",
+    "response": "please update the bencmark pages for eng! https://vasirbenchmark.com/#capabilities/engineering/benchmarks i wanna see all them ... and https://vasirbenchmark.com/#capabilities/engineering",
+    "basis": "The user explicitly requested the live Engineering update. Agent browser checks and visual review support this narrow refresh; no fresh human screenshot acceptance is claimed.",
+    "verdict": "All five Opus 5.5 settings selected for publication from saved append-only evidence; nine local browser checks passed. Agent reviewed desktop Engineering and mobile benchmark screenshots.",
+    "criterion": "41 Engineering settings, 246 answers and 492 original judge assessments. All 216 incumbent answers and original score evidence remain unchanged. Only the static Engineering counts change in presentation source. All Writing modules, Games and AI Workflows remain unchanged; new incomplete settings do not enter Overall rankings.",
+    "verification": {
+      "previousAcceptance": {
+        "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/previous-template-lock.json",
+        "bytes": 12806984,
+        "sha256": "91a3532ec13d652928b4477d94df068e5528cd9c201abc7f148c5f6733aca648"
+      },
+      "previousData": {
+        "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/previous-data.js",
+        "bytes": 830780,
+        "sha256": "1c59f127265c03be7e565b36c75747198c32d248e2acb8aacd58e7b18f4874a4"
+      },
+      "previousResponses": {
+        "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/previous-responses.js",
+        "bytes": 6484506,
+        "sha256": "9121548af5027604623f6e3e596a5f991839a521d015ca073f88ef3fff1d8f46"
+      },
+      "previousIndex": {
+        "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/previous-index.html",
+        "bytes": 2284,
+        "sha256": "2d3d7cfa015506c97f3bc8ed1a2953a28063c4090d232f1a29f73969a989c8c9"
+      },
+      "browserSuite": {
+        "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/browser-suite.json",
+        "bytes": 25704,
+        "sha256": "03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7"
+      },
+      "browserHarness": {
+        "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "localBrowserChecks": 9,
+      "counts": {
+        "settings": 41,
+        "responses": 246,
+        "judgments": 492
+      },
+      "selection": {
+        "path": "benchmarks/public-results.json",
+        "bytes": 1086,
+        "sha256": "838677dd8228c71c67f2da4c57d8678a40f3840ad4ba908c6e889a3ac67ceffc"
+      },
+      "selectedRuns": [
+        {
+          "benchmarkId": "hyper-scale-chat",
+          "path": ".agents/vasir-evals/hyper-scale-chat/2026-09-22T18-36-50Z__extend__be7c7f389db6/run.json",
+          "bytes": 2687858,
+          "sha256": "b3a5d4ccb55105fff6ceb2b4b80f055bfe7fbd0cf29579f12682db2ff7d57346",
+          "source": {
+            "path": ".agents/vasir-evals/hyper-scale-chat/2026-09-04T22-09-30Z__rejudge__d7490f32658c/run.json",
+            "bytes": 6202573,
+            "sha256": "1867869ffc922579c57cf984c768260b87b71b5f62d9be37c960bb1df9cd9b3b"
+          }
+        },
+        {
+          "benchmarkId": "personalized-home-feed",
+          "path": ".agents/vasir-evals/personalized-home-feed/2026-09-22T18-36-50Z__extend__fb81174b2ed7/run.json",
+          "bytes": 3034761,
+          "sha256": "efc5cb178b45fe926e8bef8db39390eaa08540291464e4f9d29718e7dd9246f0",
+          "source": {
+            "path": ".agents/vasir-evals/personalized-home-feed/2026-09-04T22-33-49Z__rejudge__1d7e5cf5fcdf/run.json",
+            "bytes": 7083711,
+            "sha256": "4d082a7c67f2459a707744740edbd750c43ce4f4f5932aa6c5f836608bba68eb"
+          }
+        },
+        {
+          "benchmarkId": "device-telemetry",
+          "path": ".agents/vasir-evals/device-telemetry/2026-09-22T18-36-50Z__extend__b5909f5561c0/run.json",
+          "bytes": 3160257,
+          "sha256": "2c25525050ef03ad008851c594efb25624dc60d8a4facb44b0505fe6fffab5b8",
+          "source": {
+            "path": ".agents/vasir-evals/device-telemetry/2026-09-04T22-33-50Z__rejudge__0995e097a929/run.json",
+            "bytes": 7807701,
+            "sha256": "0bb297700ae9f06bf6f93388ae5f0d816b79b36429105c3fffcc66bf521dca4a"
+          }
+        }
+      ],
+      "generatedFiles": [
+        {
+          "path": "data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        }
+      ],
+      "visualReview": {
+        "authority": "agent",
+        "capturePaths": [
+          "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capabilities-1440.png",
+          "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capability-benchmarks-390.png",
+          "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/report-820.png"
+        ],
+        "verdict": "Readable model labels and complete benchmark comparison; no clipped controls or broken rendering observed."
+      }
+    }
+  },
+  "deployment": {
+    "status": "active",
+    "targetDomain": "vasirbenchmark.com",
+    "awsAccountAlias": "faedark",
+    "topology": {
+      "owner": "CloudFormation",
+      "stack": "vasirbenchmark-production",
+      "origin": "private-s3-oac",
+      "edge": "cloudfront-release-router",
+      "dns": "route53-apex-alias"
+    }
+  },
+  "claimBoundary": "Engineering development measurements use one answer per task and condition with two model judges. This is an additive publication of saved results, not new evaluation or human calibration. The previous Writing acceptance and captures are preserved as historical evidence, not claimed to depict this refresh. Local acceptance is separate from live deployment proof.",
+  "files": [
+    {
+      "path": "app.js",
+      "bytes": 218131,
+      "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+    },
+    {
+      "path": "assets/d3.v7.min.js",
+      "bytes": 279706,
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "path": "assets/kanit-latin-900-normal.woff2",
+      "bytes": 19216,
+      "sha256": "f001e4c46c00f65965198ba7547aadd375aa6222feff177c57c943d3bf6794d3"
+    },
+    {
+      "path": "benchmark-report.css",
+      "bytes": 35976,
+      "sha256": "cfc3b8192eebf17703a6348c8e860b281cbf3dbbf29e9da974633a11caf3de6d"
+    },
+    {
+      "path": "benchmark-report.html",
+      "bytes": 2210,
+      "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+    },
+    {
+      "path": "benchmark-report.js",
+      "bytes": 122267,
+      "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+    },
+    {
+      "path": "capture.mjs",
+      "bytes": 195051,
+      "sha256": "f3776b49920fdd74b816d689d514373ad90a269c11260290604b34e30929991e"
+    },
+    {
+      "path": "capture.sh",
+      "bytes": 4994,
+      "sha256": "4cb2289a907a7d4fee4c541c4c8ae0268582b35797a2d3f1edd4e6201259eef0"
+    },
+    {
+      "path": "deployment.json",
+      "bytes": 3577,
+      "sha256": "ade9361c25ad40525c194023988ccd65c899f12df237f057b5115762eb45850e"
+    },
+    {
+      "path": "games-browsercheck.mjs",
+      "bytes": 55199,
+      "sha256": "5798f438f3446c69666a1ed1b3df5ed74786a9ccaf1874ec706153794784abb8"
+    },
+    {
+      "path": "games.css",
+      "bytes": 19893,
+      "sha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
+    },
+    {
+      "path": "games.html",
+      "bytes": 3085,
+      "sha256": "eed02c026dc2cf1aa63f1a3433bf38926ae33cef6b3bbc6c3171dee80cf7f5b0"
+    },
+    {
+      "path": "games.js",
+      "bytes": 31995,
+      "sha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
+    },
+    {
+      "path": "index.html",
+      "bytes": 2284,
+      "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+    },
+    {
+      "path": "infra/production.yml",
+      "bytes": 13312,
+      "sha256": "fad9f5ae900f944e0d0602095cc7053fe4018aa763cabb3e95e4d261bd9fff59"
+    },
+    {
+      "path": "style.css",
+      "bytes": 153357,
+      "sha256": "579c5ef001ded84385c21368a957767a2b7efd5a7d52883a41bfd699ade393e9"
+    },
+    {
+      "path": "writing-browsercheck.mjs",
+      "bytes": 208710,
+      "sha256": "f7143281d59ab9f55713ad9b4ed2408285572e300537f7f0c7e51876464839ea"
+    },
+    {
+      "path": "writing-compact-browser-evidence.mjs",
+      "role": "compact-writing-evidence-harness",
+      "bytes": 14609,
+      "sha256": "38962d403c5ee9b1c862132e7ec636550d4ae5d1a3fa720d55504c7dcd1fcf47"
+    }
+  ],
+  "captures": [
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capabilities-1440.png",
+      "bytes": 151469,
+      "sha256": "4e617a329d2e32689f84a9418da3ad8b8563d3dd174047aa4324e569dbb55d09",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capability-benchmarks-1440.png",
+      "bytes": 224816,
+      "sha256": "bc6d6f0e3f72113ba6f90e17e99310c6808af78671349b48bfce91909e3512fd",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capability-benchmarks-390.png",
+      "bytes": 69260,
+      "sha256": "b67802c551aa75300f4c3756736044d9845e94c722a72964359ac59d91837673",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capabilities-390.png",
+      "bytes": 68363,
+      "sha256": "d03e4258ed397789a29941eba8a6f36b14cecb3be9e8370baa15954703e4bb00",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capabilities-820.png",
+      "bytes": 100501,
+      "sha256": "a16c11cc0f337aa03af7a076bab5a7ffaaa8f813b4d4ed5bea5566e441322d31",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/report-1440.png",
+      "bytes": 146599,
+      "sha256": "f236f35108d837cdeda4fe28b0f02e1be3bac7b7cc213acea696925ca83f8b62",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/capability-benchmarks-820.png",
+      "bytes": 114248,
+      "sha256": "ce13960a6bf27fe6e325c8c706ddf27573d6ecd4009a5f67ea695a1a1538f5a1",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/report-390.png",
+      "bytes": 59494,
+      "sha256": "e898853a91ee6524d36df864f33328e60638837a6de2e7f275b5497795adf5f0",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/report-820.png",
+      "bytes": 101725,
+      "sha256": "929bd0008355718c4db55230132653f8cc42ce39b5ac2cb62edead976dccc23a",
+      "width": 820,
+      "height": 1000
+    }
+  ],
+  "retainedCaptureEvidence": {
+    "explanation": "The previous acceptance receipt and every referenced historical artifact remain unchanged at their original paths. They describe that historical candidate.",
+    "version": "2026-09-08-writing-category-hierarchy-cc10ea63a842",
+    "receipt": {
+      "path": "reviews/engineering-opus-5-5/03017c1f3dc4421fadd9180a248e34e7a2d9cbe5ae6a66e20052aee9bccfb8f7/previous-template-lock.json",
+      "bytes": 12806984,
+      "sha256": "91a3532ec13d652928b4477d94df068e5528cd9c201abc7f148c5f6733aca648"
+    }
+  }
+}

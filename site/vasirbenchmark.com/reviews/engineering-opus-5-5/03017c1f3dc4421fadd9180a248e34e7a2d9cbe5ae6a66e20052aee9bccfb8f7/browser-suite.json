@@ -1,0 +1,631 @@
+{
+  "kind": "vasirbenchmark-engineering-opus-5-5-browser-suite",
+  "mode": "local",
+  "completedAt": "2026-09-22T19:14:36.914Z",
+  "status": "passed",
+  "sourceUnchanged": true,
+  "harness": {
+    "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+    "bytes": 196243,
+    "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+  },
+  "sourcePins": [
+    {
+      "path": "site/vasirbenchmark.com/data.js",
+      "bytes": 862044,
+      "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+    },
+    {
+      "path": "site/vasirbenchmark.com/responses.js",
+      "bytes": 6678460,
+      "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+    },
+    {
+      "path": "site/vasirbenchmark.com/index.html",
+      "bytes": 2284,
+      "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+    },
+    {
+      "path": "site/vasirbenchmark.com/app.js",
+      "bytes": 218131,
+      "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.html",
+      "bytes": 2210,
+      "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+    },
+    {
+      "path": "site/vasirbenchmark.com/benchmark-report.js",
+      "bytes": 122267,
+      "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+    }
+  ],
+  "results": [
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "capabilities",
+      "width": 1440,
+      "height": 1000,
+      "startedAt": "2026-09-22T19:14:13.850Z",
+      "completedAt": "2026-09-22T19:14:17.211Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/capabilities-1440.png",
+        "1440",
+        "1000",
+        "capabilities"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capabilities-1440.png · #capabilities/engineering · 1440×1000 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/capabilities-1440.png",
+        "bytes": 151469,
+        "sha256": "4e617a329d2e32689f84a9418da3ad8b8563d3dd174047aa4324e569dbb55d09"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "capability-benchmarks",
+      "width": 1440,
+      "height": 1000,
+      "startedAt": "2026-09-22T19:14:13.853Z",
+      "completedAt": "2026-09-22T19:14:17.226Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/capability-benchmarks-1440.png",
+        "1440",
+        "1000",
+        "capability-benchmarks"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capability-benchmarks-1440.png · #capabilities/engineering/benchmarks · 1440×1000 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/capability-benchmarks-1440.png",
+        "bytes": 224816,
+        "sha256": "bc6d6f0e3f72113ba6f90e17e99310c6808af78671349b48bfce91909e3512fd"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "capability-benchmarks",
+      "width": 390,
+      "height": 844,
+      "startedAt": "2026-09-22T19:14:17.227Z",
+      "completedAt": "2026-09-22T19:14:20.136Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/capability-benchmarks-390.png",
+        "390",
+        "844",
+        "capability-benchmarks"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capability-benchmarks-390.png · #capabilities/engineering/benchmarks · 390×844 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/capability-benchmarks-390.png",
+        "bytes": 69260,
+        "sha256": "b67802c551aa75300f4c3756736044d9845e94c722a72964359ac59d91837673"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "capabilities",
+      "width": 390,
+      "height": 844,
+      "startedAt": "2026-09-22T19:14:17.212Z",
+      "completedAt": "2026-09-22T19:14:20.141Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/capabilities-390.png",
+        "390",
+        "844",
+        "capabilities"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capabilities-390.png · #capabilities/engineering · 390×844 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/capabilities-390.png",
+        "bytes": 68363,
+        "sha256": "d03e4258ed397789a29941eba8a6f36b14cecb3be9e8370baa15954703e4bb00"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "capabilities",
+      "width": 820,
+      "height": 1000,
+      "startedAt": "2026-09-22T19:14:20.141Z",
+      "completedAt": "2026-09-22T19:14:23.081Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/capabilities-820.png",
+        "820",
+        "1000",
+        "capabilities"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capabilities-820.png · #capabilities/engineering · 820×1000 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/capabilities-820.png",
+        "bytes": 100501,
+        "sha256": "a16c11cc0f337aa03af7a076bab5a7ffaaa8f813b4d4ed5bea5566e441322d31"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "report",
+      "width": 1440,
+      "height": 1000,
+      "startedAt": "2026-09-22T19:14:13.853Z",
+      "completedAt": "2026-09-22T19:14:25.630Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/report-1440.png",
+        "1440",
+        "1000",
+        "report"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "report-1440.png · #hyper-scale-chat · 1440×1000 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/report-1440.png",
+        "bytes": 146599,
+        "sha256": "f236f35108d837cdeda4fe28b0f02e1be3bac7b7cc213acea696925ca83f8b62"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "capability-benchmarks",
+      "width": 820,
+      "height": 1000,
+      "startedAt": "2026-09-22T19:14:23.081Z",
+      "completedAt": "2026-09-22T19:14:25.922Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/index.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/capability-benchmarks-820.png",
+        "820",
+        "1000",
+        "capability-benchmarks"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "capability-benchmarks-820.png · #capabilities/engineering/benchmarks · 820×1000 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · D3 7.9.0 · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/capability-benchmarks-820.png",
+        "bytes": 114248,
+        "sha256": "ce13960a6bf27fe6e325c8c706ddf27573d6ecd4009a5f67ea695a1a1538f5a1"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "report",
+      "width": 390,
+      "height": 844,
+      "startedAt": "2026-09-22T19:14:20.136Z",
+      "completedAt": "2026-09-22T19:14:31.428Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/report-390.png",
+        "390",
+        "844",
+        "report"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "report-390.png · #hyper-scale-chat · 390×844 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/report-390.png",
+        "bytes": 59494,
+        "sha256": "e898853a91ee6524d36df864f33328e60638837a6de2e7f275b5497795adf5f0"
+      }
+    },
+    {
+      "kind": "vasirbenchmark-engineering-opus-5-5-browser-check",
+      "mode": "local",
+      "target": "report",
+      "width": 820,
+      "height": 1000,
+      "startedAt": "2026-09-22T19:14:25.631Z",
+      "completedAt": "2026-09-22T19:14:36.899Z",
+      "command": [
+        "/Users/erikhazzard/.nvm/versions/node/v24.19.0/bin/node",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "/Users/erikhazzard/code/vasir/site/vasirbenchmark.com/benchmark-report.html",
+        "/Users/erikhazzard/code/vasir/tmp/opus-5-5-engineering-20260922/publication/local/report-820.png",
+        "820",
+        "1000",
+        "report"
+      ],
+      "harness": {
+        "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+        "bytes": 196243,
+        "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+      },
+      "sourcePins": [
+        {
+          "path": "site/vasirbenchmark.com/data.js",
+          "bytes": 862044,
+          "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        },
+        {
+          "path": "site/vasirbenchmark.com/responses.js",
+          "bytes": 6678460,
+          "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        },
+        {
+          "path": "site/vasirbenchmark.com/index.html",
+          "bytes": 2284,
+          "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+        },
+        {
+          "path": "site/vasirbenchmark.com/app.js",
+          "bytes": 218131,
+          "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.html",
+          "bytes": 2210,
+          "sha256": "060a4600dbd61ad7527163056cb3a4be8a4d9b3e3de7400e3787dbbfa7ce0136"
+        },
+        {
+          "path": "site/vasirbenchmark.com/benchmark-report.js",
+          "bytes": 122267,
+          "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+        }
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "report-820.png · #hyper-scale-chat · 820×1000 · 1 categories / 3 benchmarks / 41 settings / 82 condition entries / 246 result cells · report evidence checked · Claude release identities fit · guide mobile-not-applicable · QA clean\n",
+      "stderr": "",
+      "status": "passed",
+      "screenshot": {
+        "path": "tmp/opus-5-5-engineering-20260922/publication/local/report-820.png",
+        "bytes": 101725,
+        "sha256": "929bd0008355718c4db55230132653f8cc42ce39b5ac2cb62edead976dccc23a"
+      }
+    }
+  ]
+}

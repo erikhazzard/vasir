@@ -3,6 +3,8 @@ import { EVAL_REFERENCE_DOCS_REF } from "../docs-ref.js";
 
 const MODEL_REASONING_LEVELS = Object.freeze({
   "codex:gpt-6-astra": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
+  "codex:gpt-6-sol": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
+  "codex:gpt-6-luna": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
   "codex:gpt-5.6-sol": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-5.6-terra": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-5.6-luna": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
@@ -11,18 +13,22 @@ const MODEL_REASONING_LEVELS = Object.freeze({
   // to xhigh effort plus bounded Workflow orchestration.
   "claude:claude-fable-5-1": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultracode"]),
   "claude:opus": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
-  "claude:claude-opus-5": Object.freeze(["low", "medium", "high", "xhigh", "max"])
+  "claude:claude-opus-5": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
+  "claude:claude-opus-5-5": Object.freeze(["low", "medium", "high", "xhigh", "max"])
 });
 
 const MODEL_ALIASES = Object.freeze({
   astra: "codex:gpt-6-astra",
   "gpt-6-astra": "codex:gpt-6-astra",
+  "gpt-6-sol": "codex:gpt-6-sol",
+  "gpt-6-luna": "codex:gpt-6-luna",
   sol: "codex:gpt-5.6-sol",
   terra: "codex:gpt-5.6-terra",
   luna: "codex:gpt-5.6-luna",
   fable: "claude:fable",
   "fable-5.1": "claude:claude-fable-5-1",
   opus: "claude:opus",
+  "opus-5.5": "claude:claude-opus-5-5",
   "gpt-5.6-sol": "codex:gpt-5.6-sol",
   "gpt-5.6-terra": "codex:gpt-5.6-terra",
   "gpt-5.6-luna": "codex:gpt-5.6-luna"
@@ -61,7 +67,7 @@ function parseModelSelector(rawSelector) {
       code: "EVAL_BENCHMARK_MODEL_UNSUPPORTED",
       message: `Benchmark fresh-agent model is unsupported: ${provider}:${model}`,
       suggestion:
-        "Use GPT-6 Astra or GPT-5.6 Sol, Terra, or Luna through `codex:`, or Claude Fable or Opus through `claude:`.",
+        "Use GPT-6 Astra, Sol, or Luna, or GPT-5.6 Sol, Terra, or Luna through `codex:`, or Claude Fable or Opus through `claude:`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -97,7 +103,10 @@ export function resolveBenchmarkConfigurations({
 } = {}) {
   const selectors = requestedModelArguments.length > 0
     ? requestedModelArguments
-    : Object.keys(MODEL_REASONING_LEVELS).filter((id) => id !== "claude:claude-opus-5");
+    : Object.keys(MODEL_REASONING_LEVELS).filter((id) =>
+      id !== "claude:claude-opus-5" && id !== "claude:claude-opus-5-5" &&
+      id !== "codex:gpt-6-sol" && id !== "codex:gpt-6-luna"
+    );
   const configurations = [];
   const seen = new Set();
 
@@ -145,7 +154,10 @@ export function resolveBenchmarkConfiguration(selector) {
 }
 
 export function getDefaultBenchmarkConfigurationCount() {
-  return Object.entries(MODEL_REASONING_LEVELS).filter(([id]) => id !== "claude:claude-opus-5").map(([, levels]) => levels).reduce(
+  return Object.entries(MODEL_REASONING_LEVELS).filter(([id]) =>
+    id !== "claude:claude-opus-5" && id !== "claude:claude-opus-5-5" &&
+    id !== "codex:gpt-6-sol" && id !== "codex:gpt-6-luna"
+  ).map(([, levels]) => levels).reduce(
     (total, reasoningLevels) => total + reasoningLevels.length,
     0
   );

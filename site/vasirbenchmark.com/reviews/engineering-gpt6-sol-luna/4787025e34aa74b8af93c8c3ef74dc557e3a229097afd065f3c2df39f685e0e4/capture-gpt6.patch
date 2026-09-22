@@ -1,0 +1,28 @@
+--- tmp/opus-5-5-engineering-20260922/capture-opus.mjs
++++ tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs
+@@ -95 +95 @@
+-const EXPECTED_SETTING_COUNT = 41;
++const EXPECTED_SETTING_COUNT = 52;
+@@ -96,0 +97,4 @@
++const EXPECTED_GPT_6_CONFIGURATION_IDS = Object.freeze([
++  ...['low', 'medium', 'high', 'xhigh', 'max', 'ultra'].map(effort => 'codex:gpt-6-sol@' + effort),
++  ...['low', 'medium', 'high', 'xhigh', 'max'].map(effort => 'codex:gpt-6-luna@' + effort)
++]);
+@@ -1351 +1355 @@
+-      ...expectedRows.flatMap((expected, index) => expected.setting.configurationId.startsWith('claude:claude-opus-5-5@')
++      ...expectedRows.flatMap((expected, index) => ['claude:claude-opus-5-5@', 'codex:gpt-6-sol@', 'codex:gpt-6-luna@'].some(prefix => expected.setting.configurationId.startsWith(prefix))
+@@ -2851 +2855 @@
+-  const evaluate = async (source) => {
++  const evaluate = async (source, timeout = 15_000) => {
+@@ -2857 +2861 @@
+-    });
++    }, timeout);
+@@ -2893,0 +2898,2 @@
++    || manifest.configurationIds.filter(id => ['codex:gpt-6-sol@', 'codex:gpt-6-luna@'].some(prefix => id.startsWith(prefix))).length !== EXPECTED_GPT_6_CONFIGURATION_IDS.length
++    || !EXPECTED_GPT_6_CONFIGURATION_IDS.every(id => manifest.configurationIds.includes(id))
+@@ -2932 +2938,4 @@
+-      + ')'
++      + ')',
++    // The report audits all eleven new settings across three benchmarks, plus
++    // retained transcript probes. This is the whole audit budget, not UI latency.
++    captureTarget === 'report' ? 45_000 : 15_000

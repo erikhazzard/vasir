@@ -31,10 +31,22 @@ const EXPECTED_FABLE_CONFIGURATION_IDS = [
 ];
 const EXPECTED_ASTRA_CONFIGURATION_IDS = ["low", "medium", "high", "xhigh", "max", "ultra"]
   .map((reasoning) => `codex:gpt-6-astra@${reasoning}`);
+const EXPECTED_OPUS_5_5_CONFIGURATION_IDS = [
+  "claude:claude-opus-5-5@low",
+  "claude:claude-opus-5-5@medium",
+  "claude:claude-opus-5-5@high",
+  "claude:claude-opus-5-5@xhigh",
+  "claude:claude-opus-5-5@max"
+];
+const EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS = [
+  ...["low", "medium", "high", "xhigh", "max", "ultra"].map((reasoning) => `codex:gpt-6-sol@${reasoning}`),
+  ...["low", "medium", "high", "xhigh", "max"].map((reasoning) => `codex:gpt-6-luna@${reasoning}`)
+];
 const EXPECTED_CLAUDE_FAMILY_BY_MODEL_ID = Object.freeze({
   "claude:fable": "Claude Fable 5",
   "claude:claude-fable-5-1": "Claude Fable 5.1",
-  "claude:opus": "Claude Opus 5"
+  "claude:opus": "Claude Opus 5",
+  "claude:claude-opus-5-5": "Claude Opus 5.5"
 });
 const EXPECTED_COUNTS = {
   families: 1,
@@ -42,20 +54,20 @@ const EXPECTED_COUNTS = {
   benchmarks: 3,
   categories: 1,
   conditions: 2,
-  settings: 36,
-  resultEntries: 72,
-  responses: 216,
+  settings: 52,
+  resultEntries: 104,
+  responses: 312,
   developmentResultSets: 3,
   eligibleResultSets: 0,
   withheldResultSets: 0
 };
 const EXPECTED_RESPONSE_BUNDLE_COUNTS = {
   benchmarks: 3,
-  settings: 36,
+  settings: 52,
   conditions: 2,
-  responses: 216,
+  responses: 312,
   messageSets: 12,
-  judgments: 432
+  judgments: 624
 };
 const EXPECTED_ROUTES = {
   entrypoints: ["/", "/index.html", "/benchmark-report.html"],
@@ -275,11 +287,19 @@ test("selected immutable runs deterministically project the exact real developme
   ]));
   const sourcePathsByBenchmarkId = new Map(EXPECTED_BENCHMARK_IDS.map((benchmarkId) => [
     benchmarkId,
-    `.agents/vasir-evals/${benchmarkId}/${selectedRunsByBenchmarkId.get(benchmarkId).rescoreScope.sourceRunId}/run.json`
+    `.agents/vasir-evals/${benchmarkId}/${selectedRunsByBenchmarkId.get(benchmarkId).extension.sourceRunId}/run.json`
   ]));
   const sourceRunsByBenchmarkId = new Map([...sourcePathsByBenchmarkId].map(([benchmarkId, sourcePath]) => [
     benchmarkId,
     JSON.parse(fs.readFileSync(path.join(REPO_ROOT, sourcePath), "utf8"))
+  ]));
+  const rootPathsByBenchmarkId = new Map(EXPECTED_BENCHMARK_IDS.map((benchmarkId) => [
+    benchmarkId,
+    `.agents/vasir-evals/${benchmarkId}/${sourceRunsByBenchmarkId.get(benchmarkId).extension.sourceRunId}/run.json`
+  ]));
+  const rootRunsByBenchmarkId = new Map([...rootPathsByBenchmarkId].map(([benchmarkId, rootPath]) => [
+    benchmarkId,
+    JSON.parse(fs.readFileSync(path.join(REPO_ROOT, rootPath), "utf8"))
   ]));
   const reads = [];
   const first = buildBenchmarkPublicationProjection({
@@ -301,7 +321,7 @@ test("selected immutable runs deterministically project the exact real developme
   assert.deepEqual(first.projection, second.projection);
   assert.deepEqual(first.responseBundle, second.responseBundle);
   assert.deepEqual(first.projection.counts, EXPECTED_COUNTS, "Engineering retains its complete family-local cohort");
-  const expectedCounts = workflow ? { ...EXPECTED_COUNTS, families: games ? 3 : 2, tracks: games ? 3 : 2, benchmarks: games ? 5 : 4, categories: 2, resultEntries: 124, responses: 268, developmentResultSets: 4 } : { ...EXPECTED_COUNTS };
+  const expectedCounts = workflow ? { ...EXPECTED_COUNTS, families: games ? 3 : 2, tracks: games ? 3 : 2, benchmarks: games ? 5 : 4, categories: 2, resultEntries: 156, responses: 364, developmentResultSets: 4 } : { ...EXPECTED_COUNTS };
   if (writing) {
     const selectedWriting = first.writing;
     const writingBenchmarks = [selectedWriting, ...(selectedWriting.benchmarkPublications ?? []).map(item => item.projection), ...Object.values(selectedWriting.additionalBenchmarks ?? {})];
@@ -350,8 +370,8 @@ test("selected immutable runs deterministically project the exact real developme
     aggregateCells: first.projection.meta.aggregateCells
   }, {
     runs: 3,
-    settings: 36,
-    aggregateCells: 216
+    settings: 52,
+    aggregateCells: 312
   });
   const engineeringReads = [
     "benchmarks/public-results.json",
@@ -364,13 +384,16 @@ test("selected immutable runs deterministically project the exact real developme
     ))
   ];
   assert.deepEqual(reads.slice(0, engineeringReads.length), engineeringReads);
+  for (const sourcePath of [...sourcePathsByBenchmarkId.values(), ...rootPathsByBenchmarkId.values()]) {
+    assert.ok(reads.includes(sourcePath), `Original judge evidence is read from ${sourcePath}`);
+  }
   if (workflow) {
     assert.equal(workflow.counts.settings, 26);
     assert.equal(workflow.counts.responses, 52);
     assert.equal(first.responseBundle.aiWorkflows.counts.judgments, 104);
     assert.ok(reads.includes(publicResults.workSpecRun.runPath));
     assert.ok(reads.includes("benchmarks/work-spec-chat/publication.json"));
-  } else assert.equal(reads.length, engineeringReads.length);
+  } else assert.equal(reads.length, engineeringReads.length + 6);
 
   const { projection } = first;
   const { responseBundle } = first;
@@ -396,23 +419,47 @@ test("selected immutable runs deterministically project the exact real developme
   for (const benchmarkId of EXPECTED_BENCHMARK_IDS) {
     const selectedRun = selectedRunsByBenchmarkId.get(benchmarkId);
     const sourceRun = sourceRunsByBenchmarkId.get(benchmarkId);
-    assert.equal(sourceRun.rows.length, 72);
-    assert.equal(selectedRun.rows.length, 72);
-    assert.deepEqual(selectedRun.rescoreScope, {
-      strategy: "saved-responses-full-rescore-v1",
-      sourceRunId: sourceRun.runId,
-      rowCount: 72,
-      generationReused: true,
-      sourceScoresPreserved: false
+    const rootRun = rootRunsByBenchmarkId.get(benchmarkId);
+    assert.equal(rootRun.rows.length, 72);
+    assert.equal(sourceRun.rows.length, 82);
+    assert.equal(selectedRun.rows.length, 104);
+    assert.equal(rootRun.rescoreScope.strategy, "saved-responses-full-rescore-v1");
+    assert.equal(rootRun.rescoreScope.rowCount, 72);
+    assert.deepEqual(sourceRun.extension.extendedConfigurationIds, EXPECTED_OPUS_5_5_CONFIGURATION_IDS);
+    assert.deepEqual(sourceRun.extension.judgingScope, {
+      strategy: "appended-rows-only-v1",
+      sourceRunId: rootRun.runId,
+      sourceRowCount: 72,
+      appendedRowCount: 10,
+      combinedRowCount: 82,
+      sourceScoresPreserved: true,
+      sourceJudgingStatus: "complete",
+      sourceJudgingBasisHash: rootRun.judging.basisHash
     });
+    assert.deepEqual(sourceRun.judging.extensionScope, sourceRun.extension.judgingScope);
+    assert.deepEqual([...selectedRun.extension.extendedConfigurationIds].sort(), [...EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS].sort());
+    assert.deepEqual(selectedRun.extension.judgingScope, {
+      strategy: "appended-rows-only-v1",
+      sourceRunId: sourceRun.runId,
+      sourceRowCount: 82,
+      appendedRowCount: 22,
+      combinedRowCount: 104,
+      sourceScoresPreserved: true,
+      sourceJudgingStatus: "complete",
+      sourceJudgingBasisHash: sourceRun.judging.basisHash
+    });
+    assert.deepEqual(selectedRun.judging.extensionScope, selectedRun.extension.judgingScope);
     assert.equal(selectedRun.judging.strategy, "matched-pair-panel-consensus-v1");
     assert.deepEqual(selectedRun.judging.judgeConfigurations.map(({ id }) => id), EXPECTED_JUDGE_PANEL);
     const selectedRowsByKey = new Map(selectedRun.rows.map((row) => [row.rowKey, row]));
+    const sourceRowsByKey = new Map(sourceRun.rows.map((row) => [row.rowKey, row]));
+    for (const rootRow of rootRun.rows) {
+      assert.deepEqual(sourceRowsByKey.get(rootRow.rowKey), rootRow,
+        `${benchmarkId}/${rootRow.rowKey} survives the first extension unchanged`);
+    }
     for (const sourceRow of sourceRun.rows) {
       const selectedRow = selectedRowsByKey.get(sourceRow.rowKey);
-      for (const key of ["configurationId", "conditionId", "trialNumber", "exactMessages", "outputText", "durationMs", "usage"]) {
-        assert.deepEqual(selectedRow[key], sourceRow[key], `${benchmarkId}/${sourceRow.rowKey}/${key}`);
-      }
+      assert.deepEqual(selectedRow, sourceRow, `${benchmarkId}/${sourceRow.rowKey} retains its original response and score evidence`);
       assert.equal(selectedRow.score.aggregation.method, "unanimity-gates-mean-dimensions-v1");
       assert.equal(selectedRow.score.aggregation.judgeCount, 2);
     }
@@ -421,9 +468,28 @@ test("selected immutable runs deterministically project the exact real developme
         .sort(),
       [...EXPECTED_ASTRA_CONFIGURATION_IDS].sort()
     );
+    assert.deepEqual(
+      selectedRun.configurations.map(({ id }) => id).filter((id) => id.startsWith("claude:claude-opus-5-5@")),
+      EXPECTED_OPUS_5_5_CONFIGURATION_IDS
+    );
+    assert.deepEqual(
+      selectedRun.configurations.map(({ id }) => id).filter((id) => /^codex:gpt-6-(?:sol|luna)@/.test(id)).sort(),
+      [...EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS].sort()
+    );
+    assert.equal(rootRun.judging.judges.length, 2);
+    assert.deepEqual(rootRun.judging.judgeConfigurations.map(({ id }) => id), EXPECTED_JUDGE_PANEL);
+    assert.ok(rootRun.judging.judges.every((judge) => judge.evaluations.length === 72));
+    assert.equal(sourceRun.judging.judges.length, 2);
+    assert.deepEqual(sourceRun.judging.judgeConfigurations.map(({ id }) => id), EXPECTED_JUDGE_PANEL);
+    assert.ok(sourceRun.judging.judges.every((judge) => judge.evaluations.length === 10));
     assert.equal(selectedRun.judging.judges.length, 2);
-    assert.ok(selectedRun.judging.judges.every((judge) => judge.evaluations.length === 72));
+    assert.ok(selectedRun.judging.judges.every((judge) => judge.evaluations.length === 22));
   }
+  assert.equal([...rootRunsByBenchmarkId.values()].reduce((count, run) => count + run.rows.length, 0), 216);
+  assert.equal([...sourceRunsByBenchmarkId.values()].reduce((count, run) => count + run.rows.length, 0), 246);
+  assert.equal([...selectedRunsByBenchmarkId.values()].reduce((count, run) => (
+    count + run.judging.judges.reduce((reviews, judge) => reviews + judge.evaluations.length, 0)
+  ), 0), 132);
   for (const response of responseBundle.responses) {
     const rawConditionId = response.condition === "baseline"
       ? "clean"
@@ -437,11 +503,21 @@ test("selected immutable runs deterministically project the exact real developme
     assert.deepEqual(messageSetsById.get(response.messageSetId), sourceRow.exactMessages);
     assert.equal(response.outputText, sourceRow.outputText);
     assert.deepEqual(response.judgments, EXPECTED_JUDGE_PANEL.map((judgeConfigurationId) => {
-      const judgeSourceRun = selectedRunsByBenchmarkId.get(response.benchmarkId);
+      const judgeSourceRun = EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS.includes(response.configurationId)
+        ? selectedRunsByBenchmarkId.get(response.benchmarkId)
+        : EXPECTED_OPUS_5_5_CONFIGURATION_IDS.includes(response.configurationId)
+          ? sourceRunsByBenchmarkId.get(response.benchmarkId)
+          : rootRunsByBenchmarkId.get(response.benchmarkId);
       const sourceJudge = judgeSourceRun.judging.judges.find(
         (judge) => judge.configuration.id === judgeConfigurationId
       );
       const sourceEvaluation = sourceJudge.evaluations.find((evaluation) => evaluation.rowKey === sourceRow.rowKey);
+      assert.ok(sourceEvaluation, `${response.benchmarkId}/${sourceRow.rowKey}/${judgeConfigurationId} keeps its original review`);
+      assert.ok(sourceRow.score.aggregation.evaluations.some((evaluation) => (
+        evaluation.reviewerId === sourceJudge.reviewerId &&
+        evaluation.evaluationHash === sourceEvaluation.evaluationHash &&
+        evaluation.total === sourceEvaluation.total
+      )), `${response.benchmarkId}/${sourceRow.rowKey}/${judgeConfigurationId} retains review provenance`);
       return {
         judgeConfigurationId,
         score: sourceEvaluation.total,
@@ -532,15 +608,16 @@ test("selected immutable runs deterministically project the exact real developme
     Number.isFinite(summary.treatment) &&
     Number.isFinite(summary.delta) &&
     Math.abs(summary.delta - (summary.treatment - summary.baseline)) < 0.11 &&
-    summary.wins + summary.ties + summary.losses === 36
+    summary.wins + summary.ties + summary.losses === 52
   )));
   assert.deepEqual(
     projection.benchmarkSummaries.map((summary) => summary.judgingScope),
     EXPECTED_BENCHMARK_IDS.map(() => ({
-      strategy: "saved-responses-full-rescore-v1",
-      responseCount: 72,
-      generationReused: true,
-      sourceScoresPreserved: false
+      strategy: "appended-rows-only-v1",
+      incumbentResponseCount: 82,
+      appendedResponseCount: 22,
+      combinedResponseCount: 104,
+      incumbentScoresPreserved: true
     }))
   );
 
@@ -605,7 +682,7 @@ test("selected immutable runs deterministically project the exact real developme
   const claudeSettings = projection.settings.filter(({ configurationId }) => (
     configurationId.startsWith("claude:")
   ));
-  assert.equal(claudeSettings.length, 13);
+  assert.equal(claudeSettings.length, 18);
   for (const setting of claudeSettings) {
     const expectedFamily = EXPECTED_CLAUDE_FAMILY_BY_MODEL_ID[setting.modelId];
     assert.equal(setting.provider, "claude", setting.configurationId);
@@ -616,13 +693,63 @@ test("selected immutable runs deterministically project the exact real developme
   const claudeEntries = projection.entries.filter(({ configurationId }) => (
     configurationId.startsWith("claude:")
   ));
-  assert.equal(claudeEntries.length, 26);
+  assert.equal(claudeEntries.length, 36);
   for (const entry of claudeEntries) {
     const expectedFamily = EXPECTED_CLAUDE_FAMILY_BY_MODEL_ID[entry.modelId];
     assert.equal(entry.provider, "claude", entry.id);
     assert.equal(entry.family, expectedFamily, entry.id);
     assert.equal(entry.label, `${expectedFamily} · ${entry.reasoning}`, entry.id);
   }
+
+  const opusSettings = projection.settings.filter(({ modelId }) => modelId === "claude:claude-opus-5-5");
+  assert.deepEqual(
+    opusSettings.map(({ configurationId }) => configurationId).sort(),
+    [...EXPECTED_OPUS_5_5_CONFIGURATION_IDS].sort()
+  );
+  const opusCells = projection.benchmarkResults.filter(({ configurationId }) => (
+    EXPECTED_OPUS_5_5_CONFIGURATION_IDS.includes(configurationId)
+  ));
+  assert.equal(opusCells.length, 30);
+  assert.deepEqual(opusCells.map(({ configurationId, benchmarkId, condition }) => (
+    `${configurationId}|${benchmarkId}|${condition}`
+  )).sort(), EXPECTED_OPUS_5_5_CONFIGURATION_IDS.flatMap((configurationId) => (
+    EXPECTED_BENCHMARK_IDS.flatMap((benchmarkId) => (
+      ["baseline", "skill"].map((condition) => `${configurationId}|${benchmarkId}|${condition}`)
+    ))
+  )).sort());
+
+  const solLunaSettings = projection.settings.filter(({ modelId }) => (
+    ["codex:gpt-6-sol", "codex:gpt-6-luna"].includes(modelId)
+  ));
+  assert.deepEqual(
+    solLunaSettings.map(({ configurationId }) => configurationId).sort(),
+    [...EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS].sort()
+  );
+  const expectedNewFamilies = {
+    "codex:gpt-6-sol": "GPT-6 Sol",
+    "codex:gpt-6-luna": "GPT-6 Luna"
+  };
+  const solLunaEntries = projection.entries.filter(({ configurationId }) => (
+    EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS.includes(configurationId)
+  ));
+  assert.equal(solLunaEntries.length, 22);
+  for (const record of [...solLunaSettings, ...solLunaEntries]) {
+    const expectedFamily = expectedNewFamilies[record.modelId];
+    assert.equal(record.provider, "codex", record.configurationId);
+    assert.equal(record.family, expectedFamily, record.configurationId);
+    assert.equal(record.label, `${expectedFamily} · ${record.reasoning}`, record.configurationId);
+  }
+  const solLunaCells = projection.benchmarkResults.filter(({ configurationId }) => (
+    EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS.includes(configurationId)
+  ));
+  assert.equal(solLunaCells.length, 66);
+  assert.deepEqual(solLunaCells.map(({ configurationId, benchmarkId, condition }) => (
+    `${configurationId}|${benchmarkId}|${condition}`
+  )).sort(), EXPECTED_SOL_LUNA_6_CONFIGURATION_IDS.flatMap((configurationId) => (
+    EXPECTED_BENCHMARK_IDS.flatMap((benchmarkId) => (
+      ["baseline", "skill"].map((condition) => `${configurationId}|${benchmarkId}|${condition}`)
+    ))
+  )).sort());
 
   const expectedFableCells = EXPECTED_FABLE_CONFIGURATION_IDS.flatMap((configurationId) => (
     EXPECTED_BENCHMARK_IDS.flatMap((benchmarkId) => (

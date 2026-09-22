@@ -259,7 +259,9 @@ test("Claude benchmark aliases resolve to their expected canonical target models
   for (const [model, targetCanonicalModel] of [
     ["fable", "claude-fable-5"],
     ["claude-fable-5-1", "claude-fable-5-1"],
-    ["opus", "claude-opus-5"]
+    ["opus", "claude-opus-5"],
+    ["claude-opus-5", "claude-opus-5"],
+    ["claude-opus-5-5", "claude-opus-5-5"]
   ]) {
     const result = await runBenchmarkAgent({
       configuration: {
@@ -290,34 +292,40 @@ test("Claude benchmark aliases resolve to their expected canonical target models
   }
 });
 
-test("Claude Opus alias fails closed when the runtime reports another target model", async () => {
-  await assert.rejects(
-    runBenchmarkAgent({
-      configuration: {
-        id: "claude:opus@max",
-        provider: "claude",
-        model: "opus",
-        reasoning: "max"
-      },
-      promptText: "Judge it.",
-      spawnImplementation: createSpawnStub({
-        stdout: JSON.stringify({
-          is_error: false,
-          result: "Wrong-model judgment.",
-          modelUsage: {
-            target: { canonicalModel: "claude-fable-5-1", outputTokens: 8 }
-          }
+test("Claude Opus targets fail closed when the runtime reports another target model", async () => {
+  for (const [model, targetCanonicalModel, wrongModel, expectedMessage] of [
+    ["opus", "claude-opus-5", "claude-fable-5-1", /Opus 5 canonical-model policy/],
+    ["opus", "claude-opus-5", "claude-opus-5-5", /Opus 5 canonical-model policy/],
+    ["claude-opus-5-5", "claude-opus-5-5", "claude-opus-5", /Opus 5\.5 canonical-model policy/]
+  ]) {
+    await assert.rejects(
+      runBenchmarkAgent({
+        configuration: {
+          id: `claude:${model}@max`,
+          provider: "claude",
+          model,
+          reasoning: "max"
+        },
+        promptText: "Judge it.",
+        spawnImplementation: createSpawnStub({
+          stdout: JSON.stringify({
+            is_error: false,
+            result: "Wrong-model judgment.",
+            modelUsage: {
+              target: { canonicalModel: wrongModel, outputTokens: 8 }
+            }
+          })
         })
-      })
-    }),
-    (error) => {
-      assert.equal(error.code, "EVAL_AGENT_RUNTIME_FAILED");
-      assert.match(error.message, /Opus 5 canonical-model policy/);
-      assert.equal(error.context.targetCanonicalModel, "claude-opus-5");
-      assert.deepEqual(error.context.observedCanonicalModels, ["claude-fable-5-1"]);
-      return true;
-    }
-  );
+      }),
+      (error) => {
+        assert.equal(error.code, "EVAL_AGENT_RUNTIME_FAILED");
+        assert.match(error.message, expectedMessage);
+        assert.equal(error.context.targetCanonicalModel, targetCanonicalModel);
+        assert.deepEqual(error.context.observedCanonicalModels, [wrongModel]);
+        return true;
+      }
+    );
+  }
 });
 
 test("Fable 5.1 native modes keep the exact model, requested effort, and tool isolation", async () => {

@@ -1,0 +1,46 @@
+{
+  "kind": "vasirbenchmark-engineering-cohort-browser-harness",
+  "createdAt": "2026-09-22T19:32:48.071315+00:00",
+  "basis": "Scoped temporary derivative of the accepted Opus Engineering browser proof for additive GPT-6 Sol and GPT-6 Luna publication. Canonical presentation and harness remain unchanged.",
+  "source": {
+    "path": "tmp/opus-5-5-engineering-20260922/capture-opus.mjs",
+    "bytes": 196243,
+    "sha256": "421327f92be4428e682f46b6cc444c24b636cd283f8ae69900b3be2751d79b53"
+  },
+  "canonicalAncestor": {
+    "path": "site/vasirbenchmark.com/capture.mjs",
+    "bytes": 195051,
+    "sha256": "f3776b49920fdd74b816d689d514373ad90a269c11260290604b34e30929991e"
+  },
+  "derived": {
+    "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.mjs",
+    "bytes": 197071,
+    "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+  },
+  "patch": {
+    "path": "tmp/gpt6-sol-luna-engineering-20260922/capture-gpt6.patch",
+    "bytes": 1522,
+    "sha256": "6518846f91834e621505afb71e878084361245a1540b01951b735e61814f671c"
+  },
+  "changes": [
+    "Require exactly 52 settings, 104 condition entries, 312 responses and 624 original judgments.",
+    "Require exact six GPT-6 Sol efforts low/medium/high/xhigh/max/ultra and five GPT-6 Luna efforts low/medium/high/xhigh/max.",
+    "Preserve first/middle/last and all five Opus 5.5 transcript probes; additionally inspect all eleven GPT-6 Sol/Luna transcripts across each Engineering benchmark and both conditions.",
+    "Raise only the expanded Engineering report audit Runtime.evaluate budget from15seconds to45seconds after all three15second report probes timed out. Preserve every transcript, review, and arithmetic assertion; ordinary page calls retain15seconds."
+  ],
+  "productionOrCanonicalFilesChanged": false,
+  "observedInitialFailures": {
+    "reason": "All six main-page checks passed; all three report checks exceeded the15second whole-audit timeout while inspecting the expanded transcript roster. No product assertion was reported.",
+    "receiptDirectory": "tmp/gpt6-sol-luna-engineering-20260922/publication/local-initial-failed",
+    "harness": {
+      "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local-initial-failed/capture-gpt6.mjs",
+      "bytes": 196832,
+      "sha256": "e70125bc8d53c60836ad599c59ed4ba077c813eb839303f0902c8a1567275902"
+    },
+    "suite": {
+      "path": "tmp/gpt6-sol-luna-engineering-20260922/publication/local-initial-failed/suite.json",
+      "bytes": 24803,
+      "sha256": "38eabac07373c3ed2ad1947112b9b3433b476fa071239417fb49955f25ecfe81"
+    }
+  }
+}

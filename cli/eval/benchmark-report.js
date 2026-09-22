@@ -35,7 +35,8 @@ const REPORT_FONT_FILES = [
 const VERSIONED_CLAUDE_MODEL_NAMES = Object.freeze({
   "claude:fable": "Claude Fable 5",
   "claude:claude-fable-5-1": "Claude Fable 5.1",
-  "claude:opus": "Claude Opus 5"
+  "claude:opus": "Claude Opus 5",
+  "claude:claude-opus-5-5": "Claude Opus 5.5"
 });
 
 function renderEmbeddedFontStyles() {

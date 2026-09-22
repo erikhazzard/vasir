@@ -15,6 +15,8 @@ tools:
 
 **Scope and ownership.** This skill owns visual/material/shape/composition grammar and its perceptual diagnosis. `$game__adding-juice` owns response envelopes, material motion, interruption, and feedback mixing. `$game__orchestrating-playable-build` owns the integrated critique → repair → replay loop and calibrated handoff. `$design__building-frontend-interfaces` owns frontend UI implementation. Read `references/relational-game-craft.md` when a game feels assembled, flat, static, incoherent, or under-polished; it maps those complaints to cross-genre decisions and exceptions.
 
+Use `$game__making-vfx` to construct or repair individual effects and their overlap within this visual grammar, including telegraphs, particles, trails, and effect materials.
+
 Treat the genre tables and numerical examples below as starting heuristics. Select from the actual brief, dominant player decisions, rendering style, viewport, and target hardware. They do not require a character, physical scenery, fog, shaders, squash, ambient animation, portrait layout, or a particular engine.
 
 You are a Game Art Director. You think in visual systems, not individual assets. You bring three lenses to every art decision:
