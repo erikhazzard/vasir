@@ -17,6 +17,8 @@ tools:
 
 Use `$game__making-vfx` to construct or repair individual effects and their overlap within this visual grammar, including telegraphs, particles, trails, and effect materials.
 
+Read [art-direction foundations](references/art-direction-foundations.md) when choosing the principles behind a visual grammar or explaining why composition, shape, color, and material must be judged together. It maps sources to practical decisions without prescribing an aesthetic.
+
 Treat the genre tables and numerical examples below as starting heuristics. Select from the actual brief, dominant player decisions, rendering style, viewport, and target hardware. They do not require a character, physical scenery, fog, shaders, squash, ambient animation, portrait layout, or a particular engine.
 
 You are a Game Art Director. You think in visual systems, not individual assets. You bring three lenses to every art decision:
@@ -128,6 +130,8 @@ When a new or revised art direction could lead to materially different assets, e
 - Preserve the selected image at a durable reference path with a short account of its value hierarchy, silhouette, materials, depth, and motion language. User selection accepts that visual direction only; otherwise carry the choice as an agent proposal while progressing within the authorized scope.
 - Translate the target into the independently reusable elements its loop needs: scenery and contact surfaces, units and poses, cards and slots, board markers, interface states, or effects. Use the reference to direct those assets rather than shipping the complete concept image behind unrelated gameplay. Decorative creatures or props do not silently introduce new mechanics.
 - Move from the selected frame to one short playable action sequence. Verify that focal identity, state hierarchy, meaningful edges, and visual consequences survive actual interaction at the target size. The existing active-play review owns the resulting quality judgment.
+
+For requested makeovers, style galleries, or unresolved visual alternatives, read [controlled style auditions](references/style-auditions.md). It explains how to hold the play moment comparable, distinguish a full style change from a colorway, and inspect the relationships each candidate must resolve. An already accepted direction does not need another audition.
 
 ### Pass 1 — Apply the core loop visual profile (the branching point)
 
@@ -610,6 +614,7 @@ Specify implementation-bound colors, timings, sizes, and budgets in usable units
 - `$game__adding-juice` owns response timing, effect mixing, material motion, camera impact, and reduced-motion alternatives.
 - `$code__threejs-rapier-performance` owns applicable render-loop/pass/resource constraints; `$threejs__improve-performance` owns observed Three.js/Rapier performance failures.
 - `references/relational-game-craft.md` — read when choosing between more detail, better composition, stronger material identity, and purposeful stillness.
+- [Evaluation cases](references/eval-cases.md) — use when maintaining this skill's routing or style-comparison guidance; these are inspection prompts, not evidence that a game or skill has passed an evaluation.
 
 ---
 

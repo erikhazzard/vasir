@@ -451,7 +451,10 @@
       "files": [
         "SKILL.md",
         "references/active-play-visual-quality-gate.md",
-        "references/relational-game-craft.md"
+        "references/art-direction-foundations.md",
+        "references/eval-cases.md",
+        "references/relational-game-craft.md",
+        "references/style-auditions.md"
       ],
       "path": ".agents/skills/game__art-directing",
       "entry": "SKILL.md"
