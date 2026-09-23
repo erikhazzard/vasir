@@ -1,37 +1,22 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-09-22-engineering-gpt6-sol-luna-4787025e34aa",
+  "version": "2026-09-22-games-opus-5-5-8d0cbc81d006",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
     "scope": {
-      "kind": "engineering-data-refresh",
+      "kind": "games-data-extension",
       "schemaVersion": 1,
       "benchmarkIds": [
-        "hyper-scale-chat",
-        "personalized-home-feed",
-        "device-telemetry"
+        "2d-jumping-demo"
       ],
       "configurationIds": [
-        "codex:gpt-6-sol@low",
-        "codex:gpt-6-sol@medium",
-        "codex:gpt-6-sol@high",
-        "codex:gpt-6-sol@xhigh",
-        "codex:gpt-6-sol@max",
-        "codex:gpt-6-sol@ultra",
-        "codex:gpt-6-luna@low",
-        "codex:gpt-6-luna@medium",
-        "codex:gpt-6-luna@high",
-        "codex:gpt-6-luna@xhigh",
-        "codex:gpt-6-luna@max"
+        "claude:claude-opus-5-5@high",
+        "claude:claude-opus-5-5@max"
       ],
       "viewports": [
         {
           "width": 1440,
-          "height": 1000
-        },
-        {
-          "width": 820,
           "height": 1000
         },
         {
@@ -41,112 +26,174 @@
       ]
     },
     "authority": "user",
-    "acceptedAt": "2026-09-22T20:02:22.658Z",
-    "response": "User requested evaluating GPT-6 Sol and GPT-6 Luna, then publishing their Engineering results.",
-    "basis": "The user explicitly requested this additive Engineering evaluation and publication. Agent browser checks and visual review support the refresh; no fresh human screenshot acceptance is claimed.",
-    "verdict": "Eleven GPT-6 Sol and GPT-6 Luna settings selected for publication from saved append-only evidence; nine local browser checks passed.",
-    "criterion": "52 Engineering settings, 312 answers and 624 original judge assessments. All 246 incumbent answers and original score evidence remain unchanged. Only static Engineering counts change in presentation source. All Writing modules, Games and AI Workflows remain unchanged; new incomplete settings do not enter Overall rankings.",
+    "acceptedAt": "2026-09-22T22:57:01.542Z",
+    "response": "User requested running Opus 5.5 at highest and High effort, with and without skills, and fully updating the public Games benchmark page.",
+    "basis": "The user explicitly authorized this additive benchmark run and publication. Fresh browser evidence and the listed agent-reviewed captures support acceptance; no fresh human screenshot approval is claimed. Existing workspace Games presentation is preserved and hash-verified.",
+    "verdict": "Seven configurations, fourteen retained game outputs and twenty-eight original judge assessments are selected; the new Opus 5.5 Max and High configurations each have Bare and With Vasir outputs.",
+    "criterion": "All ten incumbent Games rows and their reviews remain identical; all non-Games projections, response archives and Writing modules remain unchanged. Both viewports exercise every pair, fourteen advancing clips, final-origin game input observations and isolation. Quality ranks exclude ineligible diagnostic scores.",
     "verification": {
       "previousAcceptance": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/previous-template-lock.json",
-        "bytes": 13399,
-        "sha256": "00d252b179e8ec40d033b52c5fdb07688372ff55363b6ac8549a103e50452baa"
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-template-lock.json",
+        "bytes": 40763,
+        "sha256": "a25b234b42711c99994756391c6518d00a77d7298be177113ea081826e7beb39"
       },
-      "previousSelection": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/previous-public-results.json",
-        "bytes": 1086,
-        "sha256": "838677dd8228c71c67f2da4c57d8678a40f3840ad4ba908c6e889a3ac67ceffc"
-      },
+      "previousFiles": [
+        {
+          "sourcePath": "deployment.json",
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-deployment.json",
+          "bytes": 3577,
+          "sha256": "1f76ec7f841eb99dba45d3fe81a839414b53f91c1431aea2cb333923bb122368"
+        }
+      ],
       "previousData": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/previous-data.js",
-        "bytes": 862044,
-        "sha256": "5c0d6715812d1af974186eeff2911d4652d5a56db9eecb4c258ff21745831680"
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-data.js",
+        "bytes": 929148,
+        "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
       },
       "previousResponses": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/previous-responses.js",
-        "bytes": 6678460,
-        "sha256": "cf14bc1c0e672cad29ddec72746d2051193a4b4f03f9e6b34d7c1ca1d199e647"
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-responses.js",
+        "bytes": 6907491,
+        "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
       },
-      "previousIndex": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/previous-index.html",
-        "bytes": 2284,
-        "sha256": "24c7d4bceaeb9211011a8782d2bf50eefcc1f452b0b56ac345e574058cbe49c6"
+      "previousSelection": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-games-publication.json",
+        "bytes": 362,
+        "sha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321"
       },
-      "browserSuite": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/browser-suite.json",
-        "bytes": 25948,
-        "sha256": "4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4"
+      "baselineManifest": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/baseline-manifest.json",
+        "bytes": 1691,
+        "sha256": "12d44ea6365a6d837e2bcbfb840c723d752ddff7a0a45a5d97aa56a120db8a18"
       },
-      "browserHarness": {
-        "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capture-gpt6.mjs",
-        "bytes": 197071,
-        "sha256": "26b2e74fead76b02f6aa314e0d317860de682d3a1f144136f69e1c800680c0f1"
+      "preservedWorkspaceManifest": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/preserved-workspace-files.json",
+        "bytes": 578,
+        "sha256": "5e96075fa416a28c5e0c00bf2328afbb958fe4e4e84e609de6a094efe78bec10"
       },
-      "localBrowserChecks": 9,
-      "counts": {
-        "settings": 52,
-        "responses": 312,
-        "judgments": 624
-      },
-      "selection": {
-        "path": "benchmarks/public-results.json",
-        "bytes": 1086,
-        "sha256": "eeb45929024df0c14f01a445a6627e520b2ef4008534f06dba0cc68f1f2939d9"
-      },
-      "selectedRuns": [
+      "preservedWorkspaceFiles": [
         {
-          "benchmarkId": "hyper-scale-chat",
-          "path": ".agents/vasir-evals/hyper-scale-chat/2026-09-22T19-31-05Z__extend__0efd2ba2b84e/run.json",
-          "bytes": 3720944,
-          "sha256": "bcc69a73cce714930f675292d6ee9daf7865c406598d4668e01069ff880caa1c",
-          "source": {
-            "path": ".agents/vasir-evals/hyper-scale-chat/2026-09-22T18-36-50Z__extend__be7c7f389db6/run.json",
-            "bytes": 2687858,
-            "sha256": "b3a5d4ccb55105fff6ceb2b4b80f055bfe7fbd0cf29579f12682db2ff7d57346"
-          }
+          "sourcePath": "games.js",
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/preserved-games.js",
+          "bytes": 34825,
+          "sha256": "4b9d7a536c2d586501ff40cd44798579806eb2886e34b4766b5a1032bb8c712c"
         },
         {
-          "benchmarkId": "personalized-home-feed",
-          "path": ".agents/vasir-evals/personalized-home-feed/2026-09-22T19-31-05Z__extend__bfcfdc599a67/run.json",
-          "bytes": 4100268,
-          "sha256": "dd73ed3db66b02c4d732815f78ee7b4e7b5292d78af2b75dcecff2485d9ca072",
-          "source": {
-            "path": ".agents/vasir-evals/personalized-home-feed/2026-09-22T18-36-50Z__extend__fb81174b2ed7/run.json",
-            "bytes": 3034761,
-            "sha256": "efc5cb178b45fe926e8bef8db39390eaa08540291464e4f9d29718e7dd9246f0"
-          }
-        },
-        {
-          "benchmarkId": "device-telemetry",
-          "path": ".agents/vasir-evals/device-telemetry/2026-09-22T19-31-05Z__extend__0a1659a0a382/run.json",
-          "bytes": 4419670,
-          "sha256": "dfee9df45000d47d61a9047b5ee842840864ac045f9e8e814395a96d73f0d065",
-          "source": {
-            "path": ".agents/vasir-evals/device-telemetry/2026-09-22T18-36-50Z__extend__b5909f5561c0/run.json",
-            "bytes": 3160257,
-            "sha256": "2c25525050ef03ad008851c594efb25624dc60d8a4facb44b0505fe6fffab5b8"
-          }
+          "sourcePath": "games.css",
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/preserved-games.css",
+          "bytes": 21947,
+          "sha256": "271ad9afb1e8f00205c10dbb768418267f6335e64649bc5610c42217066e0e29"
         }
       ],
       "generatedFiles": [
         {
           "path": "data.js",
-          "bytes": 929148,
-          "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+          "bytes": 977199,
+          "sha256": "d5d8a6426d7af1b0132a21020612cdaf5a3c05f92e4c0fc1cb43904dfd36f95a"
         },
         {
           "path": "responses.js",
           "bytes": 6907491,
           "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        },
+        {
+          "path": "writing-creation-responses.js",
+          "bytes": 6561951,
+          "sha256": "5ecca79e69f9ff8123c7f187d61736c7cbd0485d555d7f2a06dbca5ab9685b7e"
+        },
+        {
+          "path": "writing-data.js",
+          "bytes": 2177044,
+          "sha256": "48b50fd439056adfe4fcf48b76d1e890bcaf2dd2831ae926546018112f41f77b"
+        },
+        {
+          "path": "writing-dungeon-master-responses.js",
+          "bytes": 104,
+          "sha256": "3192148f7e1877e3f20f1f67b17764e964d6599b30b8221b0578167e7094faa4"
+        },
+        {
+          "path": "writing-responses.js",
+          "bytes": 4967761,
+          "sha256": "4c35ae4ca7dd70a09e09d01062046bda6a5f369dedb55defe956441cd555a919"
+        },
+        {
+          "path": "writing-twists-responses.js",
+          "bytes": 1672116,
+          "sha256": "df483b62adc636f031eca013d72c3eceb534cd6135b72833d0a46ba3d943d6f3"
         }
       ],
+      "browserHarness": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-browsercheck.mjs",
+        "bytes": 63737,
+        "sha256": "12a0d4c31422ccdd2186ec2aa7e9424113938ccd064330e8ac35e8366f02a5e1"
+      },
+      "browserProofs": [
+        {
+          "width": 1440,
+          "height": 1000,
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-browsercheck-1440.json",
+          "bytes": 424082,
+          "sha256": "ff9b5e1352518ee31985b08d5cd3b1167b5f7d291a9ba375111cbebce93e4e3a"
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-browsercheck-390.json",
+          "bytes": 421073,
+          "sha256": "e0010a7e7969d13abfa7714972d6119346c5d017b7c41d95d5a8353992c49cbe"
+        }
+      ],
+      "rehearsalManifest": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/rehearsal-manifest.json",
+        "bytes": 347082,
+        "sha256": "c62402aba6f60407d22ed321daf4d992dc2e093b5539b15e61c09e854440e655"
+      },
+      "candidate": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/candidate.json",
+        "bytes": 5875,
+        "sha256": "8d0cbc81d00637b333133b83e4739da85187700b420ce4915f6a34d8f6b968e0"
+      },
+      "selectedPublication": {
+        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-publication.json",
+        "bytes": 362,
+        "sha256": "6b3c46159e9014113dfc055e90d36db326c4bf90eca918a8a33331ffe5cdedb8"
+      },
+      "deploymentBudget": {
+        "before": {
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/baseline-deployment.json",
+          "bytes": 3577,
+          "sha256": "ade9361c25ad40525c194023988ccd65c899f12df237f057b5115762eb45850e"
+        },
+        "after": {
+          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/deployment.json",
+          "bytes": 3577,
+          "sha256": "cb3de1995306a55867530a5c251f2a3d20e4d057c47a10e782ebe3cc43136e1e"
+        },
+        "measuredCompressedLandingBytes": 311005,
+        "previousLimit": 300000,
+        "currentLimit": 320000,
+        "storage": {
+          "rejection": {
+            "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/storage-budget-rejection.json",
+            "bytes": 846,
+            "sha256": "117b0660a055ff7aeb86d28cbbecf6f22962397673f0e028b8d1f2c4bcce97be"
+          },
+          "previousLimit": 1073741824,
+          "currentLimit": 1090519040,
+          "boundaryBytes": 16777216
+        }
+      },
+      "configurations": 7,
+      "outputs": 14,
+      "judgments": 28,
+      "preservedOutputs": 10,
+      "localBrowserChecks": 2,
       "visualReview": {
         "authority": "agent",
         "capturePaths": [
-          "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capabilities-1440.png",
-          "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capability-benchmarks-390.png"
+          "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-ratings.png",
+          "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-ratings.png"
         ],
-        "verdict": "Agent inspected the listed current-candidate screenshots."
+        "verdict": "Agent inspected only the listed current-candidate captures."
       }
     }
   },
@@ -162,7 +209,7 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "Engineering development measurements use one answer per task and condition with two model judges. This additive publication retains all saved outcomes and original reviews. Previous Engineering and Writing acceptances and captures remain historical evidence, not claims about the current refresh. Local acceptance is separate from live deployment proof.",
+  "claimBoundary": "This acceptance adds four frozen generation outcomes and their saved original assessments while preserving the existing workspace presentation. Local pinned-byte browser evidence does not establish live CDN delivery or certify game mechanics, winning, physical-phone feel, or enjoyment. Historical acceptance stays archived unchanged.",
   "files": [
     {
       "path": "app.js",
@@ -207,17 +254,17 @@
     {
       "path": "deployment.json",
       "bytes": 3577,
-      "sha256": "ade9361c25ad40525c194023988ccd65c899f12df237f057b5115762eb45850e"
+      "sha256": "cb3de1995306a55867530a5c251f2a3d20e4d057c47a10e782ebe3cc43136e1e"
     },
     {
       "path": "games-browsercheck.mjs",
-      "bytes": 55199,
-      "sha256": "5798f438f3446c69666a1ed1b3df5ed74786a9ccaf1874ec706153794784abb8"
+      "bytes": 63737,
+      "sha256": "12a0d4c31422ccdd2186ec2aa7e9424113938ccd064330e8ac35e8366f02a5e1"
     },
     {
       "path": "games.css",
-      "bytes": 19893,
-      "sha256": "29dfaf16ab0b7437ba938862d253fc6cc731afbec941f5c1303d50e4a8679ac8"
+      "bytes": 21947,
+      "sha256": "271ad9afb1e8f00205c10dbb768418267f6335e64649bc5610c42217066e0e29"
     },
     {
       "path": "games.html",
@@ -226,8 +273,8 @@
     },
     {
       "path": "games.js",
-      "bytes": 31995,
-      "sha256": "4f15bf73728d00cc179f9c0b8de8a4d82f5351dd1dd13711ba8a3e9ba83319e2"
+      "bytes": 34825,
+      "sha256": "4b9d7a536c2d586501ff40cd44798579806eb2886e34b4766b5a1032bb8c712c"
     },
     {
       "path": "index.html",
@@ -258,76 +305,671 @@
   ],
   "captures": [
     {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capabilities-1440.png",
-      "bytes": 140088,
-      "sha256": "cf8740b329ca0106cafbee90212b53313efe31c86aef6b3968f6a8cb23b267b1",
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games.png",
+      "bytes": 152350,
+      "sha256": "e2984870fdc8ae57bfaab8b0e3cb33145434b4b63c16b7c140d955b1962a7ce8",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capability-benchmarks-1440.png",
-      "bytes": 198507,
-      "sha256": "c1bd7a8b85731a85b5597bd38693c114a24bddcf3c8778be9378d112ed6da3ce",
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-ratings.png",
+      "bytes": 142456,
+      "sha256": "1fbd7814891191fb87e8fcd098c4e715ce826df0c1e3e5a585a19497b1b77a11",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capability-benchmarks-390.png",
-      "bytes": 69593,
-      "sha256": "32288c33b7c16e9621abc9be5bbb3e9b7bb15c8dcfe852f18c702535ee51c644",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capabilities-390.png",
-      "bytes": 68569,
-      "sha256": "eb30b40dca22f4089f417e617aa42afa016df9734afa648e7891257f770cc43f",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capabilities-820.png",
-      "bytes": 100810,
-      "sha256": "8a8c647682dea13b97398379a404fd667e11e660c7d82ea4a2fed23f1ba54b81",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/capability-benchmarks-820.png",
-      "bytes": 114201,
-      "sha256": "7d7603e2454ff2d0f454e65148da60dfb8fa3eccb5cc0be82d22d89e165961e1",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/report-1440.png",
-      "bytes": 146731,
-      "sha256": "efaebd1ef0a309d3e0b5f307084a0d47755ba7d784282d693b9ab8669aec656b",
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-playback.png",
+      "bytes": 487027,
+      "sha256": "d37cedee0ced18a886dfa5e432a098f5a217ecf8b26c7b994c651e678c3bd27b",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/report-390.png",
-      "bytes": 60013,
-      "sha256": "b86a3f5d79b567e6d286fb624a7268e7fe498d6b005bad497a243c34a65efba0",
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-play.png",
+      "bytes": 483950,
+      "sha256": "5fe6333cefedeb3021e7e5ae5aa41a0e35124b87965c55aefd66a5debb9b6728",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-fullscreen.png",
+      "bytes": 467583,
+      "sha256": "21a57380956798a946ba2928cc4757ab7e94f800fd4b54caba7aff347aad6f28",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-1-playback.png",
+      "bytes": 486955,
+      "sha256": "32c87ca36a80b6a2fa8cb01d0278c2e4e966a28a9051f07774b1e07025424621",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-1-before-input.png",
+      "bytes": 651259,
+      "sha256": "83aada869e4336fb7e9149c4d7b0ff25b2e2401b1548c3ed24f3078b8cc87761",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-1-after-input.png",
+      "bytes": 647147,
+      "sha256": "9a26d97b3ba60f59af6aba16d1133198903a6bbdb81bdae9f9556effa032b45e",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-2-playback.png",
+      "bytes": 483940,
+      "sha256": "8b3a56291f567cbd110de8e1aa0fe2cd3f3d1a961b57e6e5ff4ee229d86cef6e",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-2-before-input.png",
+      "bytes": 593166,
+      "sha256": "4a004aca28e2d062f346255b62b5a8535320dafbbe1d2505e7a207438f8a6a64",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-2-after-input.png",
+      "bytes": 594733,
+      "sha256": "ea3eca609a8d567ed03692e9b72049cd99ab1ede25cef38ce84fa1b38c610dee",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-3-playback.png",
+      "bytes": 405037,
+      "sha256": "1de9072f6976609bc19ddfd69bd511dfc1aee7d34294c3de3b90c9d485c0f682",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-3-before-input.png",
+      "bytes": 488146,
+      "sha256": "562ad5dcd0ac07f5977bf9856046213a03be54dcfe242a0d268453fb4492573d",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-3-after-input.png",
+      "bytes": 492861,
+      "sha256": "35a432e76c51b1f43d75ae63b157b04f1daa29824e32e8c73ef4577190dd2952",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-4-playback.png",
+      "bytes": 318926,
+      "sha256": "837cbf94402a6a6493c3b7840c30f024c72f890ef6990e1b2c342c0ce9f877e5",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-4-before-input.png",
+      "bytes": 344766,
+      "sha256": "a515288a39a488c24bbdf1895b10fd983ac4826e01977a5fe130e2610084ec74",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-4-after-input.png",
+      "bytes": 419756,
+      "sha256": "98eee848e22c069e327ea6cecdfae240309c8718856e40a54ad969dccdc4a733",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-5-playback.png",
+      "bytes": 388798,
+      "sha256": "188363592099bdc8ceef473be0ece6a22c05a4420b513e745e9f6ed7729609a7",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-5-before-input.png",
+      "bytes": 321920,
+      "sha256": "03ad8a6141ecec4fdb05438c6ba730024c0301669e32525fdf74b455d91a0307",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-5-after-input.png",
+      "bytes": 324220,
+      "sha256": "af11473ff4754d9c1850fa7e4e12c2d7124ed95e3dcf50c21e4d9052b49b9a8f",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-6-playback.png",
+      "bytes": 438288,
+      "sha256": "17f52ebf50aca55ace257a46e5594ac28cb568aa0f0f86275128d3f322954296",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-6-before-input.png",
+      "bytes": 470328,
+      "sha256": "8ef42b60df030bb841f143f769d06c6a53353e4af7c64d10df2eec41e66adec8",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-6-after-input.png",
+      "bytes": 444386,
+      "sha256": "6dad5883ebe04a3fa6f6783b5bf69a03dcd1c8338e159a2a06e90f5543d7cb21",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-7-playback.png",
+      "bytes": 402465,
+      "sha256": "ce6c679591009ae3a313a17140801d6d8ad1e2755997f8f33801e7e146293b58",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-7-before-input.png",
+      "bytes": 410608,
+      "sha256": "da55861284bcdba1256ea530b8f93afe381e2007085603a6ad6777db6845407d",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-7-after-input.png",
+      "bytes": 408673,
+      "sha256": "8b96a0103b1f7d4306eda0111aac7826bf2ed817e8389033f97ce394664416bb",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-8-playback.png",
+      "bytes": 396972,
+      "sha256": "d5b7d3c42bd4833e4a7a8df86ea04f0bab33605b1013bb1fb3d2f700e8f05724",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-8-before-input.png",
+      "bytes": 420992,
+      "sha256": "177e8f6d33155990e9e509ea09c8277e27ac65b329b8c02d12698266b916b4b2",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-8-after-input.png",
+      "bytes": 407165,
+      "sha256": "e9497f162139a52bca82b49a4cfa7dac4a877b6bb27da4344d385ca3eee05f91",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-9-playback.png",
+      "bytes": 462869,
+      "sha256": "7d603fa538803fba1df81807ad1f4e1f05534d71c6840c0db59b4866547da1c4",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-9-before-input.png",
+      "bytes": 631389,
+      "sha256": "492daee3901660271a31282adb6dd0588e44cdd4ee5e5db9f3429a8c6f0e45a4",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-9-after-input.png",
+      "bytes": 622274,
+      "sha256": "6261c79697d41a59e0c049667e57b019efc2c0b359903346daeeed2a52ace406",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-10-playback.png",
+      "bytes": 670946,
+      "sha256": "b460068f87c4e33ae5a2a591cb138883d5b84d8da0036d5fda4b732fa2f2df13",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-10-before-input.png",
+      "bytes": 925604,
+      "sha256": "b263b95145b34e17cb7e0b40eefab71ef2d22f3dca5927b23aa6fbbe2e888c05",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-10-after-input.png",
+      "bytes": 938109,
+      "sha256": "42becb73e3d39651953df085e97eab3240b8f6604bc5a3f346a31d570c37a24c",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-11-playback.png",
+      "bytes": 699346,
+      "sha256": "6621e180359183b671777809b0e3bc7292c57cc43e0b6d08fd9169bed17ce2dd",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-11-before-input.png",
+      "bytes": 782767,
+      "sha256": "6e544328af1196d25a369b12d65a3ed959ec7f76aef673ad5c4223bcb37e6175",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-11-after-input.png",
+      "bytes": 920152,
+      "sha256": "e233e500d0864311061e7b1d2bbafa7323b4aa3eea80d2d27b865f49fa39f35f",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-12-playback.png",
+      "bytes": 571888,
+      "sha256": "f3f5e4eab2e3fbe3faf207d6d710cd7617fb75faa97a04ff1eee45881a1970ae",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-12-before-input.png",
+      "bytes": 861699,
+      "sha256": "13770601c850d82b36d30fbd9cfd9649d9c288a5831629906e06b878bfb1fbfe",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-12-after-input.png",
+      "bytes": 944917,
+      "sha256": "1b3f06b2728f72e8271b1d289d4446508b85eeb7315f544e17dc26529bfa916b",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-13-playback.png",
+      "bytes": 561940,
+      "sha256": "880035a90134ae95c6ecfba91ead468e340f6207bc703aaa8ef145bba5b67718",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-13-before-input.png",
+      "bytes": 845080,
+      "sha256": "fce0f322bb87b4d814af7415bc9ce1d9c19eba26fb89fb55ea0f0ed36a78453d",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-13-after-input.png",
+      "bytes": 940843,
+      "sha256": "a5fc603f0e21163d801d5a161d8e97311ca04f61103543333f4b7e5770ed608e",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-14-playback.png",
+      "bytes": 386404,
+      "sha256": "13e1141935edcd8f2d9e46de5705e8c9ecfa52c8b604e9c5a2cd17a13eb8d1e3",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-14-before-input.png",
+      "bytes": 587980,
+      "sha256": "16d5842abb6d25a8fde4bf2c2c18657e4c47b9df6a879a3644b1d079e27819ac",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-14-after-input.png",
+      "bytes": 599885,
+      "sha256": "399b128fbbb6eeae66740de11574537afcfab0e988d47cb687d13c2eb5d39bdf",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games.png",
+      "bytes": 61606,
+      "sha256": "4a85d3583792963bea9542e040c913adebf813b422fdd8285a0981ea2a2fc490",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/report-820.png",
-      "bytes": 102245,
-      "sha256": "9d96e11b64e91e1563fbc94ab74447e3950e11d484e1b3760a5cf794b437dcfc",
-      "width": 820,
-      "height": 1000
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-ratings.png",
+      "bytes": 56486,
+      "sha256": "87ea07c0258ed13314ab21624f5d7d73f1e7650c7f04d7b5bdf02873b9c96fe4",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-playback.png",
+      "bytes": 165739,
+      "sha256": "a35beac505c8274dc33197c1610f7832812430717387309658da52242140a294",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-play.png",
+      "bytes": 168136,
+      "sha256": "576eb4152b6491b70b4671582da9019958569cf04c192cc7eed93372910ed7da",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-fullscreen.png",
+      "bytes": 381135,
+      "sha256": "4fafd568fd501cd71c30e11a7cdaef4375212a07372f9d4d3b61d4102ca403f4",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-1-playback.png",
+      "bytes": 164537,
+      "sha256": "bda31aab3bf06e7f32e585881e74134ee437753951437a6691348397e3b6d042",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-1-before-input.png",
+      "bytes": 178995,
+      "sha256": "1e22e2bb77754efd29e7145f7dc6ee474f781b3fc6511edc48fced6607a3857e",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-1-after-input.png",
+      "bytes": 146788,
+      "sha256": "0238531c732deb6ba0167660f56ddea0aa2b7a597e5369e3de948da1573f30e4",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-2-playback.png",
+      "bytes": 182047,
+      "sha256": "da25e89ebcf3f588c5f25d9ef5d95b797e9e19d41a70666814062bba995251c3",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-2-before-input.png",
+      "bytes": 171959,
+      "sha256": "21d4544d060743154b448208ebd53bacbb6ea8811f06c66a3d7278edb75702c5",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-2-after-input.png",
+      "bytes": 173925,
+      "sha256": "ba889b499819fba01b74730c7783bc774e633a5a1cafc27b55e1b3d77d8a1016",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-3-playback.png",
+      "bytes": 146757,
+      "sha256": "1d06910d373063efe92a1fca04d46c86a8ac2cf93227135997c63cf370048e14",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-3-before-input.png",
+      "bytes": 138881,
+      "sha256": "86c9d40f060d2341db774620a7b9cb1aee6cbfaf0dae75676aec78b53435fbbd",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-3-after-input.png",
+      "bytes": 139783,
+      "sha256": "37e895b25c98f705b20b4f91dee45407e3fdccba0b598bb8547abeaf6cc42119",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-4-playback.png",
+      "bytes": 80840,
+      "sha256": "8a1e34d254586258e344ac9c4769bf9ea1fabb501086f6797a5fc20e8f43c2ad",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-4-before-input.png",
+      "bytes": 69425,
+      "sha256": "92f3da0ea56bda59c09864d718061788f75e8dcdfa344935022c029ff7e28cf2",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-4-after-input.png",
+      "bytes": 112664,
+      "sha256": "b86465f01413d2c7d81f1a77edafd4b6c046cb8de2efe398f039b9e415467d4e",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-5-playback.png",
+      "bytes": 125953,
+      "sha256": "a54bb4ef7557037326007d6e16c1801cd5d05ce6997d0fe23dde38463ad31f32",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-5-before-input.png",
+      "bytes": 61052,
+      "sha256": "85dc96696cfa2cd40a45797ed00d8c293cc905ba6e9407fed01b23cddf6cf7f2",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-5-after-input.png",
+      "bytes": 65940,
+      "sha256": "2b47ad18490af1fcc5757102ca8a546ad7c3f0561751183da3d7da8354defe58",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-6-playback.png",
+      "bytes": 123118,
+      "sha256": "881a84296c50fec195af56962f0cc676b14f3cf0d6f99d92db79c2c81f623639",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-6-before-input.png",
+      "bytes": 107978,
+      "sha256": "062e603a39e9c6a7cc9fd8468110bd22d8cb80d98fbad13d1144e6bd5b754396",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-6-after-input.png",
+      "bytes": 93077,
+      "sha256": "dc96f01ddc1cb77b10319d62688b81640081d370753c24492fdfd041998cb79c",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-7-playback.png",
+      "bytes": 115949,
+      "sha256": "4434ce62a9dd4ffb59aa9e24fcceada702dba697eb28e57841fd960c367cfb6c",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-7-before-input.png",
+      "bytes": 72545,
+      "sha256": "40704d6b8a1b2376f26e0d4a54aaa6b4a4998179ec703cd26a92654a9c4104b6",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-7-after-input.png",
+      "bytes": 72500,
+      "sha256": "5266702c15ea1d276500651808b4c1301512773b9469c10f8420a59a58e0ad6b",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-8-playback.png",
+      "bytes": 136965,
+      "sha256": "4f46279c21246024ec9db85aef94e285b077affb0d3e0ab537ac9030d79f463f",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-8-before-input.png",
+      "bytes": 106554,
+      "sha256": "f594f9f7a4aebe3b7662ccf82527c5e66c5592e60366061b7f90b660692c0a53",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-8-after-input.png",
+      "bytes": 99414,
+      "sha256": "3c68bd48b3dcd18fa468c528744a8171f1b6e237d3b3f83faac80da7af974f16",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-9-playback.png",
+      "bytes": 133455,
+      "sha256": "6412099d31eac53c825f21c0c3f7e4bbc11d34b64594fc15cabb5bc03e71e7a6",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-9-before-input.png",
+      "bytes": 148357,
+      "sha256": "9c71ed239c55685fb695d532884f82041049868b160857affff0c43d99a170fc",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-9-after-input.png",
+      "bytes": 141972,
+      "sha256": "374b4068bbbc46220e03f09ea5cd1b3c13426bc40d4afa0f4cfa0660a528690e",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-10-playback.png",
+      "bytes": 233837,
+      "sha256": "30bd32a30c38423d02fd9f18274da3db30bb1ae7a4a22d138fc7321cce2dc86e",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-10-before-input.png",
+      "bytes": 253064,
+      "sha256": "b0588821beb81201149cde52d18843f2371038eecbd2ffb0f08de5812dde61b0",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-10-after-input.png",
+      "bytes": 262853,
+      "sha256": "a33d4062b824966599ca1f25503c929f37f2dd54661d03ca7db49bebbdae8c08",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-11-playback.png",
+      "bytes": 228539,
+      "sha256": "309c96026e038aa5ac1dccf2f9016d6173e12ede426d7aa38a7759eea48cf4c6",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-11-before-input.png",
+      "bytes": 171951,
+      "sha256": "d3d636c43f72995f7964202f85f1e1f571b0b91243cc14c75f4e441b0f5624ff",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-11-after-input.png",
+      "bytes": 253039,
+      "sha256": "58b1f9bc7e95d7fe1bfe63d7f503b16ae65da6cabbb09a658b4c9c0b5c084a43",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-12-playback.png",
+      "bytes": 193336,
+      "sha256": "7fd62dfdd82e3667f8515638313679abcce024ec826edf6b775119bf01d7d093",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-12-before-input.png",
+      "bytes": 242585,
+      "sha256": "b891663aa81184894732606756cd6da4935eaa21fb3a058e612a1cce43642a85",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-12-after-input.png",
+      "bytes": 244495,
+      "sha256": "0f9cdbfd88110ec02097a2b3b95c48c40da6d679d1bce84a523d34c506f0ddbe",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-13-playback.png",
+      "bytes": 217065,
+      "sha256": "fd5e60bff5655a70f485ca4a81138170d9607fc96499cc9e04d3e3f1e1046750",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-13-before-input.png",
+      "bytes": 226202,
+      "sha256": "f267851fc28f67f331533da44281a1fbbfc1676e8535755ba0bf28f3a4bd2b2b",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-13-after-input.png",
+      "bytes": 265023,
+      "sha256": "464c81761bae74015a111d6f8ed0b73b4371f24615359d866f0574098bcbd307",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-14-playback.png",
+      "bytes": 117603,
+      "sha256": "67395f9fb86dca6925a2d09e108c9960047e184d7d92b1bcfe9efc1932189999",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-14-before-input.png",
+      "bytes": 171092,
+      "sha256": "6cd2167f7d10a61e3b0e6a7fba1171a90f5786a7bd39f87aba51b9bba166bf5d",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-14-after-input.png",
+      "bytes": 178925,
+      "sha256": "9ccd94f16a8f14e9341a228de486e0fdbefd81e325e2ff57939871481664ce02",
+      "width": 390,
+      "height": 844
     }
   ],
   "retainedCaptureEvidence": {
-    "explanation": "The previous acceptance receipt and every referenced historical artifact remain unchanged at their original paths. They describe that historical candidate.",
-    "version": "2026-09-22-engineering-opus-5-5-03017c1f3dc4",
+    "explanation": "The freshest previous acceptance and its historical chain remain archived unchanged; earlier captures describe their earlier candidates.",
+    "version": "2026-09-22-games-opus-5-5-1f047fe0422c",
     "receipt": {
-      "path": "reviews/engineering-gpt6-sol-luna/4787025e34aa74b8af93c8c3ef74dc557e3a229097afd065f3c2df39f685e0e4/previous-template-lock.json",
-      "bytes": 13399,
-      "sha256": "00d252b179e8ec40d033b52c5fdb07688372ff55363b6ac8549a103e50452baa"
+      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-template-lock.json",
+      "bytes": 40763,
+      "sha256": "a25b234b42711c99994756391c6518d00a77d7298be177113ea081826e7beb39"
     }
   }
 }

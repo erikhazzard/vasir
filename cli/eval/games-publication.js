@@ -11,10 +11,11 @@ const MAX_FILE_BYTES = 128 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 512 * 1024 * 1024;
 // Authored CJK font CSS alone can reference 366 WOFF2 subsets; bytes stay bounded.
 const MAX_FILES = 2048;
-const MODEL_LABELS = Object.freeze({ "gpt-6-astra": "GPT-6 Astra", "gpt-5.6-sol": "GPT-5.6 Sol", "gpt-5.6-terra": "GPT-5.6 Terra", "claude-fable-5-1": "Claude Fable 5.1" });
+const MODEL_LABELS = Object.freeze({ "gpt-6-astra": "GPT-6 Astra", "gpt-5.6-sol": "GPT-5.6 Sol", "gpt-5.6-terra": "GPT-5.6 Terra", "claude-fable-5-1": "Claude Fable 5.1", "claude-opus-5-5": "Claude Opus 5.5" });
 const TYPES = Object.freeze({
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
   ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+  ".webmanifest": "application/manifest+json",
   ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp",
   ".avif": "image/avif", ".gif": "image/gif", ".svg": "image/svg+xml",
   ".mp4": "video/mp4", ".webm": "video/webm", ".mp3": "audio/mpeg",
@@ -99,7 +100,7 @@ function collectBundle({ repoRootDirectory, bundle, reader }) {
     names.add(name);
     const file = readPinned(root, pin, reader);
     const contentType = TYPES[path.extname(name).toLowerCase()];
-    if (/^(?:text\/|image\/svg)/.test(contentType)) requireEvidence(!PRIVATE_TEXT.test(file.contents.toString("utf8")), "a runtime file contains private paths or credential material.");
+    if (/^(?:text\/|image\/svg|application\/manifest\+json)/.test(contentType)) requireEvidence(!PRIVATE_TEXT.test(file.contents.toString("utf8")), "a runtime file contains private paths or credential material.");
     return { path: name, sourcePath: file.sourcePath, bytes: file.bytes, sha256: file.sha256, contentType };
   }).sort((a, b) => a.path.localeCompare(b.path));
   requireEvidence(names.has(bundle.entrypoint) && path.extname(bundle.entrypoint) === ".html", "bundle entrypoint must be an allowlisted HTML file.");

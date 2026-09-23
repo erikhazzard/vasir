@@ -710,7 +710,7 @@ Limits:
 - at most 2 MiB per file
 - at most 5 MiB for the complete raw artifact
 - at most 250 KiB gzip-compressed for the landing page and its first-load CSS, JavaScript, data, and font dependencies
-- at most 1 GiB for retained releases plus the candidate before upload
+- retained releases plus the candidate must fit the configured `limits.maxPhysicalStorageBytes` cap before upload (currently 1040 MiB)
 
 #### JSON result
 

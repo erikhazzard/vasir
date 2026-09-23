@@ -31,7 +31,6 @@
     || !Array.isArray(data.configurations) || !Array.isArray(data.conditions) || !Array.isArray(data.runs)
     || !data.configurations.length || data.conditions.length !== 2) return;
 
-  const configurations = data.configurations;
   const conditions = data.conditions;
   const benchmark = data.benchmark || {};
   const unavailableBenchmark = Boolean(benchmarkId && benchmarkId !== benchmark.id);
@@ -55,6 +54,16 @@
   const conditionLabel = condition => condition.label || condition.id;
   const configurationLabel = configuration => configuration.label || configuration.id;
   const configurationReasoning = configuration => String(configuration.reasoning || '').replace(/^./, letter => letter.toUpperCase());
+  // Rank complete quality totals; a lone review must never become a combined score.
+  const withVasirScore = configuration => scoreValue(findRun(configuration.id, 'vasir'));
+  const configurations = [...data.configurations].sort((left, right) =>
+    (withVasirScore(right) ?? -1) - (withVasirScore(left) ?? -1)
+    || configurationLabel(left).localeCompare(configurationLabel(right))
+    || left.id.localeCompare(right.id));
+  const rankEligible = configuration => withVasirScore(configuration) !== null
+    && findRun(configuration.id, 'vasir').score?.eligible === true;
+  const scoreRank = configuration => !rankEligible(configuration) ? null
+    : 1 + configurations.filter(other => rankEligible(other) && withVasirScore(other) > withVasirScore(configuration)).length;
   const judgeLabel = (judge, index) => {
     const selector = /^(?:codex|claude):([^@]+)@([^@]+)$/.exec(judge.judge || '');
     const model = selector && ({ 'gpt-6-astra': 'GPT-6 Astra', 'gpt-5.6-sol': 'GPT-5.6 Sol', 'gpt-5.6-terra': 'GPT-5.6 Terra', 'claude-fable-5-1': 'Claude Fable 5.1' })[selector[1]];
@@ -135,11 +144,35 @@
     </article>`;
   };
   const ratingMarkup = run => `<div class="game-results__rating"><span class="game-results__value" data-combined-score="${scoreValue(run) ?? ''}" data-primary-score="${displayScore(run) ?? ''}" data-rating-kind="${scoreValue(run) !== null ? 'combined' : individualScoreValue(run) !== null ? 'individual' : 'unavailable'}">${formatDisplayScore(run)}<span class="game-results__unit">${scoreValue(run) !== null ? ' /100 · combined' : individualScoreValue(run) !== null ? ' /100 · individual' : reviewIncomplete(run) ? ' review unavailable' : ' awaiting review'}</span></span>${scoreValue(run) === null && individualScoreValue(run) !== null ? '<p class="game-results__panel">1 of 2 reviews · combined —</p>' : ''}<ul class="game-results__judges" aria-label="Individual judge ratings">${asList(run.judgments).map(judge => `<li class="game-results__judge" data-rating-judge="${escapeHtml(judge.judge || '')}" data-rating-value="${judgeScore(judge)}"><span title="${escapeHtml(judgeLabel(judge, 0))}">${escapeHtml(judgeShortLabel(judge))}</span><strong>${judgeScore(judge)}</strong></li>`).join('')}${asList(run.reviewOutcomes).filter(outcome => outcome.status === 'failed').map(outcome => `<li class="game-results__judge game-results__judge--unavailable"><span title="${escapeHtml(judgeLabel(outcome, 0))}">${escapeHtml(judgeShortLabel(outcome))}</span><span>Unavailable</span></li>`).join('')}</ul>${run.score?.eligible === false ? '<span class="game-results__qualification">Diagnostic only</span>' : run.score?.eligible === null ? '<span class="game-results__qualification">Functional proof incomplete</span>' : ''}</div>`;
-  const resultsMarkup = () => `<section class="game-results" id="game-results" data-ratings-version="3" aria-labelledby="game-results-title"><div class="game-results__intro"><div><p class="ui-eyebrow">Scores out of 100</p><h2 class="game-results__heading" id="game-results-title">Benchmark ratings</h2></div><a class="game-results__jump" href="#game-comparison">Watch & play the outputs ↓</a></div><p class="game-results__note" id="game-ratings-note">Combined scores average both judges. ${data.runs.some(run => scoreValue(run) === null && individualScoreValue(run) !== null) ? 'A one-judge rating is labelled individual; its panel remains incomplete. ' : ''}Select a model to inspect its games.</p><div class="game-results__scroll"><table class="game-results__table" aria-describedby="game-ratings-note"><thead class="game-results__table-head"><tr><th scope="col">Model configuration</th>${conditions.map(condition => `<th scope="col">${escapeHtml(conditionLabel(condition))}</th>`).join('')}<th scope="col">Score Δ</th></tr></thead><tbody>${configurations.map(configuration => {
-    const runs = conditions.map(condition => findRun(configuration.id, condition.id));
-    const delta = runs.every(run => scoreValue(run) !== null) ? scoreValue(runs[1]) - scoreValue(runs[0]) : null;
-    return `<tr class="game-results__row" data-configuration-result="${escapeHtml(configuration.id)}"><th class="game-results__configuration" scope="row"><button class="game-results__model" type="button" data-model-id="${escapeHtml(configuration.id)}">${escapeHtml(configurationLabel(configuration))}<span class="game-results__reasoning">${escapeHtml(configurationReasoning(configuration))} reasoning <span aria-hidden="true">↗</span></span></button></th>${runs.map((run, index) => `<td class="game-results__condition" data-result-run-id="${escapeHtml(run.id)}"><span class="game-results__mobile-label" aria-hidden="true">${escapeHtml(conditionLabel(conditions[index]))}</span>${ratingMarkup(run)}${statusMarkup(run)}</td>`).join('')}<td class="game-results__delta${delta < 0 ? ' game-results__delta--negative' : ''}"><span class="game-results__mobile-label" aria-hidden="true">Score Δ</span>${delta === null ? '—' : `${delta > 0 ? '+' : ''}${delta.toFixed(1)}`}</td></tr>`;
-  }).join('')}</tbody></table></div><p class="game-results__footnote">Astra = GPT-6 Astra, extra high · Fable = Claude Fable 5.1, max. Score Δ subtracts complete artifact quality scores. It is descriptive, not an estimate of skill effects. Creation methods are documented below.</p></section>`;
+  const resultsMarkup = () => `<section class="game-results" id="game-results" data-ratings-version="4" aria-labelledby="game-results-title">
+    <div class="game-results__intro"><div><p class="ui-eyebrow">Games · All ${configurations.length} settings · Scores /100</p><h2 class="game-results__heading" id="game-results-title">Model comparison</h2></div><p class="game-results__note" id="game-ratings-note">Ordered by With Vasir combined score, highest first. Equal scores share a rank.</p></div>
+    <ol class="game-results__list" aria-describedby="game-ratings-note">${configurations.map(configuration => {
+      const runs = conditions.map(condition => findRun(configuration.id, condition.id));
+      const bare = scoreValue(findRun(configuration.id, 'bare'));
+      const vasir = withVasirScore(configuration);
+      const paired = bare !== null && vasir !== null;
+      const delta = paired ? vasir - bare : null;
+      const rank = scoreRank(configuration);
+      const tied = rank !== null && configurations.filter(other => rankEligible(other) && withVasirScore(other) === vasir).length > 1;
+      const rankLabel = rank !== null ? `With Vasir quality rank #${rank} of ${configurations.length}${tied ? ' · tied' : ''}`
+        : vasir === null ? 'Combined score pending' : findRun(configuration.id, 'vasir').score?.eligible === false ? 'Diagnostic score · unranked' : 'Functional verification incomplete · unranked';
+      return `<li class="game-results__row" data-configuration-result="${escapeHtml(configuration.id)}" data-score-rank="${rank ?? ''}">
+        <details class="game-results__detail">
+          <summary class="game-results__summary${delta < 0 ? ' game-results__summary--regression' : ''}">
+            <span class="game-results__configuration"><strong>${escapeHtml(configurationLabel(configuration))} · ${escapeHtml(configuration.reasoning)}</strong><small>${escapeHtml(rankLabel)}${configuration.comparison?.controlled === false ? ' · Creator-directed' : ''}</small></span>
+            ${paired ? `<span class="game-results__plot" style="--game-score-start:${Math.min(bare, vasir)}%;--game-score-width:${Math.abs(delta)}%;--game-score-bare:${bare}%;--game-score-vasir:${vasir}%" aria-hidden="true"><i class="game-results__axis"></i><i class="game-results__connector"></i><i class="game-results__mark game-results__mark--bare"></i><i class="game-results__mark game-results__mark--vasir"></i></span>` : '<span class="game-results__pending">Combined panel incomplete</span>'}
+            ${runs.map((run, index) => `<span class="game-results__score${conditions[index].id === 'vasir' ? ' game-results__score--vasir' : ''}" data-summary-condition="${escapeHtml(conditions[index].id)}"><span class="game-results__score-label">${escapeHtml(conditionLabel(conditions[index]))}</span>${formatDisplayScore(run)}${scoreValue(run) === null && individualScoreValue(run) !== null ? '<small class="game-results__qualification">Individual · 1/2 reviews</small>' : ''}${run.score?.eligible === false ? '<small class="game-results__qualification">Diagnostic only</small>' : run.score?.eligible === null ? '<small class="game-results__qualification">Unverified</small>' : ''}</span>`).join('')}
+            <span class="game-results__delta${delta < 0 ? ' game-results__delta--negative' : ''}">${delta === null ? '—' : `${delta > 0 ? '+' : ''}${delta.toFixed(1)}`}<small class="game-results__delta-unit"> pts</small></span>
+            <span class="game-results__action">Inspect run <span class="game-results__action-mark" aria-hidden="true">↓</span></span>
+          </summary>
+          <div class="game-results__review-pair">${runs.map((run, index) => `<section class="game-results__condition" data-result-run-id="${escapeHtml(run.id)}" aria-label="${escapeHtml(conditionLabel(conditions[index]))} ratings"><h3 class="game-results__condition-label">${escapeHtml(conditionLabel(conditions[index]))}</h3>${ratingMarkup(run)}${statusMarkup(run)}</section>`).join('')}
+            <button class="game-results__model" type="button" data-model-id="${escapeHtml(configuration.id)}" aria-controls="game-selected-comparison">Watch &amp; play ${escapeHtml(configurationLabel(configuration))} · ${escapeHtml(configuration.reasoning)} <span aria-hidden="true">↓</span></button>
+          </div>
+        </details>
+      </li>`;
+    }).join('')}</ol>
+    <p class="game-results__footnote">Combined scores average both judges. Astra = GPT-6 Astra, extra high · Fable = Claude Fable 5.1, max. Score Δ compares artifact quality; creation methods and functional status remain separate. Open a row for individual ratings and build status.</p>
+  </section>`;
 
   view.innerHTML = `${unavailableBenchmark ? `<p class="game-report__notice" role="status">That benchmark is not available. Showing ${escapeHtml(benchmark.title || 'the latest game benchmark')}. <a href="./index.html#capabilities/games">Browse game benchmarks ↗</a></p>` : ''}<section class="game-report__hero"><div><p class="game-report__eyebrow">Games / One-task benchmark</p><h1 class="game-report__title" id="game-title">${escapeHtml(benchmark.title || '2D jumping demo')}</h1><p class="game-report__scope">${configurations.length} configurations × ${conditions.length} conditions · ${data.runs.length} outputs · 2 judges</p></div><details class="game-report__prompt-details" ${window.matchMedia('(min-width: 36.001rem)').matches ? 'open' : ''}><summary class="game-report__prompt-label">The exact user prompt</summary><blockquote class="game-report__prompt">${escapeHtml(benchmark.prompt || 'Prompt not yet published.')}</blockquote><p class="game-report__prompt-note">The same request for every fresh run. Select a model, watch the output, then play it.</p></details></section>
     ${resultsMarkup()}

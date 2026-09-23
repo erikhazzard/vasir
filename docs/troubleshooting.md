@@ -355,7 +355,7 @@ For `BENCHMARK_PUBLISH_ARTIFACT_INVALID`:
 
 If the generated site loses the paired D3 leaderboard, shared absolute-score scale, synchronized comparison guide, Benchmark tests ledger, Efficiency view, sidebar, or report hierarchy, treat it as a presentation regression rather than an acceptable empty-data state. Restore the accepted presentation source, keep unsupported marks absent, run `site/vasirbenchmark.com/capture.sh`, and renew the acceptance receipt only after the full desktop and mobile journeys pass. The current development projection should show one Engineering category, three benchmarks, 30 matched settings, 60 Minimal-baseline/Architecture-skill entries, 180 scored response cells, and three reports; it should not show a cost control or speculative future families.
 
-For `BENCHMARK_PUBLISH_STORAGE_BUDGET_EXCEEDED`, publication has stopped before upload. Follow the returned `safeRetry` guidance and do not delete the active or immediately previous verified release. The command will not proceed while retained releases plus the candidate exceed 1 GiB.
+For `BENCHMARK_PUBLISH_STORAGE_BUDGET_EXCEEDED`, publication has stopped before upload. Follow the returned `safeRetry` guidance and do not delete the active or immediately previous verified release. The command will not proceed while retained releases plus the candidate exceed the configured `limits.maxPhysicalStorageBytes` cap (currently 1040 MiB).
 
 ### Active publisher lease
 

@@ -7,7 +7,7 @@ import test from "node:test";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
-import { buildGamesPublication, GAME_ARTIFACT_ORIGIN, prepareGamesPublicationSource, validateGamesPublication } from "../cli/eval/games-publication.js";
+import { buildGamesPublication, GAME_ARTIFACT_ORIGIN, GAME_PUBLICATION_PATH, prepareGamesPublicationSource, validateGamesPublication } from "../cli/eval/games-publication.js";
 import { calculateProjectedPublicationBytes } from "../cli/benchmark-publish.js";
 import { buildBenchmarkPublicationProjection } from "../cli/eval/benchmark-publication-projection.js";
 
@@ -498,8 +498,15 @@ test("Games projection extends the existing published evidence without changing 
     fs.symlinkSync(path.join(REPO_ROOT, ".agents/vasir-evals", name), path.join(fixture.root, ".agents/vasir-evals", name));
   }
   fs.symlinkSync(path.join(REPO_ROOT, "tmp"), path.join(fixture.root, "tmp"));
-  const before = buildBenchmarkPublicationProjection({ repoRootDirectory: REPO_ROOT });
+  // Compare the same evidence set before/after Games. The full repository may
+  // also contain Writing editions that this focused fixture does not install.
+  const selectionPath = path.join(fixture.root, GAME_PUBLICATION_PATH);
+  const selection = fs.readFileSync(selectionPath);
+  fs.unlinkSync(selectionPath);
+  const before = buildBenchmarkPublicationProjection({ repoRootDirectory: fixture.root });
+  fs.writeFileSync(selectionPath, selection);
   const after = buildBenchmarkPublicationProjection({ repoRootDirectory: fixture.root });
+  assert.equal(before.projection.games, undefined);
   assert.deepEqual(after.projection.benchmarkResults, before.projection.benchmarkResults);
   assert.deepEqual(after.projection.overall, before.projection.overall);
   assert.deepEqual(after.responseBundle, before.responseBundle);

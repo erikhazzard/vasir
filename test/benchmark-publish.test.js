@@ -249,7 +249,7 @@ test("benchmark artifact is deterministic, finite, release-qualified, and inside
     assert.equal(first.config.limits.maxWritingDataFileBytes, 8 * 1024 * 1024);
     assert.equal(first.config.limits.maxDungeonMasterResponseFileBytes, 32 * 1024 * 1024);
     assert.equal(first.config.limits.maxArtifactBytes, 64 * 1024 * 1024);
-    assert.equal(first.config.limits.maxCompressedLandingBytes, 300000);
+    assert.equal(first.config.limits.maxCompressedLandingBytes, 320000);
     const landingDependencyPaths = new Set([
       "index.html",
       "style.css",

@@ -87,6 +87,45 @@ export function loadGamesRehearsalSiteFiles({ siteFiles, releaseId: declaredRele
   };
 }
 
+// Derive the oracle from the published judge evidence, independently of the UI sorter.
+export function deriveGamesScoreComparison(data) {
+  assert.deepEqual(data.conditions.map(condition => condition.id).sort(), ['bare', 'vasir']);
+  assert.ok(data.configurations.length >= 5, 'The original five game configurations must remain published.');
+  assert.equal(new Set(data.configurations.map(configuration => configuration.id)).size, data.configurations.length, 'Duplicate game configuration.');
+  assert.equal(data.runs.length, data.configurations.length * 2, 'Every configuration requires exactly two outputs.');
+  assert.equal(new Set(data.runs.map(run => run.id)).size, data.runs.length, 'Duplicate game output.');
+  const rows = data.configurations.map(configuration => {
+    const row = { configurationId: configuration.id, label: configuration.label || configuration.id };
+    for (const condition of ['bare', 'vasir']) {
+      const runs = data.runs.filter(run => run.configurationId === configuration.id && run.conditionId === condition);
+      assert.equal(runs.length, 1, `${configuration.id}: expected one ${condition} output.`);
+      const run = runs[0];
+      assert.equal(run.judgments?.length, 2, `${run.id}: a complete panel requires two judgments.`);
+      assert.equal(new Set(run.judgments.map(judge => judge.judge)).size, 2, `${run.id}: judge identities must be distinct.`);
+      const scores = run.judgments.map(judge => judge.score?.value ?? judge.score ?? judge.value);
+      assert.ok(scores.every(score => Number.isFinite(score) && score >= 0 && score <= 100), `${run.id}: invalid judge score.`);
+      row[condition] = Number(((scores[0] + scores[1]) / 2).toFixed(1));
+      assert.equal(run.score?.value, row[condition], `${run.id}: combined score differs from the two-judge mean.`);
+      if (condition === 'vasir') row.rankEligible = run.score.eligible === true;
+    }
+    return row;
+  });
+  const originalScores = [
+    ['codex:gpt-6-astra@ultra', 68.8, 80.6],
+    ['claude:claude-fable-5-1@max', 75, 77.5],
+    ['codex:gpt-6-astra@medium', 70, 77.5],
+    ['codex:gpt-5.6-sol@max', 77.5, 72.5],
+    ['codex:gpt-5.6-terra@max', 66.9, 65]
+  ];
+  for (const [configurationId, bare, vasir] of originalScores) {
+    const row = rows.find(candidate => candidate.configurationId === configurationId);
+    assert.ok(row, `Original configuration missing: ${configurationId}`);
+    assert.deepEqual([row.bare, row.vasir], [bare, vasir], `Original scores changed: ${configurationId}`);
+  }
+  return rows.sort((left, right) => right.vasir - left.vasir || left.label.localeCompare(right.label) || left.configurationId.localeCompare(right.configurationId))
+    .map(row => ({ ...row, rank: row.rankEligible ? String(1 + rows.filter(other => other.rankEligible && other.vasir > row.vasir).length) : '' }));
+}
+
 async function runGamesBrowserCheck() {
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, value, index, all) => {
   if (value.startsWith('--')) pairs.push([value.slice(2), all[index + 1]]);
@@ -390,31 +429,71 @@ try {
     const ultraRow = document.querySelector('[data-configuration-result="' + ultraId + '"]');
     const method = document.querySelector('#game-method')?.textContent || '';
     const differences = data.configurations.map(configuration => { const pair = data.conditions.map(condition => data.runs.find(run => run.configurationId === configuration.id && run.conditionId === condition.id)); const expected = pair.every(run => Number.isFinite(run?.score?.value)) ? pair[1].score.value - pair[0].score.value : null; const row = document.querySelector('[data-configuration-result="' + CSS.escape(configuration.id) + '"]'); return {expected,visible:row?.querySelector('.game-results__delta')?.textContent.replace('Score Δ','').trim()}; });
+    const comparison = [...document.querySelectorAll('[data-configuration-result]')].map(row => {
+      const configurationId = row.dataset.configurationResult;
+      const plot = row.querySelector('.game-results__plot');
+      const bounds = plot?.getBoundingClientRect();
+      const marks = data.conditions.map(condition => {
+        const run = data.runs.find(run => run.configurationId === configurationId && run.conditionId === condition.id);
+        const mark = row.querySelector('.game-results__mark--' + condition.id)?.getBoundingClientRect();
+        return { condition:condition.id, score:run.score.value, summary:row.querySelector('[data-summary-condition="' + condition.id + '"]')?.textContent.trim(), center:mark ? (mark.left + mark.right) / 2 : null, expectedCenter:bounds ? bounds.left + bounds.width * run.score.value / 100 : null };
+      });
+      return { configurationId, rank:row.dataset.scoreRank, nativeDisclosure:row.querySelector('details')?.firstElementChild?.matches('summary.game-results__summary'), closed:row.querySelector('details')?.open === false, plotWidth:bounds?.width, plotLabel:plot?.getAttribute('aria-label'), marks };
+    });
     const scoreRows = data.runs.map(run => {
       const element = document.querySelector('[data-result-run-id="' + CSS.escape(run.id) + '"]') || document.querySelector('[data-reference-result="' + CSS.escape(run.id) + '"]');
       const individual = run.judgments?.length === 1 ? run.judgments[0].score?.value ?? run.judgments[0].score ?? run.judgments[0].value : null;
       const primary = element?.querySelector('[data-primary-score]');
-      return {id:run.id,combined:element?.querySelector('[data-combined-score]')?.dataset.combinedScore,expectedCombined:String(run.score?.value ?? ''),primary:primary?.dataset.primaryScore,expectedPrimary:String(run.score?.value ?? individual ?? ''),kind:primary?.dataset.ratingKind,expectedKind:run.score?.value != null ? 'combined' : individual != null ? 'individual' : 'unavailable',judges:[...element?.querySelectorAll('[data-rating-judge]') || []].map(item => ({judge:item.dataset.ratingJudge,value:item.dataset.ratingValue})),expectedJudges:(run.judgments || []).map(judge => ({judge:judge.judge,value:Number(judge.score?.value ?? judge.score ?? judge.value).toFixed(1)})),unavailable:element?.querySelectorAll('.game-results__judge--unavailable').length,expectedUnavailable:(run.reviewOutcomes || []).filter(outcome => outcome.status === 'failed').length};
+      return {id:run.id,combined:element?.querySelector('[data-combined-score]')?.dataset.combinedScore,expectedCombined:String(run.score?.value ?? ''),primary:primary?.dataset.primaryScore,expectedPrimary:String(run.score?.value ?? individual ?? ''),kind:primary?.dataset.ratingKind,expectedKind:run.score?.value != null ? 'combined' : individual != null ? 'individual' : 'unavailable',judges:[...element?.querySelectorAll('[data-rating-judge]') || []].map(item => ({judge:item.dataset.ratingJudge,value:item.dataset.ratingValue})),expectedJudges:(run.judgments || []).map(judge => ({judge:judge.judge,value:Number(judge.score?.value ?? judge.score ?? judge.value).toFixed(1)})),unavailable:element?.querySelectorAll('.game-results__judge--unavailable').length,expectedUnavailable:(run.reviewOutcomes || []).filter(outcome => outcome.status === 'failed').length,status:element?.querySelector('.game-artifact__badge')?.textContent,expectedStatus:run.status === 'timeout' ? 'Incomplete · time limit' : 'Built',qualification:element?.querySelector('.game-results__qualification')?.textContent || '',expectedQualification:run.score?.eligible === false ? 'Diagnostic only' : run.score?.eligible === null ? 'Functional proof incomplete' : ''};
     });
-    return {configurations:data.configurations.length,conditions:data.conditions.length,runs:data.runs.length,table:document.querySelectorAll('[data-result-run-id]').length,completedPanels:data.runs.filter(run => Number.isFinite(run.score?.value) && run.judgments?.length === 2).length,ratings:{version:table?.dataset.ratingsVersion,beforeGames:table?.getBoundingClientRect().bottom <= document.querySelector('#game-comparison').getBoundingClientRect().top,heading:document.querySelector('#game-results-title')?.textContent,rows:scoreRows,differences},ultra:{count:ultraRuns.length,hasBare:ultraRuns.some(run => run.conditionId === 'bare' && run.status !== 'reference'),hasAsh:ultraRuns.some(run => run.conditionId === 'vasir' && run.id === 'ash-and-echo-r23'),title:ultraRow?.querySelector('.game-results__configuration')?.textContent,extraReference:Boolean(document.querySelector('[data-reference-result],section#game-reference')),methodIncludesCreation:method.includes(data.configurations.find(item => item.id === ultraId)?.comparison?.reason || 'MISSING')},iframes:document.querySelectorAll('iframe').length,videos:document.querySelectorAll('video').length,overflow:document.documentElement.scrollWidth > innerWidth,prompt:document.querySelector('.game-report__prompt').textContent,expectedPrompt:data.benchmark.prompt,sourceCounts:[window.VASIR_DATA.benchmarkResults.length,window.VASIR_DATA.aiWorkflows.benchmarkResults.length],firstPlayable:data.runs.find(run => run.artifact?.playUrl)?.configurationId,firstVideo:data.runs.find(run => run.artifact?.videoUrl)?.configurationId,posters:[...document.querySelectorAll('.game-artifact__poster')].map(img => ({src:img.src,complete:img.complete,valid:img.naturalWidth > 0}))};
+    return {configurations:data.configurations.length,conditions:data.conditions.length,runs:data.runs.length,table:document.querySelectorAll('[data-result-run-id]').length,completedPanels:data.runs.filter(run => Number.isFinite(run.score?.value) && run.judgments?.length === 2).length,ratings:{comparison,modelButtons:[...document.querySelectorAll('.game-models__button')].map(button => button.dataset.modelId),defaultSelection:document.querySelector('.game-models__button[aria-pressed="true"]')?.dataset.modelId,version:table?.dataset.ratingsVersion,beforeGames:table?.getBoundingClientRect().bottom <= document.querySelector('#game-comparison').getBoundingClientRect().top,heading:document.querySelector('#game-results-title')?.textContent,rows:scoreRows,differences},ultra:{count:ultraRuns.length,hasBare:ultraRuns.some(run => run.conditionId === 'bare' && run.status !== 'reference'),hasAsh:ultraRuns.some(run => run.conditionId === 'vasir' && run.id === 'ash-and-echo-r23'),title:ultraRow?.querySelector('.game-results__configuration')?.textContent,extraReference:Boolean(document.querySelector('[data-reference-result],section#game-reference')),methodIncludesCreation:method.includes(data.configurations.find(item => item.id === ultraId)?.comparison?.reason || 'MISSING')},iframes:document.querySelectorAll('iframe').length,videos:document.querySelectorAll('video').length,overflow:document.documentElement.scrollWidth > innerWidth,prompt:document.querySelector('.game-report__prompt').textContent,expectedPrompt:data.benchmark.prompt,sourceCounts:[window.VASIR_DATA.benchmarkResults.length,window.VASIR_DATA.aiWorkflows.benchmarkResults.length],firstPlayable:data.runs.find(run => run.artifact?.playUrl)?.configurationId,firstVideo:data.runs.find(run => run.artifact?.videoUrl)?.configurationId,posters:[...document.querySelectorAll('.game-artifact__poster')].map(img => ({src:img.src,complete:img.complete,valid:img.naturalWidth > 0}))};
   })()`);
-  check('Five configurations render ten distinct scored outputs', initial.configurations === 5 && initial.conditions === 2 && initial.runs === 10 && initial.table === 10 && initial.completedPanels === 10);
+  const publishedScores = await evaluate(`(() => { const data = window.VASIR_DATA.games; return {configurations:data.configurations,conditions:data.conditions,runs:data.runs.map(({id,configurationId,conditionId,score,judgments}) => ({id,configurationId,conditionId,score,judgments}))}; })()`);
+  const expectedComparison = deriveGamesScoreComparison(publishedScores);
+  check('Every configuration renders distinct Bare and With Vasir outputs with complete judge panels', initial.configurations === expectedComparison.length && initial.conditions === 2 && initial.runs === expectedComparison.length * 2 && initial.table === initial.runs && initial.completedPanels === initial.runs);
+  checks.push('Original ten scores are preserved and every combined score matches its two-judge mean');
   check('No eager game or video loads', initial.iframes === 0 && initial.videos === 0 && artifactRequests.length === 0);
   check('Exact user prompt rendered', initial.prompt === initial.expectedPrompt);
   check('Ultra is an ordinary model row with creation methods in methodology', !initial.ultra.extraReference && initial.ultra.methodIncludesCreation && !/human.directed/i.test(initial.ultra.title));
-  check('Benchmark ratings precede playable cards', initial.ratings.version === '3' && initial.ratings.beforeGames && initial.ratings.heading === 'Benchmark ratings');
+  check('Model comparison precedes playable cards', initial.ratings.version === '4' && initial.ratings.beforeGames && initial.ratings.heading === 'Model comparison');
   check('Every combined rating and missing panel matches the published evidence', initial.ratings.rows.every(row => row.combined === row.expectedCombined));
   check('Completed individual ratings remain prominent and explicitly distinguished from combined scores', initial.ratings.rows.every(row => row.primary === row.expectedPrimary && row.kind === row.expectedKind));
-  check('All completed individual ratings and unavailable review seats are visible in the table', initial.ratings.rows.every(row => JSON.stringify(row.judges) === JSON.stringify(row.expectedJudges) && row.unavailable === row.expectedUnavailable));
+  check('All completed individual ratings and unavailable review seats remain inspectable', initial.ratings.rows.every(row => JSON.stringify(row.judges) === JSON.stringify(row.expectedJudges) && row.unavailable === row.expectedUnavailable));
+  check('Execution status and diagnostic qualifications remain separate from score order', initial.ratings.rows.every(row => row.status === row.expectedStatus && row.qualification === row.expectedQualification));
   check('Astra Ultra pairs the fresh bare output with Ash & Echo', initial.ultra.count === 2 && initial.ultra.hasBare && initial.ultra.hasAsh && /GPT-6 Astra/.test(initial.ultra.title) && /ultra/i.test(initial.ultra.title));
-  check('Every visible score difference matches the actual complete ratings', initial.ratings.differences.every(item => item.visible === (item.expected === null ? '—' : (item.expected > 0 ? '+' : '') + item.expected.toFixed(1))));
+  check('Every visible score difference matches the actual complete ratings', initial.ratings.differences.every(item => item.expected === null ? item.visible === '—' : Number.parseFloat(item.visible) === Number(item.expected.toFixed(1))));
   check('No horizontal page overflow', !initial.overflow);
-  check('Engineering and AI Workflows source coverage preserved', initial.sourceCounts[0] === 216 && initial.sourceCounts[1] === 52);
+  check('Engineering and AI Workflows source coverage preserved', initial.sourceCounts[0] === 312 && initial.sourceCounts[1] === 52);
+  check('Comparison rows descend by combined With Vasir score; eligible ties share ranks and diagnostic rows remain unranked', JSON.stringify(initial.ratings.comparison.map(({configurationId,rank}) => ({configurationId,rank}))) === JSON.stringify(expectedComparison.map(({configurationId,rank}) => ({configurationId,rank}))));
+  check('Model controls follow score order and initially select the highest score', JSON.stringify(initial.ratings.modelButtons) === JSON.stringify(expectedComparison.map(row => row.configurationId)) && initial.ratings.defaultSelection === expectedComparison[0].configurationId);
+  check('Comparison rows start compact with native inspectable disclosures', initial.ratings.comparison.every(row => row.nativeDisclosure && row.closed));
+  check('Bare and With Vasir markers and summary scores match the fixed 0–100 scale', initial.ratings.comparison.every((row,index) => row.plotWidth > 0 && row.marks.length === 2 && row.marks.every(mark => mark.score === expectedComparison[index][mark.condition] && Number(mark.summary?.match(/[+-]?\d+(?:\.\d+)?/)?.[0]) === mark.score && mark.center !== null && Math.abs(mark.center - mark.expectedCenter) < 2)));
   await waitFor(() => evaluate(`Array.from(document.querySelectorAll('.game-comparison__pair .game-artifact__poster')).filter(image => image.getBoundingClientRect().top < innerHeight).every(image => image.complete && image.naturalWidth > 0)`), 'Visible gameplay posters loaded');
   checks.push('Visible gameplay posters loaded');
   await capture(`${width < 600 ? 'mobile' : 'desktop'}-games.png`);
   await evaluate('document.querySelector("#game-results").scrollIntoView({block:"start",behavior:"instant"})');
   await capture(`${width < 600 ? 'mobile' : 'desktop'}-games-ratings.png`);
+
+  const modelSelections = [];
+  for (const { configurationId } of expectedComparison) {
+    const selector = `[data-configuration-result=${JSON.stringify(configurationId)}]`;
+    await click(`${selector} summary.game-results__summary`);
+    const disclosure = await evaluate(`(() => {
+      const row = document.querySelector(${JSON.stringify(selector)});
+      const judges = [...row.querySelectorAll('[data-rating-judge]')];
+      return { open:row.querySelector('details').open, judges:judges.length, visible:judges.every(judge => judge.getBoundingClientRect().height > 0 && getComputedStyle(judge).visibility !== 'hidden') };
+    })()`);
+    check(`Inspecting ${configurationId} exposes both complete judge panels`, disclosure.open && disclosure.judges === 4 && disclosure.visible);
+    await click(`${selector} .game-results__model[data-model-id]`);
+    const selection = await evaluate(`(() => {
+      const configurationId = ${JSON.stringify(configurationId)};
+      const expectedRuns = window.VASIR_DATA.games.conditions.map(condition => window.VASIR_DATA.games.runs.find(run => run.configurationId === configurationId && run.conditionId === condition.id).id);
+      return {configurationId,expectedRuns,actualRuns:[...document.querySelectorAll('.game-comparison__pair [data-run-id]')].map(card => card.dataset.runId),selected:document.querySelector('.game-models__button[aria-pressed="true"]')?.dataset.modelId,urlModel:new URL(location.href).searchParams.get('model'),eagerMedia:document.querySelectorAll('iframe,video').length};
+    })()`);
+    check(`Selecting ${configurationId} opens its exact Bare and With Vasir outputs`, selection.selected === configurationId && selection.urlModel === configurationId && JSON.stringify(selection.actualRuns) === JSON.stringify(selection.expectedRuns) && selection.eagerMedia === 0);
+    modelSelections.push({ ...selection, disclosure });
+    await click(`${selector} summary.game-results__summary`);
+  }
 
   if (!initial.firstVideo || !initial.firstPlayable) throw new Error('Published Games proof requires at least one real playable build and one recorded video.');
   await click(`.game-models__button[data-model-id="${initial.firstVideo}"]`);
@@ -572,7 +651,7 @@ try {
   check('No failed artifact responses', mediaFailures.length === 0, mediaFailures.join('; '));
   if (rehearsal) check('Local rehearsal served only exact pinned files under the production artifact policy', rehearsal.failures.length === 0, JSON.stringify(rehearsal.failures));
 
-  const receipt = { kind: 'vasirbenchmark-games-browser-proof', url: url.href, width, height, checkedAt: new Date().toISOString(), delivery: rehearsalReceipt(), projectionSha256, harnessSha256, presentationFiles, screenshots, checks, ratings: initial.ratings, video: videoStarted, iframe: frameState, child: childProof, fullscreen, coverage: coverageSummary(), artifacts: artifactObservations, coverageFailures, runtimeErrors: errors, mediaFailures, inputClaimBoundary: 'Per-row observations distinguish loaded documents, retained observed failures, and unverified games. Visible controls are preferred; generic surface input does not certify mechanics, winning, recovery, or enjoyment.' };
+  const receipt = { kind: 'vasirbenchmark-games-browser-proof', url: url.href, width, height, checkedAt: new Date().toISOString(), delivery: rehearsalReceipt(), projectionSha256, harnessSha256, presentationFiles, screenshots, checks, ratings: initial.ratings, modelSelections, video: videoStarted, iframe: frameState, child: childProof, fullscreen, coverage: coverageSummary(), artifacts: artifactObservations, coverageFailures, runtimeErrors: errors, mediaFailures, inputClaimBoundary: 'Per-row observations distinguish loaded documents, retained observed failures, and unverified games. Visible controls are preferred; generic surface input does not certify mechanics, winning, recovery, or enjoyment.' };
   fs.writeFileSync(path.join(output, `games-browsercheck-${width}.json`), `${JSON.stringify(receipt, null, 2)}\n`);
   console.log(JSON.stringify(receipt, null, 2));
 } catch (error) {

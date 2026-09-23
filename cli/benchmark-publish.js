@@ -1867,7 +1867,7 @@ export async function publishBenchmarkSite({
       now
     });
     markAction(actions, "cleanup-releases");
-    onProgress({ id: "cleanup-releases", stage: "cleanup", detail: "within 1 GiB" });
+    onProgress({ id: "cleanup-releases", stage: "cleanup", detail: `within ${artifact.config.limits.maxPhysicalStorageBytes} bytes` });
 
     stageRelease({ artifact, aws, bucketName, lease, now, verifiedManifest, existingObjectKeys: storage.existingObjectKeys, fullAudit });
     markAction(actions, "stage-release");

@@ -1435,21 +1435,333 @@ async function assertEngineeringRefreshEvidence(manifest, reader = readFile, vis
   return unavailable;
 }
 
+async function assertGamesPresentationRefreshEvidence(manifest) {
+  const viewports = [{ width: 1440, height: 1000 }, { width: 390, height: 844 }];
+  const changedPaths = ['games.js', 'games.css', 'games-browsercheck.mjs'];
+  assert.deepEqual(manifest.acceptance.scope, {
+    kind: 'games-presentation-refresh', schemaVersion: 1,
+    benchmarkIds: ['2d-jumping-demo'], viewports
+  });
+  const verification = manifest.acceptance.verification;
+  const previous = JSON.parse(await assertLockedFile(verification.previousAcceptance));
+  assert.equal(previous.acceptance.scope.kind, 'engineering-data-refresh');
+  assert.equal(manifest.retainedCaptureEvidence.version, previous.version);
+  assert.deepEqual(manifest.retainedCaptureEvidence.receipt, verification.previousAcceptance);
+  assert.deepEqual(manifest.files.map(file => file.path), previous.files.map(file => file.path));
+  for (const file of manifest.files) if (!changedPaths.includes(file.path)) {
+    assert.deepEqual(file, previous.files.find(prior => prior.path === file.path), `${file.path} remains unchanged`);
+  }
+  assert.deepEqual(verification.previousFiles.map(file => file.sourcePath), changedPaths);
+  const previousFiles = new Map();
+  for (const record of verification.previousFiles) {
+    const bytes = await assertLockedFile(record);
+    const prior = previous.files.find(file => file.path === record.sourcePath);
+    assert.equal(bytes.length, prior.bytes); assert.equal(sha256(bytes), prior.sha256);
+    previousFiles.set(join(siteRoot, record.sourcePath), bytes);
+  }
+  const previousReader = async (filePath, encoding) => {
+    const bytes = previousFiles.get(resolve(filePath));
+    return bytes ? (encoding ? bytes.toString(encoding) : bytes) : readFile(filePath, encoding);
+  };
+  const unavailable = await assertEngineeringRefreshEvidence(previous, previousReader);
+  for (const capture of previous.captures) await assertCapture(capture);
+  assert.deepEqual(verification.generatedFiles.map(file => file.path).sort(), [...generatedPublicFiles].sort());
+  for (const record of verification.generatedFiles) {
+    await assertLockedFile(record);
+    const prior = previous.acceptance.verification.generatedFiles.find(file => file.path === record.path);
+    if (prior) assert.deepEqual(record, prior, `${record.path} retains the accepted Engineering evidence`);
+  }
+  const globals = { window: {} };
+  vm.runInNewContext(await readFile(join(siteRoot, 'data.js'), 'utf8'), globals);
+  const data = JSON.parse(JSON.stringify(globals.window.VASIR_DATA));
+  const harness = await assertLockedFile(verification.browserHarness);
+  const acceptedHarness = manifest.files.find(file => file.path === 'games-browsercheck.mjs');
+  assert.equal(harness.length, acceptedHarness.bytes); assert.equal(sha256(harness), acceptedHarness.sha256);
+  const rehearsalBytes = await assertLockedFile(verification.rehearsalManifest);
+  const rehearsal = JSON.parse(rehearsalBytes);
+  assert.equal(rehearsal.projectionSha256, sha256(JSON.stringify(data)));
+  const deployment = JSON.parse(await readFile(join(siteRoot, 'deployment.json'), 'utf8'));
+  assert.deepEqual(rehearsal.siteFiles.map(file => file.path).sort(), deployment.publicFiles.map(file => file.path).sort());
+  for (const released of rehearsal.siteFiles) {
+    const source = [...manifest.files, ...verification.generatedFiles].find(file => file.path === released.path);
+    assert.ok(source);
+    assertReleasePresentationFile(source, source, released, await assertLockedFile(source), rehearsal.releaseId, deployment.publicFiles);
+  }
+  assert.equal(verification.localBrowserChecks, 2);
+  assert.deepEqual(verification.browserProofs.map(({ width, height }) => ({ width, height })), viewports);
+  assert.equal(manifest.captures.length, 10);
+  const releaseIds = new Set();
+  for (const record of verification.browserProofs) {
+    const proof = JSON.parse(await assertLockedFile(record));
+    assert.equal(proof.kind, 'vasirbenchmark-games-browser-proof');
+    assert.equal(proof.width, record.width); assert.equal(proof.height, record.height);
+    assert.equal(proof.harnessSha256, acceptedHarness.sha256);
+    assert.equal(proof.projectionSha256, sha256(JSON.stringify(data)));
+    assert.equal(proof.delivery.mode, 'local-pinned-bytes');
+    assert.deepEqual(proof.delivery.failures, []);
+    assert.equal(proof.delivery.siteScope.mapping, 'immutable-release');
+    assert.match(proof.delivery.siteScope.releaseId, /^[a-f0-9]{64}$/);
+    assert.equal(proof.delivery.siteScope.releaseId, rehearsal.releaseId);
+    assert.equal(proof.delivery.manifest.sha256, sha256(rehearsalBytes));
+    assert.equal(proof.delivery.manifest.bytes, rehearsalBytes.length);
+    releaseIds.add(proof.delivery.siteScope.releaseId);
+    for (const field of ['coverageFailures', 'runtimeErrors', 'mediaFailures']) assert.deepEqual(proof[field], []);
+    for (const field of ['rows', 'clipsAdvanced', 'gamesLoadedAndInputObserved']) assert.equal(proof.coverage[field], 10);
+    for (const field of ['clipsFailed', 'gamesWithObservedFailure', 'gamesUnverified', 'unavailableRows']) assert.equal(proof.coverage[field], 0);
+    const expectedOrder = [
+      ['codex:gpt-6-astra@ultra', '1'], ['claude:claude-fable-5-1@max', '2'],
+      ['codex:gpt-6-astra@medium', '2'], ['codex:gpt-5.6-sol@max', '4'], ['codex:gpt-5.6-terra@max', '5']
+    ];
+    assert.equal(proof.ratings.version, '4'); assert.equal(proof.ratings.heading, 'Model comparison');
+    assert.equal(proof.ratings.beforeGames, true);
+    assert.deepEqual(proof.ratings.comparison.map(row => [row.configurationId, row.rank]), expectedOrder);
+    assert.deepEqual(proof.ratings.modelButtons, expectedOrder.map(([id]) => id));
+    assert.equal(proof.ratings.defaultSelection, expectedOrder[0][0]);
+    for (const row of proof.ratings.comparison) {
+      assert.equal(row.nativeDisclosure, true); assert.equal(row.closed, true); assert.ok(row.plotWidth > 0);
+      assert.deepEqual(row.marks.map(mark => mark.condition), ['bare', 'vasir']);
+      for (const mark of row.marks) {
+        const run = data.games.runs.find(run => run.configurationId === row.configurationId && run.conditionId === mark.condition);
+        assert.equal(mark.score, run.score.value);
+        assert.equal(Number(mark.summary.match(/[+-]?\d+(?:\.\d+)?/)[0]), run.score.value);
+        assert.ok(Number.isFinite(mark.center) && Number.isFinite(mark.expectedCenter));
+        assert.ok(Math.abs(mark.center - mark.expectedCenter) < 2);
+      }
+    }
+    assert.equal(proof.ratings.rows.length, data.games.runs.length);
+    for (const rating of proof.ratings.rows) {
+      const run = data.games.runs.find(run => run.id === rating.id);
+      assert.ok(run); assert.equal(rating.combined, String(run.score.value));
+      assert.deepEqual(rating.judges, run.judgments.map(judge => ({ judge: judge.judge, value: Number(judge.score?.value ?? judge.score ?? judge.value).toFixed(1) })));
+      assert.equal(rating.status, run.status === 'timeout' ? 'Incomplete · time limit' : 'Built');
+      assert.equal(rating.qualification, run.score.eligible === false ? 'Diagnostic only' : run.score.eligible === null ? 'Functional proof incomplete' : '');
+    }
+    assert.deepEqual(proof.modelSelections.map(selection => selection.configurationId), expectedOrder.map(([id]) => id));
+    for (const selection of proof.modelSelections) {
+      const runIds = data.games.conditions.map(condition => data.games.runs.find(run => run.configurationId === selection.configurationId && run.conditionId === condition.id).id);
+      assert.deepEqual(selection.actualRuns, runIds); assert.deepEqual(selection.expectedRuns, runIds);
+      assert.equal(selection.selected, selection.configurationId); assert.equal(selection.urlModel, selection.configurationId);
+      assert.equal(selection.eagerMedia, 0); assert.deepEqual(selection.disclosure, { open: true, judges: 4, visible: true });
+    }
+    for (const presentation of proof.presentationFiles) {
+      const accepted = manifest.files.find(file => file.path === presentation.path);
+      assert.ok(accepted, `Unaccepted browser presentation input ${presentation.path}`);
+      assert.equal(presentation.sourceSha256, accepted.sha256, presentation.path);
+      assert.equal(presentation.observation, 'CDP Network.getResponseBody for the completed browser-loaded response');
+    }
+    assert.deepEqual(proof.presentationFiles.map(file => file.path), ['games.html', 'games.css', 'games.js', 'style.css', 'assets/kanit-latin-900-normal.woff2']);
+    const prefix = proof.width === 1440 ? 'desktop' : 'mobile';
+    assert.deepEqual(proof.screenshots.map(capture => capture.path), ['', '-ratings', '-playback', '-play', '-fullscreen'].map(suffix => `${prefix}-games${suffix}.png`));
+    for (const screenshot of proof.screenshots) {
+      const capture = manifest.captures.find(item => item.path === `${dirname(record.path)}/${screenshot.path}`);
+      assert.ok(capture); assert.equal(capture.sha256, screenshot.sha256); assert.equal(capture.bytes, screenshot.bytes);
+      assert.equal(capture.width, proof.width); assert.equal(capture.height, proof.height);
+    }
+  }
+  assert.equal(releaseIds.size, 1, 'Both viewports exercised the same immutable candidate');
+  assert.equal(verification.visualReview.authority, 'agent');
+  assert.ok(verification.visualReview.capturePaths.length >= 2);
+  for (const capturePath of verification.visualReview.capturePaths) assert.ok(manifest.captures.some(capture => capture.path === capturePath));
+  return unavailable;
+}
+
+async function assertGamesDataExtensionEvidence(manifest, deployment) {
+  const viewports = [{ width: 1440, height: 1000 }, { width: 390, height: 844 }];
+  const configurationIds = ['claude:claude-opus-5-5@high', 'claude:claude-opus-5-5@max'];
+  assert.deepEqual(manifest.acceptance.scope, { kind: 'games-data-extension', schemaVersion: 1, benchmarkIds: ['2d-jumping-demo'], configurationIds, viewports });
+  const verification = manifest.acceptance.verification;
+  assert.deepEqual([verification.configurations, verification.outputs, verification.judgments, verification.preservedOutputs, verification.localBrowserChecks], [7, 14, 28, 10, 2]);
+  const previous = JSON.parse(await assertLockedFile(verification.previousAcceptance));
+  assert.equal(previous.kind, 'vasirbenchmark-site-template-lock'); assert.equal(previous.status, 'accepted');
+  assert.equal(manifest.retainedCaptureEvidence.version, previous.version);
+  assert.deepEqual(manifest.retainedCaptureEvidence.receipt, verification.previousAcceptance);
+  assert.deepEqual(manifest.files.map(file => file.path), previous.files.map(file => file.path));
+  const changed = manifest.files.filter(file => file.sha256 !== previous.files.find(prior => prior.path === file.path)?.sha256);
+  assert.deepEqual(verification.previousFiles.map(record => record.sourcePath), changed.map(file => file.path));
+  for (const file of changed) assert.ok(['games-browsercheck.mjs', 'games.js', 'games.css', 'deployment.json'].includes(file.path), `Unrelated presentation drift: ${file.path}`);
+  for (const record of verification.previousFiles) {
+    const bytes = await assertLockedFile(record), prior = previous.files.find(file => file.path === record.sourcePath);
+    assert.equal(bytes.length, prior.bytes); assert.equal(sha256(bytes), prior.sha256);
+  }
+  // Historical locks and captures remain history. Do not reinterpret their data
+  // against this larger current projection or label earlier screenshots current.
+  const baseline = JSON.parse(await assertLockedFile(verification.baselineManifest));
+  const beforeBytes = await assertLockedFile(verification.previousData);
+  const readData = bytes => { const globals = { window: {} }; vm.runInNewContext(bytes.toString('utf8'), globals); return JSON.parse(JSON.stringify(globals.window.VASIR_DATA)); };
+  const before = readData(beforeBytes), data = readData(await readFile(join(siteRoot, 'data.js')));
+  const baselinePin = name => baseline.pins.find(record => record.path === `site/vasirbenchmark.com/${name}`);
+  assert.equal(beforeBytes.length, baselinePin('data.js').bytes); assert.equal(sha256(beforeBytes), baselinePin('data.js').sha256);
+  const withoutGames = ({ games, ...remaining }) => remaining;
+  assert.deepEqual(withoutGames(data), withoutGames(before), 'Every non-Games projection remains identical.');
+  assert.equal(before.games.configurations.length, 5); assert.equal(before.games.runs.length, 10);
+  assert.equal(data.games.configurations.length, 7); assert.equal(data.games.runs.length, 14);
+  assert.equal(new Set(data.games.runs.map(run => run.id)).size, 14);
+  assert.equal(data.games.runs.reduce((sum, run) => sum + run.judgments.length, 0), 28);
+  assert.deepEqual(data.games.conditions, before.games.conditions);
+  assert.equal(data.games.benchmark.prompt, before.games.benchmark.prompt);
+  for (const run of before.games.runs) assert.deepEqual(data.games.runs.find(current => current.id === run.id), run, `Original output or review changed: ${run.id}`);
+  for (const configuration of before.games.configurations) assert.deepEqual(data.games.configurations.find(current => current.id === configuration.id), configuration);
+  const added = data.games.runs.filter(run => !before.games.runs.some(original => original.id === run.id));
+  assert.deepEqual(added.map(run => `${run.configurationId}|${run.conditionId}`).sort(), configurationIds.flatMap(id => ['bare', 'vasir'].map(condition => `${id}|${condition}`)).sort());
+  assert.ok(added.every(run => ['complete', 'completed', 'timeout'].includes(run.status) && run.artifact.playUrl && run.artifact.videoUrl && run.artifact.posterUrl));
+  const previousResponses = await assertLockedFile(verification.previousResponses);
+  assert.equal(sha256(previousResponses), baselinePin('responses.js').sha256);
+  assert.deepEqual(await readFile(join(siteRoot, 'responses.js')), previousResponses);
+  for (const name of [...generatedPublicFiles].filter(name => name.startsWith('writing-'))) await assertLockedFile({ ...baselinePin(name), path: name });
+  assert.deepEqual(verification.generatedFiles.map(file => file.path).sort(), [...generatedPublicFiles].sort());
+  for (const record of verification.generatedFiles) await assertLockedFile(record);
+  const preserved = JSON.parse(await assertLockedFile(verification.preservedWorkspaceManifest));
+  assert.deepEqual(verification.preservedWorkspaceFiles.map(record => record.sourcePath), ['games.js', 'games.css']);
+  for (const record of verification.preservedWorkspaceFiles) {
+    const bytes = await assertLockedFile(record), pinned = preserved.pins.find(file => file.path === record.sourcePath);
+    assert.equal(bytes.length, pinned.bytes); assert.equal(sha256(bytes), pinned.sha256);
+    assert.deepEqual(await readFile(join(siteRoot, record.sourcePath)), bytes, `Preexisting workspace file changed: ${record.sourcePath}`);
+  }
+  const budget = verification.deploymentBudget;
+  const beforeDeploymentBytes = await assertLockedFile(budget.before), beforeDeployment = JSON.parse(beforeDeploymentBytes);
+  const previousDeploymentPin = preserved.pins.find(file => file.path === 'deployment.json');
+  assert.equal(beforeDeploymentBytes.length, previousDeploymentPin.bytes); assert.equal(sha256(beforeDeploymentBytes), previousDeploymentPin.sha256);
+  assert.deepEqual(JSON.parse(await assertLockedFile(budget.after)), deployment);
+  const normalized = structuredClone(deployment); normalized.limits.maxCompressedLandingBytes = beforeDeployment.limits.maxCompressedLandingBytes;
+  normalized.limits.maxPhysicalStorageBytes = beforeDeployment.limits.maxPhysicalStorageBytes;
+  assert.deepEqual(normalized, beforeDeployment, 'Deployment changes are confined to measured landing transfer and retained-storage budgets.');
+  assert.equal(budget.previousLimit, beforeDeployment.limits.maxCompressedLandingBytes); assert.equal(budget.currentLimit, deployment.limits.maxCompressedLandingBytes);
+  assert.ok(budget.measuredCompressedLandingBytes <= budget.currentLimit);
+  if (budget.previousLimit !== budget.currentLimit) {
+    assert.ok(budget.measuredCompressedLandingBytes > budget.previousLimit);
+    assert.ok(budget.currentLimit <= Math.ceil(budget.measuredCompressedLandingBytes / 10000) * 10000);
+  }
+  if (deployment.limits.maxPhysicalStorageBytes !== beforeDeployment.limits.maxPhysicalStorageBytes) {
+    const storage = budget.storage, rejection = JSON.parse(await assertLockedFile(storage.rejection)), measured = rejection.context;
+    assert.equal(rejection.code, 'BENCHMARK_PUBLISH_STORAGE_BUDGET_EXCEEDED');
+    assert.equal(measured.stage, 'cleanup'); assert.equal(measured.rollback.status, 'not-needed'); assert.deepEqual(measured.expiredReleaseIds, []);
+    for (const field of ['physicalBytes', 'candidateBytes', 'projectedBytes']) assert.ok(Number.isSafeInteger(measured[field]) && measured[field] > 0);
+    assert.equal(measured.projectedBytes, measured.physicalBytes + measured.candidateBytes);
+    assert.equal(storage.previousLimit, beforeDeployment.limits.maxPhysicalStorageBytes); assert.equal(storage.currentLimit, deployment.limits.maxPhysicalStorageBytes);
+    assert.equal(storage.boundaryBytes, 16 * 1024 * 1024);
+    assert.ok(measured.projectedBytes > storage.previousLimit && measured.projectedBytes <= storage.currentLimit);
+    assert.ok(storage.currentLimit <= Math.ceil(measured.projectedBytes / storage.boundaryBytes) * storage.boundaryBytes);
+  }
+  const previousSelection = await assertLockedFile(verification.previousSelection);
+  const selectionPin = baseline.pins.find(record => record.path === 'benchmarks/2d-jumping-demo/publication.json');
+  assert.equal(previousSelection.length, selectionPin.bytes); assert.equal(sha256(previousSelection), selectionPin.sha256);
+  const selectedBytes = await assertLockedFile(verification.selectedPublication), selected = JSON.parse(selectedBytes);
+  assert.deepEqual(await readFile(join(repoRoot, 'benchmarks/2d-jumping-demo/publication.json')), selectedBytes);
+  const unavailable = [];
+  try { await assertLockedFile(selected.source, repoRoot); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; unavailable.push(selected.source.path); }
+  const candidate = JSON.parse(await assertLockedFile(verification.candidate));
+  assert.equal(candidate.kind, 'vasirbenchmark-games-extension-candidate'); assert.equal(candidate.schemaVersion, 1);
+  if (budget.storage) assert.equal(JSON.parse(await assertLockedFile(budget.storage.rejection)).context.releaseId, candidate.releaseId);
+  assert.equal(candidate.releaseId, sha256(Buffer.from(`${JSON.stringify({ sourceManifest: candidate.sourceManifest, projectionBasisSha256: candidate.projectionBasisSha256 })}\n`)));
+  assert.deepEqual([candidate.configurations, candidate.outputs, candidate.judgments, candidate.preservedOutputs], [7, 14, 28, 10]);
+  assert.deepEqual(candidate.addedConfigurationIds, configurationIds); assert.deepEqual(candidate.addedOutputIds, added.map(run => run.id));
+  assert.equal(candidate.selection.sha256, sha256(selectedBytes)); assert.equal(candidate.selection.bytes, selectedBytes.length);
+  assert.equal(candidate.compressedLandingBytes, budget.measuredCompressedLandingBytes);
+  const harness = await assertLockedFile(verification.browserHarness), acceptedHarness = manifest.files.find(file => file.path === 'games-browsercheck.mjs');
+  assert.equal(harness.length, acceptedHarness.bytes); assert.equal(sha256(harness), acceptedHarness.sha256);
+  assert.deepEqual(candidate.browserHarness, { path: acceptedHarness.path, bytes: acceptedHarness.bytes, sha256: acceptedHarness.sha256 });
+  const rehearsalBytes = await assertLockedFile(verification.rehearsalManifest), rehearsal = JSON.parse(rehearsalBytes);
+  assert.equal(candidate.rehearsal.sha256, sha256(rehearsalBytes)); assert.equal(candidate.rehearsal.bytes, rehearsalBytes.length);
+  assert.equal(rehearsal.releaseId, candidate.releaseId); assert.equal(rehearsal.projectionSha256, sha256(JSON.stringify(data))); assert.equal(candidate.projectionSha256, rehearsal.projectionSha256);
+  assert.deepEqual(rehearsal.siteFiles.map(file => file.path).sort(), deployment.publicFiles.map(file => file.path).sort());
+  assert.deepEqual(candidate.sourceManifest.map(file => file.path).sort(), deployment.publicFiles.map(file => file.path).sort());
+  for (const released of rehearsal.siteFiles) {
+    const accepted = [...manifest.files, ...verification.generatedFiles].find(file => file.path === released.path);
+    assertReleasePresentationFile(accepted, candidate.sourceManifest.find(file => file.path === released.path), released, await assertLockedFile(accepted), candidate.releaseId, deployment.publicFiles);
+  }
+  const scoreRows = data.games.configurations.map(configuration => {
+    const pair = data.games.conditions.map(condition => {
+      const runs = data.games.runs.filter(run => run.configurationId === configuration.id && run.conditionId === condition.id);
+      assert.equal(runs.length, 1); const run = runs[0];
+      assert.equal(run.judgments.length, 2); assert.equal(new Set(run.judgments.map(judge => judge.judge)).size, 2);
+      const scores = run.judgments.map(judge => judge.score?.value ?? judge.score ?? judge.value);
+      assert.ok(scores.every(score => Number.isFinite(score) && score >= 0 && score <= 100));
+      assert.equal(run.score.value, Number(((scores[0] + scores[1]) / 2).toFixed(1)));
+      return run;
+    });
+    const vasir = pair.find(run => run.conditionId === 'vasir');
+    return { id: configuration.id, label: configuration.label || configuration.id, score: vasir.score.value, eligible: vasir.score.eligible === true };
+  }).sort((a, b) => b.score - a.score || a.label.localeCompare(b.label) || a.id.localeCompare(b.id));
+  const expectedOrder = scoreRows.map(row => [row.id, row.eligible ? String(scoreRows.filter(other => other.eligible && other.score > row.score).length + 1) : '']);
+  assert.deepEqual(verification.browserProofs.map(({ width, height }) => ({ width, height })), viewports);
+  assert.equal(manifest.captures.length, 94); assert.equal(new Set(manifest.captures.map(capture => capture.path)).size, 94);
+  for (const record of verification.browserProofs) {
+    const proof = JSON.parse(await assertLockedFile(record));
+    assert.equal(proof.kind, 'vasirbenchmark-games-browser-proof'); assert.equal(proof.width, record.width); assert.equal(proof.height, record.height);
+    assert.equal(proof.harnessSha256, acceptedHarness.sha256); assert.equal(proof.projectionSha256, rehearsal.projectionSha256);
+    assert.equal(proof.delivery.mode, 'local-pinned-bytes'); assert.equal(proof.delivery.siteScope.mapping, 'immutable-release'); assert.equal(proof.delivery.siteScope.releaseId, candidate.releaseId);
+    assert.equal(proof.delivery.manifest.sha256, sha256(rehearsalBytes)); assert.equal(proof.delivery.manifest.bytes, rehearsalBytes.length);
+    assert.deepEqual(proof.delivery.failures, []); for (const field of ['coverageFailures', 'runtimeErrors', 'mediaFailures']) assert.deepEqual(proof[field], []);
+    assert.equal(proof.coverage.rows, 14); assert.equal(proof.coverage.clipsAdvanced, 14);
+    assert.equal(proof.coverage.gamesLoadedAndInputObserved + proof.coverage.gamesWithObservedFailure, 14);
+    for (const field of ['clipsFailed', 'gamesUnverified', 'unavailableRows']) assert.equal(proof.coverage[field], 0);
+    assert.deepEqual(proof.artifacts.map(item => item.id).sort(), data.games.runs.map(run => run.id).sort());
+    for (const artifact of proof.artifacts) {
+      assert.equal(artifact.video.status, 'advancing'); assert.ok(['loaded-and-input-observed', 'observed-failure'].includes(artifact.game.status));
+      if (artifact.game.status === 'observed-failure') assert.equal(artifact.game.declaredFunctionalFailure, true);
+    }
+    assert.equal(proof.ratings.version, '4'); assert.equal(proof.ratings.beforeGames, true); assert.equal(proof.ratings.heading, 'Model comparison');
+    assert.deepEqual(proof.ratings.comparison.map(row => [row.configurationId, row.rank]), expectedOrder);
+    assert.deepEqual(proof.ratings.modelButtons, expectedOrder.map(([id]) => id)); assert.equal(proof.ratings.defaultSelection, expectedOrder[0][0]);
+    assert.equal(proof.ratings.rows.length, 14);
+    for (const rating of proof.ratings.rows) {
+      const run = data.games.runs.find(run => run.id === rating.id); assert.ok(run);
+      assert.equal(rating.combined, String(run.score.value));
+      assert.deepEqual(rating.judges, run.judgments.map(judge => ({ judge: judge.judge, value: Number(judge.score?.value ?? judge.score ?? judge.value).toFixed(1) })));
+      assert.equal(rating.status, run.status === 'timeout' ? 'Incomplete · time limit' : 'Built');
+      assert.equal(rating.qualification, run.score.eligible === false ? 'Diagnostic only' : run.score.eligible === null ? 'Functional proof incomplete' : '');
+    }
+    for (const row of proof.ratings.comparison) {
+      assert.equal(row.nativeDisclosure, true); assert.equal(row.closed, true); assert.ok(row.plotWidth > 0);
+      assert.deepEqual(row.marks.map(mark => mark.condition), ['bare', 'vasir']);
+      for (const mark of row.marks) {
+        const run = data.games.runs.find(run => run.configurationId === row.configurationId && run.conditionId === mark.condition);
+        assert.equal(mark.score, run.score.value); assert.equal(Number(mark.summary.match(/[+-]?\d+(?:\.\d+)?/)[0]), run.score.value);
+        assert.ok(Number.isFinite(mark.center) && Number.isFinite(mark.expectedCenter) && Math.abs(mark.center - mark.expectedCenter) < 2);
+      }
+    }
+    assert.deepEqual(proof.modelSelections.map(selection => selection.configurationId), expectedOrder.map(([id]) => id));
+    for (const selection of proof.modelSelections) {
+      const runIds = data.games.conditions.map(condition => data.games.runs.find(run => run.configurationId === selection.configurationId && run.conditionId === condition.id).id);
+      assert.deepEqual(selection.actualRuns, runIds); assert.deepEqual(selection.expectedRuns, runIds);
+      assert.equal(selection.selected, selection.configurationId); assert.equal(selection.urlModel, selection.configurationId); assert.equal(selection.eagerMedia, 0);
+      assert.deepEqual(selection.disclosure, { open: true, judges: 4, visible: true });
+    }
+    assert.deepEqual(proof.presentationFiles.map(file => file.path), ['games.html', 'games.css', 'games.js', 'style.css', 'assets/kanit-latin-900-normal.woff2']);
+    for (const presentation of proof.presentationFiles) assert.equal(presentation.sourceSha256, manifest.files.find(file => file.path === presentation.path)?.sha256);
+    const prefix = proof.width === 1440 ? 'desktop' : 'mobile';
+    const expectedScreenshots = ['', '-ratings', '-playback', '-play', '-fullscreen'].map(suffix => `${prefix}-games${suffix}.png`);
+    for (let index = 1; index <= 14; index++) for (const suffix of ['playback', 'before-input', 'after-input']) expectedScreenshots.push(`${proof.width}-${index}-${suffix}.png`);
+    assert.deepEqual(proof.screenshots.map(screenshot => screenshot.path), expectedScreenshots);
+    for (const screenshot of proof.screenshots) {
+      const capture = manifest.captures.find(item => item.path === `${dirname(record.path)}/${screenshot.path}`); assert.ok(capture);
+      assert.equal(capture.sha256, screenshot.sha256); assert.equal(capture.bytes, screenshot.bytes); assert.equal(capture.width, proof.width); assert.equal(capture.height, proof.height);
+    }
+  }
+  assert.equal(verification.visualReview.authority, 'agent');
+  for (const prefix of ['desktop-', 'mobile-']) assert.ok(verification.visualReview.capturePaths.some(capture => capture.split('/').at(-1).startsWith(prefix)));
+  for (const capturePath of verification.visualReview.capturePaths) assert.ok(manifest.captures.some(capture => capture.path === capturePath));
+  return unavailable;
+}
+
 test('canonical VasirBench site matches its accepted template lock', async t => {
   const manifest = JSON.parse(await readFile(join(siteRoot, 'template-lock.json'), 'utf8'));
   const deployment = JSON.parse(await readFile(join(siteRoot, 'deployment.json'), 'utf8'));
   const focused = manifest.acceptance.scope?.kind === 'focused-writing-benchmark';
   const shared = manifest.acceptance.scope?.kind === 'shared-writing-category-frame';
   const engineeringRefresh = manifest.acceptance.scope?.kind === 'engineering-data-refresh';
+  const gamesRefresh = manifest.acceptance.scope?.kind === 'games-presentation-refresh';
+  const gamesExtension = manifest.acceptance.scope?.kind === 'games-data-extension';
   const versioned = shared && manifest.acceptance.verification?.categoryIndex?.method === versionedMethod;
-  assert.ok(!manifest.acceptance.scope || focused || shared || engineeringRefresh, 'unrecognized acceptance scope');
+  assert.ok(!manifest.acceptance.scope || focused || shared || engineeringRefresh || gamesRefresh || gamesExtension, 'unrecognized acceptance scope');
   const expectedFiles = [...new Set([
     ...deployment.publicFiles.map(({ path }) => path).filter((path) => !generatedPublicFiles.has(path)),
     ...acceptanceOnlyFiles,
     // The shared browser harness still imports this byte-pinned audit helper;
     // its presence never authorizes compact source data or public reports.
-    ...(versioned || engineeringRefresh ? [compactHarness] : []),
-    ...(focused || shared || engineeringRefresh ? ['deployment.json', 'infra/production.yml'] : [])
+    ...(versioned || engineeringRefresh || gamesRefresh || gamesExtension ? [compactHarness] : []),
+    ...(focused || shared || engineeringRefresh || gamesRefresh || gamesExtension ? ['deployment.json', 'infra/production.yml'] : [])
   ])].sort();
 
   assert.equal(manifest.kind, 'vasirbenchmark-site-template-lock');
@@ -1470,8 +1782,8 @@ test('canonical VasirBench site matches its accepted template lock', async t => 
   });
 
   assert.deepEqual(manifest.files.map(({ path }) => path).sort(), expectedFiles);
-  if (focused || shared || engineeringRefresh) {
-    const unavailable = await (engineeringRefresh ? assertEngineeringRefreshEvidence(manifest) : shared ? assertSharedFrameEvidence(manifest, deployment) : assertFocusedEvidence(manifest, deployment));
+  if (focused || shared || engineeringRefresh || gamesRefresh || gamesExtension) {
+    const unavailable = await (gamesExtension ? assertGamesDataExtensionEvidence(manifest, deployment) : gamesRefresh ? assertGamesPresentationRefreshEvidence(manifest) : engineeringRefresh ? assertEngineeringRefreshEvidence(manifest) : shared ? assertSharedFrameEvidence(manifest, deployment) : assertFocusedEvidence(manifest, deployment));
     if (unavailable.length) t.diagnostic(`Tracked selection hashes and archived source metadata verified; ${unavailable.length} gitignored private source files are absent. Restore their exact selected publication-snapshots to repeat private-byte verification or rebuild/publish. Their byte assertions were not performed; presentation and portable browser-evidence assertions remain mandatory.`);
   }
   else assert.deepEqual(manifest.captures.map(({ path }) => path), expectedCaptures);

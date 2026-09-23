@@ -14,7 +14,7 @@ const resultPath = resolve(resultArgument);
 const result = JSON.parse(await readFile(resultPath));
 const settings = JSON.parse(await readFile(resolve(settingsArgument)));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-const allowed = new Set(['.html', '.js', '.mjs', '.css', '.json', '.png', '.webp', '.jpg', '.jpeg', '.svg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.otf', '.ogg', '.mp3', '.wav', '.mp4', '.webm', '.wasm', '.glb', '.gltf']);
+const allowed = new Set(['.html', '.js', '.mjs', '.css', '.json', '.webmanifest', '.png', '.webp', '.jpg', '.jpeg', '.svg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.otf', '.ogg', '.mp3', '.wav', '.mp4', '.webm', '.wasm', '.glb', '.gltf']);
 const check = (condition, text) => { if (!condition) throw new Error(text); };
 const inside = (root, path) => { const name = relative(root, path); check(name !== '..' && !name.startsWith(`..${sep}`), 'Packaging path escapes its root'); return path; };
 async function entries(root, current = root) {

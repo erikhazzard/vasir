@@ -15,6 +15,7 @@ const TOOLKIT = '/private/tmp/vasir-jump-toolkit';
 const POLICY = JSON.parse(await readFile(join(DIRECTORY, 'generation-policy.json'), 'utf8'));
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const BASE_POLICY_SHA256 = sha256(JSON.stringify(POLICY));
+const BASE_CONDITIONS = [...POLICY.conditions];
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 
@@ -196,6 +197,17 @@ async function probeClaudeInitialization(row) {
   } finally { child.kill('SIGTERM'); }
 }
 
+function selectExtensionCohort(configurations, conditions, cohort = false) {
+  check(Array.isArray(configurations) && configurations.length > 0 && Array.isArray(conditions) && conditions.length > 0, 'Extension must select configurations and conditions.');
+  check(cohort || (configurations.length === 1 && conditions.length === 1), 'Extension must select one configuration and condition.');
+  const selectedConfigurations = configurations.map((selector) => resolveBenchmarkConfiguration(selector).id);
+  check(new Set(selectedConfigurations).size === selectedConfigurations.length, 'Duplicate generation configuration.');
+  check(conditions.every((condition) => BASE_CONDITIONS.includes(condition)), 'Unknown generation condition.');
+  check(new Set(conditions).size === conditions.length, 'Duplicate generation condition.');
+  POLICY.configurations = selectedConfigurations;
+  POLICY.conditions = [...conditions];
+}
+
 async function prepare(extension = null) {
   check(process.platform === 'darwin', 'This isolation policy requires macOS sandbox-exec.');
   let originalPlan = null;
@@ -205,10 +217,10 @@ async function prepare(extension = null) {
     const sourceBytes = await readFile(sourcePath);
     originalPlan = JSON.parse(sourceBytes);
     check(originalPlan.policySha256 === BASE_POLICY_SHA256, 'Extension must retain the original generation resource policy.');
-    check(POLICY.conditions.includes(extension.condition), 'Unknown generation condition.');
-    POLICY.configurations = [resolveBenchmarkConfiguration(extension.configuration).id];
-    POLICY.conditions = [extension.condition];
+    check(originalPlan.prompt === POLICY.prompt && originalPlan.promptSha256 === sha256(POLICY.prompt), 'Original cohort prompt mismatch.');
+    selectExtensionCohort(extension.configurations, extension.conditions, extension.cohort);
     extensionOf = { path: sourcePath, sha256: sha256(sourceBytes), batchId: originalPlan.batchId };
+    if (extension.cohort) extensionOf.mode = 'cohort';
   }
   const batchId = `${new Date().toISOString().replaceAll(/[:.]/g, '-')}-${randomBytes(3).toString('hex')}`;
   const history = join(HISTORY, batchId); await mkdir(history, { recursive: true, mode: 0o700 });
@@ -280,10 +292,16 @@ async function prepare(extension = null) {
     } finally { await rm(join(row.home, '.codex/auth.json'), { force: true }); await rm(join(row.home, '.claude/.credentials.json'), { force: true }); }
   }
   const versions = Object.fromEntries(Object.entries(binaries).map(([name, binary]) => [name, spawnSync(binary, ['--version'], { encoding: 'utf8' }).stdout.trim()]));
-  if (originalPlan) check(JSON.stringify(versions) === JSON.stringify(originalPlan.versions), 'Native CLI versions changed from the original cohort.');
+  if (originalPlan && !extension.cohort) check(JSON.stringify(versions) === JSON.stringify(originalPlan.versions), 'Native CLI versions changed from the original cohort.');
+  const runtimeComparison = originalPlan ? {
+    originalVersions: originalPlan.versions,
+    currentVersions: versions,
+    differences: [...new Set([...Object.keys(originalPlan.versions), ...Object.keys(versions)])].filter((provider) => originalPlan.versions[provider] !== versions[provider]).map((provider) => ({ provider, original: originalPlan.versions[provider] ?? null, current: versions[provider] ?? null })),
+    versionPolicy: extension.cohort ? 'record-runtime-differences' : 'require-original-versions'
+  } : null;
   const plan = { schemaVersion: 1, benchmark: POLICY.benchmark, batchId, history, batchRoot, preparedAt: new Date().toISOString(), status: 'prepared-no-model-calls', policy: POLICY, prompt: POLICY.prompt, promptSha256: sha256(POLICY.prompt), policySha256: sha256(JSON.stringify(POLICY)), runnerSha256: sha256(await readFile(fileURLToPath(import.meta.url))), bridgeSha256: sha256(await readFile(join(DIRECTORY, 'image-bridge.mjs'))), catalog: catalogReceipt, versions, preflight: { isolation: JSON.parse(isolation.stdout), browser, images, providers: providerPreflight }, rows };
-  if (extensionOf) Object.assign(plan, { extensionOf, basePolicySha256: BASE_POLICY_SHA256 });
-  await writeJson(join(history, 'plan.json'), plan); await writeJson(extensionOf ? join(history, 'generation-dry-run.json') : join(DIRECTORY, 'generation-dry-run.json'), { planPath: join(history, 'plan.json'), batchId, prompt: plan.prompt, promptSha256: plan.promptSha256, policy: POLICY, versions, catalog: { sha256: catalogReceipt.sha256, fileCount: catalogReceipt.entries.length }, isolation: plan.preflight.isolation, browserTools: browser.tools.map((tool) => tool.name), imageTools: images.tools, rows: rows.map(({ rowId, configuration, condition, arguments: args, environmentKeys, catalog: installed }) => ({ rowId, configuration, condition, arguments: args, environmentKeys, catalog: installed })) });
+  if (extensionOf) Object.assign(plan, { extensionOf, basePolicySha256: BASE_POLICY_SHA256, runtimeComparison });
+  await writeJson(join(history, 'plan.json'), plan); await writeJson(extensionOf ? join(history, 'generation-dry-run.json') : join(DIRECTORY, 'generation-dry-run.json'), { planPath: join(history, 'plan.json'), batchId, prompt: plan.prompt, promptSha256: plan.promptSha256, policy: POLICY, versions, ...(extensionOf ? { extensionOf, runtimeComparison } : {}), catalog: { sha256: catalogReceipt.sha256, fileCount: catalogReceipt.entries.length }, isolation: plan.preflight.isolation, browserTools: browser.tools.map((tool) => tool.name), imageTools: images.tools, rows: rows.map(({ rowId, configuration, condition, arguments: args, environmentKeys, catalog: installed }) => ({ rowId, configuration, condition, arguments: args, environmentKeys, catalog: installed })) });
   process.stdout.write(json({ status: plan.status, planPath: join(history, 'plan.json'), batchId, rows: rows.length, promptSha256: plan.promptSha256, catalogSha256: catalogReceipt.sha256, browserTools: browser.tools.length }));
 }
 
@@ -316,9 +334,7 @@ async function run(planPath, selectedRows) {
   const plan = JSON.parse(await readFile(resolve(planPath), 'utf8'));
   if (plan.extensionOf) {
     check(plan.basePolicySha256 === BASE_POLICY_SHA256, 'Original resource policy changed after extension preparation.');
-    check(plan.policy.configurations.length === 1 && plan.policy.conditions.length === 1 && POLICY.conditions.includes(plan.policy.conditions[0]), 'Extension must select one configuration and condition.');
-    POLICY.configurations = [resolveBenchmarkConfiguration(plan.policy.configurations[0]).id];
-    POLICY.conditions = plan.policy.conditions;
+    selectExtensionCohort(plan.policy.configurations, plan.policy.conditions, plan.extensionOf.mode === 'cohort');
   }
   check(plan.runnerSha256 === sha256(await readFile(fileURLToPath(import.meta.url))), 'Runner changed after preparation; prepare a new reviewed plan.');
   check(plan.policySha256 === sha256(JSON.stringify(POLICY)), 'Policy changed after preparation.');
@@ -368,12 +384,13 @@ async function run(planPath, selectedRows) {
   await Promise.all(Array.from({ length: Math.min(POLICY.concurrency, rows.length) }, worker));
   const results = [];
   for (const row of plan.rows) if (await exists(join(row.history, 'result.json'))) results.push(JSON.parse(await readFile(join(row.history, 'result.json'), 'utf8')));
-  await writeJson(join(plan.history, 'run.json'), { schemaVersion: 1, benchmark: POLICY.benchmark, batchId: plan.batchId, prompt: POLICY.prompt, promptSha256: plan.promptSha256, policy: POLICY, catalogSha256: plan.catalog.sha256, planPath: resolve(planPath), rows: results });
+  await writeJson(join(plan.history, 'run.json'), { schemaVersion: 1, benchmark: POLICY.benchmark, batchId: plan.batchId, prompt: POLICY.prompt, promptSha256: plan.promptSha256, policy: POLICY, catalogSha256: plan.catalog.sha256, planPath: resolve(planPath), ...(plan.extensionOf ? { extensionOf: plan.extensionOf, versions: plan.versions, runtimeComparison: plan.runtimeComparison } : {}), rows: results });
   process.stdout.write(json({ runPath: join(plan.history, 'run.json'), completedRows: results.length }));
 }
 
 const args = process.argv.slice(2);
 if (args.length === 0 || args[0] === '--dry-run') await prepare();
-else if (args[0] === '--extend' && args.length === 6 && args[2] === '--configuration' && args[4] === '--condition') await prepare({ planPath: args[1], configuration: args[3], condition: args[5] });
+else if (args[0] === '--extend' && args.length === 6 && args[2] === '--configuration' && args[4] === '--condition') await prepare({ planPath: args[1], configurations: [args[3]], conditions: [args[5]] });
+else if (args[0] === '--extend-cohort' && args.length === 6 && args[2] === '--configurations' && args[4] === '--conditions') await prepare({ planPath: args[1], configurations: args[3].split(',').map((value) => value.trim()), conditions: args[5].split(',').map((value) => value.trim()), cohort: true });
 else if (args[0] === '--run' && args[1]) await run(args[1], args[2] === '--rows' ? (args[3] ?? '').split(',').filter(Boolean) : []);
-else { process.stderr.write('Usage: node benchmarks/2d-jumping-demo/run-agents.mjs --dry-run\n       node benchmarks/2d-jumping-demo/run-agents.mjs --extend <original-plan.json> --configuration <provider:model@effort> --condition <bare|vasir>\n       node benchmarks/2d-jumping-demo/run-agents.mjs --run <plan.json> [--rows <row-id,...>]\n'); process.exitCode = 1; }
+else { process.stderr.write('Usage: node benchmarks/2d-jumping-demo/run-agents.mjs --dry-run\n       node benchmarks/2d-jumping-demo/run-agents.mjs --extend <original-plan.json> --configuration <provider:model@effort> --condition <bare|vasir>\n       node benchmarks/2d-jumping-demo/run-agents.mjs --extend-cohort <original-plan.json> --configurations <provider:model@effort,...> --conditions <bare,vasir>\n       node benchmarks/2d-jumping-demo/run-agents.mjs --run <plan.json> [--rows <row-id,...>]\n'); process.exitCode = 1; }
