@@ -1,6 +1,6 @@
 ---
 name: skills__create-skill
-description: Designs, rewrites, audits, and debugs reusable agent skills by encoding expert judgment into decision steering. Use when creating skills, extracting durable doctrine, fixing triggers, choosing granularity, or pruning manifests.
+description: Designs, rewrites, audits, and debugs reusable agent skills by encoding expert judgment into decision steering. Use when creating skills, preparing expert interviews for skills, extracting durable doctrine, fixing triggers, choosing granularity, or pruning manifests.
 ---
 
 # Designing Agent Skills
@@ -23,8 +23,17 @@ The primary job is **transferring expert judgment**: what the agent notices, wha
 
 Identify what must transfer. If there is no decision-changing expertise or recurring procedural value, prefer a checklist, document, or existing tool. Procedures and artifact schemas can earn a skill when packaging them prevents recurring mistakes; do not invent an expert insight to justify them.
 
-| Expertise type | Question |
+Capture the **assumed baseline** as well as advanced judgment: vocabulary, prerequisites, normal sequence, essential checks, and what counts as an acceptable result. Knowledge obvious to an expert can be missing from the target agent's working context. Preserve fundamentals that enable correct action; novelty is not the inclusion test.
+
+When eliciting expertise from a person or preparing questions for one, read [Expert interview](references/expert-interview.md). The interviewer supplies structure; the expert makes small, concrete judgments. Use known context to tailor short situations, choices, and correction prompts; if only a broad role is known, start with one easy specialty picker. Recover fundamentals within those exchanges, not through a generic workflow essay or glossary assignment. Text answers are sufficient. Use existing answers rather than restarting intake.
+
+Choose interview questions by the consequential model decisions their answers could change. Shortness is a delivery constraint, not the objective. Privately map the expert's strong areas and likely model mistakes, including diagnosis and validation; once a branch supplies usable guidance, move to a higher-value gap instead of repeatedly asking the expert to justify the same tradeoff.
+
+Use the following as private extraction lenses. They identify what to learn; do not paste their broad questions into an expert interview. The interview reference governs how to make each missing distinction easy to answer.
+
+| Expertise type | Private extraction question |
 |---|---|
+| Assumed baseline | What does the expert routinely know, check, or do that an outsider would not realize is necessary? |
 | Hard-won insight | What does an expert know from being burned? |
 | Hidden constraint | What true rule is not obvious from docs, code, or generic best practice? |
 | Value hierarchy | When two good things conflict, which wins, and why? |
@@ -40,14 +49,14 @@ Turn “it depends” into the variables that change the decision. When recommen
 
 Distinguish observations, causal interpretations, preferences, and heuristics. Preserve material qualifiers and source context; do not invent mechanisms, thresholds, outcomes, or consensus. When evidence is incomplete, encode the supported judgment with a clear boundary and identify the specific uncertainty—not a fabricated rule or a blanket refusal to distill.
 
-Convert each major piece into a rewrite chain:
+Convert each major judgment into a rewrite chain:
 
 ```text
 Scar/value/constraint → bad default prior → why it fails
 → replacement instinct → manifest anchor → boundary (when not to apply)
 ```
 
-Build one chain per major rule as working material. Revise or delete any rule whose changed decision is unclear. A likely bad default is an authoring hypothesis, not an observed failure unless the source establishes it.
+Build one chain per major judgment rule as working material. Revise or delete any judgment rule whose changed decision is unclear. A likely bad default is an authoring hypothesis, not an observed failure unless the source establishes it. Enabling definitions, prerequisites, and checks can remain direct instructions without an invented alternative or tradeoff.
 
 ## Encode Steering, Not Maxims
 
@@ -73,7 +82,7 @@ Design for attention loss: assume task pressure leaves the title, core principle
 
 | Placement | Use when |
 |---|---|
-| **Nowhere** | Generic or readily inferable, with no added decision value or recurring operational leverage. |
+| **Nowhere** | Generic or readily inferable in the target agent's task context, with no added decision value or recurring operational leverage. Expert familiarity alone does not justify omission. |
 | **Description** | It affects whether the skill loads. |
 | **Root manifest** | It must steer nearly every triggered run. |
 | **Contrastive example** | A concrete distinction carries judgment better than an abstract rule. |
@@ -221,7 +230,8 @@ Good: resolve the governing custody section, cite its actual location, and encod
 | **Create / substantial rewrite** | The usable skill and necessary supporting artifacts. Briefly explain only material ownership, routing, or unresolved decisions not apparent in the artifact. |
 | **Audit** | Ranked findings with evidence, the decision each defect harms, and the smallest useful fix. Prioritize expertise and steering gaps over cosmetic conformance. |
 | **Narrow patch** | Changed fields or sections and the minimum rationale. Preserve unrelated content. |
-| **Expertise extraction** | Source-grounded doctrine, rewrite chains, boundaries, and specific unresolved questions. Do not force premature packaging. |
+| **Expert interview / questionnaire** | Short, concrete prompts grounded in the person's actual context, answerable with a choice, phrase, or correction. Default to one live question or a small written round; adapt to the replies. Do not fabricate personal context or expert answers. |
+| **Expertise extraction** | Source-grounded baseline knowledge, doctrine, rewrite chains, boundaries, and specific unresolved questions. Do not force premature packaging. |
 | **Metadata question** | The direct answer or revised metadata. |
 
 The result is complete when the requested usable artifact or answer is delivered.
@@ -245,3 +255,4 @@ Use privately; do not print as a completion ritual:
 
 - [Skill template](references/skill-template.md) — read when producing a complete new skill or full rewrite: the authoring arc, mechanism and component matrices, and annotated per-genus skeletons.
 - [Agent-context extraction](references/agent-context-extraction.md) — read when extracting skills from a root contract or large agent-context file: boundary testing, distillation, splitting, and re-grounding.
+- [Expert interview](references/expert-interview.md) — read when interviewing a person, preparing written questions, or distilling replies: genuine personalization, concrete probes with short answers, assumed fundamentals, and handoff to authoring.
