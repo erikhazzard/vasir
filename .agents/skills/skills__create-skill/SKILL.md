@@ -29,6 +29,8 @@ When eliciting expertise from a person or preparing questions for one, read [Exp
 
 Choose interview questions by the consequential model decisions their answers could change. Shortness is a delivery constraint, not the objective. Privately map the expert's strong areas and likely model mistakes, including diagnosis and validation; once a branch supplies usable guidance, move to a higher-value gap instead of repeatedly asking the expert to justify the same tradeoff.
 
+For expertise beyond ordinary model output, use small actual AI work proposals for expert correction when feasible. Keep useful foundations, but distinguish them from demonstrated changes to the model's choices. Enough material for a first draft does not establish that the intended expertise has transferred.
+
 Use the following as private extraction lenses. They identify what to learn; do not paste their broad questions into an expert interview. The interview reference governs how to make each missing distinction easy to answer.
 
 | Expertise type | Private extraction question |

@@ -43,7 +43,7 @@ Do not output generic optimization folklore. Every recommendation must be tied t
 - **Equivalence:** use `intended_equivalent` until tests prove equivalence; never declare a change equivalent from inspection alone.
 - **Architecture:** route into deep specialist references rather than producing one shallow all-subsystem checklist.
 - **Remediation guard:** after attribution selects per-frame/per-tick work, route the bounded candidate through `$code__threejs-rapier-performance` before implementation or static acceptance, then return here for measured verification.
-- **Adaptive quality:** diagnose with fixed settings first. Once GPU pressure is confirmed and quality trades are allowed, dynamic resolution, foveation, or tiered effects may be early `quality_trade` interventions.
+- **Adaptive quality:** diagnose with fixed settings first. Once GPU pressure is confirmed and quality trades are allowed, match the control to the implicated work: resolution/foveation require pixel-scaled pressure; other effect tiers need their own causal evidence and supported runtime controls.
 - **Warmup:** stage likely-next-use resources; do not blindly prewarm the entire application.
 
 ## Sibling routing
@@ -67,7 +67,7 @@ Then read only the relevant specialist references for `hotspot_fix`; read every 
 | worker migration, postMessage, transfer buffers, SharedArrayBuffer, backlog, interpolation | `references/worker-handoff.md` |
 | GC, heap growth, resource leaks, teardown, pooling, long-session degradation | `references/memory-lifecycle.md` |
 | startup, first use, GLTF, Draco, Meshopt, KTX2, upload, compile, spawn spikes | `references/load-first-use-assets.md` |
-| immersive VR/AR, standalone headset, compositor deadline, foveation, multiview | `references/xr.md` |
+| WebXR, immersive VR/AR, standalone headset, Quest profiling, compositor deadline, foveation, multiview, XR layers | `references/xr.md` |
 | animation, skinning, morphs, particles, raycasting, interaction or scene-query cost | `references/animation-particles-queries.md` |
 
 Do not restate every reference. Pull only the rules and evidence needed for the current diagnosis.
@@ -290,6 +290,7 @@ Bottleneck classes:
 
 - `gpu_fill_bandwidth_overdraw`
 - `gpu_shader_execution` (arithmetic, texture latency, divergence, or resource limits; may overlap bandwidth and other classes)
+- `gpu_geometry_vertex` (vertex fetch/transforms and primitive processing; distinguish from CPU submission and pixel work)
 - `gpu_draw_state_submission`
 - `main_update_traversal_animation_ui`
 - `physics_broadphase_narrowphase_solver_ccd`
@@ -312,7 +313,7 @@ Order by the current evidence, not by a fixed folklore list:
 3. `behavior_trade`
 4. `architecture_change`
 
-Adaptive quality may appear early in step 2 after a fixed-quality benchmark confirms GPU pressure. Architecture changes remain last unless cheaper layers provably cannot meet the target.
+Adaptive quality may appear early in step 2 after a fixed-quality benchmark confirms the GPU work its control removes; resolution/foveation require pixel-scaled pressure. Architecture changes remain last unless cheaper layers provably cannot meet the target.
 
 Every action must use this card:
 

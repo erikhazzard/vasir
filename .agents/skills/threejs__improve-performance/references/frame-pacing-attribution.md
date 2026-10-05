@@ -118,7 +118,17 @@ Use the smallest reversible perturbation that causes competing hypotheses to pre
 
 **Weakens:** GPU time is unchanged or CPU submission remains dominant.
 
-**Caveat:** this does not distinguish shader arithmetic, texture access, divergence, blending, or attachment bandwidth. Lowering DPR may also change LOD, post-processing branches, or UI behavior; freeze those if possible. Little improvement does not establish a CPU bottleneck.
+**Caveat:** this does not distinguish shader arithmetic, texture access, divergence, blending, or attachment bandwidth. Lowering DPR may also change LOD, post-processing branches, or UI behavior; freeze those if possible. Little improvement establishes neither a CPU nor a vertex bottleneck. Verify that the implicated target actually resized; fixed-resolution shadows or intermediate targets may retain their pixel cost. For immersive sessions, use the actual XR layer dimensions and lifecycle in [the XR reference](xr.md#5-foveation-and-framebuffer-scale), not desktop DPR.
+
+### GPU geometry/vertex probe
+
+**Perturbation:** replace one implicated mesh population with lower-vertex geometry while preserving draw count, material, transforms, pass participation, and approximate silhouette/coverage. Keep update, physics, animation scheduling, resolution, and foveation fixed; warm resources for each variant before capture. Do not use instancing as this probe: it changes submission cost too.
+
+**Supports:** GPU duration falls while CPU update/submission stays comparable, supporting geometry-sensitive GPU cost. Use a separate vertex-shader simplification or device stage counters to distinguish vertex execution, geometry traffic/setup, and fragment work when that distinction changes the fix.
+
+**Weakens:** verified geometry reduction leaves GPU duration within noise at comparable clock/performance states. Frequency scaling can conceal reduced work behind lower clocks; differing or unknown clock states limit duration-only attribution. If only CPU timing improves, investigate upload, bounds, animation, or submission work removed by the substitution.
+
+**Caveat:** changed coverage, occlusion, fragment interpolation, skinning uploads, or culling confounds the experiment. Even equal visible coverage need not mean equal fragment cost: fewer tiny triangles can reduce partially used fragment quads, as illustrated by [Arm's GPU counter guidance](https://developer.arm.com/community/arm-community-blogs/b/mobile-graphics-and-gaming-blog/posts/mali-bifrost-family-performance-counters). Record unavoidable differences and retain a provisional verdict; a lower triangle count or a resolution-insensitive scene alone proves nothing. A diagnostic mesh substitution is not a shipping LOD policy and requires separate visual/interaction checks before adoption.
 
 ### Shader-execution probe
 
@@ -138,9 +148,11 @@ Use the smallest reversible perturbation that causes competing hypotheses to pre
 
 **Perturbation:** continue input, game update, physics, and worker traffic but replace scene rendering with a trivial clear or minimal scene.
 
-**Supports render bottleneck:** frame pacing recovers.
+**Supports render-side cost contributing to misses:** frame pacing recovers.
 
-**Supports non-render bottleneck:** little change.
+**Redirects investigation toward non-render work or presentation:** little change.
+
+The bypass removes CPU traversal/submission as well as GPU work. Recovery does not distinguish them; compare those timings before selecting a GPU intervention. Mixed bottlenecks or a presentation-rate ceiling can mask improvements in cadence.
 
 Do not ship this perturbation; it is an attribution tool.
 

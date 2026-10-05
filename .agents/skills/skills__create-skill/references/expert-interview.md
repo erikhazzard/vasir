@@ -64,6 +64,12 @@ Rewrite questions that fail. Do not print this check, an interview agenda, extra
 
 Use domain knowledge to create plausible situations and candidate actions. Do not make the expert invent every example. Keep the scenario small enough that the question concerns their judgment rather than their patience.
 
+When the goal is expertise beyond the model's usual output, prefer a small **actual AI work proposal** for the expert to review. Generate it in a fresh context without the interview answers when feasible, or use an existing attempt. Keep the real task constraints and normal competence; do not deliberately weaken the proposal. Show only enough of the plan, code, diagnostic sequence, or proposed controls for the expert to judge one consequential choice. Ask what they would change, if anything, before using it in their work.
+
+Compare the correction to the original proposal. A specific difference can reveal an omitted dependency, a misleading check, an unnecessary abstraction, a control the expert would remove, a deliberate exception to common advice, or a different order of work. Recover the condition that makes the correction appropriate. Agreement is also valid evidence: do not pressure the expert to be contrarian or keep drilling an already-sound choice. Choose another consequential decision when there is no new guidance to extract.
+
+If a fresh model already produces the interview's advice, preserve any useful baseline but do not present it as demonstrated transfer of distinctive expertise. A single sample establishes only what happened on that task. A proposed mistake is still a hypothesis when no actual model attempt exists. Real comparisons improve question selection; they are not mandatory infrastructure or a reason to delay a requested question set.
+
 Seek consequential disagreements, including counterintuitive ones: a standard fix they reject, a reassuring signal they distrust, an ordinary dependency the model overlooks, or a shortcut they accept under specific conditions. Do not demand surprising advice or manufacture a wrong answer. If they agree with a proposal, preserve that result. If the answer would merely restate a known preference, ask about a different technical decision.
 
 The examples below are **constructed question patterns**, not claims about a particular expert or correct technical answers. Adapt the method to the known person; do not paste the same technical-art questions into every interview.
@@ -147,12 +153,16 @@ Keep the bookkeeping on the interviewer side. Retain a source answer or short ex
 
 Carry the baseline into definitions, prerequisites, ordered steps, and checks. Carry judgment into the creator's cue/action/priority/boundary instructions. Preserve supported rules even when the expert cannot explain the mechanism; do not invent causes, thresholds, or universality. Their experience, preference, and local convention retain those source statuses. Do not substitute the model's generic advice for their answer.
 
+Privately distinguish captured foundations from demonstrated corrections to model behavior. For a correction, retain the original proposed action, the expert's replacement, and the supported condition or reason. Both kinds of guidance can belong in a draft; neither a polished summary nor familiar advice establishes that expert judgment has transferred. Do not relabel ordinary guidance as counterintuitive to satisfy the interview's ambition.
+
 Match the requested output:
 
 - **Questions:** deliver the usable opener or tailored written prompts. Do not simulate the expert's replies or author a domain skill from guesses.
 - **Ongoing interview:** pursue the next consequential gap. Respect time and diminishing returns; there is no quota of stories, rounds, or rules.
 - **Extraction:** return supported baseline knowledge, decisions, scope, and the specific gaps that matter.
 - **Skill creation:** once answers support useful instructions for a coherent task, continue through the existing creator. Do not require exhaustive coverage, uploads, live observation, or another approval for already-requested authoring.
+
+Distinguish ending a session, having enough material for a first draft, and demonstrating the intended improvement. When asked how many questions remain, bound the next session by its decision scope and respect the agreed limit; an arbitrary final question does not establish that extraction is complete. At the limit, deliver what is supported and state consequential gaps without continuing to interrogate the expert. A small draft can be useful while the larger expertise-transfer goal remains unfinished.
 
 When useful, check transfer on a new text scenario and let the expert correct the proposed action. A nearby case where the rule should reverse can expose overapplication. Such checks can improve the draft; they are not prerequisites for delivering supported work. Distinguish agreement with a summary, a successful interview probe, and actual evidence that the resulting skill improves task execution.
 

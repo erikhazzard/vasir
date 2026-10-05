@@ -87,6 +87,10 @@ Driven by shader/program/pipeline compilation, texture upload, target allocation
 
 Arithmetic, texture latency, divergent branches/loop tails, and register or instruction-cache pressure can constrain execution. Read `$code__threejs-rapier-performance`'s [shader-execution reference](../../code__threejs-rapier-performance/references/shader-execution.md) when implicated. Compare one shader change at fixed coverage, geometry, resolution, and pass topology; use compiled-resource evidence where available and repeated GPU timings. These mechanisms can overlap bandwidth pressure; they are not mutually exclusive diagnoses.
 
+### F. Geometry/vertex processing
+
+Vertex fetch/transforms, skinning/morph shader work, and primitive processing can constrain GPU execution even at low resolution. Compare geometry counts per actual view/pass, vertex layout, and deformation work using the [geometry/vertex probe](frame-pacing-attribution.md#gpu-geometryvertex-probe). Separate GPU movement from CPU submission and uploads. Resolution insensitivity is a reason to investigate this family, not evidence sufficient to select LOD or mesh simplification.
+
 ## 3. `renderer.info` is context, not causal proof
 
 Use it for directional counts, with these safeguards:
