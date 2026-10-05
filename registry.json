@@ -1102,7 +1102,7 @@
     },
     {
       "name": "skills__create-skill",
-      "description": "Designs, rewrites, audits, and debugs reusable agent skills by encoding expert judgment into decision steering. Use when creating skills, extracting durable doctrine, fixing triggers, choosing granularity, or pruning manifests.",
+      "description": "Designs, rewrites, audits, and debugs reusable agent skills by encoding expert judgment into decision steering. Use when creating skills, preparing expert interviews for skills, extracting durable doctrine, fixing triggers, choosing granularity, or pruning manifests.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1111,6 +1111,7 @@
         "SKILL.md",
         "references/agent-context-extraction.md",
         "references/eval-case-library.md",
+        "references/expert-interview.md",
         "references/skill-template.md"
       ],
       "path": ".agents/skills/skills__create-skill",
