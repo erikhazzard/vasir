@@ -1,33 +1,30 @@
 # Backend testing — current work context
 
-**Status:** Live comparison verified. Local skill candidate tightened; candidate not benchmarked.
-**Live report:** https://vasirbenchmark.com/benchmark-report.html#backend-testing
+**Status:** Additive score and matching-file comparison live; source, calculation and desktop/mobile checks pass.
+**Report:** https://vasirbenchmark.com/benchmark-report.html#backend-testing
 
-## Current objective
+## Objective
 
-Improve the skill against the evaluated snapshot and unseen cases. Keep seven quality dimensions, including semantic names. A preferred model winning is not an acceptance criterion.
+Protect actual user journeys with independent assertions, useful focused units, canonical repo-searchable names, coherent domain structure and economical tests. Ban tautologies. Preserve distinct protection and useful documentation. A preferred model winning is not an acceptance criterion.
 
-The skill should produce independent assertions, useful end-to-end protection, sensible focused units, clear domain structure and economical test code. Tautological checks and pointless layers are defects. Preserve distinct protection and extend existing fixtures.
+## Current evidence and scoring
 
-## Fixed comparison
+Four fresh Skill authors (Astra ultra/xhigh, Sol 6.1 xhigh, Opus 5.5 xhigh), four saved identical-input Minimal suites and two fresh blind reviewers. Six native sessions, zero retries, 384,053 recorded traffic tokens including cached input. All eight suites and reviews are immutable. This scoring/viewer revision uses no further model calls.
 
-The live comparison uses one known player-saves case, four settings and one trial per condition. Eight suites compare Minimal instructions against the frozen three-file skill under identical inputs and budgets. Tool-free patch generation followed by external execution does not measure repository exploration or author iteration. The embedded task asks authors to run tests despite the outer tool prohibition; remove this conflict in the next protocol.
+One additive /100 score uses preservation 25, behavioral coverage 20, assertions 15, fidelity 10, naming 10, domain structure 5, clarity 5, maintenance 5 and runnable coverage 5. Preserve all seven native continuous ratings. The two additional components map the existing binary findings to 1/0. Sum contributions per reviewer, then average reviewers. Unresolved evidence has no total; no caps or whole-score overrides. The user requested these aggregation weights after reviews; do not label them prospectively frozen. Preservation explicitly values avoiding regression and overlaps with total behavioral coverage.
 
-The new rubric grades assertion quality 25%, behavioral coverage 20%, test-layer fidelity 15%, domain structure 10%, clarity 10%, maintenance cost 10% and semantic variable names 10%. Every retained spec receives all seven scores. Overall scores are calculated from these weights; suite ratings never average file ratings.
+Current scores: Sol 53.850 → 90.475; Ultra 54.675 → 85.850; Opus 49.625 → 85.225; Astra xhigh 54.125 → 83.500. Mean uplift 33.19375: 25 from preserving the independent reader, 8.19375 from graded quality. One known-case attempt cannot establish general model superiority. Both behavioral controls and seeded faults pass; shared shutdown diagnostics fail separately.
 
-An opaque identifier hiding a domain value, such as x, earns 0 for semantic naming in its file and suite. Require the binding and hidden role as evidence. Useful conventional names remain judged in context. Zero applies only to the naming dimension.
+## Skill and viewer correction
 
-## Audit and local candidate
+The screenshot compared different file paths. No retained header was deleted. Open the same shared path on both sides and preserve every exact source byte. The original checkpoint reader lacked a header; three Skill suites retained that absence, Opus supplied one, and every Minimal suite deleted the reader.
 
-Both Astra settings omit distinct-request success and successful recovery/reload with and without the skill. Original tests omit both. Opus Minimal includes recovery/reload; Opus Skill includes both. These are missed additions, not skill-caused deletions. All Skill outputs preserve the seeded reader deleted by all Minimal outputs. The coverage-loss cap dominates uplift; small quality differences on one case cannot establish general model superiority.
+The local skill now explicitly requires concise headers naming protected behavior, boundary and limits, preserving useful headers and updating stale claims. This clarification is word-neutral and unbenchmarked. Future clarity grading explicitly considers useful headers. Current scores still belong to evaluated bundle `9310c5b6fde31049af1add359eacfae87bc75acac166df237c05d953db200f4f`; never imply the new prose was evaluated.
 
-The local candidate foregrounds actual user journeys, explicit repo-searchable domain identifiers, allowed-case witnesses and successful recovery continuation. Duplicate and generic prose is removed. Useful units, seeded readers and independent oracles remain; the tautology ban is explicit. Effectiveness remains untested. Published scores belong to frozen `paired-repair-2026-10-09/skill.json`, bundle SHA-256 `e5fc337d964d53d307737ed20753b52d63b027e22135c4e82f8b39e8d2223578`, not the local candidate.
+Keep one standard current-only table, exact JavaScript viewer, original reviews and closed score calculation. The seven original judge dimensions remain inspectable beside all nine weighted contributions. Naming reviewer disagreement stays visible: Astra penalizes generic `result` in every retained helper; Opus applies the zero to `bytes` in both Astra Skill specs but rates Sol/Opus naming positively.
 
-## Next bounded comparison — not launched
+## Boundaries and ownership
 
-- Compare evaluated skill versus candidate with Astra xhigh on two unused cases: four author sessions and one blind review, no automatic retries.
-- Freeze cases, contracts, consequential faults and scoring before generation. Use identical bounded repository tools and one edit/test cycle per author; describe any cheaper tool-free alternative as a narrower test.
-- Grade each suite once on seven dimensions with concise cited findings; omit per-file duplication. Bound context, output and tool steps before launch; record all usage.
-- Require concrete added protection without lost contracts or unjustified test debt. Retain neutral/negative results. Treat this as development evidence; replace the public comparison only with complete results.
+Tool-free patch generation plus external execution does not measure repository exploration, author feedback iteration or unseen-case transfer. Saved baselines remain correlated evidence. No additional round should be launched to force a ranking.
 
-`results.md` owns live scores and receipts; `eval-plan.md` owns completed publication proof. Native ratings and public data remain unchanged. No new benchmark runs for this audit.
+`results.md` owns current scores/receipts; `eval-plan.md` owns proof status. Private native evidence is under `.agents/vasir-evals/backend-testing/compact-round-2026-10-10/`; current publication proof is under `weighted-score/publication/`. The existing projection, browser harness and canonical publisher own release verification.

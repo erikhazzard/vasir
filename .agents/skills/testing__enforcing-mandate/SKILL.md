@@ -7,7 +7,7 @@ description: Protects behavior with useful tests and less test debt. Use when ch
 
 **Tautological tests are banned at every layer. New or changed user workflows require real automated journey coverage. Use explicit, repo-searchable domain names. Preserve distinct protection when simplifying.**
 
-Start with the user's action and consequential result. Reuse sufficient E2E coverage; extend or add a journey when the workflow lacks protection. Keep unit, component, and integration tests for the rules, boundaries, and states they prove directly. The target is useful confidence per maintenance cost.
+Start with the user's action and consequential result. Reuse sufficient E2E coverage; extend or add a journey when the workflow lacks protection. Keep unit, component, and integration tests for the rules, boundaries, and states they prove directly.
 
 ## 1. Establish the Claim and Existing Protection
 
@@ -59,7 +59,7 @@ Delete tautologies, test-owned forwarding checks, obsolete behavior, and genuine
 
 Choose reuse, tighten, add, or no new test. Prefer an existing sufficient guard. Add a test when a material behavior lacks protection or the new guard earns its cost through reliable feedback. Add no test for a low-impact internal change already caught by existing proof. Weigh severity, plausible recurrence, reconstruction cost, and maintenance rather than a test-count target.
 
-Organize tests by domain capability and behavior, following repository structure. Titles name the condition and expected outcome. Keep setup, action, decisive expectations, and failure diagnosis visible; avoid configurable scenario engines that obscure them.
+Organize tests by domain capability. Each test file needs a concise header naming protected behavior, exercised boundary, and scope limits; preserve accurate headers and update stale claims. Titles name conditions and outcomes. Keep setup and expectations visible; avoid opaque scenario engines.
 
 **Domain-bearing identifiers must be explicit and repo-searchable, even in short tests.** Search production code and adjacent tests for canonical domain terms; use them consistently in variables, parameters, fixtures, and helpers. Prefer long names identifying the actor/entity, role, and relevant state, unit, or encoding: `submittedCheckpointGzipBase64`, `loadedCheckpointResponse`, `expectedCheckpointRevision`. Reject `x`, `data`, `res`, `tmp`, `value`, and `bytes` when they hide domain meaning. Searchability comes from canonical concepts, not arbitrary prefixes or uniqueness. Preserve protocol fields and dependency APIs; short mathematical coordinates or counters are acceptable only when they carry no hidden domain role.
 

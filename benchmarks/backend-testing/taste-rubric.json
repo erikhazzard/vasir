@@ -1,17 +1,17 @@
 {
   "kind": "backend-testing-craft-rubric",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "minimum": 0,
   "maximum": 1,
   "decimals": 2,
-  "aggregation": "For each judge, sum the seven suite dimension scores multiplied by their fixed percentage weights, divided by 100. Average the two judge totals for each suite; average four matched differences equally. Compute file totals from their own seven dimensions; never derive suite quality from file averages.",
-  "namingZeroRule": "An unresolved opaque identifier such as x holding a meaningful domain value earns 0 in semantic_naming for its test file and for the complete suite. Cite the binding and explain the domain role hidden by the name. Ordinary loop indices, actual coordinates, protocol field names and established dependency abbreviations are not automatically opaque; evaluate whether the identifier communicates its role in context. Evaluate retained suite-owned helpers too. Identifier length alone earns no credit.",
+  "aggregation": "Grade each suite once on seven dimensions; no per-file numeric ratings. Per reviewer, weighted quality is sum(score \u00d7 percentage weight). Cap at 49 for lost material existing protection; score 0 for no meaningful runnable coverage; unresolved required evidence has no score. Average two complete reviewer scores per suite and four matched differences equally. Reused baselines are disclosed.",
+  "namingZeroRule": "An opaque domain-bearing identifier such as x earns 0 for suite semantic_naming; cite its binding and hidden role. Inspect all suite-owned test/helper identifiers. Names must use canonical domain terms and expose role plus relevant actor, state, units or encoding so they are discoverable in repository search. Prefer explicit long names over generic data/result/res/bytes when those hide meaning. Actual coordinates, simple indices and fixed protocol/dependency fields are exempt when their role is already precise. Length or arbitrary prefixes alone earn no credit.",
   "dimensions": [
     {
       "id": "assertion_quality",
       "label": "Assertion quality",
       "weight": 25,
-      "description": "Independent expected outcomes and discriminating assertions that reject plausible wrong behavior. Test-owned round trips, self-comparisons and expectations derived from the implementation under test provide no independent proof.",
+      "description": "Independent expected outcomes reject plausible wrong behavior. Tautological self-comparisons, implementation-derived expectations, mock echoes and unchecked snapshots earn no oracle credit. Distinguish a useful setup assertion from an insufficient final oracle; check allowed cases against blanket rejection and recovery through actual continued use when contracted.",
       "anchors": {
         "0": "Assertions are circular, tautological, absent or unable to reject the claimed wrong behavior.",
         "0.5": "Some independent outcomes are checked, but material assertions remain weak, indirect or vacuous.",
@@ -33,7 +33,7 @@
       "id": "boundary_fidelity",
       "label": "Test-layer fidelity",
       "weight": 15,
-      "description": "The chosen unit, integration or end-to-end boundary exercises the actual mechanism claimed. Real product actions, dependency seams, failure injection, isolation and lifecycle behavior preserve that mechanism. Useful units are valid; an E2E filename earns nothing.",
+      "description": "User-flow claims exercise normal controls, public service entrypoints or actual CLI commands through the completed outcome and consequential effects. Real local storage/protocol semantics must preserve the failure mechanism. Status codes, callbacks or E2E labels alone do not establish the user result. Focused units remain appropriate for isolated rules and distinct state partitions.",
       "anchors": {
         "0": "The test exercises its own substitute or a boundary incapable of establishing the claimed behavior.",
         "0.5": "Some real behavior is exercised, but a material seam, failure phase or lifecycle assumption weakens the proof.",
@@ -55,7 +55,7 @@
       "id": "clarity",
       "label": "Clarity and diagnosis",
       "weight": 10,
-      "description": "A reader can follow setup, action and assertions; decisive inputs are visible, behavior titles are honest, and failures explain the broken contract. Grade flow and diagnosis separately from variable naming.",
+      "description": "Concise, accurate file headers state protected behavior, exercised boundary and scope limits. Setup, action, independent expectations and failure diagnosis are visible. Preserve useful headers, update stale claims and reject boilerplate. Grade comprehension separately from variable naming.",
       "anchors": {
         "0": "A reader cannot determine the action, expected outcome or meaning of a failure.",
         "0.5": "The scenario is understandable with effort, but dense setup, hidden decisive inputs or weak failure messages obscure intent.",
@@ -77,11 +77,11 @@
       "id": "semantic_naming",
       "label": "Semantic variable names",
       "weight": 10,
-      "description": "Variables, parameters and fixture values communicate their domain role, actor, state, units or lifecycle phase. Names such as stagedCheckpointBytes or copiedBlobKeys reveal intent. An opaque x for a meaningful domain value receives the naming-zero rule; verbose names are not automatically better.",
+      "description": "Domain-bearing variables, parameters, fixtures and helpers use canonical repo-searchable terms, distinguishing actor/entity, observed versus expected role, lifecycle state, units and encoding when relevant. Explicit long names such as submittedCheckpointGzipBase64 and loadedCheckpointResponse communicate those distinctions; generic names hiding them lose credit. Apply the naming-zero rule to evidenced opaque bindings.",
       "anchors": {
         "0": "An opaque domain-bearing identifier hides what its value means; the naming-zero rule applies.",
         "0.5": "Names are understandable mostly through surrounding code, with generic or imprecise identifiers obscuring roles, units or state.",
-        "1": "Names consistently expose domain meaning and distinguish relevant actors, states, values and phases without redundant verbosity."
+        "1": "Canonical domain terms make identifiers searchable and expose the relevant role, state and representation without relying on surrounding setup or padding."
       }
     }
   ],

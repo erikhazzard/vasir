@@ -1827,5 +1827,9 @@
 .testing-report__qualification { margin-top: 1rem; padding: var(--space-3); border-left: 3px solid var(--sdk-blue); background: var(--sdk-blue-pale); }
 .testing-report__qualification h5 { margin: 0; font-size: inherit; }
 
-.testing-report__cap-note { display: block; color: var(--ink-muted); font-size: 0.5625rem; font-weight: 600; line-height: 1.4; }
+.testing-report__coverage-note { display: block; color: var(--ink-muted); font-size: 0.5625rem; font-weight: 600; line-height: 1.4; }
 [data-testing-file-content] { max-height: 30rem; overflow: auto; }
+
+[data-testing-score-calculation] > .work-spec-assessment__body { min-width: 0; grid-template-columns: minmax(0, 1fr); justify-items: stretch; }
+[data-testing-score-calculation-judge] { min-width: 0; }
+[data-testing-score-calculation-judge] h4 { overflow-wrap: anywhere; }

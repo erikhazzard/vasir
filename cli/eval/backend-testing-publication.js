@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { buildBackendTestingCompactPublication, validateBackendTestingCompactPublication } from './backend-testing-compact-publication.js';
 
 const SELECTION_PATH = 'benchmarks/backend-testing/publication.json';
 const SHA256 = /^[a-f0-9]{64}$/;
@@ -165,6 +166,7 @@ export function projectBackendTestingResults({ generation, evaluation, selection
 }
 
 export function validateBackendTestingPublication(value) {
+  if (value?.schemaVersion === 4) return validateBackendTestingCompactPublication(value);
   if (value?.schemaVersion === 3) return validateBackendTestingCurrent(value);
   if (value?.schemaVersion === 2) {
     keys(value, ['kind', 'schemaVersion', 'suiteQuality', 'faultDetectionPilot'], 'quality wrapper');
@@ -947,6 +949,7 @@ export function buildBackendTestingPublication({ repoRootDirectory, readFileSync
   try { text = readFileSyncImplementation(path.join(repoRootDirectory, SELECTION_PATH), 'utf8'); }
   catch (error) { if (error.code === 'ENOENT') return null; throw error; }
   const selected = JSON.parse(text);
+  if (selected.schemaVersion === 4) return buildBackendTestingCompactPublication({ selected, repoRootDirectory, readFileSyncImplementation });
   if (selected.schemaVersion === 2) keys(selected, ['kind', 'schemaVersion', 'suiteQuality', 'faultDetectionPilot', ...(selected.repairCheck ? ['repairCheck'] : []), ...(selected.pairedRepair ? ['pairedRepair'] : [])], 'quality selection');
   const selection = selected.schemaVersion === 2 ? selected.faultDetectionPilot : selected.schemaVersion === 3 ? null : selected;
   if (selection) { keys(selection, ['kind', 'schemaVersion', 'generation', 'evaluation', 'conditions'], 'selection'); assert(selection.kind === 'vasirbenchmark-backend-testing-selection' && selection.schemaVersion === 1, 'unsupported source selection'); }

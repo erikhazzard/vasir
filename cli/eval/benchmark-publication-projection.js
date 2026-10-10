@@ -15,6 +15,7 @@ import { buildGamesPublication, validateGamesPublication } from "./games-publica
 import { buildWritingPublication, validateWritingSummary, serializeWritingModule } from "./writing-publication.js";
 import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE, WRITING_RESPONSE_ARCHIVES } from "./writing-response-archives.js";
 import { buildBackendTestingPublication, validateBackendTestingPublication, validateBackendTestingSuiteQuality, validateBackendTestingRepairCheck, validateBackendTestingPairedRepair, validateBackendTestingCurrent, validateBackendTestingFiles } from "./backend-testing-publication.js";
+import { validateBackendTestingCompactPublication, validateBackendTestingCompactRound, validateBackendTestingCompactFiles } from './backend-testing-compact-publication.js';
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -1841,6 +1842,7 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 export function validateBenchmarkPublicationProjection(projection, { writingSource = projection?.writing?.overallSource } = {}) {
   if (projection?.schemaVersion === 7 && projection.executableTesting) {
     const { executableTesting, ...existing } = projection;
+
     validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
     validateBackendTestingPublication(executableTesting);
     return projection;
@@ -2236,6 +2238,15 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
   if (projection?.schemaVersion === 7 && projection.executableTesting) {
     validateBenchmarkPublicationProjection(projection, { writingSource });
     const { executableTesting, ...existing } = projection;
+    if (executableTesting.schemaVersion === 4) {
+      if (['backendTesting', 'backendTestingRepair', 'backendTestingPairedRepair', 'backendTestingTaste'].some(key => Object.hasOwn(responseBundle, key))) throw projectionError({ message: 'The current testing round includes an unselected backend review payload.' });
+      const { backendTestingCurrentRound, backendTestingFiles, ...incumbentResponses } = responseBundle;
+      validateBackendTestingCompactRound(backendTestingCurrentRound);
+      validateBackendTestingCompactPublication(executableTesting, backendTestingCurrentRound);
+      validateBackendTestingCompactFiles(backendTestingFiles, backendTestingCurrentRound);
+      validateBenchmarkPublicationResponses(incumbentResponses, { ...existing, schemaVersion: existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+      return responseBundle;
+    }
     if (executableTesting.schemaVersion === 3) {
       const { backendTestingPairedRepair, backendTestingTaste, backendTestingFiles, ...incumbentResponses } = responseBundle;
       if (!backendTestingPairedRepair) throw projectionError({ message: 'The current testing comparison is missing its original technical assessments.' });
@@ -2603,6 +2614,7 @@ export function buildBenchmarkPublicationProjection({
     if (executableTesting.pairedRepair) responseBundle.backendTestingPairedRepair = executableTesting.pairedRepair;
     if (executableTesting.taste) responseBundle.backendTestingTaste = executableTesting.taste;
     if (executableTesting.files) responseBundle.backendTestingFiles = executableTesting.files;
+    if (executableTesting.currentRound) responseBundle.backendTestingCurrentRound = executableTesting.currentRound;
   }
 
   const basisSha256 = sha256(stableSerialize({

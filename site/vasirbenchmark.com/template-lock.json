@@ -1,18 +1,18 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-10-10-backend-testing-combined-score-1c2e9e69caaf",
+  "version": "2026-10-10-backend-testing-weighted-score-6e54ac66be68",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
     "authority": "user",
-    "acceptedAt": "2026-10-10T14:26:04.629Z",
-    "response": "User explicitly requested one final score incorporating weighted quality and saved protection findings, and direct inspection of the exact test files. The combined formula was adopted after the reviews, with no new grading.",
-    "basis": "The current selected source provides the derived final score, unchanged native reviews and exact safe test-file bytes. Source-pinned immutable-candidate browser evidence and agent visual review verify ranking, caps, arithmetic, source rendering and clipboard behavior.",
-    "verdict": "Four model settings are ranked by the single final Skill score. Each reviewer score applies the saved protection cap to the fixed seven-dimension weighted ratings times 100, then both scores are averaged. The table, arm totals and reviewer totals use that same final metric. Coverage lost explains the capped Minimal value. Inspect run directly shows exact JavaScript test files with Copy, and retains the original seven dimensions, reasons, file ratings and source-backed qualification. The final-score calculation and full Method are native closed disclosures.",
-    "criterion": "One /100 score incorporates weighted quality and saved protection: lost existing protection caps at 49, no meaningful runnable coverage scores 0, unresolved required evidence has no score. Exact selected test files are escaped text and clipboard bytes match the source. Original native reviews remain unchanged; all new scores are deterministic derivations. Backend testing remains excluded from Engineering and Overall.",
+    "acceptedAt": "2026-10-10T16:21:34.596Z",
+    "response": "User requested one weighted score for all nine criteria, with preservation carrying 25% and no score ceiling; apply the formula to the selected native reviews and publish the current comparison.",
+    "basis": "Pinned native output, executed artifact inventories and complete two-reviewer findings support the selected current round. Immutable candidate browser evidence and desktop/mobile visual review verify the standard comparison and exact test-file viewer.",
+    "verdict": "The standard four-model table presents one final /100 score. Nine explicit weighted criteria use the unchanged seven native ratings and separately evidenced preservation and runnable-coverage findings, then average both reviewer totals. Inspect run exposes exact JavaScript test files with Copy and retains every suite reason and source citation. Method is closed initially and discloses four new authors, four reused Minimal artifacts, two fresh blind reviewers, the formula’s adoption after reviews and current-round usage.",
+    "criterion": "Do not invent file ratings, reviewer variation or missing evidence. Lost preservation contributes 0 of 25 points; absent runnable coverage contributes 0 of 5 points. Neither limits the other criteria or overrides the whole score. Unresolved required evidence leaves no official score. Preserve all other benchmark data and answers. Backend testing remains excluded from Engineering and Overall.",
     "scope": {
       "kind": "executable-testing-benchmark",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "benchmarkId": "backend-testing",
       "viewports": [
         {
@@ -78,14 +78,49 @@
       ],
       "selection": {
         "path": "benchmarks/backend-testing/publication.json",
-        "bytes": 13992,
-        "sha256": "8cefa0ac1da65e0a72b157c5000b41b3fe782b91aeba7052a77cc50791f3a459"
+        "bytes": 10389,
+        "sha256": "64de5b7b55e70e4f4d1d895bd55ff6eaac146dcf65e9870eca66d57c341ccb17"
       },
       "sourcePins": [
         {
-          "path": ".agents/vasir-evals/backend-testing/suite-quality/runs/2026-10-09T03-26-05-719Z-da3291/publication-sources/rubric.json",
-          "bytes": 11913,
-          "sha256": "0f5ec20a61d27272759ecdd66be8de670b334568089b0b84a3ac46b599d738b4"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/plan.json",
+          "bytes": 9811,
+          "sha256": "ee9055d9583fb3438ad170bf1afbdbf44bfbe1d09de4e9df499e7078de2ca1c9"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/skill.json",
+          "bytes": 37525,
+          "sha256": "9310c5b6fde31049af1add359eacfae87bc75acac166df237c05d953db200f4f"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/taste-rubric.json",
+          "bytes": 7600,
+          "sha256": "5395bf8eaf5ef2e77e36a647a6dbde07e3bb2dfaf33bbec9442b053c0c8a83aa"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/generation-summary.json",
+          "bytes": 9368,
+          "sha256": "5ff98c3172beb1bac69da8027ea1140f04f9924cfbcc41f8e094fcd493d57304"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/review-plan.json",
+          "bytes": 1542,
+          "sha256": "3211c92182f0401b70cdab447fa0c696fbeed0b032857010744a1e3d4deea95f"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/packet.json",
+          "bytes": 609689,
+          "sha256": "c51e7be7713abba89841bbf77eb674b756cb8342ed4af48a80df2cb29c43fed1"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/mapping.json",
+          "bytes": 203,
+          "sha256": "0107c38471282fce275d8d99dbb8b274df414eb284d82b81a7b63f9c4fff13d5"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/review-summary.json",
+          "bytes": 77108,
+          "sha256": "efb71c4b4f3006a69e642aa33f1f694c66fe55287c67741e3a737870af40dbb7"
         },
         {
           "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/plan.json",
@@ -93,44 +128,9 @@
           "sha256": "a6a18df2f2d8251e002fc025626d8f62bfd95876e2f2d08a9a136f92125dbe1e"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/skill.json",
-          "bytes": 37910,
-          "sha256": "e5fc337d964d53d307737ed20753b52d63b027e22135c4e82f8b39e8d2223578"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/generation-summary.json",
-          "bytes": 8152,
-          "sha256": "3638edf0499f9405ac6f83444a7ad4f67d19d371f3f67cf8eed3d44447e4a524"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/review-summary.json",
-          "bytes": 144316,
-          "sha256": "dc6dd873d26156d95c7e3208109e0a31a7fe0e101c8ef7e8b91c9adfcdc447bb"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/review-mapping.json",
-          "bytes": 203,
-          "sha256": "5cb022d4d2837fbb32f7e9bc7d144e7246ca75228acacca1bb8daee46ed5038e"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/result.json",
-          "bytes": 14152,
-          "sha256": "3af1682fbc1ddfc3db0da0e8448c11fdf40f78e0a6d41d55b9071ec2704f48d6"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/launch.json",
-          "bytes": 4680,
-          "sha256": "ea4055e754886156b80b68bcb1e255059584a40c45f752f4280c49f02038e3ba"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/outcome.json",
-          "bytes": 1129,
-          "sha256": "169ea13841c2da266318fa0829e91bdbc5886c27efce472e899c77dbef06bee8"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/verification/evaluation.json",
-          "bytes": 51781,
-          "sha256": "846897a6b398b3baf17e2573a394709f7af654b8d496366b76f197a49286bb44"
+          "path": ".agents/vasir-evals/backend-testing/suite-quality/revisions/reader-protection-v3/fixtures/player-saves/manifest.json",
+          "bytes": 230088,
+          "sha256": "19a6722330f337687bd75285007da5025efdd3ed2c1d3d2f915dca8e1233d6c3"
         },
         {
           "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/native/result.json",
@@ -153,84 +153,24 @@
           "sha256": "467a6f0ccdb43de28ade9ed23f88062148b9635d01b1931b908bd3cf92b81709"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/result.json",
-          "bytes": 7412,
-          "sha256": "d0d0b3efe31f16bbb38dc5349cd46132a20f0fc56bc251df4189245999291fd0"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/native/result.json",
+          "bytes": 9952,
+          "sha256": "f1e5a408dd241c08d79d1a7854b9f0b843bd03b4d0ad7743d515d16f7708807a"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/launch.json",
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/native/launch.json",
           "bytes": 3338,
-          "sha256": "b7ac576344734be524efe82b2a9e6f5fef2937ab48d4680f300a76c3eb1fa0de"
+          "sha256": "0b3f982c32969f7d2bf201d25950fbec29f8261016b286eecb8ab7c3fb0bb9f0"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/outcome.json",
-          "bytes": 743,
-          "sha256": "99049339e777296829524525cac71c3b982cf25c97b1d22095b8b78989c5ef0a"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/outcome.json",
+          "bytes": 893,
+          "sha256": "acc6421b36386d148a97ad733849f52e117d69a63ec9cba8eba44d3c2abeb193"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/verification/evaluation.json",
-          "bytes": 50411,
-          "sha256": "2d633515d16508fbebcc2775b405f28381f7f562e75ad5238b4a9c45869db15c"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/native/result.json",
-          "bytes": 8457,
-          "sha256": "f648b9b6c3bca0787e3f95e68d62747ad2f672055f9a8e758526857488f9b93a"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/native/launch.json",
-          "bytes": 3338,
-          "sha256": "1b21631d27b6d63ff20309991ba6a7e43afecf8334dbce000b9033099db665fb"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/outcome.json",
-          "bytes": 747,
-          "sha256": "9fb91d3bd2089050f92d01ea93d1544effbc887f0037bd867bf888368d84c87e"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/verification/evaluation.json",
-          "bytes": 69665,
-          "sha256": "ee892fa1d68a9dc85b79b45d5ca5ff8fdaec887b5e3233e35bc71e3552ecf03e"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/native/result.json",
-          "bytes": 7055,
-          "sha256": "8839693800a192da42b6cf9f9cf37551a0008f011d26d6464022419cc2907f17"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/native/launch.json",
-          "bytes": 3338,
-          "sha256": "b99d28b83aaa73d4704374c0786db12dfc1e23d5bf1aa28c739b2054e0c668c8"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/outcome.json",
-          "bytes": 747,
-          "sha256": "709d7cd2f3197bd7bd2d7cfdcb7b8dc70b97db1465fcf2b6610ec7d3f18065cb"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/verification/evaluation.json",
-          "bytes": 62125,
-          "sha256": "4496afcde694fa2a29cb0a715952194d3f272d09bc20b47623c14be9f7b0682b"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/native/result.json",
-          "bytes": 20698,
-          "sha256": "0f3d5d8ca41dba486be50d2d00a19b5ea943ab8e853bbe379172fdb392b9c828"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/native/launch.json",
-          "bytes": 4680,
-          "sha256": "56e9c4e08ad551abd060eeebace490c1b067227125037e61353a1f4908f853a2"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/outcome.json",
-          "bytes": 1138,
-          "sha256": "39e37e9c800e9152519a35c9b00412bab6f2e0c299b1103484213543df25104f"
-        },
-        {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/verification/evaluation.json",
-          "bytes": 66610,
-          "sha256": "a76de8b098cc7d4aac79e71284065109edf59c3f78f3c630c01a5d7dea0a40d5"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/verification/evaluation.json",
+          "bytes": 66929,
+          "sha256": "a452cee415cdd16fe8c47d4341104f850e83d85324ff4ce6aef8d734e64634cf"
         },
         {
           "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/native/result.json",
@@ -253,210 +193,216 @@
           "sha256": "9e1dfab4078ed0fef69c4817294abca41cae215ac576bffd9517e8276b051eb5"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/native/result.json",
-          "bytes": 7074,
-          "sha256": "355d31750f1a612eafbc60ed7f0ccbd35c1d174ca9bbe08ff79357f1f6cb09dc"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/native/result.json",
+          "bytes": 7322,
+          "sha256": "b571b6fae8abda322400dadaab64fba6ce0c73cc1cd4716012278dfc2472c87e"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/native/launch.json",
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/native/launch.json",
           "bytes": 3338,
-          "sha256": "67bd226359c1f16c1edd9964420a1586f8b80391f2ffee2be623bdd7e2630bf7"
+          "sha256": "332000e1293b76ee18641a116c12dfe43129320423c932d0b771317397c91140"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/outcome.json",
-          "bytes": 747,
-          "sha256": "65e17024b4c0c2cab49daf459488826b3577f0fe675dd5a5c44af9884e945a41"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/outcome.json",
+          "bytes": 893,
+          "sha256": "7f023ba9d9bb448e4d46e68bf0dbb1f887179da3f7f43e334b7ccfa9ea8c97e0"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/verification/evaluation.json",
-          "bytes": 69141,
-          "sha256": "a4d31f40d6af01c069e176b746dd6cb6c27b664f28b353c70123d92a647b7114"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/verification/evaluation.json",
+          "bytes": 66241,
+          "sha256": "3d9d49dd3bd73522256b1e281ff3c768f367d162d87747d11f9c3e897b04d9b3"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-1/result.json",
-          "bytes": 55256,
-          "sha256": "9741efe748e9d9e03ebd8c4a7cd8b7d605f9e89936423fff12bca68e4810bc19"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/result.json",
+          "bytes": 7412,
+          "sha256": "d0d0b3efe31f16bbb38dc5349cd46132a20f0fc56bc251df4189245999291fd0"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-1/launch.json",
-          "bytes": 4417,
-          "sha256": "3fb38de997e075ba754b9af69a42cc338e96335dbf7337fa2ded9c2869d0c796"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/launch.json",
+          "bytes": 3338,
+          "sha256": "b7ac576344734be524efe82b2a9e6f5fef2937ab48d4680f300a76c3eb1fa0de"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-1/validated.json",
-          "bytes": 69029,
-          "sha256": "7087f1c57298b3f1067fa9ef7abb9705b9db3d64408972791e00ca2868665af1"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/outcome.json",
+          "bytes": 743,
+          "sha256": "99049339e777296829524525cac71c3b982cf25c97b1d22095b8b78989c5ef0a"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-2/result.json",
-          "bytes": 83579,
-          "sha256": "36e39ae2050fefd00c044a76aa63f8db08c7d4d3258adc7edc7561c66e3190bf"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/verification/evaluation.json",
+          "bytes": 50411,
+          "sha256": "2d633515d16508fbebcc2775b405f28381f7f562e75ad5238b4a9c45869db15c"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-2/launch.json",
-          "bytes": 8564,
-          "sha256": "c3383476d96e995287aa2a708d3a0b93a627d5e655df242b35fb7b43808c6029"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/native/result.json",
+          "bytes": 14108,
+          "sha256": "cf5ae786340ef5ece3f773208566e080c1a6798efc7630351f0c4ecbb16ef76d"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-2/validated.json",
-          "bytes": 53556,
-          "sha256": "7f935cc36ee891af1919e9417bcfc843af72244ee9264c540dd59fcf9a82947a"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/native/launch.json",
+          "bytes": 3338,
+          "sha256": "a204fcd6b4cdceb55fe77d70631861de1a975ab5d9d5fc69bf2123c68ffdc432"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/rubric.json",
-          "bytes": 7026,
-          "sha256": "fd12b026394619263dec1fca01e6d9a206b4e3fc580adec365cc2fcc2e6d3f03"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/outcome.json",
+          "bytes": 893,
+          "sha256": "940326c1b8dd1c9ad6ccc5a4f95fcc953b4a7fdc419c60f2deb50585fb05ba9f"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/plan.json",
-          "bytes": 3835,
-          "sha256": "4a2b609e3ac49faeecf34252d5bb64a8ea2dd307a73cc77248cc43dbda2af8cc"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/verification/evaluation.json",
+          "bytes": 67779,
+          "sha256": "f5077a4811cd69113ce92c07f7f5772f497fce24df392028e25f54132bd18b0c"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/packet.json",
-          "bytes": 924481,
-          "sha256": "d4efaaf29a6609d56295c1b32d728c96f89930a6fa2a27c69862cdc85b8494be"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/result.json",
+          "bytes": 14152,
+          "sha256": "3af1682fbc1ddfc3db0da0e8448c11fdf40f78e0a6d41d55b9071ec2704f48d6"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/mapping.json",
-          "bytes": 203,
-          "sha256": "c03d8879b1190ac99922e1ed83c23432f2ad11bbe1d2abe9ca020d58d4db7a70"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/launch.json",
+          "bytes": 4680,
+          "sha256": "ea4055e754886156b80b68bcb1e255059584a40c45f752f4280c49f02038e3ba"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/summary.json",
-          "bytes": 134383,
-          "sha256": "0546daa0233017f56b9f305e8839647e6e661090e8e510cb3e0bda71d6f0a0dd"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/outcome.json",
+          "bytes": 1129,
+          "sha256": "169ea13841c2da266318fa0829e91bdbc5886c27efce472e899c77dbef06bee8"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/amendment.json",
-          "bytes": 1383,
-          "sha256": "87b788ce30ee02dcff9f9061884c5e98af89093dd7300433a43279c59102e1e5"
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/verification/evaluation.json",
+          "bytes": 51781,
+          "sha256": "846897a6b398b3baf17e2573a394709f7af654b8d496366b76f197a49286bb44"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-1/result.json",
-          "bytes": 1290,
-          "sha256": "303292441ea2dccabd121844013f094ce2a964cea46672d73dce0e4dd8b7c385"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/native/result.json",
+          "bytes": 30046,
+          "sha256": "6352309984ed137fa293ee100c0e906d47a2591307d33962c9f467f4883461ba"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-1/launch.json",
-          "bytes": 3517,
-          "sha256": "b8a994c89848b7e6a92accbbed9ee682e789020fd22360fe1f9d6dba808e769e"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/native/launch.json",
+          "bytes": 4680,
+          "sha256": "b600182033570c263b8894b5250a7dcdfd733d71fc0f9e7afee970f875108bbb"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/judge/result.json",
-          "bytes": 50337,
-          "sha256": "12343b47a68805ee61078c68e018b4e272c46efd3a884a1c905abd6311b60f58"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/outcome.json",
+          "bytes": 1281,
+          "sha256": "67dc9485dfb2a04057fe1654cce66b7bde1c92b9ad6e482a5f42164b903fbaa2"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/judge/launch.json",
-          "bytes": 3527,
-          "sha256": "d92946cabd6bea0dfdc0533303df6c9c3df53b89ef6f3fe2bb7fee199b5a41e9"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/verification/evaluation.json",
+          "bytes": 73125,
+          "sha256": "185e318cbd50c39832fef30a7be4987ec1aa8b72736b116e01699c1d9261b49d"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/judge/validated.json",
-          "bytes": 56391,
-          "sha256": "f9d1ddd96962e8712e053ea376fd91391f2381819f0b90f9d5ac2ef3e98cd8bd"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-1/result.json",
+          "bytes": 31021,
+          "sha256": "18699b690a88cb92df42f3511fbf04186158f022e77a8f867e7b68fa000d72c9"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-2/result.json",
-          "bytes": 83849,
-          "sha256": "abe72f34b5c7d339412f91a250d107642f42825c72fb8952fff8adf7f10b6781"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-1/launch.json",
+          "bytes": 3508,
+          "sha256": "aba5d4364392207a9cdc3259ec27acfdd05e23f9ddee926eb5d01c6fa86ae324"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-2/launch.json",
-          "bytes": 5208,
-          "sha256": "617df6491371bf3b7483228eaff80fc648e4b5f96499f51edbd92e68e3edde14"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-1/validated.json",
+          "bytes": 34819,
+          "sha256": "3daa62c48688b07c0d44b3089fec11906b96ced8343ac8bbaa2fae377a87e8a2"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-2/validated.json",
-          "bytes": 48367,
-          "sha256": "a318deee5174529d12fdd2e5e6ed8f8f97bad003eb446b105d863193a3ecf443"
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-2/result.json",
+          "bytes": 58000,
+          "sha256": "ec6c3a976137dbdf33be467c033e54423986404974dd51ff414361a0dc74c7ad"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-2/launch.json",
+          "bytes": 4745,
+          "sha256": "946eba5d6f1959fd2c8003c33c13513816fcd8b3258fd85c6f1a8330361a1a18"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-2/validated.json",
+          "bytes": 33390,
+          "sha256": "e170aa5dab844e89cf8cf83544595b73dffcd5c2d98d25832f5917205709206e"
         }
       ],
       "generatedFiles": [
         {
           "path": "data.js",
-          "bytes": 986760,
-          "sha256": "5661dc6725f49d31c9620f4cf248eec78df0405c0f53f5ae070b258333c47cbc"
+          "bytes": 996021,
+          "sha256": "18883dec0a57343184c073f4a62233a66d0a673fe6d9e19ca7e2f0e749c2be43"
         },
         {
           "path": "responses.js",
-          "bytes": 7091231,
-          "sha256": "23f9240b1af6207df1f3f02b3092f0637f257214af23ab846ac87a7211a495ae"
+          "bytes": 7050358,
+          "sha256": "c80606a7d60a81c79d2b8ee09a61d578407061eb462ced2c008b227f5a19c6e5"
         }
       ],
       "candidate": {
-        "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaff677c3f2356887f4beb5e4b170898edf92fe32cdf13b8093431c.json",
+        "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68de5482f2a0112f82bc6b1612b750ef1378af3b9eaf57e7cb51b1.json",
         "bytes": 400220,
-        "sha256": "08c17c195b4b86b528c1cd9d3357499a78bc687f920a1aac14240005345b3c01"
+        "sha256": "3ae67073da9b99ca984a70e821f6320cb8fd4a86ee7b22577bcf99a30f0303f2"
       },
       "browserHarness": {
         "path": "backend-testing-browsercheck.mjs",
-        "bytes": 53305,
-        "sha256": "e0f5990e205e215366ab2b337f52c32fb5d16da044e0618a45ea1622493187de"
+        "bytes": 59572,
+        "sha256": "1bf06f44e1b752c0ed511fdbbfd0ffe957418f00f915ca9af09a6894a8d0f046"
       },
       "browserProofs": [
         {
           "width": 1440,
           "height": 1000,
-          "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-browsercheck.json",
-          "bytes": 234135,
-          "sha256": "fc487c045773032423c4ceea24bac558aaa311a25996103cfcf18832585208e7"
+          "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-browsercheck.json",
+          "bytes": 196710,
+          "sha256": "1ec15bb8ad1192f514d5c7f47ea27c0bcd180952fc614c892eb3d7c6058a3e57"
         },
         {
           "width": 820,
           "height": 1000,
-          "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-browsercheck.json",
-          "bytes": 234061,
-          "sha256": "23313a90ee9e71a6d97656dc5c6bb1238303eaaeb5a0c17f776d71d2413b8b91"
+          "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-browsercheck.json",
+          "bytes": 196645,
+          "sha256": "5f4e42dab7e6a3401f6469ac813855e04bc3aa33c0d78abe03e9c7cd5af95427"
         },
         {
           "width": 390,
           "height": 844,
-          "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-browsercheck.json",
-          "bytes": 234030,
-          "sha256": "6e8632b332c169233d867ecae67b3e72327b6be8481d87bd30534dded2d2dacc"
+          "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-browsercheck.json",
+          "bytes": 196617,
+          "sha256": "05c2fe446c25f65a8eb8b625bcd159e105abd72cc649343c7dd66ca439c1c27d"
         }
       ],
       "visualReview": {
         "authority": "agent",
         "capturePaths": [
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-engineering-ledger-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-quality-overview-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-check-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-method-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-review-retry-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-rubric-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-execution-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-test-files-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-score-calculation-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-profile-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-ranges-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-reasons-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-semantic-naming-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-evidence-qualification-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-files-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-evidence-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-hyper-scale-chat-1440.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-engineering-ledger-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-quality-overview-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-check-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-method-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-review-retry-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-rubric-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-execution-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-test-files-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-score-calculation-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-profile-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-ranges-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-reasons-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-semantic-naming-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-evidence-qualification-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-files-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-evidence-390.png",
-          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-hyper-scale-chat-390.png"
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-engineering-ledger-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-quality-overview-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-check-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-method-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-rubric-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-execution-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-test-files-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-score-calculation-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-profile-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-ranges-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-taste-reasons-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-semantic-naming-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-coverage-evidence-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-evidence-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-hyper-scale-chat-1440.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-engineering-ledger-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-quality-overview-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-check-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-method-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-rubric-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-execution-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-test-files-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-score-calculation-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-profile-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-ranges-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-taste-reasons-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-semantic-naming-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-coverage-evidence-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-evidence-390.png",
+          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-hyper-scale-chat-390.png"
         ],
-        "verdict": "Desktop and mobile captures show the standard ranked comparison table using one final score, with Coverage lost beside capped baselines. Inspect run exposes actual JavaScript test files directly beneath Minimal and Skill; the first file is open and Copy preserves source bytes. Seven-dimension profiles and original review evidence remain inspectable. The collapsed calculation explains each reviewer cap and final score, and Method discloses adoption after reviews. Keyboard controls, safe wrapping and horizontal containment pass."
+        "verdict": "Desktop and mobile show the shared ranked comparison rows with a single weighted final score and clear coverage-loss labels. The same shared test-file path opens first in both conditions before reviewer details, Copy preserves its source bytes, nine-criterion profiles and all protection/coverage evidence remain inspectable, and Method discloses baseline reuse and six new native attempts. Native disclosure, keyboard, routing and overflow checks pass."
       }
     }
   },
@@ -472,12 +418,12 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "This acceptance verifies a current small known-case development comparison and fixed seven-dimension review. Model judges can disagree and miss defects; reviewer ranges are not confidence intervals. The results do not establish a population skill effect or broad model ranking. Candidate evidence does not establish live CDN delivery; dedicated live checks are recorded after publication.",
+  "claimBoundary": "One known-case development comparison uses four reused exact-task Minimal artifacts and four fresh Skill artifacts, with two new blind reviews of every suite. This is not a fresh paired-baseline experiment or a broad population ranking. Model reviews can disagree and miss defects; ranges are not confidence intervals. Candidate evidence does not establish live delivery; live byte and browser checks follow publication.",
   "files": [
     {
       "path": "app.js",
-      "bytes": 220100,
-      "sha256": "39fb457d38f344426549b4ca3d0be5647e52656c4843106fa73aee4706e0de8e"
+      "bytes": 220249,
+      "sha256": "c1c1826889244247ca17c181c7a26d8d61014d85d2c24ec66fef8e4e5f1b9bc5"
     },
     {
       "path": "assets/d3.v7.min.js",
@@ -491,8 +437,8 @@
     },
     {
       "path": "benchmark-report.css",
-      "bytes": 40264,
-      "sha256": "7e0e02c7dbfb7c32379b4fe12fd8db97d5bc22566b470dbb0de0c94263f025da"
+      "bytes": 40542,
+      "sha256": "f80ccbf04b4cb6375182e9b9faf28146d62d87d7490567ffdb8e22b41dd9ec55"
     },
     {
       "path": "benchmark-report.html",
@@ -501,8 +447,8 @@
     },
     {
       "path": "benchmark-report.js",
-      "bytes": 148008,
-      "sha256": "e020816125a708d6cf6d20e0b259660ef9062a9dff7e2d0302b397b16e69ee24"
+      "bytes": 154067,
+      "sha256": "92f39754d2013dd4807cd495cfd3032b675b80215b9d8bb741b6cb7d552a313a"
     },
     {
       "path": "capture.mjs",
@@ -567,363 +513,321 @@
     },
     {
       "path": "backend-testing-browsercheck.mjs",
-      "bytes": 53305,
-      "sha256": "e0f5990e205e215366ab2b337f52c32fb5d16da044e0618a45ea1622493187de"
+      "bytes": 59572,
+      "sha256": "1bf06f44e1b752c0ed511fdbbfd0ffe957418f00f915ca9af09a6894a8d0f046"
     }
   ],
   "captures": [
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-engineering-ledger-1440.png",
-      "bytes": 209046,
-      "sha256": "8cecbcf3b9bfd8bf9363a205fae102288f6fab12efd833b7156b0fc4d3c99703",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-engineering-ledger-1440.png",
+      "bytes": 208912,
+      "sha256": "4d279ec01162ad6db52de7282ce9b42df6bd6985c60a3e39979746dd83929890",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-quality-overview-1440.png",
-      "bytes": 94825,
-      "sha256": "d18316242f200adf552c40b35a798bca6ef0b998fd1e312557946a39d7d79d8d",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-quality-overview-1440.png",
+      "bytes": 94897,
+      "sha256": "6196cd697b0eb4d47f93978bbdc8bfe79d6952f27a4f139fcfe0f5b35e120564",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-check-1440.png",
-      "bytes": 95853,
-      "sha256": "534bbd2eaf31efb4928d27af1369abd7dfe830c53c5a5eb98fb69c5d5f824120",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-check-1440.png",
+      "bytes": 95991,
+      "sha256": "fabc36c94135a823a6b5752afcd0d4604f77e9baf26d3f9529ca753e73d6adef",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-method-1440.png",
-      "bytes": 121233,
-      "sha256": "07c7339afdb850ce26d9fcdebfd4960d820a8c05bde9b997c6bb7ef52df466e4",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-method-1440.png",
+      "bytes": 119594,
+      "sha256": "edb0947c84863e7ca2e6954cfd025197f9bddba8e467b345558c1e13d4785597",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-review-retry-1440.png",
-      "bytes": 147684,
-      "sha256": "d710b954ae76a246535ad3216750960c51c0401b864bc10cbd3374d75b03a26c",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-rubric-1440.png",
+      "bytes": 160614,
+      "sha256": "bd477d99f4e64e238bd5b421dd76f3ddbd85087118543bcb002302ff50352f50",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-rubric-1440.png",
-      "bytes": 154197,
-      "sha256": "cb837ed174ef76866fed79c3692ac7909cd17218be17680d7d7520d0f4fd18ca",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-execution-1440.png",
+      "bytes": 134863,
+      "sha256": "b02db7cf738ecb20be443ead2c222f44a12b448a3331b3b670e16bec1400460b",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-execution-1440.png",
-      "bytes": 139497,
-      "sha256": "f4fae928993bc83aaed08d242587fd96d5a42497799d2ecb8a4342b0a765b74a",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-test-files-1440.png",
+      "bytes": 131084,
+      "sha256": "57fe6c9e077b268a94d92f47ad3ee4d742a20003b2d5cf0986061e410fe28cea",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-test-files-1440.png",
-      "bytes": 190521,
-      "sha256": "92053312079d7f01ed3133c0947c5b9b595e58e74de683e044b881fdefec775f",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-score-calculation-1440.png",
+      "bytes": 134342,
+      "sha256": "4a1d71dfbccf3176faabab881cc911d80ad7f32d9c7144ba1b55b6a09caf3f6e",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-score-calculation-1440.png",
-      "bytes": 166038,
-      "sha256": "3a63c5d3c74af54e649a3e626371102df69d3378cb1890e6b15e75195cdf9c26",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-profile-1440.png",
+      "bytes": 95974,
+      "sha256": "e88ddb5ae79c11e387175eb40d6baa1b69012a04cd8319e36cb5eaaf51f68064",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-profile-1440.png",
-      "bytes": 105346,
-      "sha256": "7d4138a8abcf7859eb0dd923e464236ad562f576764695df3bdd16a88a30eb75",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-ranges-1440.png",
+      "bytes": 133925,
+      "sha256": "ae20ef773dca8d4539639a57970d1176206ae1579b7c7c4c3b55cb315a1255b4",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-ranges-1440.png",
-      "bytes": 156514,
-      "sha256": "1484ce61edb604fb92e1249da8e779958b6d1685c0af2ef49949a0a45a3b6593",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-taste-reasons-1440.png",
+      "bytes": 113844,
+      "sha256": "53365d46f528381a66441db0467978ac8bbe67af4615712089da6e9efdf607e0",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-reasons-1440.png",
-      "bytes": 136906,
-      "sha256": "2ca0672ad41cb505d2e81500ad5b1e37e1cd4dce934e6cfc2dcd5bc35b527b46",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-semantic-naming-1440.png",
+      "bytes": 110068,
+      "sha256": "df407bbc3190c23fb467c8f13d6fec13956d8b4d11e5653317f54527947db599",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-semantic-naming-1440.png",
-      "bytes": 125457,
-      "sha256": "817ffd6fb204b182ba81c17627744f8cd51f135d3114ef05b2b5acb67f277ac6",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-coverage-evidence-1440.png",
+      "bytes": 110973,
+      "sha256": "9056c758418da4e8f2b1574b14ce28435c3286246c09d5e7a8c28e9ab5304e49",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-evidence-qualification-1440.png",
-      "bytes": 129335,
-      "sha256": "2a58f6852134a1973425c3fb6bb9f530e3fca8d90cba1da6289d219edd6c0f5e",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-evidence-1440.png",
+      "bytes": 138780,
+      "sha256": "e59d7effc37c6eca138f704b168c5b004a0ec65fb199b4bb7967d9f4a5b77773",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-files-1440.png",
-      "bytes": 94210,
-      "sha256": "c20dcdfba7a0e1fbe38019e4307cff9f0d27cb2d660f8948efe414e3bc338f06",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-evidence-1440.png",
-      "bytes": 133097,
-      "sha256": "ded7fec461e5ef32d2b4dbc42ad78ec2da18960f920bb531ff38b7c93d0a50a0",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-hyper-scale-chat-1440.png",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-hyper-scale-chat-1440.png",
       "bytes": 143921,
       "sha256": "67602a5bcb4fb2f38019036445c31c78404c2ed5fead1ae16bffd4e17494c34a",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-engineering-ledger-820.png",
-      "bytes": 124107,
-      "sha256": "dd5d8c009cc513f35541b4d43c509798926135340ba6f438e5a913c6682b31dc",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-engineering-ledger-820.png",
+      "bytes": 123990,
+      "sha256": "fa9c32d30a8881d72ce79ed97f163b9917f16adf170bf585b2ccbcbd1d31e2a6",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-quality-overview-820.png",
-      "bytes": 88043,
-      "sha256": "5a12d536548f796708d86a68ace3f9f340c856792729fdc537d28e43ace17400",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-quality-overview-820.png",
+      "bytes": 87995,
+      "sha256": "06cd85b3a368a2334c2b07416be13ff73d68138f1264ca1ceceb2312f2427814",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-paired-check-820.png",
-      "bytes": 88973,
-      "sha256": "1af2a1c03624ef75c7d66c648fd14f4047ab30494315c1464aee583335ffc41a",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-paired-check-820.png",
+      "bytes": 88981,
+      "sha256": "c6a25aecaaad3c949b49eae77fbb01217c19c30f5b635abae9ebc50a547dafe4",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-method-820.png",
-      "bytes": 95168,
-      "sha256": "38817303c9c577e21fbe85fc6464058dfd340602b34fe25b46e2ca82db6c9b3d",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-method-820.png",
+      "bytes": 101551,
+      "sha256": "37ce976664c3e366c77d8a3b25b533d6bb1a00b9318574593f711004e3a32789",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-review-retry-820.png",
-      "bytes": 119042,
-      "sha256": "7d1b2ac0e79b23699cbeefe85c6c87609219943b39936c455c063894086ab49d",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-rubric-820.png",
+      "bytes": 140197,
+      "sha256": "7f54935dbf873db8eabf9ded869a9bdc7d740f8af222f36876ce1babbafb0f63",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-rubric-820.png",
-      "bytes": 125182,
-      "sha256": "12a297362b54428243afbe7ee0549785ac1e50837fd364c1c16843b03a33cfe8",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-execution-820.png",
+      "bytes": 115762,
+      "sha256": "62cedf7d5805e2f20456571bf0e80a82b4fbb1de4a2a3558113181044fe9725a",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-execution-820.png",
-      "bytes": 109527,
-      "sha256": "1a8bf1fa30f215d1711226f4e43d8f72090aa9bcf1c008040b8ac1bef4010ad5",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-test-files-820.png",
+      "bytes": 118336,
+      "sha256": "20d9ebffaa38ead094ccd04b022d846d54c54e6d180179dea9113dbdf0957e71",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-test-files-820.png",
-      "bytes": 159741,
-      "sha256": "daf1c330547bcda90053e94d2da9c74e9558f039d00b35f47a6249c9b706ec80",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-score-calculation-820.png",
+      "bytes": 121087,
+      "sha256": "249f025d3f31ff828483723d46053267c30f7ff6c82f61370fc5757dcbd1d860",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-score-calculation-820.png",
-      "bytes": 139409,
-      "sha256": "b71d42caa2b26e618019be9dfec707bb3f27edc2c70f7bb804d27fb5ae39366b",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-dimension-profile-820.png",
+      "bytes": 87556,
+      "sha256": "368da5d5a6aa1cac00a9442a30e209070b5f83cb1538cbafea53ffb16991ea89",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-dimension-profile-820.png",
-      "bytes": 82774,
-      "sha256": "d4caf8609a66beccb147dfcdc98c4409bf96710f0c87a921b5edf348ef12e8c7",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-dimension-ranges-820.png",
+      "bytes": 121938,
+      "sha256": "3406d941b521ebbcd505ebd7b193fe2e776a36df0492b6e9f0556c33b4fa2f29",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-dimension-ranges-820.png",
-      "bytes": 133838,
-      "sha256": "db30a09279ec554fc57cf8abeaecbd8e72e58f5a46d24d972681a055e5744e43",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-taste-reasons-820.png",
+      "bytes": 101006,
+      "sha256": "201848d427ba338b0776149a4f16336d5b23a0961c58d90a49e4f29cf2d0eca4",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-taste-reasons-820.png",
-      "bytes": 117489,
-      "sha256": "769b1878cf4117c5b92585dd5080bcee00df547ff68403a3ccbfdb296486cb1a",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-semantic-naming-820.png",
+      "bytes": 101515,
+      "sha256": "476c75701c31248789c6e123bf184e9c63ff8a7fa0833790fab46e3f6471518c",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-semantic-naming-820.png",
-      "bytes": 108333,
-      "sha256": "61fa3ed1ee06751a317e3aaf628eb3ff0c5273a1541455e039a10821ebd51383",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-coverage-evidence-820.png",
+      "bytes": 99513,
+      "sha256": "9075cf8d4983469babf48e5729ad2fa75437834a27a336a643aeb28a1825d01c",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-evidence-qualification-820.png",
-      "bytes": 107622,
-      "sha256": "0553d33eb00182d661a3159b7af30879f2a8a7caff6e04d55aab2abb4b9311b2",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-paired-evidence-820.png",
+      "bytes": 111859,
+      "sha256": "d2cc386d9ac347e9a106961743d93d6ec5480cc230b90df06db65c188ba67b70",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-taste-files-820.png",
-      "bytes": 88884,
-      "sha256": "932531e27244f7e96468a4f8432645896ac256701a88e1aa75f197b53c468cb0",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-paired-evidence-820.png",
-      "bytes": 105372,
-      "sha256": "3a4a8997878abbe2445ce5ed5baf766c879b0a7e5b42ffca675989bda8d30dda",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-hyper-scale-chat-820.png",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-hyper-scale-chat-820.png",
       "bytes": 99411,
       "sha256": "1d151d3e7b797f8778b7b239b97afd721c8b36c749d3723f735903e8fafe6b4f",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-engineering-ledger-390.png",
-      "bytes": 78723,
-      "sha256": "5f72bb1c0b403b392c4b895ac36e9dbbffcbc531a69891bbb274b90765cf4c43",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-engineering-ledger-390.png",
+      "bytes": 78603,
+      "sha256": "7e744cc50250b9f519fa1ae5da161b4b1cab3aa556ffb674227e0c75d79094db",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-quality-overview-390.png",
-      "bytes": 56444,
-      "sha256": "7363681f370d0d387ed5b887440c93c33b0b35df59d6818cdd24478ea0f1f571",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-quality-overview-390.png",
+      "bytes": 56459,
+      "sha256": "a40d9f5295f2554174585c00a3af79bd669f8595458dd5fffc5e8f7d089a4b4b",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-check-390.png",
-      "bytes": 57616,
-      "sha256": "38f07d116bed1b4024fda747f9aaab6a18650479637e2c61acf5186ac8dbd831",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-check-390.png",
+      "bytes": 57899,
+      "sha256": "aef25cad3fadbfa2f632da66d18f2ff7ef2bd300b47db635cb8a2e2f9f8723af",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-method-390.png",
-      "bytes": 54907,
-      "sha256": "d2d423527f746d75349f592fbaaf97b61f9a895b637b294b9d28ebeb27efb404",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-method-390.png",
+      "bytes": 59439,
+      "sha256": "a3d0eeeac0d1288a04f7993ed21eeedc7b5a998852ea7de19fb1446c45f73edc",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-review-retry-390.png",
-      "bytes": 75589,
-      "sha256": "e9d6dd17e384c60c790fa02a0e62718b275a4d32e4ccb12c475480a87de09c0e",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-rubric-390.png",
+      "bytes": 80616,
+      "sha256": "ac6ef4785f9c18e8e9fa7b8efa83a19074494256fe5bf94b1dc361e00c784897",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-rubric-390.png",
-      "bytes": 71932,
-      "sha256": "921c9875691516bafaae802e22c0a8e661b01518cc7095f3298b33b399e42092",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-execution-390.png",
+      "bytes": 70049,
+      "sha256": "0a6a6d16c1538420fd1e7d9329d7d0f4d8fbc557db6d1efab9f68cc6ed4908d2",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-execution-390.png",
-      "bytes": 62941,
-      "sha256": "a206c564598cc2cb2acc4fbfc2bfc1a34cfd7d3706ceb050bb640b3afc0007dd",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-test-files-390.png",
+      "bytes": 60446,
+      "sha256": "7a594176f02f7caec49c684bf550de74e00dac6e1a3cb329fd07fc08deb53bac",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-test-files-390.png",
-      "bytes": 61397,
-      "sha256": "402686554e180ef4930760bb00586bb150249ab46a5659398829462bbaf4b58d",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-score-calculation-390.png",
+      "bytes": 66588,
+      "sha256": "d800c6d6e97803c2bd5b00e1ecaf80df429a71940bd78bb4311460b37e51ae79",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-score-calculation-390.png",
-      "bytes": 62940,
-      "sha256": "12839efcec3de50fded9b4e5d1ad1b395909ee217b2babaa7594ebabf375e39b",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-profile-390.png",
+      "bytes": 58405,
+      "sha256": "850079d74168c8ea9ba66449b2f70c3e91145076efd769212eef5a5f08fb5e8e",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-profile-390.png",
-      "bytes": 59532,
-      "sha256": "3b382867192fb5e5570e252a63522dddf3ca04ed607e9fa10fc8ea6a3579aa2a",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-ranges-390.png",
+      "bytes": 66493,
+      "sha256": "168730e3e64226d71a8ca17757d0c056de2885a95f45e0a96265b5e84bff6adf",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-ranges-390.png",
-      "bytes": 66085,
-      "sha256": "35bee71e98063453fcbfabef56888f46133cd281b8cf95fa224e56efc09d4133",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-taste-reasons-390.png",
+      "bytes": 78879,
+      "sha256": "d8e59921a63c58467ac8d775e03f4b8564e2b2339480206312cdc384206f5e6f",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-reasons-390.png",
-      "bytes": 86535,
-      "sha256": "e927aee199d795ba131a875f00c05d4e1f5c2a4d8341cac457e9de7747883867",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-semantic-naming-390.png",
+      "bytes": 71400,
+      "sha256": "4837fe3d9f0eb46c1f201da80a53e3ab8ff150abe03f5462a734f4d894ce8c53",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-semantic-naming-390.png",
-      "bytes": 77587,
-      "sha256": "98d7827cd7ba4ee27182d5296596c311b043e25708804bb16a282b3c0a0a74c7",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-coverage-evidence-390.png",
+      "bytes": 69744,
+      "sha256": "13f01e32fe42a48ca83c387ddf595448b21c8a5eb16565e5e5c5f3546753e7c5",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-evidence-qualification-390.png",
-      "bytes": 79147,
-      "sha256": "26ec42c6e17d403495f49953fca8ea22f5fbc45421b9b858b62a478a33e98fde",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-evidence-390.png",
+      "bytes": 69294,
+      "sha256": "dbe53c4ca5ded1bd2734330420a8ec562603e994386d11c6b7ce478694c3ba9d",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-files-390.png",
-      "bytes": 68679,
-      "sha256": "7ae96489f9c42d7722c5ed951407cbc17b73958f993c52d332c9c229cf045cd7",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-evidence-390.png",
-      "bytes": 62012,
-      "sha256": "3e131021e7b4bd1613f0b0a0cdfe302c17a98e2b61bcf368b634132a2c835da0",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-hyper-scale-chat-390.png",
+      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-hyper-scale-chat-390.png",
       "bytes": 58723,
       "sha256": "23889acd67146fe6ca39424afcfee98551fff3acc1725b7c7b82d15f91a15dde",
       "width": 390,

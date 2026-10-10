@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { launchChrome, startVariantServer } from '../../benchmarks/threejs-water-ripples-performance/lib/browser.mjs';
 import { validateBackendTestingPublication } from '../../cli/eval/backend-testing-publication.js';
+import { validateBackendTestingCompactRound, validateBackendTestingCompactPublication, validateBackendTestingCompactFiles } from '../../cli/eval/backend-testing-compact-publication.js';
 
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, value, index, args) => {
   if (value.startsWith('--')) pairs.push([value.slice(2), args[index + 1]]);
@@ -113,20 +114,22 @@ client.on('Network.loadingFinished', ({ requestId }) => {
 
 const checkCurrentReport = async publication => {
   validateBackendTestingPublication(publication);
-  assert.equal(publication.schemaVersion, 3);
-  const paired = await evaluate('window.VASIR_RESPONSES.backendTestingPairedRepair');
-  const taste = await evaluate('window.VASIR_RESPONSES.backendTestingTaste || null');
+  assert.ok([3, 4].includes(publication.schemaVersion));
+  const compact = publication.schemaVersion === 4;
+  const paired = await evaluate(compact ? 'window.VASIR_RESPONSES.backendTestingCurrentRound' : 'window.VASIR_RESPONSES.backendTestingPairedRepair');
+  const taste = compact ? paired : await evaluate('window.VASIR_RESPONSES.backendTestingTaste || null');
   const combined = publication.overall, testFiles = await evaluate('window.VASIR_RESPONSES.backendTestingFiles');
-  assert.equal(combined.schemaVersion,1);
+  assert.equal(combined.schemaVersion,2);
   assert.equal(testFiles.kind,'backend-testing-files');
   assert.equal(testFiles.schemaVersion,1);
   backendTestingOverallSha256=sha256(JSON.stringify(combined));
   backendTestingFilesSha256=sha256(JSON.stringify(testFiles));
-  assert.equal(paired.kind, 'backend-testing-paired-repair-check');
+  assert.equal(paired.kind, compact ? 'backend-testing-current-round' : 'backend-testing-paired-repair-check');
+  if (compact) { validateBackendTestingCompactRound(paired); validateBackendTestingCompactPublication(publication, paired); validateBackendTestingCompactFiles(testFiles, paired); currentRoundSha256=sha256(JSON.stringify(paired)); }
   assert.equal(paired.schemaVersion, 1);
   assert.equal(paired.rows.length, 8);
   assert.equal(paired.summaries.length, 4);
-  pairedRepairSha256 = sha256(JSON.stringify(paired));
+  if (!compact) pairedRepairSha256 = sha256(JSON.stringify(paired));
   const expectedScore = row => row.status === 'invalid' ? 0 : row.status === 'scored' && row.judgments.length === 2 && row.judgments.every(judge => Number.isFinite(judge.score)) ? row.judgments.reduce((sum, judge) => sum + judge.score, 0) / 2 : null;
   const expected = paired.summaries.map(summary => {
     const rows = paired.rows.filter(row => row.configurationId === summary.configurationId);
@@ -143,7 +146,7 @@ const checkCurrentReport = async publication => {
     technicalScoreNodes: document.querySelectorAll('[data-testing-technical-setting],[data-testing-paired-row-score],[data-testing-paired-judges],[data-testing-judge-flags]').length,
     methodClosed: !!document.querySelector('#method details') && !document.querySelector('#method details').open,
     oldNodes: document.querySelectorAll('[data-testing-fault-pilot],[data-testing-repair-check],[data-testing-quality-row],#historical-overview,#limitations,#repair-check').length,
-    oldSourceKeys: ['suiteQuality', 'faultDetectionPilot', 'repairCheck'].filter(key => key in window.VASIR_DATA.executableTesting).concat(['backendTesting', 'backendTestingRepair'].filter(key => key in window.VASIR_RESPONSES)),
+    oldSourceKeys: ['suiteQuality', 'faultDetectionPilot', 'repairCheck'].filter(key => key in window.VASIR_DATA.executableTesting).concat(['backendTesting', 'backendTestingRepair', ...(window.VASIR_DATA.executableTesting.schemaVersion === 4 ? ['backendTestingPairedRepair','backendTestingTaste'] : [])].filter(key => key in window.VASIR_RESPONSES)),
     navigation: [...document.querySelectorAll('.report-mast__nav [data-report-section]')].map(node => ({section:node.dataset.reportSection, text:node.textContent, hash:new URL(node.href).hash, visible:!!node.getBoundingClientRect().height})),
     misplacedComparisonLinks: [...document.querySelectorAll('[data-report-section="paired-check"]')].filter(node => !node.closest('.report-mast__nav')).length,
     settings: [...document.querySelectorAll('[data-testing-paired-setting]')].map(node => ({id:node.dataset.testingPairedSetting,closed:!node.querySelector(':scope > details').open})),
@@ -154,19 +157,20 @@ const checkCurrentReport = async publication => {
     evidence:document.querySelector('[data-testing-paired-resources-evidence]').textContent
   }));
   const navigationSections = ['paired-check', 'method'];
-  check('paired-repair-comparison', dom.context.includes('Backend testing') && !dom.heroCount && !dom.technicalScoreNodes && dom.methodClosed && !dom.oldNodes && !dom.oldSourceKeys.length && !/Earlier skill|Earlier purchases|fault-detection pilot|original paired study|Technical score|Technical judge ratings/i.test(dom.text) && dom.misplacedComparisonLinks === 0 && dom.navigation.length === 2 && dom.navigation.every((item,index) => item.section === navigationSections[index] && item.hash === `#backend-testing/${item.section}` && item.visible) && dom.settings.length === 4 && dom.settings.every(item=>item.closed) && ['baseline','treatment','delta'].every(key => close(publication.technical[key], mean(key))) && close(paired.meanPairedDifference,mean('delta')), {pairedRepairSha256,caseId:paired.caseId,status:paired.status,currentOnly:true,tableOnly:true,technicalScoreNodes:dom.technicalScoreNodes,navigation:dom.navigation,settings:dom.settings,sourceScoresRetained:true});
+  check('paired-repair-comparison', dom.context.includes('Backend testing') && !dom.heroCount && !dom.technicalScoreNodes && dom.methodClosed && !dom.oldNodes && !dom.oldSourceKeys.length && !/Earlier skill|Earlier purchases|fault-detection pilot|original paired study|Technical score|Technical judge ratings/i.test(dom.text) && dom.misplacedComparisonLinks === 0 && dom.navigation.length === 2 && dom.navigation.every((item,index) => item.section === navigationSections[index] && item.hash === `#backend-testing/${item.section}` && item.visible) && dom.settings.length === 4 && dom.settings.every(item=>item.closed) && (compact || ['baseline','treatment','delta'].every(key => close(publication.technical[key], mean(key)))) && close(paired.meanPairedDifference,mean('delta')), {pairedRepairSha256,caseId:paired.caseId,status:paired.status,currentOnly:true,tableOnly:true,technicalScoreNodes:dom.technicalScoreNodes,navigation:dom.navigation,settings:dom.settings,sourceScoresRetained:true});
   const rowsMatch = dom.rows.length === 8 && paired.rows.every(row => {
     const rendered = dom.rows.find(item => item.id === row.id);
     return rendered?.execution === `Behavioral tests: ${row.testStatus} · server shutdown: ${row.cleanupStatus}.` && rendered.protection === `Existing test coverage: ${row.protection} (reviewer assessment).`;
   });
   const removed=paired.rows.filter(row=>row.condition==='none' && row.protection==='lost').length, retained=paired.rows.filter(row=>row.condition==='repaired' && row.protection==='retained').length;
-  check('paired-repair-evidence', rowsMatch && dom.outcomes.includes(`${paired.rows.filter(row => row.testStatus === 'pass').length}/8`) && /behavioral assertions/i.test(dom.outcomes) && dom.mechanism.includes(`${removed}/4 Minimal`) && dom.mechanism.includes(`${retained}/4 Skill`) && /separate test for loading an existing save/i.test(dom.mechanism) && /coverage finding from code review/i.test(dom.mechanism) && dom.cleanup.includes(`${paired.rows.filter(row=>row.cleanupStatus==='failed').length}/8`) && /shared websocket shutdown diagnostic/i.test(dom.cleanup) && /separate from the storage cleanup behavior/i.test(dom.cleanup) && dom.evidence.includes(`${publication.nativeSessions} native sessions`) && dom.evidence.includes(`${publication.knownTokens.toLocaleString('en-US')} recorded tokens`) && dom.evidence.includes(`${publication.usageMissingSessions} sessions lack usage`) && dom.evidence.includes(paired.sourceSha256) && dom.evidence.includes(paired.skillSha256), {pairedRepairSha256,rows:dom.rows,outcomes:dom.outcomes,mechanism:dom.mechanism,cleanup:dom.cleanup,nativeSessions:publication.nativeSessions,knownTokens:publication.knownTokens,usageMissingSessions:publication.usageMissingSessions,sourceSha256:paired.sourceSha256,skillSha256:paired.skillSha256});
+  check('paired-repair-evidence', rowsMatch && dom.outcomes.includes(`${paired.rows.filter(row => row.testStatus === 'pass').length}/8`) && /behavioral assertions/i.test(dom.outcomes) && dom.mechanism.includes(`${removed}/4 Minimal`) && dom.mechanism.includes(`${retained}/4 Skill`) && (compact ? /existing protection/i.test(dom.mechanism) && /reason and cited source/i.test(dom.mechanism) : /separate test for loading an existing save/i.test(dom.mechanism) && /coverage finding from code review/i.test(dom.mechanism)) && dom.cleanup.includes(`${paired.rows.filter(row=>row.cleanupStatus==='failed').length}/8`) && (compact ? /does not by itself establish missing runnable coverage/i.test(dom.cleanup) : /shared websocket shutdown diagnostic/i.test(dom.cleanup) && /separate from the storage cleanup behavior/i.test(dom.cleanup)) && dom.evidence.includes(`${publication.nativeSessions} native sessions`) && dom.evidence.includes(`${publication.knownTokens.toLocaleString('en-US')} recorded tokens`) && dom.evidence.includes(`${publication.usageMissingSessions} sessions lack usage`) && dom.evidence.includes(paired.sourceSha256) && dom.evidence.includes(paired.skillSha256), {pairedRepairSha256,rows:dom.rows,outcomes:dom.outcomes,mechanism:dom.mechanism,cleanup:dom.cleanup,nativeSessions:publication.nativeSessions,knownTokens:publication.knownTokens,usageMissingSessions:publication.usageMissingSessions,sourceSha256:paired.sourceSha256,skillSha256:paired.skillSha256});
   if (taste) {
-    assert.equal(taste.kind,'backend-testing-taste-review');
-    assert.equal(taste.schemaVersion,2);
+    assert.equal(taste.kind,compact ? 'backend-testing-current-round' : 'backend-testing-taste-review');
+    assert.equal(taste.schemaVersion,compact ? 1 : 2);
     assert.equal(taste.rows.length,8);
-    tasteSha256 = sha256(JSON.stringify(taste));
-    const rubric = JSON.parse(await readFile(new URL('../../benchmarks/backend-testing/taste-rubric.json',import.meta.url),'utf8'));
+    if (!compact) tasteSha256 = sha256(JSON.stringify(taste));
+    const selected = JSON.parse(await readFile(new URL('../../benchmarks/backend-testing/publication.json',import.meta.url),'utf8'));
+    const rubric = JSON.parse(await readFile(resolve(fileURLToPath(new URL('../../',import.meta.url)),selected.rubric.path),'utf8'));
     assert.deepEqual(taste.scoreBasis.dimensions,rubric.dimensions);
     assert.equal(taste.scoreBasis.namingZeroRule,rubric.namingZeroRule);
     assert.equal(taste.scoreBasis.aggregation,rubric.aggregation);
@@ -176,8 +180,9 @@ const checkCurrentReport = async publication => {
     const format = value => Number.isFinite(value) ? value.toFixed(3) : 'Unscored';
     const original = value => Number.isFinite(value) ? value.toFixed(2) : 'Unscored';
     const difference = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(3)}` : 'Unscored';
-    const quality = value => Number.isFinite(value) ? value.toFixed(1) : 'Unscored';
-    const points = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(1)} pts` : 'Unscored';
+    const scoreFormatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const quality = value => Number.isFinite(value) ? scoreFormatter.format(value) : 'Unscored';
+    const points = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${scoreFormatter.format(value)} pts` : 'Unscored';
     const weighted = readings => readings.length === 7 && dimensions.every(dimension=>Number.isFinite(readings.find(item=>item.id===dimension.id)?.score))
       ? dimensions.reduce((sum,dimension)=>sum+readings.find(item=>item.id===dimension.id).score*dimension.weight,0)/100 : null;
     const rawRatingsValid = readings => readings.every(reading=>reading.score === null || Number.isFinite(reading.score) && reading.score >= 0 && reading.score <= 1 && Math.abs(reading.score*100-Math.round(reading.score*100)) < 1e-8);
@@ -187,7 +192,7 @@ const checkCurrentReport = async publication => {
       for (const judge of row.judgments) {
         assert.ok(rawRatingsValid(judge.dimensions),'Suite dimension ratings must retain the raw 0.01 resolution.');
         assert.ok(close(judge.score,weighted(judge.dimensions)),'Judge suite total must equal the fixed weighted dimensions.');
-        for (const file of judge.files) {
+        for (const file of judge.files || []) {
           assert.ok(rawRatingsValid(file.dimensions),'File dimension ratings must retain the raw 0.01 resolution.');
           assert.ok(close(file.score,weighted(file.dimensions)),'File total must equal its own fixed weighted dimensions.');
         }
@@ -217,32 +222,54 @@ const checkCurrentReport = async publication => {
       assert.ok(close(taste.dimensionSummaries.find(item=>item.id===dimension.id)?.[field],expected));
     }
     assert.equal(combined.scoreBasis.maximum,100);
-    assert.equal(combined.scoreBasis.protectionLossMaximum,49);
-    assert.equal(combined.scoreBasis.zeroCoverageScore,0);
     assert.equal(combined.scoreBasis.adoption,'user-requested-after-reviews');
+    assert.equal(combined.scoreBasis.protectionLossMaximum,undefined);
+    assert.equal(combined.scoreBasis.zeroCoverageScore,undefined);
+    const criteria=combined.scoreBasis.criteria;
+    assert.deepEqual(criteria.map(({id,weight,source})=>({id,weight,source})),[
+      {id:'preservation',weight:25,source:'protection'},
+      {id:'behavioral_coverage',weight:20,source:'dimension'},
+      {id:'assertion_quality',weight:15,source:'dimension'},
+      {id:'boundary_fidelity',weight:10,source:'dimension'},
+      {id:'semantic_naming',weight:10,source:'dimension'},
+      {id:'domain_structure',weight:5,source:'dimension'},
+      {id:'clarity',weight:5,source:'dimension'},
+      {id:'maintenance_economy',weight:5,source:'dimension'},
+      {id:'runnable_coverage',weight:5,source:'coverage'}
+    ]);
     const combinedExpected=taste.rows.map(row=>{
-      const protectionRow=paired.rows.find(item=>item.id===row.id);
       const judgments=row.judgments.map(judge=>{
-        const protection=protectionRow.judgments.find(item=>item.judgeConfigurationId===judge.judgeConfigurationId);
-        const qualityScore=judge.status==='complete' ? weighted(judge.dimensions)*100 : null;
-        const maximum=protection?.status!=='complete' ? null : protection.coverage==='no' ? 0 : protection.coverage!=='yes' ? null : protection.protection==='lost' ? 49 : protection.protection==='retained' ? 100 : null;
-        const score=maximum===0 ? 0 : maximum===null || qualityScore===null ? null : Math.min(qualityScore,maximum);
+        const contributions=criteria.map(criterion=>{
+          const finding=criterion.source==='dimension' ? judge.dimensions.find(item=>item.id===criterion.id) : judge[criterion.source];
+          const observed=criterion.source==='dimension' ? finding.score : criterion.source==='protection' ? finding.status==='retained'?1:finding.status==='lost'?0:null : finding.status==='yes'?1:finding.status==='no'?0:null;
+          const score=judge.status==='complete' && finding.evidence.length>0 && Number.isFinite(observed) ? observed : null;
+          return {id:criterion.id,score,weight:criterion.weight,points:score===null?null:Number((score*criterion.weight).toFixed(2))};
+        });
+        const score=contributions.every(item=>Number.isFinite(item.points)) ? Number(contributions.reduce((sum,item)=>sum+item.points,0).toFixed(2)) : null;
         const actual=combined.rows.find(item=>item.id===row.id)?.judgments.find(item=>item.judgeConfigurationId===judge.judgeConfigurationId);
-        assert.ok(actual && close(actual.qualityScore,qualityScore) && actual.maximum===maximum && close(actual.score,score));
+        assert.deepEqual(actual.contributions,contributions);
+        assert.ok(close(actual.score,score));
+        assert.equal(actual.qualityScore,undefined);assert.equal(actual.maximum,undefined);
         assert.equal(actual.qualityReviewSha256,judge.reviewSha256);
-        assert.equal(actual.protectionReviewSha256,protection.reviewSha256);
-        assert.equal(actual.protectionStatus,protection.status);
-        assert.equal(actual.protection,protection.protection);
-        assert.equal(actual.coverage,protection.coverage);
-        return {judgeConfigurationId:judge.judgeConfigurationId,qualityScore,maximum,score};
+        assert.equal(actual.protectionReviewSha256,judge.reviewSha256);
+        assert.equal(actual.protectionStatus,judge.status);
+        assert.equal(actual.protection,judge.protection.status);
+        assert.equal(actual.coverage,judge.coverage.status);
+        return {judgeConfigurationId:judge.judgeConfigurationId,contributions,score};
       });
       const score=panel(judgments.map(judge=>judge.score)).score;
       assert.ok(close(combined.rows.find(item=>item.id===row.id)?.score,score));
-      return {id:row.id,configurationId:row.configurationId,condition:row.condition,score,judgments};
+      const criterionMeans=criteria.map(criterion=>({id:criterion.id,...panel(judgments.map(judge=>judge.contributions.find(item=>item.id===criterion.id).score))}));
+      return {id:row.id,configurationId:row.configurationId,condition:row.condition,score,judgments,dimensions:criterionMeans};
     });
     const combinedSummaries=expectedSummaries.map(summary=>{
-      const rows=combinedExpected.filter(row=>row.configurationId===summary.configurationId),baseline=rows.find(row=>row.condition==='none').score,treatment=rows.find(row=>row.condition==='repaired').score;
-      const result={configurationId:summary.configurationId,baseline,treatment,delta:Number.isFinite(baseline)&&Number.isFinite(treatment)?treatment-baseline:null,dimensions:summary.dimensions};
+      const rows=combinedExpected.filter(row=>row.configurationId===summary.configurationId),baselineRow=rows.find(row=>row.condition==='none'),treatmentRow=rows.find(row=>row.condition==='repaired');
+      const baseline=baselineRow.score,treatment=treatmentRow.score;
+      const profile=criteria.map(criterion=>{
+        const baseline=baselineRow.dimensions.find(item=>item.id===criterion.id).score,treatment=treatmentRow.dimensions.find(item=>item.id===criterion.id).score;
+        return {id:criterion.id,baseline,treatment,delta:Number.isFinite(baseline)&&Number.isFinite(treatment)?treatment-baseline:null};
+      });
+      const result={configurationId:summary.configurationId,baseline,treatment,delta:Number.isFinite(baseline)&&Number.isFinite(treatment)?treatment-baseline:null,dimensions:profile};
       assert.ok(['baseline','treatment','delta'].every(key=>close(combined.summaries.find(item=>item.configurationId===summary.configurationId)?.[key],result[key])));
       return result;
     });
@@ -252,35 +279,39 @@ const checkCurrentReport = async publication => {
     }
     const tasteDom = await inspect(() => {
       const citations = node => [...node.querySelectorAll('[data-testing-taste-citation]')].map(item=>({file:item.dataset.file,version:item.dataset.version,startLine:Number(item.dataset.startLine),endLine:Number(item.dataset.endLine)}));
+      const nativeFinding = (judge, name) => { const node=judge.querySelector(`[data-testing-${name}-finding]`); return node ? {status:node.querySelector('h4').textContent.split(': ')[1],reason:node.querySelector(`[data-testing-${name}-reason]`).textContent,evidence:citations(node.querySelector(`[data-testing-${name}-evidence]`))} : null; };
       return {
         title:document.querySelector('#report-title').textContent,
         completion:document.querySelector('[data-testing-taste-completion]').textContent,
-        settings:[...document.querySelectorAll('[data-testing-taste-setting]')].map(node=>({id:node.dataset.testingTasteSetting,rank:node.querySelector('.model-preview__identity small').textContent,action:node.querySelector('.model-preview__action').textContent.trim(),scores:[node.querySelector('[data-testing-score-baseline]').textContent,node.querySelector('[data-testing-score-treatment]').textContent],coverageLost:node.querySelector('[data-testing-coverage-cap]')?.textContent || null,delta:node.querySelector('[data-testing-taste-delta]').textContent,plot:node.querySelector('.model-preview__plot')?{baseline:parseFloat(node.querySelector('.model-preview__plot').style.getPropertyValue('--preview-baseline')),treatment:parseFloat(node.querySelector('.model-preview__plot').style.getPropertyValue('--preview-treatment'))}:null,dimensions:[...node.querySelectorAll('[data-testing-taste-profile-dimension]')].map(item=>({id:item.dataset.testingTasteProfileDimension,baseline:item.querySelector('[data-testing-taste-dimension-baseline]').textContent,treatment:item.querySelector('[data-testing-taste-dimension-treatment]').textContent,delta:item.querySelector('[data-testing-taste-dimension-delta]').textContent}))})),
+        settings:[...document.querySelectorAll('[data-testing-taste-setting]')].map(node=>({id:node.dataset.testingTasteSetting,rank:node.querySelector('.model-preview__identity small').textContent,action:node.querySelector('.model-preview__action').textContent.trim(),scores:[node.querySelector('[data-testing-score-baseline]').textContent,node.querySelector('[data-testing-score-treatment]').textContent],coverageLost:node.querySelector('[data-testing-coverage-loss]')?.textContent || null,delta:node.querySelector('[data-testing-taste-delta]').textContent,plot:node.querySelector('.model-preview__plot')?{baseline:parseFloat(node.querySelector('.model-preview__plot').style.getPropertyValue('--preview-baseline')),treatment:parseFloat(node.querySelector('.model-preview__plot').style.getPropertyValue('--preview-treatment'))}:null,dimensions:[...node.querySelectorAll('[data-testing-taste-profile-dimension]')].map(item=>({id:item.dataset.testingTasteProfileDimension,baseline:item.querySelector('[data-testing-taste-dimension-baseline]').textContent,treatment:item.querySelector('[data-testing-taste-dimension-treatment]').textContent,delta:item.querySelector('[data-testing-taste-dimension-delta]').textContent}))})),
         files:[...document.querySelectorAll('[data-testing-files-row]')].map(row=>({id:row.dataset.testingFilesRow,files:[...row.querySelectorAll('[data-testing-file]')].map(file=>({path:file.dataset.testingFile,sha256:file.dataset.sha256,content:file.querySelector('[data-testing-file-content] code').textContent,open:file.open}))})),
-        calculations:[...document.querySelectorAll('[data-testing-score-calculation]')].map(row=>({id:row.dataset.testingScoreCalculation,closed:!row.open,judgments:[...row.querySelectorAll('[data-testing-score-calculation-judge]')].map(judge=>({id:judge.dataset.testingScoreCalculationJudge,quality:judge.querySelector('[data-testing-score-quality]').textContent,maximum:judge.querySelector('[data-testing-score-maximum]').textContent,final:judge.querySelector('[data-testing-score-final]').textContent}))})),
+        calculations:[...document.querySelectorAll('[data-testing-score-calculation]')].map(row=>({id:row.dataset.testingScoreCalculation,closed:!row.open,judgments:[...row.querySelectorAll('[data-testing-score-calculation-judge]')].map(judge=>({id:judge.dataset.testingScoreCalculationJudge,final:judge.querySelector('[data-testing-score-final]').textContent,contributions:[...judge.querySelectorAll('[data-testing-score-contribution]')].map(item=>({id:item.dataset.testingScoreContribution,weight:item.querySelector('[data-testing-score-weight]').textContent,score:item.querySelector('[data-testing-score-rating]').textContent,points:item.querySelector('[data-testing-score-points]').textContent}))}))})),
         adoption:document.querySelector('[data-testing-score-adoption]').textContent,
+        definition:document.querySelector('[data-testing-score-definition]').textContent,
         closedReviews:[...document.querySelectorAll('[data-testing-taste-reviews]')].map(node=>!node.open),
-        rows:[...document.querySelectorAll('[data-testing-taste-row]')].map(node=>({id:node.dataset.testingTasteRow,score:node.querySelector('[data-testing-taste-row-score]').textContent,range:node.querySelector('[data-testing-taste-range]').textContent,rangeExplanation:node.querySelector('.model-run__aggregation-note').textContent,dimensions:[...node.querySelectorAll('[data-testing-taste-row-dimension]')].map(item=>({id:item.dataset.testingTasteRowDimension,score:item.querySelector('[data-testing-taste-dimension-score]').textContent,range:item.querySelector('[data-testing-taste-dimension-range]').textContent})),judges:[...node.querySelectorAll('[data-testing-taste-judge]')].map(judge=>({id:judge.dataset.testingTasteJudge,reviewSha256:judge.dataset.reviewSha256,status:judge.dataset.status,failure:judge.dataset.failure || null,reviewStatus:judge.querySelector('[data-testing-taste-review-status]').textContent,score:judge.querySelector('[data-testing-taste-judge-score]').textContent,dimensions:[...judge.querySelectorAll('[data-testing-taste-judge-dimension]')].map(item=>({id:item.dataset.testingTasteJudgeDimension,score:item.querySelector('[data-testing-taste-dimension-score]').textContent,reason:item.querySelector('[data-testing-taste-dimension-reason]').textContent,evidence:citations(item.querySelector('[data-testing-taste-dimension-evidence]')),qualifications:[...item.querySelectorAll('[data-testing-taste-qualification]')].map(qualification=>({finding:qualification.querySelector('[data-testing-taste-qualification-finding]').textContent,evidence:citations(qualification)}))})),files:[...judge.querySelectorAll('[data-testing-taste-file]')].map(file=>({file:file.dataset.testingTasteFile,score:file.querySelector('[data-testing-taste-file-score]').textContent,reason:file.querySelector('[data-testing-taste-file-reason]').textContent,evidence:citations(file.querySelector('[data-testing-taste-file-evidence]')),dimensions:[...file.querySelectorAll('[data-testing-taste-file-dimension]')].map(item=>({id:item.dataset.testingTasteFileDimension,score:item.querySelector('[data-testing-taste-dimension-score]').textContent}))}))}))})),
+        rows:[...document.querySelectorAll('[data-testing-taste-row]')].map(node=>({id:node.dataset.testingTasteRow,score:node.querySelector('[data-testing-taste-row-score]').textContent,range:node.querySelector('[data-testing-taste-range]').textContent,rangeExplanation:node.querySelector('.model-run__aggregation-note').textContent,dimensions:[...node.querySelectorAll('[data-testing-taste-row-dimension]')].map(item=>({id:item.dataset.testingTasteRowDimension,score:item.querySelector('[data-testing-taste-dimension-score]').textContent,range:item.querySelector('[data-testing-taste-dimension-range]').textContent})),judges:[...node.querySelectorAll('[data-testing-taste-judge]')].map(judge=>({id:judge.dataset.testingTasteJudge,reviewSha256:judge.dataset.reviewSha256,status:judge.dataset.status,failure:judge.dataset.failure || null,coverage:nativeFinding(judge,'coverage'),protection:nativeFinding(judge,'protection'),reviewStatus:judge.querySelector('[data-testing-taste-review-status]').textContent,score:judge.querySelector('[data-testing-taste-judge-score]').textContent,dimensions:[...judge.querySelectorAll('[data-testing-taste-judge-dimension]')].map(item=>({id:item.dataset.testingTasteJudgeDimension,score:item.querySelector('[data-testing-taste-dimension-score]').textContent,reason:item.querySelector('[data-testing-taste-dimension-reason]').textContent,evidence:citations(item.querySelector('[data-testing-taste-dimension-evidence]')),qualifications:[...item.querySelectorAll('[data-testing-taste-qualification]')].map(qualification=>({finding:qualification.querySelector('[data-testing-taste-qualification-finding]').textContent,evidence:citations(qualification)}))})),files:[...judge.querySelectorAll('[data-testing-taste-file]')].map(file=>({file:file.dataset.testingTasteFile,score:file.querySelector('[data-testing-taste-file-score]').textContent,reason:file.querySelector('[data-testing-taste-file-reason]').textContent,evidence:citations(file.querySelector('[data-testing-taste-file-evidence]')),dimensions:[...file.querySelectorAll('[data-testing-taste-file-dimension]')].map(item=>({id:item.dataset.testingTasteFileDimension,score:item.querySelector('[data-testing-taste-dimension-score]').textContent}))}))}))})),
         method:document.querySelector('[data-testing-taste-method]').textContent,
         namingRule:document.querySelector('[data-testing-taste-naming-rule]').textContent,
+        namingDisagreement:document.querySelector('[data-testing-naming-disagreement]')?.textContent || null,
         retry:document.querySelector('[data-testing-taste-retry]') ? {text:document.querySelector('[data-testing-taste-retry]').textContent,attempts:Number(document.querySelector('[data-testing-taste-retry]').dataset.reviewAttempts),seats:Number(document.querySelector('[data-testing-taste-retry]').dataset.reviewerSeats)} : null,
         sourceEvidence:document.querySelector('[data-testing-paired-resources-evidence]').textContent,
+        baselineReuse:document.querySelector('[data-testing-baseline-reuse]')?.textContent || null,
         rubric:[...document.querySelectorAll('[data-testing-taste-rubric-dimension]')].map(row=>({id:row.dataset.testingTasteRubricDimension,label:row.querySelector('th').childNodes[0].textContent,weight:row.querySelector('[data-testing-taste-rubric-weight]').textContent,description:row.querySelector('[data-testing-taste-rubric-description]').textContent,anchors:Object.fromEntries([...row.querySelectorAll('[data-testing-taste-rubric-anchor]')].map(item=>[item.dataset.testingTasteRubricAnchor,item.querySelector('span').textContent]))}))
       };
     });
     const ranked=combinedSummaries.slice().sort((a,b)=>(b.treatment ?? -Infinity)-(a.treatment ?? -Infinity));
     check('taste-comparison', tasteDom.title==='Model comparison' && tasteDom.completion.includes('Score /100') && tasteDom.settings.length===4 && ranked.every((summary,index)=>{
       const rendered=tasteDom.settings[index];
-      return rendered?.id===summary.configurationId && rendered.rank===`Testing skill rank #${index+1} of 4` && rendered.action==='Inspect run ↓' && rendered.scores[0]===quality(summary.baseline) && rendered.scores[1]===quality(summary.treatment) && rendered.coverageLost===(combined.rows.find(row=>row.configurationId===summary.configurationId&&row.condition==='none').protection==='lost'?'Coverage lost':null) && rendered.delta===points(summary.delta) && (summary.baseline===null ? rendered.plot===null : close(rendered.plot?.baseline,summary.baseline)&&close(rendered.plot?.treatment,summary.treatment)) && rendered.dimensions.length===7 && summary.dimensions.every(dimension=>{
+      return rendered?.id===summary.configurationId && rendered.rank===`Testing skill rank #${index+1} of 4` && rendered.action==='Inspect run ↓' && rendered.scores[0]===quality(summary.baseline) && rendered.scores[1]===quality(summary.treatment) && rendered.coverageLost===(combined.rows.find(row=>row.configurationId===summary.configurationId&&row.condition==='none').protection==='lost'?'Coverage lost':null) && rendered.delta===points(summary.delta) && (summary.baseline===null ? rendered.plot===null : close(rendered.plot?.baseline,summary.baseline)&&close(rendered.plot?.treatment,summary.treatment)) && rendered.dimensions.length===9 && summary.dimensions.every(dimension=>{
         const reading=rendered.dimensions.find(item=>item.id===dimension.id);
         return reading?.baseline===format(dimension.baseline) && reading.treatment===format(dimension.treatment) && reading.delta===difference(dimension.delta);
       });
-    }) && ['baseline','treatment','delta'].every(key=>close(publication.taste[key],tasteMean(key))) && publication.taste.scoreMaximum===1, {tasteSha256,status:taste.status,displayScale:100,sourceScale:100,backendTestingOverallSha256,weights:dimensions.map(({id,weight})=>({id,weight})),settings:tasteDom.settings,expected:ranked});
+    }) && (compact || ['baseline','treatment','delta'].every(key=>close(publication.taste[key],tasteMean(key))) && publication.taste.scoreMaximum===1), {tasteSha256,status:taste.status,displayScale:100,sourceScale:100,backendTestingOverallSha256,weights:criteria.map(({id,weight})=>({id,weight})),settings:tasteDom.settings,expected:ranked});
     const jsonEqual=(left,right)=>JSON.stringify(left)===JSON.stringify(right);
     const evidenceMatch=tasteDom.rows.length===8 && taste.rows.every(row=>{
       const rendered=tasteDom.rows.find(item=>item.id===row.id);
       const final=combinedExpected.find(item=>item.id===row.id),range=panel(final.judgments.map(judge=>judge.score)).range;
-      return rendered?.score===quality(final.score) && rendered.range===(range ? `${quality(range.minimum)}–${quality(range.maximum)}` : 'Unscored') && rendered.rangeExplanation.includes(range ? 'This range describes reviewer disagreement' : 'The final score is unscored because both reviews are required') && rendered.dimensions.length===7 && row.dimensions.every(dimension=>{
+      return rendered?.score===quality(final.score) && rendered.range===(range ? `${quality(range.minimum)}–${quality(range.maximum)}` : 'Unscored') && rendered.rangeExplanation.includes(range ? 'This range describes reviewer disagreement' : 'The final score is unscored because both reviews are required') && rendered.dimensions.length===9 && final.dimensions.every(dimension=>{
         const reading=rendered.dimensions.find(item=>item.id===dimension.id);
         return reading?.score===format(dimension.score) && reading.range===(Number.isFinite(dimension.range?.minimum)&&Number.isFinite(dimension.range?.maximum) ? `${original(dimension.range.minimum)}–${original(dimension.range.maximum)}` : 'Unscored');
       }) && rendered.judges.length===row.judgments.length && row.judgments.every(judge=>{
@@ -288,19 +319,22 @@ const checkCurrentReport = async publication => {
         return reading?.score===quality(final.judgments.find(item=>item.judgeConfigurationId===judge.judgeConfigurationId).score) && reading.reviewSha256===(judge.reviewSha256 || '') && reading.status===judge.status && reading.failure===(judge.failure || null) && reading.reviewStatus===(judge.failure==='timeout' ? 'Review timed out; no ratings returned.' : `Review: ${judge.status}.${judge.score===null ? ' No complete score returned.' : ''}`) && reading.dimensions.length===(hasRatings ? 7 : 0) && (hasRatings ? judge.dimensions : []).every(dimension=>{
           const finding=reading.dimensions.find(item=>item.id===dimension.id);
           return finding?.score===original(dimension.score) && finding.reason===(dimension.reason || 'No rating returned.') && jsonEqual(finding.evidence,dimension.evidence) && jsonEqual(finding.qualifications,dimension.qualifications || []);
-        }) && reading.files.length===judge.files.length && judge.files.every(file=>{
+        }) && (!compact || (hasRatings ? jsonEqual(reading.coverage,judge.coverage) && jsonEqual(reading.protection,judge.protection) : reading.coverage===null && reading.protection===null)) && reading.files.length===(judge.files || []).length && (judge.files || []).every(file=>{
           const publicFile=reading.files.find(item=>item.file===file.file);
           return publicFile?.score===format(file.score) && publicFile.reason===file.reason && jsonEqual(publicFile.evidence,file.evidence) && publicFile.dimensions.length===7 && file.dimensions.every(dimension=>publicFile.dimensions.find(item=>item.id===dimension.id)?.score===original(dimension.score));
         });
       });
     });
-    const rubricMatch=tasteDom.rubric.length===7 && dimensions.every(dimension=>{
-      const rendered=tasteDom.rubric.find(item=>item.id===dimension.id);
-      return rendered?.label===dimension.label && rendered.weight===`${dimension.weight}%` && rendered.description===dimension.description && jsonEqual(rendered.anchors,dimension.anchors);
+    const rubricMatch=tasteDom.rubric.length===9 && criteria.every(criterion=>{
+      const native=dimensions.find(dimension=>dimension.id===criterion.id),rendered=tasteDom.rubric.find(item=>item.id===criterion.id);
+      return rendered?.label===criterion.label && rendered.weight===`${criterion.weight}%` && (native ? rendered.description===native.description && jsonEqual(rendered.anchors,native.anchors) : Object.keys(rendered.anchors).sort().join(',')==='0,1' && rendered.description.length>0);
     });
     const filesMatch=tasteDom.files.length===8 && testFiles.rows.length===8 && testFiles.rows.every(row=>{
       const rendered=tasteDom.files.find(item=>item.id===row.id);
-      return rendered?.files.length===row.files.length && row.files.every((file,index)=>{
+      const siblings=testFiles.rows.filter(item=>item.configurationId===row.configurationId);
+      const common=siblings.find(item=>item.condition==='none').files.find(file=>siblings.every(item=>item.files.some(other=>other.path===file.path)))?.path;
+      const expectedFiles=[...row.files].sort((first,second)=>Number(second.path===common)-Number(first.path===common));
+      return rendered?.files.length===row.files.length && expectedFiles.every((file,index)=>{
         const actual=rendered.files[index];
         assert.equal(sha256(Buffer.from(file.content,'utf8')),file.sha256,'Public file digest must match exact source bytes.');
         return actual?.path===file.path && actual.sha256===file.sha256 && actual.content===file.content && actual.open===(index===0);
@@ -310,7 +344,7 @@ const checkCurrentReport = async publication => {
       const rendered=tasteDom.calculations.find(item=>item.id===row.id);
       return rendered?.closed && rendered.judgments.length===2 && row.judgments.every(judge=>{
         const actual=rendered.judgments.find(item=>item.id===judge.judgeConfigurationId);
-        return actual?.quality===quality(judge.qualityScore) && actual.maximum===(judge.maximum===null?'Unresolved':quality(judge.maximum)) && actual.final===quality(judge.score);
+        return actual?.final===quality(judge.score) && actual.contributions.length===9 && judge.contributions.every(contribution=>{const observed=actual.contributions.find(item=>item.id===contribution.id);return observed?.weight===`${contribution.weight}%` && observed.score===original(contribution.score) && observed.points===format(contribution.points);});
       });
     });
     let retryMatches=tasteDom.retry===null;
@@ -324,7 +358,10 @@ const checkCurrentReport = async publication => {
       assert.ok(taste.retry.priorTokens!==null || taste.usageMissingSessions>=1,'Original unknown usage must remain counted.');
       retryMatches=tasteDom.retry?.attempts===3 && tasteDom.retry.seats===2 && tasteDom.retry.text.includes('3 native review attempts fill 2 reviewer seats') && tasteDom.retry.text.includes('retried at the user’s request after a timeout') && tasteDom.retry.text.includes(`${taste.retry.timeoutMs/60000}-minute limit`) && tasteDom.retry.text.includes(`Selected retry: ${taste.retry.status} · 0 automatic retries`) && tasteDom.retry.text.includes('selected two reviews determine the panel; the timeout receipt remains retained') && [taste.retry.amendmentSha256,taste.retry.priorReviewSha256,taste.retry.reviewSha256].every(digest=>tasteDom.sourceEvidence.includes(digest));
     }
-    check('taste-evidence', retryMatches && evidenceMatch && rubricMatch && filesMatch && calculationsMatch && tasteDom.closedReviews.length===8 && tasteDom.closedReviews.every(Boolean) && tasteDom.method.includes('seven-dimension weighted score by 100 and apply the saved coverage cap') && tasteDom.method.includes('average both final scores') && tasteDom.adoption.includes('at the user’s request after the reviews') && tasteDom.method.includes('uplift is Skill minus Minimal') && tasteDom.sourceEvidence.includes('Original scores, reviewer reasons and cited file evidence are retained') && tasteDom.namingRule===rubric.namingZeroRule && tasteDom.sourceEvidence.includes(taste.sourceSha256), {tasteSha256,backendTestingOverallSha256,backendTestingFilesSha256,sourceSha256:taste.sourceSha256,files:testFiles.rows.map(row=>({id:row.id,files:row.files.map(file=>({path:file.path,sha256:file.sha256,bytes:Buffer.byteLength(file.content,'utf8')}))})),calculations:tasteDom.calculations,rows:tasteDom.rows,rubric:tasteDom.rubric,namingRule:tasteDom.namingRule,retry:taste.retry || null,retryDisclosure:tasteDom.retry,scope:taste.scope});
+    const expectedNamingDisagreement = compact ? `Suite-owned helpers are in scope. Semantic naming ratings differ: ${taste.rows[0].judgments.map(judge => `${judge.judgeConfigurationId.startsWith('codex:') ? 'Astra' : 'Opus'} rated ${taste.rows.filter(row => row.judgments.find(item => item.judgeConfigurationId === judge.judgeConfigurationId).dimensions.find(item => item.id === 'semantic_naming').score === 0).length}/${taste.rows.length} suites 0`).join('; ')}. Both reviewers’ original grades remain in the panel.` : null;
+    const namingMatches = tasteDom.namingDisagreement === expectedNamingDisagreement;
+    const reuseMatches = !compact || tasteDom.baselineReuse?.includes('4 new Skill author attempts · 4 unchanged Minimal artifacts · 2 new blind reviewers') && tasteDom.baselineReuse.includes('Usage below counts the six new native sessions');
+    check('taste-evidence', tasteDom.definition===combined.scoreBasis.aggregation && namingMatches && reuseMatches && retryMatches && evidenceMatch && rubricMatch && filesMatch && calculationsMatch && tasteDom.closedReviews.length===8 && tasteDom.closedReviews.every(Boolean) && tasteDom.method.includes('nine weighted criteria on a 0–100 scale') && tasteDom.method.includes('preservation carrying 25%') && tasteDom.method.includes('Average both reviewer scores') && tasteDom.method.includes('neither imposes a ceiling on the total') && tasteDom.adoption.includes('user requested these final weights after the reviews') && tasteDom.adoption.includes('no new grading was performed') && tasteDom.method.includes('uplift is Skill minus Minimal') && tasteDom.sourceEvidence.includes('Original scores, reviewer reasons and cited file evidence are retained') && tasteDom.namingRule===rubric.namingZeroRule && tasteDom.sourceEvidence.includes(taste.sourceSha256), {tasteSha256,currentRoundSha256,backendTestingOverallSha256,backendTestingFilesSha256,sourceSha256:taste.sourceSha256,files:testFiles.rows.map(row=>({id:row.id,files:row.files.map(file=>({path:file.path,sha256:file.sha256,bytes:Buffer.byteLength(file.content,'utf8')}))})),calculations:tasteDom.calculations,rows:tasteDom.rows,rubric:tasteDom.rubric,namingRule:tasteDom.namingRule,retry:taste.retry || null,retryDisclosure:tasteDom.retry,scope:taste.scope});
   } else assert.equal(publication.taste,null);
   await evaluate('window.scrollTo(0,0)');
   await measureOverflow('Current quality overview');
@@ -401,11 +438,13 @@ const checkCurrentReport = async publication => {
       await capture('backend-testing-evidence-qualification');
       if(!wasOpen) await click(`${selector} > details > summary`);
     }
+    if (!compact) {
     await click(`${model} [data-testing-taste-file-dimensions] > summary`);
     await waitFor(()=>inspect(selector=>document.querySelector(selector).open,`${model} [data-testing-taste-file-dimensions]`),'File dimension ratings open');
     await inspect(selector=>document.querySelector(`${selector} [data-testing-taste-file]`).scrollIntoView({block:'start',behavior:'instant'}),model);
     await measureOverflow('File dimension ratings and evidence');
     await capture('backend-testing-taste-files');
+    } else { await inspect(selector=>document.querySelector(`${selector} [data-testing-coverage-finding]`).scrollIntoView({block:'start',behavior:'instant'}),model); await measureOverflow('Runnable coverage and retained protection evidence'); await capture('backend-testing-coverage-evidence'); }
   }
   // Cancel the page's smooth focus scroll before collapsing a tall review panel.
   await inspect(selector=>{const summary=document.querySelector(`${selector} > summary`);summary.scrollIntoView({block:'center',behavior:'instant'});summary.focus({preventScroll:true});},model);
@@ -417,10 +456,10 @@ const checkCurrentReport = async publication => {
   await measureOverflow('Current method evidence');
   await capture('backend-testing-paired-evidence');
   await click('[data-testing-paired-resources-evidence] > summary');
-  check('native-details-keyboard',true,{openedWithEnter:['current setting','quality judge reviews'],closedSettingWithEnter:true,rubricExecutionAndUsageOpenedByClick:true,dimensionRangesAndFileRatingsOpenedByClick:Boolean(taste),dimensionReasonsVisibleAfterDisclosure:Boolean(taste),firstTestFileVisible:true,copiedFile:{path:firstFile.path,sha256:copiedFileSha256}});
+  check('native-details-keyboard',true,{openedWithEnter:['current setting','quality judge reviews'],closedSettingWithEnter:true,rubricExecutionAndUsageOpenedByClick:true,criterionRangesAndReviewsOpenedByClick:Boolean(taste),dimensionReasonsVisibleAfterDisclosure:Boolean(taste),firstTestFileVisible:true,copiedFile:{path:firstFile.path,sha256:copiedFileSha256}});
 };
 
-let publicationSha256, overallSha256, publicationSchemaVersion, pairedRepairSha256, tasteSha256, backendTestingOverallSha256, backendTestingFilesSha256;
+let publicationSha256, overallSha256, publicationSchemaVersion, pairedRepairSha256, tasteSha256, currentRoundSha256, backendTestingOverallSha256, backendTestingFilesSha256;
 try {
   await client.send('Network.enable', { maxTotalBufferSize: 256 * 1024 * 1024, maxResourceBufferSize: 64 * 1024 * 1024, enableDurableMessages: true });
   await client.send('Network.setCacheDisabled', { cacheDisabled: true });
@@ -428,7 +467,7 @@ try {
   const initial = await evaluate('({overall:JSON.stringify(window.VASIR_DATA.overall),engineeringRows:document.querySelectorAll("#capability-ranking .capability-rank-row").length,href:document.querySelector("[data-testing-report-link]").href,ledgerLabel:document.querySelector("[data-testing-report-link] .benchmark-ledger__identity small").textContent,schema:window.VASIR_DATA.executableTesting.schemaVersion,visible:!!document.querySelector("[data-testing-report-link]").getBoundingClientRect().height})');
   overallSha256 = sha256(initial.overall);
   check('engineering-52-settings', initial.engineeringRows === 52, { rows: initial.engineeringRows, ledgerLabel: initial.ledgerLabel });
-  assert.equal(initial.schema,3);
+  assert.ok([3,4].includes(initial.schema));
   assert.equal(initial.ledgerLabel,'Minimal · Skill','The Engineering link must describe the current skill comparison.');
   assert.ok(initial.visible && new URL(initial.href).hash === '#backend-testing', 'Visible Engineering ledger report link missing.');
   await measureOverflow('Engineering ledger');
@@ -475,7 +514,7 @@ try {
   }
   for (const path of ['data.js', 'app.js', 'benchmark-report.js', 'benchmark-report.css', 'style.css', ...(publicationSchemaVersion === 3 ? ['responses.js'] : [])]) if (!pins.has(path)) failures.push({ message: `Required loaded source pin missing: ${path}` });
   const status = failures.length || runtimeErrors.length || networkErrors.length ? 'failed' : 'passed';
-  const receipt = { kind: 'vasirbenchmark-backend-testing-browser-proof', schemaVersion: 1, status, url: requestedUrl.href, loadedUrl: baseUrl.href, ...(previewState ? { notAcceptanceEvidence: true, previewState } : {}), width, height, harnessSha256, publicationSchemaVersion, publicationSha256, overallSha256, ...(pairedRepairSha256 ? { pairedRepairSha256 } : {}), ...(tasteSha256 ? { tasteSha256 } : {}), ...(backendTestingOverallSha256 ? {backendTestingOverallSha256} : {}), ...(backendTestingFilesSha256 ? {backendTestingFilesSha256} : {}), sourcePins: [...pins.values()].sort((a, b) => a.path.localeCompare(b.path)), loadedFiles, checks, screenshots, failures, runtimeErrors, networkErrors, completedAt: new Date().toISOString() };
+  const receipt = { kind: 'vasirbenchmark-backend-testing-browser-proof', schemaVersion: 1, status, url: requestedUrl.href, loadedUrl: baseUrl.href, ...(previewState ? { notAcceptanceEvidence: true, previewState } : {}), width, height, harnessSha256, publicationSchemaVersion, publicationSha256, overallSha256, ...(pairedRepairSha256 ? { pairedRepairSha256 } : {}), ...(tasteSha256 ? { tasteSha256 } : {}), ...(currentRoundSha256 ? { currentRoundSha256 } : {}), ...(backendTestingOverallSha256 ? {backendTestingOverallSha256} : {}), ...(backendTestingFilesSha256 ? {backendTestingFilesSha256} : {}), sourcePins: [...pins.values()].sort((a, b) => a.path.localeCompare(b.path)), loadedFiles, checks, screenshots, failures, runtimeErrors, networkErrors, completedAt: new Date().toISOString() };
   const path = resolve(output, 'backend-testing-browsercheck.json');
   await writeFile(path, `${JSON.stringify(receipt, null, 2)}\n`);
   await browser.close();
