@@ -4,10 +4,6 @@ Read the patterns relevant to the claim and failure mechanism. Choose unit, inte
 
 ## Existing Guard Versus a Plausible Wrong Result
 
-A retry test sends the same purchase twice and observes two successful responses. It can pass while creating two purchases. Tighten it around the approved business effect through a public read. When relevant, include a distinct request to distinguish correct deduplication from an implementation that suppresses every request.
-
-Likewise, an assertion that returned IDs are unique can pass for an always-empty result. Ground properties in the actual contract and include a distinguishing example or independent relation that excludes plausible degenerate behavior.
-
 A test's expected value should not be recomputed by the production function under test. Prefer contract-derived examples, independently defined relationships, a trustworthy simpler model, or the observable business effect. Mutation is a targeted way to challenge an oracle, not a mandatory platform investment.
 
 ## Failure-First Isolated Slices

@@ -5,23 +5,21 @@ description: Protects behavior with useful tests and less test debt. Use when ch
 
 # Protect Behavior Without Test Debt
 
-**Choose tests by the failures they expose. Preserve distinct protection when simplifying. Tautological tests are banned at every layer.**
+**Tautological tests are banned at every layer. New or changed user workflows require real automated journey coverage. Use explicit, repo-searchable domain names. Preserve distinct protection when simplifying.**
 
-Unit, component, integration, and E2E tests are all legitimate tools. Prefer a real journey for app wiring and user-flow claims; use focused tests for rules, boundaries, and states they prove more directly. The goal is reliable protection with little maintenance, not a preferred test-layer ratio or a smaller test count.
-
-This skill owns test selection, authorship, scoped simplification, and reproducible setup. Read the repository's actual instructions and existing test conventions. The governing workflow owns approval, release policy, and defect investigation; independent review remains independent. Use existing work artifacts and native test reports.
+Start with the user's action and consequential result. Reuse sufficient E2E coverage; extend or add a journey when the workflow lacks protection. Keep unit, component, and integration tests for the rules, boundaries, and states they prove directly. The target is useful confidence per maintenance cost.
 
 ## 1. Establish the Claim and Existing Protection
 
 State the meaningful starting state, action or operation, and observable result. Define correctness from the approved contract before implementing or changing behavior. Identify plausible consequential failures and the outcomes that distinguish them from success.
 
-Trace the relevant code before choosing a test: entrypoint, state authority, dependency boundaries, and existing fixtures and assertions. Read the original tests before classifying them. Names such as unit, journey, or contract do not establish what runs or what it protects.
+Read repository instructions and search for the owning production path, existing journeys, fixtures, and assertions. Trace entrypoints, state authority, and dependency boundaries before choosing a test. Read original tests before classifying them; names such as unit, journey, or contract do not establish their protection.
 
 For a discovered defect, establish intended behavior independently; current code and tests can both be wrong. Before a behavior-preserving refactor, reuse sufficient guards and add characterization only for consequential behavior that remains uncertain.
 
 ## 2. Choose the Boundary That Exposes the Failure
 
-Prefer the smallest reliable test that exercises the relevant production behavior and can observe its failure. Consider fidelity, input coverage, determinism, diagnosis, execution time, and maintenance together. A focused test need not prove that E2E is impossible to earn its place.
+Choose the smallest boundary that still exposes the claimed failure; convenience cannot justify bypassing it. A user-flow claim needs the assembled app. A focused rule can use a focused test. Consider input coverage, fidelity, determinism, diagnosis, runtime, and maintenance together.
 
 | Claim or risk | Useful proof |
 |---|---|
@@ -31,7 +29,7 @@ Prefer the smallest reliable test that exercises the relevant production behavio
 | Startup, navigation, authentication wiring, or a user workflow across systems | A real journey through the normal entrypoint, asserting the user result and consequential effects. |
 | Performance or resource use | A representative workload and an approved budget or observed symptom; avoid fragile wall-clock assertions invented for routine CI. |
 
-A focused test can fully prove a focused claim. It cannot establish wiring it bypasses. When a meaningful app journey changes, exercise that real path early enough to expose broken startup or disconnected behavior. UI claims need the actual UI runtime; service and CLI claims start at their real entrypoints without an invented browser layer.
+Exercise changed journeys early: UI claims through actual controls, service claims through public routes, CLI claims through real commands. Assert the consequential result through an independent observation: the recipient receives the message, a reopened session loads saved progress, or a rejected action leaves protected state unchanged. Successful responses, callback counts, DOM presence, and screenshots alone do not establish these outcomes. A focused test cannot establish wiring it bypasses.
 
 Keep the behavior under test real. Use controlled external boundaries and isolated local infrastructure where appropriate. A fake that removes the transaction, timing, serialization, or failure semantics cannot establish those claims. Disclose substituted providers rather than calling their live integration verified.
 
@@ -45,7 +43,7 @@ Read [Proof patterns](references/proof-patterns.md) for concurrency, properties,
 
 Use contract-derived examples, literal expected values, independent invariants, or observable business effects. Interaction assertions are valid when the interaction is itself the obligation, such as a required request shape. A controlled double may expose a real production error path; merely verifying that a configured mock returned its configured value proves nothing.
 
-Name a plausible wrong implementation and the assertion that rejects it. Empty results, duplicate effects, stale reads, and skipped writes are useful probes when relevant. A test need not reject every possible defect: a missing assertion is a reason to tighten a valuable guard, not automatically delete it.
+Name a plausible wrong implementation and the assertion that rejects it. Check that existing or new coverage distinguishes a restrictive rule from blanket rejection: suppress duplicate effects while allowing a distinct operation. An always-empty result can satisfy negative assertions. Tighten valuable guards with missing assertions rather than deleting them.
 
 Preserve the strength of the oracle. An exact value, membership set, error, or conservation relationship cannot be replaced by truthiness, type, nonemptiness, or a broad range unless the contract actually permits that variation. Freshness and stability checks do not establish exact persisted-value retrieval.
 
@@ -61,7 +59,9 @@ Delete tautologies, test-owned forwarding checks, obsolete behavior, and genuine
 
 Choose reuse, tighten, add, or no new test. Prefer an existing sufficient guard. Add a test when a material behavior lacks protection or the new guard earns its cost through reliable feedback. Add no test for a low-impact internal change already caught by existing proof. Weigh severity, plausible recurrence, reconstruction cost, and maintenance rather than a test-count target.
 
-Organize tests around domain capabilities and observable behavior, following the repository's structure. Name the condition and expected outcome; keep setup, action, and assertions easy to distinguish. Keep decisive inputs and expectations visible, and failures specific enough to diagnose. Several readable tests can cost less than a configurable scenario engine.
+Organize tests by domain capability and behavior, following repository structure. Titles name the condition and expected outcome. Keep setup, action, decisive expectations, and failure diagnosis visible; avoid configurable scenario engines that obscure them.
+
+**Domain-bearing identifiers must be explicit and repo-searchable, even in short tests.** Search production code and adjacent tests for canonical domain terms; use them consistently in variables, parameters, fixtures, and helpers. Prefer long names identifying the actor/entity, role, and relevant state, unit, or encoding: `submittedCheckpointGzipBase64`, `loadedCheckpointResponse`, `expectedCheckpointRevision`. Reject `x`, `data`, `res`, `tmp`, `value`, and `bytes` when they hide domain meaning. Searchability comes from canonical concepts, not arbitrary prefixes or uniqueness. Preserve protocol fields and dependency APIs; short mathematical coordinates or counters are acceptable only when they carry no hidden domain role.
 
 Do not retain tombstone tests merely asserting that private code or helpers remain absent. Absence is a valid assertion when it protects an actual security, privacy, compatibility, or product obligation. Preserve deliberately supported contracts; temporary migration machinery follows its real removal condition.
 
@@ -71,11 +71,11 @@ Reuse the repository's fixtures, builders, dependency seams, and launch commands
 
 **Seeded data can be valid input.** A schema-valid stored record followed by the production reader and an independent exact assertion proves retrieval. It does not prove the write path. To test creating that record, perform the write; to test reading an existing record, creating it through the writer can introduce an unnecessary dependency or conceal the distinction being tested.
 
-When a failure depends on a transition, retry, race, or reconnect, reproduce the relevant event and ordering rather than seeding its successful result. Preserve supported old shapes, absent-record states, and partial or invalid states when they distinguish meaningful behavior. Label deliberately inconsistent inputs.
+When a failure depends on a transition, retry, race, or reconnect, reproduce its event and ordering. When claiming restored usability, exercise the next valid operation through its real boundary under the contract's recovery conditions; surviving state alone is insufficient. Preserve meaningful supported old, absent, partial, or invalid states; label deliberately inconsistent inputs.
 
 Make setup isolated, repeatable, and safe to clean up. Use synthetic identities and scoped resources. Do not add test-only business branches, production auth bypasses, or unrestricted reset endpoints. Separate reload from reset: automatic reseeding can conceal failed persistence.
 
-**Interactive launchers are optional.** Reuse an existing launch/reset path when manual debugging needs it. Add or extend one only when requested, required by the workflow, or justified by recurring reproduction work. Routine test cleanup does not warrant a REPL, scenario framework, or new development mode. When both tests and humans need the same preparation, share that preparation with explicit lifetimes.
+**Interactive launchers are optional.** Reuse existing launch/reset paths. Extend them only when requested, required by the workflow, or justified by recurring debugging. Share preparation with explicit lifetimes when tests and humans both need it. Exercise changed launchers before handoff; report parameters and limits without credentials. Routine cleanup does not warrant a REPL, scenario framework, or development mode.
 
 Read [App-state scenarios](references/app-state-scenarios.md) when stateful reproduction, launch/reset, or evidence capture needs more than the existing test setup.
 
@@ -91,8 +91,6 @@ For UI claims, inspect actual rendering and interaction for blank screens, block
 
 Keep native runner outcomes, exact rerun commands, and relevant code/runtime or input identity. Capture diagnostic evidence before teardown can destroy it. Preserve the original failure when reporting capture or cleanup failures; incomplete execution is not a pass. Lightweight native results suffice for routine passing checks; use richer existing traces or captures when needed to inspect a feature or failure. Do not introduce a parallel reporting system.
 
-When adding or changing an interactive launch/reset capability, exercise it before calling it working. Record its actual parameters and limits without exposing credentials. A routine test result does not need a newly authored interactive reproduction path.
-
 ## 7. Recognize the Decision Boundary
 
 **Useful unit test.** Independent examples exercise a production pricing rule's rounding and boundary behavior. A checkout journey samples one purchase. Keep the focused cases if they catch rule failures that the sampled journey misses; avoid duplicating identical arithmetic at several layers without a feedback benefit.
@@ -105,4 +103,4 @@ When adding or changing an interactive launch/reset capability, exercise it befo
 
 ## Result
 
-Return the smallest useful account of the behavior protected, test choices and relevant deletions, exact commands and observed results, existing artifact paths, and unverified boundaries. Explain material protection moved during consolidation. Include interactive launch/reset details only when that capability was needed and exercised. Distinguish authored from executed and automated from visually or manually verified; feed durable conclusions into the existing owning artifact.
+Report protected behavior, material protection moved or deleted, exact commands and outcomes, existing evidence paths, and unverified boundaries. Distinguish authored from executed and automated from manual proof. Update the existing owning artifact; introduce no parallel report.

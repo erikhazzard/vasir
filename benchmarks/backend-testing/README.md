@@ -4,7 +4,7 @@ Measures the suite an agent leaves behind: independent assertions, appropriate t
 
 ## Current assessment
 
-The [live report](https://vasirbenchmark.com/benchmark-report.html#backend-testing) compares Minimal instructions with the complete current skill on one player-saves maintenance case. Four exact model settings contribute one trial per arm: Astra ultra, Astra xhigh, Sol 6.1 xhigh and Opus 5.5 xhigh. Task, source, tools and budgets match across conditions.
+The [live report](https://vasirbenchmark.com/benchmark-report.html#backend-testing) compares Minimal instructions with the frozen evaluated skill on one player-saves maintenance case. Four exact model settings contribute one trial per arm: Astra ultra, Astra xhigh, Sol 6.1 xhigh and Opus 5.5 xhigh. Task, source, tools and budgets match across conditions. `work-spec.md` distinguishes the local unbenchmarked candidate.
 
 The two-reviewer instrument grades all eight retained suites and every retained spec file on seven 0–1 dimensions: assertion quality (25%), behavioral coverage (20%), test-layer fidelity (15%), domain structure (10%), clarity and diagnosis (10%), maintenance cost (10%), and semantic variable names (10%). `taste-rubric.json` fixes the definitions, anchors, weights and naming-zero rule. An opaque domain-bearing identifier zeros semantic naming for its affected file and suite; the other dimensions keep their scores.
 
