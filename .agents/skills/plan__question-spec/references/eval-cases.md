@@ -33,7 +33,7 @@ The skill should stay out for:
 - “Create or update the work spec for this feature.” → `$plan__maintain-work-spec`.
 - “Implement the active rung in this approved work spec.” → `$plan__implement-work-spec`.
 - “Challenge whether this proposed queue and worker topology is forced.” → `$plan__question-spec-architecture`.
-- “Audit the scale and cost assumptions in this work spec.” → `$plan__question-spec-infra`.
+- “Audit the scale and cost assumptions in this work spec.” → `$plan__question-spec-architecture` for workload and infrastructure fit.
 - “Summarize the current active rung and next action.” → `$plan__prepare-summary`.
 - A coherent approved spec with no explicit review request and no concrete high-regret mismatch → proceed; do not invent a gate.
 

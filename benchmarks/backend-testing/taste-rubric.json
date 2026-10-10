@@ -1,0 +1,114 @@
+{
+  "kind": "backend-testing-craft-rubric",
+  "schemaVersion": 2,
+  "minimum": 0,
+  "maximum": 1,
+  "decimals": 2,
+  "aggregation": "For each judge, sum the seven suite dimension scores multiplied by their fixed percentage weights, divided by 100. Average the two judge totals for each suite; average four matched differences equally. Compute file totals from their own seven dimensions; never derive suite quality from file averages.",
+  "namingZeroRule": "An unresolved opaque identifier such as x holding a meaningful domain value earns 0 in semantic_naming for its test file and for the complete suite. Cite the binding and explain the domain role hidden by the name. Ordinary loop indices, actual coordinates, protocol field names and established dependency abbreviations are not automatically opaque; evaluate whether the identifier communicates its role in context. Evaluate retained suite-owned helpers too. Identifier length alone earns no credit.",
+  "dimensions": [
+    {
+      "id": "assertion_quality",
+      "label": "Assertion quality",
+      "weight": 25,
+      "description": "Independent expected outcomes and discriminating assertions that reject plausible wrong behavior. Test-owned round trips, self-comparisons and expectations derived from the implementation under test provide no independent proof.",
+      "anchors": {
+        "0": "Assertions are circular, tautological, absent or unable to reject the claimed wrong behavior.",
+        "0.5": "Some independent outcomes are checked, but material assertions remain weak, indirect or vacuous.",
+        "1": "Independent, visible oracles sharply distinguish correct behavior from plausible failures across the claimed scope."
+      }
+    },
+    {
+      "id": "behavioral_coverage",
+      "label": "Behavioral coverage",
+      "weight": 20,
+      "description": "Distinct in-scope contract behaviors, state partitions and useful existing protection are retained. Assess files within their stated responsibility and the suite across its entire scoped contract; do not require every file to cover everything.",
+      "anchors": {
+        "0": "The claimed behavior has no useful retained protection or a core contract is abandoned.",
+        "0.5": "The main path is covered, with material missing states or lost distinct protection.",
+        "1": "The relevant behaviors and consequential state partitions have distinct, justified protection without coverage-shaped duplication."
+      }
+    },
+    {
+      "id": "boundary_fidelity",
+      "label": "Test-layer fidelity",
+      "weight": 15,
+      "description": "The chosen unit, integration or end-to-end boundary exercises the actual mechanism claimed. Real product actions, dependency seams, failure injection, isolation and lifecycle behavior preserve that mechanism. Useful units are valid; an E2E filename earns nothing.",
+      "anchors": {
+        "0": "The test exercises its own substitute or a boundary incapable of establishing the claimed behavior.",
+        "0.5": "Some real behavior is exercised, but a material seam, failure phase or lifecycle assumption weakens the proof.",
+        "1": "The smallest sufficient layer preserves the actual product boundary, failure mechanism and isolation required by the claim."
+      }
+    },
+    {
+      "id": "domain_structure",
+      "label": "Domain structure",
+      "weight": 10,
+      "description": "Files, suites and cases organize coherent domain capabilities, actors and behavior/state partitions. Assertions have a clear responsibility and related behavior has a discoverable owner.",
+      "anchors": {
+        "0": "Tests are an unstructured or misleading collection with no coherent behavioral responsibility.",
+        "0.5": "Capabilities are recognizable, but mixed responsibilities, duplicate owners or misleading groupings impede navigation.",
+        "1": "Cohesive domain and behavior boundaries make ownership and missing state partitions immediately discoverable."
+      }
+    },
+    {
+      "id": "clarity",
+      "label": "Clarity and diagnosis",
+      "weight": 10,
+      "description": "A reader can follow setup, action and assertions; decisive inputs are visible, behavior titles are honest, and failures explain the broken contract. Grade flow and diagnosis separately from variable naming.",
+      "anchors": {
+        "0": "A reader cannot determine the action, expected outcome or meaning of a failure.",
+        "0.5": "The scenario is understandable with effort, but dense setup, hidden decisive inputs or weak failure messages obscure intent.",
+        "1": "The scenario and independent expected outcome are locally obvious, and failures identify the behavior and relevant state."
+      }
+    },
+    {
+      "id": "maintenance_economy",
+      "label": "Maintenance cost",
+      "weight": 10,
+      "description": "Fixtures, setup, helpers, assertions and runtime work earn their cost. Avoid needless payload size, wrappers, scenario frameworks, duplicate layers and implementation coupling. Deleting useful protection earns no economy credit.",
+      "anchors": {
+        "0": "Most scaffolding or repeated work is unnecessary, or the suite relies on brittle machinery without useful protection.",
+        "0.5": "Useful tests coexist with avoidable fixture work, helper debt, redundant layers or private implementation dependencies.",
+        "1": "The suite uses direct, economical fixtures and existing systems with little avoidable work or maintenance coupling."
+      }
+    },
+    {
+      "id": "semantic_naming",
+      "label": "Semantic variable names",
+      "weight": 10,
+      "description": "Variables, parameters and fixture values communicate their domain role, actor, state, units or lifecycle phase. Names such as stagedCheckpointBytes or copiedBlobKeys reveal intent. An opaque x for a meaningful domain value receives the naming-zero rule; verbose names are not automatically better.",
+      "anchors": {
+        "0": "An opaque domain-bearing identifier hides what its value means; the naming-zero rule applies.",
+        "0.5": "Names are understandable mostly through surrounding code, with generic or imprecise identifiers obscuring roles, units or state.",
+        "1": "Names consistently expose domain meaning and distinguish relevant actors, states, values and phases without redundant verbosity."
+      }
+    }
+  ],
+  "anchors": [
+    {
+      "score": 0,
+      "meaning": "The dimension fails its stated responsibility."
+    },
+    {
+      "score": 0.25,
+      "meaning": "Serious defects require substantial improvement."
+    },
+    {
+      "score": 0.5,
+      "meaning": "Useful qualities coexist with material defects."
+    },
+    {
+      "score": 0.75,
+      "meaning": "Sound work with specific improvements justified."
+    },
+    {
+      "score": 0.9,
+      "meaning": "Excellent work with minor, concrete improvements remaining."
+    },
+    {
+      "score": 1,
+      "meaning": "No consequential improvement identified in this dimension within the supplied scope."
+    }
+  ]
+}

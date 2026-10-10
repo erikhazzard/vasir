@@ -2,6 +2,7 @@ import { VasirCliError } from "../cli-error.js";
 import { EVAL_REFERENCE_DOCS_REF } from "../docs-ref.js";
 
 const MODEL_REASONING_LEVELS = Object.freeze({
+  "codex:gpt-6.1-sol": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-6-astra": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-6-sol": Object.freeze(["low", "medium", "high", "xhigh", "max", "ultra"]),
   "codex:gpt-6-luna": Object.freeze(["low", "medium", "high", "xhigh", "max"]),
@@ -18,6 +19,7 @@ const MODEL_REASONING_LEVELS = Object.freeze({
 });
 
 const MODEL_ALIASES = Object.freeze({
+  "gpt-6.1-sol": "codex:gpt-6.1-sol",
   astra: "codex:gpt-6-astra",
   "gpt-6-astra": "codex:gpt-6-astra",
   "gpt-6-sol": "codex:gpt-6-sol",
@@ -67,7 +69,7 @@ function parseModelSelector(rawSelector) {
       code: "EVAL_BENCHMARK_MODEL_UNSUPPORTED",
       message: `Benchmark fresh-agent model is unsupported: ${provider}:${model}`,
       suggestion:
-        "Use GPT-6 Astra, Sol, or Luna, or GPT-5.6 Sol, Terra, or Luna through `codex:`, or Claude Fable or Opus through `claude:`.",
+        "Use GPT-6.1 Sol, GPT-6 Astra, Sol, or Luna, or GPT-5.6 Sol, Terra, or Luna through `codex:`, or Claude Fable or Opus through `claude:`.",
       docsRef: EVAL_REFERENCE_DOCS_REF
     });
   }
@@ -105,7 +107,7 @@ export function resolveBenchmarkConfigurations({
     ? requestedModelArguments
     : Object.keys(MODEL_REASONING_LEVELS).filter((id) =>
       id !== "claude:claude-opus-5" && id !== "claude:claude-opus-5-5" &&
-      id !== "codex:gpt-6-sol" && id !== "codex:gpt-6-luna"
+      id !== "codex:gpt-6-sol" && id !== "codex:gpt-6-luna" && id !== "codex:gpt-6.1-sol"
     );
   const configurations = [];
   const seen = new Set();
@@ -156,7 +158,7 @@ export function resolveBenchmarkConfiguration(selector) {
 export function getDefaultBenchmarkConfigurationCount() {
   return Object.entries(MODEL_REASONING_LEVELS).filter(([id]) =>
     id !== "claude:claude-opus-5" && id !== "claude:claude-opus-5-5" &&
-    id !== "codex:gpt-6-sol" && id !== "codex:gpt-6-luna"
+    id !== "codex:gpt-6-sol" && id !== "codex:gpt-6-luna" && id !== "codex:gpt-6.1-sol"
   ).map(([, levels]) => levels).reduce(
     (total, reasoningLevels) => total + reasoningLevels.length,
     0

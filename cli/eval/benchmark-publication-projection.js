@@ -14,6 +14,7 @@ import { buildOverallPublication, buildOverallWritingSource, validateOverallPubl
 import { buildGamesPublication, validateGamesPublication } from "./games-publication.js";
 import { buildWritingPublication, validateWritingSummary, serializeWritingModule } from "./writing-publication.js";
 import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE, WRITING_RESPONSE_ARCHIVES } from "./writing-response-archives.js";
+import { buildBackendTestingPublication, validateBackendTestingPublication, validateBackendTestingSuiteQuality, validateBackendTestingRepairCheck, validateBackendTestingPairedRepair, validateBackendTestingCurrent, validateBackendTestingFiles } from "./backend-testing-publication.js";
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -1838,6 +1839,12 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 }
 
 export function validateBenchmarkPublicationProjection(projection, { writingSource = projection?.writing?.overallSource } = {}) {
+  if (projection?.schemaVersion === 7 && projection.executableTesting) {
+    const { executableTesting, ...existing } = projection;
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+    validateBackendTestingPublication(executableTesting);
+    return projection;
+  }
   if (projection?.schemaVersion === 6 && projection.writing) {
     const { writing, ...existing } = projection;
     validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
@@ -2226,6 +2233,30 @@ export function validateBenchmarkPublicationProjection(projection, { writingSour
 }
 
 export function validateBenchmarkPublicationResponses(responseBundle, projection, { writingSource = projection?.writing?.overallSource } = {}) {
+  if (projection?.schemaVersion === 7 && projection.executableTesting) {
+    validateBenchmarkPublicationProjection(projection, { writingSource });
+    const { executableTesting, ...existing } = projection;
+    if (executableTesting.schemaVersion === 3) {
+      const { backendTestingPairedRepair, backendTestingTaste, backendTestingFiles, ...incumbentResponses } = responseBundle;
+      if (!backendTestingPairedRepair) throw projectionError({ message: 'The current testing comparison is missing its original technical assessments.' });
+      validateBackendTestingCurrent(executableTesting, { pairedRepair: backendTestingPairedRepair, taste: backendTestingTaste ?? null });
+      if (executableTesting.overall) validateBackendTestingFiles(backendTestingFiles, backendTestingPairedRepair);
+      validateBenchmarkPublicationResponses(incumbentResponses, { ...existing, schemaVersion: existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+      return responseBundle;
+    }
+    const { backendTestingRepair, backendTestingPairedRepair, ...historicalResponses } = responseBundle;
+    if (backendTestingRepair !== undefined) validateBackendTestingRepairCheck(backendTestingRepair);
+    if (backendTestingPairedRepair !== undefined) validateBackendTestingPairedRepair(backendTestingPairedRepair);
+    if (executableTesting.schemaVersion === 2) {
+      const { backendTesting, ...incumbentResponses } = historicalResponses;
+      if (!backendTesting) throw projectionError({ message: 'The suite-quality projection is missing its numerical judge assessments.' });
+      validateBackendTestingSuiteQuality(executableTesting.suiteQuality, backendTesting);
+      validateBenchmarkPublicationResponses(incumbentResponses, { ...existing, schemaVersion: existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+      return responseBundle;
+    }
+    validateBenchmarkPublicationResponses(historicalResponses, { ...existing, schemaVersion: existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+    return responseBundle;
+  }
   if (projection?.schemaVersion === 6 && projection.writing) {
     validateBenchmarkPublicationProjection(projection, { writingSource });
     const { writing, ...existing } = projection;
@@ -2482,7 +2513,8 @@ export function buildBenchmarkPublicationRoutes(projection) {
         (benchmark) => `/benchmark-report.html#${benchmark.reportFragment}`
       ),
       ...(projection.games ? (projection.games.benchmarks ?? [projection.games]).map(report => `/games.html?benchmark=${encodeURIComponent(report.benchmark.id)}`) : []),
-      ...(projection.writing ? (projection.writing.benchmarkIds ?? [projection.writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : [])
+      ...(projection.writing ? (projection.writing.benchmarkIds ?? [projection.writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : []),
+      ...(projection.executableTesting ? ["/benchmark-report.html#backend-testing"] : [])
     ]
   };
 }
@@ -2562,13 +2594,25 @@ export function buildBenchmarkPublicationProjection({
     }
   }
 
+  const executableTesting = buildBackendTestingPublication({ repoRootDirectory, readFileSyncImplementation });
+  if (executableTesting) {
+    projection.schemaVersion = 7;
+    projection.executableTesting = executableTesting.projection;
+    if (executableTesting.assessments) responseBundle.backendTesting = executableTesting.assessments;
+    if (executableTesting.repairCheck) responseBundle.backendTestingRepair = executableTesting.repairCheck;
+    if (executableTesting.pairedRepair) responseBundle.backendTestingPairedRepair = executableTesting.pairedRepair;
+    if (executableTesting.taste) responseBundle.backendTestingTaste = executableTesting.taste;
+    if (executableTesting.files) responseBundle.backendTestingFiles = executableTesting.files;
+  }
+
   const basisSha256 = sha256(stableSerialize({
     taxonomy,
     definitions: EXPECTED_BENCHMARK_IDS.map((benchmarkId) => definitions.get(benchmarkId)),
     selectedRuns: selections.map(({ benchmarkId, observedSha256 }) => ({ benchmarkId, sha256: observedSha256 })),
     ...(workflows ? { aiWorkflows: workflows.basisSha256, overall: projection.overall.scoreBasis.id } : {}),
     ...(games ? { games: games.basisSha256 } : {}),
-    ...(writing ? { writing: writing.basisSha256 } : {})
+    ...(writing ? { writing: writing.basisSha256 } : {}),
+    ...(executableTesting ? { executableTesting: executableTesting.basisSha256 } : {})
   }));
   return {
     projection,

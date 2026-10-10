@@ -383,7 +383,7 @@
   gap: 2rem;
 }
 
-.report-section__heading h2 {
+.report-section__heading :is(h1, h2) {
   margin: 0.28rem 0 0;
   font-size: 2rem;
   font-weight: 700;
@@ -1350,7 +1350,7 @@
     gap: 0.55rem;
   }
 
-  .report-section__heading h2 {
+  .report-section__heading :is(h1, h2) {
     font-size: 1.6rem;
   }
 
@@ -1778,3 +1778,54 @@
     overflow-wrap: normal;
   }
 }
+
+/* Current test-suite results retain their own units and paired comparison. */
+.testing-report__headline { margin: 0; display: grid; gap: 1.25rem; }
+.testing-report__headline > div { border-bottom: 1px solid var(--sdk-ink-soft); padding-bottom: 0.75rem; }
+.testing-report__headline dt { color: var(--sdk-paper); font-family: var(--font-data); font-size: var(--type-small); }
+.testing-report__headline dd { margin: 0.3rem 0 0; font-family: var(--font-display); font-size: 2.5rem; font-variant-numeric: tabular-nums; }
+.testing-report__headline small { display: block; margin-top: 0.2rem; color: var(--sdk-paper); font-family: var(--font-data); font-size: var(--type-small); font-weight: 400; }
+.testing-report__table-wrap { max-width: 100%; overflow-x: auto; }
+.testing-report__table { width: 100%; border-collapse: collapse; text-align: left; font-variant-numeric: tabular-nums; }
+.testing-report__table th, .testing-report__table td { padding: 1rem; border-bottom: 1px solid var(--line-strong); vertical-align: top; }
+.testing-report__table thead { background: var(--sdk-night); color: var(--sdk-paper); font-family: var(--font-data); font-size: var(--type-small); }
+.testing-report__table tbody th { max-width: 18rem; }
+.testing-report__table td strong { display: block; font-size: 1.8rem; letter-spacing: -0.04em; }
+.testing-report__table summary { min-height: var(--touch); padding-block: 0.65rem; cursor: pointer; }
+.testing-report__table span { display: block; margin-top: 0.4rem; color: var(--ink-muted); font-size: var(--type-small); font-weight: 400; }
+.testing-report__table--trials { min-width: 62rem; font-size: var(--type-small); }
+.testing-report__details { margin-top: 1.5rem; border-block: 1px solid var(--line-strong); }
+.testing-report__details > summary { min-height: var(--touch); padding-block: 1rem; font-weight: 700; cursor: pointer; }
+.testing-report__method { max-width: 70ch; margin: 0; padding-left: 1.2rem; line-height: 1.65; }
+.testing-report__method li + li { margin-top: 0.8rem; }
+.testing-report__identity { font-family: var(--font-data); font-size: var(--type-small); }
+.testing-report__identity > div { margin-block: 1rem; }
+.testing-report__identity dd { margin: 0.3rem 0 0; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .testing-report__table th, .testing-report__table td { padding: 0.7rem 0.5rem; }
+  .testing-report__table:not(.testing-report__table--trials) { min-width: 34rem; }
+  .testing-report__headline { gap: 0.75rem; }
+}
+
+.testing-report__profile { padding: var(--space-4); border-top: 1px solid var(--line-strong); background: var(--field); }
+.testing-report__profile > h3 { margin: 0; }
+.testing-report__profile > p { margin: 0.5rem 0 1rem; color: var(--ink-muted); font-size: var(--type-small); }
+.testing-report__table--dimensions { font-size: var(--type-small); }
+.testing-report__table--dimensions th, .testing-report__table--dimensions td { padding: 0.7rem 0.5rem; }
+.testing-report__table--dimensions td { white-space: nowrap; font-family: var(--font-data); }
+.testing-report__dimension-finding + .testing-report__dimension-finding { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--line-strong); }
+.testing-report__dimension-finding h4 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.3rem 0.65rem; margin: 0; }
+.testing-report__dimension-finding h4 > span { margin-left: auto; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.testing-report__dimension-finding h4 > small { color: var(--ink-muted); font-weight: 400; }
+.testing-report__file-reviews { padding-left: 1.15rem; }
+.testing-report__file-reviews > li + li { margin-top: var(--space-4); }
+@media (max-width: 600px) {
+  .testing-report__table.testing-report__table--dimensions { min-width: 0; }
+  .testing-report__profile { padding: var(--space-3); }
+}
+
+.testing-report__qualification { margin-top: 1rem; padding: var(--space-3); border-left: 3px solid var(--sdk-blue); background: var(--sdk-blue-pale); }
+.testing-report__qualification h5 { margin: 0; font-size: inherit; }
+
+.testing-report__cap-note { display: block; color: var(--ink-muted); font-size: 0.5625rem; font-weight: 600; line-height: 1.4; }
+[data-testing-file-content] { max-height: 30rem; overflow: auto; }

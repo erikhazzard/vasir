@@ -1,6 +1,6 @@
 ---
 name: plan__question-spec
-description: Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices and whether its proposed capabilities are necessary. Use for explicit product-journey or capability-necessity review, generic requests to audit, question, or adversarially review a work spec, or cold-context recovery exposing a concrete product mismatch, proxy substitution, or high-regret ambiguity; focused architecture or moving-parts-only requests and performance, scale, or cost-only requests stay with their named sibling skills, and this never runs as an automatic pre-implementation gate.
+description: Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices and whether its proposed capabilities are necessary. Use for explicit product-journey or capability-necessity review, generic requests to audit, question, or adversarially review a work spec, or cold-context recovery exposing a concrete product mismatch, proxy substitution, or high-regret ambiguity; focused architecture, infrastructure, scale, or cost-only requests stay with plan__question-spec-architecture, and this never runs as an automatic pre-implementation gate.
 tools: Read, Grep, Glob
 ---
 

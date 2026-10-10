@@ -6,11 +6,129 @@
     ? 'All Writing contributes to the Overall category-weighted comparison.' : 'Writing is excluded from Overall.';
   const runtimeBase = document.currentScript?.src || window.location.href;
   const initialBenchmarkId = decodeURIComponent(window.location.hash.slice(1)).split('/')[0];
+  const navigateBackendTestingReport = () => {
+    document.querySelectorAll('[data-report-section]').forEach(link => { link.href = `#backend-testing/${link.dataset.reportSection}`; });
+    const navigate = () => {
+      const [benchmark, section] = decodeURIComponent(window.location.hash.slice(1)).split('/');
+      if (benchmark !== 'backend-testing') { window.location.reload(); return; }
+      const target = section === 'overview' ? 'paired-check' : section === 'technical' ? 'method' : section;
+      if (target === 'method') document.querySelector('[data-testing-method]').open = true;
+      if (['paired-check', 'method', 'top'].includes(target)) document.getElementById(target)?.scrollIntoView();
+    };
+    window.addEventListener('hashchange', navigate);
+    navigate();
+  };
+  const renderBackendTestingQualityReport = (publication, paired, taste, testFiles) => {
+    if (publication.schemaVersion !== 3 || paired?.kind !== 'backend-testing-paired-repair-check' || paired.schemaVersion !== 1) throw new Error('Current paired evidence unavailable.');
+    if (taste && (taste.kind !== 'backend-testing-taste-review' || taste.schemaVersion !== 2)) throw new Error('Taste evidence unavailable.');
+    const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+    const number = value => Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 1 }) : '—';
+    const tasteScore = value => Number.isFinite(value) ? value.toFixed(2) : 'Unscored';
+    const tastePanelScore = value => Number.isFinite(value) ? value.toFixed(3) : 'Unscored';
+    const tasteDelta = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(3)}` : 'Unscored';
+    const hasRange = range => Number.isFinite(range?.minimum) && Number.isFinite(range?.maximum);
+    const duration = value => Number.isFinite(value) ? `${number(value / 1000)}s` : '—';
+    const overall = publication.overall;
+    if (!taste || overall?.schemaVersion !== 1 || testFiles?.kind !== 'backend-testing-files' || testFiles.schemaVersion !== 1) throw new Error('Combined score and test files unavailable.');
+    const finalScore = value => Number.isFinite(value) ? value.toFixed(1) : 'Unscored';
+    const finalDelta = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(1)} pts` : 'Unscored';
+    const conditions = publication.conditions.map(condition => ({ ...condition, label: condition.id === 'none' ? 'Minimal' : 'Skill' }));
+    const qualityDimensions = taste.scoreBasis.dimensions;
+    const baselineRows = paired.rows.filter(row => row.condition === 'none'), currentRows = paired.rows.filter(row => row.condition === 'repaired');
+    const baselineProtectionLosses = baselineRows.filter(row => row.protection === 'lost').length;
+    const currentRetained = currentRows.filter(row => row.protection === 'retained').length;
+    const evidenceMarkup = evidence => evidence.map(item => `<code data-testing-taste-citation data-file="${escape(item.file)}" data-version="${escape(item.version)}" data-start-line="${item.startLine}" data-end-line="${item.endLine}">${escape(item.file)} (${escape(item.version)}) L${item.startLine}${item.endLine !== item.startLine ? `–${item.endLine}` : ''}</code>`).join(' · ');
+    const dimensionTable = (readings, attributes, range = false) => `<div class="testing-report__table-wrap" tabindex="0" role="region" aria-label="${range ? 'Dimension means and reviewer ranges' : 'File dimension ratings'}"><table class="testing-report__table testing-report__table--dimensions"><thead><tr><th scope="col">Dimension</th><th scope="col">${range ? 'Mean' : 'Rating'} /1</th>${range ? '<th scope="col">Judge range</th>' : ''}</tr></thead><tbody>${qualityDimensions.map(dimension => {
+      const reading = readings.find(item => item.id === dimension.id);
+      return `<tr ${attributes}="${escape(dimension.id)}"><th scope="row">${escape(dimension.label)}<small class="work-spec-dimensions__weight">${number(dimension.weight)}% weight</small></th><td data-testing-taste-dimension-score>${range ? tastePanelScore(reading?.score) : tasteScore(reading?.score)}</td>${range ? `<td data-testing-taste-dimension-range>${hasRange(reading?.range) ? `${tasteScore(reading.range.minimum)}–${tasteScore(reading.range.maximum)}` : 'Unscored'}</td>` : ''}</tr>`;
+    }).join('')}</tbody></table></div>`;
+    const tasteJudgeMarkup = (judgment, index, finalJudgment) => `<li class="model-run__judge" data-testing-taste-judge="${escape(judgment.judgeConfigurationId)}" data-review-sha256="${escape(judgment.reviewSha256)}" data-status="${escape(judgment.status)}"${judgment.failure ? ` data-failure="${escape(judgment.failure)}"` : ''}>
+      <header class="model-run__judge-header"><span class="model-run__judge-identity"><strong class="model-run__judge-index">Judge ${String(index + 1).padStart(2, '0')}</strong><span class="model-run__judge-configuration">${escape(judgment.judgeConfigurationId)}</span></span><span class="model-run__judge-score"><strong class="model-run__judge-score-value" data-testing-taste-judge-score>${finalScore(finalJudgment?.score)}</strong><small class="model-run__judge-score-unit">/100</small></span></header>
+      <div class="model-run__judge-rationale"><p data-testing-taste-review-status>${judgment.failure === 'timeout' ? 'Review timed out; no ratings returned.' : `Review: ${escape(judgment.status)}.${judgment.score === null ? ' No complete score returned.' : ''}`}</p>${judgment.dimensions.some(item => Number.isFinite(item.score)) ? `<div class="testing-report__dimension-findings">${qualityDimensions.map(dimension => {
+        const finding = judgment.dimensions.find(item => item.id === dimension.id);
+        return `<section class="testing-report__dimension-finding" data-testing-taste-judge-dimension="${escape(dimension.id)}"><h4>${escape(dimension.label)} <span data-testing-taste-dimension-score>${tasteScore(finding?.score)}</span><small>/1 · ${number(dimension.weight)}% weight</small></h4><p data-testing-taste-dimension-reason>${escape(finding?.reason || 'No rating returned.')}</p><div data-testing-taste-dimension-evidence>${evidenceMarkup(finding?.evidence || [])}</div>${(finding?.qualifications || []).map(item => `<aside class="testing-report__qualification" data-testing-taste-qualification><h5>Evidence qualification</h5><p data-testing-taste-qualification-finding>${escape(item.finding)}</p><div>${evidenceMarkup(item.evidence)}</div></aside>`).join('')}</section>`;
+      }).join('')}</div><h4>File reviews</h4><p>Each file total uses its own seven ratings. File totals do not determine the suite score.</p><ul class="testing-report__file-reviews">${judgment.files.map(file => `<li data-testing-taste-file="${escape(file.file)}"><strong>${escape(file.file)} · <span data-testing-taste-file-score>${tastePanelScore(file.score)}</span>/1 weighted</strong><p data-testing-taste-file-reason>${escape(file.reason)}</p><div data-testing-taste-file-evidence>${evidenceMarkup(file.evidence)}</div><details class="work-spec-assessment" data-testing-taste-file-dimensions><summary class="work-spec-assessment__summary">Seven dimension ratings</summary>${dimensionTable(file.dimensions, 'data-testing-taste-file-dimension')}</details></li>`).join('')}</ul>` : '<p>No dimension or file ratings returned.</p>'}<details class="work-spec-assessment"><summary class="work-spec-assessment__summary">Assessment identity</summary><dl class="testing-report__identity"><div><dt>Status</dt><dd>${escape(judgment.status)}</dd></div><div><dt>Review SHA-256</dt><dd>${escape(judgment.reviewSha256 || 'Not recorded')}</dd></div></dl></details></div>
+    </li>`;
+    const calculationMarkup = row => `<details class="work-spec-assessment" data-testing-score-calculation="${escape(row.id)}"><summary class="work-spec-assessment__summary">Final score calculation</summary><div class="work-spec-assessment__body"><p>For each reviewer, apply the saved coverage cap to the seven-dimension weighted score. The final score is the mean of both capped reviewer scores.</p><div class="testing-report__table-wrap"><table class="testing-report__table"><thead><tr><th scope="col">Reviewer</th><th scope="col">Weighted ratings /100</th><th scope="col">Maximum</th><th scope="col">Final /100</th></tr></thead><tbody>${row.judgments.map(judge => `<tr data-testing-score-calculation-judge="${escape(judge.judgeConfigurationId)}"><th scope="row">${escape(judge.judgeConfigurationId)}</th><td data-testing-score-quality>${finalScore(judge.qualityScore)}</td><td data-testing-score-maximum>${Number.isFinite(judge.maximum) ? finalScore(judge.maximum) : 'Unresolved'}</td><td data-testing-score-final>${finalScore(judge.score)}</td></tr>`).join('')}</tbody></table></div></div></details>`;
+    const testFilesMarkup = row => `<section class="model-run__section" data-testing-files-row="${escape(row.id)}"><h4>Test files</h4>${testFiles.rows.find(item => item.id === row.id).files.map((file, index) => `<details class="work-spec-assessment" data-testing-file="${escape(file.path)}" data-sha256="${escape(file.sha256)}"${index === 0 ? ' open' : ''}><summary class="work-spec-assessment__summary">${escape(file.path)}</summary><div class="work-spec-assessment__body"><button class="model-run__copy" type="button" data-testing-copy-file aria-label="Copy ${escape(file.path)}" aria-live="polite">Copy</button><pre class="model-run__text" data-testing-file-content tabindex="0" aria-label="Source for ${escape(file.path)}"><code>${escape(file.content).replace(/\r/g, '&#13;')}</code></pre></div></details>`).join('')}</section>`;
+    const tasteRowMarkup = row => {
+      const final = overall.rows.find(item => item.id === row.id);
+      const scores = final.judgments.map(judge => judge.score), resolved = scores.length === 2 && scores.every(Number.isFinite);
+      return `<div data-testing-taste-row="${escape(row.id)}"><p class="model-run__aggregation-note"><strong>Score: <span data-testing-taste-row-score>${finalScore(final.score)}</span>/100</strong> · ${scores.filter(Number.isFinite).length}/2 scores returned · Judge range: <span data-testing-taste-range>${resolved ? `${finalScore(Math.min(...scores))}–${finalScore(Math.max(...scores))}` : 'Unscored'}</span>. ${resolved ? 'This range describes reviewer disagreement.' : 'The final score is unscored because both reviews are required.'}</p>${calculationMarkup(final)}<details class="work-spec-assessment" data-testing-taste-row-dimensions><summary class="work-spec-assessment__summary">Dimension means and reviewer ranges</summary>${dimensionTable(row.dimensions, 'data-testing-taste-row-dimension', true)}</details><details class="work-spec-assessment" data-testing-taste-reviews><summary class="work-spec-assessment__summary">Read both judge reviews</summary><ol class="model-run__judges">${row.judgments.map((judgment, index) => tasteJudgeMarkup(judgment, index, final.judgments.find(item => item.judgeConfigurationId === judgment.judgeConfigurationId))).join('')}</ol></details></div>`;
+    };
+    const profileMarkup = summary => `<div class="testing-report__profile" data-testing-taste-profile="${escape(summary.configurationId)}"><h3>Seven-dimension profile</h3><p>Two-judge means on a shared 0–1 scale. Difference is Skill − Minimal.</p><div class="testing-report__table-wrap" tabindex="0" role="region" aria-label="Seven-dimension paired profile"><table class="testing-report__table testing-report__table--dimensions"><thead><tr><th scope="col">Dimension</th><th scope="col">Minimal</th><th scope="col">Skill</th><th scope="col">Difference</th></tr></thead><tbody>${qualityDimensions.map(dimension => {
+      const reading = summary.dimensions.find(item => item.id === dimension.id);
+      return `<tr data-testing-taste-profile-dimension="${escape(dimension.id)}"><th scope="row">${escape(dimension.label)}<small class="work-spec-dimensions__weight">${number(dimension.weight)}% weight</small></th><td data-testing-taste-dimension-baseline>${tastePanelScore(reading?.baseline)}</td><td data-testing-taste-dimension-treatment>${tastePanelScore(reading?.treatment)}</td><td data-testing-taste-dimension-delta>${tasteDelta(reading?.delta)}</td></tr>`;
+    }).join('')}</tbody></table></div></div>`;
+    const rowMarkup = (row, condition, headingId) => `<section class="model-run__condition model-run__condition--${condition.id === 'none' ? 'baseline' : 'skill'}" data-testing-paired-row="${escape(row.id)}" data-condition="${condition.id}" aria-labelledby="${headingId}">
+      <header class="model-run__condition-header"><div class="model-run__condition-title"><span class="model-run__condition-meta">Player saves · test score</span><h3 class="model-run__condition-name" id="${headingId}">${escape(condition.label)}</h3></div><strong class="model-run__condition-score" data-testing-arm-score>${finalScore(overall.rows.find(reading => reading.id === row.id)?.score)}<small class="model-run__condition-unit">/100</small></strong></header>
+      ${testFilesMarkup(row)}
+      <p class="model-run__aggregation-note" data-testing-paired-execution>Behavioral tests: ${escape(row.testStatus)} · server shutdown: ${escape(row.cleanupStatus)}.</p>
+      <p class="model-run__aggregation-note" data-testing-paired-protection>Existing test coverage: ${escape(row.protection)} (reviewer assessment).</p>
+      ${tasteRowMarkup(taste.rows.find(reading => reading.id === row.id))}
+      <details class="work-spec-assessment" data-testing-paired-resources><summary class="work-spec-assessment__summary">Run details</summary><div class="work-spec-assessment__body"><dl class="testing-report__identity"><div><dt>Generation runtime</dt><dd>${duration(row.elapsedMs)}</dd></div><div><dt>Verification runtime</dt><dd>${duration(row.verificationMs)}</dd></div><div><dt>Tokens in / out</dt><dd>${number(row.inputTokens)} / ${number(row.outputTokens)}</dd></div></dl></div></details>
+    </section>`;
+    const rankedSummaries = [...overall.summaries].sort((first, second) => (second.treatment ?? -Infinity) - (first.treatment ?? -Infinity));
+    const modelMarkup = (reading, index) => {
+      const selectedRows = paired.rows.filter(row => row.configurationId === reading.configurationId);
+      const comparable = Number.isFinite(reading.baseline) && Number.isFinite(reading.treatment);
+      return `<li class="model-preview__item" data-testing-paired-setting="${escape(reading.configurationId)}" data-testing-taste-setting="${escape(reading.configurationId)}"><details class="model-run"><summary class="model-preview__row${reading.delta < 0 ? ' is-regression' : ''}"><span class="model-preview__identity"><strong>${escape(selectedRows[0].label)}</strong><small>Testing skill rank #${index + 1} of ${rankedSummaries.length}</small></span>${comparable ? `<span class="model-preview__plot" role="img" style="--preview-start:${Math.min(reading.baseline, reading.treatment)}%;--preview-width:${Math.abs(reading.delta)}%;--preview-baseline:${reading.baseline}%;--preview-treatment:${reading.treatment}%" aria-label="Score /100: Minimal ${finalScore(reading.baseline)}, Skill ${finalScore(reading.treatment)}"><i class="model-preview__axis" aria-hidden="true"></i><i class="model-preview__connector" aria-hidden="true"></i><i class="model-preview__mark model-preview__mark--baseline" aria-hidden="true"></i><i class="model-preview__mark model-preview__mark--treatment" aria-hidden="true"></i></span>` : '<span>Comparison incomplete</span>'}<span class="model-preview__score"><span>Minimal</span><b data-testing-score-baseline>${finalScore(reading.baseline)}</b>${selectedRows.find(row => row.condition === 'none').protection === 'lost' ? '<small class="testing-report__cap-note" data-testing-coverage-cap>Coverage lost</small>' : ''}</span><span class="model-preview__score model-preview__score--treatment"><span>Skill</span><b data-testing-score-treatment>${finalScore(reading.treatment)}</b></span><span class="model-preview__delta" data-testing-taste-delta>${finalDelta(reading.delta)}</span><span class="model-preview__action">Inspect run <i class="model-preview__action-mark" aria-hidden="true">↓</i></span></summary><div class="model-run__comparison">${conditions.map((condition, conditionIndex) => rowMarkup(selectedRows.find(row => row.condition === condition.id), condition, `testing-paired-${index}-${conditionIndex}`)).join('')}</div>${profileMarkup(taste.summaries.find(item => item.configurationId === reading.configurationId))}</details></li>`;
+    };
+    document.querySelector('.report-mast__nav').innerHTML = `<a href="#backend-testing/paired-check" data-report-section="paired-check">Comparison</a><a href="#backend-testing/method" data-report-section="method">Method</a>`;
+    document.title = 'Backend testing · VasirBench';
+    document.getElementById('report-page').dataset.executableBenchmark = 'backend-testing';
+    document.querySelector('.benchmark-mast__issue').textContent = 'Engineering · Backend testing';
+    document.querySelector('.report-footer > span').textContent = 'VasirBench · Current backend testing · Excluded from Engineering and Overall';
+    const view = document.getElementById('report-view');
+    view.innerHTML = `<div class="report-shell" data-testing-quality-report>
+      <div class="report-context"><nav class="report-breadcrumb" aria-label="Benchmark hierarchy"><a href="./index.html">VasirBench</a><span class="report-breadcrumb__separator" aria-hidden="true">→</span><a href="./index.html#capabilities/engineering/benchmarks">Engineering</a><span class="report-breadcrumb__separator" aria-hidden="true">→</span><span class="report-breadcrumb__current" aria-current="page">Backend testing</span></nav><a class="report-context__back" href="./index.html#capabilities/engineering/benchmarks">← All Engineering tests</a></div>
+      <section class="report-section" id="paired-check" aria-labelledby="report-title" data-testing-paired-check>
+        <header class="report-section__heading"><div><p class="ui-eyebrow">Backend testing · 4 model settings</p><h1 id="report-title">Model comparison</h1></div><p data-testing-taste-completion>Score /100 · ordered by Skill score. Open a row to inspect the seven 0–1 ratings and reviews.</p></header>
+        <ul class="model-preview">${rankedSummaries.map(modelMarkup).join('')}</ul>
+      </section>
+      <section class="report-section" id="method" aria-label="Method and evidence" data-testing-paired-evidence>
+        <details class="work-spec-assessment" data-testing-method><summary class="work-spec-assessment__summary">Method and evidence</summary><div class="work-spec-assessment__body">
+          <div class="method-grid"><section><h3>Same task</h3><p>Improve the player-save tests in an existing backend. Four model settings, one attempt with minimal instructions and one with the testing skill. Each has the same source code and ten-minute budget.</p></section><section><h3>Score /100</h3><p data-testing-taste-method>For each reviewer, multiply the seven-dimension weighted score by 100 and apply the saved coverage cap, then average both final scores. Lost existing coverage limits the score to 49; no meaningful runnable coverage scores 0. Unresolved reviews have no final score. Higher is better; uplift is Skill minus Minimal.</p><p data-testing-score-adoption>This combined formula was adopted at the user’s request after the reviews. It uses the saved judgments without new grading.</p></section><section><h3>Scope</h3><p>One development case, one attempt per condition. These results do not establish performance on other tasks and do not enter Engineering or Overall scores.</p></section></div>
+          <details class="work-spec-assessment" data-testing-rubric><summary class="work-spec-assessment__summary">Scoring rubric · seven dimensions</summary><div class="work-spec-assessment__body"><p data-testing-taste-naming-rule>${escape(taste.scoreBasis.namingZeroRule)}</p><div class="testing-report__table-wrap" tabindex="0" role="region" aria-label="Fixed seven-dimension rubric"><table class="testing-report__table"><caption>Fixed weights · each dimension is rated from 0 to 1</caption><thead><tr><th scope="col">Dimension / weight</th><th scope="col">What is assessed</th><th scope="col">0 / 0.5 / 1 anchors</th></tr></thead><tbody>${qualityDimensions.map(dimension => `<tr data-testing-taste-rubric-dimension="${escape(dimension.id)}"><th scope="row">${escape(dimension.label)}<small class="work-spec-dimensions__weight" data-testing-taste-rubric-weight>${number(dimension.weight)}%</small></th><td data-testing-taste-rubric-description>${escape(dimension.description)}</td><td>${['0', '0.5', '1'].map(value => `<p data-testing-taste-rubric-anchor="${value}"><b>${value}:</b> <span>${escape(dimension.anchors[value])}</span></p>`).join('')}</td></tr>`).join('')}</tbody></table></div></div></details>
+          <details class="work-spec-assessment" data-testing-execution><summary class="work-spec-assessment__summary">Execution and coverage findings</summary><div class="work-spec-assessment__body"><p data-testing-paired-outcomes>${paired.rows.filter(row => row.testStatus === 'pass').length}/8 suites passed behavioral assertions.</p><p data-testing-paired-mechanism>Reviewers found that ${baselineProtectionLosses}/4 Minimal suites removed the separate test for loading an existing save; ${currentRetained}/4 Skill suites retained it. This is a coverage finding from code review.</p><p data-testing-paired-cleanup>Server shutdown failed in ${paired.rows.filter(row => row.cleanupStatus === 'failed').length}/8 suites: a shared websocket shutdown diagnostic occurred after the behavioral assertions passed. This is separate from the storage cleanup behavior tested by the suites.</p></div></details>
+          <details class="work-spec-assessment" data-testing-paired-resources-evidence><summary class="work-spec-assessment__summary">Review provenance and usage</summary><div class="work-spec-assessment__body"><p>Each reviewer assessed all eight anonymous final suites. Original scores, reviewer reasons and cited file evidence are retained.</p><p>${number(publication.nativeSessions)} native sessions · ${number(publication.knownTokens)} recorded tokens including cached input traffic · ${number(publication.usageMissingSessions)} sessions lack usage. Recorded usage is a subtotal, not a complete bill.</p>${taste.retry ? `<p data-testing-taste-retry data-review-attempts="${taste.nativeSessions}" data-reviewer-seats="${taste.rows[0].judgments.length}">${number(taste.nativeSessions)} native review attempts fill ${number(taste.rows[0].judgments.length)} reviewer seats. One review was retried at the user’s request after a timeout, with a ${number(taste.retry.timeoutMs / 60000)}-minute limit. Selected retry: ${escape(taste.retry.status)} · ${number(taste.retry.automaticRetries)} automatic retries. The selected two reviews determine the panel; the timeout receipt remains retained.</p>` : ''}<dl class="testing-report__identity"><div><dt>Evidence SHA-256</dt><dd>${escape(paired.sourceSha256)}</dd></div><div><dt>Current skill bundle SHA-256</dt><dd>${escape(paired.skillSha256)}</dd></div><div><dt>Dimension review SHA-256</dt><dd>${escape(taste.sourceSha256)}</dd></div><div><dt>Dimension judges</dt><dd>${[...new Set(taste.rows.flatMap(row => row.judgments.map(judgment => judgment.judgeConfigurationId)))].map(escape).join('<br>')}</dd></div>${taste.retry ? `<div><dt>Retry amendment SHA-256</dt><dd>${escape(taste.retry.amendmentSha256)}</dd></div><div><dt>Timeout receipt SHA-256</dt><dd>${escape(taste.retry.priorReviewSha256)}</dd></div><div><dt>Selected retry receipt SHA-256</dt><dd>${escape(taste.retry.reviewSha256)}</dd></div>` : ''}</dl></div></details>
+        </div></details>
+      </section>
+    </div>`;
+    view.querySelectorAll('.model-run, .model-run__judging').forEach(details => {
+      const sync = () => details.classList.toggle('is-open', details.open);
+      details.addEventListener('toggle', sync);
+      sync();
+    });
+    view.addEventListener('click', async event => {
+      const button = event.target.closest('[data-testing-copy-file]');
+      if (!button) return;
+      const content = button.closest('[data-testing-file]').querySelector('[data-testing-file-content] code').textContent;
+      try { await navigator.clipboard.writeText(content); button.textContent = 'Copied'; button.classList.add('is-confirmed'); }
+      catch { button.textContent = 'Copy failed'; button.classList.add('is-error'); }
+    });
+    navigateBackendTestingReport();
+  };
+  if (initialBenchmarkId === 'backend-testing' && rootData?.executableTesting) {
+    try {
+      if (!window.VASIR_RESPONSES) await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = new URL('./responses.js', runtimeBase).href;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.append(script);
+      });
+      renderBackendTestingQualityReport(rootData.executableTesting, window.VASIR_RESPONSES?.backendTestingPairedRepair, window.VASIR_RESPONSES?.backendTestingTaste, window.VASIR_RESPONSES?.backendTestingFiles);
+    } catch {
+      document.getElementById('report-view').innerHTML = '<section class="development-unavailable" role="alert"><p class="ui-eyebrow">Current quality evidence unavailable</p><h1>REPORT COULD NOT BE LOADED</h1><p>Reload to try again, or <a href="./index.html">return to the benchmark index</a>.</p></section>';
+    }
+    return;
+  }
   const isWorkflowBenchmark = (benchmarkId) => Boolean(rootData?.aiWorkflows?.benchmarks?.some((benchmark) => benchmark.id === benchmarkId));
   const isWritingBenchmark = benchmarkId => Boolean(benchmarkId && (Array.isArray(rootData?.writing?.catalog)
     ? rootData.writing.catalog.some(benchmark => benchmark.id === benchmarkId && !benchmark.archived && !['withdrawn', 'planned', 'unscored'].includes(benchmark.status))
     : rootData?.writing?.benchmarkId === benchmarkId || rootData?.writing?.additionalBenchmarks?.[benchmarkId] || rootData?.writing?.compactBenchmarks?.[benchmarkId] || rootData?.writing?.benchmarkIds?.includes(benchmarkId) || rootData?.writing?.benchmarks?.some(benchmark => benchmark.id === benchmarkId)));
-  const isPublishedBenchmark = benchmarkId => isWritingBenchmark(benchmarkId) || isWorkflowBenchmark(benchmarkId)
+  const isPublishedBenchmark = benchmarkId => (benchmarkId === 'backend-testing' && Boolean(rootData?.executableTesting)) || isWritingBenchmark(benchmarkId) || isWorkflowBenchmark(benchmarkId)
     || Boolean(rootData?.benchmarks?.some(benchmark => benchmark.id === benchmarkId));
   const showUnavailableReport = () => {
     document.title = 'Benchmark unavailable · VasirBench';
@@ -1286,7 +1404,7 @@
       showUnavailableReport();
       return;
     }
-    if (isWorkflowBenchmark(route.benchmarkId) !== isWorkSpec || isWritingBenchmark(route.benchmarkId) !== isWriting || (isWriting && writingProjectionFor(route.benchmarkId) !== data)) {
+    if (route.benchmarkId === 'backend-testing' || isWorkflowBenchmark(route.benchmarkId) !== isWorkSpec || isWritingBenchmark(route.benchmarkId) !== isWriting || (isWriting && writingProjectionFor(route.benchmarkId) !== data)) {
       window.location.reload();
       return;
     }

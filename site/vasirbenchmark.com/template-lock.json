@@ -1,22 +1,26 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-09-22-games-opus-5-5-8d0cbc81d006",
+  "version": "2026-10-10-backend-testing-combined-score-1c2e9e69caaf",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
+    "authority": "user",
+    "acceptedAt": "2026-10-10T14:26:04.629Z",
+    "response": "User explicitly requested one final score incorporating weighted quality and saved protection findings, and direct inspection of the exact test files. The combined formula was adopted after the reviews, with no new grading.",
+    "basis": "The current selected source provides the derived final score, unchanged native reviews and exact safe test-file bytes. Source-pinned immutable-candidate browser evidence and agent visual review verify ranking, caps, arithmetic, source rendering and clipboard behavior.",
+    "verdict": "Four model settings are ranked by the single final Skill score. Each reviewer score applies the saved protection cap to the fixed seven-dimension weighted ratings times 100, then both scores are averaged. The table, arm totals and reviewer totals use that same final metric. Coverage lost explains the capped Minimal value. Inspect run directly shows exact JavaScript test files with Copy, and retains the original seven dimensions, reasons, file ratings and source-backed qualification. The final-score calculation and full Method are native closed disclosures.",
+    "criterion": "One /100 score incorporates weighted quality and saved protection: lost existing protection caps at 49, no meaningful runnable coverage scores 0, unresolved required evidence has no score. Exact selected test files are escaped text and clipboard bytes match the source. Original native reviews remain unchanged; all new scores are deterministic derivations. Backend testing remains excluded from Engineering and Overall.",
     "scope": {
-      "kind": "games-data-extension",
-      "schemaVersion": 1,
-      "benchmarkIds": [
-        "2d-jumping-demo"
-      ],
-      "configurationIds": [
-        "claude:claude-opus-5-5@high",
-        "claude:claude-opus-5-5@max"
-      ],
+      "kind": "executable-testing-benchmark",
+      "schemaVersion": 3,
+      "benchmarkId": "backend-testing",
       "viewports": [
         {
           "width": 1440,
+          "height": 1000
+        },
+        {
+          "width": 820,
           "height": 1000
         },
         {
@@ -25,175 +29,434 @@
         }
       ]
     },
-    "authority": "user",
-    "acceptedAt": "2026-09-22T22:57:01.542Z",
-    "response": "User requested running Opus 5.5 at highest and High effort, with and without skills, and fully updating the public Games benchmark page.",
-    "basis": "The user explicitly authorized this additive benchmark run and publication. Fresh browser evidence and the listed agent-reviewed captures support acceptance; no fresh human screenshot approval is claimed. Existing workspace Games presentation is preserved and hash-verified.",
-    "verdict": "Seven configurations, fourteen retained game outputs and twenty-eight original judge assessments are selected; the new Opus 5.5 Max and High configurations each have Bare and With Vasir outputs.",
-    "criterion": "All ten incumbent Games rows and their reviews remain identical; all non-Games projections, response archives and Writing modules remain unchanged. Both viewports exercise every pair, fourteen advancing clips, final-origin game input observations and isolation. Quality ranks exclude ineligible diagnostic scores.",
     "verification": {
       "previousAcceptance": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-template-lock.json",
-        "bytes": 40763,
-        "sha256": "a25b234b42711c99994756391c6518d00a77d7298be177113ea081826e7beb39"
+        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/template-lock.json",
+        "bytes": 16251,
+        "sha256": "e56c3e7774d994d5c164726e0dcaf662b45595f0c70464cc5b85c08f3fb29a4c"
       },
-      "previousFiles": [
-        {
-          "sourcePath": "deployment.json",
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-deployment.json",
-          "bytes": 3577,
-          "sha256": "1f76ec7f841eb99dba45d3fe81a839414b53f91c1431aea2cb333923bb122368"
-        }
-      ],
       "previousData": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-data.js",
-        "bytes": 929148,
-        "sha256": "edd57738ceb09ba45134c5d0b1babf471870614c1f417641bb31f7493f968840"
+        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/data.js",
+        "bytes": 997859,
+        "sha256": "458f401a925a0b29c49fe1dfe9b82ed2cf4f501e4765112d16bf0c2a5209187b"
       },
       "previousResponses": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-responses.js",
+        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/responses.js",
         "bytes": 6907491,
         "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
       },
       "previousSelection": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-games-publication.json",
-        "bytes": 362,
-        "sha256": "2c403a95c7cac08fe7b8b612dc6c71211e273f3545098620048df9a48049e321"
+        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/publication.json",
+        "bytes": 874,
+        "sha256": "8e1fbfee6da3bcfd926a73ad847067fba03597f7f52db141571904b6d088f6e7"
       },
-      "baselineManifest": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/baseline-manifest.json",
-        "bytes": 1691,
-        "sha256": "12d44ea6365a6d837e2bcbfb840c723d752ddff7a0a45a5d97aa56a120db8a18"
-      },
-      "preservedWorkspaceManifest": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/preserved-workspace-files.json",
-        "bytes": 578,
-        "sha256": "5e96075fa416a28c5e0c00bf2328afbb958fe4e4e84e609de6a094efe78bec10"
-      },
-      "preservedWorkspaceFiles": [
+      "previousFiles": [
         {
-          "sourcePath": "games.js",
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/preserved-games.js",
-          "bytes": 34825,
-          "sha256": "4b9d7a536c2d586501ff40cd44798579806eb2886e34b4766b5a1032bb8c712c"
+          "sourcePath": "app.js",
+          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/app.js",
+          "bytes": 219723,
+          "sha256": "516bb5069277efa6e438198e871d01f56d3a5059ab4058ea45ec66f27de00232"
         },
         {
-          "sourcePath": "games.css",
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/preserved-games.css",
-          "bytes": 21947,
-          "sha256": "271ad9afb1e8f00205c10dbb768418267f6335e64649bc5610c42217066e0e29"
+          "sourcePath": "benchmark-report.css",
+          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/benchmark-report.css",
+          "bytes": 38457,
+          "sha256": "5de2435ec194d9d80c1e734dbcb3c831d252f0713303933150334f497a0d1848"
+        },
+        {
+          "sourcePath": "benchmark-report.js",
+          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/benchmark-report.js",
+          "bytes": 133363,
+          "sha256": "4a4df466d1ef760cd5aa188a27ad47bf8b5824368ec5a554f5e88d317c874a78"
+        },
+        {
+          "sourcePath": "backend-testing-browsercheck.mjs",
+          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/backend-testing-browsercheck.mjs",
+          "bytes": 31242,
+          "sha256": "ae7df1f93b5a20e9d92efbdd158a6461b8260ef73636814e01ea0fd0dd0fd2e3"
+        }
+      ],
+      "selection": {
+        "path": "benchmarks/backend-testing/publication.json",
+        "bytes": 13992,
+        "sha256": "8cefa0ac1da65e0a72b157c5000b41b3fe782b91aeba7052a77cc50791f3a459"
+      },
+      "sourcePins": [
+        {
+          "path": ".agents/vasir-evals/backend-testing/suite-quality/runs/2026-10-09T03-26-05-719Z-da3291/publication-sources/rubric.json",
+          "bytes": 11913,
+          "sha256": "0f5ec20a61d27272759ecdd66be8de670b334568089b0b84a3ac46b599d738b4"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/plan.json",
+          "bytes": 3890,
+          "sha256": "a6a18df2f2d8251e002fc025626d8f62bfd95876e2f2d08a9a136f92125dbe1e"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/skill.json",
+          "bytes": 37910,
+          "sha256": "e5fc337d964d53d307737ed20753b52d63b027e22135c4e82f8b39e8d2223578"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/generation-summary.json",
+          "bytes": 8152,
+          "sha256": "3638edf0499f9405ac6f83444a7ad4f67d19d371f3f67cf8eed3d44447e4a524"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/review-summary.json",
+          "bytes": 144316,
+          "sha256": "dc6dd873d26156d95c7e3208109e0a31a7fe0e101c8ef7e8b91c9adfcdc447bb"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/review-mapping.json",
+          "bytes": 203,
+          "sha256": "5cb022d4d2837fbb32f7e9bc7d144e7246ca75228acacca1bb8daee46ed5038e"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/result.json",
+          "bytes": 14152,
+          "sha256": "3af1682fbc1ddfc3db0da0e8448c11fdf40f78e0a6d41d55b9071ec2704f48d6"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/launch.json",
+          "bytes": 4680,
+          "sha256": "ea4055e754886156b80b68bcb1e255059584a40c45f752f4280c49f02038e3ba"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/outcome.json",
+          "bytes": 1129,
+          "sha256": "169ea13841c2da266318fa0829e91bdbc5886c27efce472e899c77dbef06bee8"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/verification/evaluation.json",
+          "bytes": 51781,
+          "sha256": "846897a6b398b3baf17e2573a394709f7af654b8d496366b76f197a49286bb44"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/native/result.json",
+          "bytes": 6657,
+          "sha256": "08077c4f48b344e5ce5757329225c6d507022bdd50e4c48dc482d6f2ec6dbe6a"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/native/launch.json",
+          "bytes": 3338,
+          "sha256": "a3120e75c9edd8f9cb05001e5e79cfe2d9b6fed7b0932979d4e3c374864d0597"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/outcome.json",
+          "bytes": 743,
+          "sha256": "1c8407fb201d53d20710d9ab03c65d0a06d7a1969a958cc1e04262c0a049ffa4"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/verification/evaluation.json",
+          "bytes": 53164,
+          "sha256": "467a6f0ccdb43de28ade9ed23f88062148b9635d01b1931b908bd3cf92b81709"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/result.json",
+          "bytes": 7412,
+          "sha256": "d0d0b3efe31f16bbb38dc5349cd46132a20f0fc56bc251df4189245999291fd0"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/launch.json",
+          "bytes": 3338,
+          "sha256": "b7ac576344734be524efe82b2a9e6f5fef2937ab48d4680f300a76c3eb1fa0de"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/outcome.json",
+          "bytes": 743,
+          "sha256": "99049339e777296829524525cac71c3b982cf25c97b1d22095b8b78989c5ef0a"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/verification/evaluation.json",
+          "bytes": 50411,
+          "sha256": "2d633515d16508fbebcc2775b405f28381f7f562e75ad5238b4a9c45869db15c"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/native/result.json",
+          "bytes": 8457,
+          "sha256": "f648b9b6c3bca0787e3f95e68d62747ad2f672055f9a8e758526857488f9b93a"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/native/launch.json",
+          "bytes": 3338,
+          "sha256": "1b21631d27b6d63ff20309991ba6a7e43afecf8334dbce000b9033099db665fb"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/outcome.json",
+          "bytes": 747,
+          "sha256": "9fb91d3bd2089050f92d01ea93d1544effbc887f0037bd867bf888368d84c87e"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b6d39281e7/verification/evaluation.json",
+          "bytes": 69665,
+          "sha256": "ee892fa1d68a9dc85b79b45d5ca5ff8fdaec887b5e3233e35bc71e3552ecf03e"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/native/result.json",
+          "bytes": 7055,
+          "sha256": "8839693800a192da42b6cf9f9cf37551a0008f011d26d6464022419cc2907f17"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/native/launch.json",
+          "bytes": 3338,
+          "sha256": "b99d28b83aaa73d4704374c0786db12dfc1e23d5bf1aa28c739b2054e0c668c8"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/outcome.json",
+          "bytes": 747,
+          "sha256": "709d7cd2f3197bd7bd2d7cfdcb7b8dc70b97db1465fcf2b6610ec7d3f18065cb"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-b8dafe67b6/verification/evaluation.json",
+          "bytes": 62125,
+          "sha256": "4496afcde694fa2a29cb0a715952194d3f272d09bc20b47623c14be9f7b0682b"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/native/result.json",
+          "bytes": 20698,
+          "sha256": "0f3d5d8ca41dba486be50d2d00a19b5ea943ab8e853bbe379172fdb392b9c828"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/native/launch.json",
+          "bytes": 4680,
+          "sha256": "56e9c4e08ad551abd060eeebace490c1b067227125037e61353a1f4908f853a2"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/outcome.json",
+          "bytes": 1138,
+          "sha256": "39e37e9c800e9152519a35c9b00412bab6f2e0c299b1103484213543df25104f"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-ef3af81519/verification/evaluation.json",
+          "bytes": 66610,
+          "sha256": "a76de8b098cc7d4aac79e71284065109edf59c3f78f3c630c01a5d7dea0a40d5"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/native/result.json",
+          "bytes": 6737,
+          "sha256": "b7506ac46dc284d68a3c6a51f9b056755f8c1039fb3e1ce2212baac72e9f9a8e"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/native/launch.json",
+          "bytes": 3338,
+          "sha256": "f506b535763ffb2b78f936d2ddfb649bb8137b71e0498b1d75da398d06a539d1"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/outcome.json",
+          "bytes": 743,
+          "sha256": "a5fc77f5d2116e3daa19bb70ab38b489996d6497f79c409704fd357007a20d08"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/verification/evaluation.json",
+          "bytes": 45514,
+          "sha256": "9e1dfab4078ed0fef69c4817294abca41cae215ac576bffd9517e8276b051eb5"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/native/result.json",
+          "bytes": 7074,
+          "sha256": "355d31750f1a612eafbc60ed7f0ccbd35c1d174ca9bbe08ff79357f1f6cb09dc"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/native/launch.json",
+          "bytes": 3338,
+          "sha256": "67bd226359c1f16c1edd9964420a1586f8b80391f2ffee2be623bdd7e2630bf7"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/outcome.json",
+          "bytes": 747,
+          "sha256": "65e17024b4c0c2cab49daf459488826b3577f0fe675dd5a5c44af9884e945a41"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-64e28bb123/verification/evaluation.json",
+          "bytes": 69141,
+          "sha256": "a4d31f40d6af01c069e176b746dd6cb6c27b664f28b353c70123d92a647b7114"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-1/result.json",
+          "bytes": 55256,
+          "sha256": "9741efe748e9d9e03ebd8c4a7cd8b7d605f9e89936423fff12bca68e4810bc19"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-1/launch.json",
+          "bytes": 4417,
+          "sha256": "3fb38de997e075ba754b9af69a42cc338e96335dbf7337fa2ded9c2869d0c796"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-1/validated.json",
+          "bytes": 69029,
+          "sha256": "7087f1c57298b3f1067fa9ef7abb9705b9db3d64408972791e00ca2868665af1"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-2/result.json",
+          "bytes": 83579,
+          "sha256": "36e39ae2050fefd00c044a76aa63f8db08c7d4d3258adc7edc7561c66e3190bf"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-2/launch.json",
+          "bytes": 8564,
+          "sha256": "c3383476d96e995287aa2a708d3a0b93a627d5e655df242b35fb7b43808c6029"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/judge-2/validated.json",
+          "bytes": 53556,
+          "sha256": "7f935cc36ee891af1919e9417bcfc843af72244ee9264c540dd59fcf9a82947a"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/rubric.json",
+          "bytes": 7026,
+          "sha256": "fd12b026394619263dec1fca01e6d9a206b4e3fc580adec365cc2fcc2e6d3f03"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/plan.json",
+          "bytes": 3835,
+          "sha256": "4a2b609e3ac49faeecf34252d5bb64a8ea2dd307a73cc77248cc43dbda2af8cc"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/packet.json",
+          "bytes": 924481,
+          "sha256": "d4efaaf29a6609d56295c1b32d728c96f89930a6fa2a27c69862cdc85b8494be"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/mapping.json",
+          "bytes": 203,
+          "sha256": "c03d8879b1190ac99922e1ed83c23432f2ad11bbe1d2abe9ca020d58d4db7a70"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/summary.json",
+          "bytes": 134383,
+          "sha256": "0546daa0233017f56b9f305e8839647e6e661090e8e510cb3e0bda71d6f0a0dd"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/amendment.json",
+          "bytes": 1383,
+          "sha256": "87b788ce30ee02dcff9f9061884c5e98af89093dd7300433a43279c59102e1e5"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-1/result.json",
+          "bytes": 1290,
+          "sha256": "303292441ea2dccabd121844013f094ce2a964cea46672d73dce0e4dd8b7c385"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-1/launch.json",
+          "bytes": 3517,
+          "sha256": "b8a994c89848b7e6a92accbbed9ee682e789020fd22360fe1f9d6dba808e769e"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/judge/result.json",
+          "bytes": 50337,
+          "sha256": "12343b47a68805ee61078c68e018b4e272c46efd3a884a1c905abd6311b60f58"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/judge/launch.json",
+          "bytes": 3527,
+          "sha256": "d92946cabd6bea0dfdc0533303df6c9c3df53b89ef6f3fe2bb7fee199b5a41e9"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/astra-retry/judge/validated.json",
+          "bytes": 56391,
+          "sha256": "f9d1ddd96962e8712e053ea376fd91391f2381819f0b90f9d5ac2ef3e98cd8bd"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-2/result.json",
+          "bytes": 83849,
+          "sha256": "abe72f34b5c7d339412f91a250d107642f42825c72fb8952fff8adf7f10b6781"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-2/launch.json",
+          "bytes": 5208,
+          "sha256": "617df6491371bf3b7483228eaff80fc648e4b5f96499f51edbd92e68e3edde14"
+        },
+        {
+          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/dimensional-review-2026-10-10/judge-2/validated.json",
+          "bytes": 48367,
+          "sha256": "a318deee5174529d12fdd2e5e6ed8f8f97bad003eb446b105d863193a3ecf443"
         }
       ],
       "generatedFiles": [
         {
           "path": "data.js",
-          "bytes": 977199,
-          "sha256": "d5d8a6426d7af1b0132a21020612cdaf5a3c05f92e4c0fc1cb43904dfd36f95a"
+          "bytes": 986760,
+          "sha256": "5661dc6725f49d31c9620f4cf248eec78df0405c0f53f5ae070b258333c47cbc"
         },
         {
           "path": "responses.js",
-          "bytes": 6907491,
-          "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
-        },
-        {
-          "path": "writing-creation-responses.js",
-          "bytes": 6561951,
-          "sha256": "5ecca79e69f9ff8123c7f187d61736c7cbd0485d555d7f2a06dbca5ab9685b7e"
-        },
-        {
-          "path": "writing-data.js",
-          "bytes": 2177044,
-          "sha256": "48b50fd439056adfe4fcf48b76d1e890bcaf2dd2831ae926546018112f41f77b"
-        },
-        {
-          "path": "writing-dungeon-master-responses.js",
-          "bytes": 104,
-          "sha256": "3192148f7e1877e3f20f1f67b17764e964d6599b30b8221b0578167e7094faa4"
-        },
-        {
-          "path": "writing-responses.js",
-          "bytes": 4967761,
-          "sha256": "4c35ae4ca7dd70a09e09d01062046bda6a5f369dedb55defe956441cd555a919"
-        },
-        {
-          "path": "writing-twists-responses.js",
-          "bytes": 1672116,
-          "sha256": "df483b62adc636f031eca013d72c3eceb534cd6135b72833d0a46ba3d943d6f3"
+          "bytes": 7091231,
+          "sha256": "23f9240b1af6207df1f3f02b3092f0637f257214af23ab846ac87a7211a495ae"
         }
       ],
+      "candidate": {
+        "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaff677c3f2356887f4beb5e4b170898edf92fe32cdf13b8093431c.json",
+        "bytes": 400220,
+        "sha256": "08c17c195b4b86b528c1cd9d3357499a78bc687f920a1aac14240005345b3c01"
+      },
       "browserHarness": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-browsercheck.mjs",
-        "bytes": 63737,
-        "sha256": "12a0d4c31422ccdd2186ec2aa7e9424113938ccd064330e8ac35e8366f02a5e1"
+        "path": "backend-testing-browsercheck.mjs",
+        "bytes": 53305,
+        "sha256": "e0f5990e205e215366ab2b337f52c32fb5d16da044e0618a45ea1622493187de"
       },
       "browserProofs": [
         {
           "width": 1440,
           "height": 1000,
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-browsercheck-1440.json",
-          "bytes": 424082,
-          "sha256": "ff9b5e1352518ee31985b08d5cd3b1167b5f7d291a9ba375111cbebce93e4e3a"
+          "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-browsercheck.json",
+          "bytes": 234135,
+          "sha256": "fc487c045773032423c4ceea24bac558aaa311a25996103cfcf18832585208e7"
+        },
+        {
+          "width": 820,
+          "height": 1000,
+          "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-browsercheck.json",
+          "bytes": 234061,
+          "sha256": "23313a90ee9e71a6d97656dc5c6bb1238303eaaeb5a0c17f776d71d2413b8b91"
         },
         {
           "width": 390,
           "height": 844,
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-browsercheck-390.json",
-          "bytes": 421073,
-          "sha256": "e0010a7e7969d13abfa7714972d6119346c5d017b7c41d95d5a8353992c49cbe"
+          "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-browsercheck.json",
+          "bytes": 234030,
+          "sha256": "6e8632b332c169233d867ecae67b3e72327b6be8481d87bd30534dded2d2dacc"
         }
       ],
-      "rehearsalManifest": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/rehearsal-manifest.json",
-        "bytes": 347082,
-        "sha256": "c62402aba6f60407d22ed321daf4d992dc2e093b5539b15e61c09e854440e655"
-      },
-      "candidate": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/candidate.json",
-        "bytes": 5875,
-        "sha256": "8d0cbc81d00637b333133b83e4739da85187700b420ce4915f6a34d8f6b968e0"
-      },
-      "selectedPublication": {
-        "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/games-publication.json",
-        "bytes": 362,
-        "sha256": "6b3c46159e9014113dfc055e90d36db326c4bf90eca918a8a33331ffe5cdedb8"
-      },
-      "deploymentBudget": {
-        "before": {
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/baseline-deployment.json",
-          "bytes": 3577,
-          "sha256": "ade9361c25ad40525c194023988ccd65c899f12df237f057b5115762eb45850e"
-        },
-        "after": {
-          "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/deployment.json",
-          "bytes": 3577,
-          "sha256": "cb3de1995306a55867530a5c251f2a3d20e4d057c47a10e782ebe3cc43136e1e"
-        },
-        "measuredCompressedLandingBytes": 311005,
-        "previousLimit": 300000,
-        "currentLimit": 320000,
-        "storage": {
-          "rejection": {
-            "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/storage-budget-rejection.json",
-            "bytes": 846,
-            "sha256": "117b0660a055ff7aeb86d28cbbecf6f22962397673f0e028b8d1f2c4bcce97be"
-          },
-          "previousLimit": 1073741824,
-          "currentLimit": 1090519040,
-          "boundaryBytes": 16777216
-        }
-      },
-      "configurations": 7,
-      "outputs": 14,
-      "judgments": 28,
-      "preservedOutputs": 10,
-      "localBrowserChecks": 2,
       "visualReview": {
         "authority": "agent",
         "capturePaths": [
-          "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-ratings.png",
-          "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-ratings.png"
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-engineering-ledger-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-quality-overview-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-check-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-method-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-review-retry-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-rubric-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-execution-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-test-files-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-score-calculation-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-profile-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-ranges-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-reasons-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-semantic-naming-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-evidence-qualification-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-files-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-evidence-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-hyper-scale-chat-1440.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-engineering-ledger-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-quality-overview-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-check-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-method-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-review-retry-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-rubric-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-execution-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-test-files-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-score-calculation-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-profile-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-ranges-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-reasons-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-semantic-naming-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-evidence-qualification-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-files-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-evidence-390.png",
+          "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-hyper-scale-chat-390.png"
         ],
-        "verdict": "Agent inspected only the listed current-candidate captures."
+        "verdict": "Desktop and mobile captures show the standard ranked comparison table using one final score, with Coverage lost beside capped baselines. Inspect run exposes actual JavaScript test files directly beneath Minimal and Skill; the first file is open and Copy preserves source bytes. Seven-dimension profiles and original review evidence remain inspectable. The collapsed calculation explains each reviewer cap and final score, and Method discloses adoption after reviews. Keyboard controls, safe wrapping and horizontal containment pass."
       }
     }
   },
@@ -209,12 +472,12 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "This acceptance adds four frozen generation outcomes and their saved original assessments while preserving the existing workspace presentation. Local pinned-byte browser evidence does not establish live CDN delivery or certify game mechanics, winning, physical-phone feel, or enjoyment. Historical acceptance stays archived unchanged.",
+  "claimBoundary": "This acceptance verifies a current small known-case development comparison and fixed seven-dimension review. Model judges can disagree and miss defects; reviewer ranges are not confidence intervals. The results do not establish a population skill effect or broad model ranking. Candidate evidence does not establish live CDN delivery; dedicated live checks are recorded after publication.",
   "files": [
     {
       "path": "app.js",
-      "bytes": 218131,
-      "sha256": "9e7d557409c56671ee1d687f95f2da990821ac5f691cec18c0ecb98626d4eb10"
+      "bytes": 220100,
+      "sha256": "39fb457d38f344426549b4ca3d0be5647e52656c4843106fa73aee4706e0de8e"
     },
     {
       "path": "assets/d3.v7.min.js",
@@ -228,8 +491,8 @@
     },
     {
       "path": "benchmark-report.css",
-      "bytes": 35976,
-      "sha256": "cfc3b8192eebf17703a6348c8e860b281cbf3dbbf29e9da974633a11caf3de6d"
+      "bytes": 40264,
+      "sha256": "7e0e02c7dbfb7c32379b4fe12fd8db97d5bc22566b470dbb0de0c94263f025da"
     },
     {
       "path": "benchmark-report.html",
@@ -238,8 +501,8 @@
     },
     {
       "path": "benchmark-report.js",
-      "bytes": 122267,
-      "sha256": "b131c61b4d9b19adc707014948060eb230dd9c7ae74e0e5edc1716d209270ca7"
+      "bytes": 148008,
+      "sha256": "e020816125a708d6cf6d20e0b259660ef9062a9dff7e2d0302b397b16e69ee24"
     },
     {
       "path": "capture.mjs",
@@ -301,675 +564,378 @@
       "role": "compact-writing-evidence-harness",
       "bytes": 14609,
       "sha256": "38962d403c5ee9b1c862132e7ec636550d4ae5d1a3fa720d55504c7dcd1fcf47"
+    },
+    {
+      "path": "backend-testing-browsercheck.mjs",
+      "bytes": 53305,
+      "sha256": "e0f5990e205e215366ab2b337f52c32fb5d16da044e0618a45ea1622493187de"
     }
   ],
   "captures": [
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games.png",
-      "bytes": 152350,
-      "sha256": "e2984870fdc8ae57bfaab8b0e3cb33145434b4b63c16b7c140d955b1962a7ce8",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-engineering-ledger-1440.png",
+      "bytes": 209046,
+      "sha256": "8cecbcf3b9bfd8bf9363a205fae102288f6fab12efd833b7156b0fc4d3c99703",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-ratings.png",
-      "bytes": 142456,
-      "sha256": "1fbd7814891191fb87e8fcd098c4e715ce826df0c1e3e5a585a19497b1b77a11",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-quality-overview-1440.png",
+      "bytes": 94825,
+      "sha256": "d18316242f200adf552c40b35a798bca6ef0b998fd1e312557946a39d7d79d8d",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-playback.png",
-      "bytes": 487027,
-      "sha256": "d37cedee0ced18a886dfa5e432a098f5a217ecf8b26c7b994c651e678c3bd27b",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-check-1440.png",
+      "bytes": 95853,
+      "sha256": "534bbd2eaf31efb4928d27af1369abd7dfe830c53c5a5eb98fb69c5d5f824120",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-play.png",
-      "bytes": 483950,
-      "sha256": "5fe6333cefedeb3021e7e5ae5aa41a0e35124b87965c55aefd66a5debb9b6728",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-method-1440.png",
+      "bytes": 121233,
+      "sha256": "07c7339afdb850ce26d9fcdebfd4960d820a8c05bde9b997c6bb7ef52df466e4",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/desktop-games-fullscreen.png",
-      "bytes": 467583,
-      "sha256": "21a57380956798a946ba2928cc4757ab7e94f800fd4b54caba7aff347aad6f28",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-review-retry-1440.png",
+      "bytes": 147684,
+      "sha256": "d710b954ae76a246535ad3216750960c51c0401b864bc10cbd3374d75b03a26c",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-1-playback.png",
-      "bytes": 486955,
-      "sha256": "32c87ca36a80b6a2fa8cb01d0278c2e4e966a28a9051f07774b1e07025424621",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-rubric-1440.png",
+      "bytes": 154197,
+      "sha256": "cb837ed174ef76866fed79c3692ac7909cd17218be17680d7d7520d0f4fd18ca",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-1-before-input.png",
-      "bytes": 651259,
-      "sha256": "83aada869e4336fb7e9149c4d7b0ff25b2e2401b1548c3ed24f3078b8cc87761",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-execution-1440.png",
+      "bytes": 139497,
+      "sha256": "f4fae928993bc83aaed08d242587fd96d5a42497799d2ecb8a4342b0a765b74a",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-1-after-input.png",
-      "bytes": 647147,
-      "sha256": "9a26d97b3ba60f59af6aba16d1133198903a6bbdb81bdae9f9556effa032b45e",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-test-files-1440.png",
+      "bytes": 190521,
+      "sha256": "92053312079d7f01ed3133c0947c5b9b595e58e74de683e044b881fdefec775f",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-2-playback.png",
-      "bytes": 483940,
-      "sha256": "8b3a56291f567cbd110de8e1aa0fe2cd3f3d1a961b57e6e5ff4ee229d86cef6e",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-score-calculation-1440.png",
+      "bytes": 166038,
+      "sha256": "3a63c5d3c74af54e649a3e626371102df69d3378cb1890e6b15e75195cdf9c26",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-2-before-input.png",
-      "bytes": 593166,
-      "sha256": "4a004aca28e2d062f346255b62b5a8535320dafbbe1d2505e7a207438f8a6a64",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-profile-1440.png",
+      "bytes": 105346,
+      "sha256": "7d4138a8abcf7859eb0dd923e464236ad562f576764695df3bdd16a88a30eb75",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-2-after-input.png",
-      "bytes": 594733,
-      "sha256": "ea3eca609a8d567ed03692e9b72049cd99ab1ede25cef38ce84fa1b38c610dee",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-dimension-ranges-1440.png",
+      "bytes": 156514,
+      "sha256": "1484ce61edb604fb92e1249da8e779958b6d1685c0af2ef49949a0a45a3b6593",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-3-playback.png",
-      "bytes": 405037,
-      "sha256": "1de9072f6976609bc19ddfd69bd511dfc1aee7d34294c3de3b90c9d485c0f682",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-reasons-1440.png",
+      "bytes": 136906,
+      "sha256": "2ca0672ad41cb505d2e81500ad5b1e37e1cd4dce934e6cfc2dcd5bc35b527b46",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-3-before-input.png",
-      "bytes": 488146,
-      "sha256": "562ad5dcd0ac07f5977bf9856046213a03be54dcfe242a0d268453fb4492573d",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-semantic-naming-1440.png",
+      "bytes": 125457,
+      "sha256": "817ffd6fb204b182ba81c17627744f8cd51f135d3114ef05b2b5acb67f277ac6",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-3-after-input.png",
-      "bytes": 492861,
-      "sha256": "35a432e76c51b1f43d75ae63b157b04f1daa29824e32e8c73ef4577190dd2952",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-evidence-qualification-1440.png",
+      "bytes": 129335,
+      "sha256": "2a58f6852134a1973425c3fb6bb9f530e3fca8d90cba1da6289d219edd6c0f5e",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-4-playback.png",
-      "bytes": 318926,
-      "sha256": "837cbf94402a6a6493c3b7840c30f024c72f890ef6990e1b2c342c0ce9f877e5",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-taste-files-1440.png",
+      "bytes": 94210,
+      "sha256": "c20dcdfba7a0e1fbe38019e4307cff9f0d27cb2d660f8948efe414e3bc338f06",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-4-before-input.png",
-      "bytes": 344766,
-      "sha256": "a515288a39a488c24bbdf1895b10fd983ac4826e01977a5fe130e2610084ec74",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-paired-evidence-1440.png",
+      "bytes": 133097,
+      "sha256": "ded7fec461e5ef32d2b4dbc42ad78ec2da18960f920bb531ff38b7c93d0a50a0",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-4-after-input.png",
-      "bytes": 419756,
-      "sha256": "98eee848e22c069e327ea6cecdfae240309c8718856e40a54ad969dccdc4a733",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/1440/backend-testing-hyper-scale-chat-1440.png",
+      "bytes": 143921,
+      "sha256": "67602a5bcb4fb2f38019036445c31c78404c2ed5fead1ae16bffd4e17494c34a",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-5-playback.png",
-      "bytes": 388798,
-      "sha256": "188363592099bdc8ceef473be0ece6a22c05a4420b513e745e9f6ed7729609a7",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-engineering-ledger-820.png",
+      "bytes": 124107,
+      "sha256": "dd5d8c009cc513f35541b4d43c509798926135340ba6f438e5a913c6682b31dc",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-5-before-input.png",
-      "bytes": 321920,
-      "sha256": "03ad8a6141ecec4fdb05438c6ba730024c0301669e32525fdf74b455d91a0307",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-quality-overview-820.png",
+      "bytes": 88043,
+      "sha256": "5a12d536548f796708d86a68ace3f9f340c856792729fdc537d28e43ace17400",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-5-after-input.png",
-      "bytes": 324220,
-      "sha256": "af11473ff4754d9c1850fa7e4e12c2d7124ed95e3dcf50c21e4d9052b49b9a8f",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-paired-check-820.png",
+      "bytes": 88973,
+      "sha256": "1af2a1c03624ef75c7d66c648fd14f4047ab30494315c1464aee583335ffc41a",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-6-playback.png",
-      "bytes": 438288,
-      "sha256": "17f52ebf50aca55ace257a46e5594ac28cb568aa0f0f86275128d3f322954296",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-method-820.png",
+      "bytes": 95168,
+      "sha256": "38817303c9c577e21fbe85fc6464058dfd340602b34fe25b46e2ca82db6c9b3d",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-6-before-input.png",
-      "bytes": 470328,
-      "sha256": "8ef42b60df030bb841f143f769d06c6a53353e4af7c64d10df2eec41e66adec8",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-review-retry-820.png",
+      "bytes": 119042,
+      "sha256": "7d1b2ac0e79b23699cbeefe85c6c87609219943b39936c455c063894086ab49d",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-6-after-input.png",
-      "bytes": 444386,
-      "sha256": "6dad5883ebe04a3fa6f6783b5bf69a03dcd1c8338e159a2a06e90f5543d7cb21",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-rubric-820.png",
+      "bytes": 125182,
+      "sha256": "12a297362b54428243afbe7ee0549785ac1e50837fd364c1c16843b03a33cfe8",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-7-playback.png",
-      "bytes": 402465,
-      "sha256": "ce6c679591009ae3a313a17140801d6d8ad1e2755997f8f33801e7e146293b58",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-execution-820.png",
+      "bytes": 109527,
+      "sha256": "1a8bf1fa30f215d1711226f4e43d8f72090aa9bcf1c008040b8ac1bef4010ad5",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-7-before-input.png",
-      "bytes": 410608,
-      "sha256": "da55861284bcdba1256ea530b8f93afe381e2007085603a6ad6777db6845407d",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-test-files-820.png",
+      "bytes": 159741,
+      "sha256": "daf1c330547bcda90053e94d2da9c74e9558f039d00b35f47a6249c9b706ec80",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-7-after-input.png",
-      "bytes": 408673,
-      "sha256": "8b96a0103b1f7d4306eda0111aac7826bf2ed817e8389033f97ce394664416bb",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-score-calculation-820.png",
+      "bytes": 139409,
+      "sha256": "b71d42caa2b26e618019be9dfec707bb3f27edc2c70f7bb804d27fb5ae39366b",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-8-playback.png",
-      "bytes": 396972,
-      "sha256": "d5b7d3c42bd4833e4a7a8df86ea04f0bab33605b1013bb1fb3d2f700e8f05724",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-dimension-profile-820.png",
+      "bytes": 82774,
+      "sha256": "d4caf8609a66beccb147dfcdc98c4409bf96710f0c87a921b5edf348ef12e8c7",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-8-before-input.png",
-      "bytes": 420992,
-      "sha256": "177e8f6d33155990e9e509ea09c8277e27ac65b329b8c02d12698266b916b4b2",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-dimension-ranges-820.png",
+      "bytes": 133838,
+      "sha256": "db30a09279ec554fc57cf8abeaecbd8e72e58f5a46d24d972681a055e5744e43",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-8-after-input.png",
-      "bytes": 407165,
-      "sha256": "e9497f162139a52bca82b49a4cfa7dac4a877b6bb27da4344d385ca3eee05f91",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-taste-reasons-820.png",
+      "bytes": 117489,
+      "sha256": "769b1878cf4117c5b92585dd5080bcee00df547ff68403a3ccbfdb296486cb1a",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-9-playback.png",
-      "bytes": 462869,
-      "sha256": "7d603fa538803fba1df81807ad1f4e1f05534d71c6840c0db59b4866547da1c4",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-semantic-naming-820.png",
+      "bytes": 108333,
+      "sha256": "61fa3ed1ee06751a317e3aaf628eb3ff0c5273a1541455e039a10821ebd51383",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-9-before-input.png",
-      "bytes": 631389,
-      "sha256": "492daee3901660271a31282adb6dd0588e44cdd4ee5e5db9f3429a8c6f0e45a4",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-evidence-qualification-820.png",
+      "bytes": 107622,
+      "sha256": "0553d33eb00182d661a3159b7af30879f2a8a7caff6e04d55aab2abb4b9311b2",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-9-after-input.png",
-      "bytes": 622274,
-      "sha256": "6261c79697d41a59e0c049667e57b019efc2c0b359903346daeeed2a52ace406",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-taste-files-820.png",
+      "bytes": 88884,
+      "sha256": "932531e27244f7e96468a4f8432645896ac256701a88e1aa75f197b53c468cb0",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-10-playback.png",
-      "bytes": 670946,
-      "sha256": "b460068f87c4e33ae5a2a591cb138883d5b84d8da0036d5fda4b732fa2f2df13",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-paired-evidence-820.png",
+      "bytes": 105372,
+      "sha256": "3a4a8997878abbe2445ce5ed5baf766c879b0a7e5b42ffca675989bda8d30dda",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-10-before-input.png",
-      "bytes": 925604,
-      "sha256": "b263b95145b34e17cb7e0b40eefab71ef2d22f3dca5927b23aa6fbbe2e888c05",
-      "width": 1440,
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/820/backend-testing-hyper-scale-chat-820.png",
+      "bytes": 99411,
+      "sha256": "1d151d3e7b797f8778b7b239b97afd721c8b36c749d3723f735903e8fafe6b4f",
+      "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-10-after-input.png",
-      "bytes": 938109,
-      "sha256": "42becb73e3d39651953df085e97eab3240b8f6604bc5a3f346a31d570c37a24c",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-11-playback.png",
-      "bytes": 699346,
-      "sha256": "6621e180359183b671777809b0e3bc7292c57cc43e0b6d08fd9169bed17ce2dd",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-11-before-input.png",
-      "bytes": 782767,
-      "sha256": "6e544328af1196d25a369b12d65a3ed959ec7f76aef673ad5c4223bcb37e6175",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-11-after-input.png",
-      "bytes": 920152,
-      "sha256": "e233e500d0864311061e7b1d2bbafa7323b4aa3eea80d2d27b865f49fa39f35f",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-12-playback.png",
-      "bytes": 571888,
-      "sha256": "f3f5e4eab2e3fbe3faf207d6d710cd7617fb75faa97a04ff1eee45881a1970ae",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-12-before-input.png",
-      "bytes": 861699,
-      "sha256": "13770601c850d82b36d30fbd9cfd9649d9c288a5831629906e06b878bfb1fbfe",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-12-after-input.png",
-      "bytes": 944917,
-      "sha256": "1b3f06b2728f72e8271b1d289d4446508b85eeb7315f544e17dc26529bfa916b",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-13-playback.png",
-      "bytes": 561940,
-      "sha256": "880035a90134ae95c6ecfba91ead468e340f6207bc703aaa8ef145bba5b67718",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-13-before-input.png",
-      "bytes": 845080,
-      "sha256": "fce0f322bb87b4d814af7415bc9ce1d9c19eba26fb89fb55ea0f0ed36a78453d",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-13-after-input.png",
-      "bytes": 940843,
-      "sha256": "a5fc603f0e21163d801d5a161d8e97311ca04f61103543333f4b7e5770ed608e",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-14-playback.png",
-      "bytes": 386404,
-      "sha256": "13e1141935edcd8f2d9e46de5705e8c9ecfa52c8b604e9c5a2cd17a13eb8d1e3",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-14-before-input.png",
-      "bytes": 587980,
-      "sha256": "16d5842abb6d25a8fde4bf2c2c18657e4c47b9df6a879a3644b1d079e27819ac",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/1440-14-after-input.png",
-      "bytes": 599885,
-      "sha256": "399b128fbbb6eeae66740de11574537afcfab0e988d47cb687d13c2eb5d39bdf",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games.png",
-      "bytes": 61606,
-      "sha256": "4a85d3583792963bea9542e040c913adebf813b422fdd8285a0981ea2a2fc490",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-engineering-ledger-390.png",
+      "bytes": 78723,
+      "sha256": "5f72bb1c0b403b392c4b895ac36e9dbbffcbc531a69891bbb274b90765cf4c43",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-ratings.png",
-      "bytes": 56486,
-      "sha256": "87ea07c0258ed13314ab21624f5d7d73f1e7650c7f04d7b5bdf02873b9c96fe4",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-quality-overview-390.png",
+      "bytes": 56444,
+      "sha256": "7363681f370d0d387ed5b887440c93c33b0b35df59d6818cdd24478ea0f1f571",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-playback.png",
-      "bytes": 165739,
-      "sha256": "a35beac505c8274dc33197c1610f7832812430717387309658da52242140a294",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-check-390.png",
+      "bytes": 57616,
+      "sha256": "38f07d116bed1b4024fda747f9aaab6a18650479637e2c61acf5186ac8dbd831",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-play.png",
-      "bytes": 168136,
-      "sha256": "576eb4152b6491b70b4671582da9019958569cf04c192cc7eed93372910ed7da",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-method-390.png",
+      "bytes": 54907,
+      "sha256": "d2d423527f746d75349f592fbaaf97b61f9a895b637b294b9d28ebeb27efb404",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/mobile-games-fullscreen.png",
-      "bytes": 381135,
-      "sha256": "4fafd568fd501cd71c30e11a7cdaef4375212a07372f9d4d3b61d4102ca403f4",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-review-retry-390.png",
+      "bytes": 75589,
+      "sha256": "e9d6dd17e384c60c790fa02a0e62718b275a4d32e4ccb12c475480a87de09c0e",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-1-playback.png",
-      "bytes": 164537,
-      "sha256": "bda31aab3bf06e7f32e585881e74134ee437753951437a6691348397e3b6d042",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-rubric-390.png",
+      "bytes": 71932,
+      "sha256": "921c9875691516bafaae802e22c0a8e661b01518cc7095f3298b33b399e42092",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-1-before-input.png",
-      "bytes": 178995,
-      "sha256": "1e22e2bb77754efd29e7145f7dc6ee474f781b3fc6511edc48fced6607a3857e",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-execution-390.png",
+      "bytes": 62941,
+      "sha256": "a206c564598cc2cb2acc4fbfc2bfc1a34cfd7d3706ceb050bb640b3afc0007dd",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-1-after-input.png",
-      "bytes": 146788,
-      "sha256": "0238531c732deb6ba0167660f56ddea0aa2b7a597e5369e3de948da1573f30e4",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-test-files-390.png",
+      "bytes": 61397,
+      "sha256": "402686554e180ef4930760bb00586bb150249ab46a5659398829462bbaf4b58d",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-2-playback.png",
-      "bytes": 182047,
-      "sha256": "da25e89ebcf3f588c5f25d9ef5d95b797e9e19d41a70666814062bba995251c3",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-score-calculation-390.png",
+      "bytes": 62940,
+      "sha256": "12839efcec3de50fded9b4e5d1ad1b395909ee217b2babaa7594ebabf375e39b",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-2-before-input.png",
-      "bytes": 171959,
-      "sha256": "21d4544d060743154b448208ebd53bacbb6ea8811f06c66a3d7278edb75702c5",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-profile-390.png",
+      "bytes": 59532,
+      "sha256": "3b382867192fb5e5570e252a63522dddf3ca04ed607e9fa10fc8ea6a3579aa2a",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-2-after-input.png",
-      "bytes": 173925,
-      "sha256": "ba889b499819fba01b74730c7783bc774e633a5a1cafc27b55e1b3d77d8a1016",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-dimension-ranges-390.png",
+      "bytes": 66085,
+      "sha256": "35bee71e98063453fcbfabef56888f46133cd281b8cf95fa224e56efc09d4133",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-3-playback.png",
-      "bytes": 146757,
-      "sha256": "1d06910d373063efe92a1fca04d46c86a8ac2cf93227135997c63cf370048e14",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-reasons-390.png",
+      "bytes": 86535,
+      "sha256": "e927aee199d795ba131a875f00c05d4e1f5c2a4d8341cac457e9de7747883867",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-3-before-input.png",
-      "bytes": 138881,
-      "sha256": "86c9d40f060d2341db774620a7b9cb1aee6cbfaf0dae75676aec78b53435fbbd",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-semantic-naming-390.png",
+      "bytes": 77587,
+      "sha256": "98d7827cd7ba4ee27182d5296596c311b043e25708804bb16a282b3c0a0a74c7",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-3-after-input.png",
-      "bytes": 139783,
-      "sha256": "37e895b25c98f705b20b4f91dee45407e3fdccba0b598bb8547abeaf6cc42119",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-evidence-qualification-390.png",
+      "bytes": 79147,
+      "sha256": "26ec42c6e17d403495f49953fca8ea22f5fbc45421b9b858b62a478a33e98fde",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-4-playback.png",
-      "bytes": 80840,
-      "sha256": "8a1e34d254586258e344ac9c4769bf9ea1fabb501086f6797a5fc20e8f43c2ad",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-taste-files-390.png",
+      "bytes": 68679,
+      "sha256": "7ae96489f9c42d7722c5ed951407cbc17b73958f993c52d332c9c229cf045cd7",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-4-before-input.png",
-      "bytes": 69425,
-      "sha256": "92f3da0ea56bda59c09864d718061788f75e8dcdfa344935022c029ff7e28cf2",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-paired-evidence-390.png",
+      "bytes": 62012,
+      "sha256": "3e131021e7b4bd1613f0b0a0cdfe302c17a98e2b61bcf368b634132a2c835da0",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-4-after-input.png",
-      "bytes": 112664,
-      "sha256": "b86465f01413d2c7d81f1a77edafd4b6c046cb8de2efe398f039b9e415467d4e",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-5-playback.png",
-      "bytes": 125953,
-      "sha256": "a54bb4ef7557037326007d6e16c1801cd5d05ce6997d0fe23dde38463ad31f32",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-5-before-input.png",
-      "bytes": 61052,
-      "sha256": "85dc96696cfa2cd40a45797ed00d8c293cc905ba6e9407fed01b23cddf6cf7f2",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-5-after-input.png",
-      "bytes": 65940,
-      "sha256": "2b47ad18490af1fcc5757102ca8a546ad7c3f0561751183da3d7da8354defe58",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-6-playback.png",
-      "bytes": 123118,
-      "sha256": "881a84296c50fec195af56962f0cc676b14f3cf0d6f99d92db79c2c81f623639",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-6-before-input.png",
-      "bytes": 107978,
-      "sha256": "062e603a39e9c6a7cc9fd8468110bd22d8cb80d98fbad13d1144e6bd5b754396",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-6-after-input.png",
-      "bytes": 93077,
-      "sha256": "dc96f01ddc1cb77b10319d62688b81640081d370753c24492fdfd041998cb79c",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-7-playback.png",
-      "bytes": 115949,
-      "sha256": "4434ce62a9dd4ffb59aa9e24fcceada702dba697eb28e57841fd960c367cfb6c",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-7-before-input.png",
-      "bytes": 72545,
-      "sha256": "40704d6b8a1b2376f26e0d4a54aaa6b4a4998179ec703cd26a92654a9c4104b6",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-7-after-input.png",
-      "bytes": 72500,
-      "sha256": "5266702c15ea1d276500651808b4c1301512773b9469c10f8420a59a58e0ad6b",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-8-playback.png",
-      "bytes": 136965,
-      "sha256": "4f46279c21246024ec9db85aef94e285b077affb0d3e0ab537ac9030d79f463f",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-8-before-input.png",
-      "bytes": 106554,
-      "sha256": "f594f9f7a4aebe3b7662ccf82527c5e66c5592e60366061b7f90b660692c0a53",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-8-after-input.png",
-      "bytes": 99414,
-      "sha256": "3c68bd48b3dcd18fa468c528744a8171f1b6e237d3b3f83faac80da7af974f16",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-9-playback.png",
-      "bytes": 133455,
-      "sha256": "6412099d31eac53c825f21c0c3f7e4bbc11d34b64594fc15cabb5bc03e71e7a6",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-9-before-input.png",
-      "bytes": 148357,
-      "sha256": "9c71ed239c55685fb695d532884f82041049868b160857affff0c43d99a170fc",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-9-after-input.png",
-      "bytes": 141972,
-      "sha256": "374b4068bbbc46220e03f09ea5cd1b3c13426bc40d4afa0f4cfa0660a528690e",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-10-playback.png",
-      "bytes": 233837,
-      "sha256": "30bd32a30c38423d02fd9f18274da3db30bb1ae7a4a22d138fc7321cce2dc86e",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-10-before-input.png",
-      "bytes": 253064,
-      "sha256": "b0588821beb81201149cde52d18843f2371038eecbd2ffb0f08de5812dde61b0",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-10-after-input.png",
-      "bytes": 262853,
-      "sha256": "a33d4062b824966599ca1f25503c929f37f2dd54661d03ca7db49bebbdae8c08",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-11-playback.png",
-      "bytes": 228539,
-      "sha256": "309c96026e038aa5ac1dccf2f9016d6173e12ede426d7aa38a7759eea48cf4c6",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-11-before-input.png",
-      "bytes": 171951,
-      "sha256": "d3d636c43f72995f7964202f85f1e1f571b0b91243cc14c75f4e441b0f5624ff",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-11-after-input.png",
-      "bytes": 253039,
-      "sha256": "58b1f9bc7e95d7fe1bfe63d7f503b16ae65da6cabbb09a658b4c9c0b5c084a43",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-12-playback.png",
-      "bytes": 193336,
-      "sha256": "7fd62dfdd82e3667f8515638313679abcce024ec826edf6b775119bf01d7d093",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-12-before-input.png",
-      "bytes": 242585,
-      "sha256": "b891663aa81184894732606756cd6da4935eaa21fb3a058e612a1cce43642a85",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-12-after-input.png",
-      "bytes": 244495,
-      "sha256": "0f9cdbfd88110ec02097a2b3b95c48c40da6d679d1bce84a523d34c506f0ddbe",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-13-playback.png",
-      "bytes": 217065,
-      "sha256": "fd5e60bff5655a70f485ca4a81138170d9607fc96499cc9e04d3e3f1e1046750",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-13-before-input.png",
-      "bytes": 226202,
-      "sha256": "f267851fc28f67f331533da44281a1fbbfc1676e8535755ba0bf28f3a4bd2b2b",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-13-after-input.png",
-      "bytes": 265023,
-      "sha256": "464c81761bae74015a111d6f8ed0b73b4371f24615359d866f0574098bcbd307",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-14-playback.png",
-      "bytes": 117603,
-      "sha256": "67395f9fb86dca6925a2d09e108c9960047e184d7d92b1bcfe9efc1932189999",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-14-before-input.png",
-      "bytes": 171092,
-      "sha256": "6cd2167f7d10a61e3b0e6a7fba1171a90f5786a7bd39f87aba51b9bba166bf5d",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/390-14-after-input.png",
-      "bytes": 178925,
-      "sha256": "9ccd94f16a8f14e9341a228de486e0fdbefd81e325e2ff57939871481664ce02",
+      "path": "reviews/backend-testing-combined-score/2026-10-10/candidate-1c2e9e69caaf/390/backend-testing-hyper-scale-chat-390.png",
+      "bytes": 58723,
+      "sha256": "23889acd67146fe6ca39424afcfee98551fff3acc1725b7c7b82d15f91a15dde",
       "width": 390,
       "height": 844
     }
   ],
   "retainedCaptureEvidence": {
-    "explanation": "The freshest previous acceptance and its historical chain remain archived unchanged; earlier captures describe their earlier candidates.",
-    "version": "2026-09-22-games-opus-5-5-1f047fe0422c",
+    "version": "2026-10-08-backend-testing-d18fe23eea9b",
     "receipt": {
-      "path": "reviews/games-opus-5-5/4a52680ba94a0cb9757cafb5ab09c41ecd720d9600fea08a166dceb830eb2ed3/previous-template-lock.json",
-      "bytes": 40763,
-      "sha256": "a25b234b42711c99994756391c6518d00a77d7298be177113ea081826e7beb39"
+      "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/template-lock.json",
+      "bytes": 16251,
+      "sha256": "e56c3e7774d994d5c164726e0dcaf662b45595f0c70464cc5b85c08f3fb29a4c"
     }
   }
 }

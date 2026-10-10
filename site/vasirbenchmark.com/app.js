@@ -1109,7 +1109,7 @@ function buildOverallAvailableCategories(data, setting) {
         ? isOverall ? `${SETTING_COUNT} ranked settings · ${data.coverage.incompleteSettings} coverage gaps` : `${SETTING_COUNT} matched settings · ${SCORE_METHOD_LABEL.toLowerCase()} across ${TASK_COUNT} benchmark tasks`
         : `${SETTING_COUNT} matched settings · ${isWorkSpec ? 'one authored chat task · spec quality' : SCORE_EDITION_LABEL + ' rubric score'} /${SCORE_MAXIMUM}`;
     const summary = (showingBenchmarks
-      ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests`
+      ? `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} benchmark tests${category.id === 'engineering' && rootData.executableTesting ? rootData.executableTesting.schemaVersion >= 2 ? ' · plus 1 suite-quality benchmark' : ' · plus 1 executable pilot' : ''}`
       : showingEfficiency
         ? `${ENTRY_COUNT} setting × condition results · fixed ${escapeHtml(isWriting ? taskCoverageLabel : category.name)} rubric score × ${escapeHtml(metricConfig[state.metric].label.toLowerCase())}`
         : escapeHtml(modelSummary))
@@ -1144,7 +1144,7 @@ function buildOverallAvailableCategories(data, setting) {
     const rankedCount = isWriting ? data.entries.filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.eligibleForRank && Number.isFinite(entry.score)).length : SETTING_COUNT;
     return `${capabilityHeaderMarkup(category)}${capabilityTabsMarkup(category.name, [
       ['models', 'Leaderboard', `${rankedCount} ${isWorkSpec ? 'matched' : 'ranked'} settings`, 'capability-ranking'],
-      ['benchmarks', 'Benchmark tests', `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} ${benchmarks.length === 1 ? 'test' : 'tests'}`, 'capability-benchmarks'],
+      ['benchmarks', 'Benchmark tests', `${trackCount} ${trackCount === 1 ? 'track' : 'tracks'} · ${benchmarks.length} ${benchmarks.length === 1 ? 'test' : 'tests'}${category.id === 'engineering' && rootData.executableTesting ? rootData.executableTesting.schemaVersion >= 2 ? ' + 1 suite-quality test' : ' + 1 pilot' : ''}`, 'capability-benchmarks'],
       ['efficiency', 'Efficiency', 'Rubric score × resource', 'capability-efficiency']
     ])}`;
   };
@@ -1312,6 +1312,7 @@ function buildOverallAvailableCategories(data, setting) {
               </section>
             `;
           }).join('')}
+          ${category.id === 'engineering' && rootData.executableTesting?.schemaVersion === 3 ? `<section class="benchmark-ledger__track" aria-labelledby="testing-benchmark-track"><header class="benchmark-ledger__track-header"><span>TEST QUALITY</span><div><h4 id="testing-benchmark-track">Backend testing</h4><p>Current skill compared with minimal instructions on the same test-suite revision. Results stay separate from architecture scores.</p></div><strong>1 development check</strong></header><div class="benchmark-ledger__rows"><a class="benchmark-ledger__row benchmark-ledger__row--measured" href="./benchmark-report.html#backend-testing" data-testing-report-link><span class="benchmark-ledger__identity"><span>Score /100</span><strong>Backend test-suite quality</strong><small>Minimal · Skill</small></span><span class="benchmark-ledger__comparison">${rootData.executableTesting.configurations.length} settings × 1 case × ${rootData.executableTesting.trials} trial per arm</span><span class="benchmark-ledger__evidence"><strong>${rootData.executableTesting.overall ? `Score ${Number.isFinite(rootData.executableTesting.overall.baselineMean) ? rootData.executableTesting.overall.baselineMean.toFixed(1) : 'Unscored'} → ${Number.isFinite(rootData.executableTesting.overall.treatmentMean) ? rootData.executableTesting.overall.treatmentMean.toFixed(1) : 'Unscored'}` : 'Paired comparison incomplete'}</strong><span>2 blind judges per output</span><span>Excluded from aggregate scores</span></span><span class="benchmark-ledger__action">Open report <span aria-hidden="true">→</span></span></a></div></section>` : ''}
         </div>
       </section>
     `;

@@ -18,6 +18,7 @@ test("default benchmark matrix preserves every advertised model and reasoning tu
   assert.ok(!configurations.some((entry) => entry.id === "claude:opus@ultra"));
   assert.ok(!configurations.some((entry) => entry.model === "gpt-6-sol"));
   assert.ok(!configurations.some((entry) => entry.model === "gpt-6-luna"));
+  assert.ok(!configurations.some((entry) => entry.model === "gpt-6.1-sol"));
 });
 
 test("explicit model and reasoning filters produce distinct visible configurations", () => {
@@ -35,8 +36,9 @@ test("explicit model and reasoning filters produce distinct visible configuratio
   );
 });
 
-test("GPT-6 Sol and Luna selectors pin each release's advertised efforts", () => {
+test("GPT-6.1 Sol and GPT-6 Sol/Luna selectors pin each release's advertised efforts", () => {
   for (const [model, efforts] of [
+    ["gpt-6.1-sol", ["low", "medium", "high", "xhigh", "max", "ultra"]],
     ["gpt-6-sol", ["low", "medium", "high", "xhigh", "max", "ultra"]],
     ["gpt-6-luna", ["low", "medium", "high", "xhigh", "max"]]
   ]) {

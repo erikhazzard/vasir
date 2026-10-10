@@ -952,7 +952,7 @@
     },
     {
       "name": "plan__question-spec",
-      "description": "Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices and whether its proposed capabilities are necessary. Use for explicit product-journey or capability-necessity review, generic requests to audit, question, or adversarially review a work spec, or cold-context recovery exposing a concrete product mismatch, proxy substitution, or high-regret ambiguity; focused architecture or moving-parts-only requests and performance, scale, or cost-only requests stay with their named sibling skills, and this never runs as an automatic pre-implementation gate.",
+      "description": "Challenges whether a drafted work spec would deliver the user's actual vFinal journey through valuable lasting vertical slices and whether its proposed capabilities are necessary. Use for explicit product-journey or capability-necessity review, generic requests to audit, question, or adversarially review a work spec, or cold-context recovery exposing a concrete product mismatch, proxy substitution, or high-regret ambiguity; focused architecture, infrastructure, scale, or cost-only requests stay with plan__question-spec-architecture, and this never runs as an automatic pre-implementation gate.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -966,28 +966,16 @@
     },
     {
       "name": "plan__question-spec-architecture",
-      "description": "Designs and challenges non-trivial technical solution shapes by finding the smallest lasting horizontally scalable topology and proving every moving part is forced. Use for architecture or scalability design and review, or when a change adds durable state owners, services, workers, protocols, datastores, projections, transports, or deployment topology; skip routine local edits and implementation of an already approved shape unless new architecture appears.",
+      "description": "Designs the smallest lasting, horizontally scalable architecture. Use for architecture, infrastructure, scalability, or cost decisions.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
       "recommends": [],
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/README.md"
       ],
       "path": ".agents/skills/plan__question-spec-architecture",
-      "entry": "SKILL.md"
-    },
-    {
-      "name": "plan__question-spec-infra",
-      "description": "Adversarial infra review of a drafted work spec, run only when explicitly requested or when a specific material performance/scale/cost blind spot warrants independent conversational judgment in the same repo folder; challenges workload decomposition and primitive fit without becoming an automatic spec-stage audit.",
-      "category": "uncategorized",
-      "tags": [],
-      "version": "0.1.0",
-      "recommends": [],
-      "files": [
-        "SKILL.md"
-      ],
-      "path": ".agents/skills/plan__question-spec-infra",
       "entry": "SKILL.md"
     },
     {
@@ -1132,7 +1120,7 @@
     },
     {
       "name": "testing__enforcing-mandate",
-      "description": "Designs and writes great tests. Use in conjuction when writing code, tests, or editing tests",
+      "description": "Protects behavior with useful tests and less test debt. Use when changing code or tests.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",

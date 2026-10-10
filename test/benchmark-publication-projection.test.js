@@ -326,7 +326,7 @@ test("selected immutable runs deterministically project the exact real developme
     const selectedWriting = first.writing;
     const writingBenchmarks = [selectedWriting, ...(selectedWriting.benchmarkPublications ?? []).map(item => item.projection), ...Object.values(selectedWriting.additionalBenchmarks ?? {})];
     assert.deepEqual(writing.coverage, selectedWriting.coverage);
-    assert.equal(first.projection.schemaVersion, 6);
+    assert.equal(first.projection.schemaVersion, first.projection.executableTesting ? 7 : 6);
     for (const field of ["families", "categories"]) {
       expectedCounts[field] += selectedWriting.counts[field];
     }
@@ -346,7 +346,7 @@ test("selected immutable runs deterministically project the exact real developme
     entrypoints: [...expectedRoutes.entrypoints, ...(games ? ["/games.html"] : [])],
     familyFragments: ["/#capabilities/overall", "/#capabilities/engineering", ...(games ? ["/#capabilities/games"] : []), ...(workflow ? ["/#capabilities/ai-workflows"] : []), ...(writing ? ["/#capabilities/writing"] : [])],
     viewFragments: [...EXPECTED_ROUTES.viewFragments, ...(games ? ["/#capabilities/games/benchmarks", "/#capabilities/games/efficiency"] : []), ...(workflow ? ["/#capabilities/ai-workflows/benchmarks", "/#capabilities/ai-workflows/efficiency"] : []), ...(writing ? ["/#capabilities/writing/benchmarks", "/#capabilities/writing/efficiency"] : [])],
-    reportFragments: [...expectedRoutes.reportFragments, ...(games ? ["/games.html?benchmark=2d-jumping-demo"] : []), ...(writing ? (writing.benchmarkIds ?? [writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : [])]
+    reportFragments: [...expectedRoutes.reportFragments, ...(games ? ["/games.html?benchmark=2d-jumping-demo"] : []), ...(writing ? (writing.benchmarkIds ?? [writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : []), ...(first.projection.executableTesting ? ["/benchmark-report.html#backend-testing"] : [])]
   });
   if (games) {
     assert.equal(games.runs.length, 10);
@@ -531,7 +531,7 @@ test("selected immutable runs deterministically project the exact real developme
     }));
   }
   validateBenchmarkPublicationResponses(responseBundle, projection);
-  assert.equal(projection.schemaVersion, writing ? 6 : games ? 5 : workflow ? 4 : 2);
+  assert.equal(projection.schemaVersion, projection.executableTesting ? 7 : writing ? 6 : games ? 5 : workflow ? 4 : 2);
   assert.deepEqual({
     label: projection.scoreBasis.label,
     edition: projection.scoreBasis.edition,
