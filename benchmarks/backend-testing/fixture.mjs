@@ -69,6 +69,8 @@ export async function prepareFixture({ backendRoot, fixtureDir, configPath }) {
     submissionPrefix: config.submissionPrefix,
     taskPath: config.taskPath,
     privateConfigPath: path.resolve(configPath),
+    ...(config.testTimeoutMs ? { testTimeoutMs: config.testTimeoutMs } : {}),
+    ...(config.mochaArgs ? { mochaArgs: config.mochaArgs } : {}),
     createdAt: new Date().toISOString(),
   };
   await writeJson(path.join(fixtureDir, 'manifest.json'), manifest);
@@ -130,7 +132,7 @@ export async function startServices({ fixture, outputDir }) {
   const config = await readJson(fixture.privateConfigPath);
   await fs.mkdir(outputDir, { recursive: true });
   const redisPort = await freePort();
-  const ddbPort = await freePort();
+  const ddbPort = config.runtime.dynamodb ? await freePort() : null;
   const children = [];
   const streams = [];
   function launch(binary, args, label) {
@@ -145,10 +147,10 @@ export async function startServices({ fixture, outputDir }) {
   try {
     const redis = launch(config.runtime.redisBinary, ['--bind', '127.0.0.1', '--port', String(redisPort), '--save', '', '--appendonly', 'no'], 'redis');
     const runtime = config.runtime.dynamodb;
-    const ddb = launch(runtime.javaBinaryPath, [`-Djava.library.path=${runtime.libPath}`, '-cp', runtime.classPath, runtime.launcherClass, '-inMemory', '-sharedDb', '-port', String(ddbPort)], 'dynamodb');
-    await Promise.all([waitForPort(redisPort, redis), waitForPort(ddbPort, ddb)]);
+    const ddb = runtime && launch(runtime.javaBinaryPath, [`-Djava.library.path=${runtime.libPath}`, '-cp', runtime.classPath, runtime.launcherClass, '-inMemory', '-sharedDb', '-port', String(ddbPort)], 'dynamodb');
+    await Promise.all([waitForPort(redisPort, redis), ...(ddb ? [waitForPort(ddbPort, ddb)] : [])]);
     const redisUrl = `redis://127.0.0.1:${redisPort}`;
-    const ddbUrl = `http://127.0.0.1:${ddbPort}`;
+    const ddbUrl = ddbPort ? `http://127.0.0.1:${ddbPort}` : '';
     return { close, env: cleanTestEnv({
       IDV_SOCIAL_E2E_DDB_ENDPOINT_URL: ddbUrl, DDB_ENDPOINT_URL: ddbUrl,
       IRLINFRA__DDB_ENDPOINT_URL: ddbUrl,

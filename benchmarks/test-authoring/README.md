@@ -1,0 +1,22 @@
+# Writing new tests
+
+Does the testing skill help models write effective, readable tests from production code? This case gives each author the same Redis-backed work-queue implementation, consumer contract and real-service lifecycle helper. It supplies no existing queue tests. The test-suite improvement benchmark remains separate.
+
+The generated file runs twice against healthy code and against six predeclared behavioral faults. Only assertion failures from test cases that passed both healthy controls are candidate detections. Setup errors, crashes and timeouts receive no detection credit. Blind review grades seven craft dimensions with source citations; execution and craft contribute to one additive score specified in the [work spec](../../docs/work/vasir-benchmarking/test-authoring/work-spec.md).
+
+Prepare and qualify a new private round:
+
+```sh
+node benchmarks/test-authoring/prepare.mjs /path/to/idavoll-game-platform-backend /path/to/new-private-round
+node benchmarks/test-authoring/calibrate.mjs /path/to/new-private-round
+```
+
+Preparation snapshots real production modules and installed dependencies without editing the backend. Replay starts an owned Redis process and uses the shared macOS sandbox. Calibration requires two healthy reference runs, matched assertions for every fault, a restored healthy run, zero fault detections from tautological tests, and rejection of a setup-assertion control. The orchestrator reviews the resulting `calibration/calibration.json` before native authoring. Reference tests and fault definitions never enter author or blind-review context.
+
+This measures a bounded service integration task with standalone Redis. It does not establish browser E2E quality, Redis Cluster or SQS behavior, whole-repository exploration, or general model ranking. The current round uses eight author requests (Astra ultra, Astra xhigh, Sol 6.1 xhigh and Opus 5.5 xhigh, each without and with the skill) and one eight-suite batch each for the Astra and Opus reviewers. Completed outputs and executions are reused without author-file repairs or automatic retries.
+
+Publication is optional and dormant until a completed, qualified round is selected in `benchmarks/test-authoring/publication.json`. The dedicated [projector](../../cli/eval/test-authoring-publication.js) validates frozen inputs, exact native receipts and reviewer JSON, accepted JavaScript, replay evidence and independent objective adjudication. Seven native craft criteria contribute 70 points; adjudicated detection of six calibrated faults contributes 25, and clean nonzero tests in both healthy controls contribute 5. Missing required evidence leaves the score unavailable. There is no preservation component or score cap.
+
+The public fields are `VASIR_DATA.testAuthoring`, `VASIR_RESPONSES.testAuthoringRound` and `testAuthoringFiles`. The `#test-authoring` report reuses the standard model comparison, exact source viewer, Copy controls and closed reviewer details. It does not change `executableTesting`, any `backendTesting*` response, Engineering or Overall. The existing browser harness accepts `--benchmark test-authoring` and verifies incumbent hashes against a frozen receipt.
+
+The selected round contains eight native suites and two blind reviews; exact artifacts are pinned in `publication.json`. Author instructions and strict acceptance receipts retain the original 24 KiB source limit. After three complete files slightly exceeded it, a separately pinned analysis policy raised the ceiling uniformly to 64 KiB before their replay and any review. The published comparison must disclose this deviation and preserve exact files, original violations and unchanged weights. No native code-string `maxLength`; prompt bounds remain 64 KiB for authors and 256 KiB for review. Preparation alone does not authorize inference. Publication requires native results, source adjudication and browser acceptance; calibration and publication tests are not author-result evidence.

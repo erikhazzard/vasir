@@ -638,6 +638,36 @@
   background: var(--report-category);
 }
 
+.model-preview__missed-bug {
+  position: absolute;
+  color: var(--negative);
+  font-family: var(--font-data);
+  font-size: 1.5rem; /* Visible annotation beside the existing 0.62rem score mark. */
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  transform: translateX(-50%);
+}
+
+.model-preview__missed-bug--baseline {
+  left: var(--preview-baseline);
+  top: calc(50% + var(--space-2));
+}
+
+.model-preview__missed-bug--treatment {
+  left: var(--preview-treatment);
+  bottom: calc(50% + var(--space-2));
+}
+
+.testing-report__missed-bugs {
+  display: block;
+  color: var(--negative);
+  font-family: var(--font-data);
+  font-size: var(--type-micro);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .model-preview__score,
 .model-preview__delta {
   font-family: var(--font-data);

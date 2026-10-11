@@ -5,7 +5,7 @@ import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { constants, createWriteStream } from 'node:fs';
 import { chmod, cp, lstat, mkdir, mkdtemp, readFile, readdir, readlink, realpath, rename, rm, symlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { resolveBenchmarkConfiguration } from '../../cli/eval/benchmark-models.js';
@@ -64,7 +64,7 @@ function environment(row, additions = {}) {
   for (const key of ['LANG', 'LC_ALL', 'LC_CTYPE', 'SSL_CERT_FILE', 'SSL_CERT_DIR', 'HTTPS_PROXY', 'HTTP_PROXY', 'NO_PROXY']) if (process.env[key]) env[key] = process.env[key];
   return { ...env, ...additions,
     PATH: `${dirname(process.execPath)}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`,
-    HOME: row.home, CODEX_HOME: join(row.home, '.codex'), CLAUDE_CONFIG_DIR: join(row.home, '.claude'),
+    HOME: row.claudeAccount ? homedir() : row.home, ...(row.claudeAccount ? {USER:process.env.USER,LOGNAME:process.env.LOGNAME} : {}), CODEX_HOME: join(row.home, '.codex'), CLAUDE_CONFIG_DIR: row.claudeAccount?.configDir ?? join(row.home, '.claude'),
     XDG_CONFIG_HOME: join(row.home, '.config'), XDG_CACHE_HOME: join(row.home, '.cache'),
     TMPDIR: `${join(row.root, 'tmp')}/`, TMPPREFIX: join(row.root, 'tmp/zsh'), CLAUDE_CODE_TMPDIR: join(row.root, 'tmp/claude'),
     npm_config_cache: join(row.home, '.npm'), GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', ZDOTDIR: row.home,
@@ -75,7 +75,13 @@ function environment(row, additions = {}) {
 }
 function sandbox(row, readRoots) {
   const writableSuite = row.submissionMode === 'suite-quality' ? `\n(deny file-write* (subpath ${JSON.stringify(row.workspace)}))\n(allow file-write* (subpath ${JSON.stringify(join(row.workspace, row.submissionPrefix))}))\n` : '';
-  return `(version 1)\n(allow default)\n(deny file-write*)\n(deny file-read*\n${[homedir(), '/private/tmp', '/private/var/folders', '/etc/codex', '/etc/claude-code'].map(p => `  (subpath ${JSON.stringify(p)})`).join('\n')}\n)\n(allow file-read-metadata (subpath "/"))\n(allow file-write* (literal "/dev/null") (literal "/dev/tty"))\n(allow file-read* file-write* (subpath ${JSON.stringify(row.root)}))\n(allow file-read*\n${readRoots.map(p => `  (subpath ${JSON.stringify(p)})`).join('\n')}\n)\n${writableSuite}`;
+  const accountReads = row.claudeAccount ? `(allow file-read* ${['.claude.json','.credentials.json'].map(name=>`(literal ${JSON.stringify(join(row.claudeAccount.configDir,name))})`).join(' ')} (subpath ${JSON.stringify(join(homedir(),'Library/Keychains'))}))\n` : '';
+  return `(version 1)\n(allow default)\n(deny file-write*)\n(deny file-read*\n${[homedir(), '/private/tmp', '/private/var/folders', '/etc/codex', '/etc/claude-code'].map(p => `  (subpath ${JSON.stringify(p)})`).join('\n')}\n)\n(allow file-read-metadata (subpath "/"))\n(allow file-write* (literal "/dev/null") (literal "/dev/tty"))\n(allow file-read* file-write* (subpath ${JSON.stringify(row.root)}))\n(allow file-read*\n${readRoots.map(p => `  (subpath ${JSON.stringify(p)})`).join('\n')}\n)\n${accountReads}${writableSuite}`;
+}
+export function validateClaudeAccountStatus(account, status) {
+  check(account && isAbsolute(account.configDir) && typeof account.email === 'string' && account.email.length > 0, 'Claude account context requires an absolute directory and expected email');
+  check(status?.loggedIn === true && status.email === account.email, 'Claude selected-account identity does not match the requested account');
+  return {provider:'claude',contextId:basename(account.configDir),email:status.email,loggedIn:true};
 }
 function codexArgs(row) {
   const disabled = ['multi_agent', 'multi_agent_v2', 'plugins', 'apps', 'hooks', 'memories', 'skill_search', 'image_generation', 'browser_use', 'browser_use_external', 'in_app_browser', 'computer_use'];
@@ -94,6 +100,15 @@ function claudeArgs(row) {
     '--dangerously-skip-permissions', '--disallowedTools', 'Agent,Task,Workflow,TeamCreate,TeamDelete,SendMessage', '--tools', 'Bash,Read,Edit,Write,Glob,Grep'];
 }
 async function authentication(row, install) {
+  if (row.claudeAccount) {
+    if (install) {
+      const result = spawnSync(row.command, ['auth','status','--json'], {env:environment(row),encoding:'utf8',timeout:10000,maxBuffer:65536});
+      check(result.status === 0, 'Claude selected-account auth status unavailable');
+      let status; try { status = JSON.parse(result.stdout); } catch { throw Error('Claude selected-account auth status is not JSON'); }
+      row.accountAssertion = validateClaudeAccountStatus(row.claudeAccount,status);
+    }
+    return;
+  }
   const codexPath = join(row.home, '.codex/auth.json'), claudePath = join(row.home, '.claude/.credentials.json');
   if (!install) { await rm(codexPath, { force: true }); await rm(claudePath, { force: true }); return; }
   if (row.configuration.provider === 'codex') { await cp(join(process.env.CODEX_HOME ?? join(homedir(), '.codex'), 'auth.json'), codexPath); await chmod(codexPath, 0o600); }
@@ -384,7 +399,7 @@ async function collectSubmission(row, entries, originalRoot) {
 }
 
 // Packet-only judge calls share generation's exact native selection, isolation and bounded capture.
-export async function executeNativeSession({ configurationId, prompt, systemInstructions = '', outputSchema = null, outputDir, timeoutMs = POLICY.wallTimeLimitMs }) {
+export async function executeNativeSession({ configurationId, prompt, systemInstructions = '', outputSchema = null, outputDir, timeoutMs = POLICY.wallTimeLimitMs, claudeAccount = null }) {
   check(process.platform === 'darwin', 'Native isolation requires macOS sandbox-exec');
   check(POLICY.configurations.includes(configurationId), 'Unregistered native configuration; no substitution permitted');
   check(outputSchema === null || (typeof outputSchema === 'object' && !Array.isArray(outputSchema)), 'Native judge schema must be an object');
@@ -393,6 +408,11 @@ export async function executeNativeSession({ configurationId, prompt, systemInst
   check(!await exists(join(outputDir, 'started.json')), 'Native session already started; no automatic retries');
   const root = await realpath(await mkdtemp('/private/tmp/backend-testing-judge-'));
   const row = { configuration: resolveBenchmarkConfiguration(configurationId), root, home: join(root, 'home'), workspace: join(root, 'workspace'), history: outputDir };
+  if (claudeAccount) {
+    check(row.configuration.provider === 'claude', 'Claude account selection cannot be applied to another provider');
+    check(isAbsolute(claudeAccount.configDir) && typeof claudeAccount.email === 'string' && claudeAccount.email.length > 0, 'Invalid selected Claude account context');
+    row.claudeAccount = {configDir:await realpath(claudeAccount.configDir),email:claudeAccount.email};
+  }
   for (const dir of [row.workspace, join(root, 'tmp'), join(row.home, '.codex'), join(row.home, '.claude')]) await mkdir(dir, { recursive: true, mode: 0o700 });
   await checkAncestors(row.workspace);
   row.command = await realpath(executable(row.configuration.provider));
@@ -419,7 +439,7 @@ export async function executeNativeSession({ configurationId, prompt, systemInst
       stdoutPath: join(outputDir, 'stdout.jsonl'), stderrPath: join(outputDir, 'stderr.log') });
   } finally { await authentication(row, false); }
   const parsed = parseResult(row, result, outputSchema), toolUse = parsed.toolUse;
-  const record = { ...result, ...parsed, configuration: row.configuration, preflight, toolsAllowed: false, toolUse,
+  const record = { ...result, ...parsed, configuration: row.configuration, preflight, ...(row.accountAssertion?{accountAssertion:row.accountAssertion}:{}), toolsAllowed: false, toolUse,
     status: toolUse ? 'invalid-tool-use' : parsed.complete && parsed.structuredOutputDeliveryValid === false ? 'invalid-structured-output' : result.spawnError ? 'infrastructure-failure' : result.timedOut ? 'timeout' : result.exitCode === 0 && parsed.complete ? 'complete' : 'failed' };
   delete record.stdout; delete record.stderr;
   await writeFile(join(outputDir, 'final.txt'), parsed.finalText, { mode: 0o600 });
@@ -493,4 +513,4 @@ if (process.argv[1] && resolve(process.argv[1]) === SELF) {
   else if (args[0] === '--run' && args[1]) await run(args[1], args[2] === '--rows' ? args[3].split(',') : []);
   else { process.stderr.write('Usage: node benchmarks/backend-testing/run.mjs --prepare <private-fixture.json> --previous-skill <old-SKILL.md> --calibration <approved-calibration.json>\n       node benchmarks/backend-testing/run.mjs --prepare-quality <suite-quality-manifest.json>\n       node benchmarks/backend-testing/run.mjs --run <plan.json> [--rows <id,...>]\n'); process.exitCode = 1; }
 }
-export { POLICY, QUALITY_POLICY, prepare, prepareQuality, run, collectSubmission, nativePreflight, promptPreflight, sandbox, codexArgs, claudeArgs };
+export { POLICY, QUALITY_POLICY, prepare, prepareQuality, run, collectSubmission, nativePreflight, promptPreflight, sandbox, environment, codexArgs, claudeArgs };

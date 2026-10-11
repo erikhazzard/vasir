@@ -6,12 +6,18 @@ import { fileURLToPath } from 'node:url';
 import { launchChrome, startVariantServer } from '../../benchmarks/threejs-water-ripples-performance/lib/browser.mjs';
 import { validateBackendTestingPublication } from '../../cli/eval/backend-testing-publication.js';
 import { validateBackendTestingCompactRound, validateBackendTestingCompactPublication, validateBackendTestingCompactFiles } from '../../cli/eval/backend-testing-compact-publication.js';
+import { validateTestAuthoringRound, validateTestAuthoringPublication, validateTestAuthoringFiles } from '../../cli/eval/test-authoring-publication.js';
 
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, value, index, args) => {
   if (value.startsWith('--')) pairs.push([value.slice(2), args[index + 1]]);
   return pairs;
 }, []));
 assert.ok(options.url && options['output-dir'], 'Usage: backend-testing-browsercheck.mjs --url URL --output-dir DIR [--width 1440 --height 1000]');
+const benchmarkId = options.benchmark || 'backend-testing';
+assert.ok(['backend-testing', 'test-authoring'].includes(benchmarkId));
+const authoring = benchmarkId === 'test-authoring';
+const reportLink = authoring ? '[data-test-authoring-report-link]' : '[data-testing-report-link]';
+const publicationKey = authoring ? 'testAuthoring' : 'executableTesting';
 const requestedUrl = new URL(options.url);
 assert.ok(['https:', 'file:'].includes(requestedUrl.protocol) || (requestedUrl.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(requestedUrl.hostname)), 'Use HTTPS, a file preview, or local HTTP.');
 // Serve file previews over loopback so fonts retain the site's normal HTTP behavior.
@@ -48,6 +54,33 @@ const pageUrl = (file, hash = '') => { const url = new URL(file, baseUrl); url.h
 const sourcePath = value => { const pathname = new URL(value).pathname, release = pathname.match(/\/releases\/[^/]+\/(.+)$/); return release ? release[1] : pathname.slice(new URL('./', baseUrl).pathname.length); };
 const drain = async () => { let size; do { size = captures.length; await Promise.all(captures); } while (size !== captures.length); };
 const settled = () => evaluate('(async()=>{await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));})()');
+const readMissedBugMarkers = () => inspect(() => [...document.querySelectorAll('[data-testing-taste-setting]')].map(row => {
+  const summary = row.querySelector('.model-preview__row'), plot = summary.querySelector('.model-preview__plot');
+  return {configurationId: row.dataset.testingTasteSetting, description: plot.getAttribute('aria-label'), markers: [...plot.querySelectorAll('[data-testing-missed-bugs]')].map(marker => {
+    const condition = marker.dataset.testingMissedBugs, dot = plot.querySelector(`.model-preview__mark--${condition === 'none' ? 'baseline' : 'treatment'}`), note = summary.querySelector(`[data-testing-missed-bug-note="${condition}"]`);
+    const rectangle = marker.getBoundingClientRect(), target = dot.getBoundingClientRect(), color = getComputedStyle(marker).color;
+    const [red, green, blue] = color.match(/[\d.]+/g).map(Number);
+    return {condition, count:Number(marker.dataset.missedCount), title:marker.title, label:note?.textContent.trim(), visible:rectangle.width > 0 && rectangle.height > 0 && note?.getBoundingClientRect().height > 0, red:red > green && red > blue, sameLabelColor:note && getComputedStyle(note).color === color, horizontalOffset:rectangle.x + rectangle.width / 2 - target.x - target.width / 2, verticalOffset:rectangle.y + rectangle.height / 2 - target.y - target.height / 2};
+  })};
+}));
+const missedBugMarkersMatch = (readings, expected) => readings.every(row => {
+  const markers = expected.filter(item => item.configurationId === row.configurationId);
+  return row.markers.length === markers.length && markers.every(item => {
+    const marker = row.markers.find(value => value.condition === item.condition), label = `${item.count} bug${item.count === 1 ? '' : 's'} missed`, description = `${item.condition === 'none' ? 'Minimal' : 'Skill'}: ${label}`;
+    return marker && marker.count === item.count && marker.title === description && marker.label === label && marker.visible && marker.red && marker.sameLabelColor && Math.abs(marker.horizontalOffset) < 1 && Math.abs(marker.verticalOffset) < 48 && (item.condition === 'none' ? marker.verticalOffset > 0 : marker.verticalOffset < 0) && row.description.includes(description);
+  });
+}) && expected.every(item => readings.some(row => row.configurationId === item.configurationId));
+const checkMissedBugScenarios = async publication => {
+  const [first,second] = publication.overall.summaries.map(row=>row.configurationId);
+  const expected = [{configurationId:first,condition:'none',count:2},{configurationId:first,condition:'current',count:1},{configurationId:second,condition:'none',count:1}];
+  const script = await client.send('Page.addScriptToEvaluateOnNewDocument', {source:`(()=>{let responses;Object.defineProperty(window,'VASIR_RESPONSES',{configurable:true,get(){return responses},set(value){responses=value;const round=value.testAuthoringRound;if(!round)return;for(const row of round.rows){const unresolved=row.configurationId===${JSON.stringify(second)}&&row.condition==='current',count=unresolved?1:${JSON.stringify(expected)}.find(item=>item.configurationId===row.configurationId&&item.condition===row.condition)?.count||0;row.objective.faultDetection=unresolved?null:(6-count)/6;row.objective.faults.forEach((fault,index)=>fault.status=index<count?'survived':'detected');}}});})()`});
+  try {
+    await navigate(pageUrl('benchmark-report.html', 'test-authoring'), 'document.querySelectorAll("[data-testing-taste-setting]").length === 4 && document.querySelectorAll("[data-testing-missed-bugs]").length === 3');
+    const readings = await readMissedBugMarkers();
+    assert.ok(missedBugMarkersMatch(readings,expected),`Synthetic missed-bug marker mismatch: ${JSON.stringify({expected,readings})}`);
+    checks.find(check=>check.id==='taste-comparison').evidence.missedBugScenarios = {case:'Both conditions, Minimal-only and unresolved execution',browserMemoryOnly:true,expected,readings};
+  } finally { await client.send('Page.removeScriptToEvaluateOnNewDocument',{identifier:script.identifier}); }
+};
 const stableTarget = selector => inspect(async selector => {
   const deadline = performance.now() + 15000;
   let previous = null, stableFrames = 0;
@@ -459,37 +492,150 @@ const checkCurrentReport = async publication => {
   check('native-details-keyboard',true,{openedWithEnter:['current setting','quality judge reviews'],closedSettingWithEnter:true,rubricExecutionAndUsageOpenedByClick:true,criterionRangesAndReviewsOpenedByClick:Boolean(taste),dimensionReasonsVisibleAfterDisclosure:Boolean(taste),firstTestFileVisible:true,copiedFile:{path:firstFile.path,sha256:copiedFileSha256}});
 };
 
-let publicationSha256, overallSha256, publicationSchemaVersion, pairedRepairSha256, tasteSha256, currentRoundSha256, backendTestingOverallSha256, backendTestingFilesSha256;
+const checkAuthoringReport = async publication => {
+  const round = await evaluate('window.VASIR_RESPONSES.testAuthoringRound');
+  const files = await evaluate('window.VASIR_RESPONSES.testAuthoringFiles');
+  validateTestAuthoringRound(round); validateTestAuthoringPublication(publication, round); validateTestAuthoringFiles(files, round);
+  currentRoundSha256 = sha256(JSON.stringify(round));
+  testAuthoringOverallSha256 = sha256(JSON.stringify(publication.overall));
+  testAuthoringFilesSha256 = sha256(JSON.stringify(files));
+  const incumbent = await evaluate('({executableTesting:window.VASIR_DATA.executableTesting,responses:Object.fromEntries(Object.entries(window.VASIR_RESPONSES).filter(([key])=>key.startsWith("backendTesting")))})');
+  const pinned = JSON.parse(await readFile(resolve(options['incumbent-pins'] || '.agents/vasir-evals/test-authoring/round-2026-10-10/incumbent-pins.json'), 'utf8'));
+  incumbentBackendSha256 = sha256(JSON.stringify(incumbent.executableTesting));
+  assert.equal(incumbentBackendSha256, pinned.executableTesting);
+  assert.deepEqual(Object.fromEntries(Object.entries(incumbent.responses).map(([key, value]) => [key, sha256(JSON.stringify(value))])), pinned.responses, 'Incumbent backend evidence must remain exact.');
+  const expectedWeights = { fault_detection: 25, behavioral_coverage: 20, assertion_quality: 15, boundary_fidelity: 10, semantic_naming: 10, domain_structure: 5, clarity: 5, maintenance_economy: 5, runnable: 5 };
+  assert.deepEqual(Object.fromEntries(publication.overall.scoreBasis.criteria.map(item => [item.id, item.weight])), expectedWeights);
+  for (const row of round.rows) for (const judge of row.judgments) {
+    const values = Object.entries(expectedWeights).map(([id, weight]) => {
+      if (id === 'fault_detection') return row.objective.faultDetection === null ? null : weight * row.objective.faultDetection;
+      if (id === 'runnable') return row.objective.runnable === null ? null : weight * row.objective.runnable;
+      const finding = judge.dimensions.find(item => item.id === id);
+      return judge.status === 'complete' && finding.evidence.length && Number.isFinite(finding.score) ? weight * finding.score : null;
+    });
+    const expected = values.every(Number.isFinite) ? values.reduce((sum, value) => sum + value, 0) : null;
+    const selected = publication.overall.rows.find(item => item.id === row.id).judgments.find(item => item.judgeConfigurationId === judge.judgeConfigurationId);
+    assert.ok(selected.score === expected || Number.isFinite(expected) && Math.abs(selected.score - expected) < 1e-9, 'Independent authoring score arithmetic differs.');
+  }
+  const dom = await inspect(() => {
+    const citations = node => [...node.querySelectorAll('[data-testing-taste-citation]')].map(item => ({ file: item.dataset.file, version: item.dataset.version, startLine: Number(item.dataset.startLine), endLine: Number(item.dataset.endLine) }));
+    return {
+      title: document.querySelector('#report-title').textContent,
+      purpose: document.querySelector('[data-testing-taste-completion]').textContent,
+      hero: document.querySelectorAll('.evidence-hero,[data-testing-taste-condition],[data-testing-taste-mean-delta]').length,
+      protection: document.querySelectorAll('[data-testing-paired-protection],[data-testing-protection-finding],[data-testing-coverage-loss]').length,
+      methodClosed: !document.querySelector('[data-testing-method]').open,
+      reviewBasis: document.querySelector('[data-testing-review-basis]') ? {text:document.querySelector('[data-testing-review-basis]').textContent,visible:document.querySelector('[data-testing-review-basis]').getBoundingClientRect().height > 0} : null,
+      nav: [...document.querySelectorAll('.report-mast__nav [data-report-section]')].map(node => node.dataset.reportSection),
+      adoption: document.querySelector('[data-testing-score-adoption]').textContent,
+      usage: document.querySelector('[data-testing-paired-resources-evidence]').textContent,
+      definition: document.querySelector('[data-testing-score-definition]').textContent,
+      sourcePolicy: document.querySelector('[data-testing-source-policy]')?.textContent ?? null,
+      namingRule: document.querySelector('[data-testing-taste-naming-rule]').textContent,
+      settings: [...document.querySelectorAll('[data-testing-taste-setting]')].map(node => ({ id: node.dataset.testingTasteSetting, baseline: node.querySelector('[data-testing-score-baseline]').textContent, treatment: node.querySelector('[data-testing-score-treatment]').textContent, delta: node.querySelector('[data-testing-taste-delta]').textContent, closed: !node.querySelector('.model-run').open, profiles: [...node.querySelectorAll('[data-testing-taste-profile-dimension]')].map(item => ({ id: item.dataset.testingTasteProfileDimension, baseline: item.querySelector('[data-testing-taste-dimension-baseline]').textContent, treatment: item.querySelector('[data-testing-taste-dimension-treatment]').textContent, delta: item.querySelector('[data-testing-taste-dimension-delta]').textContent })) })),
+      rows: [...document.querySelectorAll('[data-testing-paired-row]')].map(node => ({ id: node.dataset.testingPairedRow, sizeViolation:node.querySelector('[data-testing-file-size-violation]')?.textContent ?? null, objective: [...node.querySelectorAll('[data-testing-objective-fault]')].map(item => ({ id: item.dataset.testingObjectiveFault, status: item.dataset.status, reason: item.querySelector('p').textContent, evidence: citations(item) })), files: [...node.querySelectorAll('[data-testing-file]')].map(item => ({ path: item.dataset.testingFile, sha256: item.dataset.sha256, content: item.querySelector('code').textContent, open: item.open })), reviewsClosed: !node.querySelector('[data-testing-taste-reviews]').open, judges: [...node.querySelectorAll('[data-testing-taste-judge]')].map(judge => ({ id: judge.dataset.testingTasteJudge, sha256: judge.dataset.reviewSha256, status: judge.dataset.status, dimensions: [...judge.querySelectorAll('[data-testing-taste-judge-dimension]')].map(item => ({ id: item.dataset.testingTasteJudgeDimension, score: item.querySelector('[data-testing-taste-dimension-score]').textContent, reason: item.querySelector('[data-testing-taste-dimension-reason]').textContent, evidence: citations(item.querySelector('[data-testing-taste-dimension-evidence]')) })) })) })),
+      rubric: [...document.querySelectorAll('[data-testing-taste-rubric-dimension]')].map(item => ({ id: item.dataset.testingTasteRubricDimension, weight: item.querySelector('[data-testing-taste-rubric-weight]').textContent, description: item.querySelector('[data-testing-taste-rubric-description]').textContent })),
+      calculations: [...document.querySelectorAll('[data-testing-score-calculation]')].map(node => ({ id: node.dataset.testingScoreCalculation, closed: !node.open, judges: [...node.querySelectorAll('[data-testing-score-calculation-judge]')].map(judge => ({ id: judge.dataset.testingScoreCalculationJudge, contributions: [...judge.querySelectorAll('[data-testing-score-contribution]')].map(item => ({ id: item.dataset.testingScoreContribution, score: item.querySelector('[data-testing-score-rating]').textContent, points: item.querySelector('[data-testing-score-points]').textContent })) })) })),
+    };
+  });
+  check('paired-repair-comparison', dom.title === 'Writing new tests' && dom.purpose === publication.benchmark.description && dom.hero === 0 && dom.protection === 0 && dom.methodClosed && dom.settings.length === publication.configurations.length && dom.settings.every(item => item.closed) && (publication.schemaVersion === 2 ? dom.reviewBasis?.visible && dom.reviewBasis.text === 'Astra judge only; Opus pending · provisional scores' : dom.reviewBasis === null) && JSON.stringify(dom.nav) === JSON.stringify(['paired-check', 'method']), { title: dom.title, purpose: dom.purpose, nav: dom.nav, oneScoreScale: 100 });
+  const expandedSourceDisclosure = publication.sourcePolicy ? dom.sourcePolicy === 'Analysis limit expanded from 24 to 64 KiB after authoring began; original prompts and files unchanged.' : dom.sourcePolicy === null;
+  check('paired-repair-evidence', dom.adoption.includes('frozen before authors') && dom.usage.includes(`${publication.provenance.freshAuthorSessions} fresh author attempts`) && dom.usage.includes(publication.knownTokens.toLocaleString('en-US')) && dom.definition === publication.overall.scoreBasis.aggregation && expandedSourceDisclosure && dom.rows.every(row => JSON.stringify(row.objective) === JSON.stringify(round.rows.find(item => item.id === row.id).objective.faults)), { incumbentBackendSha256, sourceSha256: round.sourceSha256, nativeSessions: publication.nativeSessions, measuredFaults: round.rows.length * 6, expandedSourceDisclosure });
+  const format = value => Number.isFinite(value) ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value) : 'Unscored';
+  const profile = value => Number.isFinite(value) ? value.toFixed(3) : 'Unscored';
+  const difference = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(3)}` : 'Unscored';
+  const ranked = [...publication.overall.summaries].sort((a, b) => (b.treatment ?? -Infinity) - (a.treatment ?? -Infinity));
+  const missedBugMarkers = await readMissedBugMarkers();
+  const expectedMissedBugs = round.rows.flatMap(row => {
+    const count = Number.isFinite(row.objective.faultDetection) ? row.objective.faults.filter(fault => ['survived','not-run'].includes(fault.status)).length : 0;
+    return count ? [{configurationId:row.configurationId,condition:row.condition,count}] : [];
+  });
+  const criterionMean = (configurationId, condition, id) => {
+    const scores = publication.overall.rows.find(row => row.configurationId === configurationId && row.condition === condition).judgments.map(judge => judge.contributions.find(item => item.id === id).score);
+    return scores.every(Number.isFinite) ? scores.reduce((sum, value) => sum + value, 0) / scores.length : null;
+  };
+  check('taste-comparison', missedBugMarkersMatch(missedBugMarkers,expectedMissedBugs) && ranked.every((summary, index) => {
+    const row = dom.settings[index];
+    return row.id === summary.configurationId && row.baseline === format(summary.baseline) && row.treatment === format(summary.treatment) && row.delta === (summary.delta === null ? 'Unscored' : `${summary.delta > 0 ? '+' : ''}${format(summary.delta)} pts`) && row.profiles.length === 9 && row.profiles.every(item => {
+      const baseline = criterionMean(row.id, 'none', item.id), treatment = criterionMean(row.id, 'current', item.id);
+      return item.baseline === profile(baseline) && item.treatment === profile(treatment) && item.delta === difference(baseline === null || treatment === null ? null : treatment - baseline);
+    });
+  }), { settings: dom.settings, expected: ranked, criteria: expectedWeights, missedBugMarkers, expectedMissedBugs });
+  const evidenceMatches = round.rows.every(row => {
+    const rendered = dom.rows.find(item => item.id === row.id), source = files.rows.find(item => item.id === row.id);
+    const sizeDisclosure = row.acceptance ? rendered.sizeViolation === `Original 24 KiB limit exceeded: ${row.acceptance.sourceBytes.toLocaleString('en-US')} bytes. Exact source evaluated under the selected 64 KiB analysis limit.` : rendered.sizeViolation === null;
+    return sizeDisclosure && rendered.reviewsClosed && JSON.stringify(rendered.files.map(({ open, ...file }) => file)) === JSON.stringify(source.files) && rendered.files.every((file, index) => file.open === (index === 0)) && row.judgments.every(judge => {
+      const reading = rendered.judges.find(item => item.id === judge.judgeConfigurationId);
+      return reading.sha256 === judge.reviewSha256 && reading.status === judge.status && JSON.stringify(reading.dimensions) === JSON.stringify(judge.dimensions.filter(item => Number.isFinite(item.score)).map(item => ({ ...item, score: item.score.toFixed(2) })));
+    });
+  });
+  const calculationMatches = publication.overall.rows.every(row => {
+    const reading = dom.calculations.find(item => item.id === row.id);
+    return reading.closed && row.judgments.every(judge => JSON.stringify(reading.judges.find(item => item.id === judge.judgeConfigurationId).contributions) === JSON.stringify(judge.contributions.map(item => ({ id: item.id, score: item.score === null ? 'Unscored' : item.score.toFixed(2), points: profile(item.points) }))));
+  });
+  check('taste-evidence', evidenceMatches && calculationMatches && dom.namingRule === round.scoreBasis.namingZeroRule && dom.rubric.length === 9 && [...round.scoreBasis.dimensions, ...round.scoreBasis.objectiveDimensions].every(item => { const rendered = dom.rubric.find(value => value.id === item.id); return rendered.description === item.description && rendered.weight === `${item.weight}%`; }), { nativeFindings: round.rows.reduce((sum, row) => sum + row.judgments.reduce((count, judge) => count + judge.dimensions.filter(item => item.score !== null).length, 0), 0), exactFiles: files.rows.reduce((sum, row) => sum + row.files.length, 0), evidenceMatches, calculationMatches });
+  await measureOverflow('Writing new tests comparison'); await capture('test-authoring-overview');
+  const sections = [];
+  for (const section of ['paired-check', 'method']) {
+    await click(`[data-report-section="${section}"]`);
+    await waitFor(() => evaluate(`location.hash === ${JSON.stringify(`#test-authoring/${section}`)}`), `Authoring ${section} hash navigation`);
+    // Complete the hash handler's smooth scroll before positioning the next link.
+    await settled(); await stableTarget(`#${section}`);
+    const value = await inspect(id => ({ section: id, hash: location.hash, top: document.getElementById(id).getBoundingClientRect().top }), section); sections.push(value);
+  }
+  check('report-section-links', sections.every(item => item.hash === `#test-authoring/${item.section}` && item.top < height), sections);
+  await click('[data-testing-rubric] > summary'); await measureOverflow('Test authoring rubric'); await capture('test-authoring-rubric'); await click('[data-testing-rubric] > summary');
+  const model = '#paired-check .model-run';
+  await inspect(selector => { const summary = document.querySelector(`${selector} > summary`); summary.scrollIntoView({ block: 'center', behavior: 'instant' }); summary.focus({ preventScroll: true }); }, model);
+  await key('Enter', 'Enter', 13); await waitFor(() => inspect(selector => document.querySelector(selector).open, model), 'Authoring setting opens with Enter');
+  const firstFile = await inspect(selector => { const node = document.querySelector(`${selector} [data-testing-file]`); return node ? { path: node.dataset.testingFile, row: node.closest('[data-testing-files-row]').dataset.testingFilesRow } : null; }, model);
+  if (firstFile) {
+    await inspect(selector => document.querySelector(`${selector} [data-testing-file]`).scrollIntoView({ block: 'start', behavior: 'instant' }), model);
+    await measureOverflow('Exact authored JavaScript'); await capture('test-authoring-test-files');
+    await client.send('Browser.grantPermissions', { origin: new URL(await evaluate('location.href')).origin, permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'] });
+    await click(`${model} [data-testing-copy-file]`); await waitFor(() => inspect(selector => document.querySelector(`${selector} [data-testing-copy-file]`).textContent === 'Copied', model), 'Authored file copied');
+    assert.equal(await evaluate('navigator.clipboard.readText()'), files.rows.find(row => row.id === firstFile.row).files[0].content);
+  }
+  await click(`${model} [data-testing-score-calculation] > summary`); await measureOverflow('Authoring score calculation'); await capture('test-authoring-score-calculation'); await click(`${model} [data-testing-score-calculation] > summary`);
+  await click(`${model} [data-testing-objective] > summary`); await measureOverflow('Adjudicated fault evidence'); await capture('test-authoring-fault-evidence'); await click(`${model} [data-testing-objective] > summary`);
+  await inspect(selector => document.querySelector(`${selector} [data-testing-taste-profile]`).scrollIntoView({ block: 'start', behavior: 'instant' }), model); await measureOverflow('Authoring nine-criterion profile'); await capture('test-authoring-dimension-profile');
+  await click(`${model} [data-testing-taste-reviews] > summary`); await inspect(selector => document.querySelector(`${selector} [data-testing-taste-judge]`).scrollIntoView({ block: 'start', behavior: 'instant' }), model); await measureOverflow('Original blind authoring review'); await capture('test-authoring-review-reasons');
+  await inspect(selector => { const summary = document.querySelector(`${selector} > summary`); summary.scrollIntoView({ block: 'center', behavior: 'instant' }); summary.focus({ preventScroll: true }); }, model);
+  await key('Enter', 'Enter', 13); await waitFor(() => inspect(selector => !document.querySelector(selector).open, model), 'Authoring setting closes with Enter'); await stableTarget(`${model} > summary`);
+  check('native-details-keyboard', true, { openedAndClosedWithEnter: true, rawFileCopied: firstFile, reviewAndCalculationDisclosures: true });
+};
+
+let publicationSha256, overallSha256, publicationSchemaVersion, pairedRepairSha256, tasteSha256, currentRoundSha256, backendTestingOverallSha256, backendTestingFilesSha256, testAuthoringOverallSha256, testAuthoringFilesSha256, incumbentBackendSha256;
 try {
   await client.send('Network.enable', { maxTotalBufferSize: 256 * 1024 * 1024, maxResourceBufferSize: 64 * 1024 * 1024, enableDurableMessages: true });
   await client.send('Network.setCacheDisabled', { cacheDisabled: true });
-  await navigate(pageUrl('index.html', 'capabilities/engineering/benchmarks'), 'document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector("[data-testing-report-link]")');
-  const initial = await evaluate('({overall:JSON.stringify(window.VASIR_DATA.overall),engineeringRows:document.querySelectorAll("#capability-ranking .capability-rank-row").length,href:document.querySelector("[data-testing-report-link]").href,ledgerLabel:document.querySelector("[data-testing-report-link] .benchmark-ledger__identity small").textContent,schema:window.VASIR_DATA.executableTesting.schemaVersion,visible:!!document.querySelector("[data-testing-report-link]").getBoundingClientRect().height})');
+  await navigate(pageUrl('index.html', 'capabilities/engineering/benchmarks'), `document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector(${JSON.stringify(reportLink)})`);
+  const initial = await inspect(({reportLink,publicationKey}) => ({overall:JSON.stringify(window.VASIR_DATA.overall),engineeringRows:document.querySelectorAll('#capability-ranking .capability-rank-row').length,href:document.querySelector(reportLink).href,ledgerLabel:document.querySelector(`${reportLink} .benchmark-ledger__identity small`).textContent,schema:window.VASIR_DATA[publicationKey].schemaVersion,visible:!!document.querySelector(reportLink).getBoundingClientRect().height}),{reportLink,publicationKey});
   overallSha256 = sha256(initial.overall);
   check('engineering-52-settings', initial.engineeringRows === 52, { rows: initial.engineeringRows, ledgerLabel: initial.ledgerLabel });
-  assert.ok([3,4].includes(initial.schema));
+  assert.ok(authoring ? [1,2].includes(initial.schema) : [3,4].includes(initial.schema));
   assert.equal(initial.ledgerLabel,'Minimal · Skill','The Engineering link must describe the current skill comparison.');
-  assert.ok(initial.visible && new URL(initial.href).hash === '#backend-testing', 'Visible Engineering ledger report link missing.');
+  assert.ok(initial.visible && new URL(initial.href).hash === `#${benchmarkId}`, 'Visible Engineering ledger report link missing.');
   await measureOverflow('Engineering ledger');
-  await inspect(() => document.querySelector('[data-testing-report-link]').scrollIntoView({ block: 'center', behavior: 'instant' }));
-  await capture('backend-testing-engineering-ledger');
-  await click('[data-testing-report-link]');
-  await waitFor(() => evaluate('document.querySelector("#report-page")?.dataset.executableBenchmark === "backend-testing"'), 'Backend report from Engineering ledger');
+  await inspect(selector => document.querySelector(selector).scrollIntoView({ block: 'center', behavior: 'instant' }),reportLink);
+  await capture(`${benchmarkId}-engineering-ledger`);
+  await click(reportLink);
+  await waitFor(() => evaluate(`document.querySelector("#report-page")?.dataset.executableBenchmark === ${JSON.stringify(benchmarkId)}`), 'Backend report from Engineering ledger');
   await settled();
-  const data = await evaluate('window.VASIR_DATA.executableTesting');
+  const data = await evaluate(`window.VASIR_DATA[${JSON.stringify(publicationKey)}]`);
   publicationSha256 = sha256(JSON.stringify(data));
   publicationSchemaVersion = data.schemaVersion;
-  await checkCurrentReport(data);
+  if (authoring) await checkAuthoringReport(data); else await checkCurrentReport(data);
 
   await click('.report-context__back');
-  await waitFor(() => evaluate('document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector("[data-testing-report-link]")'), 'Report backlink returns to Engineering');
+  await waitFor(() => evaluate(`document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector(${JSON.stringify(reportLink)})`), 'Report backlink returns to Engineering');
   check('ledger-navigation', true, { from: initial.href, returnedTo: await evaluate('location.href') });
   const history = await client.send('Page.getNavigationHistory');
   await client.send('Page.navigateToHistoryEntry', { entryId: history.entries[history.currentIndex - 1].id });
-  await waitFor(() => evaluate('document.querySelector("#report-page")?.dataset.executableBenchmark === "backend-testing"'), 'Browser back restores executable report');
+  await waitFor(() => evaluate(`document.querySelector("#report-page")?.dataset.executableBenchmark === ${JSON.stringify(benchmarkId)}`), 'Browser back restores executable report');
   check('browser-history', true, { restoredUrl: await evaluate('location.href'), dataset: await evaluate('document.querySelector("#report-page").dataset.executableBenchmark') });
   await navigate(pageUrl('index.html', 'capabilities/overall'), 'document.querySelector("#capability-category-overall[aria-selected=true]")');
-  const overall = await evaluate('({serialized:JSON.stringify(window.VASIR_DATA.overall),backendScore:JSON.stringify(window.VASIR_DATA.overall).includes("backend-testing"),backendRows:document.querySelectorAll("#capability-ranking [data-testing-row],#capability-ranking [data-testing-summary]").length})');
+  const overall = await evaluate('({serialized:JSON.stringify(window.VASIR_DATA.overall),backendScore:["backend-testing","test-authoring"].some(id=>JSON.stringify(window.VASIR_DATA.overall).includes(id)),backendRows:document.querySelectorAll("#capability-ranking [data-testing-row],#capability-ranking [data-testing-summary]").length})');
   check('overall-excludes-backend-testing', !overall.backendScore && overall.backendRows === 0 && sha256(overall.serialized) === overallSha256, { sourceSha256: overallSha256, afterSha256: sha256(overall.serialized), backendScore: overall.backendScore, backendRows: overall.backendRows });
   await measureOverflow('Overall');
   await navigate(pageUrl('benchmark-report.html', 'hyper-scale-chat'), 'document.querySelector("#report-title") && document.querySelectorAll(".model-run").length > 0');
@@ -497,6 +643,7 @@ try {
   check('hyper-scale-chat-report', smoke.title.toLowerCase().includes('chat') && smoke.modelRuns === 52 && !smoke.unavailable && !smoke.executable, smoke);
   await measureOverflow('Hyper-scale chat');
   await capture('backend-testing-hyper-scale-chat');
+  if(authoring && options['missed-bug-scenarios'] === 'true') await checkMissedBugScenarios(data);
   check('no-root-overflow', overflow.every(item => item.scrollWidth <= item.viewport + 1), overflow);
   await drain();
   assert.deepEqual(runtimeErrors, [], 'Runtime errors observed.');
@@ -512,9 +659,9 @@ try {
     if (pins.has(file.path) && pins.get(file.path).sha256 !== file.sha256) failures.push({ message: `Resource changed during run: ${file.path}` });
     pins.set(file.path, { path: file.path, bytes: file.bytes, sha256: file.sha256 });
   }
-  for (const path of ['data.js', 'app.js', 'benchmark-report.js', 'benchmark-report.css', 'style.css', ...(publicationSchemaVersion === 3 ? ['responses.js'] : [])]) if (!pins.has(path)) failures.push({ message: `Required loaded source pin missing: ${path}` });
+  for (const path of ['data.js', 'app.js', 'benchmark-report.js', 'benchmark-report.css', 'style.css', ...([1,3,4].includes(publicationSchemaVersion) ? ['responses.js'] : [])]) if (!pins.has(path)) failures.push({ message: `Required loaded source pin missing: ${path}` });
   const status = failures.length || runtimeErrors.length || networkErrors.length ? 'failed' : 'passed';
-  const receipt = { kind: 'vasirbenchmark-backend-testing-browser-proof', schemaVersion: 1, status, url: requestedUrl.href, loadedUrl: baseUrl.href, ...(previewState ? { notAcceptanceEvidence: true, previewState } : {}), width, height, harnessSha256, publicationSchemaVersion, publicationSha256, overallSha256, ...(pairedRepairSha256 ? { pairedRepairSha256 } : {}), ...(tasteSha256 ? { tasteSha256 } : {}), ...(currentRoundSha256 ? { currentRoundSha256 } : {}), ...(backendTestingOverallSha256 ? {backendTestingOverallSha256} : {}), ...(backendTestingFilesSha256 ? {backendTestingFilesSha256} : {}), sourcePins: [...pins.values()].sort((a, b) => a.path.localeCompare(b.path)), loadedFiles, checks, screenshots, failures, runtimeErrors, networkErrors, completedAt: new Date().toISOString() };
+  const receipt = { kind: 'vasirbenchmark-backend-testing-browser-proof', schemaVersion: 1, benchmarkId, status, url: requestedUrl.href, loadedUrl: baseUrl.href, ...(previewState ? { notAcceptanceEvidence: true, previewState } : {}), width, height, harnessSha256, publicationSchemaVersion, publicationSha256, overallSha256, ...(pairedRepairSha256 ? { pairedRepairSha256 } : {}), ...(tasteSha256 ? { tasteSha256 } : {}), ...(currentRoundSha256 ? { currentRoundSha256 } : {}), ...(backendTestingOverallSha256 ? {backendTestingOverallSha256} : {}), ...(backendTestingFilesSha256 ? {backendTestingFilesSha256} : {}), ...(testAuthoringOverallSha256 ? {testAuthoringOverallSha256,testAuthoringFilesSha256,testAuthoringRoundSha256:currentRoundSha256,incumbentBackendSha256} : {}), sourcePins: [...pins.values()].sort((a, b) => a.path.localeCompare(b.path)), loadedFiles, checks, screenshots, failures, runtimeErrors, networkErrors, completedAt: new Date().toISOString() };
   const path = resolve(output, 'backend-testing-browsercheck.json');
   await writeFile(path, `${JSON.stringify(receipt, null, 2)}\n`);
   await browser.close();

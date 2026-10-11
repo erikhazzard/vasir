@@ -1,0 +1,300 @@
+{
+  "kind": "vasirbenchmark-test-authoring-selection",
+  "schemaVersion": 1,
+  "plan": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/full-plan.json",
+    "sha256": "35e8cd86d8ebdf398b9d0246b214bfed64195edf9a4d952a3a15b333c876eeae"
+  },
+  "skill": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/skill.json",
+    "sha256": "8f4a47844c844e947741d1137e238554a424e9345a21302a77ee75fbe35b095c"
+  },
+  "rubric": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/taste-rubric.json",
+    "sha256": "17b325aee914a513463ec694d3acd1f95392e8e5af5a4b1a71d41f502fbeb328"
+  },
+  "calibration": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/calibration/calibration.json",
+    "sha256": "803b11c2b439f69bfc9af2c4c2caabbd4e2bae5597d07cb0e7c62faaf3672d77"
+  },
+  "generation": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/generation-summary-full-analysis.json",
+    "sha256": "46655ea5a8834c5f22c899ccb7ea5b75ce2749adb9924a263b2db3be0c0d8dec"
+  },
+  "reviewPlan": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/review-plan.json",
+    "sha256": "ad8e0e0bea4b08c14cfa646dcd1f157ca903bf68a82743216a5fe03dd2f583e8"
+  },
+  "packet": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/packet.json",
+    "sha256": "ba42f4b77a4119f81a518c843c59cbda892b6599ea2c8aa802fd0494e6d2a753"
+  },
+  "mapping": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/mapping.json",
+    "sha256": "8663c3d77acdd7bb7b4f39a7f5b3720410464d1fbcc838382eb4f9c8f1dd789f"
+  },
+  "objective": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/objective-adjudication.json",
+    "sha256": "ecf4cd5af5e5b19f4f35a17a5dd199d4ad4a2400a365d437e3308f94b4fc56c3"
+  },
+  "review": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/review-summary.json",
+    "sha256": "8b0b906ef150f97c2f1a3c851e29792e08bf5465c9dfed3406f17a3846cb453e"
+  },
+  "analysisPolicy": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/analysis-policy-full.json",
+    "sha256": "2c76f96c1a975abceaf1c2d1730da2ce72a12e444b4cd3b5628708822e372c89"
+  },
+  "strictGeneration": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/generation-summary-full-strict.json",
+    "sha256": "3c89c78758d0e0c2265931738c507fe5966f4f29f607ba3355ab5e592bbc7dca"
+  },
+  "continuation": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/opus-resume.json",
+    "sha256": "b3f2344fa97a72105f94fb5455c41f6dfbe82bcbd8a17c0e4e35787bc12ff7c3"
+  },
+  "codexContinuation": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/sol-current-continuation.json",
+    "sha256": "700559ecbc1dd2e39fa6a29349a3aba40c59c42cff2e3da9f5444d6760041796"
+  },
+  "authors": [
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/native/result.json",
+        "sha256": "0c9d8641740cdb1da313f97a1feb3126b03cce164c6f2eab3620fbeac88600a4"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/native/launch.json",
+        "sha256": "080ca7f78c1dfe10c3ffb7f21bd205695f40b8fbc5c37db84254c37da6540992"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/analysis/outcome.json",
+        "sha256": "40509675a36937edcdadf4c1286f4268940ad9a190cc8203a392be6989edc838"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "e66295e0c72eebf415b62d9efb036c99aa391aa2798c63659520258f9e3c7e82"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/verification/evaluation.json",
+        "sha256": "aae8879b87793dfe67a3ff5f3e53af71485208891dfc4bd01945dda07c102fdb"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/outcome.json",
+        "sha256": "90bb4ef8c64f9e0d751ace0e926d38a13bf9eed8b76a152c07e6f6be476531ab"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/native/result.json",
+        "sha256": "b6097c637e1f55e7203c288996ae469f3c9155346470839c2fb0999b9a9b7edf"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/native/launch.json",
+        "sha256": "721822993ea53ebab35018b242274c4d8a57e874802703a040a27f71fb57aa85"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/analysis/outcome.json",
+        "sha256": "239c3f281f32cffafb82154b5eb60d7c0c651693a7a6101cdd3bc57db66fe4c8"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "1f6e9a86d3cb35ee83cd70be3832b21fc6325aa49279bb66868dad4a9aeb1717"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/analysis/verification/evaluation.json",
+        "sha256": "187d72dfa208e21bdf21b5791787b54cb26629bd0925645b53111ee09755200c"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/outcome.json",
+        "sha256": "0c678977df0faefa377c76eb77bf5a94e923024e2bf14902cae57ea2dbd168e5"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/native/result.json",
+        "sha256": "339d25709186e45a21c493ba6a171ce23b099c97e83912ba8e802c0d06fd2759"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/native/launch.json",
+        "sha256": "d9cf0df8dcaf8825c74e1ebe045ce9b3d0b5b56981c3a2667cc0cfc06266e9cc"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/analysis/outcome.json",
+        "sha256": "e1c2b2ecb0ec7fbac0278a466960b6f23d1a408db14347180b9e5fa5b49998b0"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "0166b2afb065d791c9ddd04cbbad0ff4e85459a5671dc18209c1629fe196d17f"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/verification/evaluation.json",
+        "sha256": "318a46b7a79a6b5ac633444ae6a47fdfd203111f081c4089e754edfe0ba54e7d"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/outcome.json",
+        "sha256": "a083ed5608f4f7f4e3730c237ecdcf6ae86defee35dcf4a3d4e00a61d3cbecbf"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/native/result.json",
+        "sha256": "aeb3ed968b41faa4b7c732965a0c007768f4cee8fbddcb77b24f09bacf97ffe9"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/native/launch.json",
+        "sha256": "9928b080a0f4108c18fb5a38431520557ccfcb17b139683c778af6e29648bf84"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/analysis/outcome.json",
+        "sha256": "0643ca670a1d2ddf8ac4e1fa9cb088c50e3a6526c94d96a23b9fe652a7a8a5fd"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "0a7a7e7b06c621fe04bdec47a70214f592b6e4f52ac9eaaeab58e7bf0853f4b3"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/analysis/verification/evaluation.json",
+        "sha256": "646244097b3c216ca47306abdb2d5abfdf2f0424cac7694791d4e2c40a53a784"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/outcome.json",
+        "sha256": "264ec46a5d8337cda2ac6599c122d6055b287dc070d0b5d0ea8ac9b64a693344"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/native/result.json",
+        "sha256": "980596767d411b104be87fd42741e2c3a1cde06d4d62c101ca088db7e0cfb328"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/native/launch.json",
+        "sha256": "22ae9b3f9d584df063d7ad9c7ecd00ec16e7d4aba26ec43c5cb17da623fde7f6"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/analysis/outcome.json",
+        "sha256": "bcabc731c3e6d6f99c5d7bba024c8583fb445b2e03da3a2f8856db9a5dffb9f6"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "5a6b88490c59307a21c3b8452bb146271124241a54002f7917cac9f7e27d3e4e"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/analysis/verification/evaluation.json",
+        "sha256": "fa87a997d6a4b828c7897817704eca048061721d46d478480adf1437f9aa8573"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/outcome.json",
+        "sha256": "a6db78fe37ef92387d6583504b38ab34fc8182b9bc1443084695decd2c3bec66"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/native/result.json",
+        "sha256": "1f5aa282aaa750cb2c92d7d811e6e4b6ae9ae2ce6d72449b5d67de98663d216f"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/native/launch.json",
+        "sha256": "210f983b87bb1b4c086bc538db9a0033e96391e4ba79b126af9c7b755ce65d0f"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/analysis/outcome.json",
+        "sha256": "153bbe57bfab7fc909b4827448a00e9d89cec1b8c541997a6654df032c8a1c6f"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "ead94e215d576c7b8edbb92a614ea9b6ec0bdc43e0a455ee77a47781c7fe4fcf"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/analysis/verification/evaluation.json",
+        "sha256": "e39af179a69496ca24d9d96d4a270799353f4840261fcb9759aa224339130f99"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/outcome.continued.json",
+        "sha256": "dd2d7ec213c73452fd57824c6cfb17e0de68f0b6d18813f5765a1287c407a07e"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/native/result.json",
+        "sha256": "4049848a7b0996b4a9463987ae926a0dce9517e82f6af375be26cb6fecd86e3d"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/native/launch.json",
+        "sha256": "695b3f6d3e1eb57a66b467b03db3fe980ca22f9cba7b2ca0dc6ac2a5d4976475"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/analysis/outcome.json",
+        "sha256": "b733c75ddebe3b1e479e86a3e8fe4afc915cabb3a1bca92776d5cb2ba527f833"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "82f0271cd2e6f19287b7d2825c4129a9425bdd56d50e2dbe5dea979347093ec9"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/verification/evaluation.json",
+        "sha256": "78212e1e7ccc67919a840951e95ee2adbe682bc8846c76ff47bff15e4fc3c6db"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/outcome.json",
+        "sha256": "5b92803c3fbeb4b3b528908a8cc24a7be5291109697f681af34cec920b77e7b8"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/native/result.json",
+        "sha256": "6d5b12070e363d4faf6d723dd41ff7b33f49d28c8e5193aeb5c6c49225db064b"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/native/launch.json",
+        "sha256": "ca30bb1e8ae23f5be0eda45da535033d70d0058b5b18cbbe9b5063cae273a0b9"
+      },
+      "outcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/analysis/outcome.json",
+        "sha256": "f156de8e9ba340df919e4cd28686066c3d4053f3229879648aaf28a00a5da6e2"
+      },
+      "submission": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+        "sha256": "b717dab9e727934bba01ee39b6273c12337f6b3edf4674d509ae945b89a5d26f"
+      },
+      "verification": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/analysis/verification/evaluation.json",
+        "sha256": "9b185930f7a4d3675cb4039dad062b57e8931848ecbb69305f6e4ebcb037e175"
+      },
+      "strictOutcome": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/outcome.json",
+        "sha256": "f183619ef14f76cc62245f6dd5251479cd2f94030d6f42f463e337ca695b4769"
+      }
+    }
+  ],
+  "judges": [
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-1/result.json",
+        "sha256": "a42fae4ac8b4e3bff521c26fe088f5ba3eadfee2c77da6b02becf9f84ddf840e"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-1/launch.json",
+        "sha256": "b444e91fe2d7ef6bf2c35527efefa4a3096ec0a5170558ac238262c57566ba21"
+      },
+      "validated": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-1/validated.json",
+        "sha256": "fbc1761314adb2db10ea732d985d996e67a53993d4ec732efed46c5add55be10"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-2/result.json",
+        "sha256": "35116bea58b16e6b923273052941fb12d7e17ba8bd7b64aca3b68c2353eb5718"
+      },
+      "launch": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-2/launch.json",
+        "sha256": "9d716b9913eafd2a1d926d0d99b8218f550a1a9a7ba58d75b06cb3f7f48553da"
+      },
+      "validated": {
+        "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-2/validated.json",
+        "sha256": "aeb5e3007a68a4250fe3c7fd150977f98bd1c3693bb31bc1050a32a533ca5d4a"
+      }
+    }
+  ]
+}

@@ -1,19 +1,19 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-10-10-backend-testing-weighted-score-6e54ac66be68",
+  "version": "2026-10-10-test-authoring-e0fc73a35cb3-missed-bugs",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
     "authority": "user",
-    "acceptedAt": "2026-10-10T16:21:34.596Z",
-    "response": "User requested one weighted score for all nine criteria, with preservation carrying 25% and no score ceiling; apply the formula to the selected native reviews and publish the current comparison.",
-    "basis": "Pinned native output, executed artifact inventories and complete two-reviewer findings support the selected current round. Immutable candidate browser evidence and desktop/mobile visual review verify the standard comparison and exact test-file viewer.",
-    "verdict": "The standard four-model table presents one final /100 score. Nine explicit weighted criteria use the unchanged seven native ratings and separately evidenced preservation and runnable-coverage findings, then average both reviewer totals. Inspect run exposes exact JavaScript test files with Copy and retains every suite reason and source citation. Method is closed initially and discloses four new authors, four reused Minimal artifacts, two fresh blind reviewers, the formula’s adoption after reviews and current-round usage.",
-    "criterion": "Do not invent file ratings, reviewer variation or missing evidence. Lost preservation contributes 0 of 25 points; absent runnable coverage contributes 0 of 5 points. Neither limits the other criteria or overrides the whole score. Unresolved required evidence leaves no official score. Preserve all other benchmark data and answers. Backend testing remains excluded from Engineering and Overall.",
+    "acceptedAt": "2026-10-11T02:43:07.123Z",
+    "response": "User requested a red missed-bug marker beside an affected Minimal or Skill plot dot, with a visible explanatory label. No evaluation or scoring changes.",
+    "basis": "Presentation-only update to the accepted eight-author, two-reviewer result. Current data, scores, exact authored source, selection and every native input remain byte-identical. Candidate browser checks verify actual missed bugs and synthetic Minimal-only/both-condition markers without model calls.",
+    "verdict": "Red missed-bug markers sit beside the affected Minimal or Skill score dot. A visible explanation defines the marker. The current result marks Sol and Opus Skill, each with one missed bug; all Minimal runs and both Astra Skill runs remain unmarked. Existing comparison, JavaScript inspection, navigation and responsive checks pass.",
+    "criterion": "No preservation component, caps, invented file ratings or retries. Candidate detections earn credit only after source and matched healthy-case assertion adjudication. Infrastructure failures stay unresolved. Retain every native attempt and actual usage. This standalone Redis service-boundary case does not enter Engineering or Overall aggregates.",
     "scope": {
       "kind": "executable-testing-benchmark",
-      "schemaVersion": 4,
-      "benchmarkId": "backend-testing",
+      "schemaVersion": 5,
+      "benchmarkId": "test-authoring",
       "viewports": [
         {
           "width": 1440,
@@ -31,378 +31,496 @@
     },
     "verification": {
       "previousAcceptance": {
-        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/template-lock.json",
-        "bytes": 16251,
-        "sha256": "e56c3e7774d994d5c164726e0dcaf662b45595f0c70464cc5b85c08f3fb29a4c"
+        "path": "reviews/test-authoring/2026-10-10/prior-current/template-lock.json",
+        "bytes": 39988,
+        "sha256": "5117fb8ad38430c66308089c23aa347e749fce0c54ee73ec08b6eba547b4cf81"
       },
       "previousData": {
-        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/data.js",
-        "bytes": 997859,
-        "sha256": "458f401a925a0b29c49fe1dfe9b82ed2cf4f501e4765112d16bf0c2a5209187b"
+        "path": "reviews/test-authoring/2026-10-10/prior-current/data.js",
+        "bytes": 996021,
+        "sha256": "18883dec0a57343184c073f4a62233a66d0a673fe6d9e19ca7e2f0e749c2be43"
       },
       "previousResponses": {
-        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/responses.js",
-        "bytes": 6907491,
-        "sha256": "f4aa1259e1a1549abc5e54e2b1ba03c80f202fe843f4eb02bfcc2268ef656fd4"
+        "path": "reviews/test-authoring/2026-10-10/prior-current/responses.js",
+        "bytes": 7050358,
+        "sha256": "c80606a7d60a81c79d2b8ee09a61d578407061eb462ced2c008b227f5a19c6e5"
       },
       "previousSelection": {
-        "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/publication.json",
-        "bytes": 874,
-        "sha256": "8e1fbfee6da3bcfd926a73ad847067fba03597f7f52db141571904b6d088f6e7"
+        "path": "reviews/test-authoring/2026-10-10/prior-current/publication.json",
+        "bytes": 10389,
+        "sha256": "64de5b7b55e70e4f4d1d895bd55ff6eaac146dcf65e9870eca66d57c341ccb17"
       },
       "previousFiles": [
         {
           "sourcePath": "app.js",
-          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/app.js",
-          "bytes": 219723,
-          "sha256": "516bb5069277efa6e438198e871d01f56d3a5059ab4058ea45ec66f27de00232"
+          "path": "reviews/test-authoring/2026-10-10/prior-current/app.js",
+          "bytes": 220249,
+          "sha256": "c1c1826889244247ca17c181c7a26d8d61014d85d2c24ec66fef8e4e5f1b9bc5"
         },
         {
           "sourcePath": "benchmark-report.css",
-          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/benchmark-report.css",
-          "bytes": 38457,
-          "sha256": "5de2435ec194d9d80c1e734dbcb3c831d252f0713303933150334f497a0d1848"
+          "path": "reviews/test-authoring/2026-10-10/prior-current/benchmark-report.css",
+          "bytes": 40542,
+          "sha256": "f80ccbf04b4cb6375182e9b9faf28146d62d87d7490567ffdb8e22b41dd9ec55"
         },
         {
           "sourcePath": "benchmark-report.js",
-          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/benchmark-report.js",
-          "bytes": 133363,
-          "sha256": "4a4df466d1ef760cd5aa188a27ad47bf8b5824368ec5a554f5e88d317c874a78"
+          "path": "reviews/test-authoring/2026-10-10/prior-current/benchmark-report.js",
+          "bytes": 154067,
+          "sha256": "92f39754d2013dd4807cd495cfd3032b675b80215b9d8bb741b6cb7d552a313a"
         },
         {
           "sourcePath": "backend-testing-browsercheck.mjs",
-          "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/backend-testing-browsercheck.mjs",
-          "bytes": 31242,
-          "sha256": "ae7df1f93b5a20e9d92efbdd158a6461b8260ef73636814e01ea0fd0dd0fd2e3"
+          "path": "reviews/test-authoring/2026-10-10/prior-current/backend-testing-browsercheck.mjs",
+          "bytes": 59572,
+          "sha256": "1bf06f44e1b752c0ed511fdbbfd0ffe957418f00f915ca9af09a6894a8d0f046"
         }
       ],
       "selection": {
-        "path": "benchmarks/backend-testing/publication.json",
-        "bytes": 10389,
-        "sha256": "64de5b7b55e70e4f4d1d895bd55ff6eaac146dcf65e9870eca66d57c341ccb17"
+        "path": "benchmarks/test-authoring/publication.json",
+        "bytes": 16183,
+        "sha256": "0fde92d8d320c2289b5bb52693f231e87129cfaa93b28e54fa27cc46b451e1dc"
       },
       "sourcePins": [
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/plan.json",
-          "bytes": 9811,
-          "sha256": "ee9055d9583fb3438ad170bf1afbdbf44bfbe1d09de4e9df499e7078de2ca1c9"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/full-plan.json",
+          "bytes": 8155,
+          "sha256": "35e8cd86d8ebdf398b9d0246b214bfed64195edf9a4d952a3a15b333c876eeae"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/skill.json",
-          "bytes": 37525,
-          "sha256": "9310c5b6fde31049af1add359eacfae87bc75acac166df237c05d953db200f4f"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/skill.json",
+          "bytes": 37508,
+          "sha256": "8f4a47844c844e947741d1137e238554a424e9345a21302a77ee75fbe35b095c"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/taste-rubric.json",
-          "bytes": 7600,
-          "sha256": "5395bf8eaf5ef2e77e36a647a6dbde07e3bb2dfaf33bbec9442b053c0c8a83aa"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/taste-rubric.json",
+          "bytes": 8684,
+          "sha256": "17b325aee914a513463ec694d3acd1f95392e8e5af5a4b1a71d41f502fbeb328"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/generation-summary.json",
-          "bytes": 9368,
-          "sha256": "5ff98c3172beb1bac69da8027ea1140f04f9924cfbcc41f8e094fcd493d57304"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/calibration/calibration.json",
+          "bytes": 68777,
+          "sha256": "803b11c2b439f69bfc9af2c4c2caabbd4e2bae5597d07cb0e7c62faaf3672d77"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/review-plan.json",
-          "bytes": 1542,
-          "sha256": "3211c92182f0401b70cdab447fa0c696fbeed0b032857010744a1e3d4deea95f"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/generation-summary-full-analysis.json",
+          "bytes": 31742,
+          "sha256": "46655ea5a8834c5f22c899ccb7ea5b75ce2749adb9924a263b2db3be0c0d8dec"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/packet.json",
-          "bytes": 609689,
-          "sha256": "c51e7be7713abba89841bbf77eb674b756cb8342ed4af48a80df2cb29c43fed1"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/review-plan.json",
+          "bytes": 7371,
+          "sha256": "ad8e0e0bea4b08c14cfa646dcd1f157ca903bf68a82743216a5fe03dd2f583e8"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/mapping.json",
-          "bytes": 203,
-          "sha256": "0107c38471282fce275d8d99dbb8b274df414eb284d82b81a7b63f9c4fff13d5"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/packet.json",
+          "bytes": 364389,
+          "sha256": "ba42f4b77a4119f81a518c843c59cbda892b6599ea2c8aa802fd0494e6d2a753"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/review-summary.json",
-          "bytes": 77108,
-          "sha256": "efb71c4b4f3006a69e642aa33f1f694c66fe55287c67741e3a737870af40dbb7"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/mapping.json",
+          "bytes": 219,
+          "sha256": "8663c3d77acdd7bb7b4f39a7f5b3720410464d1fbcc838382eb4f9c8f1dd789f"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/plan.json",
-          "bytes": 3890,
-          "sha256": "a6a18df2f2d8251e002fc025626d8f62bfd95876e2f2d08a9a136f92125dbe1e"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/objective-adjudication.json",
+          "bytes": 30687,
+          "sha256": "ecf4cd5af5e5b19f4f35a17a5dd199d4ad4a2400a365d437e3308f94b4fc56c3"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/suite-quality/revisions/reader-protection-v3/fixtures/player-saves/manifest.json",
-          "bytes": 230088,
-          "sha256": "19a6722330f337687bd75285007da5025efdd3ed2c1d3d2f915dca8e1233d6c3"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/review-summary.json",
+          "bytes": 58203,
+          "sha256": "8b0b906ef150f97c2f1a3c851e29792e08bf5465c9dfed3406f17a3846cb453e"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/native/result.json",
-          "bytes": 6657,
-          "sha256": "08077c4f48b344e5ce5757329225c6d507022bdd50e4c48dc482d6f2ec6dbe6a"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/analysis-policy-full.json",
+          "bytes": 2218,
+          "sha256": "2c76f96c1a975abceaf1c2d1730da2ce72a12e444b4cd3b5628708822e372c89"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/native/launch.json",
-          "bytes": 3338,
-          "sha256": "a3120e75c9edd8f9cb05001e5e79cfe2d9b6fed7b0932979d4e3c374864d0597"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/generation-summary-full-strict.json",
+          "bytes": 21785,
+          "sha256": "3c89c78758d0e0c2265931738c507fe5966f4f29f607ba3355ab5e592bbc7dca"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/outcome.json",
-          "bytes": 743,
-          "sha256": "1c8407fb201d53d20710d9ab03c65d0a06d7a1969a958cc1e04262c0a049ffa4"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/opus-resume.json",
+          "bytes": 1466,
+          "sha256": "b3f2344fa97a72105f94fb5455c41f6dfbe82bcbd8a17c0e4e35787bc12ff7c3"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-a94a8197b6/verification/evaluation.json",
-          "bytes": 53164,
-          "sha256": "467a6f0ccdb43de28ade9ed23f88062148b9635d01b1931b908bd3cf92b81709"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/sol-current-continuation.json",
+          "bytes": 1310,
+          "sha256": "700559ecbc1dd2e39fa6a29349a3aba40c59c42cff2e3da9f5444d6760041796"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/native/result.json",
-          "bytes": 9952,
-          "sha256": "f1e5a408dd241c08d79d1a7854b9f0b843bd03b4d0ad7743d515d16f7708807a"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/plan.json",
+          "bytes": 6058,
+          "sha256": "d4525c7ee39597e0ce68c46d73113f1f5a0d25a5ab2fd4092a7b64066a745f77"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/native/launch.json",
-          "bytes": 3338,
-          "sha256": "0b3f982c32969f7d2bf201d25950fbec29f8261016b286eecb8ab7c3fb0bb9f0"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only-plan.json",
+          "bytes": 7758,
+          "sha256": "22246c7846c523a00e541d546375bc1ce0e8664e8a4b66ca921fea70226b1f09"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/outcome.json",
-          "bytes": 893,
-          "sha256": "acc6421b36386d148a97ad733849f52e117d69a63ec9cba8eba44d3c2abeb193"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/fixture/manifest.json",
+          "bytes": 2689,
+          "sha256": "45258bb5635afaea66b09750354d4fc5df85e981a4f0c00b428fca6a7bb476f9"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-4e982aa260/verification/evaluation.json",
-          "bytes": 66929,
-          "sha256": "a452cee415cdd16fe8c47d4341104f850e83d85324ff4ce6aef8d734e64634cf"
+          "path": "benchmarks/backend-testing/run.mjs",
+          "bytes": 55052,
+          "sha256": "e4ab70588845c62fffb424c1e71c92a3a732a1e2d4660fbecb6481d864bdd52a"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/native/result.json",
-          "bytes": 6737,
-          "sha256": "b7506ac46dc284d68a3c6a51f9b056755f8c1039fb3e1ce2212baac72e9f9a8e"
+          "path": "benchmarks/backend-testing/verify.mjs",
+          "bytes": 30876,
+          "sha256": "aeb6480bea54d9d580e4dd1d9a7263e96ae262efccaca03db2a2dfd09ec38240"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/native/launch.json",
-          "bytes": 3338,
-          "sha256": "f506b535763ffb2b78f936d2ddfb649bb8137b71e0498b1d75da398d06a539d1"
+          "path": "benchmarks/backend-testing/fixture.mjs",
+          "bytes": 8892,
+          "sha256": "25b77f1858fcb5b2656c99550602796f89db0c5adcc9177e9127234ef6600164"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/outcome.json",
-          "bytes": 743,
-          "sha256": "a5fc77f5d2116e3daa19bb70ab38b489996d6497f79c409704fd357007a20d08"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/native/result.json",
+          "bytes": 26601,
+          "sha256": "0c9d8641740cdb1da313f97a1feb3126b03cce164c6f2eab3620fbeac88600a4"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-2f0cce869f/verification/evaluation.json",
-          "bytes": 45514,
-          "sha256": "9e1dfab4078ed0fef69c4817294abca41cae215ac576bffd9517e8276b051eb5"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/native/launch.json",
+          "bytes": 3570,
+          "sha256": "080ca7f78c1dfe10c3ffb7f21bd205695f40b8fbc5c37db84254c37da6540992"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/native/result.json",
-          "bytes": 7322,
-          "sha256": "b571b6fae8abda322400dadaab64fba6ce0c73cc1cd4716012278dfc2472c87e"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/analysis/outcome.json",
+          "bytes": 3047,
+          "sha256": "40509675a36937edcdadf4c1286f4268940ad9a190cc8203a392be6989edc838"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/native/launch.json",
-          "bytes": 3338,
-          "sha256": "332000e1293b76ee18641a116c12dfe43129320423c932d0b771317397c91140"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 24068,
+          "sha256": "e66295e0c72eebf415b62d9efb036c99aa391aa2798c63659520258f9e3c7e82"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/outcome.json",
-          "bytes": 893,
-          "sha256": "7f023ba9d9bb448e4d46e68bf0dbb1f887179da3f7f43e334b7ccfa9ea8c97e0"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/verification/evaluation.json",
+          "bytes": 120677,
+          "sha256": "aae8879b87793dfe67a3ff5f3e53af71485208891dfc4bd01945dda07c102fdb"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-2d6f529e5f/verification/evaluation.json",
-          "bytes": 66241,
-          "sha256": "3d9d49dd3bd73522256b1e281ff3c768f367d162d87747d11f9c3e897b04d9b3"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-25a30e4488f6/outcome.json",
+          "bytes": 2432,
+          "sha256": "90bb4ef8c64f9e0d751ace0e926d38a13bf9eed8b76a152c07e6f6be476531ab"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/result.json",
-          "bytes": 7412,
-          "sha256": "d0d0b3efe31f16bbb38dc5349cd46132a20f0fc56bc251df4189245999291fd0"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/native/result.json",
+          "bytes": 28985,
+          "sha256": "b6097c637e1f55e7203c288996ae469f3c9155346470839c2fb0999b9a9b7edf"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/native/launch.json",
-          "bytes": 3338,
-          "sha256": "b7ac576344734be524efe82b2a9e6f5fef2937ab48d4680f300a76c3eb1fa0de"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/native/launch.json",
+          "bytes": 3570,
+          "sha256": "721822993ea53ebab35018b242274c4d8a57e874802703a040a27f71fb57aa85"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/outcome.json",
-          "bytes": 743,
-          "sha256": "99049339e777296829524525cac71c3b982cf25c97b1d22095b8b78989c5ef0a"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/analysis/outcome.json",
+          "bytes": 3066,
+          "sha256": "239c3f281f32cffafb82154b5eb60d7c0c651693a7a6101cdd3bc57db66fe4c8"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-f6c9b09853/verification/evaluation.json",
-          "bytes": 50411,
-          "sha256": "2d633515d16508fbebcc2775b405f28381f7f562e75ad5238b4a9c45869db15c"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 26416,
+          "sha256": "1f6e9a86d3cb35ee83cd70be3832b21fc6325aa49279bb66868dad4a9aeb1717"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/native/result.json",
-          "bytes": 14108,
-          "sha256": "cf5ae786340ef5ece3f773208566e080c1a6798efc7630351f0c4ecbb16ef76d"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/analysis/verification/evaluation.json",
+          "bytes": 96123,
+          "sha256": "187d72dfa208e21bdf21b5791787b54cb26629bd0925645b53111ee09755200c"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/native/launch.json",
-          "bytes": 3338,
-          "sha256": "a204fcd6b4cdceb55fe77d70631861de1a975ab5d9d5fc69bf2123c68ffdc432"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-77dd17fd8595/outcome.json",
+          "bytes": 1919,
+          "sha256": "0c678977df0faefa377c76eb77bf5a94e923024e2bf14902cae57ea2dbd168e5"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/outcome.json",
-          "bytes": 893,
-          "sha256": "940326c1b8dd1c9ad6ccc5a4f95fcc953b4a7fdc419c60f2deb50585fb05ba9f"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/native/result.json",
+          "bytes": 26511,
+          "sha256": "339d25709186e45a21c493ba6a171ce23b099c97e83912ba8e802c0d06fd2759"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-208e3078b6/verification/evaluation.json",
-          "bytes": 67779,
-          "sha256": "f5077a4811cd69113ce92c07f7f5772f497fce24df392028e25f54132bd18b0c"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/native/launch.json",
+          "bytes": 3570,
+          "sha256": "d9cf0df8dcaf8825c74e1ebe045ce9b3d0b5b56981c3a2667cc0cfc06266e9cc"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/result.json",
-          "bytes": 14152,
-          "sha256": "3af1682fbc1ddfc3db0da0e8448c11fdf40f78e0a6d41d55b9071ec2704f48d6"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/analysis/outcome.json",
+          "bytes": 3051,
+          "sha256": "e1c2b2ecb0ec7fbac0278a466960b6f23d1a408db14347180b9e5fa5b49998b0"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/native/launch.json",
-          "bytes": 4680,
-          "sha256": "ea4055e754886156b80b68bcb1e255059584a40c45f752f4280c49f02038e3ba"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 24060,
+          "sha256": "0166b2afb065d791c9ddd04cbbad0ff4e85459a5671dc18209c1629fe196d17f"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/outcome.json",
-          "bytes": 1129,
-          "sha256": "169ea13841c2da266318fa0829e91bdbc5886c27efce472e899c77dbef06bee8"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/verification/evaluation.json",
+          "bytes": 147089,
+          "sha256": "318a46b7a79a6b5ac633444ae6a47fdfd203111f081c4089e754edfe0ba54e7d"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/paired-repair-2026-10-09/row-0d49c188d4/verification/evaluation.json",
-          "bytes": 51781,
-          "sha256": "846897a6b398b3baf17e2573a394709f7af654b8d496366b76f197a49286bb44"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-1b88e2a6ada4/outcome.json",
+          "bytes": 2436,
+          "sha256": "a083ed5608f4f7f4e3730c237ecdcf6ae86defee35dcf4a3d4e00a61d3cbecbf"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/native/result.json",
-          "bytes": 30046,
-          "sha256": "6352309984ed137fa293ee100c0e906d47a2591307d33962c9f467f4883461ba"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/native/result.json",
+          "bytes": 29253,
+          "sha256": "aeb3ed968b41faa4b7c732965a0c007768f4cee8fbddcb77b24f09bacf97ffe9"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/native/launch.json",
-          "bytes": 4680,
-          "sha256": "b600182033570c263b8894b5250a7dcdfd733d71fc0f9e7afee970f875108bbb"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/native/launch.json",
+          "bytes": 3570,
+          "sha256": "9928b080a0f4108c18fb5a38431520557ccfcb17b139683c778af6e29648bf84"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/outcome.json",
-          "bytes": 1281,
-          "sha256": "67dc9485dfb2a04057fe1654cce66b7bde1c92b9ad6e482a5f42164b903fbaa2"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/analysis/outcome.json",
+          "bytes": 3061,
+          "sha256": "0643ca670a1d2ddf8ac4e1fa9cb088c50e3a6526c94d96a23b9fe652a7a8a5fd"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/row-f387c3619a/verification/evaluation.json",
-          "bytes": 73125,
-          "sha256": "185e318cbd50c39832fef30a7be4987ec1aa8b72736b116e01699c1d9261b49d"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 26553,
+          "sha256": "0a7a7e7b06c621fe04bdec47a70214f592b6e4f52ac9eaaeab58e7bf0853f4b3"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-1/result.json",
-          "bytes": 31021,
-          "sha256": "18699b690a88cb92df42f3511fbf04186158f022e77a8f867e7b68fa000d72c9"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/analysis/verification/evaluation.json",
+          "bytes": 110673,
+          "sha256": "646244097b3c216ca47306abdb2d5abfdf2f0424cac7694791d4e2c40a53a784"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-1/launch.json",
-          "bytes": 3508,
-          "sha256": "aba5d4364392207a9cdc3259ec27acfdd05e23f9ddee926eb5d01c6fa86ae324"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-c3a81b835076/outcome.json",
+          "bytes": 1914,
+          "sha256": "264ec46a5d8337cda2ac6599c122d6055b287dc070d0b5d0ea8ac9b64a693344"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-1/validated.json",
-          "bytes": 34819,
-          "sha256": "3daa62c48688b07c0d44b3089fec11906b96ced8343ac8bbaa2fae377a87e8a2"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/native/result.json",
+          "bytes": 28717,
+          "sha256": "980596767d411b104be87fd42741e2c3a1cde06d4d62c101ca088db7e0cfb328"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-2/result.json",
-          "bytes": 58000,
-          "sha256": "ec6c3a976137dbdf33be467c033e54423986404974dd51ff414361a0dc74c7ad"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/native/launch.json",
+          "bytes": 3570,
+          "sha256": "22ae9b3f9d584df063d7ad9c7ecd00ec16e7d4aba26ec43c5cb17da623fde7f6"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-2/launch.json",
-          "bytes": 4745,
-          "sha256": "946eba5d6f1959fd2c8003c33c13513816fcd8b3258fd85c6f1a8330361a1a18"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/analysis/outcome.json",
+          "bytes": 3059,
+          "sha256": "bcabc731c3e6d6f99c5d7bba024c8583fb445b2e03da3a2f8856db9a5dffb9f6"
         },
         {
-          "path": ".agents/vasir-evals/backend-testing/compact-round-2026-10-10/judge-2/validated.json",
-          "bytes": 33390,
-          "sha256": "e170aa5dab844e89cf8cf83544595b73dffcd5c2d98d25832f5917205709206e"
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 26175,
+          "sha256": "5a6b88490c59307a21c3b8452bb146271124241a54002f7917cac9f7e27d3e4e"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/analysis/verification/evaluation.json",
+          "bytes": 129423,
+          "sha256": "fa87a997d6a4b828c7897817704eca048061721d46d478480adf1437f9aa8573"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-f9430bf93b93/outcome.json",
+          "bytes": 1912,
+          "sha256": "a6db78fe37ef92387d6583504b38ab34fc8182b9bc1443084695decd2c3bec66"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/native/result.json",
+          "bytes": 29261,
+          "sha256": "1f5aa282aaa750cb2c92d7d811e6e4b6ae9ae2ce6d72449b5d67de98663d216f"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/native/launch.json",
+          "bytes": 3570,
+          "sha256": "210f983b87bb1b4c086bc538db9a0033e96391e4ba79b126af9c7b755ce65d0f"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/analysis/outcome.json",
+          "bytes": 3065,
+          "sha256": "153bbe57bfab7fc909b4827448a00e9d89cec1b8c541997a6654df032c8a1c6f"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 26666,
+          "sha256": "ead94e215d576c7b8edbb92a614ea9b6ec0bdc43e0a455ee77a47781c7fe4fcf"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/analysis/verification/evaluation.json",
+          "bytes": 108496,
+          "sha256": "e39af179a69496ca24d9d96d4a270799353f4840261fcb9759aa224339130f99"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/row-538a61122878/outcome.continued.json",
+          "bytes": 1755,
+          "sha256": "dd2d7ec213c73452fd57824c6cfb17e0de68f0b6d18813f5765a1287c407a07e"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/native/result.json",
+          "bytes": 40097,
+          "sha256": "4049848a7b0996b4a9463987ae926a0dce9517e82f6af375be26cb6fecd86e3d"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/native/launch.json",
+          "bytes": 2943,
+          "sha256": "695b3f6d3e1eb57a66b467b03db3fe980ca22f9cba7b2ca0dc6ac2a5d4976475"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/analysis/outcome.json",
+          "bytes": 3501,
+          "sha256": "b733c75ddebe3b1e479e86a3e8fe4afc915cabb3a1bca92776d5cb2ba527f833"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 18058,
+          "sha256": "82f0271cd2e6f19287b7d2825c4129a9425bdd56d50e2dbe5dea979347093ec9"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/verification/evaluation.json",
+          "bytes": 100610,
+          "sha256": "78212e1e7ccc67919a840951e95ee2adbe682bc8846c76ff47bff15e4fc3c6db"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-63fff6ecd1e6/outcome.json",
+          "bytes": 2869,
+          "sha256": "5b92803c3fbeb4b3b528908a8cc24a7be5291109697f681af34cec920b77e7b8"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/native/result.json",
+          "bytes": 53758,
+          "sha256": "6d5b12070e363d4faf6d723dd41ff7b33f49d28c8e5193aeb5c6c49225db064b"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/native/launch.json",
+          "bytes": 2943,
+          "sha256": "ca30bb1e8ae23f5be0eda45da535033d70d0058b5b18cbbe9b5063cae273a0b9"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/analysis/outcome.json",
+          "bytes": 3529,
+          "sha256": "f156de8e9ba340df919e4cd28686066c3d4053f3229879648aaf28a00a5da6e2"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/analysis/submission/test/domains/platform/runtime/queue/redis-work-queue__authored.spec.js",
+          "bytes": 24887,
+          "sha256": "b717dab9e727934bba01ee39b6273c12337f6b3edf4674d509ae945b89a5d26f"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/analysis/verification/evaluation.json",
+          "bytes": 83517,
+          "sha256": "9b185930f7a4d3675cb4039dad062b57e8931848ecbb69305f6e4ebcb037e175"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/opus-resume/row-59076bbf5dd7/outcome.json",
+          "bytes": 2202,
+          "sha256": "f183619ef14f76cc62245f6dd5251479cd2f94030d6f42f463e337ca695b4769"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-1/result.json",
+          "bytes": 21820,
+          "sha256": "a42fae4ac8b4e3bff521c26fe088f5ba3eadfee2c77da6b02becf9f84ddf840e"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-1/launch.json",
+          "bytes": 3535,
+          "sha256": "b444e91fe2d7ef6bf2c35527efefa4a3096ec0a5170558ac238262c57566ba21"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-1/validated.json",
+          "bytes": 25972,
+          "sha256": "fbc1761314adb2db10ea732d985d996e67a53993d4ec732efed46c5add55be10"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-2/result.json",
+          "bytes": 43215,
+          "sha256": "35116bea58b16e6b923273052941fb12d7e17ba8bd7b64aca3b68c2353eb5718"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-2/launch.json",
+          "bytes": 4332,
+          "sha256": "9d716b9913eafd2a1d926d0d99b8218f550a1a9a7ba58d75b06cb3f7f48553da"
+        },
+        {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/judge-2/validated.json",
+          "bytes": 24821,
+          "sha256": "aeb5e3007a68a4250fe3c7fd150977f98bd1c3693bb31bc1050a32a533ca5d4a"
         }
       ],
       "generatedFiles": [
         {
           "path": "data.js",
-          "bytes": 996021,
-          "sha256": "18883dec0a57343184c073f4a62233a66d0a673fe6d9e19ca7e2f0e749c2be43"
+          "bytes": 1012786,
+          "sha256": "d8a89a56785ce0f4fb8a271698f9987f08071ecfd6a06e91ed096d80f441951b"
         },
         {
           "path": "responses.js",
-          "bytes": 7050358,
-          "sha256": "c80606a7d60a81c79d2b8ee09a61d578407061eb462ced2c008b227f5a19c6e5"
+          "bytes": 7319894,
+          "sha256": "8f09214eaa3b1d58045186ef63909a43d6dd2dd46d97d270446bf7cb63f4e4c7"
         }
       ],
       "candidate": {
-        "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68de5482f2a0112f82bc6b1612b750ef1378af3b9eaf57e7cb51b1.json",
-        "bytes": 400220,
-        "sha256": "3ae67073da9b99ca984a70e821f6320cb8fd4a86ee7b22577bcf99a30f0303f2"
+        "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb321ae6d6a4e4e6f414df2ed672724692d1399e8f4d9e43b9373c6.json",
+        "bytes": 400268,
+        "sha256": "ad5e1c529aabab189aaef52f40607bd2c5ef7bf0ed0e9688077283e04f999dd1"
       },
       "browserHarness": {
         "path": "backend-testing-browsercheck.mjs",
-        "bytes": 59572,
-        "sha256": "1bf06f44e1b752c0ed511fdbbfd0ffe957418f00f915ca9af09a6894a8d0f046"
+        "bytes": 81924,
+        "sha256": "3f231e0ed04f9e7226194069d155164fd545ae58afab91e2b7d95a4516cf05dd"
       },
       "browserProofs": [
         {
           "width": 1440,
           "height": 1000,
-          "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-browsercheck.json",
-          "bytes": 196710,
-          "sha256": "1ec15bb8ad1192f514d5c7f47ea27c0bcd180952fc614c892eb3d7c6058a3e57"
+          "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/backend-testing-browsercheck.json",
+          "bytes": 29328,
+          "sha256": "10a2a0672f234a94227c8369ae541203caa7a703b24fc2f6b6b4737693c252a9"
         },
         {
           "width": 820,
           "height": 1000,
-          "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-browsercheck.json",
-          "bytes": 196645,
-          "sha256": "5f4e42dab7e6a3401f6469ac813855e04bc3aa33c0d78abe03e9c7cd5af95427"
+          "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/backend-testing-browsercheck.json",
+          "bytes": 25205,
+          "sha256": "dab58ff94078919c281fd7fb46c3d7594a8c029652d9f76026bde43d65147dc5"
         },
         {
           "width": 390,
           "height": 844,
-          "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-browsercheck.json",
-          "bytes": 196617,
-          "sha256": "05c2fe446c25f65a8eb8b625bcd159e105abd72cc649343c7dd66ca439c1c27d"
+          "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/backend-testing-browsercheck.json",
+          "bytes": 25187,
+          "sha256": "a2cecfe64500b50a9e8a3b0d4cb49fcf2e55981dc74f79beb134bc2b76ec1ff4"
         }
       ],
       "visualReview": {
         "authority": "agent",
         "capturePaths": [
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-engineering-ledger-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-quality-overview-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-check-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-method-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-rubric-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-execution-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-test-files-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-score-calculation-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-profile-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-ranges-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-taste-reasons-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-semantic-naming-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-coverage-evidence-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-evidence-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-hyper-scale-chat-1440.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-engineering-ledger-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-quality-overview-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-check-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-method-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-rubric-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-execution-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-test-files-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-score-calculation-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-profile-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-ranges-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-taste-reasons-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-semantic-naming-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-coverage-evidence-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-evidence-390.png",
-          "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-hyper-scale-chat-390.png"
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-engineering-ledger-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-overview-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-rubric-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-test-files-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-score-calculation-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-fault-evidence-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-dimension-profile-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-review-reasons-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/backend-testing-hyper-scale-chat-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-engineering-ledger-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-overview-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-rubric-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-test-files-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-score-calculation-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-fault-evidence-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-dimension-profile-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-review-reasons-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/backend-testing-hyper-scale-chat-390.png"
         ],
-        "verdict": "Desktop and mobile show the shared ranked comparison rows with a single weighted final score and clear coverage-loss labels. The same shared test-file path opens first in both conditions before reviewer details, Copy preserves its source bytes, nine-criterion profiles and all protection/coverage evidence remain inspectable, and Method discloses baseline reuse and six new native attempts. Native disclosure, keyboard, routing and overflow checks pass."
+        "verdict": "Desktop and mobile screenshots show red markers beside the affected Skill dots and visible missed-bug count labels. The ordinary model table, raw JavaScript viewer and score layout remain readable, with no root overflow."
       }
     }
   },
@@ -418,12 +536,12 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "One known-case development comparison uses four reused exact-task Minimal artifacts and four fresh Skill artifacts, with two new blind reviews of every suite. This is not a fresh paired-baseline experiment or a broad population ranking. Model reviews can disagree and miss defects; ranges are not confidence intervals. Candidate evidence does not establish live delivery; live byte and browser checks follow publication.",
+  "claimBoundary": "One production-code Redis service-boundary authoring case, one fresh attempt per setting and condition. It does not establish full-app, browser, SQS or population performance. Native reviewers can disagree or miss defects; ranges are not confidence intervals. New test authoring is separate from test-suite improvement and both remain excluded from aggregate scores. Both reviewers assessed all eight suites; four complete Minimal and Skill pairs form the panel.  Analysis limit expanded uniformly from 24 to 64 KiB after authoring began; original author prompts, strict outcomes and exact source remain unchanged. Candidate evidence does not establish live delivery; live byte and browser checks follow publication.",
   "files": [
     {
       "path": "app.js",
-      "bytes": 220249,
-      "sha256": "c1c1826889244247ca17c181c7a26d8d61014d85d2c24ec66fef8e4e5f1b9bc5"
+      "bytes": 222203,
+      "sha256": "59594d05e949fa8fe7aa78b7c40d6055859064ad3db990a695ea755b3ce0ba6e"
     },
     {
       "path": "assets/d3.v7.min.js",
@@ -437,8 +555,8 @@
     },
     {
       "path": "benchmark-report.css",
-      "bytes": 40542,
-      "sha256": "f80ccbf04b4cb6375182e9b9faf28146d62d87d7490567ffdb8e22b41dd9ec55"
+      "bytes": 41240,
+      "sha256": "b8ebd4451e7ec18ca4a3769423a8e3b7042f343e44ee2eedb99572ef92b06854"
     },
     {
       "path": "benchmark-report.html",
@@ -447,8 +565,8 @@
     },
     {
       "path": "benchmark-report.js",
-      "bytes": 154067,
-      "sha256": "92f39754d2013dd4807cd495cfd3032b675b80215b9d8bb741b6cb7d552a313a"
+      "bytes": 161800,
+      "sha256": "85f79ce63761dc6108566386f0229eb40495ea948fb3b1904528c4c9ba80b393"
     },
     {
       "path": "capture.mjs",
@@ -513,321 +631,195 @@
     },
     {
       "path": "backend-testing-browsercheck.mjs",
-      "bytes": 59572,
-      "sha256": "1bf06f44e1b752c0ed511fdbbfd0ffe957418f00f915ca9af09a6894a8d0f046"
+      "bytes": 81924,
+      "sha256": "3f231e0ed04f9e7226194069d155164fd545ae58afab91e2b7d95a4516cf05dd"
     }
   ],
   "captures": [
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-engineering-ledger-1440.png",
-      "bytes": 208912,
-      "sha256": "4d279ec01162ad6db52de7282ce9b42df6bd6985c60a3e39979746dd83929890",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-engineering-ledger-1440.png",
+      "bytes": 197325,
+      "sha256": "f5744b3b18f89a45a5eb934ecc600610bb0e12f842cbaf8d7c9b645878ab1199",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-quality-overview-1440.png",
-      "bytes": 94897,
-      "sha256": "6196cd697b0eb4d47f93978bbdc8bfe79d6952f27a4f139fcfe0f5b35e120564",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-overview-1440.png",
+      "bytes": 90733,
+      "sha256": "0404160fe09fbbe8929aa7fca678a56d265d6343cee00f4116a37803247ffd9f",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-check-1440.png",
-      "bytes": 95991,
-      "sha256": "fabc36c94135a823a6b5752afcd0d4604f77e9baf26d3f9529ca753e73d6adef",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-rubric-1440.png",
+      "bytes": 164300,
+      "sha256": "fc3ddaef4c3da2d3f092932148b6d639c2caf5b2a4177b2dc56ebcde06357239",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-method-1440.png",
-      "bytes": 119594,
-      "sha256": "edb0947c84863e7ca2e6954cfd025197f9bddba8e467b345558c1e13d4785597",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-test-files-1440.png",
+      "bytes": 182746,
+      "sha256": "f6546beac67ae9446cbf8fe48ada501be7b1b63ee391669b8ccb628ab79ce411",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-rubric-1440.png",
-      "bytes": 160614,
-      "sha256": "bd477d99f4e64e238bd5b421dd76f3ddbd85087118543bcb002302ff50352f50",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-score-calculation-1440.png",
+      "bytes": 163887,
+      "sha256": "8140dfd389c7e6a77e5ec4c178bd536420f66cb9cd3689a3bc2071c240625a36",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-execution-1440.png",
-      "bytes": 134863,
-      "sha256": "b02db7cf738ecb20be443ead2c222f44a12b448a3331b3b670e16bec1400460b",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-fault-evidence-1440.png",
+      "bytes": 192586,
+      "sha256": "4a14e88e079b9ac9f64ca486408637869712bea9979b60382ee59e53b70b00d0",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-test-files-1440.png",
-      "bytes": 131084,
-      "sha256": "57fe6c9e077b268a94d92f47ad3ee4d742a20003b2d5cf0986061e410fe28cea",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-dimension-profile-1440.png",
+      "bytes": 96669,
+      "sha256": "afc5ec57064b2f7e5a933b7f77a945e983ce38dfcb35f8dafa45f1733dd2707a",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-score-calculation-1440.png",
-      "bytes": 134342,
-      "sha256": "4a1d71dfbccf3176faabab881cc911d80ad7f32d9c7144ba1b55b6a09caf3f6e",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/test-authoring-review-reasons-1440.png",
+      "bytes": 123916,
+      "sha256": "9ef5a7c1f0d24f75c28bdb706db7b10ce605dff5e4776dad28b873d3bee13a2b",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-profile-1440.png",
-      "bytes": 95974,
-      "sha256": "e88ddb5ae79c11e387175eb40d6baa1b69012a04cd8319e36cb5eaaf51f68064",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-dimension-ranges-1440.png",
-      "bytes": 133925,
-      "sha256": "ae20ef773dca8d4539639a57970d1176206ae1579b7c7c4c3b55cb315a1255b4",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-taste-reasons-1440.png",
-      "bytes": 113844,
-      "sha256": "53365d46f528381a66441db0467978ac8bbe67af4615712089da6e9efdf607e0",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-semantic-naming-1440.png",
-      "bytes": 110068,
-      "sha256": "df407bbc3190c23fb467c8f13d6fec13956d8b4d11e5653317f54527947db599",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-coverage-evidence-1440.png",
-      "bytes": 110973,
-      "sha256": "9056c758418da4e8f2b1574b14ce28435c3286246c09d5e7a8c28e9ab5304e49",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-paired-evidence-1440.png",
-      "bytes": 138780,
-      "sha256": "e59d7effc37c6eca138f704b168c5b004a0ec65fb199b4bb7967d9f4a5b77773",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/1440/backend-testing-hyper-scale-chat-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/1440/backend-testing-hyper-scale-chat-1440.png",
       "bytes": 143921,
       "sha256": "67602a5bcb4fb2f38019036445c31c78404c2ed5fead1ae16bffd4e17494c34a",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-engineering-ledger-820.png",
-      "bytes": 123990,
-      "sha256": "fa9c32d30a8881d72ce79ed97f163b9917f16adf170bf585b2ccbcbd1d31e2a6",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-engineering-ledger-820.png",
+      "bytes": 114642,
+      "sha256": "538e23960d50e8b69d5d96247c8068b42c1e3044e3cf6d31bbd1454a29d76b45",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-quality-overview-820.png",
-      "bytes": 87995,
-      "sha256": "06cd85b3a368a2334c2b07416be13ff73d68138f1264ca1ceceb2312f2427814",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-overview-820.png",
+      "bytes": 84535,
+      "sha256": "e820da34db221c40ed19164d2acd1563537f87ffbbd3b322ea684178e2813525",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-paired-check-820.png",
-      "bytes": 88981,
-      "sha256": "c6a25aecaaad3c949b49eae77fbb01217c19c30f5b635abae9ebc50a547dafe4",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-rubric-820.png",
+      "bytes": 135131,
+      "sha256": "2f38e863e1c9a5eafcfde361d7117f4d7f7e21980b803fef0d9b105acce48f27",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-method-820.png",
-      "bytes": 101551,
-      "sha256": "37ce976664c3e366c77d8a3b25b533d6bb1a00b9318574593f711004e3a32789",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-test-files-820.png",
+      "bytes": 165480,
+      "sha256": "a15da6e5036f07101beb220b4249f4b760bf766380637b406f488dda57f6b580",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-rubric-820.png",
-      "bytes": 140197,
-      "sha256": "7f54935dbf873db8eabf9ded869a9bdc7d740f8af222f36876ce1babbafb0f63",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-score-calculation-820.png",
+      "bytes": 149324,
+      "sha256": "892f7780ae2ebe4c187b15da60c52338ebd3748fcacd08f78e5af0eec9d8abb5",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-execution-820.png",
-      "bytes": 115762,
-      "sha256": "62cedf7d5805e2f20456571bf0e80a82b4fbb1de4a2a3558113181044fe9725a",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-fault-evidence-820.png",
+      "bytes": 166832,
+      "sha256": "80d8f3611c4f9876ff8799581756fcc0078bc35769e0a89fe6f1d88087e3f4c8",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-test-files-820.png",
-      "bytes": 118336,
-      "sha256": "20d9ebffaa38ead094ccd04b022d846d54c54e6d180179dea9113dbdf0957e71",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-dimension-profile-820.png",
+      "bytes": 86662,
+      "sha256": "3af509c991943f9c5df21d41651bfe1109a9217e3f9ac6efb253d0b0ab83d6a7",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-score-calculation-820.png",
-      "bytes": 121087,
-      "sha256": "249f025d3f31ff828483723d46053267c30f7ff6c82f61370fc5757dcbd1d860",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/test-authoring-review-reasons-820.png",
+      "bytes": 102420,
+      "sha256": "63db879b09292980590a188497dbff7d582a6fd9df8ac217b8bab5211f9c0a3d",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-dimension-profile-820.png",
-      "bytes": 87556,
-      "sha256": "368da5d5a6aa1cac00a9442a30e209070b5f83cb1538cbafea53ffb16991ea89",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-dimension-ranges-820.png",
-      "bytes": 121938,
-      "sha256": "3406d941b521ebbcd505ebd7b193fe2e776a36df0492b6e9f0556c33b4fa2f29",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-taste-reasons-820.png",
-      "bytes": 101006,
-      "sha256": "201848d427ba338b0776149a4f16336d5b23a0961c58d90a49e4f29cf2d0eca4",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-semantic-naming-820.png",
-      "bytes": 101515,
-      "sha256": "476c75701c31248789c6e123bf184e9c63ff8a7fa0833790fab46e3f6471518c",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-coverage-evidence-820.png",
-      "bytes": 99513,
-      "sha256": "9075cf8d4983469babf48e5729ad2fa75437834a27a336a643aeb28a1825d01c",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-paired-evidence-820.png",
-      "bytes": 111859,
-      "sha256": "d2cc386d9ac347e9a106961743d93d6ec5480cc230b90df06db65c188ba67b70",
-      "width": 820,
-      "height": 1000
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/820/backend-testing-hyper-scale-chat-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/820/backend-testing-hyper-scale-chat-820.png",
       "bytes": 99411,
       "sha256": "1d151d3e7b797f8778b7b239b97afd721c8b36c749d3723f735903e8fafe6b4f",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-engineering-ledger-390.png",
-      "bytes": 78603,
-      "sha256": "7e744cc50250b9f519fa1ae5da161b4b1cab3aa556ffb674227e0c75d79094db",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-engineering-ledger-390.png",
+      "bytes": 73432,
+      "sha256": "28000058c21d56c6cc3897e1d6613881cb5746f494b49dc89140c8cb30f989d1",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-quality-overview-390.png",
-      "bytes": 56459,
-      "sha256": "a40d9f5295f2554174585c00a3af79bd669f8595458dd5fffc5e8f7d089a4b4b",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-overview-390.png",
+      "bytes": 56128,
+      "sha256": "469d3c1eb7067aeacbf413ee2b4533c47df8e0b691d6d302e428adbbe1f92249",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-check-390.png",
-      "bytes": 57899,
-      "sha256": "aef25cad3fadbfa2f632da66d18f2ff7ef2bd300b47db635cb8a2e2f9f8723af",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-rubric-390.png",
+      "bytes": 81925,
+      "sha256": "f25adf1fe145b3b126fa900f8c06d59acc70e58358a8380d658383ddeac7caba",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-method-390.png",
-      "bytes": 59439,
-      "sha256": "a3d0eeeac0d1288a04f7993ed21eeedc7b5a998852ea7de19fb1446c45f73edc",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-test-files-390.png",
+      "bytes": 63980,
+      "sha256": "7a4f0ed51d14b12ff7dc605df60e1ce7bd7bcd1b792d9155d248d153adf58d2e",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-rubric-390.png",
-      "bytes": 80616,
-      "sha256": "ac6ef4785f9c18e8e9fa7b8efa83a19074494256fe5bf94b1dc361e00c784897",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-score-calculation-390.png",
+      "bytes": 63117,
+      "sha256": "6b6e43d7b942e2db34b5267033e3890d2e723b31a8414e1c6a6dad118e1d1797",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-execution-390.png",
-      "bytes": 70049,
-      "sha256": "0a6a6d16c1538420fd1e7d9329d7d0f4d8fbc557db6d1efab9f68cc6ed4908d2",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-fault-evidence-390.png",
+      "bytes": 68601,
+      "sha256": "4c0f0722603230b1ceebefc9a8eaf882ed27aed5ef784b98d9e79201b92ddcfd",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-test-files-390.png",
-      "bytes": 60446,
-      "sha256": "7a594176f02f7caec49c684bf550de74e00dac6e1a3cb329fd07fc08deb53bac",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-dimension-profile-390.png",
+      "bytes": 58063,
+      "sha256": "c4a63b6fcc98351c12818640c08cc7bacaccab9f56f4cc3921669497115ef267",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-score-calculation-390.png",
-      "bytes": 66588,
-      "sha256": "d800c6d6e97803c2bd5b00e1ecaf80df429a71940bd78bb4311460b37e51ae79",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/test-authoring-review-reasons-390.png",
+      "bytes": 73537,
+      "sha256": "b154a40f76b45a75073fa212f098b0a47d006c9dc7d444c57761cd906bad5131",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-profile-390.png",
-      "bytes": 58405,
-      "sha256": "850079d74168c8ea9ba66449b2f70c3e91145076efd769212eef5a5f08fb5e8e",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-dimension-ranges-390.png",
-      "bytes": 66493,
-      "sha256": "168730e3e64226d71a8ca17757d0c056de2885a95f45e0a96265b5e84bff6adf",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-taste-reasons-390.png",
-      "bytes": 78879,
-      "sha256": "d8e59921a63c58467ac8d775e03f4b8564e2b2339480206312cdc384206f5e6f",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-semantic-naming-390.png",
-      "bytes": 71400,
-      "sha256": "4837fe3d9f0eb46c1f201da80a53e3ab8ff150abe03f5462a734f4d894ce8c53",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-coverage-evidence-390.png",
-      "bytes": 69744,
-      "sha256": "13f01e32fe42a48ca83c387ddf595448b21c8a5eb16565e5e5c5f3546753e7c5",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-paired-evidence-390.png",
-      "bytes": 69294,
-      "sha256": "dbe53c4ca5ded1bd2734330420a8ec562603e994386d11c6b7ce478694c3ba9d",
-      "width": 390,
-      "height": 844
-    },
-    {
-      "path": "reviews/backend-testing-weighted-score/2026-10-10/candidate-6e54ac66be68/390/backend-testing-hyper-scale-chat-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-e0fc73a35cb3/390/backend-testing-hyper-scale-chat-390.png",
       "bytes": 58723,
       "sha256": "23889acd67146fe6ca39424afcfee98551fff3acc1725b7c7b82d15f91a15dde",
       "width": 390,
@@ -835,11 +827,11 @@
     }
   ],
   "retainedCaptureEvidence": {
-    "version": "2026-10-08-backend-testing-d18fe23eea9b",
+    "version": "2026-10-10-backend-testing-weighted-score-6e54ac66be68",
     "receipt": {
-      "path": "reviews/backend-testing-quality/2026-10-09T03-26-05-719Z-da3291/prior-v1/template-lock.json",
-      "bytes": 16251,
-      "sha256": "e56c3e7774d994d5c164726e0dcaf662b45595f0c70464cc5b85c08f3fb29a4c"
+      "path": "reviews/test-authoring/2026-10-10/prior-current/template-lock.json",
+      "bytes": 39988,
+      "sha256": "5117fb8ad38430c66308089c23aa347e749fce0c54ee73ec08b6eba547b4cf81"
     }
   }
 }

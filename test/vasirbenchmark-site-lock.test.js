@@ -1847,18 +1847,23 @@ function assertSuiteQualityBrowserProof(proof, expected) {
   if (expected.currentRoundSha256) assert.equal(proof.currentRoundSha256, expected.currentRoundSha256, 'Compact-round proof must match the exact selected native reviews.');
   if (expected.backendTestingOverallSha256) assert.equal(proof.backendTestingOverallSha256, expected.backendTestingOverallSha256, 'Combined-score proof must match the exact selected arithmetic.');
   if (expected.backendTestingFilesSha256) assert.equal(proof.backendTestingFilesSha256, expected.backendTestingFilesSha256, 'File inspection proof must match the exact public test source.');
+  if (expected.testAuthoring) {
+    assert.equal(proof.benchmarkId, 'test-authoring');
+    for (const key of ['testAuthoringRoundSha256', 'testAuthoringOverallSha256', 'testAuthoringFilesSha256', 'incumbentBackendSha256']) assert.equal(proof[key], expected[key], `${key} must match the selected source and unchanged incumbent.`);
+  }
   for (const field of ['failures', 'runtimeErrors', 'networkErrors']) assert.deepEqual(proof[field], []);
-  const expectedChecks = [3, 4].includes(expected.schemaVersion) ? [...currentTestingAcceptanceChecks, ...(expected.taste || expected.schemaVersion === 4 ? ['taste-comparison', 'taste-evidence'] : [])] : [...suiteQualityAcceptanceChecks, ...(expected.repairCheck ? ['repair-outcomes-and-limits', 'repair-review-and-budget-evidence'] : []), ...(expected.pairedRepair ? ['paired-repair-comparison', 'paired-repair-evidence'] : [])];
+  const expectedChecks = expected.testAuthoring || [3, 4].includes(expected.schemaVersion) ? [...currentTestingAcceptanceChecks, ...(expected.testAuthoring || expected.taste || expected.schemaVersion === 4 ? ['taste-comparison', 'taste-evidence'] : [])] : [...suiteQualityAcceptanceChecks, ...(expected.repairCheck ? ['repair-outcomes-and-limits', 'repair-review-and-budget-evidence'] : []), ...(expected.pairedRepair ? ['paired-repair-comparison', 'paired-repair-evidence'] : [])];
   assert.deepEqual(proof.checks.map(check => check.id).sort(), expectedChecks.sort());
   for (const check of proof.checks) { assert.equal(check.passed, true, check.id); assert.ok(check.evidence != null && JSON.stringify(check.evidence) !== '{}', `${check.id} needs observed evidence`); }
 }
 
 async function assertSuiteQualityTestingEvidence(manifest, deployment) {
-  assert.ok([2, 3, 4].includes(manifest.acceptance.scope.schemaVersion));
-  assert.deepEqual(manifest.acceptance.scope, { kind: 'executable-testing-benchmark', schemaVersion: manifest.acceptance.scope.schemaVersion, benchmarkId: 'backend-testing', viewports: focusedViewports });
+  const authoring = manifest.acceptance.scope.benchmarkId === 'test-authoring';
+  assert.ok(authoring ? manifest.acceptance.scope.schemaVersion === 5 : [2, 3, 4].includes(manifest.acceptance.scope.schemaVersion));
+  assert.deepEqual(manifest.acceptance.scope, { kind: 'executable-testing-benchmark', schemaVersion: manifest.acceptance.scope.schemaVersion, benchmarkId: authoring ? 'test-authoring' : 'backend-testing', viewports: focusedViewports });
   const verification = manifest.acceptance.verification, previous = JSON.parse(await assertLockedFile(verification.previousAcceptance));
   assert.equal(previous.kind, 'vasirbenchmark-site-template-lock'); assert.equal(previous.status, 'accepted');
-  assert.equal(previous.acceptance.scope.kind, 'executable-testing-benchmark'); assert.equal(previous.acceptance.scope.schemaVersion, 1);
+  assert.equal(previous.acceptance.scope.kind, 'executable-testing-benchmark'); assert.equal(previous.acceptance.scope.schemaVersion, authoring ? 4 : 1);
   assert.equal(manifest.retainedCaptureEvidence.version, previous.version);
   assert.deepEqual(manifest.retainedCaptureEvidence.receipt, verification.previousAcceptance);
   assert.deepEqual(manifest.files.map(file => file.path).sort(), previous.files.map(file => file.path).sort(), 'Suite-quality publication adds no new assets.');
@@ -1882,14 +1887,25 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   const readModule = (bytes, globalName) => { const context = { window: {} }; vm.runInNewContext(bytes.toString('utf8'), context); return JSON.parse(JSON.stringify(context.window[globalName])); };
   const before = readModule(previousData, 'VASIR_DATA'), beforeResponses = readModule(previousResponses, 'VASIR_RESPONSES');
   const data = readModule(await assertLockedFile(verification.generatedFiles[0]), 'VASIR_DATA'), responses = readModule(await assertLockedFile(verification.generatedFiles[1]), 'VASIR_RESPONSES');
-  assert.equal(verification.selection.path, 'benchmarks/backend-testing/publication.json');
+  assert.equal(verification.selection.path, authoring ? 'benchmarks/test-authoring/publication.json' : 'benchmarks/backend-testing/publication.json');
   const selected = JSON.parse(await assertLockedFile(verification.selection, repoRoot)), previousSelection = JSON.parse(previousSelectionBytes);
-  const compactPlan = selected.schemaVersion === 4 ? JSON.parse(await assertLockedFile(verification.sourcePins.find(record => record.path === selected.plan.path && record.sha256 === selected.plan.sha256), repoRoot)) : undefined;
-  const selectedSources = assertSuiteQualityAcceptanceBoundaries({ selected, previousSelection, before, data, beforeResponses, responses, compactPlan });
+  const compactPlan = authoring || selected.schemaVersion === 4 ? JSON.parse(await assertLockedFile(verification.sourcePins.find(record => record.path === selected.plan.path && record.sha256 === selected.plan.sha256), repoRoot)) : undefined;
+  const selectedSources = authoring ? await (async () => {
+    const { testAuthoring, schemaVersion, ...incumbent } = data;
+    assert.equal(schemaVersion, 8);
+    assert.deepEqual({ ...incumbent, schemaVersion: 7 }, before, 'Adding new test authoring must preserve every incumbent score.');
+    const { testAuthoringRound, testAuthoringFiles, ...incumbentResponses } = responses;
+    assert.deepEqual(incumbentResponses, beforeResponses, 'Every incumbent answer, review and raw test file must remain exact.');
+    assert.equal(selected.kind, 'vasirbenchmark-test-authoring-selection'); assert.ok([1, 2].includes(selected.schemaVersion));
+    assert.deepEqual(JSON.parse(await readFile(join(repoRoot, 'benchmarks/backend-testing/publication.json'), 'utf8')), previousSelection, 'Incumbent selection must remain unchanged.');
+    const { testAuthoringSourcePins, validateTestAuthoringRound, validateTestAuthoringPublication, validateTestAuthoringFiles } = await import('../cli/eval/test-authoring-publication.js');
+    validateTestAuthoringRound(testAuthoringRound); validateTestAuthoringPublication(testAuthoring, testAuthoringRound); validateTestAuthoringFiles(testAuthoringFiles, testAuthoringRound);
+    return testAuthoringSourcePins(selected, compactPlan);
+  })() : assertSuiteQualityAcceptanceBoundaries({ selected, previousSelection, before, data, beforeResponses, responses, compactPlan });
   const { validateBackendTestingPublication, validateBackendTestingSuiteQuality, buildBackendTestingPublication } = await import('../cli/eval/backend-testing-publication.js');
   validateBackendTestingPublication(data.executableTesting);
   if (selected.schemaVersion === 4) assert.equal(data.executableTesting.overall.schemaVersion, 2);
-  if (selected.schemaVersion === 2) validateBackendTestingSuiteQuality(data.executableTesting.suiteQuality, responses.backendTesting);
+  if (!authoring && selected.schemaVersion === 2) validateBackendTestingSuiteQuality(data.executableTesting.suiteQuality, responses.backendTesting);
   assert.deepEqual(verification.sourcePins.map(({ path, sha256 }) => ({ path, sha256 })), selectedSources);
   const unavailable = [];
   for (const record of verification.sourcePins) {
@@ -1897,6 +1913,11 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
     catch (error) { if (error.code !== 'ENOENT') throw error; unavailable.push(record.path); }
   }
   if (!unavailable.length) {
+    if (authoring) {
+      const { buildTestAuthoringPublication } = await import('../cli/eval/test-authoring-publication.js');
+      const source = buildTestAuthoringPublication({ repoRootDirectory: repoRoot });
+      assert.deepEqual(data.testAuthoring, source.projection); assert.deepEqual(responses.testAuthoringRound, source.round); assert.deepEqual(responses.testAuthoringFiles, source.files);
+    }
     const source = buildBackendTestingPublication({ repoRootDirectory: repoRoot });
     assert.deepEqual(data.executableTesting, source.projection); assert.deepEqual(responses.backendTesting, source.assessments);
     assert.deepEqual(responses.backendTestingRepair, source.repairCheck);
@@ -1911,6 +1932,14 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   // The pilot regenerated data.js; its prior acceptance still owns the unchanged Writing modules.
   const inherited = JSON.parse(await assertLockedFile(previous.acceptance.verification.previousAcceptance));
   const acceptedFiles = [...manifest.files, ...verification.generatedFiles, ...previous.acceptance.verification.generatedFiles, ...inherited.acceptance.verification.generatedFiles];
+  if (authoring) {
+    let ancestor = inherited;
+    for (let depth = 0; depth < 8 && ancestor.acceptance.verification.previousAcceptance; depth++) {
+      ancestor = JSON.parse(await assertLockedFile(ancestor.acceptance.verification.previousAcceptance));
+      acceptedFiles.push(...ancestor.acceptance.verification.generatedFiles);
+      if (candidate.files.every(file => acceptedFiles.some(pin => pin.path === file.path))) break;
+    }
+  }
   for (const released of candidate.files) {
     const accepted = acceptedFiles.find(file => file.path === released.path);
     assert.ok(accepted, released.path);
@@ -1922,7 +1951,7 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   const capturePaths = [];
   for (const record of verification.browserProofs) {
     const proof = JSON.parse(await assertLockedFile(record));
-    assertSuiteQualityBrowserProof(proof, { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.executableTesting)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: selected.schemaVersion, repairCheck: Boolean(selected.repairCheck), pairedRepair: Boolean(selected.pairedRepair), pairedRepairSha256: responses.backendTestingPairedRepair ? sha256(JSON.stringify(responses.backendTestingPairedRepair)) : undefined, currentRoundSha256: responses.backendTestingCurrentRound ? sha256(JSON.stringify(responses.backendTestingCurrentRound)) : undefined, taste: Boolean(selected.taste), tasteSha256: responses.backendTestingTaste ? sha256(JSON.stringify(responses.backendTestingTaste)) : undefined, backendTestingOverallSha256: data.executableTesting.overall ? sha256(JSON.stringify(data.executableTesting.overall)) : undefined, backendTestingFilesSha256: responses.backendTestingFiles ? sha256(JSON.stringify(responses.backendTestingFiles)) : undefined });
+    assertSuiteQualityBrowserProof(proof, authoring ? { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.testAuthoring)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: data.testAuthoring.schemaVersion, testAuthoring: true, testAuthoringRoundSha256: sha256(JSON.stringify(responses.testAuthoringRound)), testAuthoringOverallSha256: sha256(JSON.stringify(data.testAuthoring.overall)), testAuthoringFilesSha256: sha256(JSON.stringify(responses.testAuthoringFiles)), incumbentBackendSha256: sha256(JSON.stringify(before.executableTesting)) } : { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.executableTesting)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: selected.schemaVersion, repairCheck: Boolean(selected.repairCheck), pairedRepair: Boolean(selected.pairedRepair), pairedRepairSha256: responses.backendTestingPairedRepair ? sha256(JSON.stringify(responses.backendTestingPairedRepair)) : undefined, currentRoundSha256: responses.backendTestingCurrentRound ? sha256(JSON.stringify(responses.backendTestingCurrentRound)) : undefined, taste: Boolean(selected.taste), tasteSha256: responses.backendTestingTaste ? sha256(JSON.stringify(responses.backendTestingTaste)) : undefined, backendTestingOverallSha256: data.executableTesting.overall ? sha256(JSON.stringify(data.executableTesting.overall)) : undefined, backendTestingFilesSha256: responses.backendTestingFiles ? sha256(JSON.stringify(responses.backendTestingFiles)) : undefined });
     assert.equal(new Set(proof.sourcePins.map(file => file.path)).size, proof.sourcePins.length);
     for (const name of ['data.js', 'responses.js', 'app.js', 'benchmark-report.js', 'benchmark-report.css', 'style.css']) assert.ok(proof.sourcePins.some(file => file.path === name), `Missing loaded dependency: ${name}`);
     for (const loaded of proof.sourcePins) { const accepted = acceptedFiles.find(file => file.path === loaded.path); assert.ok(accepted, loaded.path); assert.equal(loaded.sha256, accepted.sha256); assert.equal(loaded.bytes, accepted.bytes); }
@@ -2028,8 +2057,17 @@ test('suite-quality acceptance rejects rehearsal receipts, stale release hashes 
   ]) { const proof = fixture(); mutate(proof); assert.throws(() => assertSuiteQualityBrowserProof(proof, expected)); }
 });
 
+test('test-authoring browser acceptance binds new findings and the unchanged incumbent', () => {
+  const expected = { width: 390, height: 844, harnessSha256: sha256('harness'), publicationSha256: sha256('authoring'), overallSha256: sha256('overall'), schemaVersion: 1, testAuthoring: true, testAuthoringRoundSha256: sha256('native findings'), testAuthoringOverallSha256: sha256('final score'), testAuthoringFilesSha256: sha256('exact JS'), incumbentBackendSha256: sha256('incumbent') };
+  const fixture = () => ({ kind: 'vasirbenchmark-backend-testing-browser-proof', benchmarkId: 'test-authoring', status: 'passed', publicationSchemaVersion: 1, ...expected, failures: [], runtimeErrors: [], networkErrors: [], checks: [...currentTestingAcceptanceChecks, 'taste-comparison', 'taste-evidence'].map(id => ({ id, passed: true, evidence: { observed: true } })) });
+  assert.doesNotThrow(() => assertSuiteQualityBrowserProof(fixture(), expected));
+  for (const mutate of [proof => { proof.incumbentBackendSha256 = sha256('changed incumbent'); }, proof => { proof.testAuthoringFilesSha256 = sha256('changed code'); }, proof => { proof.checks = proof.checks.filter(check => check.id !== 'taste-evidence'); }]) {
+    const proof = fixture(); mutate(proof); assert.throws(() => assertSuiteQualityBrowserProof(proof, expected));
+  }
+});
+
 async function assertExecutableTestingEvidence(manifest, deployment) {
-  if ([2, 3, 4].includes(manifest.acceptance.scope.schemaVersion)) return assertSuiteQualityTestingEvidence(manifest, deployment);
+  if ([2, 3, 4, 5].includes(manifest.acceptance.scope.schemaVersion)) return assertSuiteQualityTestingEvidence(manifest, deployment);
   assert.deepEqual(manifest.acceptance.scope, { kind: 'executable-testing-benchmark', schemaVersion: 1, benchmarkId: 'backend-testing', viewports: focusedViewports });
   const verification = manifest.acceptance.verification;
   const previous = JSON.parse(await assertLockedFile(verification.previousAcceptance));

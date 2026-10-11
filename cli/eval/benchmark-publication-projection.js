@@ -16,6 +16,7 @@ import { buildWritingPublication, validateWritingSummary, serializeWritingModule
 import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE, WRITING_RESPONSE_ARCHIVES } from "./writing-response-archives.js";
 import { buildBackendTestingPublication, validateBackendTestingPublication, validateBackendTestingSuiteQuality, validateBackendTestingRepairCheck, validateBackendTestingPairedRepair, validateBackendTestingCurrent, validateBackendTestingFiles } from "./backend-testing-publication.js";
 import { validateBackendTestingCompactPublication, validateBackendTestingCompactRound, validateBackendTestingCompactFiles } from './backend-testing-compact-publication.js';
+import { buildTestAuthoringPublication, validateTestAuthoringPublication, validateTestAuthoringRound, validateTestAuthoringFiles } from './test-authoring-publication.js';
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -1840,6 +1841,12 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 }
 
 export function validateBenchmarkPublicationProjection(projection, { writingSource = projection?.writing?.overallSource } = {}) {
+  if (projection?.schemaVersion === 8 && projection.testAuthoring) {
+    const { testAuthoring, ...existing } = projection;
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.executableTesting ? 7 : existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+    validateTestAuthoringPublication(testAuthoring);
+    return projection;
+  }
   if (projection?.schemaVersion === 7 && projection.executableTesting) {
     const { executableTesting, ...existing } = projection;
 
@@ -2235,6 +2242,16 @@ export function validateBenchmarkPublicationProjection(projection, { writingSour
 }
 
 export function validateBenchmarkPublicationResponses(responseBundle, projection, { writingSource = projection?.writing?.overallSource } = {}) {
+  if (projection?.schemaVersion === 8 && projection.testAuthoring) {
+    validateBenchmarkPublicationProjection(projection, { writingSource });
+    const { testAuthoring, ...existing } = projection;
+    const { testAuthoringRound, testAuthoringFiles, ...incumbentResponses } = responseBundle;
+    validateTestAuthoringRound(testAuthoringRound);
+    validateTestAuthoringPublication(testAuthoring, testAuthoringRound);
+    validateTestAuthoringFiles(testAuthoringFiles, testAuthoringRound);
+    validateBenchmarkPublicationResponses(incumbentResponses, { ...existing, schemaVersion: existing.executableTesting ? 7 : existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+    return responseBundle;
+  }
   if (projection?.schemaVersion === 7 && projection.executableTesting) {
     validateBenchmarkPublicationProjection(projection, { writingSource });
     const { executableTesting, ...existing } = projection;
@@ -2525,7 +2542,8 @@ export function buildBenchmarkPublicationRoutes(projection) {
       ),
       ...(projection.games ? (projection.games.benchmarks ?? [projection.games]).map(report => `/games.html?benchmark=${encodeURIComponent(report.benchmark.id)}`) : []),
       ...(projection.writing ? (projection.writing.benchmarkIds ?? [projection.writing.benchmarkId]).map(id => `/benchmark-report.html#${id}`) : []),
-      ...(projection.executableTesting ? ["/benchmark-report.html#backend-testing"] : [])
+      ...(projection.executableTesting ? ["/benchmark-report.html#backend-testing"] : []),
+      ...(projection.testAuthoring ? ["/benchmark-report.html#test-authoring"] : [])
     ]
   };
 }
@@ -2617,6 +2635,14 @@ export function buildBenchmarkPublicationProjection({
     if (executableTesting.currentRound) responseBundle.backendTestingCurrentRound = executableTesting.currentRound;
   }
 
+  const testAuthoring = buildTestAuthoringPublication({ repoRootDirectory, readFileSyncImplementation });
+  if (testAuthoring) {
+    projection.schemaVersion = 8;
+    projection.testAuthoring = testAuthoring.projection;
+    responseBundle.testAuthoringRound = testAuthoring.round;
+    responseBundle.testAuthoringFiles = testAuthoring.files;
+  }
+
   const basisSha256 = sha256(stableSerialize({
     taxonomy,
     definitions: EXPECTED_BENCHMARK_IDS.map((benchmarkId) => definitions.get(benchmarkId)),
@@ -2624,7 +2650,8 @@ export function buildBenchmarkPublicationProjection({
     ...(workflows ? { aiWorkflows: workflows.basisSha256, overall: projection.overall.scoreBasis.id } : {}),
     ...(games ? { games: games.basisSha256 } : {}),
     ...(writing ? { writing: writing.basisSha256 } : {}),
-    ...(executableTesting ? { executableTesting: executableTesting.basisSha256 } : {})
+    ...(executableTesting ? { executableTesting: executableTesting.basisSha256 } : {}),
+    ...(testAuthoring ? { testAuthoring: testAuthoring.basisSha256 } : {})
   }));
   return {
     projection,

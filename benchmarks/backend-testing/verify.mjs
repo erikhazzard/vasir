@@ -5,13 +5,13 @@ import { pathToFileURL } from 'node:url';
 import { homedir } from 'node:os';
 import { copyFixture, filesIn, readJson, sha256, startServices, within, writeJson } from './fixture.mjs';
 
-async function runSingleSpec({ fixture, workspace, testFile, outputDir, timeoutMs = 180000 }) {
+async function runSingleSpec({ fixture, workspace, testFile, outputDir, timeoutMs = fixture.testTimeoutMs ?? 180000 }) {
   workspace = path.resolve(workspace);
   outputDir = path.resolve(outputDir);
   await fs.mkdir(outputDir, { recursive: true });
   const reportPath = path.join(outputDir, 'mocha.json');
   const logPath = path.join(outputDir, 'process.log');
-  const args = ['node_modules/mocha/bin/mocha.js', '--exit', '--reporter', 'json', '--reporter-option', `output=${reportPath}`, testFile];
+  const args = ['node_modules/mocha/bin/mocha.js', ...(fixture.mochaArgs ?? []), '--exit', '--reporter', 'json', '--reporter-option', `output=${reportPath}`, testFile];
   const started = Date.now();
   const chunks = [];
   let timedOut = false;
