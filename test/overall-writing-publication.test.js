@@ -10,6 +10,13 @@ import { buildDungeonMasterPublication } from '../cli/eval/dungeon-master-public
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const built = buildBenchmarkPublicationProjection({ repoRootDirectory: repo });
+// Keep the historical seven-task v3 contract explicit. The Engineering suite
+// verifies the normal publisher's five-task category and nine-task Overall v4.
+delete built.projection.engineering;
+delete built.projection.testAuthoring;
+delete built.projection.executableTesting;
+built.projection.schemaVersion = 6;
+built.projection.overall = buildOverallPublication({ engineering: built.projection, aiWorkflows: built.projection.aiWorkflows, writing: built.writing });
 const sources = { engineering: built.projection, aiWorkflows: built.projection.aiWorkflows, writing: built.writing };
 const overall = built.projection.overall;
 const adapter = built.projection.writing.overallSource;
@@ -43,7 +50,7 @@ const originalConfigurationIds = [...new Set([...sources.engineering.settings, .
 const completeOriginalIds = originalConfigurationIds.filter(id => ['baseline', 'skill'].every(condition =>
   originalScores(id, condition).length === 7 && originalScores(id, condition).every(Number.isFinite)));
 
-test('normal publication automatically includes All Writing with fixed category priorities and complete exact pairs', () => {
+test('historical Overall v3 includes All Writing with fixed category priorities and complete exact pairs', () => {
   assert.equal(overall.scoreBasis.edition, 'overall-v3');
   assert.equal(overall.scoreBasis.declarationVersion, 3);
   assert.equal(overall.scoreBasis.benchmarkWeighting, 'declared-within-category');

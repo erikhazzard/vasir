@@ -48,11 +48,17 @@ function validateAcceptance(acceptance, policy) {
   keys(acceptance, ['status', 'sourceBytes', 'originalMaximumSourceBytes'], 'source acceptance');
   assert(policy && acceptance.status === 'expanded-analysis' && acceptance.originalMaximumSourceBytes === MAX_SOURCE_BYTES && Number.isInteger(acceptance.sourceBytes) && acceptance.sourceBytes > MAX_SOURCE_BYTES && acceptance.sourceBytes <= policy.maximumSourceBytes, 'invalid original source-size violation');
 }
-const scoreBasis = (provisional = false) => ({ id: provisional ? 'test-authoring-weighted-evidence-astra-provisional-v1' : 'test-authoring-weighted-evidence-v1', maximum: 100, adoption: 'adopted-before-round', aggregation: `${provisional ? 'Provisional score: use the single Astra reviewer’s' : 'Average the two reviewers’'} seven weighted craft contributions (70 points), then add calibrated fault detection (25 points) and runnable tests (5 points). ${provisional ? 'The official two-reviewer panel is pending; no Opus ratings are imputed. ' : ''}Only source-adjudicated matched assertions from cases passing both healthy controls earn fault credit. No preservation criterion, caps or score overrides. Unresolved required evidence has no total.`, criteria: TEST_AUTHORING_SCORE_CRITERIA.map(criterion => ({ ...criterion })) });
+const scoreBasis = (provisional = false, corrected = false) => ({ id: `test-authoring-weighted-evidence${provisional ? '-astra-provisional' : ''}-v${corrected ? 2 : 1}`, maximum: 100, adoption: corrected ? 'detection-corrected-after-round' : 'adopted-before-round', aggregation: `${provisional ? 'Provisional score: use the single Astra reviewer’s' : 'Average the two reviewers’'} seven weighted craft contributions (70 points), then add calibrated fault detection (25 points) and runnable tests (5 points). ${provisional ? 'The official two-reviewer panel is pending; no Opus ratings are imputed. ' : ''}${corrected ? 'Credit source-adjudicated failures caused by the injected fault in cases passing both healthy controls, regardless of error class. Exclude setup, hooks, infrastructure, process timeouts, cleanup failures and unrelated errors. Detection was corrected after the round; weights and native craft ratings are unchanged.' : 'Only source-adjudicated matched assertions from cases passing both healthy controls earn fault credit.'} No preservation criterion, caps or score overrides. Unresolved required evidence has no total.`, criteria: TEST_AUTHORING_SCORE_CRITERIA.map(criterion => ({ ...criterion })) });
 const craftScore = dimensions => CRAFT.every(criterion => Number.isFinite(dimensions.find(item => item.id === criterion.id)?.score)) ? CRAFT.reduce((sum, criterion) => sum + dimensions.find(item => item.id === criterion.id).score * criterion.weight, 0) / 70 : null;
-export function hasMatchedTestAuthoringAssertion(run, controls) {
+export function hasMatchedTestAuthoringFailure(run, controls, failures = run?.assertions ?? []) {
   if (!run || !['assertion-failure', 'execution-failure'].includes(run.executionStatus ?? run.testStatus) || run.timedOut !== false || run.launchError || run.cleanupError || run.cleanupStatus !== 'pass' || !Number.isInteger(run.code) || run.code <= 0 || !(run.stats?.tests > 0) || !(run.stats?.failures > 0) || run.stats.pending !== 0 || controls.length !== 2 || !controls.every(control => (control.testStatus ?? control.status) === 'pass' && control.cleanupStatus === 'pass' && control.stats?.tests > 0 && control.stats.passes === control.stats.tests && control.stats.failures === 0 && control.stats.pending === 0)) return false;
-  return (run.assertions ?? []).some(assertion => /AssertionError|\bERR_ASSERTION\b/.test(assertion.stack ?? '') && !/hook for|hook in|(?:before|after) (?:all|each).*hook/i.test(assertion.fullTitle ?? '') && controls.every(control => control.passedCases?.some(test => test.fullTitle === assertion.fullTitle && test.file === assertion.file)));
+  // Error class is diagnostic quality, not whether the injected bug was rejected. Source adjudication still establishes causality.
+  return failures.some(failure => typeof failure.stack === 'string' && failure.stack.length > 0 && failure.code !== 'ERR_MOCHA_TIMEOUT' && !/hook for|hook in|(?:before|after) (?:all|each).*hook/i.test(failure.fullTitle ?? '') && controls.every(control => control.passedCases?.some(test => test.fullTitle === failure.fullTitle && test.file === failure.file)));
+}
+function validateDetectionCorrection(correction) {
+  keys(correction, ['adoption', 'sourceSha256', 'rule'], 'detection correction');
+  assert(correction.adoption === 'corrected-after-round' && SHA256.test(correction.sourceSha256), 'invalid detection correction');
+  prose(correction.rule);
 }
 const pairedSummaries = rows => BACKEND_TESTING_CONFIGURATIONS.filter(configuration => rows.some(row => row.configurationId === configuration.id)).map(configuration => {
   const baseline = rows.find(row => row.configurationId === configuration.id && row.condition === 'none').score;
@@ -82,14 +88,15 @@ export function deriveTestAuthoringOverall(round) {
     const score = mean(judgments.map(judge => judge.score));
     return { id: row.id, configurationId: row.configurationId, condition: row.condition, status: score === null ? 'incomplete' : 'scored', score, judgments };
   });
-  const summaries = pairedSummaries(rows), basis = scoreBasis(round.schemaVersion === 2);
+  const summaries = pairedSummaries(rows), basis = scoreBasis(round.schemaVersion === 2, Boolean(round.detectionCorrection));
   return { schemaVersion: 2, sourceSha256: hash([round.sourceSha256, JSON.stringify(basis)].join('\n')), scoreBasis: basis, status: rows.every(row => row.status === 'scored') ? resolvedStatus(round) : 'incomplete', rows, summaries, baselineMean: mean(summaries.map(row => row.baseline)), treatmentMean: mean(summaries.map(row => row.treatment)), meanPairedDifference: mean(summaries.map(row => row.delta)) };
 }
 
 export function validateTestAuthoringRound(round) {
   const provisional = round.schemaVersion === 2;
-  keys(round, ['kind', 'schemaVersion', 'date', 'caseId', 'sourceSha256', 'skillSha256', 'sourceCodeSha256', 'status', 'scoreBasis', 'provenance', 'rows', 'summaries', ...(provisional ? ['reviewBasis'] : []), ...(round.sourcePolicy ? ['sourcePolicy'] : [])], 'round');
+  keys(round, ['kind', 'schemaVersion', 'date', 'caseId', 'sourceSha256', 'skillSha256', 'sourceCodeSha256', 'status', 'scoreBasis', 'provenance', 'rows', 'summaries', ...(provisional ? ['reviewBasis'] : []), ...(round.sourcePolicy ? ['sourcePolicy'] : []), ...(round.detectionCorrection ? ['detectionCorrection'] : [])], 'round');
   if (round.sourcePolicy) validateSourcePolicy(round.sourcePolicy);
+  if (round.detectionCorrection) validateDetectionCorrection(round.detectionCorrection);
   assert(round.kind === 'test-authoring-round' && [1, 2].includes(round.schemaVersion) && /^\d{4}-\d{2}-\d{2}$/.test(round.date) && round.caseId === 'redis-work-queue' && [round.sourceSha256, round.skillSha256, round.sourceCodeSha256].every(value => SHA256.test(value)), 'invalid round identity');
   if (provisional) assert(same(round.reviewBasis, PROVISIONAL_REVIEW_BASIS), 'provisional reviewer basis differs');
   keys(round.scoreBasis, ['minimum', 'maximum', 'decimals', 'aggregation', 'dimensions', 'objectiveDimensions', 'namingZeroRule'], 'rubric');
@@ -153,19 +160,20 @@ export function validateTestAuthoringRound(round) {
 export function projectTestAuthoring(round) {
   validateTestAuthoringRound(round);
   const overall = deriveTestAuthoringOverall(round);
-  return { kind: 'vasirbenchmark-test-authoring', schemaVersion: round.schemaVersion, benchmark: { id: 'test-authoring', title: 'Writing new tests', description: 'Write new behavioral tests from production code: Minimal versus Skill.' }, sourceSha256: hash([round.sourceSha256, overall.sourceSha256].join('\n')), date: round.date, caseId: round.caseId, scope: 'one-production-code-case', configurations: configurationsFor(round).map(item => ({ ...item })), conditions: CONDITIONS.map(item => ({ ...item })), trials: 1, ...(round.reviewBasis ? { reviewBasis: structuredClone(round.reviewBasis) } : {}), ...(round.sourcePolicy ? {sourcePolicy:structuredClone(round.sourcePolicy)} : {}), overall, provenance: { ...round.provenance }, nativeSessions: round.provenance.nativeSessions, knownTokens: round.provenance.knownTokens, usageMissingSessions: round.provenance.usageMissingSessions };
+  return { kind: 'vasirbenchmark-test-authoring', schemaVersion: round.schemaVersion, benchmark: { id: 'test-authoring', title: 'Writing new tests', description: 'Write new behavioral tests from production code: Minimal versus Skill.' }, sourceSha256: hash([round.sourceSha256, overall.sourceSha256].join('\n')), date: round.date, caseId: round.caseId, scope: 'one-production-code-case', configurations: configurationsFor(round).map(item => ({ ...item })), conditions: CONDITIONS.map(item => ({ ...item })), trials: 1, ...(round.reviewBasis ? { reviewBasis: structuredClone(round.reviewBasis) } : {}), ...(round.sourcePolicy ? {sourcePolicy:structuredClone(round.sourcePolicy)} : {}), ...(round.detectionCorrection ? {detectionCorrection:structuredClone(round.detectionCorrection)} : {}), overall, provenance: { ...round.provenance }, nativeSessions: round.provenance.nativeSessions, knownTokens: round.provenance.knownTokens, usageMissingSessions: round.provenance.usageMissingSessions };
 }
 
 export function validateTestAuthoringPublication(publication, round) {
   const provisional = publication.schemaVersion === 2;
-  keys(publication, ['kind', 'schemaVersion', 'benchmark', 'sourceSha256', 'date', 'caseId', 'scope', 'configurations', 'conditions', 'trials', 'overall', 'provenance', 'nativeSessions', 'knownTokens', 'usageMissingSessions', ...(provisional ? ['reviewBasis'] : []), ...(publication.sourcePolicy ? ['sourcePolicy'] : [])], 'publication');
+  keys(publication, ['kind', 'schemaVersion', 'benchmark', 'sourceSha256', 'date', 'caseId', 'scope', 'configurations', 'conditions', 'trials', 'overall', 'provenance', 'nativeSessions', 'knownTokens', 'usageMissingSessions', ...(provisional ? ['reviewBasis'] : []), ...(publication.sourcePolicy ? ['sourcePolicy'] : []), ...(publication.detectionCorrection ? ['detectionCorrection'] : [])], 'publication');
   if (publication.sourcePolicy) validateSourcePolicy(publication.sourcePolicy);
+  if (publication.detectionCorrection) validateDetectionCorrection(publication.detectionCorrection);
   assert(publication.kind === 'vasirbenchmark-test-authoring' && [1, 2].includes(publication.schemaVersion) && publication.caseId === 'redis-work-queue' && publication.scope === 'one-production-code-case' && publication.trials === 1 && same(publication.configurations, configurationsFor(publication)) && same(publication.conditions, CONDITIONS) && publication.benchmark.id === 'test-authoring' && publication.benchmark.title === 'Writing new tests' && SHA256.test(publication.sourceSha256), 'invalid publication');
   if (provisional) assert(same(publication.reviewBasis, PROVISIONAL_REVIEW_BASIS), 'provisional reviewer basis differs');
   assert(publication.nativeSessions === (provisional ? 7 : 10) && publication.provenance.nativeSessions === publication.nativeSessions && publication.provenance.freshAuthorSessions === (provisional ? 6 : 8) && publication.provenance.reviewerSessions === (provisional ? 1 : 2) && publication.provenance.reusedBaselineArtifacts === 0 && publication.knownTokens === publication.provenance.knownTokens && publication.usageMissingSessions === publication.provenance.usageMissingSessions, 'usage differs');
   const overall = publication.overall;
   keys(overall, ['schemaVersion', 'sourceSha256', 'scoreBasis', 'status', 'rows', 'summaries', 'baselineMean', 'treatmentMean', 'meanPairedDifference'], 'overall');
-  assert(overall.schemaVersion === 2 && SHA256.test(overall.sourceSha256) && same(overall.scoreBasis, scoreBasis(provisional)), 'final score basis differs');
+  assert(overall.schemaVersion === 2 && SHA256.test(overall.sourceSha256) && same(overall.scoreBasis, scoreBasis(provisional, Boolean(publication.detectionCorrection))), 'final score basis differs');
   ids(overall.rows.map(row => row.id), rowIds(configurationsFor(publication)), 'final suite');
   for (const row of overall.rows) {
     keys(row, ['id', 'configurationId', 'condition', 'status', 'score', 'judgments'], 'final suite');
@@ -213,13 +221,13 @@ export function validateTestAuthoringFiles(files, round) {
 }
 
 export function testAuthoringSourcePins(selected, plan) {
-  return [...['plan', 'skill', 'rubric', 'calibration', 'generation', 'reviewPlan', 'packet', 'mapping', 'objective', 'review'].map(key => selected[key]), ...['analysisPolicy', 'strictGeneration', 'continuation', 'codexContinuation'].filter(key => selected[key]).map(key => selected[key]), ...(plan.basePlan ? [plan.basePlan] : []), ...(plan.codexPlan ? [plan.codexPlan] : []), plan.fixture, plan.nativeRunner, plan.verifier, plan.fixtureRuntime,
+  return [...['plan', 'skill', 'rubric', 'calibration', 'generation', 'reviewPlan', 'packet', 'mapping', 'objective', 'review'].map(key => selected[key]), ...['analysisPolicy', 'strictGeneration', 'continuation', 'codexContinuation', 'detectionCorrection'].filter(key => selected[key]).map(key => selected[key]), ...(plan.basePlan ? [plan.basePlan] : []), ...(plan.codexPlan ? [plan.codexPlan] : []), plan.fixture, plan.nativeRunner, plan.verifier, plan.fixtureRuntime,
     ...selected.authors.flatMap(author => [author.receipt, author.launch, author.outcome, ...(author.submission ? [author.submission] : []), ...(author.verification ? [author.verification] : []), ...(author.strictOutcome ? [author.strictOutcome] : [])]),
     ...selected.judges.flatMap(judge => [judge.receipt, judge.launch, ...(judge.validated ? [judge.validated] : [])])];
 }
 
 export function buildSelectedTestAuthoringPublication({ selected, repoRootDirectory, readFileSyncImplementation = fs.readFileSync }) {
-  keys(selected, ['kind', 'schemaVersion', 'plan', 'skill', 'rubric', 'calibration', 'generation', 'reviewPlan', 'packet', 'mapping', 'objective', 'review', 'authors', 'judges', ...['analysisPolicy', 'strictGeneration', 'continuation', 'codexContinuation'].filter(key => selected[key])], 'selection');
+  keys(selected, ['kind', 'schemaVersion', 'plan', 'skill', 'rubric', 'calibration', 'generation', 'reviewPlan', 'packet', 'mapping', 'objective', 'review', 'authors', 'judges', ...['analysisPolicy', 'strictGeneration', 'continuation', 'codexContinuation', 'detectionCorrection'].filter(key => selected[key])], 'selection');
   assert(selected.kind === 'vasirbenchmark-test-authoring-selection' && [1, 2].includes(selected.schemaVersion), 'invalid selected round');
   const provisional = selected.schemaVersion === 2;
   const configurations = provisional ? CODEX_CONFIGURATIONS : BACKEND_TESTING_CONFIGURATIONS, judges = provisional ? [JUDGES[0]] : JUDGES;
@@ -377,10 +385,52 @@ export function buildSelectedTestAuthoringPublication({ selected, repoRootDirect
     assert(observed.runnable === runnable && (runnable !== 0 || observed.faultDetection === 0), 'objective runnable credit differs from execution');
     for (const fault of observed.faults) if (fault.status === 'detected') {
       const run = verification?.faultRuns.find(item => item.faultId === fault.id);
-      assert(runnable === 1 && hasMatchedTestAuthoringAssertion(run, controls) && fault.evidence.some(pointer => packet.specs.includes(pointer.path)), 'fault credit lacks healthy matched assertions and authored evidence');
+      assert(runnable === 1 && hasMatchedTestAuthoringFailure(run, controls) && fault.evidence.some(pointer => packet.specs.includes(pointer.path)), 'fault credit lacks healthy matched failures and authored evidence');
     }
-    return { planned, receipt, outcome, verification, source, acceptance: source !== null && Buffer.byteLength(source) > MAX_SOURCE_BYTES ? {status:'expanded-analysis',sourceBytes:Buffer.byteLength(source),originalMaximumSourceBytes:MAX_SOURCE_BYTES} : null, packet, packetFiles, observed };
+    return { planned, receipt, outcome, verification, source, acceptance: source !== null && Buffer.byteLength(source) > MAX_SOURCE_BYTES ? {status:'expanded-analysis',sourceBytes:Buffer.byteLength(source),originalMaximumSourceBytes:MAX_SOURCE_BYTES} : null, packet, packetFiles, observed: structuredClone(observed) };
   });
+  let detectionCorrection;
+  if (selected.detectionCorrection) {
+    const correction = read(selected.detectionCorrection, 'detection correction');
+    keys(correction, ['kind', 'schemaVersion', 'originalObjectiveSha256', 'rule', 'changes', 'reviewedRows', 'reviewedFaults'], 'detection correction artifact');
+    assert(correction.kind === 'test-authoring-detection-correction' && correction.schemaVersion === 1 && correction.originalObjectiveSha256 === selected.objective.sha256 && correction.reviewedRows === artifacts.length && correction.reviewedFaults === artifacts.length * 6 && correction.changes.length > 0, 'detection correction basis differs');
+    const changeIds = correction.changes.map(change => `${change.rowId}:${change.faultId}`);
+    assert(new Set(changeIds).size === changeIds.length, 'duplicate detection correction');
+    detectionCorrection = {adoption:'corrected-after-round',sourceSha256:selected.detectionCorrection.sha256,rule:correction.rule};
+    validateDetectionCorrection(detectionCorrection);
+    for (const change of correction.changes) {
+      keys(change, ['rowId', 'faultId', 'reason', 'evidence', 'matchedFailures', 'nativePins'], 'corrected finding');
+      keys(change.nativePins, ['faultResult', 'faultMocha', 'control1Result', 'control1Mocha', 'control2Result', 'control2Mocha'], 'correction native pins');
+      prose(change.reason);
+      const artifact = artifacts.find(item => item.planned.id === change.rowId), finding = artifact?.observed.faults.find(fault => fault.id === change.faultId);
+      assert(artifact?.observed.runnable === 1 && finding?.status === 'survived' && change.evidence.length > 0 && change.matchedFailures.length > 0, 'correction lacks an eligible adjudicated finding');
+      const verificationRoot = path.posix.dirname(selected.authors[activeRows.indexOf(artifact.planned)].verification.path);
+      const workspace = path.join(repoRootDirectory, verificationRoot, 'workspace');
+      const faultRun = artifact.verification.faultRuns.find(run => run.faultId === change.faultId), controls = artifact.verification.controlRuns;
+      const readNativeReport = (prefix, folder, expectedRun) => {
+        const resultPin = change.nativePins[`${prefix}Result`], reportPin = change.nativePins[`${prefix}Mocha`];
+        assert(resultPin.path === `${verificationRoot}/${folder}/result.json` && reportPin.path === `${verificationRoot}/${folder}/mocha.json`, 'correction native run differs');
+        const result = read(resultPin, 'corrected native result'), report = read(reportPin, 'corrected native report');
+        assert(Object.entries(result).every(([key, value]) => same(value, key === 'status' ? expectedRun.executionStatus ?? expectedRun.status : expectedRun[key])) && result.reportPath === path.join(repoRootDirectory, reportPin.path), 'correction result differs from selected execution');
+        const caseIdentity = test => ({fullTitle:test.fullTitle,file:path.relative(workspace, test.file)});
+        assert(same(report.stats, expectedRun.stats) && report.failures.length === expectedRun.stats.failures && report.passes.length === expectedRun.stats.passes && same(report.passes.map(caseIdentity), expectedRun.passedCases), 'correction report differs from selected execution');
+        return report.failures.map(test => ({...caseIdentity(test),stack:test.err?.stack,code:test.err?.code}));
+      };
+      const failures = readNativeReport('fault', change.faultId, faultRun);
+      controls.forEach((control, index) => readNativeReport(`control${index + 1}`, `control-${index + 1}`, control));
+      for (const matched of change.matchedFailures) {
+        keys(matched, ['file', 'fullTitle'], 'corrected failing case');
+        const failure = failures.find(item => item.file === matched.file && item.fullTitle === matched.fullTitle);
+        assert(failure && hasMatchedTestAuthoringFailure(faultRun, controls, [failure]) && artifact.packet.specs.includes(`final/${matched.file}`), 'correction lacks a healthy matched test failure');
+        assert(change.evidence.some(pointer => pointer.path === `final/${matched.file}` && failure.stack.split('\n').some(frame => {
+          const location = frame.match(/\.js:(\d+):\d+/);
+          return frame.includes(path.join(workspace, matched.file)) && location && Number(location[1]) >= pointer.startLine && Number(location[1]) <= pointer.endLine;
+        })), 'corrected failure is not linked to cited authored source');
+      }
+      Object.assign(finding, {status:'detected',reason:change.reason,evidence:change.evidence});
+      artifact.observed.faultDetection = artifact.observed.faults.filter(fault => fault.status === 'detected').length / 6;
+    }
+  }
   const panels = selected.judges.map((pins, index) => {
     keys(pins, ['receipt', 'launch', ...(pins.validated ? ['validated'] : [])], 'review pins');
     const receipt = native(pins, judges[index], reviewPlan.pins[`review-prompt-${index + 1}.txt`], reviewPlan.pins['review-system.txt'], reviewPlan.pins['review.schema.json']), validated = pins.validated ? read(pins.validated, 'validated review') : null;
@@ -414,11 +464,13 @@ export function buildSelectedTestAuthoringPublication({ selected, repoRootDirect
     return fields.every(field => receipt.usage[field] != null) ? fields.reduce((sum, field) => sum + receipt.usage[field], 0) : null;
   });
   const sourcePins = testAuthoringSourcePins(selected, plan); assert(new Set(sourcePins.map(pin => pin.path)).size === sourcePins.length, 'duplicate selected source pins');
-  const round = validateTestAuthoringRound({ kind: 'test-authoring-round', schemaVersion: selected.schemaVersion, date: plan.date, caseId: plan.caseId, sourceSha256: hash(sourcePins.map(pin => pin.sha256).join('\n')), skillSha256: selected.skill.sha256, sourceCodeSha256: plan.sourceHash, status: rows.every(row => row.status === 'scored') ? provisional ? 'provisional' : 'complete' : 'incomplete', ...(provisional ? {reviewBasis:structuredClone(PROVISIONAL_REVIEW_BASIS)} : {}), ...(sourcePolicy ? {sourcePolicy} : {}), scoreBasis: { minimum: 0, maximum: 1, decimals: 2, aggregation: provisional ? scoreBasis(true).aggregation : rubric.aggregation, dimensions: rubric.dimensions, objectiveDimensions: rubric.objectiveDimensions, namingZeroRule: rubric.namingZeroRule }, provenance: { freshAuthorSessions: activeRows.length, reusedBaselineArtifacts: 0, reviewerSessions: judges.length, authorTimeoutMs: plan.policy.authorTimeoutMs, reviewTimeoutMs: plan.policy.reviewTimeoutMs, nativeSessions: receipts.length, knownTokens: totals.reduce((sum, total) => sum + (total ?? 0), 0), usageMissingSessions: totals.filter(total => total === null).length, verifierSha256: plan.verifier.sha256, calibrationSha256: selected.calibration.sha256, objectiveAdjudicationSha256: selected.objective.sha256 }, rows, summaries: pairedSummaries(rows) });
+  const round = validateTestAuthoringRound({ kind: 'test-authoring-round', schemaVersion: selected.schemaVersion, date: plan.date, caseId: plan.caseId, sourceSha256: hash(sourcePins.map(pin => pin.sha256).join('\n')), skillSha256: selected.skill.sha256, sourceCodeSha256: plan.sourceHash, status: rows.every(row => row.status === 'scored') ? provisional ? 'provisional' : 'complete' : 'incomplete', ...(provisional ? {reviewBasis:structuredClone(PROVISIONAL_REVIEW_BASIS)} : {}), ...(sourcePolicy ? {sourcePolicy} : {}), ...(detectionCorrection ? {detectionCorrection} : {}), scoreBasis: { minimum: 0, maximum: 1, decimals: 2, aggregation: detectionCorrection ? scoreBasis(provisional, true).aggregation : provisional ? scoreBasis(true).aggregation : rubric.aggregation, dimensions: rubric.dimensions, objectiveDimensions: rubric.objectiveDimensions.map(dimension => detectionCorrection && dimension.id === 'fault_detection' ? {...dimension,description:detectionCorrection.rule} : dimension), namingZeroRule: rubric.namingZeroRule }, provenance: { freshAuthorSessions: activeRows.length, reusedBaselineArtifacts: 0, reviewerSessions: judges.length, authorTimeoutMs: plan.policy.authorTimeoutMs, reviewTimeoutMs: plan.policy.reviewTimeoutMs, nativeSessions: receipts.length, knownTokens: totals.reduce((sum, total) => sum + (total ?? 0), 0), usageMissingSessions: totals.filter(total => total === null).length, verifierSha256: plan.verifier.sha256, calibrationSha256: selected.calibration.sha256, objectiveAdjudicationSha256: selected.objective.sha256 }, rows, summaries: pairedSummaries(rows) });
   const projection = projectTestAuthoring(round);
   for (const artifact of artifacts) {
     const summary = review.rows.find(row => row.id === artifact.planned.id), score = projection.overall.rows.find(row => row.id === `${artifact.planned.configurationId}:${artifact.planned.condition}`).score;
-    assert(summary?.configurationId === artifact.planned.configurationId && summary.condition === artifact.planned.condition && close(summary.score, score) && summary.faultDetection === artifact.observed.faultDetection && summary.runnable === artifact.observed.runnable, 'reported score differs from independently derived evidence');
+    const originalFinding = objective.rows.find(row => row.id === artifact.planned.id);
+    const originalScore = score === null ? null : score - 25 * (artifact.observed.faultDetection - originalFinding.faultDetection);
+    assert(summary?.configurationId === artifact.planned.configurationId && summary.condition === artifact.planned.condition && close(summary.score, originalScore) && summary.faultDetection === originalFinding.faultDetection && summary.runnable === artifact.observed.runnable, 'original reported score differs from independently derived evidence');
   }
   const files = { kind: 'test-authoring-files', schemaVersion: selected.schemaVersion, sourceSha256: sourcePolicy ? round.sourceSha256 : selected.packet.sha256, ...(sourcePolicy ? {sourcePolicy} : {}), rows: artifacts.map(artifact => ({ id: `${artifact.planned.configurationId}:${artifact.planned.condition}`, configurationId: artifact.planned.configurationId, condition: artifact.planned.condition, ...(artifact.acceptance ? {acceptance:artifact.acceptance} : {}), files: artifact.source === null ? [] : [{ path: plan.testPath, sha256: hash(artifact.source), content: artifact.source }] })) };
   validateTestAuthoringPublication(projection, round); validateTestAuthoringFiles(files, round);

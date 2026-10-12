@@ -17,6 +17,8 @@ import { splitWritingResponseArchives, WRITING_CREATION_ARCHIVE, WRITING_RESPONS
 import { buildBackendTestingPublication, validateBackendTestingPublication, validateBackendTestingSuiteQuality, validateBackendTestingRepairCheck, validateBackendTestingPairedRepair, validateBackendTestingCurrent, validateBackendTestingFiles } from "./backend-testing-publication.js";
 import { validateBackendTestingCompactPublication, validateBackendTestingCompactRound, validateBackendTestingCompactFiles } from './backend-testing-compact-publication.js';
 import { buildTestAuthoringPublication, validateTestAuthoringPublication, validateTestAuthoringRound, validateTestAuthoringFiles } from './test-authoring-publication.js';
+import { buildEngineeringPublication, validateEngineeringPublication } from './engineering-publication.js';
+import { buildPendingArchitecturePublication, validatePendingArchitecturePublication, validatePendingArchitectureSelections } from './architecture-pending-publication.js';
 
 const TAXONOMY_PATH = path.join("benchmarks", "capability-taxonomy.json");
 const PUBLIC_RESULTS_PATH = path.join("benchmarks", "public-results.json");
@@ -288,7 +290,8 @@ function validatePublicResultsManifest(manifest) {
       suggestion: "Restore benchmarks/public-results.json schema version 1."
     });
   }
-  assertExactObjectKeys(manifest, ["kind", "schemaVersion", "selectedRuns", ...(manifest.schemaVersion === 2 ? ["workSpecRun"] : [])], "selection manifest");
+  assertExactObjectKeys(manifest, ["kind", "schemaVersion", "selectedRuns", ...(manifest.schemaVersion === 2 ? ["workSpecRun"] : []), ...(Object.hasOwn(manifest, "pendingArchitectureRuns") ? ["pendingArchitectureRuns"] : [])], "selection manifest");
+  if (Object.hasOwn(manifest, "pendingArchitectureRuns")) validatePendingArchitectureSelections(manifest.pendingArchitectureRuns, manifest.selectedRuns);
   if (manifest.schemaVersion === 2) assertExactObjectKeys(manifest.workSpecRun, ["benchmarkId", "runPath", "sha256"], "workSpecRun");
 
   const selectedBenchmarkIds = new Set();
@@ -1486,6 +1489,80 @@ function validateExactMessages(messages, label) {
   }
 }
 
+function validatePublicArchitectureJudgment(judgment, judgmentLabel) {
+  assertResponseObjectKeys(judgment, [
+    "judgeConfigurationId", "score", "rawScore", "gateCap", "failedGates", "rationale"
+  ], judgmentLabel);
+  assertNonEmptyString(judgment.judgeConfigurationId, `${judgmentLabel}.judgeConfigurationId`);
+  assertScore(judgment.score, `${judgmentLabel}.score`);
+  assertScore(judgment.rawScore, `${judgmentLabel}.rawScore`);
+  assertScore(judgment.gateCap, `${judgmentLabel}.gateCap`);
+  assertNonEmptyString(judgment.rationale, `${judgmentLabel}.rationale`);
+  if (containsPrivatePath(judgment.rationale)) {
+    throw projectionError({
+      message: `Public response ${judgmentLabel}.rationale contains a private local path.`,
+      suggestion: "Do not publish judge evidence that exposes local provenance."
+    });
+  }
+  if (
+    !Array.isArray(judgment.failedGates) ||
+    new Set(judgment.failedGates).size !== judgment.failedGates.length
+  ) {
+    throw projectionError({
+      message: `Public response ${judgmentLabel}.failedGates is invalid.`,
+      suggestion: "Project each failed rubric gate at most once."
+    });
+  }
+  for (const [gateIndex, gateId] of judgment.failedGates.entries()) {
+    assertIdentifier(gateId, `${judgmentLabel}.failedGates[${gateIndex}]`);
+  }
+}
+
+function createPublicArchitectureJudgment({ evaluation, benchmarkId, rowKey, judgeConfigurationId }) {
+  assertScore(evaluation.total, `${benchmarkId}.${rowKey}.${judgeConfigurationId}.score`);
+  assertScore(evaluation.uncapped, `${benchmarkId}.${rowKey}.${judgeConfigurationId}.rawScore`);
+  assertScore(evaluation.gateCap, `${benchmarkId}.${rowKey}.${judgeConfigurationId}.gateCap`);
+  const rationale = typeof evaluation.reason === "string"
+    ? evaluation.reason.replace(NONSEMANTIC_JUDGE_NOTE_PATTERN, "")
+    : evaluation.reason;
+  assertNonEmptyString(rationale, `${benchmarkId}.${rowKey}.${judgeConfigurationId}.rationale`);
+  if (containsPrivatePath(evaluation.reason)) {
+    throw projectionError({
+      code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
+      message: `Selected judge rationale contains a private local path for ${benchmarkId}.`,
+      suggestion: "Do not publish judge evidence that exposes local provenance."
+    });
+  }
+  if (!Array.isArray(evaluation.gates) || evaluation.gates.length === 0) {
+    throw projectionError({
+      code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
+      message: `Selected judge rationale has no gate decisions for ${benchmarkId}.`,
+      suggestion: "Rejudge the response with the complete task rubric before publishing."
+    });
+  }
+  const gateIds = new Set();
+  for (const gate of evaluation.gates) {
+    assertIdentifier(gate?.id, `${benchmarkId}.${rowKey}.${judgeConfigurationId}.gate.id`);
+    if ((gate.status !== "pass" && gate.status !== "fail") || gateIds.has(gate.id)) {
+      throw projectionError({
+        code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
+        message: `Selected judge rationale has invalid gate decisions for ${benchmarkId}.`,
+        suggestion: "Rejudge the response with one decision per rubric gate before publishing."
+      });
+    }
+    gateIds.add(gate.id);
+  }
+
+  return {
+    judgeConfigurationId,
+    score: evaluation.total,
+    rawScore: evaluation.uncapped,
+    gateCap: evaluation.gateCap,
+    failedGates: evaluation.gates.filter((gate) => gate.status === "fail").map((gate) => gate.id),
+    rationale
+  };
+}
+
 function createPublicJudgmentsByRowKey({ run, sourceRows, benchmarkId, judgeConfigurationIds }) {
   const sourceJudges = Array.isArray(run?.judging?.judges) ? run.judging.judges : [];
   const rowsByKey = new Map(sourceRows.map((row) => [row?.rowKey, row]));
@@ -1548,48 +1625,7 @@ function createPublicJudgmentsByRowKey({ run, sourceRows, benchmarkId, judgeConf
       }
       observedRowKeys.add(evaluation.rowKey);
 
-      assertScore(evaluation.total, `${benchmarkId}.${evaluation.rowKey}.${judgeConfigurationId}.score`);
-      assertScore(evaluation.uncapped, `${benchmarkId}.${evaluation.rowKey}.${judgeConfigurationId}.rawScore`);
-      assertScore(evaluation.gateCap, `${benchmarkId}.${evaluation.rowKey}.${judgeConfigurationId}.gateCap`);
-      const rationale = typeof evaluation.reason === "string"
-        ? evaluation.reason.replace(NONSEMANTIC_JUDGE_NOTE_PATTERN, "")
-        : evaluation.reason;
-      assertNonEmptyString(rationale, `${benchmarkId}.${evaluation.rowKey}.${judgeConfigurationId}.rationale`);
-      if (containsPrivatePath(evaluation.reason)) {
-        throw projectionError({
-          code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
-          message: `Selected judge rationale contains a private local path for ${benchmarkId}.`,
-          suggestion: "Do not publish judge evidence that exposes local provenance."
-        });
-      }
-      if (!Array.isArray(evaluation.gates) || evaluation.gates.length === 0) {
-        throw projectionError({
-          code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
-          message: `Selected judge rationale has no gate decisions for ${benchmarkId}.`,
-          suggestion: "Rejudge the response with the complete task rubric before publishing."
-        });
-      }
-      const gateIds = new Set();
-      for (const gate of evaluation.gates) {
-        assertIdentifier(gate?.id, `${benchmarkId}.${evaluation.rowKey}.${judgeConfigurationId}.gate.id`);
-        if ((gate.status !== "pass" && gate.status !== "fail") || gateIds.has(gate.id)) {
-          throw projectionError({
-            code: "BENCHMARK_PUBLISH_EVIDENCE_INELIGIBLE",
-            message: `Selected judge rationale has invalid gate decisions for ${benchmarkId}.`,
-            suggestion: "Rejudge the response with one decision per rubric gate before publishing."
-          });
-        }
-        gateIds.add(gate.id);
-      }
-
-      judgmentsByRowKey.get(row.rowKey).push({
-        judgeConfigurationId,
-        score: evaluation.total,
-        rawScore: evaluation.uncapped,
-        gateCap: evaluation.gateCap,
-        failedGates: evaluation.gates.filter((gate) => gate.status === "fail").map((gate) => gate.id),
-        rationale
-      });
+      judgmentsByRowKey.get(row.rowKey).push(createPublicArchitectureJudgment({ evaluation, benchmarkId, rowKey: row.rowKey, judgeConfigurationId }));
     }
   }
 
@@ -1841,6 +1877,20 @@ function validateEngineeringV2JudgingScope(scope, label, expectedResponseCount) 
 }
 
 export function validateBenchmarkPublicationProjection(projection, { writingSource = projection?.writing?.overallSource } = {}) {
+  if (Object.hasOwn(projection ?? {}, 'architecturePending')) {
+    const { architecturePending, ...scoredProjection } = projection;
+    validatePendingArchitecturePublication(architecturePending);
+    validatePublicValue(architecturePending);
+    validateBenchmarkPublicationProjection(scoredProjection, { writingSource });
+    return projection;
+  }
+  if (projection?.schemaVersion === 9 && projection.engineering) {
+    const { engineering, overall, ...existing } = projection;
+    validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.testAuthoring ? 8 : existing.executableTesting ? 7 : existing.writing ? 6 : existing.games ? 5 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+    validateEngineeringPublication(engineering, { architecture: existing, testAuthoring: existing.testAuthoring, executableTesting: existing.executableTesting });
+    if (overall) validateOverallPublication(overall, { engineering, aiWorkflows: existing.aiWorkflows, ...(writingSource ? { writing: writingSource } : {}) });
+    return projection;
+  }
   if (projection?.schemaVersion === 8 && projection.testAuthoring) {
     const { testAuthoring, ...existing } = projection;
     validateBenchmarkPublicationProjection({ ...existing, schemaVersion: existing.executableTesting ? 7 : existing.writing ? 6 : existing.games ? 5 : existing.overall ? 4 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
@@ -2242,6 +2292,20 @@ export function validateBenchmarkPublicationProjection(projection, { writingSour
 }
 
 export function validateBenchmarkPublicationResponses(responseBundle, projection, { writingSource = projection?.writing?.overallSource } = {}) {
+  if (Object.hasOwn(projection ?? {}, 'architecturePending') || Object.hasOwn(responseBundle ?? {}, 'architecturePending')) {
+    const { architecturePending, ...scoredProjection } = projection;
+    const { architecturePending: pendingResponses, ...scoredResponses } = responseBundle;
+    if (!architecturePending || !pendingResponses) throw projectionError({ message: 'The pending architecture descriptor and response appendix must be published together.' });
+    validatePendingArchitecturePublication(architecturePending, pendingResponses, { validateMessages: validateExactMessages, validateJudgment: validatePublicArchitectureJudgment, containsPrivatePath });
+    validatePublicValue(architecturePending);
+    validateBenchmarkPublicationResponses(scoredResponses, scoredProjection, { writingSource });
+    return responseBundle;
+  }
+  if (projection?.schemaVersion === 9 && projection.engineering) {
+    validateBenchmarkPublicationProjection(projection, { writingSource });
+    const { engineering, overall, ...existing } = projection;
+    return validateBenchmarkPublicationResponses(responseBundle, { ...existing, schemaVersion: existing.testAuthoring ? 8 : existing.executableTesting ? 7 : existing.writing ? 6 : existing.games ? 5 : existing.aiWorkflows ? 3 : 2 }, { writingSource });
+  }
   if (projection?.schemaVersion === 8 && projection.testAuthoring) {
     validateBenchmarkPublicationProjection(projection, { writingSource });
     const { testAuthoring, ...existing } = projection;
@@ -2405,32 +2469,7 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
     }
     for (const [judgmentIndex, judgment] of response.judgments.entries()) {
       const judgmentLabel = `responses[${index}].judgments[${judgmentIndex}]`;
-      assertResponseObjectKeys(judgment, [
-        "judgeConfigurationId", "score", "rawScore", "gateCap", "failedGates", "rationale"
-      ], judgmentLabel);
-      assertNonEmptyString(judgment.judgeConfigurationId, `${judgmentLabel}.judgeConfigurationId`);
-      assertScore(judgment.score, `${judgmentLabel}.score`);
-      assertScore(judgment.rawScore, `${judgmentLabel}.rawScore`);
-      assertScore(judgment.gateCap, `${judgmentLabel}.gateCap`);
-      assertNonEmptyString(judgment.rationale, `${judgmentLabel}.rationale`);
-      if (containsPrivatePath(judgment.rationale)) {
-        throw projectionError({
-          message: `Public response ${judgmentLabel}.rationale contains a private local path.`,
-          suggestion: "Do not publish judge evidence that exposes local provenance."
-        });
-      }
-      if (
-        !Array.isArray(judgment.failedGates) ||
-        new Set(judgment.failedGates).size !== judgment.failedGates.length
-      ) {
-        throw projectionError({
-          message: `Public response ${judgmentLabel}.failedGates is invalid.`,
-          suggestion: "Project each failed rubric gate at most once."
-        });
-      }
-      for (const [gateIndex, gateId] of judgment.failedGates.entries()) {
-        assertIdentifier(gateId, `${judgmentLabel}.failedGates[${gateIndex}]`);
-      }
+      validatePublicArchitectureJudgment(judgment, judgmentLabel);
       judgmentCount += 1;
     }
     observedResponses.add(identity);
@@ -2495,7 +2534,7 @@ export function validateBenchmarkPublicationResponses(responseBundle, projection
 
 export function serializeBenchmarkPublicationProjection(projection) {
   validateBenchmarkPublicationProjection(projection);
-  if (projection.overall?.scoreBasis.edition === 'overall-v3') {
+  if (['overall-v3', 'overall-v4', 'overall-v5'].includes(projection.overall?.scoreBasis.edition) && projection.writing?.overallSource) {
     // These are already validated, identical source collections. Store them
     // once in the landing bundle, then restore the unchanged public shape.
     // No fetch, score calculation, eligibility decision, or evidence omission
@@ -2504,8 +2543,25 @@ export function serializeBenchmarkPublicationProjection(projection) {
     const sourceCollections = ['families', 'tracks', 'benchmarks', 'results', 'benchmarkResults', 'benchmarkSummaries'];
     delete compact.overall.program;
     for (const key of sourceCollections) delete compact.overall[key];
+    if (compact.engineering) {
+      delete compact.engineering.program;
+      compact.engineering.benchmarkResults = compact.engineering.benchmarkResults.filter(cell => !projection.scoreBasis.benchmarkIds.includes(cell.benchmarkId));
+      compact.engineering.results = compact.engineering.results.filter(result => !projection.scoreBasis.benchmarkIds.includes(result.benchmarkId));
+    }
+    const availableAggregate = projection.overall.scoreBasis.edition === 'overall-v5';
+    const coverageFields = ['complete', 'eligible', 'eligibleForRank', 'partial', 'completedTaskCount', 'expectedTaskCount', 'availableBenchmarkIds', 'benchmarkWeights', 'categoryWeights'];
+    const entryFields = ['modelId', 'provider', 'family', 'reasoning', 'label', ...coverageFields];
+    const recordFields = ['id', 'modelId', 'provider', 'family', 'reasoning', 'label', ...coverageFields, 'scores', 'exactScores', 'deltas', 'exactDeltas', 'metrics'];
+    if (availableAggregate) for (const aggregate of [compact.engineering, compact.overall]) {
+      for (const entry of aggregate.entries) for (const field of [...entryFields, 'score', 'exactScore', 'baselineScore', 'exactBaselineScore', 'categories', 'baselineCategories', 'metrics']) delete entry[field];
+      for (const record of aggregate.coverage.records) for (const field of recordFields) delete record[field];
+      aggregate.categoryLeaders = aggregate.categoryLeaders.map(leader => ({ category: leader.category, entryId: leader.entry.id, categoryScore: leader.entry.categoryScore }));
+      aggregate.regressions = aggregate.regressions.map(entry => entry.id);
+    }
     const serialized = JSON.stringify(compact).replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
-    return `(function () {\n  'use strict';\n\n  const data = ${serialized};\n  const sources = [data, data.writing.overallSource, data.aiWorkflows];\n  data.overall.program = data.program;\n  for (const key of ${JSON.stringify(sourceCollections)}) data.overall[key] = sources.flatMap(source => source[key]);\n  window.VASIR_DATA = Object.freeze(data);\n}());\n`;
+    const restoreEngineering = projection.engineering ? '  data.engineering.program = data.program;\n  data.engineering.results = [...data.results, ...data.engineering.results];\n  data.engineering.benchmarkResults = [...data.benchmarkResults.map(cell => ({ ...cell, exactScore: cell.score, sourceScoreBasisId: data.scoreBasis.id })), ...data.engineering.benchmarkResults];\n' : '';
+    const restoreAggregateFields = availableAggregate ? `  for (const aggregate of [data.engineering, data.overall]) {\n    const settings = new Map(aggregate.settings.map(setting => [setting.configurationId, setting]));\n    for (const entry of aggregate.entries) {\n      const setting = settings.get(entry.configurationId);\n      for (const field of ${JSON.stringify(entryFields)}) entry[field] = setting[field];\n      entry.score = setting.scores[entry.condition];\n      entry.exactScore = setting.exactScores[entry.condition];\n      entry.baselineScore = setting.scores.baseline;\n      entry.exactBaselineScore = setting.exactScores.baseline;\n      entry.categories = setting.categories[entry.condition];\n      entry.baselineCategories = setting.categories.baseline;\n      entry.metrics = setting.metrics[entry.condition];\n    }\n    for (const record of aggregate.coverage.records) {\n      const setting = settings.get(record.configurationId);\n      for (const field of ${JSON.stringify(recordFields)}) record[field] = setting[field];\n    }\n    const entries = new Map(aggregate.entries.map(entry => [entry.id, entry]));\n    aggregate.categoryLeaders = aggregate.categoryLeaders.map(leader => ({ category: leader.category, entry: { ...entries.get(leader.entryId), categoryScore: leader.categoryScore } }));\n    aggregate.regressions = aggregate.regressions.map(id => entries.get(id));\n  }\n` : '';
+    return `(function () {\n  'use strict';\n\n  const data = ${serialized};\n${restoreEngineering}${restoreAggregateFields}  const sources = [${projection.engineering ? 'data.engineering' : 'data'}, data.writing.overallSource, data.aiWorkflows];\n  data.overall.program = data.program;\n  for (const key of ${JSON.stringify(sourceCollections)}) data.overall[key] = sources.flatMap(source => source[key]);\n  window.VASIR_DATA = Object.freeze(data);\n}());\n`;
   }
   const serialized = JSON.stringify(projection)
     .replaceAll("\u2028", "\\u2028")
@@ -2643,6 +2699,21 @@ export function buildBenchmarkPublicationProjection({
     responseBundle.testAuthoringFiles = testAuthoring.files;
   }
 
+  if (testAuthoring?.projection.overall || executableTesting?.projection.overall) {
+    projection.engineering = buildEngineeringPublication({ architecture: projection, testAuthoring: projection.testAuthoring, executableTesting: projection.executableTesting });
+    if (workflows) projection.overall = buildOverallPublication({ engineering: projection.engineering, aiWorkflows: workflows.projection,
+      ...(projection.writing?.overallSource ? { writing: projection.writing.overallSource } : {}) });
+    projection.schemaVersion = 9;
+  }
+
+  const pendingArchitecture = buildPendingArchitecturePublication({ selections: publicResults.pendingArchitectureRuns,
+    selectedRuns: publicResults.selectedRuns, runRecords, repoRootDirectory, readFileSyncImplementation,
+    projectJudgment: createPublicArchitectureJudgment, validateMessages: validateExactMessages, validateJudgment: validatePublicArchitectureJudgment, containsPrivatePath });
+  if (pendingArchitecture) {
+    projection.architecturePending = pendingArchitecture.projection;
+    responseBundle.architecturePending = pendingArchitecture.responseBundle;
+  }
+
   const basisSha256 = sha256(stableSerialize({
     taxonomy,
     definitions: EXPECTED_BENCHMARK_IDS.map((benchmarkId) => definitions.get(benchmarkId)),
@@ -2651,7 +2722,9 @@ export function buildBenchmarkPublicationProjection({
     ...(games ? { games: games.basisSha256 } : {}),
     ...(writing ? { writing: writing.basisSha256 } : {}),
     ...(executableTesting ? { executableTesting: executableTesting.basisSha256 } : {}),
-    ...(testAuthoring ? { testAuthoring: testAuthoring.basisSha256 } : {})
+    ...(testAuthoring ? { testAuthoring: testAuthoring.basisSha256 } : {}),
+    ...(projection.engineering ? { engineering: projection.engineering.scoreBasis.id } : {}),
+    ...(pendingArchitecture ? { architecturePending: pendingArchitecture.basisSha256 } : {})
   }));
   return {
     projection,

@@ -91,8 +91,11 @@ const stableTarget = selector => inspect(async selector => {
     stableFrames = previous && current.every((value, index) => Math.abs(value - previous[index]) < 0.1) ? stableFrames + 1 : 0;
     previous = current;
     if (stableFrames >= 4) {
-      const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2, hit = document.elementFromPoint(x, y);
-      return { x, y, actionable: rect.width > 0 && rect.height > 0 && (hit === node || node.contains(hit)) };
+      const points = [rect, ...node.getClientRects()].filter(box => box.width > 0 && box.height > 0).map(box => {
+        const x = box.x + box.width / 2, y = box.y + box.height / 2, hit = document.elementFromPoint(x, y);
+        return { x, y, actionable: hit === node || node.contains(hit), hit: hit ? {tag:hit.tagName,id:hit.id,className:hit.className} : null };
+      });
+      return { ...(points.find(point => point.actionable) || points[0] || { actionable: false }), rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height} };
     }
   }
   throw new Error(`Target did not stop moving: ${selector}`);
@@ -106,8 +109,8 @@ const navigate = async (url, predicate) => {
 const click = async selector => {
   await inspect(selector => document.querySelector(selector).scrollIntoView({ block: 'center', behavior: 'instant' }), selector);
   await settled();
-  const { x, y, actionable } = await stableTarget(selector);
-  assert.ok(actionable, `Click target is covered or outside the viewport: ${selector}`);
+  const target = await stableTarget(selector), { x, y, actionable } = target;
+  assert.ok(actionable, `Click target is covered or outside the viewport: ${selector}: ${JSON.stringify(target)}`);
   const point = { x, y };
   await client.send('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
   await client.send('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
@@ -531,7 +534,11 @@ const checkAuthoringReport = async publication => {
       usage: document.querySelector('[data-testing-paired-resources-evidence]').textContent,
       definition: document.querySelector('[data-testing-score-definition]').textContent,
       sourcePolicy: document.querySelector('[data-testing-source-policy]')?.textContent ?? null,
+      detectionCorrection: document.querySelector('[data-testing-detection-correction]')?.textContent ?? null,
+      detectionMethod: document.querySelector('[data-testing-taste-method]').textContent,
       namingRule: document.querySelector('[data-testing-taste-naming-rule]').textContent,
+      faultCreditRules: [...document.querySelectorAll('[data-testing-fault-credit-rule]')].map(node=>node.textContent),
+      faultLabels: [...document.querySelectorAll('[data-testing-objective-fault]')].map(node=>({id:node.dataset.testingObjectiveFault,status:node.dataset.status,heading:node.querySelector('h4').textContent})),
       settings: [...document.querySelectorAll('[data-testing-taste-setting]')].map(node => ({ id: node.dataset.testingTasteSetting, baseline: node.querySelector('[data-testing-score-baseline]').textContent, treatment: node.querySelector('[data-testing-score-treatment]').textContent, delta: node.querySelector('[data-testing-taste-delta]').textContent, closed: !node.querySelector('.model-run').open, profiles: [...node.querySelectorAll('[data-testing-taste-profile-dimension]')].map(item => ({ id: item.dataset.testingTasteProfileDimension, baseline: item.querySelector('[data-testing-taste-dimension-baseline]').textContent, treatment: item.querySelector('[data-testing-taste-dimension-treatment]').textContent, delta: item.querySelector('[data-testing-taste-dimension-delta]').textContent })) })),
       rows: [...document.querySelectorAll('[data-testing-paired-row]')].map(node => ({ id: node.dataset.testingPairedRow, sizeViolation:node.querySelector('[data-testing-file-size-violation]')?.textContent ?? null, objective: [...node.querySelectorAll('[data-testing-objective-fault]')].map(item => ({ id: item.dataset.testingObjectiveFault, status: item.dataset.status, reason: item.querySelector('p').textContent, evidence: citations(item) })), files: [...node.querySelectorAll('[data-testing-file]')].map(item => ({ path: item.dataset.testingFile, sha256: item.dataset.sha256, content: item.querySelector('code').textContent, open: item.open })), reviewsClosed: !node.querySelector('[data-testing-taste-reviews]').open, judges: [...node.querySelectorAll('[data-testing-taste-judge]')].map(judge => ({ id: judge.dataset.testingTasteJudge, sha256: judge.dataset.reviewSha256, status: judge.dataset.status, dimensions: [...judge.querySelectorAll('[data-testing-taste-judge-dimension]')].map(item => ({ id: item.dataset.testingTasteJudgeDimension, score: item.querySelector('[data-testing-taste-dimension-score]').textContent, reason: item.querySelector('[data-testing-taste-dimension-reason]').textContent, evidence: citations(item.querySelector('[data-testing-taste-dimension-evidence]')) })) })) })),
       rubric: [...document.querySelectorAll('[data-testing-taste-rubric-dimension]')].map(item => ({ id: item.dataset.testingTasteRubricDimension, weight: item.querySelector('[data-testing-taste-rubric-weight]').textContent, description: item.querySelector('[data-testing-taste-rubric-description]').textContent })),
@@ -540,7 +547,8 @@ const checkAuthoringReport = async publication => {
   });
   check('paired-repair-comparison', dom.title === 'Writing new tests' && dom.purpose === publication.benchmark.description && dom.hero === 0 && dom.protection === 0 && dom.methodClosed && dom.settings.length === publication.configurations.length && dom.settings.every(item => item.closed) && (publication.schemaVersion === 2 ? dom.reviewBasis?.visible && dom.reviewBasis.text === 'Astra judge only; Opus pending · provisional scores' : dom.reviewBasis === null) && JSON.stringify(dom.nav) === JSON.stringify(['paired-check', 'method']), { title: dom.title, purpose: dom.purpose, nav: dom.nav, oneScoreScale: 100 });
   const expandedSourceDisclosure = publication.sourcePolicy ? dom.sourcePolicy === 'Analysis limit expanded from 24 to 64 KiB after authoring began; original prompts and files unchanged.' : dom.sourcePolicy === null;
-  check('paired-repair-evidence', dom.adoption.includes('frozen before authors') && dom.usage.includes(`${publication.provenance.freshAuthorSessions} fresh author attempts`) && dom.usage.includes(publication.knownTokens.toLocaleString('en-US')) && dom.definition === publication.overall.scoreBasis.aggregation && expandedSourceDisclosure && dom.rows.every(row => JSON.stringify(row.objective) === JSON.stringify(round.rows.find(item => item.id === row.id).objective.faults)), { incumbentBackendSha256, sourceSha256: round.sourceSha256, nativeSessions: publication.nativeSessions, measuredFaults: round.rows.length * 6, expandedSourceDisclosure });
+  const detectionCorrectionDisclosure = publication.detectionCorrection ? dom.detectionCorrection === 'Detection rule corrected after the round; original runs and reviewer ratings retained.' && dom.detectionMethod.includes('causal test failures of any error type') && dom.detectionMethod.includes('Infrastructure, process timeouts, hook, setup, cleanup and unrelated failures are excluded.') : dom.detectionCorrection === null;
+  check('paired-repair-evidence', dom.adoption.includes('frozen before authors') && dom.usage.includes(`${publication.provenance.freshAuthorSessions} fresh author attempts`) && dom.usage.includes(publication.knownTokens.toLocaleString('en-US')) && dom.definition === publication.overall.scoreBasis.aggregation && expandedSourceDisclosure && detectionCorrectionDisclosure && dom.rows.every(row => JSON.stringify(row.objective) === JSON.stringify(round.rows.find(item => item.id === row.id).objective.faults)), { incumbentBackendSha256, sourceSha256: round.sourceSha256, nativeSessions: publication.nativeSessions, measuredFaults: round.rows.length * 6, expandedSourceDisclosure, detectionCorrectionDisclosure });
   const format = value => Number.isFinite(value) ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value) : 'Unscored';
   const profile = value => Number.isFinite(value) ? value.toFixed(3) : 'Unscored';
   const difference = value => Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(3)}` : 'Unscored';
@@ -573,7 +581,8 @@ const checkAuthoringReport = async publication => {
     const reading = dom.calculations.find(item => item.id === row.id);
     return reading.closed && row.judgments.every(judge => JSON.stringify(reading.judges.find(item => item.id === judge.judgeConfigurationId).contributions) === JSON.stringify(judge.contributions.map(item => ({ id: item.id, score: item.score === null ? 'Unscored' : item.score.toFixed(2), points: profile(item.points) }))));
   });
-  check('taste-evidence', evidenceMatches && calculationMatches && dom.namingRule === round.scoreBasis.namingZeroRule && dom.rubric.length === 9 && [...round.scoreBasis.dimensions, ...round.scoreBasis.objectiveDimensions].every(item => { const rendered = dom.rubric.find(value => value.id === item.id); return rendered.description === item.description && rendered.weight === `${item.weight}%`; }), { nativeFindings: round.rows.reduce((sum, row) => sum + row.judgments.reduce((count, judge) => count + judge.dimensions.filter(item => item.score !== null).length, 0), 0), exactFiles: files.rows.reduce((sum, row) => sum + row.files.length, 0), evidenceMatches, calculationMatches });
+  const causalFailureDisplay = dom.faultCreditRules.length === round.rows.length && dom.faultCreditRules.every(text=>text === 'Fault credit requires a source-adjudicated causal test failure of any error type in a case passing both healthy controls. Infrastructure, process timeouts, hook, setup, cleanup and unrelated failures are excluded.') && dom.faultLabels.every(fault=>fault.heading === `${fault.id} · ${fault.status}`);
+  check('taste-evidence', causalFailureDisplay && evidenceMatches && calculationMatches && dom.namingRule === round.scoreBasis.namingZeroRule && dom.rubric.length === 9 && [...round.scoreBasis.dimensions, ...round.scoreBasis.objectiveDimensions].every(item => { const rendered = dom.rubric.find(value => value.id === item.id); return rendered.description === item.description && rendered.weight === `${item.weight}%`; }), { nativeFindings: round.rows.reduce((sum, row) => sum + row.judgments.reduce((count, judge) => count + judge.dimensions.filter(item => item.score !== null).length, 0), 0), exactFiles: files.rows.reduce((sum, row) => sum + row.files.length, 0), evidenceMatches, calculationMatches, causalFailureDisplay });
   await measureOverflow('Writing new tests comparison'); await capture('test-authoring-overview');
   const sections = [];
   for (const section of ['paired-check', 'method']) {
@@ -584,6 +593,8 @@ const checkAuthoringReport = async publication => {
     const value = await inspect(id => ({ section: id, hash: location.hash, top: document.getElementById(id).getBoundingClientRect().top }), section); sections.push(value);
   }
   check('report-section-links', sections.every(item => item.hash === `#test-authoring/${item.section}` && item.top < height), sections);
+  await inspect(()=>document.querySelector('[data-testing-taste-method]').scrollIntoView({block:'start',behavior:'instant'}));
+  await measureOverflow('Detection method'); await capture('test-authoring-detection-method');
   await click('[data-testing-rubric] > summary'); await measureOverflow('Test authoring rubric'); await capture('test-authoring-rubric'); await click('[data-testing-rubric] > summary');
   const model = '#paired-check .model-run';
   await inspect(selector => { const summary = document.querySelector(`${selector} > summary`); summary.scrollIntoView({ block: 'center', behavior: 'instant' }); summary.focus({ preventScroll: true }); }, model);
@@ -603,22 +614,155 @@ const checkAuthoringReport = async publication => {
   await inspect(selector => { const summary = document.querySelector(`${selector} > summary`); summary.scrollIntoView({ block: 'center', behavior: 'instant' }); summary.focus({ preventScroll: true }); }, model);
   await key('Enter', 'Enter', 13); await waitFor(() => inspect(selector => !document.querySelector(selector).open, model), 'Authoring setting closes with Enter'); await stableTarget(`${model} > summary`);
   check('native-details-keyboard', true, { openedAndClosedWithEnter: true, rawFileCopied: firstFile, reviewAndCalculationDisclosures: true });
+  const survivor = round.rows.find(row=>row.objective.faults.some(fault=>fault.status==='survived'));
+  if(survivor){
+    const setting = `[data-testing-taste-setting="${survivor.configurationId}"] .model-run`, condition = `[data-testing-paired-row="${survivor.id}"]`;
+    await click(`${setting} > summary`); await click(`${condition} [data-testing-objective] > summary`);
+    await inspect(selector=>document.querySelector(`${selector} [data-testing-fault-credit-rule]`).scrollIntoView({block:'start',behavior:'instant'}),condition);
+    await measureOverflow('Survived fault evidence'); await capture('test-authoring-survived-fault');
+    await click(`${setting} > summary`);
+  }
 };
 
+const readAggregateMainRows = selector => inspect(selector => [...document.querySelectorAll(selector)].map(row=>({configurationId:row.dataset.configurationId,count:Number(row.dataset.completedTaskCount),expected:Number(row.dataset.expectedTaskCount),complete:row.dataset.coverageComplete,label:row.querySelector('.benchmark-coverage')?.textContent,visible:row.getBoundingClientRect().height>0})),selector);
+const assertAggregateMainRows = (rows,aggregate) => {
+  assert.equal(rows.length,aggregate.settings.length);assert.equal(new Set(rows.map(row=>row.configurationId)).size,aggregate.settings.length);
+  for(const row of rows){const setting=aggregate.settings.find(item=>item.configurationId===row.configurationId);assert.ok(setting);assert.equal(row.count,setting.completedTaskCount);assert.equal(row.expected,setting.expectedTaskCount);assert.equal(row.complete,String(setting.complete));assert.ok(row.visible&&row.label.includes(`${row.count}/${row.expected} tests`));}
+};
+const checkAvailableEngineeringUI = async integration => {
+  const engineering=await evaluate('window.VASIR_DATA.engineering'),mainRows=await readAggregateMainRows('#capability-ranking .capability-rank-row');assertAggregateMainRows(mainRows,engineering);
+  const solId='codex:gpt-6.1-sol@xhigh',sol=`#capability-ranking [data-configuration-id="${solId}"]`;
+  await click(`${sol} > button`);await waitFor(()=>evaluate(`document.querySelector('[data-engineering-score-details]')?.dataset.configurationId === ${JSON.stringify(solId)}`),'Sol main-row selection exposes its own calculation');await capture('engineering-sol-main-ranking');
+  const detail='[data-engineering-score-details]';await click(`${detail} > summary`);
+  const calculation=await inspect(()=>{const detail=document.querySelector('[data-engineering-score-details]'),number=value=>value==='null'||value===undefined||value===''?null:Number(value);return {configurationId:detail.dataset.configurationId,rows:[...detail.querySelectorAll('[data-engineering-component]')].map(row=>({id:row.dataset.engineeringComponent,baseline:number(row.dataset.exactBaseline),skill:number(row.dataset.exactSkill),weight:Number(row.dataset.weight),pendingReview:row.hasAttribute('data-architecture-pending-review'),text:row.textContent,href:row.querySelector('a').href})),baseline:Number(detail.querySelector('[data-engineering-exact-baseline]').dataset.engineeringExactBaseline),skill:Number(detail.querySelector('[data-engineering-exact-skill]').dataset.engineeringExactSkill),caption:detail.querySelector('caption').textContent};});
+  assert.equal(calculation.configurationId,solId);assert.deepEqual(calculation.rows.map(row=>row.id),integration.engineeringTaskIds);const paired=calculation.rows.filter(row=>row.weight>0);assert.equal(paired.length,2);assert.ok(paired.every(row=>row.weight===0.5));assert.ok(calculation.rows.filter(row=>row.weight===0).every(row=>row.baseline===null&&row.skill===null&&(integration.pendingArchitecture?row.pendingReview&&row.text.includes('Awaiting review'):/N\/A|Not run/.test(row.text))));for(const condition of ['baseline','skill'])assert.ok(Math.abs(calculation[condition]-paired.reduce((sum,row)=>sum+row[condition],0)/paired.length)<1e-9);assert.ok(calculation.caption.includes('2/5'));
+  await inspect(()=>document.querySelector('[data-engineering-score-details] table').scrollIntoView({block:'center',behavior:'instant'}));await measureOverflow('Sol available-pair calculation');await capture('engineering-score-breakdown');await click(`${detail} > summary`);
+  const old=engineering.entries.find(row=>row.condition==='skill'&&row.completedTaskCount===3&&Number.isFinite(row.latency)&&row.latency>0);assert.ok(old,'An original architecture model retains measured runtime.');await click(`#capability-ranking [data-configuration-id="${old.configurationId}"] > button`);await click('#capability-mode-efficiency');await settled();
+  const resource=await evaluate('({pointIds:[...document.querySelectorAll("#capability-efficiency .plot-point[data-entry-id]")].map(row=>row.dataset.entryId),unavailable:document.querySelector("#capability-efficiency").textContent.includes("Resource comparison unavailable")})');assert.ok(!resource.unavailable&&resource.pointIds.length>0);assert.ok(resource.pointIds.every(id=>{const entry=engineering.entries.find(row=>row.id===id);return entry&&Number.isFinite(entry.latency)&&entry.latency>0;}));await measureOverflow('Measured architecture resource comparison');await capture('engineering-available-resource-comparison');
+  await click('#capability-mode-models');await settled();await click(`${sol} > button`);await click('#capability-mode-efficiency');await settled();const fallback=await evaluate('({text:document.querySelector("#capability-efficiency").textContent,points:document.querySelectorAll("#capability-efficiency .plot-point").length})');assert.ok(fallback.text.includes('Resource comparison unavailable'));assert.equal(fallback.points,0);await capture('engineering-resource-unavailable');
+  Object.assign(integration,{mainRows,calculation,coverage:{count:50,label:mainRows.find(row=>row.configurationId===solId).label},efficiency:{resource,fallback}});
+};
+const assertAvailableAggregateArithmetic = (root, expectedEngineering) => {
+  const close=(actual,expected)=>Number.isFinite(actual)&&Number.isFinite(expected)&&Math.abs(actual-expected)<1e-9;
+  const engineering=root.engineering,overall=root.overall,key=cell=>`${cell.configurationId}|${cell.condition}|${cell.benchmarkId}`;
+  const sources=new Map([...expectedEngineering,...[...(root.writing.overallSource?.benchmarkResults||[]),...root.aiWorkflows.benchmarkResults].map(cell=>[key(cell),cell.exactScore])]);
+  assert.equal(overall.scoreBasis.edition,'overall-v5');
+  for(const [aggregate,total,complete,cells,tasks]of [[engineering,53,3,328,5],[overall,56,2,578,9]]){
+    assert.deepEqual([aggregate.settings.length,aggregate.coverage.totalSettings,aggregate.coverage.completeSettings,aggregate.coverage.rankedSettings,aggregate.coverage.unrankedSettings,aggregate.benchmarkResults.length,aggregate.scoreBasis.taskCount],[total,total,complete,total,0,cells,tasks]);
+    for(const cell of aggregate.benchmarkResults)assert.equal(cell.exactScore,sources.get(key(cell)),'Original task score differs from available-coverage aggregate.');
+    for(const record of aggregate.coverage.records){
+      const ids=aggregate.scoreBasis.benchmarkIds.filter(id=>['baseline','skill'].every(condition=>Number.isFinite(sources.get(`${record.configurationId}|${condition}|${id}`))));
+      assert.ok(ids.length>0);assert.equal(record.eligible,true);assert.equal(record.complete,ids.length===tasks);assert.equal(record.completedTaskCount,ids.length);assert.equal(record.expectedTaskCount,tasks);assert.deepEqual(record.availableBenchmarkIds,ids);
+      for(const condition of ['baseline','skill']){
+        const entry=aggregate.entries.find(row=>row.configurationId===record.configurationId&&row.condition===condition);
+        assert.ok(entry);assert.equal(entry.eligibleForRank,true);assert.equal(entry.complete,record.complete);assert.equal(entry.completedTaskCount,ids.length);assert.equal(entry.expectedTaskCount,tasks);assert.deepEqual(entry.availableBenchmarkIds,ids);
+        const categories=aggregate===engineering?[{id:'engineering',weight:1}]:[{id:'engineering',weight:0.5},{id:'writing',weight:0.25},{id:'ai-workflows',weight:0.25}];
+        const parts=categories.map(category=>({...category,ids:ids.filter(id=>aggregate===engineering||aggregate.scoreBasis.benchmarkWeights.find(weight=>weight.benchmarkId===id).familyId===category.id)}));
+        const totalWeight=parts.filter(part=>part.ids.length).reduce((sum,part)=>sum+part.weight,0);let expected=0;
+        for(const part of parts){const weight=part.ids.length?part.weight/totalWeight:0,values=part.ids.map(id=>sources.get(`${record.configurationId}|${condition}|${id}`)),mean=values.length?values.reduce((sum,value)=>sum+value,0)/values.length:null;if(mean!==null)expected+=mean*weight;const actual=entry.categories.find(item=>item.category===part.id);assert.ok(actual);assert.equal(actual.weight,weight);if(mean===null){assert.equal(actual.exactScore,null);assert.equal(actual.exactContribution,null);}else{assert.ok(close(actual.exactScore,mean));assert.ok(close(actual.exactContribution,mean*weight));}for(const id of part.ids)assert.ok(close(entry.benchmarkWeights.find(item=>item.benchmarkId===id).weight,weight/part.ids.length));}
+        assert.ok(close(entry.exactScore,expected));assert.ok(Number.isFinite(record.exactScores[condition]));assert.ok(Number.isInteger(record.ranks[condition]));
+      }
+    }
+  }
+  const sol=engineering.coverage.records.find(row=>row.configurationId==='codex:gpt-6.1-sol@xhigh');assert.equal(sol.completedTaskCount,2);assert.deepEqual(sol.availableBenchmarkIds,['test-authoring','backend-testing']);
+  assert.ok(root.settings.every(old=>engineering.settings.some(row=>row.configurationId===old.configurationId)));
+  return {availableCoverage:true,engineeringSha256:sha256(JSON.stringify(engineering)),engineeringSettings:53,engineeringObservedSettings:53,overallSettings:56,overallObservedSettings:56,engineeringTaskIds:engineering.scoreBasis.benchmarkIds,solCoverage:'2/5',...(root.architecturePending?{pendingArchitecture:{descriptorSha256:sha256(JSON.stringify(root.architecturePending)),...root.architecturePending}}:{}),sourceTaskScoresVerified:true,pairedCoverageVerified:true,equalAvailableTaskMeanVerified:true,categoryRenormalizationVerified:true};
+};
+const assertAggregateArithmetic = root => {
+  if (!root.engineering) return null;
+  const engineering = root.engineering, overall = root.overall, taskIds = ['hyper-scale-chat','personalized-home-feed','device-telemetry','test-authoring','backend-testing'];
+  const scores = [...root.benchmarkResults.map(cell=>({...cell,exactScore:cell.score})), ...[[root.testAuthoring,'current'],[root.executableTesting,'repaired']].flatMap(([publication,skill])=>publication.overall.rows.map(row=>({configurationId:row.configurationId,condition:row.condition==='none'?'baseline':row.condition===skill?'skill':null,benchmarkId:publication.benchmark.id,exactScore:row.score})))];
+  const key = cell=>`${cell.configurationId}|${cell.condition}|${cell.benchmarkId}`, expected = new Map(scores.map(cell=>[key(cell),cell.exactScore]));
+  if(engineering.scoreBasis.edition==='engineering-available-pairs-v2')return assertAvailableAggregateArithmetic(root,expected);
+  assert.deepEqual(engineering.scoreBasis.benchmarkIds,taskIds); assert.equal(engineering.scoreBasis.edition,'engineering-all-tasks-v1'); assert.equal(overall.scoreBasis.edition,'overall-v4');
+  for(const [aggregate,counts]of [[engineering,[3,53,50,328,5]],[overall,[2,56,54,578,9]]]){
+    assert.deepEqual([aggregate.settings.length,aggregate.coverage.totalSettings,aggregate.coverage.incompleteSettings,aggregate.benchmarkResults.length,aggregate.scoreBasis.taskCount],counts);
+    for(const record of aggregate.coverage.records){
+      const complete=['baseline','skill'].every(condition=>aggregate.scoreBasis.benchmarkIds.every(id=>aggregate.benchmarkResults.some(cell=>cell.configurationId===record.configurationId&&cell.condition===condition&&cell.benchmarkId===id&&Number.isFinite(aggregate===engineering?expected.get(key(cell)):cell.exactScore))));
+      assert.equal(record.eligible,complete);
+      if(!complete){assert.deepEqual(record.exactScores,{baseline:null,skill:null});assert.deepEqual(record.ranks,{baseline:null,skill:null});}
+    }
+  }
+  for(const cell of engineering.benchmarkResults) assert.equal(cell.exactScore,expected.get(key(cell)),'Every integrated task score must equal its authoritative source.');
+  for(const entry of engineering.entries){const values=taskIds.map(id=>expected.get(`${entry.configurationId}|${entry.condition}|${id}`));assert.ok(values.every(Number.isFinite));assert.ok(Math.abs(entry.exactScore-values.reduce((sum,value)=>sum+value,0)/5)<1e-9);}
+  assert.deepEqual(overall.categories.map(({id,weight})=>({id,weight})),[{id:'engineering',weight:0.5},{id:'writing',weight:0.25},{id:'ai-workflows',weight:0.25}]);
+  for(const entry of overall.entries){
+    for(const part of entry.categories){assert.equal(part.weight,{engineering:0.5,writing:0.25,'ai-workflows':0.25}[part.category]);if(part.category==='engineering')assert.equal(part.exactScore,engineering.entries.find(row=>row.configurationId===entry.configurationId&&row.condition===entry.condition).exactScore);}
+    assert.ok(Math.abs(entry.exactScore-entry.categories.reduce((sum,part)=>sum+part.exactScore*part.weight,0))<1e-9);
+  }
+  const sol=engineering.coverage.records.find(row=>row.configurationId==='codex:gpt-6.1-sol@xhigh');
+  assert.equal(sol.eligible,false);for(const condition of ['baseline','skill']){assert.equal(sol.conditions[condition].assessableTaskCount,2);assert.deepEqual(sol.conditions[condition].missingTaskIds,taskIds.slice(0,3));}
+  return {engineeringSha256:sha256(JSON.stringify(engineering)),engineeringSettings:3,engineeringObservedSettings:53,overallSettings:2,overallObservedSettings:56,engineeringTaskIds:taskIds,solCoverage:'2/5',weights:{engineering:0.5,writing:0.25,'ai-workflows':0.25},sourceTaskScoresVerified:true,fullPairEligibilityVerified:true,equalTaskMeanVerified:true};
+};
+let aggregateIntegration;
 let publicationSha256, overallSha256, publicationSchemaVersion, pairedRepairSha256, tasteSha256, currentRoundSha256, backendTestingOverallSha256, backendTestingFilesSha256, testAuthoringOverallSha256, testAuthoringFilesSha256, incumbentBackendSha256;
 try {
   await client.send('Network.enable', { maxTotalBufferSize: 256 * 1024 * 1024, maxResourceBufferSize: 64 * 1024 * 1024, enableDurableMessages: true });
   await client.send('Network.setCacheDisabled', { cacheDisabled: true });
   await navigate(pageUrl('index.html', 'capabilities/engineering/benchmarks'), `document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector(${JSON.stringify(reportLink)})`);
-  const initial = await inspect(({reportLink,publicationKey}) => ({overall:JSON.stringify(window.VASIR_DATA.overall),engineeringRows:document.querySelectorAll('#capability-ranking .capability-rank-row').length,href:document.querySelector(reportLink).href,ledgerLabel:document.querySelector(`${reportLink} .benchmark-ledger__identity small`).textContent,schema:window.VASIR_DATA[publicationKey].schemaVersion,visible:!!document.querySelector(reportLink).getBoundingClientRect().height}),{reportLink,publicationKey});
+  aggregateIntegration=assertAggregateArithmetic(await evaluate('window.VASIR_DATA'));
+  const integrated=Boolean(aggregateIntegration);
+  if(integrated) assert.doesNotMatch(await evaluate('document.querySelector("#capability-field-panel").textContent'), /excluded from (?:the )?(?:Engineering|Architecture)|architecture-only|Architecture leaderboard/i);
+  const initial = await inspect(({reportLink,publicationKey}) => ({overall:JSON.stringify(window.VASIR_DATA.overall),engineeringRows:document.querySelectorAll('#capability-ranking .capability-rank-row').length,href:document.querySelector(reportLink).href,ledgerLabel:document.querySelector(`${reportLink} .benchmark-ledger__identity small`).textContent,cohort:document.querySelector(`${reportLink} .benchmark-ledger__evidence strong`).textContent,schema:window.VASIR_DATA[publicationKey].schemaVersion,expectedCohort:`${window.VASIR_DATA[publicationKey].configurations.length} settings · ${window.VASIR_DATA[publicationKey].trials} trial per arm`,visible:!!document.querySelector(reportLink).getBoundingClientRect().height}),{reportLink,publicationKey});
+  const testingHierarchy = await inspect(()=>{
+    const tracks=[...document.querySelectorAll('[data-testing-ledger-track]')],track=tracks[0];
+    return {tracks:tracks.length,title:track?.querySelector('.benchmark-ledger__track-header h4')?.textContent,note:track?.querySelector('.benchmark-ledger__track-header p')?.textContent,count:track?.querySelector('.benchmark-ledger__track-header > strong')?.textContent,benchmarks:[...(track?.querySelectorAll('[data-testing-ledger-benchmark]')||[])].map(section=>({id:section.dataset.testingLedgerBenchmark,title:section.querySelector('.benchmark-ledger__identity h5')?.textContent,number:section.querySelector('.benchmark-ledger__identity > span')?.textContent,nestedHeader:!!section.querySelector('.benchmark-ledger__track-header'),lightAxis:!!section.querySelector('.capability-ranking__axis--nested'),duplicateScore:section.querySelector('.benchmark-ledger__evidence strong')?.textContent.startsWith('Score ')})),testCount:Number(document.querySelector('.capability-canvas__reading--measured')?.dataset.count),modelCount:document.querySelector('.capability-canvas__reading--audit dd')?.childNodes[0]?.textContent,modelCohort:document.querySelector('.capability-canvas__reading--audit small')?.textContent,modelTab:document.querySelector('#capability-mode-models strong')?.textContent,benchmarkTab:document.querySelector('#capability-mode-benchmarks > span')?.textContent};
+  });
+  const testingHierarchyMatches=testingHierarchy.tracks===1&&testingHierarchy.title==='Testing'&&testingHierarchy.note===(aggregateIntegration?.availableCoverage?'Included in Engineering; completed benchmarks share equal weight.':integrated?'Each benchmark contributes 20% of the Engineering score.':'Shown separately; excluded from the Architecture and Overall rankings.')&&testingHierarchy.count==='2 tests · 2 scored'&&testingHierarchy.testCount===5&&(integrated||testingHierarchy.modelCount==='52'&&testingHierarchy.modelCohort==='architecture · 4 testing'&&testingHierarchy.modelTab==='Architecture leaderboard')&&testingHierarchy.benchmarkTab==='2 tracks · 5 tests'&&JSON.stringify(testingHierarchy.benchmarks)===JSON.stringify([{id:'backend-testing',title:'Backend test-suite quality',number:'01 / TESTING',nestedHeader:false,lightAxis:true,duplicateScore:false},{id:'test-authoring',title:'Writing new tests',number:'02 / TESTING',nestedHeader:false,lightAxis:true,duplicateScore:false}]);
+  const ledgerCharts = await inspect(() => ['backend-testing','test-authoring'].filter(id=>window.VASIR_DATA[id==='test-authoring'?'testAuthoring':'executableTesting']).map(id=>{
+    const publication=window.VASIR_DATA[id==='test-authoring'?'testAuthoring':'executableTesting'],chart=document.querySelector(`[data-testing-ledger-chart="${id}"]`);
+    const expected=[...publication.overall.summaries].sort((first,second)=>second.treatment-first.treatment);
+    const readings=[...(chart?.querySelectorAll('[data-testing-ledger-setting]')||[])].map(row=>{
+      const track=row.querySelector('.capability-rank-row__track'),rect=track?.getBoundingClientRect();
+      const position=condition=>{const marker=row.querySelector(`.capability-rank-row__marker--${condition}`),mark=marker?.getBoundingClientRect();return rect?.width&&mark?((mark.left+mark.width/2-rect.left)/rect.width)*100:null;};
+      return {id:row.dataset.testingLedgerSetting,baseline:Number(row.dataset.baselineScore),skill:Number(row.dataset.skillScore),baselineText:row.querySelector('.capability-rank-row__reading--baseline strong')?.textContent,skillText:row.querySelector('.capability-rank-row__reading--full strong')?.textContent,delta:row.querySelector('.capability-rank-row__delta')?.childNodes[0]?.textContent,baselinePosition:position('baseline'),skillPosition:position('full'),ariaLabel:track?.getAttribute('aria-label'),href:row.querySelector('a')?.getAttribute('href'),visible:!!rect?.width&&!!rect?.height};
+    });
+    return {id,expected,readings,conditions:[...(chart?.querySelectorAll('.capability-ranking__condition-heading')||[])].map(node=>node.textContent.trim()),scale:[...(chart?.querySelectorAll('.capability-ranking__scale-values i')||[])].map(node=>node.textContent),visible:!!chart?.getBoundingClientRect().height};
+  }));
+  const ledgerScore=value=>(Math.round((value+2*Number.EPSILON*Math.max(1,Math.abs(value)))*10)/10).toFixed(1);
+  const ledgerDelta=value=>{const rounded=Number(ledgerScore(value));return rounded>0?`+${rounded.toFixed(1)}`:rounded<0?`−${Math.abs(rounded).toFixed(1)}`:'±0.0';};
+  const ledgerChartsMatch=ledgerCharts.length===2&&ledgerCharts.every(chart=>chart.visible&&JSON.stringify(chart.conditions)===JSON.stringify(['Minimal','Skill'])&&JSON.stringify(chart.scale)===JSON.stringify(['0','25','50','75','100'])&&chart.readings.length===chart.expected.length&&chart.readings.length===4&&chart.expected.every((expected,index)=>{
+    const reading=chart.readings[index];
+    return reading.id===expected.configurationId&&reading.baseline===expected.baseline&&reading.skill===expected.treatment&&reading.baselineText===ledgerScore(expected.baseline)&&reading.skillText===ledgerScore(expected.treatment)&&reading.delta===ledgerDelta(expected.delta)&&reading.visible&&Math.abs(reading.baselinePosition-expected.baseline)<0.15&&Math.abs(reading.skillPosition-expected.treatment)<0.15&&reading.ariaLabel===`Minimal circle at ${ledgerScore(expected.baseline)}; Skill square at ${ledgerScore(expected.treatment)} on a 0–100 scale.`&&reading.href===`./benchmark-report.html#${chart.id}`;
+  }));
   overallSha256 = sha256(initial.overall);
-  check('engineering-52-settings', initial.engineeringRows === 52, { rows: initial.engineeringRows, ledgerLabel: initial.ledgerLabel });
+  check(integrated?'engineering-all-benchmarks':'engineering-52-settings', initial.engineeringRows === (aggregateIntegration?.availableCoverage?53:integrated?3:52) && ledgerChartsMatch && testingHierarchyMatches, { rows: initial.engineeringRows, ledgerLabel: initial.ledgerLabel, ledgerChartsMatch, ledgerCharts, testingHierarchyMatches, testingHierarchy,...(integrated?{aggregateIntegration}:{}) });
   assert.ok(authoring ? [1,2].includes(initial.schema) : [3,4].includes(initial.schema));
-  assert.equal(initial.ledgerLabel,'Minimal · Skill','The Engineering link must describe the current skill comparison.');
+  assert.equal(initial.ledgerLabel,authoring?'Write new tests from production code.':'Improve an existing test suite.','The Engineering link must describe the selected testing task.');
+  assert.equal(initial.cohort,initial.expectedCohort,'The Engineering link must describe the current cohort and trial count.');
   assert.ok(initial.visible && new URL(initial.href).hash === `#${benchmarkId}`, 'Visible Engineering ledger report link missing.');
   await measureOverflow('Engineering ledger');
+  await inspect(()=>document.querySelector('[data-testing-ledger-track]').scrollIntoView({block:'start',behavior:'instant'}));
+  await capture('testing-ledger-track');
+  for(const chart of ledgerCharts){
+    await inspect(id=>document.querySelector(`[data-testing-ledger-benchmark="${id}"]`).scrollIntoView({block:'start',behavior:'instant'}),chart.id);
+    await capture(`${chart.id}-ledger-chart`);
+  }
   await inspect(selector => document.querySelector(selector).scrollIntoView({ block: 'center', behavior: 'instant' }),reportLink);
   await capture(`${benchmarkId}-engineering-ledger`);
+  if(integrated){
+    await click('#capability-mode-models');await settled();
+    await inspect(()=>document.querySelector('#capability-ranking').scrollIntoView({block:'start',behavior:'instant'}));
+    await measureOverflow('Combined Engineering leaderboard');await capture('engineering-combined-leaderboard');
+    if(aggregateIntegration.availableCoverage){await checkAvailableEngineeringUI(aggregateIntegration);}else{
+    const breakdown='[data-engineering-score-details]';
+    await click(`${breakdown} > summary`);
+    const calculation=await inspect(()=>{const detail=document.querySelector('[data-engineering-score-details]');return {configurationId:detail.dataset.configurationId,open:detail.open,rows:[...detail.querySelectorAll('[data-engineering-component]')].map(row=>({id:row.dataset.engineeringComponent,baseline:Number(row.dataset.exactBaseline),skill:Number(row.dataset.exactSkill),weight:Number(row.dataset.weight),href:row.querySelector('a').getAttribute('href')})),baseline:Number(detail.querySelector('[data-engineering-exact-baseline]').dataset.engineeringExactBaseline),skill:Number(detail.querySelector('[data-engineering-exact-skill]').dataset.engineeringExactSkill)};});
+    assert.equal(calculation.open,true);assert.deepEqual(calculation.rows.map(row=>row.id),aggregateIntegration.engineeringTaskIds);assert.ok(calculation.rows.every(row=>row.weight===0.2&&Number.isFinite(row.baseline)&&Number.isFinite(row.skill)&&row.href.includes(row.id)));for(const condition of ['baseline','skill'])assert.ok(Math.abs(calculation[condition]-calculation.rows.reduce((sum,row)=>sum+row[condition],0)/5)<1e-9);
+    await inspect(()=>document.querySelector('[data-engineering-score-details] table').scrollIntoView({block:'center',behavior:'instant'}));
+    const tableVisibility=await evaluate('(()=>{const table=document.querySelector("[data-engineering-score-details] table"),rect=table.getBoundingClientRect();return {top:rect.top,bottom:rect.bottom,viewport:innerHeight,color:getComputedStyle(table).color}})()');assert.ok(tableVisibility.top>=0&&tableVisibility.bottom<=tableVisibility.viewport);assert.notEqual(tableVisibility.color,'rgb(255, 255, 255)');calculation.tableVisibility=tableVisibility;
+    await measureOverflow('Engineering exact score breakdown');await capture('engineering-score-breakdown');await click(`${breakdown} > summary`);
+    await click('[data-overall-coverage-display] > summary');
+    const coverage=await inspect(()=>{const root=window.VASIR_DATA.engineering,sol=root.coverage.records.find(row=>row.configurationId==='codex:gpt-6.1-sol@xhigh'),row=document.querySelector(`[data-incomplete-setting-id="${sol.id}"]`);row.scrollIntoView({block:'start',behavior:'instant'});return {count:Number(document.querySelector('[data-overall-coverage-display]').dataset.incompleteCount),label:row.querySelector('.overall-coverage__identity').textContent,benchmarks:[...row.querySelectorAll('[data-engineering-coverage-benchmark]')].map(node=>({id:node.dataset.engineeringCoverageBenchmark,complete:node.dataset.benchmarkComplete,text:node.textContent,href:node.getAttribute('href')}))};});
+    assert.equal(coverage.count,50);assert.ok(coverage.label.includes('2/5 tests · unranked'));assert.deepEqual(coverage.benchmarks.map(row=>row.id),aggregateIntegration.engineeringTaskIds);assert.equal(coverage.benchmarks.filter(row=>row.complete==='true').length,2);assert.ok(coverage.benchmarks.filter(row=>row.complete==='false').every(row=>row.text.includes('Not run')));
+    await measureOverflow('Engineering missing coverage');await capture('engineering-sol-partial-coverage');await click('[data-overall-coverage-display] > summary');
+    await click('#capability-mode-efficiency');await settled();
+    const efficiency=await evaluate('({text:document.querySelector("#capability-efficiency").textContent,points:document.querySelectorAll("#capability-efficiency .efficiency-point").length})');assert.ok(efficiency.text.includes('Resource comparison unavailable'));assert.equal(efficiency.points,0);await measureOverflow('Engineering missing resource comparison');await capture('engineering-resource-unavailable');
+    Object.assign(aggregateIntegration,{calculation,coverage,efficiency});
+    }
+    await click('#capability-mode-benchmarks');await settled();
+    await inspect(selector=>document.querySelector(selector).scrollIntoView({block:'center',behavior:'instant'}),reportLink);
+  }
   await click(reportLink);
   await waitFor(() => evaluate(`document.querySelector("#report-page")?.dataset.executableBenchmark === ${JSON.stringify(benchmarkId)}`), 'Backend report from Engineering ledger');
   await settled();
@@ -626,6 +770,10 @@ try {
   publicationSha256 = sha256(JSON.stringify(data));
   publicationSchemaVersion = data.schemaVersion;
   if (authoring) await checkAuthoringReport(data); else await checkCurrentReport(data);
+  if(integrated){
+    const inclusion=await evaluate('({footer:document.querySelector(".report-footer > span").textContent,method:document.querySelector(".method-grid").textContent})');
+    assert.ok(inclusion.footer.includes('Included in Engineering and Overall'));assert.ok((aggregateIntegration.availableCoverage?inclusion.method.includes('completed')&&inclusion.method.includes('Engineering'):inclusion.method.includes('This benchmark contributes 20% of Engineering, which contributes 50% of the current Overall score.')));assert.doesNotMatch(inclusion.method,/excluded from (?:the )?(?:Engineering|Overall|Architecture)|architecture-only/i);aggregateIntegration.reportInclusion={[benchmarkId]:inclusion};
+  }
 
   await click('.report-context__back');
   await waitFor(() => evaluate(`document.querySelector("#capability-category-engineering[aria-selected=true]") && document.querySelector(${JSON.stringify(reportLink)})`), 'Report backlink returns to Engineering');
@@ -634,15 +782,64 @@ try {
   await client.send('Page.navigateToHistoryEntry', { entryId: history.entries[history.currentIndex - 1].id });
   await waitFor(() => evaluate(`document.querySelector("#report-page")?.dataset.executableBenchmark === ${JSON.stringify(benchmarkId)}`), 'Browser back restores executable report');
   check('browser-history', true, { restoredUrl: await evaluate('location.href'), dataset: await evaluate('document.querySelector("#report-page").dataset.executableBenchmark') });
+  if(integrated){
+    const other=authoring?'backend-testing':'test-authoring';
+    await navigate(pageUrl('benchmark-report.html',other),`document.querySelector("#report-page")?.dataset.executableBenchmark === ${JSON.stringify(other)}`);
+    const inclusion=await evaluate('({footer:document.querySelector(".report-footer > span").textContent,method:document.querySelector(".method-grid").textContent})');
+    assert.ok(inclusion.footer.includes('Included in Engineering and Overall'));assert.ok((aggregateIntegration.availableCoverage?inclusion.method.includes('completed')&&inclusion.method.includes('Engineering'):inclusion.method.includes('This benchmark contributes 20% of Engineering, which contributes 50% of the current Overall score.')));assert.doesNotMatch(inclusion.method,/excluded from (?:the )?(?:Engineering|Overall|Architecture)|architecture-only/i);aggregateIntegration.reportInclusion[other]=inclusion;
+  }
   await navigate(pageUrl('index.html', 'capabilities/overall'), 'document.querySelector("#capability-category-overall[aria-selected=true]")');
-  const overall = await evaluate('({serialized:JSON.stringify(window.VASIR_DATA.overall),backendScore:["backend-testing","test-authoring"].some(id=>JSON.stringify(window.VASIR_DATA.overall).includes(id)),backendRows:document.querySelectorAll("#capability-ranking [data-testing-row],#capability-ranking [data-testing-summary]").length})');
-  check('overall-excludes-backend-testing', !overall.backendScore && overall.backendRows === 0 && sha256(overall.serialized) === overallSha256, { sourceSha256: overallSha256, afterSha256: sha256(overall.serialized), backendScore: overall.backendScore, backendRows: overall.backendRows });
+  if(integrated){await click('#capability-mode-models');await settled();}
+  const overall = await evaluate('({serialized:JSON.stringify(window.VASIR_DATA.overall),backendScore:["backend-testing","test-authoring"].every(id=>window.VASIR_DATA.overall.scoreBasis.benchmarkIds.includes(id)),backendRows:document.querySelectorAll("#capability-ranking [data-testing-row],#capability-ranking [data-testing-summary]").length,rankedRows:document.querySelectorAll("#capability-ranking .setting-row").length,incomplete:Number(document.querySelector("[data-overall-coverage-display]")?.dataset.incompleteCount)})');
+  const {serialized:overallSource,...overallEvidence}=overall;
+  check(integrated?'overall-includes-testing':'overall-excludes-backend-testing', (integrated?overall.backendScore&&overall.rankedRows===(aggregateIntegration.availableCoverage?56:2)&&overall.incomplete===54:!overall.backendScore&&overall.backendRows===0) && sha256(overallSource) === overallSha256, { sourceSha256: overallSha256, afterSha256: sha256(overallSource), ...overallEvidence });
   await measureOverflow('Overall');
+  if(integrated && aggregateIntegration.availableCoverage){
+    const overallData=await evaluate('window.VASIR_DATA.overall'),mainRows=await readAggregateMainRows('#capability-ranking .setting-row');assertAggregateMainRows(mainRows,overallData);aggregateIntegration.overallMainRows=mainRows;
+    const weightingCopy=await evaluate('({legend:document.querySelector("#capability-ranking .capability-legend").textContent,method:document.querySelector("[data-overall-method]").textContent})');assert.doesNotMatch(weightingCopy.legend,/%/);assert.ok(weightingCopy.method.startsWith('Base weights:'));aggregateIntegration.overallWeightingCopy=weightingCopy;
+    await inspect(()=>document.querySelector('#capability-ranking').scrollIntoView({block:'start',behavior:'instant'}));await capture('overall-combined-engineering');
+    const solId='codex:gpt-6.1-sol@xhigh',sol=`#capability-ranking .setting-row[data-configuration-id="${solId}"]`;
+    await click(`${sol} .setting-row__select`);await settled();assert.ok(await evaluate(`document.querySelector('${sol}').classList.contains('is-selected')`));await capture('overall-sol-available-profile');
+    const segments=await inspect(selector=>[...document.querySelector(selector).querySelectorAll('.capability-composition__segment')].map(node=>({category:node.dataset.categoryId,weight:Number(node.dataset.weight),label:node.getAttribute('aria-label')})),sol);assert.ok(segments.length===2&&segments.every(segment=>segment.category==='engineering'&&segment.weight===1&&segment.label.includes('100%')));aggregateIntegration.overallSolSegments=segments;
+    await click(`${sol} .capability-composition__segment[data-category-id="engineering"]`);
+    await waitFor(()=>evaluate(`document.querySelector('#capability-category-engineering[aria-selected=true]') && document.querySelector('#capability-ranking .capability-rank-row.is-selected')?.dataset.configurationId === ${JSON.stringify(solId)}`),'Overall chart category link preserves the selected Sol model');
+    const focused=await evaluate('(()=>{const row=document.querySelector("#capability-ranking .capability-rank-row.is-selected");return {configurationId:row.dataset.configurationId,label:row.querySelector(".benchmark-coverage").textContent,links:row.querySelectorAll("[data-engineering-component] a").length}})()');assert.equal(focused.configurationId,solId);assert.ok(focused.label.includes('2/5 tests'));assert.equal(focused.links,5);aggregateIntegration.overallPartialLink=focused;await capture('overall-to-engineering-sol-coverage');
+  }else if(integrated){
+    await inspect(()=>document.querySelector('#capability-ranking').scrollIntoView({block:'start',behavior:'instant'}));await capture('overall-combined-engineering');await click('#capability-mode-efficiency');await settled();assert.ok((await evaluate('document.querySelector("#capability-efficiency").textContent')).includes('Resource comparison unavailable'));await capture('overall-resource-unavailable');
+    await click('#capability-mode-models');await settled();await click('[data-overall-coverage-display] > summary');
+    const sol='[data-incomplete-setting-id="'+await evaluate('window.VASIR_DATA.overall.coverage.records.find(row=>row.configurationId==="codex:gpt-6.1-sol@xhigh").id')+'"]';
+    const link=`${sol} [data-overall-category="engineering"]`;await click(link);
+    await waitFor(()=>evaluate('document.querySelector("[data-overall-coverage-display]")?.open && document.activeElement?.dataset.incompleteSettingId === window.VASIR_DATA.engineering.coverage.records.find(row=>row.configurationId==="codex:gpt-6.1-sol@xhigh").id'),'Overall category link reveals requested partial Engineering setting');
+    const focused=await evaluate('({configuration:location.search,label:document.activeElement.querySelector(".overall-coverage__identity").textContent,links:document.activeElement.querySelectorAll("[data-engineering-coverage-benchmark]").length})');assert.ok(focused.label.includes('2/5 tests · unranked'));assert.equal(focused.links,5);aggregateIntegration.overallPartialLink=focused;await capture('overall-to-engineering-sol-coverage');
+  }
   await navigate(pageUrl('benchmark-report.html', 'hyper-scale-chat'), 'document.querySelector("#report-title") && document.querySelectorAll(".model-run").length > 0');
   const smoke = await evaluate('({title:document.querySelector("#report-title").textContent,modelRuns:document.querySelectorAll(".model-run").length,unavailable:!!document.querySelector("[data-report-unavailable]"),executable:document.querySelector("#report-page").dataset.executableBenchmark||null})');
-  check('hyper-scale-chat-report', smoke.title.toLowerCase().includes('chat') && smoke.modelRuns === 52 && !smoke.unavailable && !smoke.executable, smoke);
+  check('hyper-scale-chat-report', smoke.title.toLowerCase().includes('chat') && smoke.modelRuns === (aggregateIntegration?.pendingArchitecture?53:52) && !smoke.unavailable && !smoke.executable, smoke);
   await measureOverflow('Hyper-scale chat');
   await capture('backend-testing-hyper-scale-chat');
+  if(aggregateIntegration?.pendingArchitecture){
+    const pending=aggregateIntegration.pendingArchitecture,appendix=await evaluate('window.VASIR_RESPONSES.architecturePending'),reports=[];
+    assert.equal(pending.status,'pending-review');assert.equal(appendix.status,'pending-review');assert.equal(appendix.responses.length,6);assert.ok(appendix.responses.every(row=>row.score===null&&row.judgments.length===1));
+    for(const benchmark of pending.benchmarkIds){
+      await navigate(pageUrl('index.html','capabilities/engineering'),'document.querySelectorAll("#capability-ranking .capability-rank-row").length===53');
+      const sol=`#capability-ranking [data-configuration-id="${pending.configurationId}"]`;
+      await click(`${sol} > button`);await click('[data-engineering-score-details] > summary');
+      const link=`[data-engineering-component="${benchmark}"] a`;await click(link);
+      await waitFor(()=>evaluate('document.querySelector("[data-architecture-pending-setting] > .model-run")?.open'),'Engineering link opens saved Sol answers');await settled();
+      const selector='[data-architecture-pending-setting] > .model-run';
+      const summary=await inspect(()=>({rows:document.querySelectorAll('#ranking .model-preview__item').length,scored:document.querySelectorAll('#ranking .model-preview__item:not([data-architecture-pending-setting])').length,setting:document.querySelector('[data-architecture-pending-setting]').dataset.reportSettingId,summary:document.querySelector('[data-architecture-pending-setting] > .model-run > summary').textContent,marks:document.querySelector('[data-architecture-pending-setting]').querySelectorAll('.model-preview__mark').length,header:document.querySelector('#ranking .preview-disclosure__summary').textContent}));
+      assert.equal(summary.rows,53);assert.equal(summary.scored,52);assert.equal(summary.setting,pending.settingId);assert.ok(summary.summary.includes('Awaiting Fable review'));assert.equal(summary.marks,0);assert.ok(summary.header.includes('52 scored settings · 1 awaiting review'));await measureOverflow(`Pending ${benchmark} row`);await capture(`sol-pending-${benchmark}-row`);
+      for(const condition of ['baseline','skill']){await click(`${selector} [data-condition="${condition}"] .model-run__prompt > summary`);await click(`${selector} [data-condition="${condition}"] .model-run__judging > summary`);}
+      const readings=await inspect(selector=>[...document.querySelector(selector).querySelectorAll('[data-condition]')].map(node=>({condition:node.dataset.condition,score:node.querySelector('.model-run__condition-score').textContent,output:node.querySelector('[data-output-text]').textContent,messages:[...node.querySelectorAll('[data-message-content]')].map(message=>message.textContent),reasons:[...node.querySelectorAll('[data-judge-rationale]')].map(judge=>judge.textContent),scores:[...node.querySelectorAll('[data-judge-score]')].map(judge=>Number(judge.textContent)),reviewStatus:node.querySelector('[data-architecture-review-status]').textContent,judgeStatus:node.querySelector('.model-run__judging-meta').textContent})),selector);
+      assert.equal(readings.length,2);
+      for(const reading of readings){const response=appendix.responses.find(row=>row.benchmarkId===benchmark&&row.condition===reading.condition);assert.equal(reading.score,'—');assert.equal(reading.output,response.outputText);assert.deepEqual(reading.messages,appendix.messageSets.find(messages=>messages.id===response.messageSetId).messages.map(message=>message.content));assert.deepEqual(reading.reasons,response.judgments.map(judge=>judge.rationale));assert.deepEqual(reading.scores,response.judgments.map(judge=>Number(judge.score.toFixed(1))));assert.ok(reading.reviewStatus.includes('Awaiting Fable review'));assert.equal(reading.judgeStatus,'1/2 judges · Fable pending');}
+      await inspect(selector=>document.querySelector(`${selector} [data-output-text]`).scrollIntoView({block:'start',behavior:'instant'}),selector);await measureOverflow(`Pending ${benchmark} exact answer`);await capture(`sol-pending-${benchmark}-answer`);
+      const copy=`${selector} [data-condition="baseline"] .model-run__section [data-copy-id]`;await click(copy);await waitFor(()=>inspect(selector=>document.querySelector(selector).textContent==='Copied',copy),'Saved pending answer copied');assert.equal(await evaluate('navigator.clipboard.readText()'),appendix.responses.find(row=>row.benchmarkId===benchmark&&row.condition==='baseline').outputText);
+      await inspect(selector=>document.querySelector(`${selector} .model-run__judging`).scrollIntoView({block:'start',behavior:'instant'}),selector);await capture(`sol-pending-${benchmark}-astra-review`);
+      reports.push({benchmarkId:benchmark,answers:2,judgments:2,finalScores:null,exactSourceMatches:true,exactPromptsMatch:true,copyMatches:true,deepLinkOpened:true});
+    }
+    aggregateIntegration.pendingArchitectureReports=reports;aggregateIntegration.pendingArchitectureResponsesSha256=sha256(JSON.stringify(appendix));
+  }
   if(authoring && options['missed-bug-scenarios'] === 'true') await checkMissedBugScenarios(data);
   check('no-root-overflow', overflow.every(item => item.scrollWidth <= item.viewport + 1), overflow);
   await drain();
@@ -661,7 +858,7 @@ try {
   }
   for (const path of ['data.js', 'app.js', 'benchmark-report.js', 'benchmark-report.css', 'style.css', ...([1,3,4].includes(publicationSchemaVersion) ? ['responses.js'] : [])]) if (!pins.has(path)) failures.push({ message: `Required loaded source pin missing: ${path}` });
   const status = failures.length || runtimeErrors.length || networkErrors.length ? 'failed' : 'passed';
-  const receipt = { kind: 'vasirbenchmark-backend-testing-browser-proof', schemaVersion: 1, benchmarkId, status, url: requestedUrl.href, loadedUrl: baseUrl.href, ...(previewState ? { notAcceptanceEvidence: true, previewState } : {}), width, height, harnessSha256, publicationSchemaVersion, publicationSha256, overallSha256, ...(pairedRepairSha256 ? { pairedRepairSha256 } : {}), ...(tasteSha256 ? { tasteSha256 } : {}), ...(currentRoundSha256 ? { currentRoundSha256 } : {}), ...(backendTestingOverallSha256 ? {backendTestingOverallSha256} : {}), ...(backendTestingFilesSha256 ? {backendTestingFilesSha256} : {}), ...(testAuthoringOverallSha256 ? {testAuthoringOverallSha256,testAuthoringFilesSha256,testAuthoringRoundSha256:currentRoundSha256,incumbentBackendSha256} : {}), sourcePins: [...pins.values()].sort((a, b) => a.path.localeCompare(b.path)), loadedFiles, checks, screenshots, failures, runtimeErrors, networkErrors, completedAt: new Date().toISOString() };
+  const receipt = { kind: 'vasirbenchmark-backend-testing-browser-proof', schemaVersion: 1, benchmarkId, status, url: requestedUrl.href, loadedUrl: baseUrl.href, ...(previewState ? { notAcceptanceEvidence: true, previewState } : {}), width, height, harnessSha256, publicationSchemaVersion, publicationSha256, overallSha256, ...(aggregateIntegration ? { aggregateIntegration, engineeringSha256: aggregateIntegration.engineeringSha256 } : {}), ...(pairedRepairSha256 ? { pairedRepairSha256 } : {}), ...(tasteSha256 ? { tasteSha256 } : {}), ...(currentRoundSha256 ? { currentRoundSha256 } : {}), ...(backendTestingOverallSha256 ? {backendTestingOverallSha256} : {}), ...(backendTestingFilesSha256 ? {backendTestingFilesSha256} : {}), ...(testAuthoringOverallSha256 ? {testAuthoringOverallSha256,testAuthoringFilesSha256,testAuthoringRoundSha256:currentRoundSha256,incumbentBackendSha256} : {}), sourcePins: [...pins.values()].sort((a, b) => a.path.localeCompare(b.path)), loadedFiles, checks, screenshots, failures, runtimeErrors, networkErrors, completedAt: new Date().toISOString() };
   const path = resolve(output, 'backend-testing-browsercheck.json');
   await writeFile(path, `${JSON.stringify(receipt, null, 2)}\n`);
   await browser.close();

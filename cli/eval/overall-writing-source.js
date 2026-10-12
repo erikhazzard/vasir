@@ -32,7 +32,7 @@ export function buildOverallWritingSource(collection, engineering, applicationSo
     || display.scoreBasis.sources.some(source => source.weight !== 1 / collection.writingScoreBasis.benchmarkIds.length))) {
     throw new Error('Overall Writing changed the fixed established benchmark basis or equal weights.');
   }
-  const canonical = new Map([...(engineering?.settings || []), ...(engineering?.aiWorkflows?.settings || [])].map(setting => [setting.configurationId, identity(setting)]));
+  const canonical = new Map([...(engineering?.coverage?.records ?? engineering?.settings ?? []), ...(engineering?.aiWorkflows?.settings || [])].map(setting => [setting.configurationId, identity(setting)]));
   const selectedIds = display.writingCategory.activeBenchmarkIds;
   const selectedPublications = display.writingCategory.publications.filter(publication => selectedIds.includes(publication.benchmarks[0].id));
   const selectedConfigurations = new Set(selectedPublications.flatMap(publication => publication.settings.map(setting => setting.configurationId)));

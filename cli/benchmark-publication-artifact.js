@@ -846,7 +846,7 @@ export function buildBenchmarkPublicationArtifact({
     const writingResponses = hydrateWritingResponseArchives(primaryWritingResponses, writingCreationResponses, additionalWritingResponses);
     if (data.writing) {
       validateWritingPublication(writing, writingResponses);
-      if (data.overall?.scoreBasis?.edition === 'overall-v3') {
+      if (['overall-v3', 'overall-v4', 'overall-v5'].includes(data.overall?.scoreBasis?.edition)) {
         const expectedOverallSource = buildOverallWritingSource(writing, data, filesByPath.get('app.js').body.toString('utf8'));
         if (JSON.stringify(data.writing.overallSource) !== JSON.stringify(expectedOverallSource)) throw artifactError({
           message: "Overall Writing inputs differ from the complete published Writing sources.",

@@ -58,7 +58,7 @@ Legacy adoption follows root §4:
 10. **No invented machinery.** Discovery is read-only. Commands, routes, fixtures, thresholds, paths, and environments come from repo truth or are labeled missing/assumed. A missing harness is a boundary, not an invitation to improvise.
 11. **Proof medium follows the failure.** Browser, packet, persistence, benchmark, replay, or human media exists only when the material failure requires that fidelity. User visibility alone selects none.
 12. **No automatic hostile or nearby gate.** Move a hostile/adjacent axis only when a plausible material failure warrants it.
-13. **Stop precisely.** Allowed stops: missing approval/environment/credential; Waiting Human; repeated similar harness defect; changed unlock/contract/authority/rollback/product boundary; or a material claim that cannot be credibly observed. New files inside an approved boundary are not stops.
+13. **Stop precisely.** Allowed stops: missing approval/environment/credential; Waiting Human; changed unlock/contract/authority/rollback/product boundary; or a material claim that cannot be credibly observed. Harness recovery follows root §5. New files inside an approved boundary are not stops.
 
 ## Gate states and transitions
 

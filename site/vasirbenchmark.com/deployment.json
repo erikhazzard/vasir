@@ -115,7 +115,7 @@
     "maxWritingDataFileBytes": 8388608,
     "maxDungeonMasterResponseFileBytes": 33554432,
     "maxArtifactBytes": 67108864,
-    "maxCompressedLandingBytes": 320000,
+    "maxCompressedLandingBytes": 344000,
     "maxPhysicalStorageBytes": 1090519040,
     "releaseRetentionDays": 30,
     "controlNoncurrentRetentionDays": 7,

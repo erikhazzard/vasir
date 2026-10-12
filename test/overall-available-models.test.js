@@ -61,17 +61,19 @@ test('category weights use all registered tests, never a mean of the available s
   assert.equal(after[1].expected, 3);
 });
 
-test('Overall keeps incomplete settings in a closed coverage summary without invented aggregate scores', () => {
+test('Overall coverage exposes missing tests and original category identity without duplicating ranked rows', () => {
   assert.match(app, /id="overall-model-provider"/);
   assert.match(app, /provider === 'claude' \? 'Claude'/);
   const start = app.indexOf('  const overallCoverageMarkup = ');
   const source = app.slice(start, app.indexOf('\n  const ', start + 1));
   const data = fixture();
   data.categories.forEach(category => { category.name = category.id; });
-  data.coverage = { records: [{ ...setting, id: 'opus-max', provider: 'claude', family: 'Opus', reasoning: 'max', eligible: false },
-    { id: 'complete', provider: 'codex', family: 'Complete', eligible: true }] };
+  data.coverage = { records: [{ ...setting, id: 'opus-max', provider: 'claude', family: 'Opus', reasoning: 'max', complete: false, completedTaskCount: 3, expectedTaskCount: 4 },
+    { id: 'complete', provider: 'codex', family: 'Complete', complete: true }] };
   const before = JSON.stringify(data);
-  const render = vm.runInNewContext(source + '\noverallCoverageMarkup', { data, state: { overallProvider: 'all' },
+  const coverageStart = app.indexOf('  const aggregateCoverageMarkup = ');
+  const coverageSource = app.slice(coverageStart, app.indexOf('\n  const ', coverageStart + 1));
+  const render = vm.runInNewContext(coverageSource + '\n' + source + '\noverallCoverageMarkup', { data, state: { overallProvider: 'all' }, isEngineeringAggregate: false,
     escapeHtml: String, formatScore: value => value.toFixed(1), buildOverallAvailableCategories: context.buildOverallAvailableCategories,
     overallCategoryHref: (category, configuration) => `${category}?setting=${configuration}` });
   const html = render();
@@ -82,7 +84,9 @@ test('Overall keeps incomplete settings in a closed coverage summary without inv
   assert.match(html, /data-incomplete-setting-id="opus-max"/);
   assert.match(html, /data-category-complete="false" data-category-exact-baseline="null" data-category-exact-skill="null" data-available-tests="1\/2"/);
   assert.match(html, /data-category-exact-skill="95\.04"/);
-  assert.match(html, /Plain 60\.0 → Skill 80\.0/);
+  assert.match(html, /Minimal 60\.0 → Skill 80\.0/);
+  assert.match(html, /3\/4 tests · partial/);
+  assert.match(html, /included in the leaderboard using their completed benchmark pairs/);
   assert.match(html, /writing\?setting=claude:claude-opus-5@max/);
   assert.doesNotMatch(html, /data-incomplete-setting-id="complete"|data-full-score|data-full-rank|data-delta|setting-row|capability-composition|hatched/);
   assert.equal(JSON.stringify(data), before);

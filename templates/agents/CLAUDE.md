@@ -174,6 +174,8 @@
 
   **Close-out stays compact.** Report the outcome, the exact fresh check or inspection and its result, anything material not run, and the remaining delta or next decision. Do not dump clean transcripts or manufacture artifact paths.
 
+  **Failure recovery.** Repeated failures require a changed diagnosis or repair, never an automatic handoff. Do not repeat unchanged attempts without evidence of a transient failure. Continue authorized recovery; halt only at a concrete §3 boundary. When CI is required, inspect its terminal result for the current change before closing.
+
   **Done means the declared value works.** The intended outcome is present, the cheapest credible current check supports it, required human acceptance is recorded, and no known delta remains inside the declared boundary. Tests, eval plans, audits, and raw bundles are required only when their specific risk earned them.
 </proof_doctrine>
 
@@ -246,8 +248,6 @@
   Proof:
     - All work follows the same evidence-honesty standard; proof depth and storage scale with risk (§5). Quick changes do not create `tmp/` artifacts by default.
 
-  Circuit Breaker:
-    - Do not argue with reviewer/tester agents. One repair attempt from the trace; if the same or similar failure repeats, hard stop and escalate to the user with the blocked gate named in the close-out.
 </multi_agent_routing>
 
 ---

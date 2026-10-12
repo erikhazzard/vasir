@@ -63,7 +63,7 @@ data_payload: "World seed, runId, observer account, 100 bot identities, movement
 fresh_artifact: "tmp/<datetime>__mmorpg-netcode-100-concurrent-observer/{summary.json,server.log,bots.ndjson,playwright-trace.zip,observer-video.webm,observer-screenshot.png,ws-frames.ndjson}"
 harness_status: "missing"
 ci_policy: "Non-default local eval"
-stop_condition: "Invoke $eval__implement-proof-gate before product code. After harness exists, repair once, rerun this gate, then circuit-break on repeated similar failure."
+stop_condition: "Invoke $eval__implement-proof-gate before product code. Harness failures follow root §5; halt only at a concrete root §3 boundary."
 required_before_product_code: "yes — this milestone’s definition of done is the 100-concurrent live netcode value path."
 source_refs:
   - "User requirement: 100 concurrent netcode proof with bots, reconnect churn, Playwright observer, and websocket/devtools evidence."
@@ -230,7 +230,7 @@ data_payload: "user request transcript, attendee availability fixtures, approval
 fresh_artifact: "tmp/<datetime>__agent-calendar-approval-boundary/{summary.json,transcript.md,tool-trace.json,audit-log.ndjson,calendar-state.json}"
 harness_status: "missing"
 ci_policy: "Default CI now"
-stop_condition: "Invoke $eval__implement-proof-gate before product code if the harness does not exist; repair once and rerun on failure, then circuit-break on repeated similar failure."
+stop_condition: "Invoke $eval__implement-proof-gate before product code if the harness does not exist. Harness failures follow root §5; halt only at a concrete root §3 boundary."
 required_before_product_code: "yes — the milestone is a safety-critical agent/tool workflow."
 source_refs:
   - "WIP C-### tool authority/approval/audit contracts when available"

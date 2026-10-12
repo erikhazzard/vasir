@@ -37,7 +37,6 @@ If these are clear, build. Do not manufacture another gate.
 - **Failure containment is implementation truth.** Apply root §9 at material failure boundaries. An internal spec, test, or fixture that merely memorializes a broader outage is not external-contract evidence; correct that record and the implementation together. An actual supported wire or consumer contract remains protected by root contract-preservation law and requires an explicit compatibility decision before it changes. Report the exact failed subject, preserve selected verified state and independent behavior, and keep the rung open unless its promised terminal outcome occurred; empty data, hidden controls, swallowed errors, skipped work, and successful no-ops are non-green outcomes, not delivery.
 - **Specialists are conditional.** Route `$code__enforcing-principles`, `$testing__enforcing-mandate`, `$eval__design-proof-gates`, or an audit skill under root §7 only when its owned judgment is needed. Loading a skill is not progress.
 - **Subjective truth stays human.** Stop for the user's verdict only when the active slice has an explicit feel/taste/readability/fun gate and the reviewable experience is ready.
-- **Failures stay bounded.** Fix a discovered in-boundary defect and continue. Stop after a repeated similar tool/harness failure or a real boundary above, not because the turn or rung is large.
 
 ## Implementation loop
 

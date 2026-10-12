@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { gzipSync } from 'node:zlib';
 import { PAIRED_NATIVE_CONFIGURATION_IDS, PAIRED_TWISTS_EDITION, PAIRED_WRITING_SCORE_BASIS, deriveExpectedPairedTwistsEvidence, deriveExpectedOverallV3, verifyOverallV3Projection, deriveExpectedWritingCategory, deriveExpectedProvisionalEvidence, verifyWritingProofEvidence } from '../docs/work/vasir-benchmarking/writing-category/acceptance-evidence.mjs';
 import { WRITING_COMPACT_BENCHMARKS, WRITING_ESTABLISHED_SCORE_BASIS, projectWritingCompactRun } from '../cli/eval/writing-compact-publication.js';
 import { WRITING_RESPONSE_ARCHIVES, WRITING_CREATION_ARCHIVE, hydrateWritingResponseArchives } from '../cli/eval/writing-response-archives.js';
@@ -1851,15 +1852,50 @@ function assertSuiteQualityBrowserProof(proof, expected) {
     assert.equal(proof.benchmarkId, 'test-authoring');
     for (const key of ['testAuthoringRoundSha256', 'testAuthoringOverallSha256', 'testAuthoringFilesSha256', 'incumbentBackendSha256']) assert.equal(proof[key], expected[key], `${key} must match the selected source and unchanged incumbent.`);
   }
+  if (expected.integrated) {
+    assert.equal(proof.engineeringSha256, expected.engineeringSha256, 'Combined Engineering proof must bind the exact new aggregate.');
+    const integration = proof.aggregateIntegration;
+    assert.equal(integration?.engineeringSha256, expected.engineeringSha256);
+    assert.equal(integration?.sourceTaskScoresVerified, true);
+    if (expected.available) {
+      assert.equal(integration?.availableCoverage, true);
+      for (const field of ['pairedCoverageVerified', 'equalAvailableTaskMeanVerified', 'categoryRenormalizationVerified']) assert.equal(integration[field], true);
+      assert.equal(integration.mainRows.length, 53); assert.equal(integration.overallMainRows.length, 56);
+      assert.ok(integration.mainRows.every(row => row.visible && row.count > 0 && row.expected === 5));
+      assert.ok(integration.overallMainRows.every(row => row.visible && row.count > 0 && row.expected === 9));
+      assert.equal(integration.calculation.configurationId, 'codex:gpt-6.1-sol@xhigh');
+      assert.equal(integration.calculation.rows.filter(row => row.weight > 0).length, 2);
+      if (expected.pendingArchitecture) {
+        assert.equal(integration.pendingArchitecture.descriptorSha256, expected.pendingDescriptorSha256);
+        assert.equal(integration.pendingArchitectureResponsesSha256, expected.pendingResponsesSha256);
+        assert.deepEqual(integration.pendingArchitectureReports.map(report => report.benchmarkId), ['hyper-scale-chat', 'personalized-home-feed', 'device-telemetry']);
+        assert.ok(integration.pendingArchitectureReports.every(report => report.answers === 2 && report.judgments === 2 && report.finalScores === null && report.exactSourceMatches && report.exactPromptsMatch && report.copyMatches && report.deepLinkOpened));
+        assert.ok(integration.calculation.rows.filter(row => row.weight === 0).every(row => row.pendingReview && row.text.includes('Awaiting review')));
+      }
+    } else {
+      assert.equal(integration?.fullPairEligibilityVerified, true);
+      assert.equal(integration?.equalTaskMeanVerified, true);
+    }
+    assert.equal(integration?.calculation.rows.length, 5, 'The displayed breakdown must contain all five task scores.');
+    assert.equal(integration?.coverage.count, 50);
+    const solCoverage = expected.available ? '2/5 tests' : '2/5 tests · unranked';
+    assert.ok(integration?.coverage.label.includes(solCoverage));
+    assert.ok(integration?.overallPartialLink.label.includes(solCoverage), 'Overall category links must retain the requested setting.');
+    for (const id of ['test-authoring', 'backend-testing']) assert.ok(integration?.reportInclusion[id].footer.includes('Included in Engineering and Overall'));
+  }
   for (const field of ['failures', 'runtimeErrors', 'networkErrors']) assert.deepEqual(proof[field], []);
   const expectedChecks = expected.testAuthoring || [3, 4].includes(expected.schemaVersion) ? [...currentTestingAcceptanceChecks, ...(expected.testAuthoring || expected.taste || expected.schemaVersion === 4 ? ['taste-comparison', 'taste-evidence'] : [])] : [...suiteQualityAcceptanceChecks, ...(expected.repairCheck ? ['repair-outcomes-and-limits', 'repair-review-and-budget-evidence'] : []), ...(expected.pairedRepair ? ['paired-repair-comparison', 'paired-repair-evidence'] : [])];
-  assert.deepEqual(proof.checks.map(check => check.id).sort(), expectedChecks.sort());
+  const requiredChecks = expected.integrated ? expectedChecks.map(id => ({ 'engineering-52-settings': 'engineering-all-benchmarks', 'overall-excludes-backend-testing': 'overall-includes-testing' }[id] || id)) : expectedChecks;
+  assert.deepEqual(proof.checks.map(check => check.id).sort(), requiredChecks.sort());
   for (const check of proof.checks) { assert.equal(check.passed, true, check.id); assert.ok(check.evidence != null && JSON.stringify(check.evidence) !== '{}', `${check.id} needs observed evidence`); }
 }
 
 async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   const authoring = manifest.acceptance.scope.benchmarkId === 'test-authoring';
-  assert.ok(authoring ? manifest.acceptance.scope.schemaVersion === 5 : [2, 3, 4].includes(manifest.acceptance.scope.schemaVersion));
+  const integrated = authoring && [6, 7, 9].includes(manifest.acceptance.scope.schemaVersion);
+  const available = integrated && [7, 9].includes(manifest.acceptance.scope.schemaVersion);
+  const pendingArchitecture = integrated && manifest.acceptance.scope.schemaVersion === 9;
+  assert.ok(authoring ? [5, 6, 7, 9].includes(manifest.acceptance.scope.schemaVersion) : [2, 3, 4].includes(manifest.acceptance.scope.schemaVersion));
   assert.deepEqual(manifest.acceptance.scope, { kind: 'executable-testing-benchmark', schemaVersion: manifest.acceptance.scope.schemaVersion, benchmarkId: authoring ? 'test-authoring' : 'backend-testing', viewports: focusedViewports });
   const verification = manifest.acceptance.verification, previous = JSON.parse(await assertLockedFile(verification.previousAcceptance));
   assert.equal(previous.kind, 'vasirbenchmark-site-template-lock'); assert.equal(previous.status, 'accepted');
@@ -1868,7 +1904,7 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   assert.deepEqual(manifest.retainedCaptureEvidence.receipt, verification.previousAcceptance);
   assert.deepEqual(manifest.files.map(file => file.path).sort(), previous.files.map(file => file.path).sort(), 'Suite-quality publication adds no new assets.');
   const changed = manifest.files.filter(file => file.sha256 !== previous.files.find(prior => prior.path === file.path)?.sha256);
-  assert.ok(changed.every(file => ['app.js', 'benchmark-report.js', 'benchmark-report.css', 'backend-testing-browsercheck.mjs'].includes(file.path)), 'Unrelated presentation or deployment drift.');
+  assert.ok(changed.every(file => ['app.js', 'benchmark-report.js', 'benchmark-report.css', 'backend-testing-browsercheck.mjs'].includes(file.path) || (authoring && file.path === 'style.css') || (available && file.path === 'deployment.json')), 'Unrelated presentation or deployment drift.');
   assert.deepEqual(verification.previousFiles.map(record => record.sourcePath).sort(), changed.map(file => file.path).sort());
   for (const record of verification.previousFiles) {
     const bytes = await assertLockedFile(record), prior = previous.files.find(file => file.path === record.sourcePath);
@@ -1892,10 +1928,101 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   const compactPlan = authoring || selected.schemaVersion === 4 ? JSON.parse(await assertLockedFile(verification.sourcePins.find(record => record.path === selected.plan.path && record.sha256 === selected.plan.sha256), repoRoot)) : undefined;
   const selectedSources = authoring ? await (async () => {
     const { testAuthoring, schemaVersion, ...incumbent } = data;
-    assert.equal(schemaVersion, 8);
-    assert.deepEqual({ ...incumbent, schemaVersion: 7 }, before, 'Adding new test authoring must preserve every incumbent score.');
+    assert.equal(schemaVersion, integrated ? 9 : 8);
+    if (integrated) {
+      const baseline = verification.aggregateBaseline;
+      assert.ok(baseline, 'Combined Engineering requires its pinned previous task data.');
+      const taskData = readModule(await assertLockedFile(baseline.data), 'VASIR_DATA');
+      const taskResponses = readModule(await assertLockedFile(baseline.responses), 'VASIR_RESPONSES');
+      const omitAggregates = ({ engineering, overall, schemaVersion: aggregateSchema, ...tasks }) => tasks;
+      if (pendingArchitecture) {
+        const { architecturePending: descriptor, ...officialData } = data;
+        const { architecturePending: appendix, ...officialResponses } = responses;
+        assert.deepEqual(officialData, taskData, 'Pending answers must leave every official score, rank, identity and aggregate exact.');
+        assert.deepEqual(officialResponses, taskResponses, 'Pending answers must leave every original answer and judgment exact.');
+        const { validateBenchmarkPublicationResponses } = await import('../cli/eval/benchmark-publication-projection.js');
+        validateBenchmarkPublicationResponses(responses, data);
+        const pendingEvidence = verification.architecturePending;
+        const previousArchitectureSelection = JSON.parse(await assertLockedFile(pendingEvidence.previousSelection));
+        const currentArchitectureSelection = JSON.parse(await assertLockedFile(pendingEvidence.selection, repoRoot));
+        const { pendingArchitectureRuns, ...scoredSelection } = currentArchitectureSelection;
+        assert.deepEqual(scoredSelection, previousArchitectureSelection);
+        assert.deepEqual(pendingEvidence.sourcePins.map(({ path, sha256 }) => ({ runPath: path, sha256 })), pendingArchitectureRuns.map(({ runPath, sha256 }) => ({ runPath, sha256 })));
+        for (const source of pendingEvidence.sourcePins) await assertLockedFile(source, repoRoot);
+        const { buildBenchmarkPublicationProjection } = await import('../cli/eval/benchmark-publication-projection.js');
+        const canonical = buildBenchmarkPublicationProjection({ repoRootDirectory: repoRoot });
+        assert.deepEqual(descriptor, canonical.projection.architecturePending);
+        assert.deepEqual(appendix, canonical.responseBundle.architecturePending, 'Saved pending answers and individual reviews must match exact immutable native checkpoints.');
+        assert.equal(pendingEvidence.descriptorSha256, sha256(JSON.stringify(descriptor)));
+        assert.equal(pendingEvidence.responsesSha256, sha256(JSON.stringify(appendix)));
+        const priorAccepted = JSON.parse(await assertLockedFile(baseline.acceptance));
+        const priorDeployment = priorAccepted.files.find(file => file.path === 'deployment.json');
+        assert.equal(sha256(await readFile(join(siteRoot, 'deployment.json'))), priorDeployment.sha256, 'Pending publication keeps all accepted deployment limits unchanged.');
+      } else {
+        assert.deepEqual(omitAggregates(data), omitAggregates(taskData), 'Only Engineering and Overall projections may change. Every task score remains exact.');
+        assert.deepEqual(responses, taskResponses, 'Every original authored source and review remains exact.');
+      }
+      assert.deepEqual(selected, JSON.parse(await assertLockedFile(baseline.selection, repoRoot)), 'Test-authoring selection remains unchanged.');
+      assert.deepEqual(previousSelection, JSON.parse(await assertLockedFile(baseline.backendSelection, repoRoot)), 'Backend-testing selection remains unchanged.');
+      const { validateEngineeringPublication } = await import('../cli/eval/engineering-publication.js');
+      const { validateOverallPublication } = await import('../cli/eval/overall-publication.js');
+      validateEngineeringPublication(data.engineering, { architecture: taskData, testAuthoring: taskData.testAuthoring, executableTesting: taskData.executableTesting });
+      validateOverallPublication(data.overall, { engineering: data.engineering, aiWorkflows: taskData.aiWorkflows, writing: taskData.writing.overallSource });
+      assert.equal(data.engineering?.scoreBasis.edition, available ? 'engineering-available-pairs-v2' : 'engineering-all-tasks-v1');
+      assert.equal(data.overall?.scoreBasis.edition, available ? 'overall-v5' : 'overall-v4');
+      assert.deepEqual(data.engineering.scoreBasis.benchmarkIds, ['hyper-scale-chat', 'personalized-home-feed', 'device-telemetry', 'test-authoring', 'backend-testing']);
+      assert.deepEqual(data.overall.categories.map(({ id, weight }) => ({ id, weight })), [{ id: 'engineering', weight: 0.5 }, { id: 'writing', weight: 0.25 }, { id: 'ai-workflows', weight: 0.25 }]);
+      for (const [aggregate, expected] of [[data.engineering, [available ? 53 : 3, 53, 50, 328, 5]], [data.overall, [available ? 56 : 2, 56, 54, 578, 9]]]) {
+        assert.deepEqual([aggregate.settings.length, aggregate.coverage.totalSettings, aggregate.coverage.incompleteSettings, aggregate.benchmarkResults.length, aggregate.scoreBasis.taskCount], expected);
+        for (const record of aggregate.coverage.records) {
+          if (available) {
+            const ids = aggregate.scoreBasis.benchmarkIds.filter(id => ['baseline', 'skill'].every(condition => aggregate.benchmarkResults.some(cell => cell.configurationId === record.configurationId && cell.condition === condition && cell.benchmarkId === id && Number.isFinite(cell.exactScore))));
+            assert.deepEqual(record.availableBenchmarkIds, ids); assert.equal(record.completedTaskCount, ids.length); assert.equal(record.expectedTaskCount, aggregate.scoreBasis.taskCount);
+            assert.equal(record.eligible, ids.length > 0); assert.equal(record.complete, ids.length === aggregate.scoreBasis.taskCount);
+          } else {
+            const complete = ['baseline', 'skill'].every(condition => record.conditions[condition].assessableTaskCount === aggregate.scoreBasis.taskCount);
+            assert.equal(record.eligible, complete, 'Both arms must contain every task before ranking.');
+            if (!complete) { assert.deepEqual(record.exactScores, { baseline: null, skill: null }); assert.deepEqual(record.ranks, { baseline: null, skill: null }); }
+          }
+        }
+      }
+      const taskScores = [...taskData.benchmarkResults.map(cell => ({ ...cell, exactScore: cell.score })), ...[[taskData.testAuthoring, 'current'], [taskData.executableTesting, 'repaired']].flatMap(([publication, skill]) => publication.overall.rows.map(row => ({ configurationId: row.configurationId, benchmarkId: publication.benchmark.id, condition: row.condition === 'none' ? 'baseline' : skill === row.condition ? 'skill' : null, exactScore: row.score })))];
+      const expectedCells = new Map(taskScores.map(cell => [`${cell.configurationId}|${cell.condition}|${cell.benchmarkId}`, cell.exactScore]));
+      for (const cell of data.engineering.benchmarkResults) assert.equal(cell.exactScore, expectedCells.get(`${cell.configurationId}|${cell.condition}|${cell.benchmarkId}`), 'Engineering retains each authoritative final task score.');
+      for (const entry of data.engineering.entries) {
+        const ids = available ? entry.availableBenchmarkIds : data.engineering.scoreBasis.benchmarkIds;
+        const values = ids.map(id => expectedCells.get(`${entry.configurationId}|${entry.condition}|${id}`));
+        assert.ok(values.length && values.every(Number.isFinite));
+        assert.ok(Math.abs(entry.exactScore - values.reduce((sum, score) => sum + score, 0) / values.length) < 1e-9, 'Engineering must equally average its declared paired tasks.');
+      }
+      if (available) {
+        const priorAcceptance = JSON.parse(await assertLockedFile(baseline.acceptance));
+        assert.equal(priorAcceptance.acceptance.scope.schemaVersion, pendingArchitecture ? 7 : 6);
+        assert.equal(priorAcceptance.acceptance.verification.generatedFiles.find(file => file.path === 'data.js').sha256, baseline.data.sha256);
+        for (const [aggregate, old] of [[data.engineering, taskData.engineering], [data.overall, taskData.overall]]) {
+          assert.equal(aggregate.coverage.rankedSettings, aggregate.settings.length); assert.equal(aggregate.coverage.unrankedSettings, 0);
+          for (const previousEntry of old.entries) assert.equal(aggregate.entries.find(entry => entry.configurationId === previousEntry.configurationId && entry.condition === previousEntry.condition)?.exactScore, previousEntry.exactScore, 'Every previously complete score remains exact.');
+        }
+        assert.ok(taskData.settings.every(setting => data.engineering.settings.some(current => current.configurationId === setting.configurationId)), 'Every original architecture model remains in Engineering.');
+      }
+      for (const entry of data.overall.entries) {
+        const parts = entry.categories;
+        const previousEntry = taskData.overall.entries.find(row => row.configurationId === entry.configurationId && row.condition === entry.condition);
+        const baseWeights = { engineering: 0.5, writing: 0.25, 'ai-workflows': 0.25 };
+        const presentWeight = parts.filter(part => Number.isFinite(part.exactScore)).reduce((sum, part) => sum + baseWeights[part.category], 0);
+        if (!available) assert.ok(previousEntry, 'A ranked Overall row must retain its original complete Writing and AI inputs.');
+        for (const part of parts) {
+          assert.equal(part.weight, available ? Number.isFinite(part.exactScore) ? baseWeights[part.category] / presentWeight : 0 : baseWeights[part.category]);
+          if (!available && part.category !== 'engineering') assert.deepEqual(part, previousEntry.categories.find(old => old.category === part.category), 'Writing and AI category scores and contributions remain unchanged.');
+          if (available && !Number.isFinite(part.exactScore)) { assert.equal(part.exactScore, null); assert.equal(part.exactContribution, null); }
+        }
+        assert.ok(Math.abs(entry.exactScore - parts.reduce((sum, part) => sum + (Number.isFinite(part.exactScore) ? part.exactScore * part.weight : 0), 0)) < 1e-9, 'Overall must apply the unchanged category weights.');
+        const engineering = data.engineering.entries.find(row => row.configurationId === entry.configurationId && row.condition === entry.condition);
+        assert.equal(parts.find(part => part.category === 'engineering').exactScore, engineering?.exactScore ?? null);
+      }
+    } else assert.deepEqual({ ...incumbent, schemaVersion: 7 }, before, 'Adding new test authoring must preserve every incumbent score.');
     const { testAuthoringRound, testAuthoringFiles, ...incumbentResponses } = responses;
-    assert.deepEqual(incumbentResponses, beforeResponses, 'Every incumbent answer, review and raw test file must remain exact.');
+    assert.deepEqual(pendingArchitecture ? Object.fromEntries(Object.entries(incumbentResponses).filter(([key]) => key !== 'architecturePending')) : incumbentResponses, beforeResponses, 'Every incumbent answer, review and raw test file must remain exact.');
     assert.equal(selected.kind, 'vasirbenchmark-test-authoring-selection'); assert.ok([1, 2].includes(selected.schemaVersion));
     assert.deepEqual(JSON.parse(await readFile(join(repoRoot, 'benchmarks/backend-testing/publication.json'), 'utf8')), previousSelection, 'Incumbent selection must remain unchanged.');
     const { testAuthoringSourcePins, validateTestAuthoringRound, validateTestAuthoringPublication, validateTestAuthoringFiles } = await import('../cli/eval/test-authoring-publication.js');
@@ -1928,6 +2055,30 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   }
   const candidate = JSON.parse(await assertLockedFile(verification.candidate));
   assert.equal(candidate.kind, 'vasirbenchmark-release-manifest'); assert.equal(candidate.schemaVersion, 1); assert.match(candidate.releaseId, /^[a-f0-9]{64}$/);
+  if (available) {
+    const budget = verification.landingBudget;
+    const beforeDeployment = JSON.parse(await assertLockedFile(budget.before));
+    assert.deepEqual(JSON.parse(await assertLockedFile(budget.after)), deployment);
+    const normalized = structuredClone(deployment);
+    normalized.limits.maxCompressedLandingBytes = beforeDeployment.limits.maxCompressedLandingBytes;
+    assert.deepEqual(normalized, beforeDeployment, 'Only the measured compressed landing allowance may change.');
+    assert.equal(budget.previousLimit, 320000); assert.equal(beforeDeployment.limits.maxCompressedLandingBytes, budget.previousLimit);
+    assert.equal(budget.currentLimit, 344000); assert.equal(deployment.limits.maxCompressedLandingBytes, budget.currentLimit);
+    let measuredLandingBytes = 0;
+    for (const path of ['index.html', 'style.css', 'assets/d3.v7.min.js', 'app.js', 'data.js', 'assets/kanit-latin-900-normal.woff2']) {
+      let bytes = await readFile(join(siteRoot, path));
+      if (path === 'index.html') {
+        let text = bytes.toString('utf8');
+        for (const file of deployment.publicFiles) if (file.cacheClass === 'immutable') text = text.replaceAll(`./${file.path}`, `/releases/${candidate.releaseId}/${file.path}`);
+        bytes = Buffer.from(text, 'utf8');
+      }
+      measuredLandingBytes += gzipSync(bytes, { level: 9 }).length;
+    }
+    assert.equal(budget.measuredCompressedLandingBytes, measuredLandingBytes);
+    assert.ok(budget.measuredCompressedLandingBytes > budget.previousLimit && budget.measuredCompressedLandingBytes <= budget.currentLimit);
+    assert.ok(budget.currentLimit - budget.measuredCompressedLandingBytes <= 9000, 'Budget headroom stays below 9 KB.');
+    assert.ok(budget.reason.includes('53 Engineering') && budget.reason.includes('56 Overall'));
+  }
   assert.deepEqual(candidate.files.map(file => file.path).sort(), deployment.publicFiles.map(file => file.path).sort());
   // The pilot regenerated data.js; its prior acceptance still owns the unchanged Writing modules.
   const inherited = JSON.parse(await assertLockedFile(previous.acceptance.verification.previousAcceptance));
@@ -1951,7 +2102,7 @@ async function assertSuiteQualityTestingEvidence(manifest, deployment) {
   const capturePaths = [];
   for (const record of verification.browserProofs) {
     const proof = JSON.parse(await assertLockedFile(record));
-    assertSuiteQualityBrowserProof(proof, authoring ? { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.testAuthoring)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: data.testAuthoring.schemaVersion, testAuthoring: true, testAuthoringRoundSha256: sha256(JSON.stringify(responses.testAuthoringRound)), testAuthoringOverallSha256: sha256(JSON.stringify(data.testAuthoring.overall)), testAuthoringFilesSha256: sha256(JSON.stringify(responses.testAuthoringFiles)), incumbentBackendSha256: sha256(JSON.stringify(before.executableTesting)) } : { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.executableTesting)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: selected.schemaVersion, repairCheck: Boolean(selected.repairCheck), pairedRepair: Boolean(selected.pairedRepair), pairedRepairSha256: responses.backendTestingPairedRepair ? sha256(JSON.stringify(responses.backendTestingPairedRepair)) : undefined, currentRoundSha256: responses.backendTestingCurrentRound ? sha256(JSON.stringify(responses.backendTestingCurrentRound)) : undefined, taste: Boolean(selected.taste), tasteSha256: responses.backendTestingTaste ? sha256(JSON.stringify(responses.backendTestingTaste)) : undefined, backendTestingOverallSha256: data.executableTesting.overall ? sha256(JSON.stringify(data.executableTesting.overall)) : undefined, backendTestingFilesSha256: responses.backendTestingFiles ? sha256(JSON.stringify(responses.backendTestingFiles)) : undefined });
+    assertSuiteQualityBrowserProof(proof, authoring ? { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.testAuthoring)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: data.testAuthoring.schemaVersion, testAuthoring: true, ...(integrated ? { integrated, available, pendingArchitecture, ...(pendingArchitecture ? { pendingDescriptorSha256: sha256(JSON.stringify(data.architecturePending)), pendingResponsesSha256: sha256(JSON.stringify(responses.architecturePending)) } : {}), engineeringSha256: sha256(JSON.stringify(data.engineering)) } : {}), testAuthoringRoundSha256: sha256(JSON.stringify(responses.testAuthoringRound)), testAuthoringOverallSha256: sha256(JSON.stringify(data.testAuthoring.overall)), testAuthoringFilesSha256: sha256(JSON.stringify(responses.testAuthoringFiles)), incumbentBackendSha256: sha256(JSON.stringify(before.executableTesting)) } : { width: record.width, height: record.height, harnessSha256: harnessPin.sha256, publicationSha256: sha256(JSON.stringify(data.executableTesting)), overallSha256: sha256(JSON.stringify(data.overall)), schemaVersion: selected.schemaVersion, repairCheck: Boolean(selected.repairCheck), pairedRepair: Boolean(selected.pairedRepair), pairedRepairSha256: responses.backendTestingPairedRepair ? sha256(JSON.stringify(responses.backendTestingPairedRepair)) : undefined, currentRoundSha256: responses.backendTestingCurrentRound ? sha256(JSON.stringify(responses.backendTestingCurrentRound)) : undefined, taste: Boolean(selected.taste), tasteSha256: responses.backendTestingTaste ? sha256(JSON.stringify(responses.backendTestingTaste)) : undefined, backendTestingOverallSha256: data.executableTesting.overall ? sha256(JSON.stringify(data.executableTesting.overall)) : undefined, backendTestingFilesSha256: responses.backendTestingFiles ? sha256(JSON.stringify(responses.backendTestingFiles)) : undefined });
     assert.equal(new Set(proof.sourcePins.map(file => file.path)).size, proof.sourcePins.length);
     for (const name of ['data.js', 'responses.js', 'app.js', 'benchmark-report.js', 'benchmark-report.css', 'style.css']) assert.ok(proof.sourcePins.some(file => file.path === name), `Missing loaded dependency: ${name}`);
     for (const loaded of proof.sourcePins) { const accepted = acceptedFiles.find(file => file.path === loaded.path); assert.ok(accepted, loaded.path); assert.equal(loaded.sha256, accepted.sha256); assert.equal(loaded.bytes, accepted.bytes); }
@@ -2066,8 +2217,23 @@ test('test-authoring browser acceptance binds new findings and the unchanged inc
   }
 });
 
+test('combined Engineering acceptance requires current aggregate hashes and complete-coverage browser proof', () => {
+  const expected = { width: 390, height: 844, harnessSha256: sha256('harness'), publicationSha256: sha256('authoring'), overallSha256: sha256('overall-v4'), engineeringSha256: sha256('five-task Engineering'), schemaVersion: 1, testAuthoring: true, integrated: true, testAuthoringRoundSha256: sha256('native findings'), testAuthoringOverallSha256: sha256('task score'), testAuthoringFilesSha256: sha256('exact JS'), incumbentBackendSha256: sha256('incumbent') };
+  const checks = [...currentTestingAcceptanceChecks, 'taste-comparison', 'taste-evidence'].map(id => ({ 'engineering-52-settings': 'engineering-all-benchmarks', 'overall-excludes-backend-testing': 'overall-includes-testing' }[id] || id));
+  const fixture = () => ({ kind: 'vasirbenchmark-backend-testing-browser-proof', benchmarkId: 'test-authoring', status: 'passed', publicationSchemaVersion: 1, ...expected, aggregateIntegration: { engineeringSha256: expected.engineeringSha256, sourceTaskScoresVerified: true, fullPairEligibilityVerified: true, equalTaskMeanVerified: true, calculation: { rows: Array(5).fill({}) }, coverage: { count: 50, label: '2/5 tests · unranked' }, overallPartialLink: { label: '2/5 tests · unranked' }, reportInclusion: Object.fromEntries(['test-authoring', 'backend-testing'].map(id => [id, { footer: 'Included in Engineering and Overall' }])) }, failures: [], runtimeErrors: [], networkErrors: [], checks: checks.map(id => ({ id, passed: true, evidence: { observed: true } })) });
+  assert.doesNotThrow(() => assertSuiteQualityBrowserProof(fixture(), expected));
+  for (const mutate of [proof => { proof.engineeringSha256 = sha256('architecture only'); }, proof => { proof.aggregateIntegration.fullPairEligibilityVerified = false; }, proof => { proof.aggregateIntegration.coverage.label = 'Ranked'; }, proof => { proof.checks.find(check => check.id === 'overall-includes-testing').id = 'overall-excludes-backend-testing'; }]) {
+    const proof = fixture(); mutate(proof); assert.throws(() => assertSuiteQualityBrowserProof(proof, expected));
+  }
+  const availableExpected = { ...expected, available: true }, availableFixture = () => {
+    const proof = fixture(); Object.assign(proof.aggregateIntegration, { availableCoverage: true, pairedCoverageVerified: true, equalAvailableTaskMeanVerified: true, categoryRenormalizationVerified: true, mainRows: Array.from({ length: 53 }, () => ({ visible: true, count: 3, expected: 5 })), overallMainRows: Array.from({ length: 56 }, () => ({ visible: true, count: 4, expected: 9 })), calculation: { configurationId: 'codex:gpt-6.1-sol@xhigh', rows: [0.5, 0.5, 0, 0, 0].map(weight => ({ weight })) }, coverage: { count: 50, label: '2/5 tests · partial' }, overallPartialLink: { label: '2/5 tests · partial' } }); return proof;
+  };
+  assert.doesNotThrow(() => assertSuiteQualityBrowserProof(availableFixture(), availableExpected));
+  for (const mutate of [proof => proof.aggregateIntegration.mainRows.pop(), proof => { proof.aggregateIntegration.overallMainRows[0].visible = false; }, proof => { proof.aggregateIntegration.categoryRenormalizationVerified = false; }]) { const proof = availableFixture(); mutate(proof); assert.throws(() => assertSuiteQualityBrowserProof(proof, availableExpected)); }
+});
+
 async function assertExecutableTestingEvidence(manifest, deployment) {
-  if ([2, 3, 4, 5].includes(manifest.acceptance.scope.schemaVersion)) return assertSuiteQualityTestingEvidence(manifest, deployment);
+  if ([2, 3, 4, 5, 6, 7, 9].includes(manifest.acceptance.scope.schemaVersion)) return assertSuiteQualityTestingEvidence(manifest, deployment);
   assert.deepEqual(manifest.acceptance.scope, { kind: 'executable-testing-benchmark', schemaVersion: 1, benchmarkId: 'backend-testing', viewports: focusedViewports });
   const verification = manifest.acceptance.verification;
   const previous = JSON.parse(await assertLockedFile(verification.previousAcceptance));

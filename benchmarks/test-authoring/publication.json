@@ -296,5 +296,9 @@
         "sha256": "aeb5e3007a68a4250fe3c7fd150977f98bd1c3693bb31bc1050a32a533ca5d4a"
       }
     }
-  ]
+  ],
+  "detectionCorrection": {
+    "path": ".agents/vasir-evals/test-authoring/prepared-round/codex-only/detection-correction.json",
+    "sha256": "a79e7760d8bdd65df078496c46f44815e46d496ee07c7ff38c18549b6c15b2ca"
+  }
 }

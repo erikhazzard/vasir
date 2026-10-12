@@ -6,6 +6,7 @@ import { buildOverallWritingSource } from './overall-writing-source.js';
 export { buildOverallWritingSource } from './overall-writing-source.js';
 
 const CONDITIONS = ["baseline", "skill"];
+const ENGINEERING_EDITIONS = ['engineering-all-tasks-v1', 'engineering-available-pairs-v2'];
 const IDENTITY_FIELDS = ["id", "configurationId", "modelId", "provider", "family", "reasoning", "label"];
 const DECLARATION = Object.freeze({
   schemaVersion: 2,
@@ -71,12 +72,36 @@ function responseMetrics(cells, weights, allowMissing = false) {
 // display-rounded workflow scores, or candidate-supplied Overall values.
 function reconstructOverall({ engineering, aiWorkflows, writing }) {
   requireEvidence(engineering && aiWorkflows, 'both published family datasets are required.');
-  const writingSource = writing ? writing.kind === 'vasirbenchmark-overall-writing-source' ? writing : buildOverallWritingSource(writing, engineering) : null;
-  const declaration = writingSource ? { ...DECLARATION, schemaVersion: 3, edition: 'overall-v3',
+  const writingSource = writing ? writing.kind === 'vasirbenchmark-overall-writing-source' ? writing : buildOverallWritingSource(writing, { ...engineering, aiWorkflows }) : null;
+  const expandedEngineering = ENGINEERING_EDITIONS.includes(engineering.scoreBasis?.edition);
+  const availablePairs = engineering.scoreBasis?.edition === 'engineering-available-pairs-v2';
+  const declaration = writingSource ? { ...DECLARATION, schemaVersion: availablePairs ? 5 : expandedEngineering ? 4 : 3, edition: availablePairs ? 'overall-v5' : expandedEngineering ? 'overall-v4' : 'overall-v3',
     resourceAggregation: 'weighted-mean-over-the-same-task-cells-null-propagating-v3',
-    sourceScoreFields: { ...DECLARATION.sourceScoreFields, 'writing-all-writing-v1': 'exactScore', 'writing-established-storytelling-v1': 'exactScore',
-      ...(writingSource.scoreBasis.edition === 'writing-storytelling-paired-v2' ? { 'writing-storytelling-paired-v2': 'exactScore' } : {}) } } : DECLARATION;
+    sourceScoreFields: { ...DECLARATION.sourceScoreFields, ...(expandedEngineering ? { [engineering.scoreBasis.edition]: 'exactScore' } : {}), 'writing-all-writing-v1': 'exactScore', 'writing-established-storytelling-v1': 'exactScore',
+      ...(writingSource.scoreBasis.edition === 'writing-storytelling-paired-v2' ? { 'writing-storytelling-paired-v2': 'exactScore' } : {}) } }
+    : expandedEngineering ? { ...DECLARATION, schemaVersion: availablePairs ? 5 : 4, edition: availablePairs ? 'overall-v5' : 'overall-v4',
+      resourceAggregation: 'weighted-mean-over-the-same-task-cells-null-propagating-v3',
+      sourceScoreFields: { ...DECLARATION.sourceScoreFields, [engineering.scoreBasis.edition]: 'exactScore' } } : DECLARATION;
+  if (availablePairs) Object.assign(declaration, { eligibility: 'at-least-one-assessable-task-pair-v1', completeness: DECLARATION.eligibility,
+    settingWeighting: 'renormalize-over-available-paired-tasks-and-categories-v1', method: 'priority-weighted-available-paired-category-mean-v2' });
   const sources = [engineering, writingSource, aiWorkflows].filter(Boolean);
+  return reconstructPublication({ engineering, writingSource, sources, declaration, name: 'Overall', kind: 'vasirbenchmark-overall-projection', allowMissingMetrics: Boolean(writingSource) || expandedEngineering, availablePairs });
+}
+
+// Engineering and Overall share the same full-pair eligibility, exact-score
+// ranking, coverage ledger, and resource accounting.
+export function buildPublishedEngineeringAggregate(engineering) {
+  const availablePairs = engineering.scoreBasis.edition === 'engineering-available-pairs-v2';
+  const declaration = { ...DECLARATION, schemaVersion: availablePairs ? 2 : 1, edition: engineering.scoreBasis.edition,
+    method: availablePairs ? 'equal-available-paired-engineering-task-mean-v2' : 'equal-published-engineering-task-mean-v1', categories: [{ id: 'engineering', name: 'Engineering', short: 'ENG', targetWeight: 1 }],
+    resourceAggregation: 'weighted-mean-over-the-same-task-cells-null-propagating-v3',
+    sourceScoreFields: { [engineering.scoreBasis.edition]: 'exactScore' },
+    ...(availablePairs ? { eligibility: 'at-least-one-assessable-task-pair-v1', completeness: DECLARATION.eligibility,
+      settingWeighting: 'renormalize-over-available-paired-tasks-and-categories-v1' } : {}) };
+  return reconstructPublication({ engineering, writingSource: null, sources: [engineering], declaration, name: 'Engineering', kind: 'vasirbenchmark-engineering-projection', allowMissingMetrics: true, availablePairs });
+}
+
+function reconstructPublication({ engineering, writingSource, sources, declaration, name, kind, allowMissingMetrics, availablePairs = false }) {
   requireEvidence(sources.every(source => source && Array.isArray(source.settings) && Array.isArray(source.benchmarkResults)), "both published family datasets are required.");
   const taskById = new Map();
   const identities = new Map();
@@ -92,7 +117,7 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
     requireEvidence(source.families?.length === 1 && source.categories?.length === 1 && family.id === category.id && declaredCategory && !familyTasks.some(candidate => candidate.familyId === family.id) && scoreField && Array.isArray(source.benchmarks) && source.benchmarks.length > 0, "a source family or score edition is unsupported.");
     requireEvidence(equal(source.benchmarks.map(benchmark => benchmark.id), source.scoreBasis.benchmarkIds), "a source score basis omits or reorders its published tasks.");
     const sourceSettings = new Map();
-    for (const setting of source.settings) {
+    for (const setting of source.coverage?.records ?? source.settings) {
       const identity = Object.fromEntries(IDENTITY_FIELDS.map(key => [key, setting[key]]));
       requireEvidence(IDENTITY_FIELDS.every(key => typeof identity[key] === "string" && identity[key]) && !sourceSettings.has(setting.configurationId), "source setting identity is missing or duplicated.");
       const prior = identities.get(setting.configurationId);
@@ -103,12 +128,15 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
     const benchmarkIds = source.benchmarks.map(benchmark => benchmark.id);
     for (const benchmark of source.benchmarks) {
       requireEvidence(!taskById.has(benchmark.id) && benchmark.familyId === family.id, "a published benchmark is duplicated or assigned to the wrong family.");
-      taskById.set(benchmark.id, { familyId: family.id, scoreField, sourceScoreBasisId: source.scoreBasis.id });
+      taskById.set(benchmark.id, { familyId: family.id, scoreField,
+        sourceScoreBasisId: ENGINEERING_EDITIONS.includes(source.scoreBasis.edition)
+          ? source.scoreBasis.sources.find(item => item.benchmarkIds.includes(benchmark.id))?.id ?? source.scoreBasis.id : source.scoreBasis.id });
     }
     const withinWeights = family.id === 'writing' ? source.scoreBasis.benchmarkWeights : benchmarkIds.map(benchmarkId => ({ benchmarkId, weight: 1 / benchmarkIds.length }));
     requireEvidence(equal(withinWeights.map(item => item.benchmarkId), benchmarkIds) && withinWeights.every(item => Number.isFinite(item.weight) && item.weight > 0) && Math.abs(withinWeights.reduce((sum, item) => sum + item.weight, 0) - 1) < 1e-12, 'source within-category weights are invalid.');
     familyTasks.push({ familyId: family.id, category, benchmarkIds, withinWeights, targetWeight: declaredCategory.targetWeight });
-    sourceBases.push({ familyId: family.id, id: source.scoreBasis.id, edition: source.scoreBasis.edition, scoreField, benchmarkIds, aggregation: source.scoreBasis.aggregation, batchUnit: source.scoreBasis.batchUnit });
+    sourceBases.push({ familyId: family.id, id: source.scoreBasis.id, edition: source.scoreBasis.edition, scoreField, benchmarkIds, aggregation: source.scoreBasis.aggregation, batchUnit: source.scoreBasis.batchUnit,
+      ...(ENGINEERING_EDITIONS.includes(source.scoreBasis.edition) ? { sources: clone(source.scoreBasis.sources) } : {}) });
     for (const cell of source.benchmarkResults) {
       const identity = sourceSettings.get(cell.configurationId);
       const key = cellKey(cell.configurationId, cell.condition, cell.benchmarkId);
@@ -161,13 +189,37 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
         unassessableTaskIds: benchmarkIds.filter((_, index) => values[index]?.value === null)
       };
     }
-    // A setting enters neither ranked condition until both complete value paths
-    // exist. An absent fourth task can never become a zero or a three-task mean.
-    const eligible = CONDITIONS.every(condition => conditions[condition].assessableTaskCount === taskCount);
+    const pairedBenchmarkIds = benchmarkIds.filter(benchmarkId => CONDITIONS.every(condition => {
+      const reading = cellsByKey.get(cellKey(identity.configurationId, condition, benchmarkId));
+      return reading && reading.value !== null;
+    }));
+    const complete = pairedBenchmarkIds.length === taskCount;
+    const eligible = availablePairs ? pairedBenchmarkIds.length > 0 : complete;
+    const selectedBenchmarkIds = availablePairs ? pairedBenchmarkIds : benchmarkIds;
+    const selectedByFamily = new Map(familyTasks.map(family => [family.familyId, family.benchmarkIds.filter(id => selectedBenchmarkIds.includes(id))]));
+    const selectedTargetWeight = familyTasks.filter(family => selectedByFamily.get(family.familyId).length).reduce((sum, family) => sum + family.targetWeight, 0);
+    const settingCategoryWeights = familyTasks.filter(family => selectedByFamily.get(family.familyId).length).map(family => ({ categoryId: family.familyId,
+      targetWeight: family.targetWeight, weight: family.targetWeight / selectedTargetWeight, taskCount: selectedByFamily.get(family.familyId).length }));
+    const categoryWeight = familyId => settingCategoryWeights.find(category => category.categoryId === familyId)?.weight ?? 0;
+    const selectedWithinWeights = family => {
+      const selected = family.withinWeights.filter(task => selectedByFamily.get(family.familyId).includes(task.benchmarkId));
+      const total = selected.reduce((sum, task) => sum + task.weight, 0);
+      return selected.map(task => ({ ...task, weight: selected.length === family.benchmarkIds.length ? task.weight : task.weight / total }));
+    };
+    const settingBenchmarkWeights = benchmarkWeights.filter(task => selectedBenchmarkIds.includes(task.benchmarkId)).map(task => {
+      const family = familyTasks.find(family => family.familyId === task.familyId);
+      const within = selectedWithinWeights(family).find(candidate => candidate.benchmarkId === task.benchmarkId).weight;
+      return { ...task, weight: categoryWeight(task.familyId) * within };
+    });
+    const settingCoverage = { complete, eligible, eligibleForRank: eligible, partial: eligible && !complete,
+      completedTaskCount: pairedBenchmarkIds.length, expectedTaskCount: taskCount, availableBenchmarkIds: pairedBenchmarkIds,
+      benchmarkWeights: settingBenchmarkWeights, categoryWeights: settingCategoryWeights };
+    if (availablePairs) for (const condition of CONDITIONS) conditions[condition].completedTaskCount = pairedBenchmarkIds.length;
     const record = {
       ...identity,
-      status: eligible ? "eligible" : "incomplete",
+      status: availablePairs ? complete ? 'complete' : eligible ? 'partial' : 'unavailable' : eligible ? "eligible" : "incomplete",
       eligible,
+      ...(availablePairs ? settingCoverage : {}),
       conditions,
       scores: { baseline: null, skill: null },
       exactScores: { baseline: null, skill: null },
@@ -177,19 +229,26 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
       metrics: { baseline: null, skill: null }
     };
     coverageRecords.push(record);
-    if (!eligible) continue;
+    if (!eligible && !availablePairs) continue;
 
     const categoryScores = Object.fromEntries(CONDITIONS.map(condition => [condition, familyTasks.map(family => {
-      const values = family.benchmarkIds.map(benchmarkId => cellsByKey.get(cellKey(identity.configurationId, condition, benchmarkId)).value);
-      const exactScore = family.familyId === 'writing' ? weightedMean(values, family.withinWeights.map(item => item.weight)) : mean(values);
-      const weight = categoryWeightById.get(family.familyId).weight;
-      return { category: family.familyId, score: round(exactScore), exactScore, weight, exactContribution: exactScore * weight };
+      const selectedIds = availablePairs ? selectedByFamily.get(family.familyId) : family.benchmarkIds;
+      const values = selectedIds.map(benchmarkId => cellsByKey.get(cellKey(identity.configurationId, condition, benchmarkId)).value);
+      const exactScore = values.length ? family.familyId === 'writing' ? weightedMean(values, (availablePairs ? selectedWithinWeights(family) : family.withinWeights).map(item => item.weight)) : mean(values) : null;
+      const weight = availablePairs ? categoryWeight(family.familyId) : categoryWeightById.get(family.familyId).weight;
+      return { category: family.familyId, score: round(exactScore), exactScore, weight, exactContribution: exactScore === null ? null : exactScore * weight,
+        ...(availablePairs ? { available: values.length > 0, complete: values.length === family.benchmarkIds.length,
+          completedTaskCount: values.length, expectedTaskCount: family.benchmarkIds.length } : {}) };
     })]));
-    const exactScores = Object.fromEntries(CONDITIONS.map(condition => [condition, categoryScores[condition].reduce((sum, category) => sum + category.exactContribution, 0)]));
-    const exactDelta = exactScores.skill - exactScores.baseline;
-    const metrics = Object.fromEntries(CONDITIONS.map(condition => [condition, responseMetrics(sourceCells[condition].map(value => value.cell), taskWeights, Boolean(writingSource))]));
+    const exactScores = Object.fromEntries(CONDITIONS.map(condition => [condition, eligible ? categoryScores[condition].filter(category => category.exactScore !== null).reduce((sum, category) => sum + category.exactContribution, 0) : null]));
+    const exactDelta = eligible ? exactScores.skill - exactScores.baseline : null;
+    const selectedWeights = availablePairs ? settingBenchmarkWeights.map(task => task.weight) : taskWeights;
+    const metrics = Object.fromEntries(CONDITIONS.map(condition => [condition, eligible ? responseMetrics(
+      availablePairs ? selectedBenchmarkIds.map(benchmarkId => cellsByKey.get(cellKey(identity.configurationId, condition, benchmarkId)).cell) : sourceCells[condition].map(value => value.cell),
+      selectedWeights, allowMissingMetrics) : null]));
     const setting = {
       ...identity,
+      ...(availablePairs ? settingCoverage : {}),
       scores: { baseline: round(exactScores.baseline), skill: round(exactScores.skill) },
       exactScores,
       deltas: { skill: round(exactDelta) },
@@ -200,9 +259,9 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
     Object.assign(record, { scores: clone(setting.scores), exactScores: clone(exactScores), deltas: clone(setting.deltas), exactDeltas: clone(setting.exactDeltas), metrics: clone(metrics) });
     settings.push(setting);
   }
-  settings.sort((left, right) => right.exactScores.skill - left.exactScores.skill || right.exactScores.baseline - left.exactScores.baseline || left.configurationId.localeCompare(right.configurationId));
+  settings.sort((left, right) => (right.exactScores.skill ?? -Infinity) - (left.exactScores.skill ?? -Infinity) || (right.exactScores.baseline ?? -Infinity) - (left.exactScores.baseline ?? -Infinity) || left.configurationId.localeCompare(right.configurationId));
   const conditions = clone(engineering.conditions).map(condition => condition.id === "skill"
-    ? { ...condition, sourceId: "task-specific-skill", short: "Task skill", label: "Task-specific skill" }
+    ? { ...condition, sourceId: "task-specific-skill", short: name === 'Engineering' ? 'Skill' : "Task skill", label: "Task-specific skill" }
     : condition);
   const entries = settings.flatMap(setting => conditions.map(condition => {
     const metrics = setting.metrics[condition.id];
@@ -212,24 +271,25 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
       ...Object.fromEntries(IDENTITY_FIELDS.filter(key => key !== "id").map(key => [key, setting[key]])),
       condition: condition.id,
       conditionLabel: condition.label,
+      ...(availablePairs ? Object.fromEntries(['complete', 'eligible', 'eligibleForRank', 'partial', 'completedTaskCount', 'expectedTaskCount', 'availableBenchmarkIds', 'benchmarkWeights', 'categoryWeights'].map(field => [field, clone(setting[field])])) : {}),
       score: setting.scores[condition.id],
       exactScore: setting.exactScores[condition.id],
       baselineScore: setting.scores.baseline,
       exactBaselineScore: setting.exactScores.baseline,
-      delta: condition.id === "baseline" ? 0 : setting.deltas.skill,
-      exactDelta: condition.id === "baseline" ? 0 : setting.exactDeltas.skill,
+      delta: availablePairs && !setting.eligibleForRank ? null : condition.id === "baseline" ? 0 : setting.deltas.skill,
+      exactDelta: availablePairs && !setting.eligibleForRank ? null : condition.id === "baseline" ? 0 : setting.exactDeltas.skill,
       categories: clone(setting.categories[condition.id]),
       baselineCategories: clone(setting.categories.baseline),
       metrics: clone(metrics),
       cost: null,
-      latency: metrics.meanLatencyMs === null ? null : metrics.meanLatencyMs / 1000,
-      tokens: metrics.meanOutputTokens,
+      latency: metrics?.meanLatencyMs === null || !metrics ? null : metrics.meanLatencyMs / 1000,
+      tokens: metrics?.meanOutputTokens ?? null,
       rank: null
     };
   }));
   const coverageById = new Map(coverageRecords.map(record => [record.configurationId, record]));
   for (const condition of CONDITIONS) {
-    const ranked = entries.filter(entry => entry.condition === condition).sort((left, right) => right.exactScore - left.exactScore || left.configurationId.localeCompare(right.configurationId));
+    const ranked = entries.filter(entry => entry.condition === condition && Number.isFinite(entry.exactScore)).sort((left, right) => right.exactScore - left.exactScore || left.configurationId.localeCompare(right.configurationId));
     ranked.forEach((entry, index) => {
       entry.rank = index > 0 && entry.exactScore === ranked[index - 1].exactScore ? ranked[index - 1].rank : index + 1;
       coverageById.get(entry.configurationId).ranks[condition] = entry.rank;
@@ -238,20 +298,22 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
   const benchmarks = sources.flatMap(source => clone(source.benchmarks));
   const sourceCells = sources.flatMap(source => clone(source.benchmarkResults));
   const totalSettings = identities.size;
-  const eligibleSettings = settings.length;
+  const eligibleSettings = availablePairs ? coverageRecords.filter(record => record.eligibleForRank).length : settings.length;
+  const completeSettings = availablePairs ? coverageRecords.filter(record => record.complete).length : eligibleSettings;
   const coverage = {
     totalSettings,
     eligibleSettings,
-    incompleteSettings: totalSettings - eligibleSettings,
+    incompleteSettings: totalSettings - completeSettings,
     observedResponseCount: sourceCells.length,
     expectedResponseCount: totalSettings * taskCount * CONDITIONS.length,
-    eligibleResponseCount: eligibleSettings * taskCount * CONDITIONS.length,
+    eligibleResponseCount: availablePairs ? coverageRecords.reduce((sum, record) => sum + record.completedTaskCount * CONDITIONS.length, 0) : eligibleSettings * taskCount * CONDITIONS.length,
+    ...(availablePairs ? { completeSettings, rankedSettings: eligibleSettings, unrankedSettings: totalSettings - eligibleSettings } : {}),
     records: coverageRecords
   };
   const declarationSha256 = hash(declaration);
   const scoreBasis = {
     id: `${declaration.edition}:${hash({ declaration, sourceBases, benchmarkWeights })}`,
-    label: writingSource ? "Overall v3" : "Overall v2",
+    label: name === 'Engineering' ? availablePairs ? 'Engineering · available paired results' : 'Engineering · all tasks' : `Overall v${declaration.schemaVersion}`,
     edition: declaration.edition,
     declarationVersion: declaration.schemaVersion,
     declarationSha256,
@@ -269,37 +331,44 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
     trialsPerTask: writingSource ? null : 1,
     judgeCount: new Set(sources.flatMap(source => source.scoreBasis.judges)).size,
     judges: [...new Set(sources.flatMap(source => source.scoreBasis.judges))],
-    aggregation: writingSource ? 'weighted-category-means-of-authoritative-final-task-scores-v3' : "weighted-category-means-of-authoritative-final-task-scores-v2",
+    aggregation: availablePairs ? name === 'Engineering' ? 'equal-mean-of-authoritative-available-task-pairs-v2' : 'weighted-available-category-means-of-authoritative-paired-task-scores-v5'
+      : name === 'Engineering' ? 'equal-mean-of-authoritative-final-task-scores-v1' : writingSource ? 'weighted-category-means-of-authoritative-final-task-scores-v3' : "weighted-category-means-of-authoritative-final-task-scores-v2",
     batchUnit: "task-specific",
     effectMethod: "paired-absolute-delta-v1",
     effectUnit: "rubric-points",
     treatment: "Task-specific skill",
     sourceBases,
+    ...(name === 'Engineering' ? { sources: clone(engineering.scoreBasis.sources) } : {}),
     eligibility: declaration.eligibility,
+    ...(availablePairs ? { completeness: declaration.completeness, settingWeighting: declaration.settingWeighting,
+      pairSelection: 'same-assessable-task-pairs-for-both-conditions-v1' } : {}),
     resourceAggregation: declaration.resourceAggregation,
     ...(writingSource ? { provisional: writingSource.scoreBasis.provisional, writingSources: clone(writingSource.scoreBasis.sources) } : {}),
     calibrationStatus: "development-uncalibrated",
     uncertainty: { status: "not-estimated", reason: writingSource
-      ? "The published task rubrics and judge panels are uncalibrated; trial counts vary by source benchmark. Overall inherits selected provisional bases and is a development aggregate with declared category priorities, without a confidence interval or broader capability claim."
-      : "The published task rubrics are uncalibrated and have one trial per condition. Overall is a development aggregate with declared category priorities, without a confidence interval or broader capability claim." }
+      ? `The published task rubrics and judge panels are uncalibrated; trial counts vary by source benchmark. ${name} inherits selected provisional bases and is a development aggregate with declared category priorities, without a confidence interval or broader capability claim.`
+      : `The published task rubrics are uncalibrated and have one trial per condition. ${name} is a development aggregate with declared category priorities, without a confidence interval or broader capability claim.` }
   };
   const availability = {
     status: "development", verification: "unverified", code: "development-unverified-results",
     message: "Development results — not verified benchmark claims.",
-    detail: `Overall weights category means by declared priorities normalized across published categories, with ${writingSource ? 'equal task weights within Engineering and AI Workflows; Writing uses equal tracks and equal benchmarks within each track' : 'equal task weights within each category'}. It ranks only settings with complete assessable results in both conditions. Task-specific skills differ by benchmark; human calibration remains pending.${writingSource?.scoreBasis.provisional ? ' The aggregate inherits provisional status from its selected Writing score bases.' : ''}`,
+    detail: availablePairs
+      ? `${name === 'Engineering' ? 'Engineering averages the available paired task scores equally' : 'Overall averages available paired task scores within each category, then renormalizes the declared category priorities across available categories'}. Both conditions use the same tasks and weights. Missing results are excluded, never scored as zero or imputed. Settings with at least one assessable pair are ranked; task coverage differs and is reported separately from completeness. Task-specific skills differ by benchmark; human calibration remains pending.${writingSource?.scoreBasis.provisional ? ' The aggregate inherits provisional status from its selected Writing score bases.' : ''}`
+      : `${name === 'Engineering' ? 'Engineering gives every published Engineering task equal weight' : `Overall weights category means by declared priorities normalized across published categories, with ${writingSource ? 'equal task weights within Engineering and AI Workflows; Writing uses equal tracks and equal benchmarks within each track' : 'equal task weights within each category'}`}. It ranks only settings with complete assessable results in both conditions. Task-specific skills differ by benchmark; human calibration remains pending.${writingSource?.scoreBasis.provisional ? ' The aggregate inherits provisional status from its selected Writing score bases.' : ''}`,
     blockers: [{ code: "author-calibration-pending", message: "Human calibration and broader task validation remain pending." }]
   };
-  const skillEntries = entries.filter(entry => entry.condition === "skill");
+  const skillEntries = entries.filter(entry => entry.condition === "skill" && Number.isFinite(entry.exactScore));
   const topScore = skillEntries.length ? Math.max(...skillEntries.map(entry => entry.exactScore)) : null;
   const leaders = skillEntries.filter(entry => entry.exactScore === topScore);
   const categoryLeaders = categories.flatMap(category => {
-    const top = skillEntries.length ? Math.max(...skillEntries.map(entry => entry.categories.find(value => value.category === category.id).exactScore)) : null;
-    return skillEntries.filter(entry => entry.categories.find(value => value.category === category.id).exactScore === top).map(entry => ({ category: category.id, entry: { ...clone(entry), categoryScore: entry.categories.find(value => value.category === category.id).score } }));
+    const candidates = skillEntries.filter(entry => Number.isFinite(entry.categories.find(value => value.category === category.id)?.exactScore));
+    const top = candidates.length ? Math.max(...candidates.map(entry => entry.categories.find(value => value.category === category.id).exactScore)) : null;
+    return candidates.filter(entry => entry.categories.find(value => value.category === category.id).exactScore === top).map(entry => ({ category: category.id, entry: { ...clone(entry), categoryScore: entry.categories.find(value => value.category === category.id).score } }));
   });
   return {
-    kind: "vasirbenchmark-overall-projection", schemaVersion: 1,
+    kind, schemaVersion: 1,
     program: clone(engineering.program),
-    meta: { ...clone(engineering.meta), categories: categories.length, benchmarks: taskCount, settings: eligibleSettings, aggregateCells: coverage.eligibleResponseCount, runs: taskCount },
+    meta: { ...clone(engineering.meta), categories: categories.length, benchmarks: taskCount, settings: settings.length, aggregateCells: coverage.eligibleResponseCount, runs: taskCount },
     scoreBasis,
     conditions,
     categories,
@@ -317,14 +386,14 @@ function reconstructOverall({ engineering, aiWorkflows, writing }) {
     efficientFrontier: [],
     regressions: skillEntries.filter(entry => entry.exactDelta < 0).map(clone),
     callouts: {
-      overall: leaders.length ? `${leaders.map(entry => entry.label).join(", ")} ${leaders.length === 1 ? "leads" : "share the lead"} Overall at ${round(topScore).toFixed(1)} development rubric points.` : "No setting has complete assessable results across all published tasks in both conditions.",
+      overall: leaders.length ? `${leaders.map(entry => entry.label).join(", ")} ${leaders.length === 1 ? "leads" : "share the lead"} ${name} at ${round(topScore).toFixed(1)} development rubric points.` : availablePairs ? 'No setting has an assessable task pair.' : "No setting has complete assessable results across all published tasks in both conditions.",
       value: "Resource averages use the same task cells and weights as each score; provider cost comparison remains withheld.",
       regression: `${skillEntries.filter(entry => entry.exactDelta < 0).length} of ${eligibleSettings} eligible settings score lower with their task-specific skills.`,
-      category: `${taskCount} benchmarks across ${categories.length} of ${portfolioCategories.length} planned categories cover ${publishedTargetWeight * 100}% of target weight. Published category weights are normalized; source benchmark summaries retain their complete published cohorts.`
+      category: `${taskCount} benchmarks across ${categories.length} of ${portfolioCategories.length} planned categories cover ${publishedTargetWeight * 100}% of target weight. ${availablePairs ? 'Each setting normalizes weights over its available task pairs and categories' : 'Published category weights are normalized'}; source benchmark summaries retain their complete published cohorts.`
     },
     availability,
     coverage,
-    counts: { families: sources.length, tracks: sources.reduce((sum, source) => sum + source.tracks.length, 0), benchmarks: taskCount, categories: categories.length, conditions: CONDITIONS.length, settings: eligibleSettings, resultEntries: entries.length, responses: sourceCells.length, developmentResultSets: taskCount, eligibleResultSets: 0, withheldResultSets: 0 }
+    counts: { families: sources.length, tracks: sources.reduce((sum, source) => sum + source.tracks.length, 0), benchmarks: taskCount, categories: categories.length, conditions: CONDITIONS.length, settings: settings.length, resultEntries: entries.length, responses: sourceCells.length, developmentResultSets: taskCount, eligibleResultSets: 0, withheldResultSets: 0 }
   };
 }
 

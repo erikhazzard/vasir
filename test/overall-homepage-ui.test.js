@@ -19,7 +19,7 @@ test('Overall Writing benchmark leaders use the full source cohort, not only Ove
     benchmarkId: benchmark.id, exactScore: [baseline, skill][index], score: [baseline, skill][index] }));
   const data = { settings: [setting('overall-eligible')], coverage: { records: [setting('overall-eligible'), setting('task-leader')] },
     benchmarkResults: [...cells('overall-eligible', 70, 90), ...cells('task-leader', 60, 98)] };
-  const context = { data, benchmark, isOverall: true, rootData: { benchmarks: [] }, workflowData: { benchmarkResults: [] } };
+  const context = { data, benchmark, isOverall: true, isAggregate: true, rootData: { benchmarks: [] }, workflowData: { benchmarkResults: [] } };
   const source = `${pure}\n${declaration('benchmarkTopModels')}\n${declaration('benchmarkTopModelFor')}\nbenchmarkTopModelFor(benchmark, {caseCount:1})`;
   const leader = vm.runInNewContext(source, context);
   assert.equal(leader.settingId, 'task-leader'); assert.equal(leader.baseline, 60); assert.equal(leader.skill, 98);
@@ -44,13 +44,16 @@ test('Overall reuses the compact Writing ledger with field averages and paired w
   assert.doesNotMatch(html, /undefined|Minimal average|Published cohort/);
 });
 
-test('Overall Methodology derives current Writing weight and does not claim uniform one-trial coverage', () => {
+test('Overall methodology discloses available paired coverage and renormalized category weights', () => {
   const source = `${formatters}\n${declaration('overallWeightsMarkup')}\noverallWeightsMarkup()`;
   const html = vm.runInNewContext(source, { overallWritingCategory: { weight: 0.25 }, portfolioCategories: [], TASK_COUNT: 8, rootData: { games: {} }, hasWriting: true });
-  assert.match(html, /All Writing averages its three Storytelling benchmarks equally/); assert.match(html, /8\/8 assessable benchmarks/);
+  assert.match(html, /Scores use each model’s completed benchmark pairs/);
+  assert.match(html, /category weights normalize across that model’s measured categories/);
+  assert.match(html, /Both conditions use the same tests and weights/);
+  assert.match(html, /missing results are not scored as zero/);
   assert.match(html, /Games pilot/); assert.match(html, /no comparable plain-answer\/skill pair/);
   assert.doesNotMatch(html, /Writing benchmarks are excluded/);
-  assert.match(app, /scoreBasis\.edition === 'overall-v3' \? `\$\{TASK_COUNT\} benchmarks/);
+  assert.doesNotMatch(html, /require 8\/8|one trial per/);
 });
 
 test('clicking the homepage Writing segment resets stale score scope and retains exact model identity', () => {

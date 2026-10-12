@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import test from 'node:test';
 import { BACKEND_TESTING_CONFIGURATIONS } from '../cli/eval/backend-testing-publication.js';
-import { TEST_AUTHORING_SCORE_CRITERIA, deriveTestAuthoringOverall, projectTestAuthoring, validateTestAuthoringRound, validateTestAuthoringPublication, validateTestAuthoringFiles, buildTestAuthoringPublication, hasMatchedTestAuthoringAssertion } from '../cli/eval/test-authoring-publication.js';
+import { TEST_AUTHORING_SCORE_CRITERIA, deriveTestAuthoringOverall, projectTestAuthoring, validateTestAuthoringRound, validateTestAuthoringPublication, validateTestAuthoringFiles, buildTestAuthoringPublication, hasMatchedTestAuthoringFailure } from '../cli/eval/test-authoring-publication.js';
 
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
 const weights = Object.fromEntries(TEST_AUTHORING_SCORE_CRITERIA.map(item => [item.id, item.weight]));
@@ -184,19 +184,47 @@ test('expanded analysis with both reviewers retains all four pairs and completed
 test('a matched assertion retains fault credit when a separate case throws a TypeError', () => {
   const passed = {file:'test/queue.spec.js',fullTitle:'queue recovers expired work'}, controls = Array.from({length:2},()=>({testStatus:'pass',cleanupStatus:'pass',stats:{tests:2,passes:2,failures:0,pending:0},passedCases:[passed]}));
   const run = {status:'invalid',executionStatus:'execution-failure',cleanupStatus:'pass',timedOut:false,code:2,stats:{tests:2,passes:0,failures:2,pending:0},assertions:[{...passed,stack:'AssertionError [ERR_ASSERTION]: recovered work must remain available'}]};
-  assert.equal(hasMatchedTestAuthoringAssertion(run, controls), true);
+  assert.equal(hasMatchedTestAuthoringFailure(run, controls), true);
   for (const mutate of [
     value=>{value.assertions[0].fullTitle='"before all" hook for queue';},
     value=>{value.assertions[0].fullTitle='queue untested failure';},
     value=>{value.assertions=[];},
-    value=>{value.assertions[0].stack='TypeError: undefined receipt';},
+    value=>{value.assertions[0].code='ERR_MOCHA_TIMEOUT';},
     value=>{value.timedOut=true;},
     value=>{value.cleanupStatus='failed';},
     value=>{value.launchError='Redis never started';},
   ]) {
     const invalid = structuredClone(run); mutate(invalid);
-    assert.equal(hasMatchedTestAuthoringAssertion(invalid, controls), false);
+    assert.equal(hasMatchedTestAuthoringFailure(invalid, controls), false);
   }
   const unhealthy = structuredClone(controls); unhealthy[1].stats.failures=1;
-  assert.equal(hasMatchedTestAuthoringAssertion(run, unhealthy), false);
+  assert.equal(hasMatchedTestAuthoringFailure(run, unhealthy), false);
+});
+
+test('missing recovery can reject a fault through a TypeError or an authored business deadline', () => {
+  const recoveredJobCase = {file:'test/queue.spec.js',fullTitle:'queue recovers expired work'};
+  const controls = Array.from({length:2},()=>({testStatus:'pass',cleanupStatus:'pass',stats:{tests:1,passes:1,failures:0,pending:0},passedCases:[recoveredJobCase]}));
+  const lostJobRun = {executionStatus:'execution-failure',cleanupStatus:'pass',timedOut:false,code:1,stats:{tests:1,passes:0,failures:1,pending:0},assertions:[]};
+  for (const stack of ["TypeError: Cannot read properties of null (reading 'message')", 'Error: Timed out waiting for expired work to be recovered']) {
+    const reviewedFailures = [{...recoveredJobCase,stack}];
+    assert.equal(hasMatchedTestAuthoringFailure(lostJobRun, controls, reviewedFailures), true);
+    assert.equal(hasMatchedTestAuthoringFailure({...lostJobRun,timedOut:true}, controls, reviewedFailures), false);
+    assert.equal(hasMatchedTestAuthoringFailure(lostJobRun, controls, [{...reviewedFailures[0],fullTitle:'unrelated setup failure'}]), false);
+  }
+  assert.equal(hasMatchedTestAuthoringFailure(lostJobRun, controls), false, 'An execution error without reviewed failing-case evidence earns no credit.');
+});
+
+test('a detection correction changes execution points without changing native craft ratings or weights', () => {
+  const round = fixture(), original = projectTestAuthoring(round), nativeReviews = structuredClone(round.rows.map(row => row.judgments));
+  round.detectionCorrection = {adoption:'corrected-after-round',sourceSha256:hash('causal failure review'),rule:'Credit source-reviewed failures caused by the injected bug, regardless of error class.'};
+  round.rows[0].objective.faults[3].status = 'detected';
+  round.rows[0].objective.faultDetection = 4/6;
+  const corrected = projectTestAuthoring(round);
+  validateTestAuthoringPublication(corrected, round);
+  assert.ok(Math.abs(corrected.overall.rows[0].score - original.overall.rows[0].score - 25/6) < 1e-10);
+  assert.deepEqual(round.rows.map(row => row.judgments), nativeReviews);
+  assert.deepEqual(corrected.overall.scoreBasis.criteria, original.overall.scoreBasis.criteria);
+  assert.equal(corrected.overall.scoreBasis.adoption, 'detection-corrected-after-round');
+  assert.match(corrected.overall.scoreBasis.aggregation, /regardless of error class/);
+  assert.deepEqual(corrected.overall.rows.slice(1), original.overall.rows.slice(1));
 });

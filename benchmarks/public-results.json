@@ -22,5 +22,22 @@
     "benchmarkId": "work-spec-chat",
     "runPath": ".agents/vasir-evals/work-spec-chat/2026-09-05T05-06-00Z__chat__expanded-26/run.json",
     "sha256": "00d8f3db4bc5f6087364bf6cdf629a7876b2ac6ae7667b722ddd80f4217c4aa2"
-  }
+  },
+  "pendingArchitectureRuns": [
+    {
+      "benchmarkId": "hyper-scale-chat",
+      "runPath": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/retry-2026-10-12/prior/hyper-scale-chat/run.json",
+      "sha256": "cf89eb62557f77de3e08612c1de792c6a5b42a99eb018dfdaa1f2590ab0364f5"
+    },
+    {
+      "benchmarkId": "personalized-home-feed",
+      "runPath": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/retry-2026-10-12/prior/personalized-home-feed/run.json",
+      "sha256": "5c7722cacfa73658e1a96e00ac186a21526c044f678b3a8ba0941c7b6db0c95d"
+    },
+    {
+      "benchmarkId": "device-telemetry",
+      "runPath": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/retry-2026-10-12/prior/device-telemetry/run.json",
+      "sha256": "9959adfec437f200f394cf8224cb1e965c954ccb11062b71eeafcc0eb90af043"
+    }
+  ]
 }
