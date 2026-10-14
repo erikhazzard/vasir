@@ -13,7 +13,7 @@ import { createStorytellingSkillInstruction, freezeStorytellingSkill, STORYTELLI
 import { creationIsolationArguments, STORYTELLING_CREATION_ISOLATION_VERSION } from "../cli/eval/storytelling-creation-runtime.js";
 import { createStorytellingCreationJudgePrompt, parseStorytellingCreationJudgment, runStorytellingCreationJudging, STORYTELLING_CREATION_INFORMED_FILES } from "../cli/eval/judge-storytelling-creation.js";
 import { runStorytellingBenchmark } from "../cli/eval/run-storytelling-benchmark.js";
-import { buildWritingPublication, prepareWritingPublicationSource, serializeWritingModule, validateWritingPublication, validateWritingSummary, writingSelectionPath } from "../cli/eval/writing-publication.js";
+import { buildWritingPublication, buildWritingSourceCollection, prepareWritingPublicationSource, serializeWritingModule, validateWritingPublication, validateWritingSummary, writingSelectionPath } from "../cli/eval/writing-publication.js";
 import { buildStorytellingCreationPublication, prepareStorytellingCreationPublicationSource, projectStorytellingCreationRun, STORYTELLING_CREATION_BENCHMARK_ID, STORYTELLING_CREATION_SELECTION_PATH, validateStorytellingCreationCreatorReceipt, validateStorytellingCreationPublication } from "../cli/eval/storytelling-creation-publication.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -291,9 +291,11 @@ test("creation is an additive Storytelling collection child preserving the origi
   await runStorytellingBenchmark({ projectRootDirectory: f.root, currentWorkingDirectory: f.root, requestedModelArguments: ["codex:gpt-5.6-luna@low"], runId: "core-original", seed: "test", prepareOnly: true, environmentVariables: {} });
   const coreDirectory = path.join(f.root, ".agents/vasir-evals/storytelling-core-idea/core-original");
   write(f.root, writingSelectionPath("storytelling-core-idea"), prepareWritingPublicationSource({ repoRootDirectory: f.root, runDirectory: coreDirectory }));
-  const before = buildWritingPublication({ repoRootDirectory: f.root });
+  assert.throws(() => buildWritingPublication({ repoRootDirectory: f.root }), /incomplete active release/);
+  const before = buildWritingSourceCollection({ repoRootDirectory: f.root });
   write(f.root, writingSelectionPath(ID), prepareWritingPublicationSource({ repoRootDirectory: f.root, runDirectory: f.save(), benchmarkId: ID }));
-  const after = buildWritingPublication({ repoRootDirectory: f.root });
+  assert.throws(() => buildWritingPublication({ repoRootDirectory: f.root }), /incomplete active release/);
+  const after = buildWritingSourceCollection({ repoRootDirectory: f.root });
   const { benchmarkPublications, collectionCoverage, ...defaultProjection } = after.projection;
   const { benchmarkResponses, ...defaultResponses } = after.responseBundle;
   assert.deepEqual(defaultProjection, before.projection); assert.deepEqual(defaultResponses, before.responseBundle);

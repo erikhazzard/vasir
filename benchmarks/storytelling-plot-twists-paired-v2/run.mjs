@@ -11,7 +11,7 @@ export async function main(args = process.argv.slice(2)) {
   const options = {};
   for (let index = 0; index < rest.length; index += 2) {
     const key = rest[index], value = rest[index + 1];
-    assert.ok(['--run-dir', '--parent-snapshot', '--add-configurations', '--source-snapshot', '--authorization', '--limit', '--concurrency', '--output'].includes(key) && value && !value.startsWith('--'), 'Unknown option or missing value.');
+    assert.ok(['--run-dir', '--parent-snapshot', '--add-configurations', '--current-runtime-append', '--source-snapshot', '--authorization', '--limit', '--concurrency', '--output'].includes(key) && value && !value.startsWith('--'), 'Unknown option or missing value.');
     assert.ok(!Object.hasOwn(options, key), 'Duplicate option.'); options[key] = value;
   }
   assert.ok(options['--run-dir'], '--run-dir is required.');
@@ -24,10 +24,13 @@ export async function main(args = process.argv.slice(2)) {
   assert.ok(!options['--source-snapshot'] && !options['--authorization'], 'Recovery authority is a preparation-only option.');
   assert.ok(command === 'prepare' || !options['--parent-snapshot'], 'Parent snapshot is a preparation-only option.');
   assert.ok(command === 'prepare' || !options['--add-configurations'], 'Additional configurations are a preparation-only option.');
+  assert.ok(command === 'prepare' || !options['--current-runtime-append'], 'Execution compatibility is a preparation-only option.');
+  assert.ok(!options['--current-runtime-append'] || options['--current-runtime-append'] === 'true', 'Use --current-runtime-append true for the reviewed Sol 6.1 xhigh extension.');
   if (command === 'apply-runtime-erratum') { assert.equal(Object.keys(options).length, 1); return applyPairedRuntimeValidationErratum({ runDirectoryPath }); }
-  if (command === 'prepare') { assert.equal(Object.keys(options).length, 1 + Number(Boolean(options['--parent-snapshot'])) + Number(Boolean(options['--add-configurations'])));
+  if (command === 'prepare') { assert.equal(Object.keys(options).length, 1 + Number(Boolean(options['--parent-snapshot'])) + Number(Boolean(options['--add-configurations'])) + Number(Boolean(options['--current-runtime-append'])));
     return preparePairedRun({ runDirectoryPath, parentSnapshotPath: options['--parent-snapshot'] ? path.resolve(options['--parent-snapshot']) : null,
-      addedConfigurations: options['--add-configurations'] ? options['--add-configurations'].split(',') : null }); }
+      addedConfigurations: options['--add-configurations'] ? options['--add-configurations'].split(',') : null,
+      currentRuntimeAppend: options['--current-runtime-append'] === 'true' }); }
   if (['status', 'export'].includes(command)) {
     assert.ok(!options['--limit'] && !options['--concurrency'], 'Read-only commands cannot dispatch.');
     const snapshot = exportPairedRun({ runDirectoryPath });

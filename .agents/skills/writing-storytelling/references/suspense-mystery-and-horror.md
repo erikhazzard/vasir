@@ -1,6 +1,6 @@
 # Suspense, mystery, and horror in action
 
-Use this supplement when a puzzle needs a fair inference, suspense needs a precise information arrangement, or horror needs accumulating dread and competent action. It develops two original cases rather than surveying genres. Use [genre-and-form.md](genre-and-form.md) for the larger promise, [narration-and-prose.md](narration-and-prose.md) for viewpoint and duration, [plot-and-structure.md](plot-and-structure.md) for consequence, and [antagonism-and-irony.md](antagonism-and-irony.md) for responsive opposition.
+Use these two worked cases for fair inference, suspenseful information arrangements, or accumulating dread. For the larger genre promise, read [crime](genres/crime.md), [horror](genres/horror.md), or [thriller](genres/thriller.md); for execution, use [narration](narration-and-prose.md), [plot](plot-and-structure.md), or [responsive opposition](antagonism-and-irony.md).
 
 If solving the mystery should change the meaning of remembered acts or relationships, continue to [twists and revelations](twists-and-revelations.md). A fair inference establishes what the clue warrants; retrospective recontextualization additionally changes the account through which those earlier events mattered.
 

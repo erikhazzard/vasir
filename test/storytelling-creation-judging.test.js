@@ -1,4 +1,7 @@
+// Protect frozen creation judging and append-only inheritance through real sidecar files;
+// judge responses are synthetic, so provider behavior and availability are outside this suite.
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import { EventEmitter } from "node:events";
 import fs from "node:fs";
@@ -81,6 +84,102 @@ function loadArchive(f) {
     contextSnapshot: JSON.parse(fs.readFileSync(path.join(f.directory, "creation-judge-context.json"), "utf8")),
     runSha256: hash(fs.readFileSync(path.join(f.directory, "run.json"), "utf8")) };
 }
+
+test("an appended configuration preserves inherited judgments and executes only its four globally ordered seats", async (t) => {
+  const original = fixture(t);
+  const originalResult = await runStorytellingCreationJudging({ runDirectory: original.directory,
+    agentRunnerImplementation: async (args) => response(args, original.scoring) });
+  const originalSidecar = fs.readFileSync(path.join(original.directory, "creation-judging.json"), "utf8");
+  const appended = fixture(t, { modelCount: 2 });
+  appended.run.runId = "creation-appended-fixture";
+  for (const row of appended.run.rows.slice(2)) {
+    row.outputText += " APPENDED_STORY_ONLY";
+    row.outputHash = hash(row.outputText);
+  }
+  writeJson(path.join(appended.directory, "run.json"), appended.run);
+  writeJson(path.join(appended.directory, "manifest.json"), {
+    runId: appended.run.runId, manifestHash: appended.run.storytelling.manifestHash
+  });
+  const preparation = JSON.parse(execFileSync(process.execPath, [
+    new URL("../cli/eval/judge-storytelling-creation.js", import.meta.url).pathname,
+    "--run-directory", appended.directory, "--inherit-run-directory", original.directory, "--prepare-only"
+  ], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
+  assert.equal(preparation.status, "incomplete");
+  const prepared = loadArchive(appended);
+  assert.deepEqual(prepared.judging.pairs[0], originalResult.judging.pairs[0]);
+  assert.equal(prepared.judging.summary.judgmentCounts.complete, 4);
+  assert.equal(prepared.judging.summary.judgmentCounts.pending, 4);
+  assert.deepEqual(prepared.judging.pairs[1].judgments.map((judgment) => judgment.candidateOrder[0].rowKey), [
+    "codex:gpt-5.6-luna@medium::magic-discovery::trial-1::skill:writing-storytelling",
+    "codex:gpt-5.6-luna@medium::magic-discovery::trial-1::skill:writing-storytelling",
+    "codex:gpt-5.6-luna@medium::magic-discovery::trial-1::clean",
+    "codex:gpt-5.6-luna@medium::magic-discovery::trial-1::clean"
+  ]);
+  for (const file of prepared.judging.appendSource.files) {
+    assert.equal(file.sha256, hash(fs.readFileSync(path.join(original.directory, file.relativePath), "utf8")));
+  }
+  let appendedCalls = 0;
+  const completed = await runStorytellingCreationJudging({ runDirectory: appended.directory,
+    agentRunnerImplementation: async (args) => {
+      appendedCalls++;
+      assert.match(args.promptText, /APPENDED_STORY_ONLY/);
+      return response(args, appended.scoring);
+    } });
+  assert.equal(appendedCalls, 4);
+  assert.equal(completed.judging.status, "complete");
+  assert.equal(completed.judging.summary.judgmentCounts.complete, 8);
+  assert.deepEqual(completed.judging.pairs[0], originalResult.judging.pairs[0]);
+  assert.equal(fs.readFileSync(path.join(original.directory, "creation-judging.json"), "utf8"), originalSidecar);
+  assert.equal(validateStorytellingCreationJudging(loadArchive(appended)), true);
+  await runStorytellingCreationJudging({ runDirectory: appended.directory,
+    inheritedSourceDirectory: original.directory, retryFailed: true,
+    agentRunnerImplementation: () => assert.fail("Neither inherited nor completed appended judgments may rerun.") });
+  const rebound = fixture(t);
+  await runStorytellingCreationJudging({ runDirectory: rebound.directory,
+    agentRunnerImplementation: async (args) => response(args, rebound.scoring) });
+  await assert.rejects(runStorytellingCreationJudging({ runDirectory: appended.directory,
+    inheritedSourceDirectory: rebound.directory, prepareOnly: true }), /inherited source binding/i);
+  fs.appendFileSync(path.join(original.directory, "creation-judging.json"), "\n");
+  const beforeRejectedResume = fs.readFileSync(path.join(appended.directory, "creation-judging.json"), "utf8");
+  await assert.rejects(runStorytellingCreationJudging({ runDirectory: appended.directory,
+    inheritedSourceDirectory: original.directory, prepareOnly: true }), /inherited source binding/i);
+  assert.equal(fs.readFileSync(path.join(appended.directory, "creation-judging.json"), "utf8"), beforeRejectedResume);
+});
+
+test("inherited operational failures and pending seats remain frozen even when appended judging requests retries", async (t) => {
+  const original = fixture(t);
+  const originalResult = await runStorytellingCreationJudging({ runDirectory: original.directory, judgeConcurrency: 1,
+    agentRunnerImplementation: async ({ configuration }) => {
+      throw Object.assign(new Error("You've hit your usage limit."), { code: "EVAL_AGENT_RUNTIME_FAILED",
+        context: { requestedConfiguration: configuration, apiErrorStatus: 429 } });
+    } });
+  assert.equal(originalResult.judging.summary.judgmentCounts.error, 1);
+  assert.equal(originalResult.judging.summary.judgmentCounts.pending, 3);
+  const appended = fixture(t, { modelCount: 2 });
+  let appendedCalls = 0;
+  const result = await runStorytellingCreationJudging({ runDirectory: appended.directory,
+    inheritedSourceDirectory: original.directory, retryFailed: true,
+    agentRunnerImplementation: async (args) => { appendedCalls++; return response(args, appended.scoring); } });
+  assert.equal(appendedCalls, 4);
+  assert.deepEqual(result.judging.pairs[0], originalResult.judging.pairs[0]);
+  assert.equal(result.judging.status, "incomplete");
+  assert.equal(result.judging.summary.judgmentCounts.complete, 4);
+  assert.equal(validateStorytellingCreationJudging(loadArchive(appended)), true);
+});
+
+test("append inheritance rejects changed original generation rows before writing a sidecar or calling judges", async (t) => {
+  const original = fixture(t);
+  await runStorytellingCreationJudging({ runDirectory: original.directory,
+    agentRunnerImplementation: async (args) => response(args, original.scoring) });
+  const appended = fixture(t, { modelCount: 2 });
+  appended.run.rows[0].durationMs = 123;
+  writeJson(path.join(appended.directory, "run.json"), appended.run);
+  await assert.rejects(runStorytellingCreationJudging({ runDirectory: appended.directory,
+    inheritedSourceDirectory: original.directory,
+    agentRunnerImplementation: () => assert.fail("Original generation drift must fail before judging.") }), /inherited generation row/i);
+  assert.equal(fs.existsSync(path.join(appended.directory, "creation-judging.json")), false);
+  assert.equal(fs.existsSync(path.join(appended.directory, "creation-judge-context.json")), false);
+});
 
 test("context freezes the complete selected bytes and gives canonical models two separate seats", (t) => {
   const f = fixture(t);

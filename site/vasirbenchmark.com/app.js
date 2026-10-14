@@ -275,7 +275,7 @@ function buildWritingCategoryCollection(collection, selectionId = 'storytelling'
     meta: { release: publications[0].meta?.release, status: selection.provisional ? 'Provisional · uncalibrated development index' : 'Uncalibrated development index', categories: groups.length, benchmarks: benchmarks.length, settings: settings.length, conditions: 2, aggregateCells: entries.length, runs: publications.length, calibration: 0 },
     scoreBasis: { id: `${writingScoreBasis?.id || method}:${selection.id}`, label: selection.scoreBasisLabel, edition: writingScoreBasis?.id || 'Writing common-benchmark ranking v5', method, unit: 'rubric-points', range: { minimum: 0, maximum: 100 }, taskCount: activeBenchmarkIds.length, benchmarkIds: activeBenchmarkIds, comparisonBenchmarkNames, declaredConfigurationIds, declaredRosterBenchmarkId, declaredRosterSelection, readinessPolicy, benchmarkWeighting: selection.type === 'category' && !writingScoreBasis ? 'equal-tracks-equal-benchmarks' : 'equal-fixed-benchmarks-for-ranked-settings', subgroupWeighting: writingScoreBasis ? 'fixed-benchmark-basis' : selection.type === 'category' ? 'equal-selected-tracks' : 'selected-track-only', calibrationStatus: 'development-uncalibrated', provisional: selection.provisional, partial: selection.partial, selection, sources: sourceBases, coverage, panelMethod, sourceMethods: sourceBases.map(source => ({ benchmarkId: source.benchmarkId, label: source.label, method: source.method })) },
     coverage, categoryLeaders, efficientFrontier: [], regressions: entries.filter(entry => entry.eligibleForRank && entry.condition === 'skill' && finite(entry.exactDelta) && entry.exactDelta < 0),
-    callouts: { overall: publishedStorytelling ? 'All Writing averages its three published Storytelling benchmarks equally.' : writingScoreBasis ? `All Writing uses the fixed ${writingScoreBasis.id} benchmark basis.` : 'All Writing combines its published track scores.', value: 'Quality and resources use the same available benchmark weights for each setting; missing resources are not imputed.' },
+    callouts: { overall: publishedStorytelling ? 'All Writing averages its three established Storytelling benchmarks equally.' : writingScoreBasis ? `All Writing uses the fixed ${writingScoreBasis.id} benchmark basis.` : 'All Writing combines its published track scores.', value: 'Quality and resources use the same available benchmark weights for each setting; missing resources are not imputed.' },
     methodology: { method, panelMethod, limitations: ['Scores describe the selected benchmarks, not a calibrated measure of general writing ability.', 'An asterisk marks an unranked available-score mean, not a comparable aggregate. Only settings covering every selected benchmark receive ranks.', writingScoreBasis?.coreIdeaScoring === 'published-single-judge-provisional' ? 'Scores inherit provisional status from their sources. Core idea stays on its pinned published single-judge basis; missing paired totals remain unranked.' : 'A score inherits provisional status from its included benchmark totals. When official pairs become available, that entire benchmark switches basis; unavailable official totals are omitted from each model’s mean.'] },
     writingCategory: { method, publications, catalog, writingScoreBasis, groups, selection, selections, activeBenchmarkIds, availableOfficialBenchmarkIds, comparisonBenchmarkIds: activeBenchmarkIds, comparisonBenchmarkNames, comparisonLabel, declaredConfigurationIds, declaredRosterBenchmarkId, declaredRosterSelection, readinessPolicy, sourceCoverage, benchmarkWeights, coverageRecords, completeSettingCount: coverage.completedSettingCount, rankedSettingCount: coverage.rankedSettingCount, partialSettingCount: coverage.partialSettingCount, totalSettingCount: settings.length }
   };
@@ -631,6 +631,7 @@ function buildOverallAvailableCategories(data, setting) {
   const restoredEntry = entryById.get(window.history.state?.selectedEntryId);
 
   const state = {
+    modelSelectedByUser: false,
     selectedId: requestedWritingEntry?.id || (restoredEntry && (!isWriting || Number.isFinite(restoredEntry.score)) ? restoredEntry.id : null) || (isWriting ? [...data.entries].filter(entry => entry.condition === TREATMENT_CONDITION_ID && entry.eligibleForRank && Number.isFinite(entry.score)).sort((a, b) => (b.exactScore ?? b.score) - (a.exactScore ?? a.score))[0]?.id : null) || data.entries.find(entry => entry.condition === TREATMENT_CONDITION_ID)?.id || data.entries[0].id,
     capabilityCategory: initialRoute.category || COMBINED_CAPABILITY.id,
     capabilityMode: CAPABILITY_MODES.includes(initialRoute.mode) ? initialRoute.mode : 'models',
@@ -1445,7 +1446,7 @@ function buildOverallAvailableCategories(data, setting) {
   const aggregateCoverageMarkup = entry => `<span class="benchmark-coverage" title="Score uses ${entry.completedTaskCount} of ${entry.expectedTaskCount} benchmarks with both conditions completed">${entry.completedTaskCount}/${entry.expectedTaskCount} tests${entry.complete ? '' : ' · partial'}</span>`;
 
   const engineeringScoreDetailsMarkup = (entry = selectedEntry()) => {
-    if (!isEngineeringAggregate) return '';
+    if (!isEngineeringAggregate || !state.modelSelectedByUser) return '';
     const readings = engineeringBenchmarkReadings(entry);
     const baseline = baselineBySetting.get(entry.settingId);
     const skill = data.entries.find(item => item.settingId === entry.settingId && item.condition === 'skill');
@@ -1726,7 +1727,7 @@ function buildOverallAvailableCategories(data, setting) {
     const delta = comparable ? (isWorkSpec || isAggregate || isWriting ? fullEntry.delta : Math.round((fullScore - baselineScore) * 10) / 10) : null;
     const start = Math.min(baselineScore, fullScore);
     const connectorWidth = Math.max(Math.abs(fullScore - baselineScore), 0.25);
-    const selected = !options.linkFor && selectedEntry().settingId === fullEntry.settingId;
+    const selected = !options.linkFor && (!isEngineeringAggregate || state.modelSelectedByUser) && selectedEntry().settingId === fullEntry.settingId;
     const rowTag = options.linkFor ? 'a' : 'button';
     const rankCount = options.rankCount ?? RANKED_SETTING_COUNT;
     return `
@@ -2491,6 +2492,7 @@ function buildOverallAvailableCategories(data, setting) {
 
   const selectEntry = (entryId, focusSelector) => {
     if (!entryById.has(entryId)) return;
+    state.modelSelectedByUser = true;
     state.selectedId = entryId;
     if (isWriting) {
       const url = new URL(window.location.href);

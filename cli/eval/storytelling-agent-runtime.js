@@ -280,6 +280,15 @@ function parseEvents(stdout) {
   });
 }
 
+function externalToolEvents(events, transport) {
+  return events.filter(event => ["item.started", "item.completed"].includes(event.type))
+    .map(event => event.item).filter(item => item && (
+      ["web_search", "web_search_call", "browser_tool_call", "computer_tool_call"].includes(item.type) ||
+      item.type === "mcp_tool_call" && !(transport === "mcp-chunks" &&
+        item.server === "benchmark_reader" && item.tool === "read_chunk")))
+    .map(item => ({ type: item.type, server: item.server ?? null, tool: item.tool ?? null, status: item.status ?? null }));
+}
+
 function inspectEvidence(events, configuration, snapshot, fixtureDirectoryPath = null) {
   const observedModels = new Set();
   const declaredModels = new Set();
@@ -376,6 +385,7 @@ export async function runStorytellingAgent({
   let instructionHash = null;
   let fixtureDirectoryPath = null;
   let fixtureRealPath = null;
+  let externalToolAbortRequested = false;
   const startedAt = new Date().toISOString();
   const spawnWithSkill = (command, commandArguments, options) => {
     fixtureDirectoryPath = options.cwd;
@@ -391,7 +401,15 @@ export async function runStorytellingAgent({
       if (configuration.provider === "codex") args.splice(args.indexOf("-"), 0, "--config", `developer_instructions=${JSON.stringify(instruction)}`);
       else args.push("--append-system-prompt", instruction);
     }
-    if (configuration.provider === "codex") args.splice(args.indexOf("-"), 0, "--config", 'web_search="disabled"');
+    if (configuration.provider === "codex") {
+      // Ignoring user config does not disable CLI-default apps. Their MCP web
+      // tools bypass web_search=disabled, so close those independent sources.
+      const isolation = ['web_search="disabled"', 'features.apps=false', 'features.plugins=false',
+        'features.browser_use=false', 'features.browser_use_external=false', 'features.computer_use=false',
+        'features.skip_host_skill_discovery=true', 'features.skill_search=false', 'project_doc_max_bytes=0',
+        'suppress_unstable_features_warning=true'];
+      args.splice(args.indexOf("-"), 0, ...isolation.flatMap(value => ["--config", value]));
+    }
     if (requiredSkillReadTransport === "mcp-chunks") {
       const serverFile = path.join(options.cwd, ".benchmark-frozen-reader.cjs");
       const directory = skillSnapshot ? path.join(options.cwd, ".benchmark-skill", skillSnapshot.skillName) : options.cwd;
@@ -402,10 +420,7 @@ export async function runStorytellingAgent({
       const isolation = [
         'default_permissions="writing-benchmark"',
         `permissions={ writing-benchmark={ filesystem={ ":root"="deny", ":minimal"="read", ${JSON.stringify(options.cwd)}="read", ${JSON.stringify(nodeDirectory)}="read" }, network={ enabled=false } } }`,
-        'approval_policy="never"', 'features.skip_host_skill_discovery=true',
-        'features.skill_search=false', 'features.plugins=false', 'features.apps=false',
-        'features.browser_use=false', 'features.computer_use=false', 'features.shell_snapshot=false',
-        'project_doc_max_bytes=0', 'shell_environment_policy.inherit="none"',
+        'approval_policy="never"', 'features.shell_snapshot=false', 'shell_environment_policy.inherit="none"',
         `shell_environment_policy.set.PATH=${JSON.stringify(`${nodeDirectory}:/usr/bin:/bin:/usr/sbin:/sbin`)}`
       ];
       args.splice(args.indexOf("-"), 0, ...isolation.flatMap(value => ["--config", value]));
@@ -440,7 +455,20 @@ export async function runStorytellingAgent({
         return child.stdout;
       };
     } else {
-      child.stdout.on("data", (chunk) => { stdout += chunk; });
+      let pendingEventText = "";
+      child.stdout.on("data", (chunk) => {
+        stdout += chunk;
+        if (configuration.provider !== "codex" || externalToolAbortRequested) return;
+        pendingEventText += chunk;
+        const end = pendingEventText.lastIndexOf("\n");
+        if (end < 0) return;
+        const events = parseEvents(pendingEventText.slice(0, end));
+        pendingEventText = pendingEventText.slice(end + 1);
+        if (externalToolEvents(events, requiredSkillReadTransport).length) {
+          externalToolAbortRequested = true;
+          child.kill("SIGTERM");
+        }
+      });
     }
     return child;
   };
@@ -449,7 +477,16 @@ export async function runStorytellingAgent({
       configuration, promptText, outputSchema, environmentVariables,
       ...(timeoutMs === undefined ? {} : { timeoutMs }), spawnImplementation: spawnWithSkill
     });
-    const evidence = inspectEvidence(parseEvents(stdout), configuration, skillSnapshot, fixtureDirectoryPath);
+    const events = parseEvents(stdout);
+    const forbiddenEvents = configuration.provider === "codex" ? externalToolEvents(events, requiredSkillReadTransport) : [];
+    if (forbiddenEvents.length) {
+      const error = new Error("Storytelling response used an external tool despite frozen-resource isolation; retain the answer as a protocol failure, not a comparable result.");
+      error.code = "EVAL_STORYTELLING_EXTERNAL_TOOL_USED";
+      error.context = { externalToolEvents: forbiddenEvents, outputText: result.text, outputSha256: digest(result.text),
+        usage: result.usage, costUsd: result.costUsd, durationMs: result.durationMs, outputRetained: true };
+      throw error;
+    }
+    const evidence = inspectEvidence(events, configuration, skillSnapshot, fixtureDirectoryPath);
     return {
       ...result,
       runtimeReceipt: {
@@ -477,6 +514,19 @@ export async function runStorytellingAgent({
     };
   } catch (error) {
     const events = parseEvents(stdout);
+    if (externalToolAbortRequested) {
+      const outputText = error.context?.outputText ?? events.filter(event => event.type === "item.completed" && event.item?.type === "agent_message").at(-1)?.item?.text ?? null;
+      const usage = events.findLast(event => event.type === "turn.completed")?.usage;
+      error.code = "EVAL_STORYTELLING_EXTERNAL_TOOL_USED";
+      error.message = "Storytelling session was stopped after a forbidden external tool event; retained output is excluded from comparison.";
+      error.context = { ...(error.context ?? {}), externalToolAbortRequested: true,
+        externalToolEvents: externalToolEvents(events, requiredSkillReadTransport), outputText,
+        outputSha256: outputText === null ? null : digest(outputText), outputRetained: outputText !== null,
+        usage: error.context?.usage ?? (usage ? { inputTokens: Number(usage.input_tokens ?? 0),
+          cachedInputTokens: Number(usage.cached_input_tokens ?? 0), outputTokens: Number(usage.output_tokens ?? 0),
+          reasoningOutputTokens: Number(usage.reasoning_output_tokens ?? 0),
+          totalTokens: Number(usage.input_tokens ?? 0) + Number(usage.output_tokens ?? 0) } : null) };
+    }
     const terminalDiagnostic = events.filter((event) => event.type === "result" || event.type === "error")
       .map((event) => event.result ?? event.message ?? "").join("\n");
     const authenticationDiagnostic = `${error.message ?? ""}

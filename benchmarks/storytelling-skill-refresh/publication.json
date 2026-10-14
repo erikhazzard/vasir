@@ -1,0 +1,8 @@
+{
+  "kind": "vasirbenchmark-writing-refresh-source",
+  "schemaVersion": 1,
+  "snapshot": {
+    "path": ".agents/vasir-evals/storytelling-skill-refresh/publication-snapshots/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/snapshot.json",
+    "sha256": "071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e"
+  }
+}

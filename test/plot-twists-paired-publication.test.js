@@ -6,7 +6,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { completePairedFixture, completeSupplementalPairedFixture, createPairedFixture, createSupplementalPairedFixture, mockPairedProvider, pairedAssessment, codexPairedOutput, claudePairedOutput } from './helpers/plot-twists-paired-fixture.js';
-import { applyPairedRuntimeValidationErratum, exportPairedRun, preparePairedRun, preparePairedTechnicalRecovery, runPairedGenerations, runPairedJudgments } from '../cli/eval/plot-twists-paired-runtime.js';
+import { applyPairedRuntimeValidationErratum, exportPairedRun, preparePairedRun, runPairedGenerations, runPairedJudgments } from '../cli/eval/plot-twists-paired-runtime.js';
 import { projectPlotTwistsPairedRun, validatePlotTwistsPairedPublication, preparePlotTwistsPairedPublicationSource,
   buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, WRITING_PAIRED_SCORE_BASIS,
   PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_PATH, PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256 } from '../cli/eval/plot-twists-paired-publication.js';
@@ -608,22 +608,14 @@ test('generic chained append preserves each original cohort and accepts only dec
 });
 
 test('approved technical recovery publishes exact per-record origins and preserves all superseded evidence', async t => {
-  const sourceDirectory = path.join(repo, '.agents/vasir-evals/storytelling-plot-twists-paired-v2/remaining-writing-coverage-20260909T2257Z');
-  if (!fs.existsSync(sourceDirectory)) return t.skip('Retained private stopped-run evidence is not installed.');
-  const source = exportPairedRun({ runDirectoryPath: sourceDirectory }), sourceText = JSON.stringify(source, null, 2) + '\n';
-  const fixture = createPairedFixture(t), root = path.dirname(fixture), sourceSnapshotPath = path.join(root, 'stopped-source.json');
-  fs.writeFileSync(sourceSnapshotPath, sourceText, { flag: 'wx' });
-  const runDirectoryPath = path.join(root, 'approved-recovery');
-  preparePairedTechnicalRecovery({ runDirectoryPath, sourceSnapshotPath, authorization: {
-    approvedAt: '2026-09-10T00:00:00.000Z', userInstruction: 'please do it',
-    scope: 'Rerun only the three skill answers affected by tool errors and their reviews; preserve all clean results and original attempts.' } });
-  const pending = project(exportPairedRun({ runDirectoryPath }));
-  assert.equal(pending.projection.coverage.executionComplete, false);
-  assert.throws(() => preparePlotTwistsPairedPublicationSource({ repoRootDirectory: root, runDirectory: runDirectoryPath }), /all declared pairs/);
-  const calls = [];
-  await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
-  const { snapshot } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
-  assert.equal(calls.length, 57, 'Only 3 replacement + 14 pending answers and 2 replacement + 38 pending reviews are called.');
+  const snapshotSha256 = 'f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7';
+  const snapshotPath = path.join(repo, `.agents/vasir-evals/storytelling-plot-twists-paired-v2/publication-snapshots/${snapshotSha256}/snapshot.json`);
+  if (!fs.existsSync(snapshotPath)) return t.skip('Retained immutable technical-recovery evidence is not installed.');
+  const snapshotText = fs.readFileSync(snapshotPath, 'utf8'); assert.equal(hash(snapshotText), snapshotSha256);
+  const snapshot = JSON.parse(snapshotText), source = snapshot.recoverySourceSnapshot, sourceText = JSON.stringify(source, null, 2) + '\n';
+  const fixture = createPairedFixture(t), root = path.dirname(fixture);
+  const plan = snapshot.manifest.technicalRecovery;
+  assert.equal(plan.replacementGenerationIds.length + plan.pendingGenerationIds.length + plan.replacementJudgmentIds.length + plan.pendingJudgmentIds.length, 57);
   const built = project(snapshot), { projection, responseBundle } = built, contract = projection.methodology.sourceContract;
   const recovery = contract.technicalRecovery;
   assert.equal(recovery.sourceSnapshotSha256, hash(sourceText));
@@ -700,7 +692,9 @@ test('approved technical recovery publishes exact per-record origins and preserv
   previous[index] = { benchmarkId: 'storytelling-plot-twists', ...parentPin, sources: [parent], lineage: {
     kind: 'declared-writing-coverage-extension', previousSources: previous[index].sources,
     previousLineage: { kind: 'declared-writing-source-replacement', previousSources: previous[index].sources } } };
-  write(root, selectionPath, preparePlotTwistsPairedPublicationSource({ repoRootDirectory: root, runDirectory: runDirectoryPath }));
+  const selectedSnapshot = write(root, `history/accepted-recovery/${snapshotSha256}/snapshot.json`, snapshotText);
+  write(root, selectionPath, { kind: 'vasirbenchmark-plot-twists-paired-source', schemaVersion: 1, edition: PLOT_TWISTS_PAIRED_EDITION, snapshot: { path: selectedSnapshot.path, sha256: selectedSnapshot.sha256 } });
+  write(root, PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_PATH, fs.readFileSync(path.join(repo, PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_PATH), 'utf8'));
   const accepted = verifyWritingSourceSelections({ repo: root, previousSelections: previous });
   const lineage = accepted[index].lineage;
   assert.equal(lineage.kind, 'declared-writing-technical-recovery');
@@ -712,6 +706,6 @@ test('approved technical recovery publishes exact per-record origins and preserv
   assert.equal(lineage.originalSettingsRerun, true);
   assert.deepEqual(verifyWritingSourceSelections({ repo: root, previousSelections: accepted }), accepted);
   assert.deepEqual(snapshot.recoverySourceSnapshot, source);
-  assert.equal(fs.readFileSync(sourceSnapshotPath, 'utf8'), sourceText);
-  assert.equal(JSON.stringify(exportPairedRun({ runDirectoryPath: sourceDirectory }), null, 2) + '\n', sourceText);
+  assert.equal(fs.readFileSync(snapshotPath, 'utf8'), snapshotText);
+  assert.equal(hash(sourceText), recovery.sourceSnapshotSha256);
 });

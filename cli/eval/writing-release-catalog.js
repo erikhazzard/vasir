@@ -7,6 +7,7 @@ export const WRITING_ACTIVE_RELEASE = Object.freeze({
   benchmarks: Object.freeze([
     Object.freeze({ id: 'storytelling-core-idea', trackId: 'storytelling', lifecycle: 'published' }),
     Object.freeze({ id: 'storytelling-plot-twists', trackId: 'storytelling', lifecycle: 'published' }),
-    Object.freeze({ id: 'storytelling-magic-discovery', trackId: 'storytelling', lifecycle: 'published' })
+    Object.freeze({ id: 'storytelling-magic-discovery', trackId: 'storytelling', lifecycle: 'published' }),
+    Object.freeze({ id: 'storytelling-core-idea-refresh', trackId: 'storytelling', lifecycle: 'published', scoreBasisIncluded: false })
   ])
 });

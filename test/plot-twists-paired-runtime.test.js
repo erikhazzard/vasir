@@ -1,13 +1,113 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { preparePairedRun, preparePairedTechnicalRecovery, exportPairedRun, validatePairedRunExport, runPairedGenerations, runPairedJudgments,
   pairedCandidateMap, pairedDigest, pairedWordCount, validatePairedAssessment, PAIRED_CREATORS, PAIRED_JUDGES, PAIRED_RUNTIME_POLICY,
-  PAIRED_ADDED_CREATORS, PAIRED_EXPANDED_CREATORS, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY } from '../cli/eval/plot-twists-paired-runtime.js';
+  PAIRED_ADDED_CREATORS, PAIRED_EXPANDED_CREATORS, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY, PAIRED_TOOL_ISOLATION_POLICY,
+  PAIRED_DISABLED_HOST_ERRATUM_VERSION, runPairedAgent, applyPairedRuntimeValidationErratum } from '../cli/eval/plot-twists-paired-runtime.js';
 import { main } from '../benchmarks/storytelling-plot-twists-paired-v2/run.mjs';
 import { createPairedFixture, completePairedFixture, createSupplementalPairedFixture, completeSupplementalPairedFixture,
   mockPairedProvider, codexPairedOutput, claudePairedOutput, pairedAssessment } from './helpers/plot-twists-paired-fixture.js';
+import { projectPlotTwistsPairedRun } from '../cli/eval/plot-twists-paired-publication.js';
+
+test('disabled-host correction accepts the paired startup notice and rejects tools, other errors, repetition and incomplete turns', async t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'vasir-disabled-host-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const notice = { type: 'item.completed', item: { type: 'error', message: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY.allowedStartupDiagnostic } };
+  const stderr = '2026-10-12T21:01:25.633158Z ERROR codex_core::tools::router: error=code-mode host is disabled\n';
+  const originalEvents = codexPairedOutput('Original saved answer.').trim().split('\n').map(JSON.parse);
+  const withNotice = () => { const events = structuredClone(originalEvents); events.splice(1, 0, notice); return events; };
+  const cases = [
+    { name: 'paired startup', events: withNotice(), stderr, expected: 'succeeded' },
+    { name: 'unmatched stderr', events: originalEvents, stderr, expected: 'failed' },
+    { name: 'other router error', events: withNotice(), stderr: stderr.replace('code-mode host is disabled', 'multi-agent host is disabled'), expected: 'failed' },
+    { name: 'repeated stderr', events: withNotice(), stderr: stderr + stderr, expected: 'failed' },
+    { name: 'repeated stdout', events: [originalEvents[0], notice, notice, ...originalEvents.slice(1)], stderr, expected: 'failed' },
+    { name: 'in-turn notice', events: [originalEvents[0], originalEvents[1], notice, ...originalEvents.slice(2)], stderr, expected: 'failed' },
+    { name: 'tool call', events: [...withNotice().slice(0, -1), { type: 'item.completed', item: { type: 'command_execution', command: 'forbidden' } }, originalEvents.at(-1)], stderr, expected: 'failed' },
+    { name: 'incomplete turn', events: withNotice().slice(0, -1), stderr, expected: 'failed' }
+  ];
+  for (const [index, scenario] of cases.entries()) {
+    const artifactDirectoryPath = path.join(directory, String(index)); fs.mkdirSync(artifactDirectoryPath);
+    const result = await runPairedAgent({ configuration: { id: 'codex:gpt-6.1-sol@xhigh', provider: 'codex', model: 'gpt-6.1-sol', reasoning: 'xhigh' },
+      promptText: 'Frozen task.', artifactDirectoryPath, validationErratumSha256: 'a'.repeat(64), validationErratumVersion: PAIRED_DISABLED_HOST_ERRATUM_VERSION,
+      executionValidationPolicy: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY, toolIsolationPolicy: PAIRED_TOOL_ISOLATION_POLICY,
+      spawnImplementation: mockPairedProvider({ stderr: scenario.stderr, answer: () => scenario.events.map(JSON.stringify).join('\n') + '\n' }) });
+    assert.equal(result.status, scenario.expected, scenario.name);
+    if (result.status === 'succeeded') { assert.equal(result.runtimeReceipt.terminalEvidence.toolCallCount, 0); assert.equal(result.runtimeReceipt.terminalEvidence.completedTurns, 1); }
+  }
+});
+
+test('disabled-host offline erratum preserves native failure bytes and reuses both author answers for only two remaining judges', async t => {
+  const nativeDirectory = path.resolve('.agents/vasir-evals/storytelling-plot-twists-paired-v2/sol-6-1-xhigh-20261012');
+  if (!fs.existsSync(path.join(nativeDirectory, 'failed-snapshot.json'))) return t.skip('Pinned native failure is not installed.');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'vasir-saved-writing-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const runDirectoryPath = path.join(directory, 'sol-6-1-xhigh-20261012'); fs.mkdirSync(runDirectoryPath);
+  for (const name of ['manifest.json', 'manifest.sha256', 'specification.json', 'parent-snapshot.json', 'STOP.json', 'generations']) fs.cpSync(path.join(nativeDirectory, name), path.join(runDirectoryPath, name), { recursive: true });
+  fs.mkdirSync(path.join(runDirectoryPath, 'judgments'));
+  const before = exportPairedRun({ runDirectoryPath });
+  const originalFiles = ['STOP.json', ...before.generations.slice(66).flatMap(row => ['result.json', 'result.sha256', 'stdout.txt', 'stderr.txt', 'attempted.json', 'prompt.txt', 'input-payload.json'].map(file => row.artifactDirectory + '/' + file))];
+  const originalHashes = originalFiles.map(file => [file, pairedDigest(fs.readFileSync(path.join(runDirectoryPath, file)))]);
+  const corrected = applyPairedRuntimeValidationErratum({ runDirectoryPath }); assert.equal(corrected.additionalInferenceCalls, 0);
+  const calls = [];
+  const generated = await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(generated.dispatched, 0); assert.equal(calls.length, 0);
+  assert.equal(generated.snapshot.generations[67].responseText, before.generations[67].responseText);
+  assert.deepEqual(generated.snapshot.generations[67].validationCorrection.originalRecord, before.generations[67]);
+  const judged = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(judged.dispatched, 2); assert.equal(calls.length, 2);
+  assert.deepEqual(judged.snapshot.generations.slice(0, 66), before.generations.slice(0, 66));
+  assert.deepEqual(judged.snapshot.judgments.slice(0, 66), before.judgments.slice(0, 66));
+  for (const call of calls) for (const row of before.generations.slice(66)) assert.ok(call.inputText.includes(JSON.stringify(row.responseText)), 'Review uses the exact saved author text.');
+  for (const [file, sha256] of originalHashes) assert.equal(pairedDigest(fs.readFileSync(path.join(runDirectoryPath, file))), sha256);
+  const published = projectPlotTwistsPairedRun({ snapshot: judged.snapshot, sourceSha256: pairedDigest(JSON.stringify(judged.snapshot)) });
+  assert.equal(published.projection.methodology.sourceContract.appendedRuntimeValidationErratum.additionalInferenceCalls, 0);
+});
+
+test('Sol 6.1 current-runtime append executes four new slots and preserves every frozen incumbent', async t => {
+  const parentSnapshotPath = path.resolve('.agents/vasir-evals/storytelling-plot-twists-paired-v2/publication-snapshots/f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7/snapshot.json');
+  if (!fs.existsSync(parentSnapshotPath)) return t.skip('Pinned private published parent is not installed.');
+  const parentBytes = fs.readFileSync(parentSnapshotPath), parent = JSON.parse(parentBytes);
+  assert.equal(pairedDigest(parentBytes), 'f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'vasir-sol-writing-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const runDirectoryPath = path.join(directory, 'sol-6-1-xhigh');
+  await main(['prepare', '--run-dir', runDirectoryPath, '--parent-snapshot', parentSnapshotPath,
+    '--add-configurations', 'codex:gpt-6.1-sol@xhigh', '--current-runtime-append', 'true']);
+  const calls = [];
+  await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  const { snapshot } = await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) });
+  assert.equal(calls.length, 4);
+  assert.deepEqual(calls.map(call => call.args[call.args.indexOf('--model') + 1]), ['gpt-6.1-sol', 'gpt-6.1-sol', 'gpt-6-astra', 'gpt-5.6-sol']);
+  for (const kind of ['generations', 'judgments']) {
+    assert.deepEqual(snapshot[kind].slice(0, 66), parent[kind]);
+    assert.equal(snapshot[kind].length, 68);
+    assert.equal(fs.readdirSync(path.join(runDirectoryPath, kind)).length, 2);
+  }
+  assert.deepEqual(snapshot.parentSnapshot, parent);
+  assert.deepEqual(snapshot.manifest.frozenBundle, parent.manifest.frozenBundle);
+  const publication = projectPlotTwistsPairedRun({ snapshot, sourceSha256: pairedDigest(JSON.stringify(snapshot)) });
+  assert.equal(publication.projection.settings.at(-1).configurationId, 'codex:gpt-6.1-sol@xhigh');
+  assert.equal(publication.projection.settings.at(-1).family, 'GPT-6.1 Sol');
+  assert.equal(publication.projection.methodology.sourceContract.executionCompatibility.version, 'paired-current-runtime-coverage-append-v1');
+  for (const mutate of [
+    candidate => { delete candidate.manifest.executionCompatibility; },
+    candidate => { candidate.manifest.executionCompatibility.reviewedSourceChanges[0].sha256 = 'a'.repeat(64); },
+    candidate => { candidate.manifest.sourceHashes[1].sha256 = 'a'.repeat(64); },
+    candidate => { candidate.manifest.runtimeInventory.codex = parent.manifest.runtimeInventory.codex; },
+    candidate => { candidate.parentSnapshot.generations[0].responseText += ' changed'; }
+  ]) {
+    const candidate = structuredClone(snapshot); mutate(candidate); candidate.manifestSha256 = pairedDigest(candidate.manifest);
+    assert.throws(() => validatePairedRunExport(candidate));
+  }
+  assert.equal((await runPairedGenerations({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal((await runPairedJudgments({ runDirectoryPath, spawnImplementation: mockPairedProvider({ calls }) })).dispatched, 0);
+  assert.equal(calls.length, 4);
+  assert.deepEqual(fs.readFileSync(parentSnapshotPath), parentBytes);
+});
 
 test('prepare pins one prompt, exact six medium models, twelve answers and twelve paired requests without inference', t => {
   const runDirectoryPath = createPairedFixture(t), snapshot = exportPairedRun({ runDirectoryPath });

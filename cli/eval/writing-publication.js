@@ -12,6 +12,7 @@ import { TWISTS_COMPLETION_VERSION, TWISTS_PARENT_SHA256, validateTwistsCompleti
 import { buildWritingNavigationSummary } from "./writing-navigation.js";
 import { validateWritingCompactPublication, WRITING_COMPACT_BENCHMARKS, WRITING_ESTABLISHED_SCORE_BASIS } from "./writing-compact-publication.js";
 import { WRITING_ACTIVE_RELEASE } from "./writing-release-catalog.js";
+import { buildWritingRefreshPublication, validateWritingRefreshPublication, WRITING_REFRESH_BENCHMARK_IDS } from "./writing-refresh-publication.js";
 import { buildPlotTwistsPairedPublication, PLOT_TWISTS_PAIRED_EDITION, PLOT_TWISTS_PAIRED_SOURCE_KIND,
   validatePlotTwistsPairedPublication, WRITING_PAIRED_SCORE_BASIS } from "./plot-twists-paired-publication.js";
 
@@ -27,7 +28,7 @@ const HASH = /^[a-f0-9]{64}$/;
 const PANEL = ["codex:gpt-6-astra@xhigh", "claude:claude-fable-5-1@max"];
 export const PLOT_TWISTS_BENCHMARK_ID = "storytelling-plot-twists";
 const TWISTS_PANEL = ["codex:gpt-6-astra@xhigh", "codex:gpt-5.6-sol@xhigh"];
-const BENCHMARK_IDS = [WRITING_BENCHMARK_ID, PLOT_TWISTS_BENCHMARK_ID, STORYTELLING_CREATION_BENCHMARK_ID];
+const BENCHMARK_IDS = [WRITING_BENCHMARK_ID, PLOT_TWISTS_BENCHMARK_ID, STORYTELLING_CREATION_BENCHMARK_ID, ...WRITING_REFRESH_BENCHMARK_IDS];
 export const writingSelectionPath = benchmarkId => {
   requireEvidence(BENCHMARK_IDS.includes(benchmarkId), "unsupported Writing benchmark.");
   return `benchmarks/${benchmarkId}/publication.json`;
@@ -37,7 +38,7 @@ const CONDITIONS = [
   { id: "skill", sourceId: "skill:writing-storytelling", short: "Storytelling", label: "Storytelling skill", color: "#1f6fff", shape: "square" }
 ];
 const LABELS = {
-  "gpt-6-astra": "GPT-6 Astra", "gpt-5.6-sol": "GPT-5.6 Sol", "gpt-5.6-terra": "GPT-5.6 Terra",
+  "gpt-6-astra": "GPT-6 Astra", "gpt-6.1-sol": "GPT-6.1 Sol", "gpt-5.6-sol": "GPT-5.6 Sol", "gpt-5.6-terra": "GPT-5.6 Terra",
   "gpt-5.6-luna": "GPT-5.6 Luna", "claude-fable-5-1": "Claude Fable 5.1", "claude-opus-5": "Claude Opus 5"
 };
 const digest = value => crypto.createHash("sha256").update(value).digest("hex");
@@ -536,6 +537,7 @@ export function validateWritingPublication(projection, responseBundle) {
     return projection;
   }
   const benchmarkId = projection?.benchmarks?.[0]?.id;
+  if (WRITING_REFRESH_BENCHMARK_IDS.includes(benchmarkId)) return validateWritingRefreshPublication(projection, responseBundle);
   if (benchmarkId === PLOT_TWISTS_BENCHMARK_ID && projection.scoreBasis?.edition === PLOT_TWISTS_PAIRED_EDITION) return validatePlotTwistsPairedPublication(projection, responseBundle);
   if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return validateStorytellingCreationPublication(projection, responseBundle);
   const panel = benchmarkId === PLOT_TWISTS_BENCHMARK_ID ? TWISTS_PANEL : PANEL;
@@ -646,6 +648,7 @@ export function validateWritingPublication(projection, responseBundle) {
 }
 
 export function buildSelectedWritingPublication({ repoRootDirectory, benchmarkId, readFileSyncImplementation = fs.readFileSync }) {
+  if (WRITING_REFRESH_BENCHMARK_IDS.includes(benchmarkId)) return buildWritingRefreshPublication({ repoRootDirectory, benchmarkId, readFileSyncImplementation });
   if (benchmarkId === STORYTELLING_CREATION_BENCHMARK_ID) return buildStorytellingCreationPublication({ repoRootDirectory, readFileSyncImplementation });
   let selectionText;
   try { selectionText = readFileSyncImplementation(path.join(repoRootDirectory, writingSelectionPath(benchmarkId)), "utf8"); }
@@ -706,8 +709,8 @@ function validateWritingCatalog(catalog, basis, publicRelease) {
   if (publicRelease) {
     requireEvidence(same(publicRelease, { id: WRITING_ACTIVE_RELEASE.id, lifecycle: WRITING_ACTIVE_RELEASE.lifecycle }), "unknown Writing public release.");
     const published = WRITING_ACTIVE_RELEASE.benchmarks.filter(benchmark => benchmark.lifecycle === "published");
-    requireEvidence(same(catalog?.map(item => item.id), published.map(item => item.id)) && same(catalog.map(item => item.id), basis.benchmarkIds), "public Writing catalog differs from its score inputs.");
-    requireEvidence(catalog.every((item, index) => item.lifecycle === "published" && item.archived === false && item.scoreBasisIncluded === true
+    requireEvidence(same(catalog?.map(item => item.id), published.map(item => item.id)) && same(catalog.filter(item => item.scoreBasisIncluded).map(item => item.id), basis.benchmarkIds), "public Writing catalog differs from its score inputs.");
+    requireEvidence(catalog.every((item, index) => item.lifecycle === "published" && item.archived === false && item.scoreBasisIncluded === (published[index].scoreBasisIncluded !== false)
       && item.trackId === published[index].trackId && item.detailHref === `benchmark-report.html#${item.id}`), "public Writing catalog source lifecycle changed.");
     return;
   }
@@ -735,7 +738,7 @@ export function buildWritingPublication(options) {
     return { id: benchmark.id, name: benchmark.name, title: benchmark.title, trackId: benchmark.trackId,
       trackTitle: publication.tracks.find(track => track.id === benchmark.trackId)?.title ?? benchmark.suite,
       edition: publication.scoreBasis.edition ?? publication.scoreBasis.id, status: publication.coverage.scoredResponseCount > 0 ? "measured" : "unscored",
-      lifecycle: "published", archived: false, scoreBasisIncluded: true, detailHref: benchmark.detailHref };
+      lifecycle: "published", archived: false, scoreBasisIncluded: WRITING_ACTIVE_RELEASE.benchmarks.find(item => item.id === benchmark.id)?.scoreBasisIncluded !== false, detailHref: benchmark.detailHref };
   });
   const writingScoreBasis = catalog.find(item => item.id === PLOT_TWISTS_BENCHMARK_ID).edition === PLOT_TWISTS_PAIRED_EDITION
     ? WRITING_PAIRED_SCORE_BASIS : WRITING_ESTABLISHED_SCORE_BASIS;

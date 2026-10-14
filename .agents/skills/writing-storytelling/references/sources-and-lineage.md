@@ -18,7 +18,7 @@ The foundation is the completed *What Makes Story* synthesis in the writing rese
 
 For skill creation, independent domain agents revisited relevant synthesis chapters, selected analyses, and targeted primary passages. Detailed reading scopes and review results are retained in the Vasir work record outside the runtime skill. This is not a claim that each agent freshly reread every complete book. The supplied editions include physical-PDF page anchors; printed folios, later editions, and other transcriptions may differ.
 
-The prose and invented demonstrations here operationalize the research. They are not reproduced chapters, an exhaustive substitute for the source books, or a claim to have discovered every underlying idea independently.
+The prose and invented demonstrations operationalize the research; they are not reproduced chapters or exhaustive substitutes. The [genre guides](genres/index.md) also distill the user's `tmp/writing-info/genre.md`, a compilation of templates, illustrative propositions, and proposed extensions; its provenance and scope are recorded in their index.
 
 ## The nine core works
 
@@ -29,7 +29,7 @@ The prose and invented demonstrations here operationalize the research. They are
 | Robert McKee, *Dialogue* | Speech as action; foreground and background desires; text/subtext; inner and audience-directed speech; sentence design; telling; degrees and alternatives of conflict | [Dialogue](dialogue.md), [narration](narration-and-prose.md), [scenes](scenes-and-beats.md) |
 | Matt Bird, *The Secrets of Story* | Audience involvement; problematic pursuits; practical starting philosophy; easy approaches meeting unforeseen conflict; scene and structure tests; distinguishing workable guidance from prescribed formulas | [Characters](characters.md), [arcs](character-arcs.md), [development](story-development.md), [plot](plot-and-structure.md) |
 | Matt Bird, *The Secrets of Character* | Believe, care, and invest as separable relationships to a character; specificity, voice, motivation, competence, vulnerability, social position, and point of access | [Characters](characters.md), [relationships](relationships-and-cast.md), [dialogue](dialogue.md) |
-| Shawn Coyne, *The Story Grid* | Genre expectations; inspectable scene and manuscript structure; global/local distinctions; conventions and obligatory effects; revision diagnostics | [Genre and form](genre-and-form.md), [scenes](scenes-and-beats.md), [revision](revision-and-diagnosis.md) |
+| Shawn Coyne, *The Story Grid* | Content genres and value spectra; global/local structure; conventions and obligatory effects; revision diagnostics | [Genre and form](genre-and-form.md), [scenes](scenes-and-beats.md), [revision](revision-and-diagnosis.md) |
 | Robert McKee and Thomas Gerace, *Storynomics* | Earned attention; meaningful negative-to-positive movement; purpose-told narrative; audience/need/action; the relation and difference between fictional causality and measurable commercial effects | [Applied narrative](applied-narrative.md) |
 | Chuck Palahniuk, supplied writing-craft essay collection | Physical specificity; controlled information; recurring language; rhythm; implied thought; performance and audience contact; techniques treated as tools rather than absolute prohibitions | [Narration and prose](narration-and-prose.md), [dialogue](dialogue.md), [revision](revision-and-diagnosis.md) |
 | Joseph Campbell, *The Hero with a Thousand Faces* | Mythic and symbolic transformations; departure/return and their alternatives; individual/cosmic relations; loss of forms and renewed worlds; comparison used with historical and cultural limits | [World and myth](world-and-myth.md), [genre and form](genre-and-form.md) |
@@ -37,6 +37,8 @@ The prose and invented demonstrations here operationalize the research. They are
 The source folder labels in the research corpus include `STORY__mckee-md`, `CHARACTER__mckee-md`, `DIAGLOUE__mckee-md` (the transcription's spelling), `secretsofstory-md`, `secretsofcharacter-md`, `StoryGrid-md`, `storynomics-md`, `palahniuk-writing-craft-essays-md`, and `hero-with-a-thousand-faces-md`. These labels aid identification; their folders are not required beside the installed skill.
 
 ## Selective boundary sources
+
+The [MMORPG guide](genres/mmorpg.md) combines the user's earned-power brief with targeted Bartle analyses in `analysis/MMOs_from_the_Inside_Out-md/analysis.md` and `analysis/From_MUDs_to_MMORPGs_The_History_of_Virt-md/analysis.md` from the writing corpus. Project Horseshoe's [2019 Everlasting Narrative report](https://www.projecthorseshoe.com/reports/featured/ph19r4.htm) contributes recurring events, overlapping arcs, stable world elements, and regional sources of conflict. Sources establish provenance; ordinary writing requests do not require loading them.
 
 Jesse Schell's *The Art of Game Design* supplies the experience-first distinction, designed pathways versus story-generating systems, and indirect-control questions. Michael E. Shea's *Return of the Lazy Dungeon Master* supplies bounded preparation, strong openings, possible rather than compulsory scenes, secrets, improvisation, and participant authority. These are selective comparisons, not a claim that this writing skill replaces a complete game-design or tabletop library.
 
@@ -69,7 +71,7 @@ All uncited workshop examples—repair shops, archives, ferries, couriers, famil
 
 **Pressure and revelation:** pressure can reveal priorities, but coercion can remove the alternatives that make an action evidence of choice. Capacity-sensitive analysis qualifies a simplistic “more pressure always reveals more truth.”
 
-**Genre:** a genre-first taxonomy can make promises inspectable. It does not have sole authority over every work's values, historical form, or audience experience. Use the actual contract; do not automatically lock one genre and assign its predefined moral scale before encountering the material.
+**Genre:** Story Grid's content genres supply useful default value spectra. Begin there, then verify against the work's conflict and climax. This skill treats the mappings as heuristics: mixed genres, distinct internal arcs, or contrary story evidence can require a different account.
 
 **Transformation:** a changed philosophy can organize an arc, but not every valuable character is transformed, and not every positive inner movement produces outward victory. Keep steadfastness, corruption, testing, recognition, relational change, and incomplete development available.
 

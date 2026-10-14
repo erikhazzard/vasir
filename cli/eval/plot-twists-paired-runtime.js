@@ -19,9 +19,28 @@ export const PAIRED_ADDED_CREATORS = Object.freeze(['codex:gpt-6-astra@low', 'co
 export const PAIRED_EXPANDED_CREATORS = Object.freeze([...PAIRED_CREATORS, ...PAIRED_ADDED_CREATORS]);
 export const PAIRED_COVERAGE_EXTENSION_VERSION = 'paired-reasoning-coverage-extension-v1';
 export const PAIRED_DECLARED_COVERAGE_EXTENSION_VERSION = 'paired-declared-coverage-extension-v2';
+export const PAIRED_CURRENT_RUNTIME_APPEND_VERSION = 'paired-current-runtime-coverage-append-v1';
+const reviewedAppendDependencies = [
+  { path: 'cli/eval/agent-runtime.js', parentSha256: '93ecf518f7591c093d8dc26de56a4b868636629ef09edda8e911131226ef19bf', sha256: '3dce3393be1cdc056baacab35654713a41cd08fd7f2fb8cbd6ff835ede97ea00' },
+  { path: 'cli/eval/benchmark-models.js', parentSha256: 'f12542e956b6ade4e5af927bd06cb35d46e8435f47f7afcdc65e612994ebe576', sha256: '7befadea9d2c01650faa49730b9af5e821ef59c96ab92854bf3122181fd8b6d3' }
+];
+function currentRuntimeAppend(parent, manifest) {
+  assert.deepEqual(manifest.coverageExtension.addedConfigurations, ['codex:gpt-6.1-sol@xhigh'], 'This reviewed execution amendment is limited to the requested Sol 6.1 xhigh append.');
+  assert.deepEqual(parent.manifest.runtimeInventory, { codex: 'codex-cli 0.153.4', claude: '2.1.266 (Claude Code)' });
+  assert.deepEqual(manifest.runtimeInventory, { codex: 'codex-cli 0.162.1', claude: '2.1.296 (Claude Code)' });
+  for (const dependency of reviewedAppendDependencies) {
+    assert.equal(parent.manifest.sourceHashes.find(source => source.path === dependency.path)?.sha256, dependency.parentSha256);
+    assert.equal(manifest.sourceHashes.find(source => source.path === dependency.path)?.sha256, dependency.sha256, 'Unreviewed execution dependency change.');
+  }
+  return { version: PAIRED_CURRENT_RUNTIME_APPEND_VERSION,
+    purpose: 'User-requested Sol 6.1 xhigh coverage uses the currently installed native CLIs. The transport delta only adds unused Claude Opus 5.5 metadata; the registry adds model identities. Task, frozen skill, rubric, original judge panel, ordering, runtime limits and historical records are unchanged. This appended cohort does not claim historical CLI-version parity.',
+    parentRuntimeInventory: parent.manifest.runtimeInventory, runtimeInventory: manifest.runtimeInventory,
+    reviewedSourceChanges: reviewedAppendDependencies };
+}
 const extensionPurpose = 'Later user-requested reasoning coverage expansion. Retain all six original medium pairs and their reviews unchanged; generate and judge only the eight declared additional settings. This expanded roster was not prespecified before the original cohort outcomes.';
 const declaredExtensionPurpose = 'User-requested coverage completion. Retain every previously published answer and review unchanged; generate and judge only the explicitly declared additional model-and-effort settings. These additions were declared after earlier cohort outcomes.';
 export const PAIRED_VALIDATION_ERRATUM_VERSION = 'paired-code-mode-diagnostic-and-final-message-v1';
+export const PAIRED_DISABLED_HOST_ERRATUM_VERSION = 'paired-disabled-host-stderr-validation-v1';
 const disabledCodeModeNotice = 'Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.';
 const validationErratumPolicy = Object.freeze({ version: PAIRED_VALIDATION_ERRATUM_VERSION,
   allowedStartupDiagnostic: disabledCodeModeNotice, maximumStartupDiagnosticCount: 1,
@@ -29,6 +48,9 @@ const validationErratumPolicy = Object.freeze({ version: PAIRED_VALIDATION_ERRAT
   finalAnswerSelection: 'last-completed-agent-message-as-already-selected-by-generic-parser',
   preserveAllAssistantMessagesInRawStream: true, originalAttemptRecordsModified: false,
   additionalInferenceCallsForCorrection: 0, continuation: 'untouched-pending-slots-only' });
+const disabledHostErratumPolicy = Object.freeze({ ...validationErratumPolicy, version: PAIRED_DISABLED_HOST_ERRATUM_VERSION,
+  allowedStartupStderr: 'One timestamped ERROR codex_core::tools::router: error=code-mode host is disabled line, paired with the exact pre-turn stdout notice.',
+  historicalResultsReclassified: false });
 export const PAIRED_SUPPLEMENTAL_VALIDATION_POLICY = Object.freeze({ version: 'paired-one-turn-last-message-validation-v1',
   allowedStartupDiagnostic: disabledCodeModeNotice, maximumStartupDiagnosticCount: 1, startupDiagnosticMustPrecedeTurn: true,
   completedTurnsRequired: 1, toolsAllowed: false, finalAnswerSelection: 'last-completed-agent-message-as-already-selected-by-generic-parser',
@@ -78,7 +100,7 @@ function expandedSpecification(original) {
 function validateAddedConfigurations(added, retained) {
   assert.ok(Array.isArray(added) && added.length > 0, 'Explicit nonempty additional configurations required.');
   assert.equal(new Set(added).size, added.length, 'Additional configurations must be unique.');
-  const models = new Set(PAIRED_CREATORS.map(id => resolveBenchmarkConfiguration(id).model));
+  const models = new Set([...PAIRED_CREATORS.map(id => resolveBenchmarkConfiguration(id).model), 'gpt-6.1-sol']);
   for (const id of added) {
     const configuration = resolveBenchmarkConfiguration(id);
     assert.equal(configuration.id, id, 'Use exact canonical configuration IDs.');
@@ -159,9 +181,10 @@ function inventories(specification) {
 }
 
 export function preparePairedRun({ runDirectoryPath, specificationPath = path.join(root, 'benchmarks/storytelling-plot-twists-paired-v2/specification.json'), sourceRoot = root,
-  parentSnapshotPath = null, addedConfigurations = null, now = new Date().toISOString() }) {
+  parentSnapshotPath = null, addedConfigurations = null, currentRuntimeAppend: useCurrentRuntimeAppend = false, now = new Date().toISOString() }) {
   const parentText = parentSnapshotPath ? fs.readFileSync(parentSnapshotPath, 'utf8') : null;
   const parentSnapshot = parentText ? validatePairedRunExport(JSON.parse(parentText)) : null;
+  assert.ok(!useCurrentRuntimeAppend || parentSnapshot && addedConfigurations, 'A current-runtime append requires an explicit complete parent and added configuration.');
   assert.ok(!addedConfigurations || parentSnapshot, 'Additional configurations require a complete parent snapshot.');
   if (parentSnapshot) {
     assert.ok(addedConfigurations || !parentSnapshot.coverageExtension && !parentSnapshot.parentSnapshot, 'Extending beyond the original six-setting cohort requires explicit additional configurations.');
@@ -189,6 +212,7 @@ export function preparePairedRun({ runDirectoryPath, specificationPath = path.jo
     sourceHashes: sourcePaths.map(filename => ({ path: filename, sha256: pairedDigest(fs.readFileSync(path.join(root, filename))) })),
     ...(parentSnapshot ? { coverageExtension,
       executionValidationPolicy: PAIRED_SUPPLEMENTAL_VALIDATION_POLICY, executionValidationPolicySha256: pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY) } : {}) };
+  if (useCurrentRuntimeAppend) manifest.executionCompatibility = currentRuntimeAppend(parentSnapshot, manifest);
   if (parentSnapshot) validatePairedRunExport({ kind: 'storytelling-plot-twists-paired-run', schemaVersion: 1, runId,
     manifest, manifestSha256: pairedDigest(manifest), parentSnapshot, coverageExtension: manifest.coverageExtension, globalStop: null,
     ...Object.fromEntries(['generations', 'judgments'].map(kind => [kind,
@@ -334,10 +358,11 @@ export function buildPairedJudgePrompt({ specification, candidateMap, generation
 }
 
 function terminalEvidence(raw, configuration, responseText, receipt) {
+  const correctedDisabledHost = receipt?.validationErratumVersion === PAIRED_DISABLED_HOST_ERRATUM_VERSION;
   if (receipt?.toolIsolationPolicyVersion) {
     assert.equal(receipt.toolIsolationPolicyVersion, PAIRED_TOOL_ISOLATION_POLICY.version);
     assert.equal(receipt.toolIsolationPolicySha256, pairedDigest(PAIRED_TOOL_ISOLATION_POLICY));
-    assert.ok(!/codex_core::tools::router[^\n]*error=/i.test(raw.stderr || ''), 'Tool-router errors invalidate a tool-isolated result, including failed delegation attempts.');
+    if (!correctedDisabledHost) assert.ok(!/codex_core::tools::router[^\n]*error=/i.test(raw.stderr || ''), 'Tool-router errors invalidate a tool-isolated result, including failed delegation attempts.');
   }
   assert.equal(raw.exitCode, 0, 'Provider exited unsuccessfully.'); assert.equal(raw.signal, null, 'Provider was terminated.');
   assert.ok(responseText.trim(), 'Empty final answer.');
@@ -363,7 +388,7 @@ function terminalEvidence(raw, configuration, responseText, receipt) {
   assert.ok(start < end); assert.equal(end, events.length - 1, 'Unexpected events after completion.');
   const supplemental = receipt?.executionValidationPolicyVersion === PAIRED_SUPPLEMENTAL_VALIDATION_POLICY.version;
   if (supplemental) assert.equal(receipt.executionValidationPolicySha256, pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY));
-  const corrected = supplemental || receipt?.validationErratumVersion === PAIRED_VALIDATION_ERRATUM_VERSION;
+  const corrected = supplemental || correctedDisabledHost || receipt?.validationErratumVersion === PAIRED_VALIDATION_ERRATUM_VERSION;
   if (corrected && !supplemental) assert.match(receipt.validationErratumSha256, /^[a-f0-9]{64}$/);
   const messages = []; let startupDiagnosticCount = 0;
   for (const [index, event] of events.entries()) {
@@ -382,6 +407,11 @@ function terminalEvidence(raw, configuration, responseText, receipt) {
   else assert.equal(messages.length, 1, 'Exactly one final Codex answer required.');
   assert.equal(String(messages.at(-1)).trim(), responseText, 'Raw final answer changed.');
   assert.ok(events[end].usage?.output_tokens > 0, 'Missing output usage.');
+  if (correctedDisabledHost) {
+    const routerErrors = (raw.stderr || '').split(/\r?\n/).filter(line => /codex_core::tools::router[^\n]*error=/i.test(line));
+    assert.ok(routerErrors.length <= 1 && routerErrors.every(line => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z ERROR codex_core::tools::router: error=code-mode host is disabled$/.test(line)), 'Only the exact disabled-host stderr companion is allowed.');
+    assert.ok(!routerErrors.length || startupDiagnosticCount === 1, 'The stderr companion requires the exact pre-turn stdout notice.');
+  }
   return { stopReason: 'turn.completed', completedTurns: 1, toolCallCount: 0, modelVerification: 'explicit-cli-request-only',
     modelAttribution: { requestedModel: configuration.model }, usage: events[end].usage,
     ...(corrected ? { startupDiagnosticCount, assistantMessageCount: messages.length,
@@ -400,10 +430,10 @@ export function pairedStopReason(raw, error = null) {
 
 export async function runPairedAgent({ configuration, promptText, bundleText = null, outputSchema = null, artifactDirectoryPath,
   spawnImplementation = childProcess.spawn, environmentVariables = process.env, signal = null, timeoutMs = PAIRED_RUNTIME_POLICY.timeoutMs,
-  validationErratumSha256 = null, executionValidationPolicy = null, toolIsolationPolicy = null }) {
+  validationErratumSha256 = null, validationErratumVersion = PAIRED_VALIDATION_ERRATUM_VERSION, executionValidationPolicy = null, toolIsolationPolicy = null }) {
   if (toolIsolationPolicy) assert.deepEqual(toolIsolationPolicy, PAIRED_TOOL_ISOLATION_POLICY);
   if (executionValidationPolicy) assert.deepEqual(executionValidationPolicy, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY);
-  assert.ok(!(validationErratumSha256 && executionValidationPolicy), 'Historical correction and new-attempt validation authorities cannot be combined.');
+  assert.ok(!(validationErratumSha256 && executionValidationPolicy) || validationErratumVersion === PAIRED_DISABLED_HOST_ERRATUM_VERSION, 'Historical correction and new-attempt validation authorities cannot be combined.');
   const supplementalReceipt = executionValidationPolicy ? { executionValidationPolicyVersion: executionValidationPolicy.version,
     executionValidationPolicySha256: pairedDigest(executionValidationPolicy) } : {};
   const isolationReceipt = toolIsolationPolicy ? { toolIsolationPolicyVersion: toolIsolationPolicy.version,
@@ -443,7 +473,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
     result = await runBenchmarkAgent({ configuration, promptText, outputSchema, spawnImplementation: spawnIsolated, environmentVariables, timeoutMs });
     terminal = terminalEvidence(raw, configuration, result.text, { ...result.runtimeReceipt,
       ...supplementalReceipt, ...isolationReceipt,
-      ...(validationErratumSha256 ? { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256 } : {}) });
+      ...(validationErratumSha256 ? { validationErratumVersion, validationErratumSha256 } : {}) });
   } catch (failure) { error = normalizeError(failure); }
   finally { signal?.removeEventListener('abort', abort); clearTimeout(killTimer); }
   let responseText = result?.text || '';
@@ -455,7 +485,7 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
     cliArguments: invocation?.arguments || null, rawStreamsRetained: true, rawStdoutSha256: pairedDigest(raw.stdout), rawStderrSha256: pairedDigest(raw.stderr),
     exitCode: raw.exitCode, signal: raw.signal, terminalEvidence: terminal, hiddenProviderInstructionsVerified: false,
     providerInternalRetriesVerified: false, runtimePolicy: PAIRED_RUNTIME_POLICY, ...supplementalReceipt, ...isolationReceipt,
-    ...(validationErratumSha256 ? { validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256 } : {}) };
+    ...(validationErratumSha256 ? { validationErratumVersion, validationErratumSha256 } : {}) };
   return { status: error ? 'failed' : 'succeeded', responseText, outputSha256: pairedDigest(responseText), promptText, promptSha256: pairedDigest(promptText),
     inputPayload: payload, inputPayloadSha256: pairedDigest(payload), exactMessages: exactMessages(payload), exactMessagesSha256: pairedDigest(exactMessages(payload)), bundleSha256: bundleText ? pairedDigest(bundleText) : null,
     rawStdout: raw.stdout, rawStderr: raw.stderr, invocation, runtimeReceipt, usage: result?.usage || null, costUsd: result?.costUsd ?? null,
@@ -464,9 +494,10 @@ export async function runPairedAgent({ configuration, promptText, bundleText = n
 
 function validateErratum(erratum, manifest, sha256) {
   assert.equal(pairedDigest(erratum), sha256, 'Runtime validation erratum hash changed.');
-  assert.equal(erratum.schemaVersion, 1); assert.equal(erratum.version, PAIRED_VALIDATION_ERRATUM_VERSION);
+  assert.equal(erratum.schemaVersion, 1); assert.ok([PAIRED_VALIDATION_ERRATUM_VERSION, PAIRED_DISABLED_HOST_ERRATUM_VERSION].includes(erratum.version));
+  const disabledHost = erratum.version === PAIRED_DISABLED_HOST_ERRATUM_VERSION;
   assert.equal(erratum.originalManifestSha256, pairedDigest(manifest));
-  assert.deepEqual(erratum.policy, validationErratumPolicy);
+  assert.deepEqual(erratum.policy, disabledHost ? disabledHostErratumPolicy : validationErratumPolicy);
   assert.deepEqual(erratum.originalSourceHashes, manifest.sourceHashes);
   assert.deepEqual(erratum.correctedSourceHashes.map(source => source.path), sourcePaths);
   for (const source of erratum.correctedSourceHashes) {
@@ -474,7 +505,10 @@ function validateErratum(erratum, manifest, sha256) {
     if (!['cli/eval/plot-twists-paired-runtime.js', 'benchmarks/storytelling-plot-twists-paired-v2/run.mjs'].includes(source.path))
       assert.equal(source.sha256, manifest.sourceHashes.find(original => original.path === source.path).sha256, 'Erratum cannot change generic transport or other dependencies.');
   }
-  assert.deepEqual(erratum.originalFailedRecords.map(row => row.id), manifest.generationPlan.slice(0, 2).map(row => row.id), 'Only the original Astra pair qualifies.');
+  if (disabledHost) assert.ok(manifest.executionCompatibility, 'The stderr correction is limited to the reviewed current-runtime append.');
+  assert.deepEqual(erratum.originalFailedRecords.map(row => row.id), disabledHost
+    ? manifest.generationPlan.filter(row => row.configurationId === 'codex:gpt-6.1-sol@xhigh' && row.condition === 'skill').map(row => row.id)
+    : manifest.generationPlan.slice(0, 2).map(row => row.id), 'Only the explicitly qualified original failed records may be corrected.');
   assert.ok(erratum.originalFailedRecords.every(row => /^[a-f0-9]{64}$/.test(row.sha256)));
   assert.equal(erratum.originalStop.reason, 'runtime-contract-failure');
   assert.ok(erratum.originalFailedRecords.some(row => row.id === erratum.originalStop.attemptId));
@@ -493,13 +527,15 @@ function normalizedOriginal(record, erratum, sha256) {
   assert.ok(pin); assert.equal(pairedDigest(record), pin.sha256, 'Original failed record changed.');
   assert.equal(record.status, 'failed'); assert.equal(record.globalStopReason, 'runtime-contract-failure');
   assert.equal(record.error?.name, 'AssertionError'); assert.equal(record.error?.code, 'ERR_ASSERTION');
-  assert.equal(record.error.message, 'Unexpected startup diagnostic or out-of-turn output.');
+  const disabledHost = erratum.version === PAIRED_DISABLED_HOST_ERRATUM_VERSION;
+  assert.equal(record.error.message, disabledHost ? 'Tool-router errors invalidate a tool-isolated result, including failed delegation attempts.' : 'Unexpected startup diagnostic or out-of-turn output.');
   assert.equal(record.runtimeReceipt.terminalEvidence, null); assert.equal(record.attempt.number, 1);
   assert.equal(record.runtimeReceipt.validationErratumSha256, undefined);
-  const receipt = { ...record.runtimeReceipt, validationErratumVersion: PAIRED_VALIDATION_ERRATUM_VERSION, validationErratumSha256: sha256 };
+  const receipt = { ...record.runtimeReceipt, validationErratumVersion: erratum.version, validationErratumSha256: sha256 };
   receipt.terminalEvidence = terminalEvidence({ stdout: record.rawStdout, stderr: record.rawStderr,
     exitCode: receipt.exitCode, signal: receipt.signal }, resolveBenchmarkConfiguration(record.configurationId), record.responseText, receipt);
   assert.equal(receipt.terminalEvidence.startupDiagnosticCount, 1, 'Original failure lacks the exact allowed diagnostic.');
+  if (disabledHost) assert.match(record.rawStderr, /codex_core::tools::router: error=code-mode host is disabled/, 'Original failure lacks the exact stderr companion.');
   return { ...record, status: 'succeeded', error: null, globalStopReason: null, runtimeReceipt: receipt,
     validationCorrection: { erratumSha256: sha256, originalRecordSha256: pin.sha256, additionalInferenceCalls: 0, originalRecord: record } };
 }
@@ -509,20 +545,23 @@ export function applyPairedRuntimeValidationErratum({ runDirectoryPath, now = ne
   assert.ok(!fs.existsSync(path.join(runDirectoryPath, 'dispatch.lock')), 'Wait for the original pair to finish.');
   assert.ok(!fs.existsSync(path.join(runDirectoryPath, 'runtime-validation-erratum.json')), 'An erratum already exists.');
   const snapshot = exportPairedRun({ runDirectoryPath }), manifest = snapshot.manifest;
-  assert.ok(!snapshot.coverageExtension, 'The historical erratum cannot authorize supplemental attempts.');
-  assert.ok(snapshot.generations.slice(2).every(row => row.status === 'pending') && snapshot.judgments.every(row => row.status === 'pending'), 'Only untouched pending slots may follow the original Astra pair.');
-  const erratum = { schemaVersion: 1, version: PAIRED_VALIDATION_ERRATUM_VERSION, createdAt: now,
-    originalManifestSha256: snapshot.manifestSha256, policy: validationErratumPolicy,
-    reason: 'Two validation defects rejected completed one-turn answers: an exact pre-turn notice confirms Code Mode fails closed with its host disabled, and the validator confused one completed turn with one assistant message. Ignore only that exact pre-turn diagnostic; preserve every raw assistant message and use the same last completed message already selected by the generic parser. Original failed records and STOP remain unchanged. No additional inference is used to recover either answer.',
+  const disabledHost = Boolean(manifest.executionCompatibility);
+  assert.ok(!snapshot.coverageExtension || disabledHost, 'The historical erratum cannot authorize supplemental attempts.');
+  const failedRecords = disabledHost ? snapshot.generations.filter(row => row.configurationId === 'codex:gpt-6.1-sol@xhigh' && row.condition === 'skill') : snapshot.generations.slice(0, 2);
+  if (disabledHost) assert.ok(snapshot.generations.every(row => failedRecords.includes(row) || row.status === 'succeeded') && snapshot.judgments.every(row => row.status === 'succeeded' || row.status === 'pending'), 'Only the saved failed Skill answer and unattempted judges qualify.');
+  else assert.ok(snapshot.generations.slice(2).every(row => row.status === 'pending') && snapshot.judgments.every(row => row.status === 'pending'), 'Only untouched pending slots may follow the original Astra pair.');
+  const erratum = { schemaVersion: 1, version: disabledHost ? PAIRED_DISABLED_HOST_ERRATUM_VERSION : PAIRED_VALIDATION_ERRATUM_VERSION, createdAt: now,
+    originalManifestSha256: snapshot.manifestSha256, policy: disabledHost ? disabledHostErratumPolicy : validationErratumPolicy,
+    reason: disabledHost ? 'The saved Skill answer completed one clean turn without tool events. The validator rejected a single stderr companion to its already permitted exact pre-turn disabled-Code-Mode notice. Admit only that exact paired startup diagnostic; retain the original failed record, STOP, raw messages and answer bytes. No additional author inference is used.' : 'Two validation defects rejected completed one-turn answers: an exact pre-turn notice confirms Code Mode fails closed with its host disabled, and the validator confused one completed turn with one assistant message. Ignore only that exact pre-turn diagnostic; preserve every raw assistant message and use the same last completed message already selected by the generic parser. Original failed records and STOP remain unchanged. No additional inference is used to recover either answer.',
     originalSourceHashes: manifest.sourceHashes,
     correctedSourceHashes: sourcePaths.map(filename => ({ path: filename, sha256: pairedDigest(fs.readFileSync(path.join(root, filename))) })),
-    originalFailedRecords: snapshot.generations.slice(0, 2).map(row => ({ id: row.id, sha256: pairedDigest(row) })),
+    originalFailedRecords: failedRecords.map(row => ({ id: row.id, sha256: pairedDigest(row) })),
     originalStop: snapshot.globalStop, originalStopSha256: pairedDigest(snapshot.globalStop) };
   const sha256 = pairedDigest(erratum); validateErratum(erratum, manifest, sha256);
-  for (const record of snapshot.generations.slice(0, 2)) normalizedOriginal(record, erratum, sha256);
+  for (const record of failedRecords) normalizedOriginal(record, erratum, sha256);
   writeOnce(path.join(runDirectoryPath, 'runtime-validation-erratum.json'), erratum);
   writeOnce(path.join(runDirectoryPath, 'runtime-validation-erratum.sha256'), sha256 + '\n');
-  return { runId: snapshot.runId, runtimeValidationErratumSha256: sha256, correctedOriginalAnswers: 2,
+  return { runId: snapshot.runId, runtimeValidationErratumSha256: sha256, correctedOriginalAnswers: failedRecords.length,
     additionalInferenceCalls: 0, status: 'explicit-validation-erratum-applied' };
 }
 
@@ -532,7 +571,7 @@ function loadManifest(runDirectoryPath, execution = false) {
   assert.equal(fs.readFileSync(path.join(runDirectoryPath, 'specification.json'), 'utf8'), manifest.specificationFileText, 'Original specification bytes changed.');
   const correction = readErratum(runDirectoryPath, manifest);
   if (manifest.coverageExtension) {
-    assert.ok(!correction, 'Supplemental runs do not reuse the historical correction authority.');
+    assert.ok(!correction || correction.erratum.version === PAIRED_DISABLED_HOST_ERRATUM_VERSION, 'Supplemental runs do not reuse the historical correction authority.');
     assert.equal(pairedDigest(fs.readFileSync(path.join(runDirectoryPath, 'parent-snapshot.json'))), manifest.coverageExtension.parentSnapshotSha256, 'Original parent snapshot bytes changed.');
   }
   if (manifest.technicalRecovery) assert.equal(pairedDigest(fs.readFileSync(path.join(runDirectoryPath, 'recovery-source-snapshot.json'))),
@@ -596,20 +635,26 @@ export function validatePairedRunExport(snapshot) {
     assert.deepEqual(snapshot.coverageExtension, extension);
     assert.deepEqual(specification, declared ? declaredSpecification(parent.manifest.specification, added) : expandedSpecification(parent.manifest.specification), 'Only declared reasoning coverage may change.');
     assert.deepEqual(manifest.frozenBundle, parent.manifest.frozenBundle, 'The original frozen treatment must remain unchanged.');
-    assert.deepEqual(manifest.runtimeInventory, parent.manifest.runtimeInventory, 'Provider CLI versions must match the original cohort.');
+    if (manifest.executionCompatibility) {
+      assert.ok(declared, 'Execution compatibility is limited to an explicit declared append.');
+      assert.deepEqual(manifest.executionCompatibility, currentRuntimeAppend(parent, manifest));
+    } else assert.deepEqual(manifest.runtimeInventory, parent.manifest.runtimeInventory, 'Provider CLI versions must match the original cohort.');
     assert.deepEqual(manifest.executionValidationPolicy, PAIRED_SUPPLEMENTAL_VALIDATION_POLICY);
     assert.equal(manifest.executionValidationPolicySha256, pairedDigest(PAIRED_SUPPLEMENTAL_VALIDATION_POLICY));
-    for (const source of manifest.sourceHashes) if (!['cli/eval/plot-twists-paired-runtime.js', 'benchmarks/storytelling-plot-twists-paired-v2/run.mjs'].includes(source.path))
-      assert.equal(source.sha256, parent.manifest.sourceHashes.find(original => original.path === source.path)?.sha256, 'Coverage expansion cannot change the generic transport or registry.');
-    assert.ok(!snapshot.runtimeValidationErratum && !snapshot.runtimeValidationErratumSha256 && !snapshot.supersededStop, 'Historical correction belongs only to the retained parent.');
+    for (const source of manifest.sourceHashes) if (!['cli/eval/plot-twists-paired-runtime.js', 'benchmarks/storytelling-plot-twists-paired-v2/run.mjs'].includes(source.path)) {
+      const reviewed = manifest.executionCompatibility && reviewedAppendDependencies.find(dependency => dependency.path === source.path);
+      assert.equal(source.sha256, reviewed?.sha256 ?? parent.manifest.sourceHashes.find(original => original.path === source.path)?.sha256, 'Coverage expansion cannot change an unreviewed dependency.');
+    }
+    if (snapshot.runtimeValidationErratum) assert.equal(snapshot.runtimeValidationErratum.version, PAIRED_DISABLED_HOST_ERRATUM_VERSION, 'Historical correction belongs only to the retained parent.');
+    else assert.ok(!snapshot.runtimeValidationErratumSha256 && !snapshot.supersededStop);
   } else {
-    assert.ok(!parent && !snapshot.coverageExtension && !manifest.executionValidationPolicy && !manifest.executionValidationPolicySha256);
+    assert.ok(!parent && !snapshot.coverageExtension && !manifest.executionValidationPolicy && !manifest.executionValidationPolicySha256 && !manifest.executionCompatibility);
   }
   const erratum = snapshot.runtimeValidationErratum;
   if (erratum) {
     validateErratum(erratum, manifest, snapshot.runtimeValidationErratumSha256);
     assert.deepEqual(snapshot.supersededStop, erratum.originalStop);
-    assert.equal(snapshot.generations.filter(row => row.validationCorrection).length, 2);
+    assert.equal(snapshot.generations.filter(row => row.validationCorrection?.erratumSha256 === snapshot.runtimeValidationErratumSha256).length, erratum.version === PAIRED_DISABLED_HOST_ERRATUM_VERSION ? 1 : 2);
   } else assert.ok(!snapshot.runtimeValidationErratumSha256 && !snapshot.supersededStop);
   assert.ok(typeof manifest.runtimeInventory.codex === 'string' && manifest.runtimeInventory.codex.startsWith('codex-cli '));
   assert.ok(typeof manifest.runtimeInventory.claude === 'string' && manifest.runtimeInventory.claude.includes('Claude Code'));
@@ -668,11 +713,12 @@ export function validatePairedRunExport(snapshot) {
       if (extension) {
         assert.equal(row.runtimeReceipt.executionValidationPolicyVersion, manifest.executionValidationPolicy.version);
         assert.equal(row.runtimeReceipt.executionValidationPolicySha256, manifest.executionValidationPolicySha256);
-        assert.ok(!row.runtimeReceipt.validationErratumVersion && !row.runtimeReceipt.validationErratumSha256 && !row.validationCorrection);
+        if (row.runtimeReceipt.validationErratumVersion || row.validationCorrection) assert.equal(erratum?.version, PAIRED_DISABLED_HOST_ERRATUM_VERSION, 'Supplemental records cannot borrow historical correction authority.');
+        else assert.ok(!row.runtimeReceipt.validationErratumSha256);
       } else assert.ok(!row.runtimeReceipt.executionValidationPolicyVersion && !row.runtimeReceipt.executionValidationPolicySha256);
       if (row.runtimeReceipt.validationErratumVersion || row.runtimeReceipt.validationErratumSha256) {
         assert.ok(erratum, 'Diagnostic handling requires the pinned explicit erratum.');
-        assert.equal(row.runtimeReceipt.validationErratumVersion, PAIRED_VALIDATION_ERRATUM_VERSION);
+        assert.equal(row.runtimeReceipt.validationErratumVersion, erratum.version);
         assert.equal(row.runtimeReceipt.validationErratumSha256, snapshot.runtimeValidationErratumSha256);
       }
       if (row.invocation) { assert.deepEqual(row.invocation.configuration, configuration); assert.deepEqual(row.invocation.arguments, row.runtimeReceipt.cliArguments);
@@ -751,6 +797,7 @@ async function dispatch({ runDirectoryPath, kind, limit = Infinity, concurrency 
         onProgress({ event: 'started', kind, id: slot.id, configurationId: configuration.id });
         const result = await runPairedAgent({ configuration, promptText, bundleText, outputSchema, artifactDirectoryPath: directory, spawnImplementation, environmentVariables, signal,
           validationErratumSha256: snapshot.runtimeValidationErratumSha256 || null, executionValidationPolicy: manifest.executionValidationPolicy || null,
+          validationErratumVersion: snapshot.runtimeValidationErratum?.version || PAIRED_VALIDATION_ERRATUM_VERSION,
           toolIsolationPolicy: manifest.toolIsolationPolicy || null });
         const record = { ...slot, ...result, attempt, artifactDirectory: `${kind}/${slot.id}`, finishedAt: new Date().toISOString() };
         if (kind === 'generations') { record.wordCount = pairedWordCount(record.responseText); record.wordLimitExceeded = record.wordCount > manifest.specification.benchmark.wordLimit;

@@ -27,6 +27,7 @@ const PROFILE_SPECS = [
 ];
 const IMPLEMENTATION_FILES = ["judge-storytelling-creation.js", "storytelling-creation-runtime.js",
   "storytelling-agent-runtime.js", "agent-runtime.js", "benchmark-models.js", "benchmark-source.js", "run-storytelling-benchmark.js"];
+const INHERITED_SOURCE_FILES = ["run.json", "skill-snapshot.json", "creation-judging.json", "creation-judge-context.json"];
 const SUPPORTED_ORDER_RULE = "For zero-based frozen configuration index c, one-based trial t, and canonical judge index j (Astra 0, Sol 1), plain occupies answer A when (c + t - 1 + j) modulo 2 is 0, otherwise answer B. Hold this order fixed across the two context profiles.";
 const digest = (value) => crypto.createHash("sha256").update(typeof value === "string" ? value : JSON.stringify(value)).digest("hex");
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -306,6 +307,42 @@ function summarize(judging, scoring) {
   judging.status = judging.summary.completePairCount === judging.pairs.length ? "complete" : "incomplete";
 }
 
+function inheritedRows(run, configurationCount) {
+  const configurationIds = new Set(run.configurations.slice(0, configurationCount).map((configuration) => configuration.id));
+  return run.rows.filter((row) => configurationIds.has(row.configurationId)).sort((a, b) => a.rowKey.localeCompare(b.rowKey));
+}
+
+function readInheritedJudging({ inheritedSourceDirectory, run, skillSnapshot, profiles, contextSnapshot }) {
+  const files = INHERITED_SOURCE_FILES.map((relativePath) => {
+    const contents = fs.readFileSync(path.join(inheritedSourceDirectory, relativePath), "utf8");
+    return { relativePath, sha256: digest(contents), contents: JSON.parse(contents) };
+  });
+  const [sourceRun, sourceSkill, sourceJudging, sourceContext] = files.map((file) => file.contents);
+  validateStorytellingSkillSnapshot(sourceSkill);
+  validateStorytellingCreationJudging({ run: sourceRun, skillSnapshot: sourceSkill, judging: sourceJudging,
+    contextSnapshot: sourceContext, runSha256: files[0].sha256 });
+  const configurationCount = sourceRun.configurations.length;
+  if (!same(run.benchmark, sourceRun.benchmark) || !same(skillSnapshot, sourceSkill) ||
+    !same(run.conditions, sourceRun.conditions) || run.generation.trialCount !== sourceRun.generation.trialCount ||
+    run.generation.orderSeed !== sourceRun.generation.orderSeed ||
+    run.configurations.length <= configurationCount || !same(run.configurations.slice(0, configurationCount), sourceRun.configurations) ||
+    !same(profiles, sourceJudging.profiles) || !same(contextSnapshot, sourceContext)) {
+    fail("Inherited creation source must retain the frozen task, skill, conditions, trials, seed, configuration prefix, and judge contexts.");
+  }
+  if (!same(inheritedRows(run, configurationCount), inheritedRows(sourceRun, configurationCount))) {
+    fail("An inherited generation row changed; preserve every original row object.");
+  }
+  if (!same(planPairs(run, profiles).slice(0, sourceJudging.pairs.length), planPairs(sourceRun, profiles))) {
+    fail("Inherited pair identity or candidate order differs from the appended run.");
+  }
+  return { pairs: sourceJudging.pairs, appendSource: {
+    version: "storytelling-creation-append-source-v1", runDirectory: inheritedSourceDirectory, runId: sourceRun.runId,
+    files: files.map(({ relativePath, sha256 }) => ({ relativePath, sha256 })), configurationCount,
+    pairCount: sourceJudging.pairs.length, rowsSha256: digest(inheritedRows(sourceRun, configurationCount)),
+    pairsSha256: digest(sourceJudging.pairs)
+  } };
+}
+
 /** Verify archive joins and recompute every completed rating from its original final response. */
 export function validateStorytellingCreationJudging({ run, skillSnapshot, judging, contextSnapshot, runSha256 }) {
   const protocolBinding = assertFrozenProfileProtocol(run, contextSnapshot.informedSkillFiles);
@@ -323,6 +360,19 @@ export function validateStorytellingCreationJudging({ run, skillSnapshot, judgin
     !same(judging.implementationSnapshot.files?.map((file) => file.relativePath), IMPLEMENTATION_FILES.map((name) => `cli/eval/${name}`)) ||
     judging.implementationSnapshot.files.some((file) => typeof file.contents !== "string" || digest(file.contents) !== file.sha256) ||
     judging.implementationSnapshotSha256 !== digest(judging.implementationSnapshot)) fail("Frozen judge implementation archive changed.");
+  if (judging.appendSource !== undefined) {
+    const source = judging.appendSource;
+    if (source?.version !== "storytelling-creation-append-source-v1" || typeof source.runDirectory !== "string" ||
+      !path.isAbsolute(source.runDirectory) || typeof source.runId !== "string" ||
+      !Number.isInteger(source.configurationCount) || source.configurationCount < 1 || source.configurationCount >= run.configurations.length ||
+      source.pairCount !== source.configurationCount * run.benchmark.definition.cases.length * run.generation.trialCount ||
+      !same(source.files?.map((file) => file.relativePath), INHERITED_SOURCE_FILES) ||
+      source.files.some((file) => !/^[a-f0-9]{64}$/u.test(file.sha256)) ||
+      source.rowsSha256 !== digest(inheritedRows(run, source.configurationCount)) ||
+      source.pairsSha256 !== digest(judging.pairs.slice(0, source.pairCount))) {
+      fail("Inherited source binding or preserved generation rows and judgments changed.");
+    }
+  }
   const planned = planPairs(run, judging.profiles);
   if (judging.pairs.length !== planned.length) fail("Creation judging pair inventory changed.");
   for (const [pairIndex, pair] of judging.pairs.entries()) {
@@ -433,11 +483,15 @@ export async function runStorytellingCreationJudgeAgent({ spawnImplementation = 
 
 /** Judge only: never regenerate, edit, or attach scores to the generation run. */
 export async function runStorytellingCreationJudging({
-  runDirectory, informedSkillFiles, prepareOnly = false, judgeProfileIds = [], judgeProvider = null, judgeModel = null,
+  runDirectory, inheritedSourceDirectory = null, informedSkillFiles, prepareOnly = false, judgeProfileIds = [], judgeProvider = null, judgeModel = null,
   retryFailed = false, judgeConcurrency = 8, maxJudgments = null, environmentVariables = process.env,
   agentRunnerImplementation = runStorytellingCreationJudgeAgent, onCheckpoint = null, nowImplementation = () => new Date()
 } = {}) {
   if (typeof runDirectory !== "string" || !path.isAbsolute(runDirectory)) fail("runDirectory must be an absolute existing generation-run directory.");
+  if (inheritedSourceDirectory !== null && (typeof inheritedSourceDirectory !== "string" ||
+    !path.isAbsolute(inheritedSourceDirectory) || path.resolve(inheritedSourceDirectory) === path.resolve(runDirectory))) {
+    fail("inheritedSourceDirectory must be an absolute distinct source-run directory.");
+  }
   if (!Number.isInteger(judgeConcurrency) || judgeConcurrency < 1 || judgeConcurrency > 32) fail("Judge concurrency must be 1 through 32.");
   if (maxJudgments !== null && (!Number.isInteger(maxJudgments) || maxJudgments < 1)) fail("maxJudgments must be a positive integer.");
   const release = acquireRunLock(runDirectory);
@@ -460,6 +514,10 @@ export async function runStorytellingCreationJudging({
       if (informedSkillFiles !== undefined && !same(informedSkillFiles, contextSnapshot.informedSkillFiles)) fail("Resume uses the already frozen informed context file selection.");
       validateStorytellingCreationJudging({ run, skillSnapshot, judging, contextSnapshot, runSha256 });
       if (!same(judging.implementationSnapshot, implementationSnapshot())) fail("Judge implementation changed after its first frozen checkpoint.");
+      if (inheritedSourceDirectory !== null) {
+        const inherited = readInheritedJudging({ inheritedSourceDirectory, run, skillSnapshot, profiles: judging.profiles, contextSnapshot });
+        if (!same(judging.appendSource, inherited.appendSource)) fail("Resume cannot change the frozen inherited source binding.");
+      }
     } else {
       const metadata = createStorytellingCreationJudgingMetadata({ skillSnapshot, ...(informedSkillFiles === undefined ? {} : { informedSkillFiles }) });
       contextSnapshot = metadata.contextSnapshot;
@@ -470,6 +528,11 @@ export async function runStorytellingCreationJudging({
         startedAt: nowImplementation().toISOString(), lastCheckpointAt: null,
         pairs: planPairs(run, metadata.profiles), results: [], summary: {}, status: "incomplete", executionPauses: [] };
       judging.implementationSnapshotSha256 = digest(judging.implementationSnapshot);
+      if (inheritedSourceDirectory !== null) {
+        const inherited = readInheritedJudging({ inheritedSourceDirectory, run, skillSnapshot, profiles: judging.profiles, contextSnapshot });
+        judging.appendSource = inherited.appendSource;
+        judging.pairs.splice(0, inherited.pairs.length, ...inherited.pairs);
+      }
       if (fs.existsSync(contextPath) && !same(readJson(contextPath), contextSnapshot)) fail("Existing frozen judge context changed.");
       if (!fs.existsSync(contextPath)) writeJsonAtomic(contextPath, contextSnapshot);
     }
@@ -486,6 +549,7 @@ export async function runStorytellingCreationJudging({
       judgeProvider, judgeModel, retryFailed, maxJudgments, plannedJudgmentCount: 0, startedJudgmentCount: 0,
       completedJudgmentCount: 0, failedJudgmentCount: 0, peakConcurrentInvocations: 0 };
     judging.executionHistory.push(execution);
+    const executablePairs = judging.pairs.slice(judging.appendSource?.pairCount ?? 0);
     const checkpoint = () => {
       summarize(judging, scoring);
       judging.lastCheckpointAt = nowImplementation().toISOString();
@@ -493,7 +557,7 @@ export async function runStorytellingCreationJudging({
       onCheckpoint?.({ judging: structuredClone(judging), outputDirectory: runDirectory });
     };
     // Recover a response checkpointed before parsing, never ask the provider to reroll it.
-    for (const pair of judging.pairs) for (const judgment of pair.judgments) {
+    for (const pair of executablePairs) for (const judgment of pair.judgments) {
       if (judgment.status !== "running") continue;
       const attempt = judgment.attempts.at(-1);
       if (typeof attempt?.outputText === "string") {
@@ -514,7 +578,7 @@ export async function runStorytellingCreationJudging({
     }
     checkpoint();
     if (prepareOnly) { execution.completedAt = nowImplementation().toISOString(); checkpoint(); return { outputDirectory: runDirectory, judging }; }
-    const work = judging.pairs.flatMap((pair) => pair.judgments.map((judgment) => ({ pair, judgment,
+    const work = executablePairs.flatMap((pair) => pair.judgments.map((judgment) => ({ pair, judgment,
       profile: judging.profiles.find((profile) => profile.id === judgment.profileId) })))
       .filter(({ judgment, profile }) => selectedProfiles.some((selected) => selected.id === profile.id) &&
         (judgment.status === "pending" || (retryFailed && judgment.status === "error" && judgment.attempts.at(-1)?.retryable === true)))
@@ -583,13 +647,14 @@ export async function runStorytellingCreationJudging({
 
 async function main() {
   const { values } = parseArgs({ options: {
-    "run-directory": { type: "string" }, "informed-skill-file": { type: "string", multiple: true },
+    "run-directory": { type: "string" }, "inherit-run-directory": { type: "string" }, "informed-skill-file": { type: "string", multiple: true },
     "prepare-only": { type: "boolean", default: false }, "judge-profile": { type: "string", multiple: true, default: [] },
     "judge-provider": { type: "string" }, "judge-model": { type: "string" },
     "retry-failed": { type: "boolean", default: false }, concurrency: { type: "string", default: "8" },
     "max-judgments": { type: "string" }
   } });
   const result = await runStorytellingCreationJudging({ runDirectory: values["run-directory"] ? path.resolve(values["run-directory"]) : undefined,
+    inheritedSourceDirectory: values["inherit-run-directory"] ? path.resolve(values["inherit-run-directory"]) : null,
     informedSkillFiles: values["informed-skill-file"], prepareOnly: values["prepare-only"], judgeProfileIds: values["judge-profile"],
     judgeProvider: values["judge-provider"] ?? null, judgeModel: values["judge-model"] ?? null, retryFailed: values["retry-failed"],
     judgeConcurrency: Number(values.concurrency), maxJudgments: values["max-judgments"] === undefined ? null : Number(values["max-judgments"]),

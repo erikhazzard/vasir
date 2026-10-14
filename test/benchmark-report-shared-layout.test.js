@@ -32,13 +32,13 @@ test('common Core report derives included story scores from Astra while preservi
     REQUIRED_CONDITION_IDS: ['baseline', 'skill'], actualTrialNumber: () => 1, responseKey,
     responseByKey: new Map(responseBundle.responses.map(answer => [responseKey(answer.benchmarkId, answer.settingId, answer.condition, answer.caseId), answer])) });
   vm.runInContext(declaration('commonCoreResults') + '\n' + declaration('commonCoreSummary') + '\nglobalThis.cells = commonCoreResults; globalThis.summary = commonCoreSummary;', context);
-  assert.equal(context.cells.length, 33 * 11 * 2);
+  assert.equal(context.cells.length, data.settings.length * 11 * 2);
   for (const cell of context.cells) {
     const answer = responseBundle.responses.find(answer => answer.settingId === cell.settingId && answer.caseId === cell.caseId && answer.condition === cell.condition);
     assert.equal(cell.exactScore, answer.judgments.find(judge => judge.judgeConfigurationId === 'codex:gpt-6-astra@xhigh').score);
   }
   assert.equal(context.summary('the-matrix'), null);
-  assert.equal(context.summary(data.provisionalLeaderboard.caseIds[0]).usablePairs, 33);
+  assert.equal(context.summary(data.provisionalLeaderboard.caseIds[0]).usablePairs, data.settings.length);
   assert.equal(JSON.stringify({ data, responseBundle }), before);
   assert.match(declaration('modelPreviewRows'), /commonCoreScope\?\.caseIds\.includes\(activeCaseId\) \? commonCoreResults : reportResults/);
   assert.match(declaration('judgingMarkup'), /One Astra xhigh review determines this score/);
@@ -71,7 +71,7 @@ test('Magic displays the existing three-trial aggregate regardless of a legacy t
   const reportResults = [1, 2, 3].flatMap(trialNumber => data.benchmarkResults.map(cell => ({ ...cell, caseId: 'prompt', trialNumber,
     score: cell.score + (trialNumber - 2) * 10, exactScore: cell.exactScore + (trialNumber - 2) * 10 })));
   const context = vm.createContext({ data, reportResults, isCreation: true, isWriting: true, isWorkSpec: false,
-    commonCoreScope: null, activeCaseId: 'prompt', activeTrialNumber: 1, actualTrialNumber: cell => cell.trialNumber,
+    commonCoreScope: null, pendingArchitectureResponses: null, activeCaseId: 'prompt', activeTrialNumber: 1, actualTrialNumber: cell => cell.trialNumber,
     settingById: new Map(data.settings.map(setting => [setting.id, setting])), responseByKey: new Map(), responseKey: () => '' });
   vm.runInContext(declaration('modelPreviewRows') + '\n' + declaration('creationAggregateSummary') + '\nglobalThis.rows=modelPreviewRows;globalThis.summary=creationAggregateSummary;', context);
   for (const trial of [1, 2, 3]) {

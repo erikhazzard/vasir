@@ -663,7 +663,7 @@ test("selection pins both immutable sources and rejects hash drift, missing pins
   const f = await fixture(t, { prepareOnly: true });
   const pinned = selectedReader(f);
   const built = pinned.build();
-  assert.deepEqual(pinned.reads, [WRITING_SELECTION_PATH, pinned.selection.run.path, pinned.selection.skill.path, "benchmarks/storytelling-plot-twists/publication.json", "benchmarks/storytelling-magic-discovery/publication.json"]);
+  assert.deepEqual(pinned.reads, [WRITING_SELECTION_PATH, pinned.selection.run.path, pinned.selection.skill.path, "benchmarks/storytelling-plot-twists/publication.json", "benchmarks/storytelling-magic-discovery/publication.json", "benchmarks/storytelling-skill-refresh/publication.json"]);
   assert.equal(built.projection.scoreBasis.sourceSha256, hash(f.runText));
   assert.ok(built.responseBundle.responses.every(response => response.provenance.sourceSha256 === hash(f.runText)));
   assert.deepEqual(pinned.build(), built, "Identical selected bytes project reproducibly.");

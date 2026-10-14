@@ -1,23 +1,12 @@
 # Genre and form
 
-Use this reference to choose or diagnose the work's audience promise, length, medium, information pattern, serial design, or alternative to a conventional pursuit plot. Use [plot-and-structure.md](plot-and-structure.md) for causal construction, [narration-and-prose.md](narration-and-prose.md) for execution, and [interactive-and-adaptation.md](interactive-and-adaptation.md) when agency or medium changes the problem.
+Read for length, medium, serial form, quiet work, and mixed promises. Use the [genre guides](genres/index.md) for content values, conventions, and core events; [plot](plot-and-structure.md) for causal construction; [narration](narration-and-prose.md) for execution; [interactive narrative](interactive-and-adaptation.md) when agency changes the problem.
 
-Contents: [the particular promise](#the-particular-promise); [a form that can carry the experience](#a-form-that-can-carry-the-experience); [short fiction](#short-fiction); [novels and novellas](#novels-and-novellas); [screen and stage](#screen-and-stage); [serial narrative](#serial-narrative); [quiet and associative forms](#quiet-and-associative-forms); [mystery](#mystery); [horror](#horror); [comedy](#comedy); [romance and mixed genres](#romance-and-mixed-genres); [endings](#endings).
+Contents: [the particular promise](#the-particular-promise); [a form that can carry the experience](#a-form-that-can-carry-the-experience); [short fiction](#short-fiction); [novels and novellas](#novels-and-novellas); [screen and stage](#screen-and-stage); [serial narrative](#serial-narrative); [quiet and associative forms](#quiet-and-associative-forms); [comedy](#comedy); [mixed genres](#mixed-genres); [endings](#endings).
 
 ## The particular promise
 
-A genre label is a starting hypothesis about the experience offered. The work's opening, voice, cover description, medium, and unfolding emphasis make that promise more specific. “Mystery” can mean finding a culprit, proving a known culprit's guilt, reconstructing a missing life, or discovering why an agreed fact has been concealed. Determine which experience this work actually asks the audience to await.
-
-Write a useful promise in this shape when choosing the form: “Readers are invited to ___, through ___, and will reasonably expect ___ to receive its due.” The last phrase concerns an encounter or resolution, not necessarily a conventional victory.
-
-Examples:
-
-- A puzzle novella invites readers to compare testimony with physical evidence and expects an explanation that survives rereading.
-- A domestic comedy invites readers to enjoy a family translating affection into inconvenient acts and expects the accumulated inconveniences to produce a distinctive final encounter.
-- A quiet elegy invites readers to spend one afternoon among the absent person's possessions and expects that attention to discover something more particular than a statement that grief is hard.
-- A survival thriller invites readers to anticipate decisions under shrinking practical options and expects the established constraints to matter to the escape.
-
-Coyne's conventions and obligatory scenes are useful questions about learned expectations. His taxonomy is one practitioner's system; do not require every work to adopt its full categories or universal claims. Identify the function before repeating its customary embodiment. If a mystery promises an answer, a confrontation may deliver it, but a letter, reenactment, failed prosecution, or final comparison can perform a different version of the needed work. The substitution must actually fulfill or meaningfully transform the promise.
+Specify what readers are invited to experience, what makes that experience particular, and what the work owes at the end. A puzzle promises a defensible explanation; a quiet elegy promises attention that discovers something beyond the statement that grief hurts. The promise concerns an encounter or resolution, not necessarily a conventional victory.
 
 An expectation can change. Earn the change through the telling: let readers discover why the apparent objective was incomplete or what another form of attention makes available. Announcing late that the murder never mattered is unlikely to satisfy a work that spent two hundred pages asking for exact clue tracking. An investigation can, however, reveal that identification and justice are different undertakings and let that distinction become its ending.
 
@@ -138,38 +127,6 @@ For associative form, choose the relationship between adjacent parts. Sound may 
 
 For lyric or contemplative work, let an image remain partly resistant to paraphrase. Explain enough for orientation; allow duration for perception. “The tree symbolizes endurance” rarely replaces the work of showing one branch rubbing a window through a sleepless night. Nor does an exact image forbid direct thought: an essayistic narrator may think as part of the encounter.
 
-## Mystery
-
-For a complete fair-inference scene and a worked dread sequence, use [suspense-mystery-and-horror.md](suspense-mystery-and-horror.md) when brief genre guidance is insufficient.
-
-Distinguish facts, testimony, inference, confidence, and proof. A clue is an available detail whose relation matters; a red herring should have a credible source and an eventual intelligible status. The reader need not solve the puzzle, but should be able to revisit the solution's basis under the fairness promised by this particular work.
-
-Before:
-
-> The detective realized the caretaker was the killer because she suddenly remembered that he had a twin.
-
-Repair choices:
-
-- Establish the twin and make the identity problem the puzzle.
-- Keep one caretaker and build the solution from an already present material discrepancy.
-- If identity uncertainty is the subject, prepare the unreliable record or witness that created it.
-
-Do not merely add an early sentence saying twins exist in the world. Preparation must support the particular inference.
-
-An open mystery can reveal the culprit first and concentrate on proof, pursuit, or the cost of acting. A revelation should change the task: finding the witness becomes keeping them alive; knowing the truth becomes persuading someone with power; solving the case becomes deciding whether the official account can bear it. These are different promises and consequences.
-
-When the ending remains unresolved, identify the closure actually offered. A missing person's fate may stay unknown while the investigator's false certainty is conclusively dismantled. That ending requires the book to make the dismantling worth the relinquished answer.
-
-## Horror
-
-Choose the fear and its avenue of approach: bodily vulnerability, intrusion, contamination, predation, social complicity, loss of identity, or an unknowable scale. This is a selection of possible effects, not a universal taxonomy. Establish the ordinary good that the horror invades; comfort must exist before its corruption has a cost.
-
-Information designs differ. Shared discovery lets reader and character enter a sanctuary before recognizing its machinery. Foreknowledge lets readers watch a character misread known danger. Uncertain interpretation can make ordinary evidence oscillate. Each spends and gains different pleasures; withholding the monster is not always stronger.
-
-Practical rules can make horror exact without explaining its ultimate origin. The caller never enters unless answered. The room grows warmer when someone remembers its former occupant. If a rule matters to survival, establish what supports belief in it and what remains conjecture. Arbitrary exceptions at the climax weaken a promised survival problem; unstable rules can be the horror if uncertainty has been made part of the encounter.
-
-Scale intensity through changed exposure or lost options, not only more graphic description. A safe public place becoming unsafe may alter the entire strategy. A familiar helper enforcing the threat may destroy the last available interpretation. Give aftermath duration when the experience requires it. A sequence of shocks with immediate reset can erase the damage the prose asks readers to feel.
-
 ## Comedy
 
 Find the pattern that generates another specific variation: excessive dignity under trivial conditions, a competent tactic used in the wrong domain, literal obedience that exposes an absurd rule, affection disguised as complaint, or incompatible interpretations sustained too long. “Add jokes” is not a comic design.
@@ -192,11 +149,7 @@ Let comic characters care about the matter they are mishandling. Reactions can p
 
 Preserve space for uptake. Test the punch word's placement, remove the explanation after the joke, and hear whether the next sentence interrupts laughter. On the page, rhythm still matters even though the reader chooses speed. Not every comic ending must punish folly; companionship and the pleasure of recurrence are sufficient aims when the work earns them.
 
-## Romance and mixed genres
-
-For a romance centered on a relationship, make attraction, mutual recognition, and decisions about a life together available through encounters. A catalogue of desirable traits cannot substitute for the particular pleasure or difficulty of this person's company. Let both people have wants and obligations that do not exist solely to delay union. The eventual relationship should change what each can ask, risk, or choose.
-
-Establish the intended ending promise from the user's genre and framing. A work offered as a romance often makes a hopeful relational outcome central to its invitation; a tragedy containing love makes a different invitation. Do not silently change one into the other for perceived seriousness. Avoid making an avoidable misunderstanding the only barrier unless the story makes inability to ask or answer the actual subject.
+## Mixed genres
 
 In a hybrid, decide which promises govern the ending and which enrich the journey. A romantic mystery may owe both a coherent solution and a consequential relational choice. A literary horror can withhold an ontological answer while still delivering dread and an exact human outcome. The combination should make the two forms interact: solving the mystery changes the relationship, or the relationship changes what can be learned. Running two unrelated promised payoffs side by side can feel less integrated than either alone.
 

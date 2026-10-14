@@ -9,6 +9,7 @@ import { VasirCliError } from "./cli-error.js";
 import { GAME_ARTIFACT_ORIGIN } from "./eval/games-publication.js";
 import { validateWritingPublication } from "./eval/writing-publication.js";
 import { WRITING_COMPACT_BENCHMARKS } from "./eval/writing-compact-publication.js";
+import { WRITING_REFRESH_BENCHMARK_IDS } from "./eval/writing-refresh-publication.js";
 import { buildWritingNavigationSummary } from "./eval/writing-navigation.js";
 import { buildOverallWritingSource } from "./eval/overall-publication.js";
 import { WRITING_CREATION_ARCHIVE, WRITING_DM_ARCHIVE, WRITING_RESPONSE_ARCHIVES, hydrateWritingResponseArchives } from "./eval/writing-response-archives.js";
@@ -113,6 +114,26 @@ export function writingParentPathScanSource(writing, responses) {
       const destination = path.posix.normalize(path.posix.join(path.posix.dirname(file.title), href.split("#")[0]));
       return skillPaths.has(destination) ? `${opening}<verified-frozen-skill-link>${closing}` : match;
     });
+  }
+  for (const benchmarkId of WRITING_REFRESH_BENCHMARK_IDS) {
+    const publication = writing?.benchmarkPublications?.find(child => child.benchmarkId === benchmarkId)?.projection;
+    const evidence = source?.benchmarkResponses?.find(child => child.benchmarkId === benchmarkId)?.responseBundle;
+    const pins = new Map((publication?.methodology?.frozenSkillFiles ?? publication?.methodology?.skillFiles ?? []).map(file => [file.path, file]));
+    const replacements = [];
+    for (const file of evidence?.promptFiles ?? []) {
+      const pin = pins.get(file.title);
+      if (!pin || file.sha256 !== pin.sha256 || sha256(file.content) !== pin.sha256 || Buffer.byteLength(file.content) !== pin.bytes) continue;
+      const original = file.content;
+      file.content = original.replace(/(\]\()(\.\.\/[^\s)]+)(\))/gu, (match, opening, href, closing) => {
+        const destination = path.posix.normalize(path.posix.join(path.posix.dirname(file.title), href.split('#')[0]));
+        return pins.has(destination) ? `${opening}<verified-frozen-skill-link>${closing}` : match;
+      });
+      replacements.push([original, file.content]);
+    }
+    for (const file of evidence?.promptFiles ?? []) {
+      if (!file.id.startsWith('skill-instruction-') || sha256(file.content) !== file.sha256) continue;
+      for (const [original, normalized] of replacements) file.content = file.content.replaceAll(original, normalized);
+    }
   }
   return JSON.stringify(source);
 }

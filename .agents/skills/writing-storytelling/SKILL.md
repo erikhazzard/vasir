@@ -5,13 +5,13 @@ description: Develops, drafts, and revises stories through connected character, 
 
 # Writing Story
 
-Make the requested story work as an experience, not merely as an explanation of itself. A character pursues an object of desire through a particular philosophy of life; action encounters resistance, changes a value, and creates the next conditions of action. Dialogue, character, scene, and plot are operations of that same movement. The telling makes us experience what the movement means.
+A dramatic story's governing meaning is its **controlling idea: value + final charge + chief cause**—what is finally gained, lost, or preserved, and why. Derive it from enacted consequences, not just a topic or intended message. Make that meaning an experience: a character pursues an object of desire through a philosophy of life; resistance, action, and value change create the next conditions. The telling makes us feel that movement.
 
-This is the master skill for integrated story craft. Its strong default is consequential dramatic storytelling; it also supports other forms on their own terms. User canon, intended form, and requested scope govern. A skill's preferred pattern is not permission to replace them.
+Use **[content genre](references/genres/index.md)** to choose an initial value spectrum—action: life/death; crime: justice/injustice; love: love/hate. Read its matching guide before choosing conventions or the core event. Verify against the conflict and climax; refine when the work disagrees. External and internal arcs may turn different values. User canon, form, and scope govern.
 
 ## Route before expanding
 
-Identify the deliverable and the live uncertainty. Read the smallest reference set that can answer it; do not load this library wholesale. For a short rewrite or a single character, begin with its specialist reference. For a new long work or an unfamiliar framework, begin with the core model and development route. Read a selected reference completely; follow another link only when its stated condition applies.
+Identify the deliverable and live uncertainty; read the smallest reference set that resolves it. Begin short rewrites and character work with the specialist; new long works or unfamiliar frameworks with the core model and development route. Read selected references completely; follow further links only when their stated condition applies.
 
 | Work in front of you | Read first | Add when the work requires it |
 | --- | --- | --- |
@@ -25,7 +25,8 @@ Identify the deliverable and the live uncertainty. Read the smallest reference s
 | Character transformation, steadfastness, corruption or disillusionment | [Character arcs](references/character-arcs.md) | [Characters](references/characters.md), [plot and structure](references/plot-and-structure.md) |
 | Dialogue, subtext, distinctive voice or monologue | [Dialogue](references/dialogue.md) | [Relationships and cast](references/relationships-and-cast.md), [narration and prose](references/narration-and-prose.md) |
 | Point of view, prose, description, rhythm or information release | [Narration and prose](references/narration-and-prose.md) | [Genre and form](references/genre-and-form.md) |
-| Genre, short form, serial form, comedy, mystery or quiet literary work | [Genre and form](references/genre-and-form.md) | [Narration and prose](references/narration-and-prose.md), [plot and structure](references/plot-and-structure.md) |
+| Content genre, value spectrum, conventions or obligatory moments | Matching [genre guide](references/genres/index.md) | [Genre and form](references/genre-and-form.md) for mixed promises, medium, length or quiet work |
+| Length, medium, serial form, comedy or quiet work | [Genre and form](references/genre-and-form.md) | [Narration](references/narration-and-prose.md) |
 | Fair clues, suspense, accumulating dread or an adapting pursuer | [Suspense, mystery and horror](references/suspense-mystery-and-horror.md) | [Genre and form](references/genre-and-form.md), [narration and prose](references/narration-and-prose.md) |
 | Twists or layered revelations that reinterpret earlier events: hidden allegiance, secret protectors, concealed architects, apparently settled betrayals or relationships recognized too late | [Twists and revelations](references/twists-and-revelations.md) | [Antagonism and irony](references/antagonism-and-irony.md) for opposed ideas or mixed outcomes; [narration and prose](references/narration-and-prose.md) for viewpoint |
 | World, myth, symbolism, culture or institutional forces | [World and myth](references/world-and-myth.md) | [Relationships and cast](references/relationships-and-cast.md), [interactive and adaptation](references/interactive-and-adaptation.md) |
@@ -37,13 +38,13 @@ Identify the deliverable and the live uncertainty. Read the smallest reference s
 
 ## Work on the requested scale
 
-- **Explain or diagnose** — use the supplied work as evidence. Separate what it does from what you would change; do not silently rewrite it. Lead explanations with an accessible answer, orient an unfamiliar reader to the protagonist's pursuit, then make the decisive causal relationship concrete. A controlling idea guides the analysis; it is not automatically the opening sentence. Use compressed philosophical language when the reader has enough context to understand it.
+- **Explain or diagnose** — ground claims in the supplied work; separate interpretation from proposed changes. For “core idea” or “what is it about?” asked as a meaning question, state the controlling idea in a clear sentence: governing value, final charge, and chief enacted cause. Support it with decisive events. Plot summaries and spoiler-free introductions have narrower scope. For unresolved or non-dramatic work, identify what remains unsettled rather than inventing an outcome or cause.
 - **Explore** — vary the causal mechanism, emotional experience, or sacrifice, not just the wording of the same idea. Return as many alternatives as the request merits, not a fixed portfolio.
 - **Design** — resolve the decisions that downstream drafting depends on. Treat an unearned controlling idea as a hypothesis, not a theorem the characters must prove.
 - **Draft** — produce the actual requested prose or dialogue. Keep diagnostic machinery backstage unless the user wants it.
 - **Revise** — preserve the passage's live strengths and fixed facts; repair the smallest mechanism capable of producing the requested effect.
 
-Ask only when an unresolved choice would materially change the work. Otherwise make a modest, visible assumption and proceed. For an extended project, retain a compact record of canon, viewpoint, value trajectories, planted information, unresolved promises, and chosen revisions in the user's existing artifact structure; do not prescribe a new bureaucracy for a small task.
+Ask only when the answer materially changes the work; otherwise make a visible assumption and proceed. For extended projects, retain canon, viewpoint, value trajectories, planted information, unresolved promises, and revisions in the user's existing artifacts.
 
 ## Keep the causal distinctions alive
 
@@ -66,12 +67,12 @@ The LOTR anchor is a stress test, not a universal thesis. Frodo's earlier mercy 
 
 ## Ownership and boundaries
 
-This master supersedes earlier storytelling and controlling-idea skill instructions. Do not import a legacy checklist, fixed genre-value taxonomy, compulsory ten-candidate exercise, or ban on decisive help as an additional authority. If the user explicitly chooses a particular craft framework, apply it knowingly and make a consequential disagreement with the supplied story clear.
+This master supersedes legacy storytelling and controlling-idea instructions. Do not import compulsory genre mappings, candidate counts, or bans on decisive help. Apply a user-chosen framework explicitly and identify consequential disagreements with the supplied story.
 
 Persistent multiplayer narrative architecture requires separate game-state, multiplayer, and production expertise. This skill owns writing and player-facing narrative decisions; it does not make a short quest or conversation request depend on a live-service architecture exercise. Plain response polishing, documentation, factual reporting, and code changes do not trigger this master merely because they use words such as character, scene, or story.
 
 ## Before returning the work
 
-Check the actual artifact, not a self-awarded quality score. Did you honor the requested scope and fixed facts? Did the selected craft operation alter a real decision or the reader's experience? Are causal claims supported by the events, distinct voices enacted in language, and necessary information available at the right time? Did an intended ambiguity survive without an accidental contradiction? If you only proposed an improvement, do not claim the unwritten result proves it.
+Check the actual artifact. Does a meaning answer make its value, final charge, and enacted chief cause identifiable? Are causal claims supported by events, distinct voices enacted in language, and necessary information available at the right time? Honor fixed facts, requested scope, and intended ambiguity. A proposed improvement does not prove the unwritten result.
 
 Return the requested story, scene, character, explanation, or actionable critique. Expose only the assumptions and tradeoffs the user needs to judge it. A few precise, consequential choices outrank a complete-looking worksheet.

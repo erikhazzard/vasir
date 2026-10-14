@@ -1162,7 +1162,7 @@
     const settingLabel = row.setting.label || `${row.setting.family} · ${row.setting.reasoning}`;
     return `
       <li class="model-preview__item" data-report-setting-id="${escapeHTML(row.setting.id)}"${row.pendingPanel ? ' data-architecture-pending-setting' : ''}>
-        <details class="model-run"${(isWriting || row.pendingPanel) && requestedSettingId === row.setting.id ? ' open' : ''}>
+        <details class="model-run"${requestedSettingId === row.setting.id ? ' open' : ''}>
           <summary class="model-preview__row${regressionClass}">
             <span class="model-preview__identity"><strong>${escapeHTML(settingLabel)}</strong><small>${row.pendingPanel ? 'Awaiting Fable review' : row.rank ? `${isCreation ? 'Three-trial balanced skill' : escapeHTML(TREATMENT_LABEL)} rank #${row.rank} of ${SETTING_COUNT}` : isCreation ? 'Three-trial aggregate incomplete' : 'Panel total not assessable'}</small></span>
             ${comparable ? `<span
@@ -1464,7 +1464,7 @@
     }
     hydrateSectionLinks(benchmark.id, options.section || 'overview');
     if (options.scroll) scrollToSection(options.section || 'top');
-    if ((isWriting || pendingArchitectureResponses) && requestedSettingId && !options.section) {
+    if (requestedSettingId && !options.section) {
       window.requestAnimationFrame(() => reportView.querySelector(`[data-report-setting-id="${CSS.escape(requestedSettingId)}"]`)?.scrollIntoView({ block: 'start', behavior: 'instant' }));
     }
   };

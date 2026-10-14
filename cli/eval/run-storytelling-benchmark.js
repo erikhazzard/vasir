@@ -115,7 +115,11 @@ function skillConditionHash(snapshot, requiredSkillFiles) {
     requiredSkillReadPolicyVersion: STORYTELLING_REQUIRED_SKILL_READ_POLICY_VERSION }) : snapshot.hash;
 }
 
-function validateGenerationExecutionFilters(configurations, { generateProvider, generateModel }) {
+function validateGenerationExecutionFilters(configurations, { generateProvider, generateModel, generateCaseIds }, cases) {
+  if (!Array.isArray(generateCaseIds) || new Set(generateCaseIds).size !== generateCaseIds.length ||
+    generateCaseIds.some((id) => !cases.some((entry) => entry.id === id))) {
+    fail("generateCaseIds must contain distinct exact case IDs in the frozen inventory.", "EVAL_STORYTELLING_EXECUTION_FILTER");
+  }
   if (generateModel === null) return;
   if (typeof generateModel !== "string" || !configurations.some((configuration) => configuration.model === generateModel)) {
     fail("generateModel must exactly match a model in the frozen inventory; aliases are not resolved.", "EVAL_STORYTELLING_EXECUTION_FILTER");
@@ -286,7 +290,7 @@ export async function runStorytellingBenchmark({
   requestedModelArguments = [], requestedCaseIds = [], trialCount = 1, generationConcurrency = 4,
   requiredSkillFiles = [],
   judgeConcurrency = DEFAULT_PANEL_JUDGE_CONCURRENCY,
-  generateProvider = null, generateModel = null, judgeProvider = null,
+  generateProvider = null, generateModel = null, generateCaseIds = [], judgeProvider = null,
   runId = null, resumeRunId = null, prepareOnly = false, generationOnly = false, judgeOnly = false, retryFailed = false,
   maxGenerationRows = null, seed = null,
   environmentVariables = process.env,
@@ -334,7 +338,7 @@ export async function runStorytellingBenchmark({
       }
       snapshot = validateStorytellingSkillSnapshot(readJson(path.join(outputDirectory, "skill-snapshot.json")));
       validateResume(run, snapshot);
-      validateGenerationExecutionFilters(run.configurations, { generateProvider, generateModel });
+      validateGenerationExecutionFilters(run.configurations, { generateProvider, generateModel, generateCaseIds }, run.benchmark.definition.cases);
     } catch (error) {
       releaseLock();
       throw error;
@@ -360,7 +364,7 @@ export async function runStorytellingBenchmark({
       fail("Required skill-file read verification currently supports Codex contestant configurations only.");
     }
     if (requestedModelArguments.some((value) => value.endsWith("@ultracode"))) fail("Ultracode is a workflow mode and is excluded from this reasoning benchmark.");
-    validateGenerationExecutionFilters(configurations, { generateProvider, generateModel });
+    validateGenerationExecutionFilters(configurations, { generateProvider, generateModel, generateCaseIds }, definition.cases);
     const startedAt = nowImplementation().toISOString();
     const benchmarkHash = createBenchmarkHash(definition);
     const generatedRunId = `${startedAt.replaceAll(":", "-")}__${crypto.randomUUID().slice(0, 8)}`;
@@ -431,6 +435,7 @@ export async function runStorytellingBenchmark({
       mode: prepareOnly ? "prepare" : generationOnly ? "generation-only" : judgeOnly ? "judge-only" : "generate-and-judge",
       generationConcurrencyLimit: generationConcurrency,
       generationProviderFilter: generateProvider, generationModelFilter: generateModel,
+      generationCaseFilter: [...generateCaseIds],
       judgeProviderFilter: judgeProvider, judgeConcurrencyLimit: judgeConcurrency, retryFailed, maxGenerationRows,
       selectedGenerationRowCount: 0
     };
@@ -458,7 +463,9 @@ export async function runStorytellingBenchmark({
       const row = rowsByKey.get(rowKey(plan));
       return (!generateProvider || plan.configuration.provider === generateProvider) &&
         (!generateModel || plan.configuration.model === generateModel) &&
+        (!generateCaseIds.length || generateCaseIds.includes(plan.caseDefinition.id)) &&
         row.error?.code !== "EVAL_STORYTELLING_REQUIRED_READ_INCOMPLETE" &&
+        row.error?.code !== "EVAL_STORYTELLING_EXTERNAL_TOOL_USED" &&
         !isStorytellingGenerationOutputPolicyBlocked({ error: row.error, configuration: plan.configuration }) &&
         (["pending", "running"].includes(row.rowStatus) ||
           (retryFailed && ["error", "unavailable"].includes(row.rowStatus)));
@@ -629,7 +636,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     trials: { type: "string" }, concurrency: { type: "string" }, "judge-concurrency": { type: "string" }, "run-id": { type: "string" },
     resume: { type: "string" }, prepare: { type: "boolean" }, "generation-only": { type: "boolean" },
     "retry-failed": { type: "boolean" }, "judge-only": { type: "boolean" },
-    "generate-provider": { type: "string" }, "generate-model": { type: "string" }, "judge-provider": { type: "string" }, "max-rows": { type: "string" }, seed: { type: "string" }
+    "generate-provider": { type: "string" }, "generate-model": { type: "string" }, "generate-case": { type: "string", multiple: true }, "judge-provider": { type: "string" }, "max-rows": { type: "string" }, seed: { type: "string" }
   } });
   runStorytellingBenchmark({
     benchmarkName: values.benchmark, projectRootDirectory: values["project-root"] ?? process.cwd(),
@@ -643,6 +650,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     judgeOnly: values["judge-only"],
     generateProvider: values["generate-provider"],
     generateModel: values["generate-model"],
+    generateCaseIds: values["generate-case"] ?? [],
     judgeProvider: values["judge-provider"],
     maxGenerationRows: values["max-rows"] === undefined ? null : Number(values["max-rows"]), seed: values.seed,
     onCheckpoint: ({ event, runId: id, run }) => {

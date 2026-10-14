@@ -29,7 +29,7 @@ The sentence is a working concentration of meaning. It need not contain every be
 
 ## Derive an idea from material
 
-Start where the user has started. An image, character, finished climax, philosophical concern, genre promise, or ugly contradiction can all be legitimate entrances. Genre can help identify the dominant stakes, but do not lock a value before understanding the user's actual material.
+Start from the user's material. Read the matching [genre guide](genres/index.md) to propose the governing value spectrum; confirm it against the central conflict and ending. Keep external stakes, internal arcs, and subplot values distinct. If the material contradicts the genre hypothesis, revise the hypothesis.
 
 For an existing story, reconstruct the conclusion before judging its philosophy:
 
@@ -164,15 +164,15 @@ At crisis, Nera can turn back while the known route remains usable, saving those
 
 A controlling idea is a concentration of understanding, not a substitute for creating that understanding in someone else. Separate the writer's design instrument from the reader-facing explanation. Lead with an accessible answer to the question, then ground the central relationship in the protagonist's pursuit of an object of desire, the actions taken, and the resulting value changes. Preserve depth by making causes explicit, not by increasing abstraction.
 
-Supply minimum necessary context without assuming familiarity. Establish the protagonist, the inciting incident or relevant opening life situation, and the object of desire. Identify the forces of antagonism needed to understand that pursuit; introduce antagonists and supporting characters through their relevant relationships and roles in the action, not unexplained names. Select context that makes the protagonist's initial expectations, subsequent choices, and their consequences intelligible; omit what the conversation already establishes. These craft distinctions guide the explanation, not a compulsory synopsis or list of labels.
+Supply minimum necessary context without assuming familiarity. Establish the protagonist, the relevant opening situation, and the object of desire. Introduce antagonists and supporting characters through their roles in that pursuit. Select context that makes expectations, choices, and consequences intelligible; omit what the conversation already establishes. These distinctions guide explanation, not a compulsory synopsis or list of labels.
 
-For a broad “What is this story about?”, a premise and a precise thematic tension may suffice.
+For “What is this story about?”, distinguish meaning from synopsis. A meaning answer must state the controlling idea; a premise or spoiler-free introduction may omit the ending.
 
 When expanding an interpretation, use specific events, exchanges of dialogue, recurring patterns, or features of the telling to support a connection the answer has not yet established. Explain how that material supports, complicates, or limits the claim. If a passage merely restates the interpretation, replace it with the missing support—or remove it if the explanation is already sufficient. Meaning may accumulate through progressive complications, contrasting subplots, or interacting causes; do not compress those relationships into one supposedly decisive choice.
 
-Introduce a formal maxim afterward if it adds something. Do not reproduce the reference's analytical order as a mandatory answer structure. Respect spoiler constraints; a spoiler-free introduction need not expose the climax to justify its scope.
+Arrange the controlling idea and its evidence for the reader; no fixed labels or sentence pattern are required. Respect spoiler constraints. For unresolved or non-dramatic work, identify what remains unsettled rather than inventing a final charge or cause.
 
-For example, an explanation with ending spoilers can make the LOTR interpretation concrete:
+For example, support the LOTR controlling idea—“Freedom is preserved because it is given to those who give themselves; the pursuit of domination destroys the freedom it promises”—with the events that establish it:
 
 > Frodo carries the Ring to destroy it, but at the decisive moment he cannot surrender it. Earlier mercy has kept Gollum alive; Gollum seizes the Ring and falls with it into the fire. The person Frodo spared completes what Frodo cannot. Frodo receives deliverance beyond his remaining strength, while Gollum's possession ends in destruction.
 

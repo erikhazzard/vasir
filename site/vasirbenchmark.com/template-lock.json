@@ -1,26 +1,25 @@
 {
   "kind": "vasirbenchmark-site-template-lock",
-  "version": "2026-10-10-test-authoring-ae4a4d4a1fa1-sol-architecture-pending",
+  "version": "2026-10-10-test-authoring-86432f37049f-sol-architecture-final-e19a3461f213-manual-inspection-d4bdee89dbc3-writing-sol61-writing-refresh-071c75e0c0b9",
   "status": "accepted",
   "canonicalPath": "site/vasirbenchmark.com",
   "acceptance": {
     "authority": "user",
-    "acceptedAt": "2026-10-12T13:52:07.178Z",
-    "response": "User requested the live pages show completed Sol architecture work now despite the original Fable reviewer quota. Publish exact saved answers and Astra reviews with explicit pending status.",
-    "basis": "Six saved GPT-6.1 Sol xhigh architecture answers and three original Astra paired reviews are published as separately validated pending evidence. Original Fable reviews are pending due to provider quota; all official scores, ranks, source cells and prior responses remain exact.",
-    "verdict": "Every architecture report retains its 52 scored settings and adds the saved Sol pair with Awaiting Fable review and no final score. Engineering and Overall retain all 53 and 56 settings and their exact scores. Sol remains 2/5 Engineering and 2/9 Overall scored coverage; its three architecture links open the exact saved answers and Astra reviews.",
-    "criterion": "Keep every official task cell, score, rank, model identity, aggregate, native response and judgment exact. Retain all 53 Engineering and 56 Overall settings; Sol stays 2/5 and 2/9 for scored coverage. Publish six separate unscored architecture answers with exact frozen inputs, six original Astra answer ratings and three pending original Fable requests. No provisional final scores, alternate reviewers or missing-score imputation. All accepted deployment limits remain unchanged.",
+    "acceptedAt": "2026-10-13T03:11:14.142Z",
+    "response": "User authorized the complete current Writing skill benchmark run and publication with “great lets do it all”; existing benchmark layout remains accepted.",
+    "basis": "Two additive current-skill reports reuse the existing report and table UI. The only frontend copy change is “three published” to “three established” for the unchanged Writing aggregate. No new layout or human visual review is claimed.",
+    "verdict": "Candidate browser proof passes both new reports at desktop and mobile widths, including every case, exact displayed scores and raw answers, original reviews, closed inspection disclosures, five catalog reports, and the unchanged three-benchmark aggregate.",
+    "criterion": "Publish the complete frozen snapshot under separate report IDs; preserve all established benchmarks and aggregate score bases; retain raw answer, rubric, review and exact delivered skill evidence.",
     "scope": {
-      "kind": "executable-testing-benchmark",
-      "schemaVersion": 9,
-      "benchmarkId": "test-authoring",
+      "kind": "writing-skill-refresh",
+      "schemaVersion": 1,
+      "benchmarkIds": [
+        "storytelling-core-idea-refresh",
+        "storytelling-mmorpg-narrative"
+      ],
       "viewports": [
         {
           "width": 1440,
-          "height": 1000
-        },
-        {
-          "width": 820,
           "height": 1000
         },
         {
@@ -473,139 +472,176 @@
       "generatedFiles": [
         {
           "path": "data.js",
-          "bytes": 1316154,
-          "sha256": "0da8ea2992046e79e312c436376180d9f183c55118e0ba79d6c678501fc937ec"
+          "bytes": 1325352,
+          "sha256": "9c389b27b93e006a4f6353c0b2229461477d25152bb496c00939998eb77fa7e7"
         },
         {
           "path": "responses.js",
-          "bytes": 7395428,
-          "sha256": "f741af0da1aa97701f43dfa6d1ebefa5a9c2c8d76d39624690b2a8f4f6b6626a"
+          "bytes": 7347249,
+          "sha256": "bd493f1f7fa1d9b61f47903e1133a1b463bef023feb2cfe0931ae5375341904d"
+        },
+        {
+          "path": "writing-data.js",
+          "bytes": 2241856,
+          "sha256": "fdef2369d61cf7ba4efb3d66ba4eab891a40b8af9e9010877a83e16e6d84d581"
+        },
+        {
+          "path": "writing-responses.js",
+          "bytes": 5055227,
+          "sha256": "ab7fb41d3ae2b2f19d5f6ab4ca85237ca46e7ded5aa798cf22306f29712fb4b6"
+        },
+        {
+          "path": "writing-creation-responses.js",
+          "bytes": 6728396,
+          "sha256": "1043ad0376c9a68dd819e86a14c560fc169a91f3f31eef8c248a7ee4b9bd74ee"
+        },
+        {
+          "path": "writing-twists-responses.js",
+          "bytes": 1726774,
+          "sha256": "f6492895ce5d0737ddeb9f505b02e1d26ffeeceb055c6f245e70c500bb91ec5b"
+        },
+        {
+          "path": "writing-dungeon-master-responses.js",
+          "bytes": 104,
+          "sha256": "3192148f7e1877e3f20f1f67b17764e964d6599b30b8221b0578167e7094faa4"
         }
       ],
       "candidate": {
-        "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa13153c4f2d8dec8693d0b6ef6e973b06731223ccf54716ecb62ec.json",
+        "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc347c77ca15e1c124aba8cd26524a485c5592054cb3ea9d5583123.json",
         "bytes": 400268,
-        "sha256": "b3ea70d597873003c6b821351dfa7df606eef173169a02c6f14d7f83157e8922"
+        "sha256": "78a540a48c4ba1f60401ec155e9872b808ae3cfcef6d1bf953584e6c7b6bc2fd"
       },
       "browserHarness": {
         "path": "backend-testing-browsercheck.mjs",
-        "bytes": 120822,
-        "sha256": "436834b76ccc8d99eb692126f9f777595274541458714ec8084ab5d20ef37dcc"
+        "bytes": 131683,
+        "sha256": "3ab1534ef59ce2b10202b04823be3dcbd145c1ca396eb289f711edf3d3ce7e1e"
       },
       "browserProofs": [
         {
           "width": 1440,
           "height": 1000,
-          "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/backend-testing-browsercheck.json",
-          "bytes": 143004,
-          "sha256": "5327d1d8f5c4711c487b34dc86d4e788f7c2526783c403eec18b50956ffee703"
+          "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/backend-testing-browsercheck.json",
+          "bytes": 156060,
+          "sha256": "23f79e6487439ea15e4a8f6cdeede0c607dd9da0e9248c955a35a1e89179bf26"
         },
         {
           "width": 820,
           "height": 1000,
-          "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/backend-testing-browsercheck.json",
-          "bytes": 142887,
-          "sha256": "e3e6cb1961b2097a3e0e819f63f7284b2968f959b06a46da4fe8dcd94eff16fc"
+          "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/backend-testing-browsercheck.json",
+          "bytes": 155926,
+          "sha256": "43d9ecf88902a0f51a5580ddfcb5c71ba91c57a9fb0d119aecc4bc93a404ab8a"
         },
         {
           "width": 390,
           "height": 844,
-          "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/backend-testing-browsercheck.json",
-          "bytes": 142840,
-          "sha256": "fe753f2a49d2c652a2a21e9b7a6323bc31f7b3b1e4b97edc740b5a2c676bd593"
+          "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/backend-testing-browsercheck.json",
+          "bytes": 155870,
+          "sha256": "bde196838d783d373d1ac5c88036bca602476c96c2ff4262afb437ced6bb2d7b"
         }
       ],
       "visualReview": {
         "authority": "agent",
         "capturePaths": [
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/testing-ledger-track-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/backend-testing-ledger-chart-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-ledger-chart-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-engineering-ledger-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-combined-leaderboard-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-sol-main-ranking-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-score-breakdown-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-available-resource-comparison-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-resource-unavailable-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-overview-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-detection-method-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-rubric-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-test-files-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-score-calculation-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-fault-evidence-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-dimension-profile-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-review-reasons-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/overall-combined-engineering-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/overall-sol-available-profile-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/overall-to-engineering-sol-coverage-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/backend-testing-hyper-scale-chat-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-hyper-scale-chat-row-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-hyper-scale-chat-answer-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-hyper-scale-chat-astra-review-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-personalized-home-feed-row-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-personalized-home-feed-answer-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-personalized-home-feed-astra-review-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-device-telemetry-row-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-device-telemetry-answer-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-device-telemetry-astra-review-1440.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/testing-ledger-track-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/backend-testing-ledger-chart-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-ledger-chart-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-engineering-ledger-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-combined-leaderboard-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-sol-main-ranking-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-score-breakdown-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-available-resource-comparison-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-resource-unavailable-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-overview-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-detection-method-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-rubric-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-test-files-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-score-calculation-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-fault-evidence-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-dimension-profile-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-review-reasons-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/overall-combined-engineering-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/overall-sol-available-profile-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/overall-to-engineering-sol-coverage-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/backend-testing-hyper-scale-chat-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-hyper-scale-chat-row-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-hyper-scale-chat-answer-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-hyper-scale-chat-astra-review-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-personalized-home-feed-row-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-personalized-home-feed-answer-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-personalized-home-feed-astra-review-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-device-telemetry-row-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-device-telemetry-answer-390.png",
-          "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-device-telemetry-astra-review-390.png"
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/testing-ledger-track-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/backend-testing-ledger-chart-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-ledger-chart-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-engineering-ledger-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-combined-leaderboard-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-default-ranking-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-default-selected-url-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-sol-main-ranking-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-score-breakdown-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-available-resource-comparison-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-resource-unavailable-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-overview-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-detection-method-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-rubric-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-test-files-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-score-calculation-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-fault-evidence-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-dimension-profile-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-review-reasons-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/overall-combined-engineering-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/overall-sol-available-profile-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-complete-scores-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-storytelling-core-idea-answers-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-storytelling-plot-twists-answers-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-storytelling-magic-discovery-answers-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/overall-to-engineering-sol-coverage-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/backend-testing-hyper-scale-chat-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-hyper-scale-chat-row-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-hyper-scale-chat-answer-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-hyper-scale-chat-judges-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-personalized-home-feed-row-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-personalized-home-feed-answer-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-personalized-home-feed-judges-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-device-telemetry-row-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-device-telemetry-answer-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-device-telemetry-judges-1440.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/testing-ledger-track-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/backend-testing-ledger-chart-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-ledger-chart-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-engineering-ledger-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-combined-leaderboard-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-default-ranking-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-default-selected-url-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-sol-main-ranking-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-score-breakdown-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-available-resource-comparison-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-resource-unavailable-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-overview-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-detection-method-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-rubric-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-test-files-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-score-calculation-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-fault-evidence-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-dimension-profile-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-review-reasons-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/overall-combined-engineering-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/overall-sol-available-profile-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-complete-scores-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-storytelling-core-idea-answers-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-storytelling-plot-twists-answers-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-storytelling-magic-discovery-answers-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/overall-to-engineering-sol-coverage-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/backend-testing-hyper-scale-chat-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-hyper-scale-chat-row-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-hyper-scale-chat-answer-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-hyper-scale-chat-judges-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-personalized-home-feed-row-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-personalized-home-feed-answer-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-personalized-home-feed-judges-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-device-telemetry-row-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-device-telemetry-answer-390.png",
+          "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-device-telemetry-judges-390.png"
         ],
-        "verdict": "Desktop and mobile show the unscored Sol row in each normal architecture table, readable exact saved answers and Astra reasons, and Awaiting review labels in the Engineering breakdown. Native links open and scroll the requested Sol row. Official totals, ranks and coverage remain unchanged."
+        "verdict": "Existing Writing tables show Sol complete under all three original task bases; exact answers and reviews are reachable from its Overall Writing segment. Overall shows 8/9 and the actual Engineering/Writing weights. Engineering retains every score and starts without a model-inspection strip; native manual disclosures, copy, routing and responsive checks pass."
       },
       "aggregateBaseline": {
         "data": {
-          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture/data.js",
-          "bytes": 1314328,
-          "sha256": "36e03819a81ef1e48bb871e0774fa7f85b25bdd9fece9d8c928f3f8a77295aec"
+          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture-final/data.js",
+          "bytes": 1316154,
+          "sha256": "0da8ea2992046e79e312c436376180d9f183c55118e0ba79d6c678501fc937ec"
         },
         "responses": {
-          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture/responses.js",
-          "bytes": 7321085,
-          "sha256": "836e79f9584a86cee084be94793184693850e9b970a43cce386a2d79ee20797c"
+          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture-final/responses.js",
+          "bytes": 7395428,
+          "sha256": "f741af0da1aa97701f43dfa6d1ebefa5a9c2c8d76d39624690b2a8f4f6b6626a"
         },
         "selection": {
-          "path": "site/vasirbenchmark.com/reviews/test-authoring/2026-10-10/prior-sol-architecture/publication.json",
+          "path": "site/vasirbenchmark.com/reviews/test-authoring/2026-10-10/prior-sol-architecture-final/publication.json",
           "bytes": 16398,
           "sha256": "d86eac3ddb942fc980b716c3638bf90e3006513a5a0589df21f884311369b855"
         },
         "backendSelection": {
-          "path": "site/vasirbenchmark.com/reviews/test-authoring/2026-10-10/prior-sol-architecture/backend-publication.json",
+          "path": "site/vasirbenchmark.com/reviews/test-authoring/2026-10-10/prior-sol-architecture-final/backend-publication.json",
           "bytes": 10389,
           "sha256": "64de5b7b55e70e4f4d1d895bd55ff6eaac146dcf65e9870eca66d57c341ccb17"
         },
         "acceptance": {
-          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture/template-lock.json",
-          "bytes": 54841,
-          "sha256": "8b5a3b1bb39ef06dd2a12d636a5407d4f8ed4e6881de7a01db9f59b24ead7de3"
+          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture-final/template-lock.json",
+          "bytes": 66352,
+          "sha256": "dfaf1959d91febf7fa3024900c17b8dbdb46121805563a1141b4a0c98dc289cd"
         }
       },
       "landingBudget": {
@@ -614,7 +650,7 @@
         "sourceMeasuredCompressedLandingBytes": 335327,
         "previousReleaseCompressedLandingBytes": 312913,
         "reason": "Restoring all 53 Engineering and 56 Overall settings adds measured aggregate projections while preserving native task evidence. Exact duplicate serialization was removed; only the compressed landing allowance changes, with approximately 8.6 KiB headroom.",
-        "measuredCompressedLandingBytes": 336057,
+        "measuredCompressedLandingBytes": 336399,
         "headroomBytes": 8603,
         "before": {
           "path": "reviews/test-authoring/2026-10-10/prior-available-coverage/deployment.json",
@@ -627,36 +663,237 @@
           "sha256": "30c7ee7f40776733359d37e735159b089d0291956d7f951281753da4b48686ab"
         }
       },
-      "architecturePending": {
+      "architectureAppend": {
+        "configurationId": "codex:gpt-6.1-sol@xhigh",
+        "benchmarkIds": [
+          "hyper-scale-chat",
+          "personalized-home-feed",
+          "device-telemetry"
+        ],
         "selection": {
           "path": "benchmarks/public-results.json",
+          "bytes": 1086,
+          "sha256": "911949029032eb0d94b8c7c3e79a37ad2b5c396a85d9af5bfb3658029a425e04"
+        },
+        "previousSelection": {
+          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture-final/public-results.json",
           "bytes": 1943,
           "sha256": "cff84665c4b112d4457169f5ee96c7c3cc712c229b4292d68b9d62c1effb21ee"
         },
-        "previousSelection": {
-          "path": "reviews/test-authoring/2026-10-10/prior-sol-architecture/public-results.json",
-          "bytes": 1086,
-          "sha256": "eeb45929024df0c14f01a445a6627e520b2ef4008534f06dba0cc68f1f2939d9"
+        "plan": {
+          "path": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/plan.json",
+          "bytes": 11976,
+          "sha256": "32c4d1fc5169bc3cfe68340b8f69c859009810a8a91285f142ac3293f8c731c6"
+        }
+      },
+      "manualInspection": {
+        "previousAcceptance": {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/manual-inspection/prior/template-lock.json",
+          "bytes": 65865,
+          "sha256": "4aa4d8237ff4d628c734893a593f32184ea1446b18cde62a21d7d530b01e35aa"
         },
-        "sourcePins": [
+        "data": {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/manual-inspection/prior/data.js",
+          "bytes": 1320878,
+          "sha256": "6f0f550219f76ee9d6bf2a2e78c71f52126362f18719089f26684b626218f3a5"
+        },
+        "responses": {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/manual-inspection/prior/responses.js",
+          "bytes": 7347249,
+          "sha256": "bd493f1f7fa1d9b61f47903e1133a1b463bef023feb2cfe0931ae5375341904d"
+        },
+        "selection": {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/manual-inspection/prior/public-results.json",
+          "bytes": 1086,
+          "sha256": "911949029032eb0d94b8c7c3e79a37ad2b5c396a85d9af5bfb3658029a425e04"
+        }
+      },
+      "writingAppend": {
+        "configurationId": "codex:gpt-6.1-sol@xhigh",
+        "benchmarkIds": [
+          "storytelling-core-idea",
+          "storytelling-plot-twists",
+          "storytelling-magic-discovery"
+        ],
+        "baseline": {
+          "acceptance": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/template-lock.json",
+            "bytes": 68984,
+            "sha256": "e2d2ccf7e3c07ab8be9f7d08867b0c7e2b7d127128086b4d58c1f7595efcf981"
+          },
+          "data": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/data.js",
+            "bytes": 1320878,
+            "sha256": "6f0f550219f76ee9d6bf2a2e78c71f52126362f18719089f26684b626218f3a5"
+          },
+          "responses": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/responses.js",
+            "bytes": 7347249,
+            "sha256": "bd493f1f7fa1d9b61f47903e1133a1b463bef023feb2cfe0931ae5375341904d"
+          },
+          "writingData": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/writing-data.js",
+            "bytes": 2177044,
+            "sha256": "48b50fd439056adfe4fcf48b76d1e890bcaf2dd2831ae926546018112f41f77b"
+          },
+          "writingResponses": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/writing-responses.js",
+            "bytes": 4967761,
+            "sha256": "4c35ae4ca7dd70a09e09d01062046bda6a5f369dedb55defe956441cd555a919"
+          },
+          "twistsResponses": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/writing-twists-responses.js",
+            "bytes": 1672116,
+            "sha256": "df483b62adc636f031eca013d72c3eceb534cd6135b72833d0a46ba3d943d6f3"
+          },
+          "creationResponses": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/writing-creation-responses.js",
+            "bytes": 6561951,
+            "sha256": "5ecca79e69f9ff8123c7f187d61736c7cbd0485d555d7f2a06dbca5ab9685b7e"
+          },
+          "dungeonResponses": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/writing-dungeon-master-responses.js",
+            "bytes": 104,
+            "sha256": "3192148f7e1877e3f20f1f67b17764e964d6599b30b8221b0578167e7094faa4"
+          },
+          "architectureSelection": {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/public-results.json",
+            "bytes": 1086,
+            "sha256": "911949029032eb0d94b8c7c3e79a37ad2b5c396a85d9af5bfb3658029a425e04"
+          }
+        },
+        "parentSourcePins": [
           {
-            "path": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/retry-2026-10-12/prior/hyper-scale-chat/run.json",
-            "bytes": 2618374,
-            "sha256": "cf89eb62557f77de3e08612c1de792c6a5b42a99eb018dfdaa1f2590ab0364f5"
+            "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/bdf31f6ba88a720057da05d31597dd80a35606201dff7c73a6a741a4cefe4280/run.json",
+            "bytes": 60128493,
+            "sha256": "bdf31f6ba88a720057da05d31597dd80a35606201dff7c73a6a741a4cefe4280"
           },
           {
-            "path": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/retry-2026-10-12/prior/personalized-home-feed/run.json",
-            "bytes": 2844357,
-            "sha256": "5c7722cacfa73658e1a96e00ac186a21526c044f678b3a8ba0941c7b6db0c95d"
+            "path": ".agents/vasir-evals/storytelling-core-idea/publication-snapshots/bdf31f6ba88a720057da05d31597dd80a35606201dff7c73a6a741a4cefe4280/skill-snapshot.json",
+            "bytes": 453845,
+            "sha256": "a4db1b5ea3ae79e9655be2ab793fa71e153571359a88d098a383bf94cd4667e5"
           },
           {
-            "path": ".agents/vasir-evals/architecture-sol-6.1-xhigh/round-2026-10-11/retry-2026-10-12/prior/device-telemetry/run.json",
-            "bytes": 2938355,
-            "sha256": "9959adfec437f200f394cf8224cb1e965c954ccb11062b71eeafcc0eb90af043"
+            "path": ".agents/vasir-evals/storytelling-plot-twists-paired-v2/publication-snapshots/f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7/snapshot.json",
+            "bytes": 65441159,
+            "sha256": "f50472e807d05802ee2f62e1e29d4aef425c3b1c776d253e9e4fa7ba7fb048e7"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/run.json",
+            "bytes": 2306274,
+            "sha256": "233db3f8cf5c4db8ddd6432ff7323d7be567a46654213f9a00a148e04329a18f"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/skill-snapshot.json",
+            "bytes": 470201,
+            "sha256": "bd95674e5a5dfd99b4b47571bf08742f7c736bd1465d21ba8357bc42638f07e4"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judging.json",
+            "bytes": 54200034,
+            "sha256": "927abaeb682628de190bc609bd999c23a5be33e260ce3a989b10283a2b49f138"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-magic-discovery/publication-snapshots/48fadf69fb9904e198ebfc61d892db9e6f4a8ea2e36c35c2ad72c8e7853b7168/creation-judge-context.json",
+            "bytes": 316721,
+            "sha256": "ecbc9f56410245065b6d160c0a6f411ed2a5dcafab13a805efd1950b43d3e9fe"
           }
         ],
-        "descriptorSha256": "d3efd803e46e242608d2d81450fe5258b6273d20897d72f90977522d6f3ff98d",
-        "responsesSha256": "6220a0c2eedc13a2b221a41db2332fefbff783da5222d8be18f3159c5fc708bd"
+        "previousSelections": [
+          {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/storytelling-core-idea-publication.json",
+            "bytes": 638,
+            "sha256": "6f7e93ef1c4154fa2c4c6c1857cee0ee3044b498eb03c380ff28a288e91d7904"
+          },
+          {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/storytelling-plot-twists-publication.json",
+            "bytes": 403,
+            "sha256": "5b1c9286bafc2455594cfc6608887781d24f22dc5778a48dc65893ff025db482"
+          },
+          {
+            "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/prior/storytelling-magic-discovery-publication.json",
+            "bytes": 1217,
+            "sha256": "3dc61c105531ed538f0f72a8c74b563bf48c7cfe3b667dd5c9720b8df28739ee"
+          }
+        ],
+        "selections": [
+          {
+            "path": "benchmarks/storytelling-core-idea/publication.json",
+            "bytes": 638,
+            "sha256": "31bf36e9d58c88165e66e2af8fa3b705fb37e4fcacebe682ce4f0c57bf8ba972"
+          },
+          {
+            "path": "benchmarks/storytelling-plot-twists/publication.json",
+            "bytes": 403,
+            "sha256": "8b8a92fc01f66dec74962cb82171e468eeedbcf3cf4b345769affd65d988aa0a"
+          },
+          {
+            "path": "benchmarks/storytelling-magic-discovery/publication.json",
+            "bytes": 1217,
+            "sha256": "bb3b377c18e9de360f43d064569705a17cb97dc8cde8883164b1270167600f96"
+          }
+        ],
+        "handoffs": [
+          {
+            "path": ".agents/vasir-evals/storytelling-core-idea/core-idea-sol61-xhigh-2026-10-12-merged/merge-report.json",
+            "bytes": 5799,
+            "sha256": "3a12aa8d5249589cb76114950bdf04b226e4bc9322fd44ceb37479a6da973a5a"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-plot-twists-paired-v2/sol-6-1-xhigh-20261012/handoff.json",
+            "bytes": 5235,
+            "sha256": "9ea5f033d78fb580620b658b5a47e60f01186a41bb52c91d86c42399fc4d99cb"
+          },
+          {
+            "path": ".agents/vasir-evals/storytelling-magic-discovery/gpt61-sol-xhigh-append-20261012/handoff.json",
+            "bytes": 9427,
+            "sha256": "83b52d7fb13e86c0c9af2879f0395e83bdc6e19a0099946f1fde9a27c64871d0"
+          }
+        ],
+        "taskUsage": {
+          "path": ".agents/vasir-evals/test-authoring/prepared-round/publication/writing-sol61/task-usage.json",
+          "bytes": 4108,
+          "sha256": "2757f0d5b78607f2253ddf18b2ff4a4dbe2479096ad23eee79c8fc34d8da45a2"
+        }
+      },
+      "writingRefresh": {
+        "previousAcceptance": {
+          "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/prior-template-lock.json",
+          "bytes": 82402,
+          "sha256": "fabad84cf33099474fe81386a70c216673c7a03ecae58d9f91cb66a3f9b88f84"
+        },
+        "previousApp": {
+          "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/prior-app.js",
+          "bytes": 232357,
+          "sha256": "3afad8f1e7f8e01505ea203bcf123c89b34e2d9b0a42591d2085c8f7ae5e4a74"
+        },
+        "selection": {
+          "path": "benchmarks/storytelling-skill-refresh/publication.json",
+          "bytes": 341,
+          "sha256": "9e47d11c52537503bb1ce0ad029a3cd8922607d7cd166ae874633a14e7eb977e"
+        },
+        "snapshot": {
+          "path": ".agents/vasir-evals/storytelling-skill-refresh/publication-snapshots/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/snapshot.json",
+          "sha256": "071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e"
+        },
+        "browserHarness": {
+          "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/browsercheck.mjs",
+          "bytes": 10510,
+          "sha256": "f21bafe21d7f874e56d46602c58fde8a1e7a29be1a6e45320083849bb96231fb"
+        },
+        "candidate": {
+          "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/browser-evidence.json",
+          "bytes": 9879,
+          "sha256": "42ec8153eec2552963113d54968f33aaf25e79ea6e000d045cb7ec88873570ba"
+        },
+        "checks": 14,
+        "captures": 10,
+        "visualReview": {
+          "reviewer": "agent",
+          "status": "passed",
+          "scope": "Existing shared table, normal disclosure behavior, typography and overflow reviewed on desktop and mobile captures."
+        },
+        "frontendChange": "Single-word aggregate copy correction; previous accepted app SHA256 is recovered exactly by reverting that word."
       }
     }
   },
@@ -672,12 +909,12 @@
       "dns": "route53-apex-alias"
     }
   },
-  "claimBoundary": "Pending architecture answers are saved evidence, excluded from official task and aggregate scores until the original two-reviewer panel completes. Individual saved Astra ratings do not form a provisional final score. All prior official evidence and available-paired coverage rules remain exact. Missing scores are not imputed. Analysis limit expanded uniformly from 24 to 64 KiB after authoring began; original author prompts, strict outcomes and exact source remain unchanged. Candidate evidence does not establish live delivery; live byte and browser checks follow publication.",
+  "claimBoundary": "Rankings compare available paired evidence and can cover different task subsets. Coverage is displayed beside each score and in its calculation. Missing tasks are not zeroed or imputed. Original task scores and fully covered aggregate scores are unchanged. Original source calibration and Writing limitations remain; these development comparisons do not establish population performance or confidence intervals. Analysis limit expanded uniformly from 24 to 64 KiB after authoring began; original author prompts, strict outcomes and exact source remain unchanged. Candidate evidence does not establish live delivery; live byte and browser checks follow publication. The two current Writing reports are development comparisons over three Core Idea cases and one MMORPG prompt for two configurations; they do not enter the established three-benchmark Writing or Overall score basis.",
   "files": [
     {
       "path": "app.js",
-      "bytes": 232199,
-      "sha256": "3433de743b05da6cf0122f82d521fcf8d8394cddd3f2c62da94c923c40a6078b"
+      "bytes": 232359,
+      "sha256": "428598c27593eaec6d23342f80ac000416b4dcb6b53129f9b0ad502d37793525"
     },
     {
       "path": "assets/d3.v7.min.js",
@@ -701,8 +938,8 @@
     },
     {
       "path": "benchmark-report.js",
-      "bytes": 165180,
-      "sha256": "d80cda67d3e9013b8334d5a77324c8bd1e04a9d615a3c8a1e67612bec5103677"
+      "bytes": 165098,
+      "sha256": "8a40cb0f8813114df3f0097c64426982f18ce79cef143aa4fbe6251a1de0c851"
     },
     {
       "path": "capture.mjs",
@@ -767,640 +1004,861 @@
     },
     {
       "path": "backend-testing-browsercheck.mjs",
-      "bytes": 120822,
-      "sha256": "436834b76ccc8d99eb692126f9f777595274541458714ec8084ab5d20ef37dcc"
+      "bytes": 131683,
+      "sha256": "3ab1534ef59ce2b10202b04823be3dcbd145c1ca396eb289f711edf3d3ce7e1e"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/prior-template-lock.json",
+      "bytes": 82402,
+      "sha256": "fabad84cf33099474fe81386a70c216673c7a03ecae58d9f91cb66a3f9b88f84"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/prior-app.js",
+      "bytes": 232357,
+      "sha256": "3afad8f1e7f8e01505ea203bcf123c89b34e2d9b0a42591d2085c8f7ae5e4a74"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/browsercheck.mjs",
+      "bytes": 10510,
+      "sha256": "f21bafe21d7f874e56d46602c58fde8a1e7a29be1a6e45320083849bb96231fb"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/browser-evidence.json",
+      "bytes": 9879,
+      "sha256": "42ec8153eec2552963113d54968f33aaf25e79ea6e000d045cb7ec88873570ba"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/publication.json",
+      "bytes": 341,
+      "sha256": "9e47d11c52537503bb1ce0ad029a3cd8922607d7cd166ae874633a14e7eb977e"
     }
   ],
   "captures": [
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/testing-ledger-track-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/testing-ledger-track-1440.png",
       "bytes": 111446,
       "sha256": "9c050ad58e6381d929bed63ef03a756b564a1584b967ecee0abf7c14a18c55ae",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/backend-testing-ledger-chart-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/backend-testing-ledger-chart-1440.png",
       "bytes": 113690,
       "sha256": "ec880a07b3c72552ced9824ec3064be4741a4c99705574987460c1083c534f7c",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-ledger-chart-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-ledger-chart-1440.png",
       "bytes": 113690,
       "sha256": "ec880a07b3c72552ced9824ec3064be4741a4c99705574987460c1083c534f7c",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-engineering-ledger-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-engineering-ledger-1440.png",
       "bytes": 113690,
       "sha256": "ec880a07b3c72552ced9824ec3064be4741a4c99705574987460c1083c534f7c",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-combined-leaderboard-1440.png",
-      "bytes": 156702,
-      "sha256": "eaf94767994fdfc19092ff3820a277202d47e5089a54919761629e85dfd72fce",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-combined-leaderboard-1440.png",
+      "bytes": 154541,
+      "sha256": "5c2889fe8317cfb0c1d955ec54b171c870a23e67fd95a16b0cc94dd314086391",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-sol-main-ranking-1440.png",
-      "bytes": 151760,
-      "sha256": "87c2b5e0853462f5746c133390cc9dcee9b50f6a8f3742c1c0bfc2f4a908d168",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-default-ranking-1440.png",
+      "bytes": 134224,
+      "sha256": "ae7ac8b215463e8e0d98d0ce53ed986205c99f9d13ca64d6e4f3ff5e3a5955a9",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-score-breakdown-1440.png",
-      "bytes": 142760,
-      "sha256": "5465bc0ef276074ec8bc600e4fb7178853db7b8a9aae36c6b2b39274b79774b6",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-default-selected-url-1440.png",
+      "bytes": 151506,
+      "sha256": "6f463401de3968e2206c441e2f3ed92503a8218c7048c91d45d53f6336a1a2c4",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-available-resource-comparison-1440.png",
-      "bytes": 202618,
-      "sha256": "4013c8c37fc799e146da466d28b0a4461ae347dcbb9ed0e44bd4a9c02f6c5e0b",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-sol-main-ranking-1440.png",
+      "bytes": 149941,
+      "sha256": "e0d0a4f3fd1d21655d79c9feaa0d3a9e20ffa3e3fe3d1f2f50e23d42c9aeb1f5",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/engineering-resource-unavailable-1440.png",
-      "bytes": 132234,
-      "sha256": "af95cd70bd4e2e747b743cdf65e16a1ae06705555ec3a1a3c170091ee09841e0",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-score-breakdown-1440.png",
+      "bytes": 129461,
+      "sha256": "25d3329152a73d43155b177bd66026f559d9fe0f36334df5c0e439628e23bcb5",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-overview-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-available-resource-comparison-1440.png",
+      "bytes": 180725,
+      "sha256": "c79802fdbcaa4c0e22e09da429a74bcde61027925ff2f9ed70b808025b20ec27",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/engineering-resource-unavailable-1440.png",
+      "bytes": 130175,
+      "sha256": "c86834fd35068cb49c28cfeb3b8cb973b5ad24845f7f2f73b3ccfa3df3f11cc7",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-overview-1440.png",
       "bytes": 87843,
       "sha256": "20212235d6caa55fc13ae511e84c85da95900f6f280b9b3dc5b954eb0612d561",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-detection-method-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-detection-method-1440.png",
       "bytes": 120341,
       "sha256": "1f860f3c9a3e5b304250e2f524e159516539ea5865676b2751ab5118210047d0",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-rubric-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-rubric-1440.png",
       "bytes": 173298,
       "sha256": "26abe672e2fb753e3917acd0683221b9b50ce25bb50bb2ec22ecfb55ebb80663",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-test-files-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-test-files-1440.png",
       "bytes": 163161,
       "sha256": "c17a7ec7ee90b5c2c2ab9dd00c08ac3dc8e4fca172832c101995e4c1085dfd8c",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-score-calculation-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-score-calculation-1440.png",
       "bytes": 147836,
       "sha256": "8fa97e449a180dbc20df99d670f709641512408288cc646d2783bb4671d28c27",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-fault-evidence-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-fault-evidence-1440.png",
       "bytes": 185845,
       "sha256": "536c45cee783b3011d0b3b0fe44a608d04652463e21c785f1d26e2667b8513f8",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-dimension-profile-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-dimension-profile-1440.png",
       "bytes": 94294,
       "sha256": "5dbee9faf523c534c84209622ba1f9267d21c43ddd5945b82d84d499d15fc244",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/test-authoring-review-reasons-1440.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/test-authoring-review-reasons-1440.png",
       "bytes": 117072,
       "sha256": "425c3b09f1f581b414479c01f1c0a7e07a4aa5cbfec9063089796c5c5a9063cb",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/overall-combined-engineering-1440.png",
-      "bytes": 160187,
-      "sha256": "ebdd2263ecbb43d1af3f745ddc8398c8c81711f935f14ed2cf4ee2785817ba01",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/overall-combined-engineering-1440.png",
+      "bytes": 162196,
+      "sha256": "4dded1351d6794105cdcd5c29f9546540a6dcb0bf5dd4da6629ab2289039efe4",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/overall-sol-available-profile-1440.png",
-      "bytes": 176319,
-      "sha256": "8242ea7da91b8ffb6d788544ed74861f88e4a8fb941d27c621dc3cb0db06d407",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/overall-sol-available-profile-1440.png",
+      "bytes": 166207,
+      "sha256": "f2cdd93b7cad0953f19628f14e96f9563889edd55a75a77a10ac848120fd4164",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/overall-to-engineering-sol-coverage-1440.png",
-      "bytes": 149885,
-      "sha256": "15dd7d580250145157dcd7be0211c6fbdb9e9f2339ee0877a2c0e1b8546b9492",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-complete-scores-1440.png",
+      "bytes": 103180,
+      "sha256": "54d0326f69d96364ddcb053a0d8152924fefc954ac37763a775d8d19e0cf40d8",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/backend-testing-hyper-scale-chat-1440.png",
-      "bytes": 144377,
-      "sha256": "6642e2fe70206f61e118fb77051225a09f06da183fde22305c67eb98202dd5a1",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-storytelling-core-idea-answers-1440.png",
+      "bytes": 138200,
+      "sha256": "849288cb1948bf681f8726aa71173fbe45d6ac14a61480f65b994bc668829e67",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-hyper-scale-chat-row-1440.png",
-      "bytes": 283808,
-      "sha256": "2193444eb8019fe6ed09cea9a383de57cfdb1edff6cd19ddc7e6371861895fbe",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-storytelling-plot-twists-answers-1440.png",
+      "bytes": 168693,
+      "sha256": "b7f532caeb40f1be79502362ba15ff3521ad5f6a43b9456e340cb72a79150038",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-hyper-scale-chat-answer-1440.png",
-      "bytes": 354577,
-      "sha256": "f745bb8b53b63e2cdf60ab92cc0300589e478f66bbb5636441ebc8e1597cc104",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/writing-sol-storytelling-magic-discovery-answers-1440.png",
+      "bytes": 160608,
+      "sha256": "673f2a3ffdecd6fa36fac40577e54564b4c7603445b44fa07e81e22a6c6f7ac6",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-hyper-scale-chat-astra-review-1440.png",
-      "bytes": 382499,
-      "sha256": "7a0f5e209d2263b7d1ee72ae9505b1b56bc6391f997b651f3b3538662481812d",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/overall-to-engineering-sol-coverage-1440.png",
+      "bytes": 149956,
+      "sha256": "502f57af790b5be1f3a92d3748ac395c1d7125f7ee6fe3933cd0ffcce7d46dfe",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-personalized-home-feed-row-1440.png",
-      "bytes": 281461,
-      "sha256": "e44722979b28a0345705d07a0e4de5b7c74591b037a1f30a7a38edde8b0312c3",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/backend-testing-hyper-scale-chat-1440.png",
+      "bytes": 144879,
+      "sha256": "f5528279faae934989ac4b2efa440c3e1cbea75a09abcd53f75d9ecdc0be1b5e",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-personalized-home-feed-answer-1440.png",
-      "bytes": 428213,
-      "sha256": "39259145bf7fb9ea258b6f3c8d05661aa1500164651ba3af6f86584b02af6308",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-hyper-scale-chat-row-1440.png",
+      "bytes": 293904,
+      "sha256": "4a8d9eaa019454aabe091c6f6d575465bc9131988797047db38cb180f7dbf91e",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-personalized-home-feed-astra-review-1440.png",
-      "bytes": 391030,
-      "sha256": "af78cd4573aeb7eee5ba1985f1861030864726517ad36be928ccca64aafd276f",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-hyper-scale-chat-answer-1440.png",
+      "bytes": 300842,
+      "sha256": "1b4b0e8f7822cd2ee6c49dbda11d65eb89b532ea3739351ab09915b71d092a78",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-device-telemetry-row-1440.png",
-      "bytes": 281975,
-      "sha256": "dfa8aafa8ceb85a4c3589d7f1a00911d932c756585432da65ade0f1163a52dfa",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-hyper-scale-chat-judges-1440.png",
+      "bytes": 256441,
+      "sha256": "e477ed95a26c09e3cca11027ff1d43a3eae4df9570665254b390bf1b83510b6d",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-device-telemetry-answer-1440.png",
-      "bytes": 389492,
-      "sha256": "abb92f1f7542542f4e2af9fdcdf1769fae93bb8f94d74f9e680cbd8b59ec24a6",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-personalized-home-feed-row-1440.png",
+      "bytes": 299263,
+      "sha256": "c4e9851da782de0c1e3b462f5dcb415ed794daa7879cc2af48c04ae28d79d9de",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/1440/sol-pending-device-telemetry-astra-review-1440.png",
-      "bytes": 394919,
-      "sha256": "73b9bdf1869bdd485174d2c8a34b30d0d58df6e7fe005ff219cf4fb759eed867",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-personalized-home-feed-answer-1440.png",
+      "bytes": 405348,
+      "sha256": "a401a10a487bcc398b2b93783762ddb0915891e26d33aacc6dad32eb471d93d0",
       "width": 1440,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/testing-ledger-track-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-personalized-home-feed-judges-1440.png",
+      "bytes": 276290,
+      "sha256": "2058bc5f013b0449a41ae4574597604b344239c09bc9a5fc87d34c963e6dda49",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-device-telemetry-row-1440.png",
+      "bytes": 297478,
+      "sha256": "681f7acef73a998bb3b6306eb422ffd93e5ea95a5355dcfb775af544517d27fe",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-device-telemetry-answer-1440.png",
+      "bytes": 341742,
+      "sha256": "d0c6ced2e225d8200fbf41db6908446bd4521e3fcdbc4ee6d8e4e48e5a59bc17",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/1440/sol-architecture-device-telemetry-judges-1440.png",
+      "bytes": 260537,
+      "sha256": "9085e9350eb578aa2f244546970cab2e2e9ebc783f603158960efbe2eb36a705",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/testing-ledger-track-820.png",
       "bytes": 87843,
       "sha256": "3a7dc6a64c915c649abd4ef83fa15ad0b8ba2d4192801d81e723e9147a4d13db",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/backend-testing-ledger-chart-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/backend-testing-ledger-chart-820.png",
       "bytes": 84744,
       "sha256": "92d722214fa5556e20d83d3f6123aad0c126709319459f159f0efeb3e33c2f6c",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-ledger-chart-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-ledger-chart-820.png",
       "bytes": 80040,
       "sha256": "9035d78422fb5bcd6dfc73392da698e057c68b4fd3504581c95bab000458d442",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-engineering-ledger-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-engineering-ledger-820.png",
       "bytes": 84256,
       "sha256": "db8e36f0a4c81ff639056ac3858dc3fa11f8d89c70d287237a7cd3e63cd92ae9",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/engineering-combined-leaderboard-820.png",
-      "bytes": 99110,
-      "sha256": "8bbae04bac592a39f2126683e5e6e3f7a400fe3f2c4220a177e1842b7ba69d98",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-combined-leaderboard-820.png",
+      "bytes": 99920,
+      "sha256": "16751533a0fc29121c50838d11945bb9f7f372495b3dcb2deb716b56ce122110",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/engineering-sol-main-ranking-820.png",
-      "bytes": 87862,
-      "sha256": "0060df9b2087454dacab92212b883fcb761389ad20771e43fc977099f6e7e2f7",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-default-ranking-820.png",
+      "bytes": 83603,
+      "sha256": "67abe49baf3af2e432b0a51c1478bd972681ee10c0274215517f310eeea0cfce",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/engineering-score-breakdown-820.png",
-      "bytes": 94532,
-      "sha256": "22747a2c538c83d5381b7fd9a38e278165d423a90ade0bc58e6f16e5618a3ec1",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-default-selected-url-820.png",
+      "bytes": 91495,
+      "sha256": "3dbb89a9a3141e9b05994e750ea5ae09113a7e3e36d12dab06a1a531f9628393",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/engineering-available-resource-comparison-820.png",
-      "bytes": 122132,
-      "sha256": "72882f9145b92f2372c16cfc9e6e26bf8f614a8a7514ed3629dc12e720ad6843",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-sol-main-ranking-820.png",
+      "bytes": 90228,
+      "sha256": "73442148e9eeb943f67fe177185d4d45906512de646193d17adb8a8a917c279b",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/engineering-resource-unavailable-820.png",
-      "bytes": 108717,
-      "sha256": "76b94c006aff419cb323442730fc8ef7aea5ff9906394be098bf57f2222f80a7",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-score-breakdown-820.png",
+      "bytes": 88015,
+      "sha256": "20367c0ce3bdc389997ee9c720b7c8f97ee09482de7995d20f95d509f277dcf1",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-overview-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-available-resource-comparison-820.png",
+      "bytes": 111556,
+      "sha256": "8acb5225f035527cb2a1b59c5ec908ca1c141211348fbafaf3b63f33bb937b34",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/engineering-resource-unavailable-820.png",
+      "bytes": 110021,
+      "sha256": "d9747d7d6e65f71c9d2cad44b4120c5d6142bc635c49279cb7e4cc41e437e893",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-overview-820.png",
       "bytes": 81493,
       "sha256": "ac5477d0efda0862c6d00063ade484b83b5daa4ea99d11af42287f181bc0c5ba",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-detection-method-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-detection-method-820.png",
       "bytes": 97318,
       "sha256": "593ef1269c0deb200ebfee151c47e6dd9d893cc889bafff4db0b3e9f70334487",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-rubric-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-rubric-820.png",
       "bytes": 138166,
       "sha256": "e0fb5e580476c7f7ccbc38aef0582e0869a38ce650961a6700a5da969df7ea73",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-test-files-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-test-files-820.png",
       "bytes": 134374,
       "sha256": "f58876c78c0a15ee22b348d301985e9f69fce636127859b53a8b766d447737f7",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-score-calculation-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-score-calculation-820.png",
       "bytes": 124689,
       "sha256": "9df01e65543d040c5903ae5a301160811d42eede7be6b8e9bb196c9e17c9335d",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-fault-evidence-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-fault-evidence-820.png",
       "bytes": 151695,
       "sha256": "ccb5cfb0b6b79dbb2b89deede209ca950bd12fb811ede54f3d13108e73423cb2",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-dimension-profile-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-dimension-profile-820.png",
       "bytes": 86467,
       "sha256": "8d8b7da518709962352abcb18b910005e4662a40209c411abb8b6e0e72f6c9c0",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/test-authoring-review-reasons-820.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/test-authoring-review-reasons-820.png",
       "bytes": 104972,
       "sha256": "cd9568a6e74a04f21c9594b131fe01d4ddf2be804d9da742048674346b5bcd09",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/overall-combined-engineering-820.png",
-      "bytes": 137153,
-      "sha256": "6ee9b280d57caacc7df79fa1d5664b61a43fa433cf382d2e1488ece1754f4dc3",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/overall-combined-engineering-820.png",
+      "bytes": 138771,
+      "sha256": "2cbff40ca81ec3f86f2a192478087a481c8a3c8c69e07ba6e96adba58463ddf0",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/overall-sol-available-profile-820.png",
-      "bytes": 128926,
-      "sha256": "8dfd4eaea5a3998f5655d602ac53a1c00f3828c403beaeeef29419558282b56a",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/overall-sol-available-profile-820.png",
+      "bytes": 138980,
+      "sha256": "770a288586be3b5b6241f50b66baf02e89bfc533e34a3341097390c951df525d",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/overall-to-engineering-sol-coverage-820.png",
-      "bytes": 89231,
-      "sha256": "38cd39a9b304a25a4b58ff3fab11f5adf1c4358595afe487f7fc71229d5fce17",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/writing-sol-complete-scores-820.png",
+      "bytes": 88080,
+      "sha256": "7bedcd32f6fe4886c6aaee859b811213b943ddb6091dfef32b2c7286d654886f",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/backend-testing-hyper-scale-chat-820.png",
-      "bytes": 99411,
-      "sha256": "1d151d3e7b797f8778b7b239b97afd721c8b36c749d3723f735903e8fafe6b4f",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/writing-sol-storytelling-core-idea-answers-820.png",
+      "bytes": 127515,
+      "sha256": "88b055a5615e3c981c681d322cf2654296525a0f0461da72b03e3fcc840bfff7",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-hyper-scale-chat-row-820.png",
-      "bytes": 201682,
-      "sha256": "bdae08831195c010c48d63e43ac9bfa9a4ddebe0a4b65c3af5bd2bd20379ba96",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/writing-sol-storytelling-plot-twists-answers-820.png",
+      "bytes": 139793,
+      "sha256": "380d383e7230a34027c6864affb0d038a43d4582268efeed07977f634613c6dc",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-hyper-scale-chat-answer-820.png",
-      "bytes": 297717,
-      "sha256": "22b1811ecf3ba5af4fb140125ac7318559303b09f7ea1e572d60b7b9e0f486e2",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/writing-sol-storytelling-magic-discovery-answers-820.png",
+      "bytes": 128564,
+      "sha256": "65cef3e5eb6f68785c4e55e54030dc2fa6fdfacbdff8a517f951eafc082c94cb",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-hyper-scale-chat-astra-review-820.png",
-      "bytes": 260710,
-      "sha256": "c9b2f2fb403bed90e3bbae2c63db03e00d660ac8dffe7157a67fa9fd4daab536",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/overall-to-engineering-sol-coverage-820.png",
+      "bytes": 90113,
+      "sha256": "001a98c75c270e41069c66ad64e2247aecd44f8bb6ae51d04a9ead34f60cf21e",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-personalized-home-feed-row-820.png",
-      "bytes": 196457,
-      "sha256": "79d4288b41b6c10f3676bfc4c19c0a0e3369064ab8a6988e002dc9f68a79682b",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/backend-testing-hyper-scale-chat-820.png",
+      "bytes": 99721,
+      "sha256": "90a187b0f3c8ad361852425666f0ea16516c43cbba4a44988fe2288f3a0da2d9",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-personalized-home-feed-answer-820.png",
-      "bytes": 261914,
-      "sha256": "24827482c4a429a5fbf87814296056a5ce7f9ce79d4e3bb89e5cd460462b0ddd",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-hyper-scale-chat-row-820.png",
+      "bytes": 221831,
+      "sha256": "3b6f2057edb85a9b36ffe8052f90f4bfa3fe3b0875b0f3aafd0854056cf36eff",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-personalized-home-feed-astra-review-820.png",
-      "bytes": 252332,
-      "sha256": "5ee1741d1d6cc8976ed65d4c3d2406f217493473ead99e78449c56be86b23ca6",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-hyper-scale-chat-answer-820.png",
+      "bytes": 273329,
+      "sha256": "7f494816d749b88be7e845daf8a3a0526fe14792afe62c555e1c0e92f086ecad",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-device-telemetry-row-820.png",
-      "bytes": 198534,
-      "sha256": "7b587dc80db668a493331e037d826bba51044152d16220a539eddc78b1ed83e5",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-hyper-scale-chat-judges-820.png",
+      "bytes": 179343,
+      "sha256": "c5105cc9460dee74681f15d68ea6055bfb9fd4c3427484c7afa4a42a8d05a2d9",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-device-telemetry-answer-820.png",
-      "bytes": 280244,
-      "sha256": "c5783fd7914a0677949ba0a4966f7c470aadd9b4232078a7a41408172dbc3a6a",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-personalized-home-feed-row-820.png",
+      "bytes": 213365,
+      "sha256": "674681f8cc23a2217dfa0730ce38b6d655df46e54fdef5f34310fd028badc0f8",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/820/sol-pending-device-telemetry-astra-review-820.png",
-      "bytes": 261786,
-      "sha256": "4caaed88483e4958e3979575352c0c40cca297118760ce1fb8c5fed96b106b19",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-personalized-home-feed-answer-820.png",
+      "bytes": 267007,
+      "sha256": "59fae3c82e6c0ae23ff3bf24352dc3687fbf7c69d12ec802c14cd771909eed7b",
       "width": 820,
       "height": 1000
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/testing-ledger-track-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-personalized-home-feed-judges-820.png",
+      "bytes": 194658,
+      "sha256": "a196df578561d3ec3c0a05699bbe9a6ff98927682cb9fa0568de5be16ac69943",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-device-telemetry-row-820.png",
+      "bytes": 218020,
+      "sha256": "6c8d6545fb64e348631456472b4f4faf5b31fa757ef4a23d8431ebdc335e41f5",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-device-telemetry-answer-820.png",
+      "bytes": 287473,
+      "sha256": "6e255aa1110f9112e7548c70ee312e9d04af3eff16faa43b500e0aee5405658b",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/820/sol-architecture-device-telemetry-judges-820.png",
+      "bytes": 190156,
+      "sha256": "d589dfda0f95a6ddb0f97a4a9494bc9e8661e590f223c44bf6cc6645ef28d041",
+      "width": 820,
+      "height": 1000
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/testing-ledger-track-390.png",
       "bytes": 68985,
       "sha256": "4d6f9a5c8f7f88019907a00ad161d26bded029de0dd969bf352eabab77a3d861",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/backend-testing-ledger-chart-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/backend-testing-ledger-chart-390.png",
       "bytes": 67533,
       "sha256": "5062b2577cd4ba9bb32334098410d8448b16bc4b0a1f22e841dcc69f87ac03cc",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-ledger-chart-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-ledger-chart-390.png",
       "bytes": 65287,
       "sha256": "8bbbb6a344ba769048c8ab3e2fa3069f735991bf28d8eabbe80fcd61a7e4ae99",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-engineering-ledger-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-engineering-ledger-390.png",
       "bytes": 64845,
       "sha256": "f0af3d7566c68efb5537b65ebfd32171a44b6c3f7fe6d0f8a7388188c2594ca8",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-combined-leaderboard-390.png",
-      "bytes": 80532,
-      "sha256": "176047469827ec04f9be886fda4c4de9bf65a61e6da94b051a0b4f633bd70767",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-combined-leaderboard-390.png",
+      "bytes": 81743,
+      "sha256": "7387555a2f979171e60dac80a1264270a0f6ac86a92f553d919a7bf331457ccb",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-sol-main-ranking-390.png",
-      "bytes": 67052,
-      "sha256": "9ddd06487a243369ae3c38a11a9df30601537970bdd3b0180135a556264eeb70",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-default-ranking-390.png",
+      "bytes": 68945,
+      "sha256": "7598479f15a61a88a112d1bd9c95e9ee05f1e1a29c2402c7b67ba3045c8d1f99",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-score-breakdown-390.png",
-      "bytes": 70754,
-      "sha256": "22eab57ae461833943e35206aa869f2b3842015aee9567217c2c5edc8da592a6",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-default-selected-url-390.png",
+      "bytes": 73083,
+      "sha256": "86a1a02a35dfb8abec1829aa2ce7685f37c0de17dd0c8caf2d46d967107302d8",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-available-resource-comparison-390.png",
-      "bytes": 77676,
-      "sha256": "7a92082a566f36d1410f53431412616f1887a9c7c2303d139c1097c26109323c",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-sol-main-ranking-390.png",
+      "bytes": 71634,
+      "sha256": "31aa3d50fb13023b0f04fdb4bd9d074471188c18f7dd76025f0b94ed0fd67560",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/engineering-resource-unavailable-390.png",
-      "bytes": 70126,
-      "sha256": "de64f534564af34ff3aefcc16a27ca033fbf81888ac7742a22aa0bcec77a3b48",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-score-breakdown-390.png",
+      "bytes": 71192,
+      "sha256": "943a2a53b3eb4cbe282455d74f26308c18c033257cd6d4c092b44a24c613c9e8",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-overview-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-available-resource-comparison-390.png",
+      "bytes": 72177,
+      "sha256": "fdc3a2c5b317ca0ecbca54ec266f3fd30e07e41b5157591b193023a5de801596",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/engineering-resource-unavailable-390.png",
+      "bytes": 71717,
+      "sha256": "190aa6777b36490ac668e8bd5baa3c6fdb93ac6ddcee8d4b6e4ae1d9ab9379ca",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-overview-390.png",
       "bytes": 56571,
       "sha256": "e51af51ffd24e369a30621cf2c36ae2b734f8536f16421a58e194d6987b1ae6e",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-detection-method-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-detection-method-390.png",
       "bytes": 64239,
       "sha256": "dc2199b576357e4d7de66dc9706099434e852ff9ee3f691f62b0e9a7a18345ab",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-rubric-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-rubric-390.png",
       "bytes": 82444,
       "sha256": "4661a8f98aef4f9f4dc182177e8a90ad99144d447116c42665fcbf5bf5b79239",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-test-files-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-test-files-390.png",
       "bytes": 61642,
       "sha256": "1c42dd3f3c8c6b606e91025892c7f1a162d8d173b505bbb1f9589ae4df60e092",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-score-calculation-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-score-calculation-390.png",
       "bytes": 60947,
       "sha256": "a9f709bb9271f381ac9755ed7b42d8c36cf02e66c6b07284fa1c2aee098c0c79",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-fault-evidence-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-fault-evidence-390.png",
       "bytes": 63854,
       "sha256": "2b05b32a4c7cb773d6f2faadd797fabf7d237b7e6530fb88c01dc10e7f974c7f",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-dimension-profile-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-dimension-profile-390.png",
       "bytes": 59110,
       "sha256": "46e6ab2aeceffd8971923733f825a2f5c5bb2ac244c5cd4963e01b4b5e81a650",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/test-authoring-review-reasons-390.png",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/test-authoring-review-reasons-390.png",
       "bytes": 78028,
       "sha256": "8ef2fd882f98763bd4c5c115ed92832859a82490c45578c4c430df1d8587ee85",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/overall-combined-engineering-390.png",
-      "bytes": 53139,
-      "sha256": "9cd56203c3fa5d0e62d2d23e5cc6aa2bd0911a18a2667c54053098418f059584",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/overall-combined-engineering-390.png",
+      "bytes": 53975,
+      "sha256": "9b46c909d4944dc2d88bbcccfc0caec75d7ff9a22328a3d5c4f008d0a14860c8",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/overall-sol-available-profile-390.png",
-      "bytes": 60873,
-      "sha256": "43a0d6cddad7b6c74cbd88bf8e7b040d508b7654eeeb8efd538a17b587a0efa8",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/overall-sol-available-profile-390.png",
+      "bytes": 54412,
+      "sha256": "37a359420f1339ce743577090e49120b1953dcb22c95e2d704d7e10e21f411cf",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/overall-to-engineering-sol-coverage-390.png",
-      "bytes": 69206,
-      "sha256": "44127a59e1f14d39516d7810c825f48a4dc167bae690ee478b27f09d88f236af",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-complete-scores-390.png",
+      "bytes": 69386,
+      "sha256": "2165d06cd4533f78a0116c1e4df0b6df5d3acfe71b645900c98ee0dc4e4a3e91",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/backend-testing-hyper-scale-chat-390.png",
-      "bytes": 58723,
-      "sha256": "23889acd67146fe6ca39424afcfee98551fff3acc1725b7c7b82d15f91a15dde",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-storytelling-core-idea-answers-390.png",
+      "bytes": 71162,
+      "sha256": "ee2d0902c4c0f54b0e42e3a9730d9a59c213ac9c88032933f34e1476d3908da7",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-hyper-scale-chat-row-390.png",
-      "bytes": 75404,
-      "sha256": "d12db5b9c1df402075db788f0c8729a82f29ec9b48973d2c4b5abd6691c3b39b",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-storytelling-plot-twists-answers-390.png",
+      "bytes": 75528,
+      "sha256": "8ee9bf5551a059705e269777abc98a7234b21790dfa7fb9149bf4ba5cea6edf2",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-hyper-scale-chat-answer-390.png",
-      "bytes": 101922,
-      "sha256": "fe4cba31575358230184b6c9cfda8ac7b1ae8037fa5b8763d47a06b4b30f642f",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/writing-sol-storytelling-magic-discovery-answers-390.png",
+      "bytes": 75343,
+      "sha256": "60e2de4c23004f72a9361bed59d05d215f49194dbc7c3c439a8947e0ceac3623",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-hyper-scale-chat-astra-review-390.png",
-      "bytes": 80599,
-      "sha256": "d10c36a145853d0c46f51e9f942a04612c4f9ac1744d7a5369ec2f353473b145",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/overall-to-engineering-sol-coverage-390.png",
+      "bytes": 70492,
+      "sha256": "ee3854fc056c629387829a3848a2ee165a714b6d99cc9450f6742ba525c61281",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-personalized-home-feed-row-390.png",
-      "bytes": 72661,
-      "sha256": "4fc0f01631c95e836633da6ba1386abf6a2eb51eb290aca35c16c51f094268a6",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/backend-testing-hyper-scale-chat-390.png",
+      "bytes": 58375,
+      "sha256": "d6a6f25068c51f308b16d15c96694a66c53143e5fb3915f0b8f3f1766e10021b",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-personalized-home-feed-answer-390.png",
-      "bytes": 98022,
-      "sha256": "ec6e6d630ecb6d55945ab333e56bd66c1205e3669d8013c23a28a9b5f7b93779",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-hyper-scale-chat-row-390.png",
+      "bytes": 80807,
+      "sha256": "7a9b203838624c78e4f663e3ba9ac4fc993a6ba4eeb42392f119065a2907f913",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-personalized-home-feed-astra-review-390.png",
-      "bytes": 76517,
-      "sha256": "6255ec91115b704edcb33b22454115835629d7830dbc8ad53347dc2086e86efa",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-hyper-scale-chat-answer-390.png",
+      "bytes": 101863,
+      "sha256": "897fe3670ada3f204ea45cf60c447828edca80d3dc38f8dddbfdb736dc2718c0",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-device-telemetry-row-390.png",
-      "bytes": 76312,
-      "sha256": "777446487e06c08486384845aa272fb1fc8c1139eb72ad91e82f5def9ecd2783",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-hyper-scale-chat-judges-390.png",
+      "bytes": 82823,
+      "sha256": "f83930ff252f4f84412d838543c76ce39ffe85a5f9f3883d2eb0374012a2cbdc",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-device-telemetry-answer-390.png",
-      "bytes": 96820,
-      "sha256": "26fc935aa57114eab4ffb628fc5860572f9e57a540c938bd8be38418ea92779a",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-personalized-home-feed-row-390.png",
+      "bytes": 80056,
+      "sha256": "1f4bc6bedb34a4ad07ef8a4c48e93a902bb24d5630efe9658f18ae3005f45336",
       "width": 390,
       "height": 844
     },
     {
-      "path": "reviews/test-authoring/2026-10-10/candidate-ae4a4d4a1fa1/390/sol-pending-device-telemetry-astra-review-390.png",
-      "bytes": 78932,
-      "sha256": "f7179cdfd25b5273ea76a07c4e2ab08d827297fc94142b0fcce6d24c4f5572b0",
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-personalized-home-feed-answer-390.png",
+      "bytes": 98162,
+      "sha256": "2d10299e0c14437ea9324289df44dcea827ddfd9523aa887a25b5fefb4d43c46",
       "width": 390,
       "height": 844
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-personalized-home-feed-judges-390.png",
+      "bytes": 83859,
+      "sha256": "7a0de41e3753d665460e15a6e6e5a53a3ea2b02d390f48d27c32bb36f15047dd",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-device-telemetry-row-390.png",
+      "bytes": 81466,
+      "sha256": "5bcf07b59fc48799b44b273acb539a9ae62ad3fca6599b4d1606329435e2b0fa",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-device-telemetry-answer-390.png",
+      "bytes": 96842,
+      "sha256": "9fd388eee61a0c1d427c5c6ea38aa85e4a772a740be908a498dcf4c137a19e75",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/test-authoring/2026-10-10/candidate-d4bdee89dbc3/390/sol-architecture-device-telemetry-judges-390.png",
+      "bytes": 84613,
+      "sha256": "e979561bdccde07e5ac1871455c0bc1ae227758350e585e3d6163fb6f7dfa64a",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/1440-storytelling-core-idea-refresh.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 128996,
+      "sha256": "8aad72a2621f355eb8a19a3ede17d7aee9561eecdeb466f6e47977066b6e3ed5"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/1440-storytelling-core-idea-refresh-inspection.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 277906,
+      "sha256": "3894e5566bf4433c28c6500639b0d9905c9cdcbcb0cfff34d3022374df960787"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/1440-storytelling-mmorpg-narrative.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 153985,
+      "sha256": "ebf8b681bae6c32f0b9166aab1d0ce4095437ca1b26181761fdb39c234e03bd7"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/1440-storytelling-mmorpg-narrative-inspection.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 299457,
+      "sha256": "c4e63348e61c9f5f0fe5e48fdf07b19fbddbabf46e9e25b8a956ccd9e2655a99"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/1440-writing-catalog.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 185558,
+      "sha256": "9727b282114fb0c4e8a6a298de9ce230da5089303e9a7585c8ddb9f8632ad9cf"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/390-storytelling-core-idea-refresh.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 54326,
+      "sha256": "66fa97175d92353a291bbb76994b1a1096a3dded69ae6869fe3059c69d4f8347"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/390-storytelling-core-idea-refresh-inspection.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 73284,
+      "sha256": "ea2e5444cbdbd1d5a566025e01ab3db5311481dd1be362d5bc200cdb6977bbe3"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/390-storytelling-mmorpg-narrative.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 52855,
+      "sha256": "a258fe7c8830b1cb4cec7ccb83c604a6f61b1240ac3d5f98cf1efeb6ff9e45a9"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/390-storytelling-mmorpg-narrative-inspection.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 72773,
+      "sha256": "80fcad3b9c4ad0974a0fc4cdcd29fe4a5171f84a0868de036819c410e027b4f7"
+    },
+    {
+      "path": "reviews/writing-refresh/071c75e0c0b9a8fb7d587a218625650b39ce7357bf7870c8709837063885245e/390-writing-catalog.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 62418,
+      "sha256": "0091831c6a352306dcb812b3e6ee1cdb9d4e0dc7ccbedbaa536d5edddf97f32f"
     }
   ],
   "retainedCaptureEvidence": {

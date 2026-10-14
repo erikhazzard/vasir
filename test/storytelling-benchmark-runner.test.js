@@ -165,6 +165,7 @@ test("Codex gets an exact user question and a separate short skill root with fro
     spawnImplementation: spawnStub((_command, _args, options) => [
       { type: "thread.started", thread_id: "fresh-test" },
       { type: "item.completed", item: { type: "command_execution", command: `cat ${options.cwd}/.benchmark-skill/writing-storytelling/references/controlling-idea.md`, status: "completed" } },
+      { type: "item.completed", item: { type: "collab_tool_call", status: "completed", agent_ids: ["local-helper"] } },
       { type: "item.completed", item: { type: "agent_message", text: "The answer." } },
       { type: "turn.completed", usage: { input_tokens: 40, output_tokens: 3 } }
     ].map(JSON.stringify).join("\n"), (_command, args, options) => {
@@ -175,11 +176,16 @@ test("Codex gets an exact user question and a separate short skill root with fro
       assert.doesNotMatch(injected, /Frozen specialist reference/);
       assert.ok(args.indexOf(injected) > args.indexOf("exec"));
       assert.ok(args.indexOf('web_search="disabled"') > args.indexOf("exec"));
+      for (const override of ['features.apps=false', 'features.plugins=false', 'features.browser_use=false', 'features.browser_use_external=false',
+        'features.computer_use=false', 'features.skip_host_skill_discovery=true', 'features.skill_search=false',
+        'project_doc_max_bytes=0', 'suppress_unstable_features_warning=true']) assert.ok(args.indexOf(override) > args.indexOf("exec"));
+      assert.ok(!args.includes('features.multi_agent=false'));
     })
   });
   assert.equal(result.runtimeReceipt.userPromptSha256, hash(promptText));
   assert.equal(result.runtimeReceipt.skillHash, snapshot.hash);
   assert.deepEqual(result.runtimeReceipt.referenceAccess.observedPaths, ["references/controlling-idea.md"]);
+  assert.ok(result.runtimeReceipt.toolCalls.some(tool => tool.type === "collab_tool_call"));
   assert.equal(result.runtimeReceipt.modelVerification, "explicit-cli-request-only");
   assert.ok(capturedArguments.includes("--ignore-user-config"));
   assert.equal(fs.existsSync(cwd), false);
@@ -187,6 +193,57 @@ test("Codex gets an exact user question and a separate short skill root with fro
   assert.equal(result.runtimeReceipt.requiredSkillReads, undefined);
   assert.equal(createStorytellingSkillInstruction({ skillSnapshot: snapshot, skillDirectoryPath: "<frozen-skill-directory>" }),
     `Use the writing-storytelling skill for this request. Its frozen directory is <frozen-skill-directory>. Resolve linked reference paths relative to that directory and read the references selected by the skill.\n\n${snapshot.files.find((file) => file.relativePath === "SKILL.md").contents}`);
+});
+
+test("Codex rejects external tool events while preserving returned answer and usage evidence", async () => {
+  for (const item of [
+    { type: "mcp_tool_call", server: "codex_apps", tool: "search_service.web_run", status: "completed" },
+    { type: "web_search", status: "completed" }
+  ]) {
+    await assert.rejects(() => runStorytellingAgent({
+      configuration: { id: "codex:gpt-6.1-sol@xhigh", provider: "codex", model: "gpt-6.1-sol", reasoning: "xhigh" },
+      promptText: "What is the core idea of the specified story?",
+      spawnImplementation: spawnStub([
+        { type: "thread.started", thread_id: "external-tool-test" },
+        { type: "item.completed", item },
+        { type: "item.completed", item: { type: "agent_message", text: "Externally assisted answer." } },
+        { type: "turn.completed", usage: { input_tokens: 70, output_tokens: 8 } }
+      ].map(JSON.stringify).join("\n"))
+    }), error => {
+      assert.equal(error.code, "EVAL_STORYTELLING_EXTERNAL_TOOL_USED");
+      assert.equal(error.context.outputText, "Externally assisted answer.");
+      assert.equal(error.context.usage.totalTokens, 78);
+      assert.equal(error.context.externalToolEvents[0].type, item.type);
+      assert.equal(error.context.outputRetained, true);
+      return true;
+    });
+  }
+});
+
+test("Codex stops a forbidden streamed tool call before any final answer arrives", async () => {
+  let killSignal = null;
+  await assert.rejects(() => runStorytellingAgent({
+    configuration: { id: "codex:gpt-6.1-sol@xhigh", provider: "codex", model: "gpt-6.1-sol", reasoning: "xhigh" },
+    promptText: "What is the core idea of the specified story?",
+    spawnImplementation: () => {
+      const child = new EventEmitter();
+      child.stdout = new PassThrough(); child.stderr = new PassThrough(); child.stdin = new PassThrough();
+      child.kill = signal => { killSignal = signal; queueMicrotask(() => child.emit("close", null, signal)); };
+      queueMicrotask(() => {
+        const event = JSON.stringify({ type: "item.started", item: { type: "mcp_tool_call", server: "codex_apps", tool: "search_service.web_run" } });
+        child.stdout.write(event.slice(0, 25)); child.stdout.write(event.slice(25) + "\n");
+      });
+      return child;
+    }
+  }), error => {
+    assert.equal(killSignal, "SIGTERM");
+    assert.equal(error.code, "EVAL_STORYTELLING_EXTERNAL_TOOL_USED");
+    assert.equal(error.context.externalToolAbortRequested, true);
+    assert.equal(error.context.outputRetained, false);
+    assert.equal(error.context.usage, null);
+    assert.equal(error.context.externalToolEvents[0].tool, "search_service.web_run");
+    return true;
+  });
 });
 
 test("required skill reads expose every frozen UTF-8 byte through bounded successful helper results", async (t) => {
@@ -746,6 +803,37 @@ test("unavailable generation cells remain planned while intact matched pairs are
   assert.equal(run.judging.eligibility.eligiblePairCount, 1);
   assert.equal(run.judging.eligibility.completePlannedCohort, false);
   assert.equal(run.rows.length, 4);
+});
+
+test("case execution filter retains excluded inventory and resumes only the selected missing answers", async (t) => {
+  const f = fixture(t);
+  extendFixtureCases(f, 3);
+  const options = { projectRootDirectory: f.directory, currentWorkingDirectory: f.directory };
+  const prepared = await runStorytellingBenchmark({ ...options,
+    requestedModelArguments: ["codex:gpt-6.1-sol@xhigh"], runId: "case-filter", prepareOnly: true });
+  const runPath = path.join(prepared.outputDirectory, "run.json");
+  const originalManifest = fs.readFileSync(path.join(prepared.outputDirectory, "manifest.json"), "utf8");
+  const calls = [];
+  const execute = () => runStorytellingBenchmark({ ...options, resumeRunId: prepared.runId,
+    generationOnly: true, generateCaseIds: ["story-1", "story-3"], generationConcurrency: 2,
+    agentRunnerImplementation: async (args) => { calls.push(args.promptText); return fakeResponse(args); } });
+  await execute();
+  const first = fs.readFileSync(runPath, "utf8");
+  const run = JSON.parse(first);
+  assert.equal(run.rows.length, 6);
+  assert.equal(run.rows.filter(row => row.rowStatus === "complete").length, 4);
+  assert.ok(run.rows.filter(row => row.caseId === "story-2").every(row => row.rowStatus === "pending" && row.attempts.length === 0));
+  assert.deepEqual(run.executionHistory.at(-1).generationCaseFilter, ["story-1", "story-3"]);
+  await execute();
+  assert.equal(calls.length, 4);
+  assert.deepEqual(JSON.parse(fs.readFileSync(runPath)).rows, run.rows);
+  assert.equal(fs.readFileSync(path.join(prepared.outputDirectory, "manifest.json"), "utf8"), originalManifest);
+  const beforeInvalidFilter = fs.readFileSync(runPath, "utf8");
+  await assert.rejects(() => runStorytellingBenchmark({ ...options, resumeRunId: prepared.runId,
+    generationOnly: true, generateCaseIds: ["unknown-story"],
+    agentRunnerImplementation: () => assert.fail("Unknown cases cannot trigger inference.")
+  }), error => error.code === "EVAL_STORYTELLING_EXECUTION_FILTER");
+  assert.equal(fs.readFileSync(runPath, "utf8"), beforeInvalidFilter);
 });
 
 test("execution provider filter preserves pending cells and the complete frozen model inventory", async (t) => {

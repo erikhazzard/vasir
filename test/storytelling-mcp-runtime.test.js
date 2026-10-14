@@ -64,6 +64,17 @@ for (const [name, mutate] of Object.entries({
   alteredBytes: item => ({ ...item, result: { content: item.result.content.map(part => ({ ...part, text: part.text.replace("Frozen", "Changed") })), isError: false } }),
   unsuccessful: item => ({ ...item, status: "failed" })
 })) test(`MCP verification rejects ${name} without replacing the answer`, async () => {
+  if (["wrongServer", "wrongTool"].includes(name)) {
+    await assert.rejects(() => runStorytellingAgent({ configuration, promptText: "Outline", skillSnapshot: snapshot, requiredSkillFiles,
+      requiredSkillReadTransport: "mcp-chunks", spawnImplementation: spawnMcp({ mutate }) }), error => {
+      assert.equal(error.code, "EVAL_STORYTELLING_EXTERNAL_TOOL_USED");
+      assert.equal(error.context.outputText, "An outline.");
+      assert.equal(error.context.outputRetained, true);
+      assert.equal(error.context.requiredSkillReads.status, "incomplete");
+      return true;
+    });
+    return;
+  }
   const result = await runStorytellingAgent({ configuration, promptText: "Outline", skillSnapshot: snapshot, requiredSkillFiles,
     requiredSkillReadTransport: "mcp-chunks", spawnImplementation: spawnMcp({ mutate }) });
   assert.equal(result.text, "An outline."); assert.equal(result.runtimeReceipt.requiredSkillReads.status, "incomplete");

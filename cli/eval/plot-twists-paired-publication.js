@@ -33,7 +33,7 @@ const TOOL_ISOLATION_POLICY = { version: 'explicit-agent-tool-isolation-v1', cod
 const TOOL_ISOLATION_PURPOSE = 'Only newly attempted calls in this manifest use the explicit Codex agents.enabled=false override and reject tool-router errors. Retained historical answers and reviews are not retrospectively certified or reclassified by this policy.';
 const TECHNICAL_RECOVERY_VERSION = 'paired-tool-isolation-recovery-v1';
 const RECOVERY_MODELS = ['codex:gpt-6-astra@ultra', 'codex:gpt-5.6-sol@ultra', 'codex:gpt-5.6-terra@ultra'];
-const LABELS = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-5.6-sol': 'GPT-5.6 Sol', 'gpt-5.6-terra': 'GPT-5.6 Terra',
+const LABELS = { 'gpt-6.1-sol': 'GPT-6.1 Sol', 'gpt-6-astra': 'GPT-6 Astra', 'gpt-5.6-sol': 'GPT-5.6 Sol', 'gpt-5.6-terra': 'GPT-5.6 Terra',
   'gpt-5.6-luna': 'GPT-5.6 Luna', 'claude-fable-5-1': 'Claude Fable 5.1', 'claude-opus-5': 'Claude Opus 5' };
 const CONDITIONS = [{ id: 'baseline', sourceId: 'baseline', label: 'Plain answer', short: 'Plain', color: '#72777f', shape: 'circle' },
   { id: 'skill', sourceId: 'skill', label: 'Storytelling skill', short: 'Storytelling', color: '#1f6fff', shape: 'square' }];
@@ -74,6 +74,7 @@ const cohortProvenance = (contract, configurationId) => {
     sourceManifestSha256: original ? contract.coverageExtension.parentManifestSha256 : contract.manifestSha256 };
 };
 const recordProvenance = (contract, kind, id, configurationId) => {
+  if (!contract.technicalRecovery && contract.parentSourceContract?.configurations.some(configuration => configuration.id === configurationId)) return recordProvenance(contract.parentSourceContract, kind, id, configurationId);
   if (!contract.technicalRecovery) return cohortProvenance(contract, configurationId);
   const record = contract.recordSources.find(item => item.kind === kind && item.id === id);
   requireEvidence(record, 'effective answer or review has no original record source.');
@@ -97,8 +98,10 @@ function validateHeadToHeads(projection, responseBundle) {
   const originalSidecar = { kind: 'vasirbenchmark-writing-head-to-head-evidence', schemaVersion: 1, headToHead: head };
   requireEvidence(evidenceSha256 === PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256
     && hash(JSON.stringify(originalSidecar, null, 2) + '\n') === evidenceSha256, 'head-to-head evidence differs from its explicitly pinned source.');
+  let sourceContract = projection.methodology.sourceContract;
+  while (sourceContract.sourceSha256 !== head.sourceSnapshotSha256 && sourceContract.parentSourceContract) sourceContract = sourceContract.parentSourceContract;
   requireEvidence(head.sourceSnapshotSha256 === HEAD_TO_HEAD_SOURCE_SHA256
-    && projection.scoreBasis.sourceSha256 === head.sourceSnapshotSha256
+    && sourceContract.sourceSha256 === head.sourceSnapshotSha256
     && head.benchmarkId === ID && head.caseId === projection.cases[0].id && head.condition === 'skill'
     && head.scoreEffect === 'none', 'head-to-head comparison changes source identity or scoring scope.');
   for (const candidate of head.candidates) {
@@ -236,10 +239,17 @@ function validateCoverageHistory(contract) {
 
 function publicContract(snapshot, sourceSha256) {
   const { manifest } = snapshot, specification = manifest.specification;
+  const parentContract = snapshot.coverageExtension ? publicContract(snapshot.parentSnapshot, snapshot.coverageExtension.parentSnapshotSha256) : null;
   let erratumSource = snapshot;
   while (erratumSource.parentSnapshot) erratumSource = erratumSource.parentSnapshot;
   return { edition: PLOT_TWISTS_PAIRED_EDITION, benchmarkId: ID, runId: snapshot.runId,
     runtimeVersion: manifest.runtimePolicy.version, runtimeInventory: manifest.runtimeInventory,
+    ...(manifest.executionCompatibility ? { executionCompatibility: manifest.executionCompatibility } : {}),
+    ...(parentContract && (parentContract.technicalRecovery || parentContract.parentSourceContract) ? { parentSourceContract: parentContract } : {}),
+    ...(snapshot.runtimeValidationErratum?.version === 'paired-disabled-host-stderr-validation-v1' ? { appendedRuntimeValidationErratum: {
+      version: snapshot.runtimeValidationErratum.version, sha256: snapshot.runtimeValidationErratumSha256,
+      purpose: snapshot.runtimeValidationErratum.reason, originalFailedRecords: snapshot.runtimeValidationErratum.originalFailedRecords,
+      additionalInferenceCalls: 0 } } : {}),
     ...(erratumSource.runtimeValidationErratum ? { runtimeValidationErratum: {
       version: erratumSource.runtimeValidationErratum.version, sha256: erratumSource.runtimeValidationErratumSha256,
       purpose: ERRATUM_PURPOSE, additionalInferenceCalls: erratumSource.runtimeValidationErratum.policy.additionalInferenceCallsForCorrection } } : {}),
@@ -336,6 +346,13 @@ function validateContract(contract) {
       && contract.executionValidationPolicy.purpose === EXECUTION_VALIDATION_PURPOSE, 'supplemental execution validation identity changed.');
   } else requireEvidence(!contract.executionValidationPolicy, 'supplemental execution policy lacks a declared extension.');
   validateTechnicalRecovery(contract);
+  if (contract.parentSourceContract) {
+    const parent = contract.parentSourceContract;
+    validateContract(parent);
+    requireEvidence(parent.sourceSha256 === contract.coverageExtension?.parentSnapshotSha256 && parent.manifestSha256 === contract.coverageExtension.parentManifestSha256
+      && same(parent.task, contract.task) && parent.bundleSha256 === contract.bundleSha256 && same(parent.judges, contract.judges)
+      && parent.configurations.length === contract.coverageExtension.retainedConfigurationCount && parent.configurations.every(configuration => contract.configurations.some(current => same(current, configuration))), 'inherited source contract changed its pinned parent, inputs, panel or retained roster.');
+  }
   if (Object.hasOwn(contract, 'toolIsolationPolicy')) requireEvidence(same(contract.toolIsolationPolicy,
     publicToolIsolationPolicy(TOOL_ISOLATION_POLICY, hash(JSON.stringify(TOOL_ISOLATION_POLICY)),
       contract.coverageExtension?.addedConfigurations ?? contract.configurations.map(item => item.id), contract.technicalRecovery)),
@@ -416,7 +433,7 @@ function buildProjection(contract, responses, judgeRequests) {
     pairedJudgeCallCount: judgeRequests.filter(request => request.status === 'succeeded').length, expectedPairedJudgeCallCount,
     executionComplete: pairs.length === settingCount, executionStatus: pairs.length === settingCount ? 'complete' : 'in-progress' };
   const recovery = contract.technicalRecovery;
-  const limitations = [recovery
+  const limitations = [recovery || contract.parentSourceContract
     ? 'One prompt and one selected generation per condition describe this task, not general storytelling ability or repeated-run reliability. The disclosed technical replacements are not independent repeated trials.'
     : 'One prompt and one generation per condition describe this task, not general storytelling ability or repeated-run reliability.',
     'The two model judges share a provider and overlap with creator families; no human calibration or population confidence interval is claimed.',
@@ -551,7 +568,7 @@ export function projectPlotTwistsPairedRun({ snapshot, sourceSha256, headToHeadE
         questionSha256: hash(contract.task.prompt), skillSha256: row.condition === 'skill' ? bundle.sha256 : null,
         exactMessagesSha256: hash(JSON.stringify(exactMessages)), inputPayloadSha256: row.inputPayloadSha256 ?? null },
       runtime: succeeded ? { freshSession: true, durationMs: row.durationMs ?? null, usage: usage(row.usage), rawProviderStreamRetained: true,
-        ...(contract.technicalRecovery ? { attemptNumber: row.attempt.number } : {}),
+        ...(contract.technicalRecovery || contract.parentSourceContract?.configurations.some(configuration => configuration.id === row.configurationId) ? { attemptNumber: row.attempt.number } : {}),
         modelVerification: row.runtimeReceipt?.terminalEvidence?.modelVerification ?? row.runtimeReceipt?.modelVerification ?? 'explicit-cli-request-only', reasoningVerification: 'explicit-cli-request-only',
         skillDelivery: row.condition === 'skill' ? 'frozen-inline-once' : null } : null };
   });
@@ -703,13 +720,18 @@ export function buildPlotTwistsPairedPublication({ repoRootDirectory, selection,
     && pin.path.split('/').every(part => part && part !== '..' && part !== '.') && /^[a-f0-9]{64}$/.test(pin.sha256 ?? ''), 'unsafe or unpinned paired source.');
   const bytes = readFileSyncImplementation(path.join(repoRootDirectory, pin.path), 'utf8');
   requireEvidence(hash(bytes) === pin.sha256, 'selected immutable paired source changed.');
+  const snapshot = JSON.parse(bytes);
+  let ancestor = snapshot, ancestorSha256 = pin.sha256;
+  while (ancestorSha256 !== HEAD_TO_HEAD_SOURCE_SHA256 && ancestor.parentSnapshot) {
+    ancestorSha256 = ancestor.coverageExtension.parentSnapshotSha256; ancestor = ancestor.parentSnapshot;
+  }
   let headToHeadEvidence = null;
-  if (pin.sha256 === HEAD_TO_HEAD_SOURCE_SHA256) {
+  if (ancestorSha256 === HEAD_TO_HEAD_SOURCE_SHA256) {
     const evidenceBytes = readFileSyncImplementation(path.join(repoRootDirectory, PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_PATH), 'utf8');
     requireEvidence(hash(evidenceBytes) === PLOT_TWISTS_HEAD_TO_HEAD_EVIDENCE_SHA256, 'pinned head-to-head sidecar bytes changed.');
     headToHeadEvidence = JSON.parse(evidenceBytes);
   }
-  const built = projectPlotTwistsPairedRun({ snapshot: JSON.parse(bytes), sourceSha256: pin.sha256, headToHeadEvidence });
+  const built = projectPlotTwistsPairedRun({ snapshot, sourceSha256: pin.sha256, headToHeadEvidence });
   requireEvidence(built.projection.coverage.completedSettingCount === built.projection.settings.length,
     'the public measurement requires all declared pairs to be complete.');
   return built;
