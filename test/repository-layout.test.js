@@ -309,10 +309,10 @@ test("root contract twins share a compact skill-routing law", () => {
   assert.ok(agentsSkillRoutingBlock.split(/\s+/).length <= 75, "skill routing law must stay compact");
 });
 
-test("specialist descriptions stay narrow and performance has no forced preamble", () => {
+test("specialist descriptions stay narrow and performance routes build, review, and diagnosis", () => {
   const skillNames = [
     "art-direction__defining-game-art",
-    "code__threejs-rapier-performance",
+    "threejs__improve-performance",
     "testing__enforcing-mandate"
   ];
   const skillTexts = Object.fromEntries(skillNames.map((skillName) => [
@@ -325,10 +325,17 @@ test("specialist descriptions stay narrow and performance has no forced preamble
     assert.ok(description.split(/\s+/).length <= 40, `${skillName} description must stay under 40 words`);
   }
 
-  const performanceSkillText = skillTexts["code__threejs-rapier-performance"];
-  assert.match(performanceSkillText, /batching, instancing, render-loop, pass, target, UI-composition/);
-  assert.match(performanceSkillText, /every concrete implementation or static acceptance/);
-  assert.match(performanceSkillText, /regardless of whether a slowdown is already observed/);
+  const performanceSkillText = skillTexts["threejs__improve-performance"];
+  const performanceDescription = performanceSkillText.match(/^description: (.+)$/m)?.[1] ?? "";
+  const performanceBuildReviewText = performanceSkillText
+    .split("### `build_review`")[1]?.split(/^### |^## /m)[0] ?? "";
+  assert.match(performanceSkillText, /^name: threejs__improve-performance$/m);
+  assert.match(performanceDescription, /\bbuild(?:ing)?\b/i);
+  assert.match(performanceDescription, /\breview(?:ing)?\b/i);
+  assert.match(performanceDescription, /\bdiagnos(?:e|es|ing|is)\b/i);
+  assert.match(performanceBuildReviewText, /static review/i);
+  assert.match(performanceBuildReviewText, /without (?:an? )?slowdown/i);
+  assert.match(performanceBuildReviewText, /mechanical (?:renames|edits).*need no performance/i);
   assert.doesNotMatch(performanceSkillText, /Mobile Perf Note|Game Form & Player Journey|Output \*\*exactly\*\*/);
 });
 

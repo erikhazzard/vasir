@@ -50,6 +50,8 @@ Discovery remains reciprocal. A provisional idea helps generate scenes; surprisi
 
 The word *because* can hide weak reasoning. Test what follows it.
 
+Identify the philosophical stance the story explores. State its claim, strongest counterclaim, and the choices and consequences that test them. When drawing from a thinker or tradition, verify the specific proposition and distinguish it from your interpretation. Express the controlling idea through the story’s enacted value change and cause.
+
 **A trait is not yet a mechanism.** “She survives because she is brave” omits the action bravery permits. Does she cross an exposed roof, ask an enemy for help, remain still while being searched, or admit that her map is wrong? Each makes different capacities consequential. Name the operative action before compressing it into a trait.
 
 **An intention is not a result.** A protagonist can choose loyalty and accidentally betray the person protected. State the discrepancy. The story may concern the inadequacy of loyalty without judgment, or the brutal limits of an honorable act. It does not become a successful loyalty story because the character meant well.

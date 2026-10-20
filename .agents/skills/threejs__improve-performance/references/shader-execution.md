@@ -36,11 +36,11 @@ Resolve the installed Three.js version, actual backend, shader stage, and releva
 
 Preserve the derivative/LOD and stage-migration safeguards in `render-topology-guard.md`. Check barrier and subgroup participation rules when those constructs occur. Do not assume a workgroup equals a subgroup, a fixed wave width, a mapping from invocation IDs to lanes, or that a first-lane broadcast preserves a value that varies among participating lanes. Feature availability and fallback semantics must be established before using subgroup or compute remedies.
 
-## Smallest credible proof
+## Proof for performance claims
 
-For the implicated block, state the execution/resource change expected, the cost that could increase, and one discriminating test. Examples: coherent versus scattered work with the same aggregate distribution; runtime-disabled versus specialized-away features; retained versus unrolled loops. Hold coverage, geometry, resolution, pass topology, and other quality settings fixed where they are not the tested variable. Diagnostic substitutions are not automatically equivalent production patches.
+For a shader-performance hypothesis, state the execution/resource change expected, the cost that could increase, and one discriminating test. Examples: coherent versus scattered work with the same aggregate distribution; runtime-disabled versus specialized-away features; retained versus unrolled loops. Hold coverage, geometry, resolution, pass topology, and other quality settings fixed where they are not the tested variable. Diagnostic substitutions are not automatically equivalent production patches.
 
-Use repeated target GPU and frame timings. Compiler resource reports, native captures, and active-lane measurements strengthen attribution when available; do not invent unavailable browser counters or make native tooling mandatory. Reconcile submission savings with GPU costs and the actual frame deadline. `SAFE_LOCAL_CHANGE` requires the existing semantic checks and does not certify a speedup; a shader-performance hypothesis alone is not a topology violation.
+To claim a speedup, use repeated target GPU and frame timings. Compiler resource reports, native captures, and active-lane measurements strengthen attribution when available; do not invent unavailable browser counters or make native tooling mandatory. Reconcile submission savings with GPU costs and the actual frame deadline. A structurally valid change still needs the relevant semantic checks and does not certify a speedup; a shader-performance hypothesis alone is not a topology violation.
 
 ## Sources and limits
 

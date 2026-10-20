@@ -11,7 +11,7 @@ Use this reference when planning or reviewing batching, instancing, material, pa
 - [Cardinality and cost](#cardinality-and-cost)
 - [Required contrasts](#required-contrasts)
 - [Legitimate multipass exceptions](#legitimate-multipass-exceptions)
-- [Dispositions and proof boundary](#dispositions-and-proof-boundary)
+- [Evidence boundary](#evidence-boundary)
 
 ## Hard guard
 
@@ -59,45 +59,7 @@ One scene submission can expand into shadows and several backend passes. Several
 
 One `frame_owner` owns each output surface. World, UI, post, picking, mirrors, and effects contribute data or graph nodes to that owner; they do not independently drive the renderer. Multiple canvases or XR layers may have distinct owners only when the product architecture explicitly requires them.
 
-Capture this before approving a render change:
-
-```yaml
-render_topology_delta:
-  scenario:
-  output_surface:
-  counts:
-    frame_owners: { before:, after:, delta: }
-    scene_submissions_per_frame: { before:, after:, delta: }
-    logical_pass_executions: { before:, after:, delta: }
-    backend_render_passes_if_observable: { before:, after:, delta: }
-    full_scene_pass_executions: { before:, after:, delta: }
-    gbuffer_pass_executions: { before:, after:, delta: }
-    offscreen_targets: { before:, after:, delta: }
-    terminal_target_write_passes: { before:, after:, delta: }
-  added_nodes:
-  removed_nodes:
-  changed_multiplicity:
-  expected_draw_group_delta:
-```
-
-For every added or changed pass, record:
-
-```yaml
-pass:
-  id:
-  owner:
-  purpose:
-  level: logical | backend | target_write
-  multiplicity_axis:
-  frequency:
-  scene_camera_or_view:
-  draw_scope:
-  reads:
-  target_and_attachments:
-  dimensions_samples_formats:
-  clear_load_store_resolve:
-  terminal_output: true | false
-```
+For the touched topology, compare owners, scene/pass executions, targets/attachments, terminal writes, and the content axis that can multiply them. For a changed pass, identify its owner, purpose, cadence, inputs/output, dimensions/samples/formats, and clear/load/store/resolve behavior. Use the existing code or frame manifest; no fixed report schema is required.
 
 Static call sites are insufficient: a single call inside a type loop is several executions. If backend passes are opaque, owners, scene submissions, logical passes, target binds/writes, allocations, and terminal writes are still required.
 
@@ -141,7 +103,7 @@ A second terminal-target write can be legitimate when native-resolution UI, post
 
 ## Legitimate multipass exceptions
 
-Multipass rendering is not itself a defect. Shadows by light/cascade/face, deferred geometry plus lighting, reflections/refractions/portals, transparency, post-processing, on-demand GPU picking, XR views or multiview, and UI after tone mapping can require distinct work.
+Multipass rendering is not itself a defect. Shadows by light/cascade/face, deferred geometry plus lighting, reflections/refractions/portals, transparency, post-processing, on-demand GPU picking, XR views or multiview, and UI after tone mapping can require distinct work. Mobile/WebXR choices must also satisfy the [house rules](mobile-xr-house-rules.md).
 
 Approve an added pass only when all are true:
 
@@ -155,16 +117,10 @@ Approve an added pass only when all are true:
 
 An exception may not be smuggled into a local batching, instancing, or material patch. Split it into a separately reviewable architecture decision. When the new topology must exist to measure either proof route, authorize only the smallest reversible isolated prototype; do not merge it into the production path or treat it as accepted architecture before proof.
 
-## Dispositions and proof boundary
+## Evidence boundary
 
-Use one local-change domain disposition:
-
-- `SAFE_LOCAL_CHANGE` — the patch stays inside the requested boundary, preserves required topology, and passes the relevant semantic checks. This is not a measured performance-win claim.
-- `REJECT_UNFORCED_MULTIPLIER` — the patch makes leaf/content cardinality create frame-global work, terminal work, or another owner; reject regardless of current headroom.
-- `ARCHITECTURE_PROOF_REQUIRED` — extra work may be legitimate, but explicit authorization, necessity, cost-both-ways, or target proof is missing. Do not merge or accept the expansion on the production path; a separately authorized, reversible isolated prototype may obtain the missing proof.
-
-After a separately requested architecture change satisfies every exception gate and target-device proof, record that approval in the architecture plan; do not relabel it as a local optimization.
+Reject unintended structural expansion directly from the code. For a deliberate architecture change, establish the requirement, cost both ways, and target-budget proof before accepting it; use a reversible isolated prototype when measurement requires one. Keep a justified architecture change distinct from a local optimization.
 
 The topology delta proves structure, multiplicity, ownership, and patch scope. It does not prove the current bottleneck or a performance win. Pass/draw/target counts are not causal timing evidence; GPU timers, CPU submission timing, repeated same-workload frame distributions, target-device coverage, and thermal tests establish runtime cost.
 
-Proof must also preserve the touched semantics: visible set, culling, picking identity, shadow inclusion, transparency order, depth, color/tone mapping, UI order/readability, resolution policy, XR behavior, and target disposal/loss recovery. When runtime proof is unavailable, report the topology disposition and remaining measurement honestly; never convert an unknown timing result into permission for structural fan-out.
+Proof must also preserve the touched semantics: visible set, culling, picking identity, shadow inclusion, transparency order, depth, color/tone mapping, UI order/readability, resolution policy, XR behavior, and target disposal/loss recovery. When runtime proof is unavailable, report the structural finding and remaining measurement honestly; never convert an unknown timing result into permission for structural fan-out.

@@ -26,7 +26,7 @@ Use these prompts when changing the skill's trigger, ownership, or style-compari
    - Route to `$game-assets__generating-images`; use art direction only if the visual rules are unresolved.
 
 6. “Turn these approved art rules into batched Three.js buildings and vehicles.”
-   - Implement through the repo's existing rendering path with `$code__threejs-rapier-performance` for relevant rendering constraints. The art recipe is input, not a choice to reopen.
+   - Implement through the repo's existing rendering path with `$threejs__improve-performance` for relevant rendering constraints. The art recipe is input, not a choice to reopen.
 
 7. “This Three.js scene drops to 25 FPS after two minutes.”
    - Route to `$threejs__improve-performance`; do not prescribe an aesthetic change without diagnosis.

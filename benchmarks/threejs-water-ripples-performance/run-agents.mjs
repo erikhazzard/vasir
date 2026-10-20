@@ -38,7 +38,7 @@ const HISTORY_ROOT = join(
   'threejs-water-ripples-performance'
 );
 
-const SKILL_NAME = 'code__threejs-rapier-performance';
+const SKILL_NAME = 'threejs__improve-performance';
 const DEFAULT_MODEL_SELECTORS = Object.freeze([
   'codex:gpt-5.6-sol@max',
   'codex:gpt-5.6-terra@max',

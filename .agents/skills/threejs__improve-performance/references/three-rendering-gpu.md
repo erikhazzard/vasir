@@ -85,7 +85,7 @@ Driven by shader/program/pipeline compilation, texture upload, target allocation
 
 ### E. Shader execution
 
-Arithmetic, texture latency, divergent branches/loop tails, and register or instruction-cache pressure can constrain execution. Read `$code__threejs-rapier-performance`'s [shader-execution reference](../../code__threejs-rapier-performance/references/shader-execution.md) when implicated. Compare one shader change at fixed coverage, geometry, resolution, and pass topology; use compiled-resource evidence where available and repeated GPU timings. These mechanisms can overlap bandwidth pressure; they are not mutually exclusive diagnoses.
+Arithmetic, texture latency, divergent branches/loop tails, and register or instruction-cache pressure can constrain execution. Read the [shader-execution reference](shader-execution.md) when implicated. Compare one shader change at fixed coverage, geometry, resolution, and pass topology; use compiled-resource evidence where available and repeated GPU timings. These mechanisms can overlap bandwidth pressure; they are not mutually exclusive diagnoses.
 
 ### F. Geometry/vertex processing
 
@@ -152,6 +152,8 @@ Do not merge materials when independent render state is semantically required. C
 ## 5. Batching and instancing eligibility
 
 Batching is a representation and invalidation decision, not merely a draw-call reduction.
+
+Before grouping ripple stamps by blend state, preserve intermediate writes in the actual target format. Interleaved subtract/add draws into RGBA8 can clamp and quantize after each draw; all subtracts followed by all adds may produce different overlaps. Preserve the sequence unless equivalence is demonstrated. A floating-point accumulation target changes precision, bandwidth, and capability requirements; it is not a free batching fix. See [blending and fixed-point conversion](https://registry.khronos.org/OpenGL/specs/es/3.0/es_spec_3.0.pdf).
 
 ### `InstancedMesh` candidate
 
@@ -281,6 +283,8 @@ Any stale-shadow possibility is a quality/correctness surface and must be tested
 
 Transparent object count is weaker than covered pixels × layers × shader cost.
 
+For height-dependent haze with localized drifting banks, start with analytic height fog in existing surface shading plus a bounded set of depth-tested cards. Preserve world anchoring, transparency order, and camera-entry cues. Use volumetric integration when heterogeneous density or volumetric lighting/occlusion requires it; endpoint noise modulation is not an exact volume integral.
+
 Audit:
 
 - blended pixel coverage and overlap
@@ -295,6 +299,10 @@ Audit:
 When testing particle cost, preserve simulation and draw count while changing blend/coverage/shader work; otherwise CPU simulation and GPU overdraw remain confounded.
 
 ## 10. DPR, MSAA, render targets, and adaptive quality
+
+For conditional effect targets, preserve initialization and the active-to-empty transition. Once the last ripple expires, write/clear the neutral field once or bypass sampling it; otherwise the consumer keeps stale ripples. An extra startup clear is unnecessary when the producer already initializes the target before its first consumer.
+
+When scaling an effect target, derive screen UVs from the consuming viewport's physical dimensions and origin. Keep producer texel dimensions separate for filtering offsets. Using the smaller ripple-target size to normalize the main pass's `gl_FragCoord` misaligns the effect; subview/XR mappings must match the producing view.
 
 During diagnosis:
 

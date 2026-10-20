@@ -1,10 +1,10 @@
 # Benchmark, Replay, Correctness, and Regression Protocol
 
-Use this reference for every task. Performance work is experimental work: the benchmark defines the claim, and replay/canonical assertions prove the optimized build executed materially the same workload.
+Use this reference when establishing or checking a measured performance claim. Reuse existing scenarios, traces, and assertions; the templates below are optional recording aids. Preserve enough evidence to reproduce the comparison and verify the affected behavior without requiring a new harness or report format.
 
 ## 1. Benchmark contract
 
-Record concrete values or `unknown` before claiming a win:
+Record the relevant conditions below with concrete values or `unknown` before claiming a win:
 
 ```yaml
 benchmark:
@@ -41,7 +41,7 @@ Do not benchmark a static camera if normal play changes visibility, contacts, an
 
 ## 2. Replay and gameplay-level reproducibility
 
-The default requirement is not bitwise cross-platform physics identity. It is a repeatable command tape that produces the same canonical gameplay contract closely enough to prove both variants did the same work.
+Both variants must execute materially the same workload. Reuse an adequate existing scenario; use a command tape when needed for repeatability or affected gameplay semantics. Compare canonical gameplay state/events at the project's tolerance rather than requiring bitwise cross-platform physics identity.
 
 Record:
 
@@ -141,7 +141,7 @@ For every variant:
 1. Start from the same build state and scenario snapshot.
 2. Apply the same fixed quality and browser/device conditions.
 3. Warm the exact resources declared warm; do not accidentally warm the candidate only.
-4. Run the same command tape.
+4. Repeat the same scenario or command tape.
 5. Capture the same tick or time window.
 6. Preserve raw samples or a trace, not only summary numbers.
 7. Repeat.
@@ -272,31 +272,7 @@ Good gates include:
 
 Do not block CI on an unstable micro-difference. Use warnings for weak signals and blocking thresholds for repeatable regressions.
 
-## 10. Performance proof bundle
+## 10. Preserve reproducible evidence
 
-Use this final artifact:
-
-```yaml
-proof_bundle:
-  runtime_identity:
-  benchmark_contract:
-  raw_artifacts:
-  baseline:
-  hypothesis:
-  discriminating_test:
-  diagnosis_status:
-  patch_commit:
-  before_after:
-  result: accepted | rejected | inconclusive
-  gameplay_replay:
-  render_semantics:
-  lifecycle:
-  suspension_resume:
-  loss_recovery:
-  residual_bottleneck:
-  rollback:
-  lab_or_field:
-```
-
-The bundle is complete only when another engineer can reproduce the workload, understand why the change should help, see whether the predicted metric moved, and verify that the application still performed the same intended work.
+Keep the scenario/settings, baseline and changed results, causal evidence, and relevant correctness checks with the existing task or benchmark artifacts. Another engineer should be able to reproduce the comparison and judge the claim. Include uncertainty and remaining work; no separate proof-bundle artifact is required.
 

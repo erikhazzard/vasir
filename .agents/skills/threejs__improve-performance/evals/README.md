@@ -1,17 +1,17 @@
-# Three.js + Rapier Hot-Path Guard Eval
+# Three.js + Rapier Performance Engineering Eval
 
-This suite checks whether `code__threejs-rapier-performance` changes a planned mobile-rendering decision from locally plausible optimization to bounded render-topology architecture, explicit shader execution cardinality, and valid whole-frame counters.
+This suite checks whether `threejs__improve-performance` makes bounded build and review decisions, diagnoses observed symptoms, and preserves render topology, shader execution cardinality, and valid whole-frame counters.
 
 The core contract is structural, not timing-dependent. For a batching-only change, content cardinality may change instance and draw data but must not silently multiply full-scene passes, full-resolution targets, attachments, or frame/output owners. The treatment must block the exact five-G-buffer-per-enemy-type defect and the independently owned `HudRenderer` terminal-output path, generalize through renamed helpers to any undeclared cardinality fan-out, and still allow fixed centrally owned multipass rendering. It must distinguish a WebGPU render pass targeting the current canvas texture from a second browser presentation.
 
-The cases also exercise positive, negative, and borderline routing; the diagnosis → guard → verification boundary for an observed symptom; draw-invariant shader work requested again by each covered fragment invocation; `WebGLRenderer.info` aggregation across multiple render calls; and attention drift under a long otherwise-correct mobile-performance brief. Hard substring checks are only a semantic floor. The suite-level judge rejects keyword cosplay, advice that waits for FPS before recognizing a deterministic architecture violation, and blanket rules that treat every additional pass as invalid.
+The cases also exercise positive, negative, and borderline routing; diagnosis, candidate review, implementation, and verification within the same skill for an observed symptom; draw-invariant shader work requested again by each covered fragment invocation; `WebGLRenderer.info` aggregation across multiple render calls; and attention drift under a long otherwise-correct mobile-performance brief. Build and static review need no observed slowdown. Unrelated mechanical edits do not load the skill. Hard substring checks are only a semantic floor; no status label is required. The suite-level judge rejects keyword cosplay, advice that waits for FPS before recognizing a deterministic architecture violation, and blanket rules that treat every additional pass as invalid.
 
 Four contrasting shader cases cover identical loop work grouped or scattered across supplied execution groups, uniform branching versus eager selection and compile specialization, opposing measured outcomes of loop unrolling, and evidenced AMD waterfall lowering versus ordinary texture-array-layer indexing and unsupported browser subgroup assumptions. They test mechanisms and evidence, not GPU vocabulary or blanket optimization rules.
 
 Run the structural smoke test locally:
 
 ```bash
-npm run eval -- code__threejs-rapier-performance mock --trials 1
+npm run eval -- threejs__improve-performance mock --trials 1
 ```
 
 A live-model run is required for the behavioral verdict. Mock mode proves suite discovery, baseline/treatment wiring, and result persistence only.

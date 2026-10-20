@@ -16,7 +16,7 @@ This skill owns the visual manifestation and construction of individual game eff
 - `$game__art-directing` owns the game's visual grammar, material language, and hierarchy. Apply that grammar to effects; do not establish a competing palette.
 - `$game__adding-juice` owns the whole response phrase across acting, sound, camera, haptics, interruption, and the next action. Use it when a weak impact may involve more than its visual effect.
 - `$art-direction__defining-game-art` supplies bounded style references when the requested art direction fits them. `$game-assets__generating-images` owns generating and promoting needed raster assets.
-- For Three.js/Rapier material, shader, batching, or per-frame implementation, apply `$code__threejs-rapier-performance` in `local_change_guard` mode. Route observed performance failures through `$threejs__improve-performance`.
+- For Three.js/Rapier material, shader, batching, or per-frame implementation and review, apply `$threejs__improve-performance`. Use its diagnosis path for observed performance failures or claims of measured improvement.
 - The existing gameplay implementation owns damage, collision, targeting, status, and timing. An effect mismatch is not permission to change those mechanics. Bring a proposed gameplay redesign to that owner within the task's authorized scope.
 
 Do not load this skill solely for menus, a whole-game style brief, damage arithmetic, or video transcription. For broad polish, use it when the diagnosis identifies an effect that needs construction or repair.

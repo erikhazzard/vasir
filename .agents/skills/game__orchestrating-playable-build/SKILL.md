@@ -31,8 +31,7 @@ Use the smallest specialist set that can resolve the active gap. For a broad art
 | State-specific acting, response envelopes, force, variation and aftermath | `$game__adding-juice` |
 | Rules, resources, combat, inventory, loot or procedural content | Relevant game-system owner only where the requested experience needs it |
 | HUD, menu or results | `$ui__revamping-game-shell-ui` or the relevant interface/end-screen skill |
-| Three.js / Rapier hot-path implementation | `$code__threejs-rapier-performance` |
-| Observed Three.js performance failure | `$threejs__improve-performance`, with the hot-path guard for a candidate patch |
+| Three.js / Rapier hot-path implementation, review, or observed performance failure | `$threejs__improve-performance` |
 | 3D physical object manipulation | `$physics__creating-interaction-system` when that interaction is actually in scope |
 | First-playable comprehension is the specific question | `$game-proof__auditing-first-playable-comprehension` |
 

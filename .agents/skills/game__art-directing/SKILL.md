@@ -378,7 +378,7 @@ Safe areas:         Top [N]px status bar, bottom [N]px home indicator, notch zon
 
 A custom shader is warranted when a visible material relationship needs it and the target supports it. A static bitmap or simple shape may already express the relationship better. Full-screen alpha work can dominate fill rate; a small per-object material may be affordable. There is no universal mobile ban on shaders or fixed safe count of transparent layers.
 
-For Three.js/Rapier rendering work use `$code__threejs-rapier-performance`; route an observed regression to `$threejs__improve-performance`. Keep visual judgment separate from measured runtime support, and do not infer physical-device performance from desktop emulation.
+For Three.js/Rapier rendering implementation, review, or observed regressions use `$threejs__improve-performance`. Keep visual judgment separate from measured runtime support, and do not infer physical-device performance from desktop emulation.
 
 ### Pass 4 — Design the UI visual system
 
@@ -612,7 +612,7 @@ Specify implementation-bound colors, timings, sizes, and budgets in usable units
 ### Response and Rendering References
 
 - `$game__adding-juice` owns response timing, effect mixing, material motion, camera impact, and reduced-motion alternatives.
-- `$code__threejs-rapier-performance` owns applicable render-loop/pass/resource constraints; `$threejs__improve-performance` owns observed Three.js/Rapier performance failures.
+- `$threejs__improve-performance` owns applicable render-loop/pass/resource constraints and Three.js/Rapier performance diagnosis.
 - `references/relational-game-craft.md` — read when choosing between more detail, better composition, stronger material identity, and purposeful stillness.
 - [Evaluation cases](references/eval-cases.md) — use when maintaining this skill's routing or style-comparison guidance; these are inspection prompts, not evidence that a game or skill has passed an evaluation.
 

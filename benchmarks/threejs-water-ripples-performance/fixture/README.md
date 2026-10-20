@@ -1,7 +1,7 @@
 # Water ripples benchmark fixture
 
 `index.html` is a benchmark derivative of the frozen water-ripples example at
-`.agents/skills/code__threejs-rapier-performance/evals/fixtures/water-ripples/index.html`.
+`.agents/skills/threejs__improve-performance/evals/fixtures/water-ripples/index.html`.
 Normal mode keeps the example's autonomous animation, visuals, controls, and render topology.
 
 Open `index.html?benchmark=1` to disable the autonomous `requestAnimationFrame` loop and

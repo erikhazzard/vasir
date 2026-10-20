@@ -1,6 +1,6 @@
 # WebXR and Standalone-Headset Performance
 
-Use this reference whenever immersive VR/AR, standalone XR, headset browsers/runtimes, foveation, multiview, or compositor misses are in scope. XR is a separate performance regime, not desktop rendering with a smaller budget.
+Use this reference for causal diagnosis or measured verification involving immersive VR/AR, standalone XR, headset browsers/runtimes, foveation, multiview, or compositor misses. XR is a separate performance regime, not desktop rendering with a smaller budget.
 
 Start with a repeatable workload on the target headset. Separate application update, CPU render submission, GPU execution, and compositor/presentation before choosing an intervention. **Render bypass identifies render-side cost; resolution sensitivity identifies pixel-scaled cost. Neither alone proves a CPU/GPU or vertex/fragment verdict.**
 
@@ -123,7 +123,7 @@ Consider native composition layers when a measured cost comes from suitable plan
 
 - For unchanged content, retain the layer image through the supported lifecycle and honor runtime redraw/resource-loss requests. Video and changing UI still have update work. The [Layers specification](https://www.w3.org/TR/webxrlayers-1/) defines `needsRedraw` and static-layer restrictions; “only redraw when app data changes” is insufficient.
 - Static world geometry can still change its projected image with head translation. Do not flatten a nearby 3D scene into a panorama without testing parallax, stereo, and occlusion; that is a representation change, not automatic equivalence.
-- Verify requested features, successful layer creation, and the installed renderer's integration. Measure app work removed against texture memory, uploads, layer management, and compositor cost added. Keep the existing frame/session owner and pass the candidate through `$code__threejs-rapier-performance`'s topology guard.
+- Verify requested features, successful layer creation, and the installed renderer's integration. Measure app work removed against texture memory, uploads, layer management, and compositor cost added. Keep the existing frame/session owner and apply the [render topology rules](render-topology-guard.md) to the candidate.
 - Check layer order, alpha edges, color handling, hands/controllers intersecting content, six-degree-of-freedom movement, session restart, and fallback. Ordinary scene depth occlusion must not be assumed across composition layers.
 
 ## 4. Multiview

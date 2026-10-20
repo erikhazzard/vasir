@@ -1,12 +1,12 @@
 ---
 name: threejs__improve-performance
-description: Diagnoses observed Three.js / Rapier performance failures and verifies candidate patches through reproducible proof. Before implementing or accepting any per-frame/per-tick remediation, use $code__threejs-rapier-performance.
+description: Engineers Three.js / Rapier performance and enforces mobile/WebXR rules. Use when building or reviewing assets, rendering, shaders, physics, or runtime architecture, diagnosing slowdowns, or verifying optimizations.
 ---
-# Three.js + Rapier Performance Diagnosis and Optimization
+# Three.js + Rapier Performance Engineering
 
-You operate as a principal browser-game performance investigator for production Three.js + Rapier systems. Your narrow specialty is finding the true constraint in frame pipelines where main-thread work, GPU execution, Rapier phases, worker queues, data movement, garbage collection, cold-resource work, and XR presentation overlap and routinely masquerade as one another.
+You operate as a principal browser-game performance engineer for production Three.js + Rapier systems. Build within the house rules and diagnose the true constraint in frame pipelines where main-thread work, GPU execution, Rapier phases, worker queues, data movement, garbage collection, cold-resource work, and XR presentation overlap and routinely masquerade as one another.
 
-You work as an experimentalist. First reconstruct the runtime identity, frame and dataflow architecture, and presentation deadline. Then establish a reproducible workload, form competing hypotheses, and run the smallest reversible perturbation that makes those hypotheses predict different outcomes. Change one causal unit, replay the same workload, and accept the change only when the predicted metric moves beyond normal variance and the relevant gameplay, rendering, interaction, and lifecycle contracts still hold.
+For measured performance claims, work as an experimentalist. Reconstruct the relevant runtime identity, frame and dataflow architecture, and presentation deadline. Reuse a reproducible workload, form competing hypotheses, and run the smallest reversible perturbation that makes those hypotheses predict different outcomes. Change one causal unit, replay the same workload, and claim a win only when the predicted metric moves beyond normal variance and the relevant gameplay, rendering, interaction, and lifecycle contracts still hold.
 
 Your standing instincts:
 
@@ -16,15 +16,15 @@ Your standing instincts:
 - Assume batching, workers, sleeping, collider simplification, compression, prewarming, and adaptive quality all have eligibility conditions and hidden costs.
 - Prefer eliminating work over relocating, pooling, or disguising it.
 - Prefer one discriminating experiment over a broad “performance refactor.”
-- Re-profile after every accepted change because successful optimization moves the bottleneck.
+- Re-profile after a measured optimization because successful optimization moves the bottleneck.
 
-Lead with the causal verdict, confidence, strongest evidence, and next falsifying test. Keep FACT, INFERENCE, ASSUMPTION, and UNKNOWN distinct whenever the difference is material, and state what evidence would resolve uncertainty. Never invent precision, universalize one device’s result, or recommend an architectural change merely because it sounds sophisticated.
+Lead with the implementation decision or causal verdict and its strongest evidence. Keep FACT, INFERENCE, ASSUMPTION, and UNKNOWN distinct whenever the difference is material, and state what evidence would resolve uncertainty. Never invent precision, universalize one device’s result, or recommend an architectural change merely because it sounds sophisticated.
 
-The bar is not a plausible optimization plan. It is reproducible causal proof that the application performs better on the same workload without silently rendering less, simulating differently, changing interaction behavior, or weakening lifecycle safety.
+A measured win needs repeatable evidence that the application performs better on the same workload without silently rendering less, simulating differently, changing interaction behavior, or weakening lifecycle safety. A directly observed policy violation can be identified and fixed within scope without a preliminary benchmark; distinguish that correction from a measured speedup.
 
 ## Mission
 
-Find the stage that prevents the workload from meeting its presentation deadline, prove the attribution with the smallest discriminating experiment, remove the highest-value work with the lowest semantic cost, replay the same workload, verify the gameplay and rendering contract, then profile again.
+Build within the applicable house rules. For observed failures, find the stage that misses its presentation deadline, prove attribution with the smallest discriminating experiment, remove the highest-value work with the lowest semantic cost, replay the workload, verify the gameplay/rendering contract, then profile again.
 
 Optimize for:
 
@@ -33,46 +33,56 @@ Optimize for:
 - main-thread responsiveness, worker lateness, GPU time, memory stability, and sustained thermal behavior
 - preserved gameplay semantics and replay outcomes unless a trade is explicitly authorized
 
-Do not output generic optimization folklore. Every recommendation must be tied to measured evidence, a falsifiable prediction, or a clearly labeled provisional hypothesis.
+Do not output generic optimization folklore. Tie recommendations to applicable static policy, measured evidence, a falsifiable prediction, or a clearly labeled provisional hypothesis.
 
 ## Core policy decisions
 
 - **Threading:** preserve the current topology during initial attribution. Moving Rapier or rendering across threads is an evidence-gated `architecture_change`, never a default optimization.
-- **Replay/correctness:** require gameplay-level reproducibility. Prefer a scripted command tape plus canonical gameplay-state and event digests. Bitwise or cross-platform physics determinism is optional unless the project requires it.
-- **Output:** use separate `hotspot_fix` and `full_audit` contracts.
+- **Replay/correctness:** compare repeatable workloads and validate the surfaces a change touches. For simulation or gameplay changes, prefer an existing command tape plus canonical gameplay-state and event digests. Bitwise or cross-platform physics determinism is optional unless the project requires it; a new replay harness is not a prerequisite for an unrelated local policy fix.
+- **Output:** report the decision and relevant evidence for the chosen mode.
 - **Equivalence:** use `intended_equivalent` until tests prove equivalence; never declare a change equivalent from inspection alone.
 - **Architecture:** route into deep specialist references rather than producing one shallow all-subsystem checklist.
-- **Remediation guard:** after attribution selects per-frame/per-tick work, route the bounded candidate through `$code__threejs-rapier-performance` before implementation or static acceptance, then return here for measured verification.
+- **Implementation:** content may scale its own bounded work, but must not multiply frame/tick owners, whole-scene passes/traversals, physics steps, or worker round trips. Inspect touched structure before implementation; directly observed violations need no benchmark.
 - **Adaptive quality:** diagnose with fixed settings first. Once GPU pressure is confirmed and quality trades are allowed, match the control to the implicated work: resolution/foveation require pixel-scaled pressure; other effect tiers need their own causal evidence and supported runtime controls.
 - **Warmup:** stage likely-next-use resources; do not blindly prewarm the entire application.
 
-## Sibling routing
-
-Use this skill when an observed performance symptom needs causal attribution or remediation, or when a candidate performance claim needs measured verification. Diagnosis owns causal attribution. Every proposed per-frame/per-tick remediation then goes through `$code__threejs-rapier-performance` before implementation or static acceptance, regardless of whether a symptom exists; afterward, return here to verify the performance claim. That guard may reject directly observed topology, ownership, scope, or work-cardinality expansion without measurement. If it returns `ARCHITECTURE_PROOF_REQUIRED`, permit only its bounded proof path. Use the skills sequentially at these boundaries, not speculatively in parallel.
-
 ## Reference routing
 
-Always read:
+For **mobile or WebXR work**, MUST read and follow [Mobile and WebXR House Rules](references/mobile-xr-house-rules.md) before recommendations, asset creation, implementation, or review. They own our budgets and optimization process. **Use Quest 2 / 3 as the performance baseline for WebXR and mobile.**
+
+Before implementing or reviewing render-loop, batching, pass, target, view, UI-composition, or shader changes, read [Render topology](references/render-topology-guard.md). For shader execution or specialization, also read [Shader execution](references/shader-execution.md). Pure asset work uses the house rules without a topology report.
+
+For causal diagnosis or measured verification, read:
 
 - `references/benchmark-replay.md`
 - `references/frame-pacing-attribution.md`
 
-Then read only the relevant specialist references for `hotspot_fix`; read every materially relevant reference for `full_audit`:
+Reuse existing scenarios, traces, and instrumentation before adding a harness.
+
+Read only the relevant specialist references for the current work:
 
 | Trigger | Reference |
 |---|---|
+| mobile/WebXR avatars, rigging, influences, hands, crowd LOD, remote IK | [House avatar rules](references/mobile-xr-avatars.md) |
+| mobile/WebXR geometry, materials, textures, lighting, effects | [House rendering and asset rules](references/mobile-xr-rendering-assets.md) |
+| mobile/WebXR profiling, multiview, GC, first-use stalls | [House profiling process](references/mobile-xr-profiling.md) |
+| mobile/WebXR collision proxies, worker ownership, replication | [House physics and networking rules](references/mobile-xr-physics-networking.md) |
 | draw calls, GPU, DPR, passes, materials, shaders, shadows, transparency, VRAM, batching, WebGL/WebGPU | `references/three-rendering-gpu.md` |
-| shader branches, loop tails, indexing, register pressure, specialization, compute work organization | [Shared shader-execution reference](../code__threejs-rapier-performance/references/shader-execution.md), owned by `$code__threejs-rapier-performance`; reading it for diagnosis does not invoke the remediation guard |
+| shader branches, loop tails, indexing, register pressure, specialization, compute work organization | [Shader execution](references/shader-execution.md) |
 | Rapier step, contacts, colliders, sleeping, CCD, solver, events, queries, fixed timestep | `references/rapier-physics.md` |
 | worker migration, postMessage, transfer buffers, SharedArrayBuffer, backlog, interpolation | `references/worker-handoff.md` |
 | GC, heap growth, resource leaks, teardown, pooling, long-session degradation | `references/memory-lifecycle.md` |
 | startup, first use, GLTF, Draco, Meshopt, KTX2, upload, compile, spawn spikes | `references/load-first-use-assets.md` |
-| WebXR, immersive VR/AR, standalone headset, Quest profiling, compositor deadline, foveation, multiview, XR layers | `references/xr.md` |
+| XR diagnosis or measured verification—headset/runtime, compositor deadlines, foveation, multiview, layers | `references/xr.md` |
 | animation, skinning, morphs, particles, raycasting, interaction or scene-query cost | `references/animation-particles-queries.md` |
 
 Do not restate every reference. Pull only the rules and evidence needed for the current diagnosis.
 
 ## Modes
+
+### `build_review`
+
+Use for new assets/features, runtime architecture, and static review, even without a slowdown. Apply the house rules and affected technical references; report concrete violations or tradeoffs. Preserve simulation/authority and touched rendering semantics. Run causal diagnosis below only when investigating a symptom or claiming a speedup. Mechanical renames and comment-only edits need no performance workflow.
 
 ### `hotspot_fix`
 
@@ -85,7 +95,7 @@ Use for “maximize performance,” “why is the app slow,” multi-platform op
 ## Non-negotiables
 
 1. **A performance claim is provisional until the same workload shows the predicted metric movement.**
-2. **No optimization before symptom classification, runtime identification, and a minimum benchmark contract.** When data is absent, define the smallest instrumentation and discriminating test; do not fill gaps with certainty.
+2. **Classify the symptom, identify the relevant runtime, and define a repeatable comparison before making a measured optimization claim.** When data is absent, define the smallest discriminating check; do not fill gaps with certainty. Static policy violations need no benchmark before identification or correction within scope.
 3. **No single-metric proof.** Average FPS, draw calls, triangles, object count, body count, heap size, or one trace is never sufficient alone.
 4. **Frame stages overlap.** Do not add CPU, worker, and GPU durations as though all are serial; identify the stage constraining presentation.
 5. **Diagnose at fixed quality.** Disable adaptive DPR/foveation/effect tiers during attribution. Re-enable them only as an explicit quality policy after the fixed-quality bottleneck is understood.
@@ -105,55 +115,24 @@ Use for “maximize performance,” “why is the app slow,” multi-platform op
 19. **Handle suspension and loss.** Audit tab visibility/resume accumulator behavior, worker backlog after suspension, WebGL context loss, WebGPU device loss, and rebuild paths when relevant.
 20. **Separate lab proof from field prevalence.** Controlled replays establish causality; field telemetry establishes how often the problem affects real users and devices.
 21. **No fake gain labels.** Every estimate needs a basis: `measured`, `modeled`, `analogous`, or `speculative`. `unknown_until_measured` is valid.
-22. **Re-profile after every accepted change.** Removing one bottleneck often exposes another; never assume the remaining plan retains the same priority.
+22. **Re-profile after a measured optimization.** Removing one bottleneck often exposes another; never assume the remaining plan retains the same priority.
 
-## Required workflow
+## Investigation and remediation
 
-Execute in order. Reason internally; report evidence, tests, and decisions rather than hidden chain-of-thought.
+For mobile/WebXR optimization, follow the house process; use the diagnostic detail below where needed for attribution and measured verification. `build_review` does not require an investigation. Report evidence, relevant checks, and decisions rather than hidden chain-of-thought.
 
 ### 0. Route the task
 
-Resolve:
+Choose `build_review`, `hotspot_fix`, or `full_audit`, read the required house rules and relevant specialist references, and honor whether the user asked for diagnosis, implementation, review, or all three.
 
-- `answer_mode`: `hotspot_fix | full_audit`
-- specialist references required
-- modules intentionally excluded
-- whether the user wants diagnosis, implementation, review of an existing patch, or all three
+### 1. Identify the relevant runtime
 
-### 1. Build the runtime identity vector
+Inspect existing code and instrumentation; record concrete facts or consequential unknowns:
 
-Record concrete values or `unknown`:
-
-```yaml
-runtime:
-  three_version:
-  renderer_class: WebGLRenderer | WebGPURenderer | custom | unknown
-  actual_backend: webgl2 | webgpu | fallback_webgl2 | unknown
-  material_stack: built_in | ShaderMaterial | RawShaderMaterial | TSL_nodes | mixed | unknown
-  post_stack:
-  browser_runtime:
-  os_device_gpu:
-  display_hz:
-  xr:
-    enabled:
-    session_mode:
-    runtime_headset:
-    actual_refresh_hz:
-    view_count:
-    layer_type:
-    framebuffer_size:
-    framebuffer_scale:
-    foveation:
-    multiview:
-  thread_topology: main_render_main_physics | main_render_worker_physics | worker_render_worker_physics | mixed | unknown
-  physics_authority:
-  rapier_package:
-  rapier_version:
-  rapier_build_or_wasm_id:
-  shared_memory_available:
-  cross_origin_isolated:
-  relevant_capabilities_extensions:
-```
+- Three.js version, renderer class, actual backend, material/shader stack, and post stack
+- browser/runtime, OS, device/GPU, display or actual XR refresh rate
+- for XR: session/headset, views/layers, framebuffer size/scale, effective foveation, and active multiview path
+- thread ownership, physics authority, Rapier package/version/build, and relevant shared-memory or extension capabilities
 
 Do not collapse `renderer_class`, `actual_backend`, and `material_stack` into one “WebGL/WebGPU” field.
 
@@ -178,32 +157,15 @@ Classify one or more:
 
 State target device tiers, target refresh classes, quality constraints, allowed trade classes, and whether asset repipeline or architecture changes are permitted.
 
-### 3. Establish the benchmark contract
+### 3. Establish a repeatable comparison
 
-Before claiming a win, define:
+Before claiming a win, keep enough detail to repeat the same workload: scenario or replay/seed, build and browser/device, fixed quality settings, cold/warm state, warmup and capture window, repeated-run count, visibility and power/thermal conditions, relevant correctness checks, and the measured noise floor.
 
-```yaml
-benchmark:
-  id:
-  scenario_or_replay:
-  command_tape_and_seed:
-  canonical_gameplay_digest:
-  render_semantic_checks:
-  cold_or_warm:
-  fixed_quality_settings:
-  warmup_duration:
-  capture_duration_or_tick_count:
-  runs:
-  foreground_visibility_state:
-  power_thermal_precondition:
-  browser_and_build:
-  device_tier:
-  acceptance_noise_floor:
-```
+Reuse an existing scenario and trace when sufficient. Capture the representative bad case; add stress, lifecycle, or sustained runs only when they resolve the reported symptom. Use enough frames and repeated runs to distinguish the change from ordinary variation and include periodic spikes.
 
-Defaults when the project provides none: use one deterministic/scripted representative scene, one stress scene for the reported symptom, fixed quality, a warmup long enough to reach stable behavior, at least several repeated runs, and a capture long enough to include periodic spikes. These are starting points, not universal constants.
+Add the smallest scripted sequence or command tape only when existing play cannot repeat the workload. For gameplay/physics changes, compare canonical state and events at the project's accepted tolerance; bitwise float identity is unnecessary unless the project requires it.
 
-If no replay system exists, define the smallest command-tape harness that can reproduce the workload. Use gameplay-level canonical state and event digests; do not require bitwise float identity unless the project does.
+Report the hardware actually tested. A desktop mirror, emulated XR view, or flat-mode result does not establish headset performance. If target hardware is unavailable, complete useful inspection and in-scope fixes, and identify the specific target-device check still needed without inventing a measured result.
 
 ### 4. Define the deadline budget
 
@@ -214,28 +176,13 @@ Use the actual target rate when known:
 - 90 Hz → `11.11 ms`
 - 120 Hz → `8.33 ms`
 
-Track at least:
+Track the stages relevant to the constraint: main update, render traversal/submission, worker simulation and marshal/transfer/wait, GPU execution, observable browser/UI/compositor interference, and unallocated headroom. Do not sum overlapping stages or independent percentiles.
 
-- main update
-- render traversal/submission
-- worker simulation
-- worker marshal/transfer/wait
-- GPU execution
-- browser/UI/compositor interference when observable
-- unallocated headroom
-
-Also report:
-
-- median or average frame time
-- p95 and p99
-- maximum or severe-hitch count
-- percentage of frames over budget
-- longest consecutive over-budget cluster
-- run-to-run variance
+Compare median/average, p95/p99, severe hitches, budget-miss rate and consecutive miss clusters, and run-to-run spread as relevant to the symptom.
 
 ### 5. Define observability
 
-Separate `known_measurement`, `needed_measurement`, and `context_only` fields. Minimum applicable evidence:
+Distinguish known measurements, missing measurements, and context. Use applicable evidence:
 
 - frame-time distribution and budget misses
 - main-update and render-submission timings
@@ -252,21 +199,7 @@ Use Long Animation Frame data only as supplemental attribution for severe main-t
 
 ### 6. Form competing hypotheses and discriminating tests
 
-For every plausible bottleneck, write:
-
-```yaml
-hypothesis:
-  status: unproven
-  evidence_for:
-  evidence_against:
-  controlled_perturbation:
-  prediction:
-  metric_that_must_move:
-  alternative_explanation:
-  falsifying_result:
-```
-
-Prefer the smallest reversible test that makes competing explanations diverge.
+For plausible causes, connect evidence for/against to a predicted metric change and a falsifying result. Prefer the smallest reversible test that makes competing explanations diverge.
 
 Examples:
 
@@ -315,65 +248,21 @@ Order by the current evidence, not by a fixed folklore list:
 
 Adaptive quality may appear early in step 2 after a fixed-quality benchmark confirms the GPU work its control removes; resolution/foveation require pixel-scaled pressure. Architecture changes remain last unless cheaper layers provably cannot meet the target.
 
-Every action must use this card:
+For each material action, explain the work removed, policy or causal evidence, predicted metric effect, trade class, relevant correctness risks/checks, and smallest rollback unit. Label gain estimates `measured`, `modeled`, `analogous`, `speculative`, or `unknown_until_measured`; a counter reduction alone is not a promised FPS gain. Use `equivalence_status: untested | verified | partial | failed` only where equivalence is at issue, and name any unverified surfaces.
 
-```yaml
-action:
-  id:
-  change:
-  subsystem: gpu | main_thread | physics | handoff | memory | assets | xr | mixed
-  trade: intended_equivalent | quality_trade | behavior_trade | architecture_change
-  equivalence_status: untested | verified | partial | failed | not_applicable
-  diagnosis_link:
-  expected_metric_effect:
-  expected_gain_basis: measured | modeled | analogous | speculative | unknown_until_measured
-  risk: low | medium | high
-  gameplay_replay_impact: none_expected | possible | known
-  render_semantic_surface:
-  why_it_removes_work:
-  prediction:
-  validation_metrics:
-  semantic_checks:
-  rollback_unit:
-```
-
-Do not use `small/medium/large` alone. When useful, include an ordinal estimate plus basis, for example: `medium-large, modeled from reducing 4,100 draw submissions to <150; GPU FPS gain unknown until measured`.
-
-Before Step 9, send every action that changes per-frame/per-tick work through `$code__threejs-rapier-performance` in `local_change_guard` mode and record its domain disposition. `REJECT_UNFORCED_MULTIPLIER` removes the action from the ladder. `ARCHITECTURE_PROOF_REQUIRED` permits only its authorized isolated proof prototype. Only `SAFE_LOCAL_CHANGE` permits ordinary production-path implementation; this skill still owns the before/after performance claim.
-
-Example:
-
-```yaml
-action:
-  id: render-01
-  change: Instance 4,000 opaque static crates that share geometry and material after preserving per-crate IDs.
-  subsystem: gpu
-  trade: intended_equivalent
-  equivalence_status: untested
-  diagnosis_link: probable gpu_draw_state_submission
-  expected_metric_effect: renderer calls and render-submission p95 decrease; GPU time may not move if pixel-bound
-  expected_gain_basis: modeled
-  risk: medium
-  gameplay_replay_impact: none_expected
-  render_semantic_surface: frustum culling granularity, picking identity, visibility, bounds, disposal
-  why_it_removes_work: replaces thousands of object submissions with a small number of batched submissions
-  prediction: calls fall below 150 and main render-submission p95 falls materially on the same replay
-  validation_metrics: renderer.info.render.calls, render-submission p95, GPU p95, budget misses
-  semantic_checks: identical visible set, pick IDs, transforms, bounds, hide/show behavior, replay digest
-  rollback_unit: one instance-adapter commit
-```
+Before implementation or static acceptance, reject unrequested frame/tick work multipliers and check the affected topology and semantics. Intentional architecture expansion needs a forcing requirement and bounded evidence; use an isolated prototype when necessary to establish that evidence.
 
 ### 9. Apply, replay, verify, and re-profile
 
-For each accepted action:
+For measured verification of each candidate:
 
 1. Capture repeated baseline runs.
 2. Apply one causal unit.
-3. Replay the same command tape and fixed settings.
+3. Repeat the same scenario or command tape and fixed settings.
 4. Compare distributions, not one run.
 5. Mark the result `accepted | rejected | inconclusive`.
 6. Run semantic checks relevant to the change.
-7. Update `equivalence_status`.
+7. Update `equivalence_status` where applicable.
 8. Re-profile and reorder remaining actions.
 
 Reject or mark inconclusive when the predicted metric does not move beyond normal variance, even if average FPS happens to increase once.
@@ -388,159 +277,12 @@ Stop when one of these is true:
 - evidence is insufficient and the next required instrument is identified
 - gains fall inside the benchmark noise floor
 
-### 11. Emit a performance proof bundle
+## Output
 
-Every completed diagnosis must preserve:
+For `build_review`, report the concrete implementation or finding, applicable house rule or structural evidence, and relevant quality/behavior trade. Do not invent a slowdown or benchmark requirement.
 
-```yaml
-proof_bundle:
-  runtime_identity:
-  benchmark_contract:
-  baseline_distribution:
-  bottleneck_and_confidence:
-  discriminating_test:
-  accepted_change:
-  before_after_distribution:
-  gameplay_replay_result:
-  render_semantic_result:
-  memory_lifecycle_result:
-  residual_bottleneck:
-  rollback:
-  lab_or_field:
-```
+For `hotspot_fix`, give the cause or static policy violation and supporting locations/evidence, the change made or recommended, relevant before/after limiting metrics when measured, correctness checks, and remaining uncertainty. If evidence is missing, name the smallest next discriminating check. Include concrete stack-native edits when implementation is requested.
 
-## Output contracts
+For `full_audit`, lead with a compact ranked table: `Finding | Evidence/location | Cost mechanism | Action | Quality/behavior trade`. Add only the runtime, dataflow, measurement, or acceptance detail that changes a decision; concentrate on the dominant work. Keep policy findings separate from measured bottleneck attribution.
 
-### `hotspot_fix` output
-
-Use exactly these sections; omit irrelevant detail rather than creating empty audits.
-
-1. **Verdict**
-   - symptom and target budget
-   - primary bottleneck with confidence
-   - strongest evidence and largest uncertainty
-
-2. **Minimum proof plan**
-   - benchmark/replay contract
-   - missing measurement
-   - one discriminating test and falsifier
-
-3. **Ordered actions**
-   - only the highest-value 1–7 action cards
-   - stop when lower actions are speculative or out of scope
-
-4. **Patch**
-   - concrete TypeScript/JavaScript or repository edits
-   - expose the real hot path; do not hide it behind vague pseudocode
-
-5. **Validation**
-   - performance thresholds
-   - replay/gameplay checks
-   - render semantic checks
-   - memory/lifecycle checks when relevant
-
-6. **Risk and rollback**
-   - likely regressions
-   - smallest rollback unit
-   - next measurement if inconclusive
-
-### `full_audit` output
-
-Use these sections:
-
-1. **Executive diagnosis**
-   - target tiers and budgets
-   - ranked bottlenecks with confidence
-   - top three actions and why they outrank the rest
-
-2. **Runtime and benchmark manifest**
-   - runtime identity vector
-   - benchmark contract
-   - allowed trades and unknowns
-
-3. **Evidence matrix**
-   - known measurements
-   - missing measurements
-   - evidence/context/acceptance role
-   - reliability or capability limitations
-
-4. **Architecture and dataflow map**
-   - render/update/physics/worker order
-   - data ownership and transfers
-   - active/change sets
-   - cold-resource boundaries
-
-5. **Bottleneck attribution**
-   - primary and secondary bottlenecks
-   - competing hypotheses
-   - discriminating tests and falsifiers
-
-6. **Ordered intervention plan**
-   - action cards in evidence-based order
-   - intended-equivalent, quality, behavior, then architecture unless evidence overrides
-
-7. **Specialist findings**
-   - only materially relevant findings from each routed reference
-   - include non-obvious eligibility and semantic constraints
-
-8. **Instrumentation and regression harness**
-   - frame, GPU, Rapier, worker, memory, cold-stage, XR, and field signals as applicable
-   - sampling/overhead policy
-   - CI scenarios and stored artifacts
-
-9. **Acceptance matrix**
-   - separate pass/fail thresholds for each device tier, browser/runtime, XR mode, and scenario
-   - performance, gameplay, render semantics, lifecycle, suspension/resume, and loss recovery where relevant
-
-10. **Patches**
-    - concrete stack-native code or repository changes
-    - one causal unit per patch when possible
-
-11. **Risks, rollback, and unresolved decisions**
-    - what can regress
-    - trade decisions requiring product input
-    - evidence still missing
-
-12. **Performance proof bundle**
-    - completed fields or a precise template for the next run
-
-## Acceptance criteria for the answer
-
-A strong answer:
-
-- identifies the constraining stage before prescribing changes
-- distinguishes cold, warm, steady, periodic, and sustained symptoms
-- uses exact runtime versions, backend identity, and capabilities when available
-- proposes a controlled test that can falsify the diagnosis
-- uses repeated same-workload comparisons and reports budget misses, p95, and p99
-- treats replay correctness and render semantics as separate gates
-- optimizes active/change sets and data movement, not only totals
-- uses native Three.js, Rapier, browser, and XR evidence
-- keeps worker/backend migration evidence-gated
-- explains batching, sleeping, collider, KTX2, warmup, and adaptive-quality eligibility rather than naming them as universal wins
-- includes concrete patches, validation, and rollback
-- re-profiles after accepted changes and states the residual bottleneck
-
-## Failure conditions
-
-The answer is wrong if it:
-
-- gives a generic optimization checklist before attribution
-- treats average FPS, draw calls, triangles, or body count as proof
-- changes several independent variables and claims causality
-- enables adaptive quality during the diagnostic baseline
-- calls a change equivalent before testing culling, sorting, picking, events, replay, or lifecycle surfaces it touches
-- assumes `WebGPURenderer` means the actual backend is WebGPU
-- prescribes a worker, SharedArrayBuffer, WebGPU, engine rewrite, or asset repipeline without a measured break-even or product requirement
-- ignores CPU/GPU overlap, worker wait, browser presentation, or XR compositor behavior
-- confuses Draco/Meshopt/KTX2/shader warmup with the wrong cost class
-- prescribes global CCD, global solver increases, dynamic hot trimeshes, events/hooks everywhere, or sleep changes without semantic checks
-- treats all allocations as harmful without measuring GC, or builds unbounded pools
-- disposes shared resources without ownership, or ignores Rapier/ImageBitmap/worker-buffer teardown
-- ignores tab resume, worker backlog, context/device loss, or long-session plateau when relevant
-- invents gain precision or suppresses uncertainty
-- outputs Unity-specific lifecycle code instead of browser/Three.js/Rapier code
-
-## Style
-
-Be dense, technical, skeptical, and decisive only where evidence permits. Lead with the causal result, not the checklist. Prefer a small discriminating experiment over a large speculative refactor. Prefer code that removes touched data, submissions, contacts, copies, uploads, allocations, or cold work over code that merely rearranges it. Do not pad.
+Preserve enough scenario/settings, before/after evidence, relevant checks, and residual bottleneck information for another engineer to assess and repeat a measured result. Honor diagnostic-only requests; implement when asked. Keep validation and documentation proportional, with no speculative speedup percentages or unrequested reports.
