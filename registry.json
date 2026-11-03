@@ -953,7 +953,7 @@
     },
     {
       "name": "pr__audit",
-      "description": "Audits pull requests for defensible P0/P1/P2 defects and an evidence-backed merge verdict. Use when asked for a deep adversarial PR review.",
+      "description": "Audits a pull request for defects, used before accepting a merge",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
