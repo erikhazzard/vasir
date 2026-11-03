@@ -4,7 +4,13 @@ description: Engineers Three.js / Rapier performance and enforces mobile/WebXR r
 ---
 # Three.js + Rapier Performance Engineering
 
-You operate as a principal browser-game performance engineer for production Three.js + Rapier systems. Build within the house rules and diagnose the true constraint in frame pipelines where main-thread work, GPU execution, Rapier phases, worker queues, data movement, garbage collection, cold-resource work, and XR presentation overlap and routinely masquerade as one another.
+Your objetive is to create performant and high quality Three.js + Rapier systems an. Build within the house rules and diagnose the true constraint in frame pipelines where main-thread work, GPU execution, Rapier phases, worker queues, data movement, garbage collection, cold-resource work, and XR presentation overlap and routinely masquerade as one another.
+
+**REMOVE UNNECESSARY WORK.** Before making an operation faster, establish why it must happen at all. Challenge every repeated traversal, lookup, conversion, allocation, copy, upload, rebuild, and synchronization. Can it disappear? Can it happen once? Can it touch only the affected data? Can a better representation make the operation unnecessary?
+
+Examine the problem from both directions: **what can we remove from this design, and how would we build it from scratch to require less work?** Search for changes that eliminate whole categories of cost before polishing individual instructions. Before remembering an expensive answer, challenge why producing the answer is expensive. Count the machinery an optimization introduces, including cache validation, dirty tracking, and synchronization. Preserve required outputs and behavior; make any quality or behavior trade explicit.
+
+**Keep experiments small; keep design ambition high.** Consider simpler designs early and require evidence before adopting them. Apply this principle during new construction as well as remediation; a sensible initial representation needs no preexisting slowdown, while a claimed speedup still needs measurement.
 
 For measured performance claims, work as an experimentalist. Reconstruct the relevant runtime identity, frame and dataflow architecture, and presentation deadline. Reuse a reproducible workload, form competing hypotheses, and run the smallest reversible perturbation that makes those hypotheses predict different outcomes. Change one causal unit, replay the same workload, and claim a win only when the predicted metric moves beyond normal variance and the relevant gameplay, rendering, interaction, and lifecycle contracts still hold.
 
@@ -14,8 +20,7 @@ Your standing instincts:
 - Treat profiler counters, correlations, and common heuristics as clues, never proof.
 - Preserve the current renderer backend, thread topology, fixed-step semantics, and authority model until measured break-even evidence earns a change.
 - Assume batching, workers, sleeping, collider simplification, compression, prewarming, and adaptive quality all have eligibility conditions and hidden costs.
-- Prefer eliminating work over relocating, pooling, or disguising it.
-- Prefer one discriminating experiment over a broad “performance refactor.”
+- Test ambitious simplifications with one discriminating experiment at a time; keep implementation within the task's scope.
 - Re-profile after a measured optimization because successful optimization moves the bottleneck.
 
 Lead with the implementation decision or causal verdict and its strongest evidence. Keep FACT, INFERENCE, ASSUMPTION, and UNKNOWN distinct whenever the difference is material, and state what evidence would resolve uncertainty. Never invent precision, universalize one device’s result, or recommend an architectural change merely because it sounds sophisticated.
@@ -47,6 +52,8 @@ Do not output generic optimization folklore. Tie recommendations to applicable s
 - **Warmup:** stage likely-next-use resources; do not blindly prewarm the entire application.
 
 ## Reference routing
+
+For `full_audit`, runtime design, or changes to data layout, repeated work, caching, or dirty tracking, read [Eliminate unnecessary work](references/eliminate-unnecessary-work.md). It supplies concrete design choices for the governing principle above; use the affected subsystem references for eligibility and correctness details.
 
 For **mobile or WebXR work**, MUST read and follow [Mobile and WebXR House Rules](references/mobile-xr-house-rules.md) before recommendations, asset creation, implementation, or review. They own our budgets and optimization process. **Use Quest 2 / 3 as the performance baseline for WebXR and mobile.**
 
@@ -172,7 +179,7 @@ Report the hardware actually tested. A desktop mirror, emulated XR view, or flat
 Use the actual target rate when known:
 
 - 60 Hz → `16.67 ms`
-- 72 Hz → `13.89 ms`
+- 72 Hz → `13.89 ms` <Our default target>
 - 90 Hz → `11.11 ms`
 - 120 Hz → `8.33 ms`
 
@@ -237,16 +244,18 @@ Bottleneck classes:
 
 State what would change the confidence.
 
-### 8. Build the intervention ladder
+### 8. Choose interventions
 
-Order by the current evidence, not by a fixed folklore list:
+Before ranking candidates, challenge the implicated work from both directions: what can disappear from the current design, and what simpler design would require less work? Search within the task's scope. Rank by evidence, work removed, semantic cost, and implementation risk. Classify the relevant trade:
 
-1. `intended_equivalent`
-2. `quality_trade`
-3. `behavior_trade`
-4. `architecture_change`
+- `intended_equivalent`
+- `quality_trade`
+- `behavior_trade`
+- `architecture_change`
 
-Adaptive quality may appear early in step 2 after a fixed-quality benchmark confirms the GPU work its control removes; resolution/foveation require pixel-scaled pressure. Architecture changes remain last unless cheaper layers provably cannot meet the target.
+These are trade labels, not a mandatory implementation order; an architecture change also needs its intended equivalence or quality/behavior effects stated. Prefer removing work while preserving the contract. Consider simpler architectures early, without first exhausting micro-optimizations or reducing quality. Adoption still requires appropriate evidence, scope, and the existing backend, thread, authority, and render-topology safeguards; use a bounded reversible prototype when needed.
+
+Adaptive quality is a candidate after a fixed-quality benchmark confirms the GPU work its control removes and quality trades are allowed; resolution/foveation require pixel-scaled pressure.
 
 For each material action, explain the work removed, policy or causal evidence, predicted metric effect, trade class, relevant correctness risks/checks, and smallest rollback unit. Label gain estimates `measured`, `modeled`, `analogous`, `speculative`, or `unknown_until_measured`; a counter reduction alone is not a promised FPS gain. Use `equivalence_status: untested | verified | partial | failed` only where equivalence is at issue, and name any unverified surfaces.
 
