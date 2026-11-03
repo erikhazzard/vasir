@@ -1,299 +1,155 @@
 ---
 name: documentation__writing
-description: Creates, restructures, and reviews technical documentation using Diátaxis. Use for tutorials, how-to guides, reference material, explanations, API docs, quickstarts, installation guides, troubleshooting, or documentation architecture.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Edit
-  - Write
-model: opus
+description: Creates, revises, audits, and organizes technical documentation using Diátaxis. Use when authoring or restructuring tutorials, how-to guides, reference, explanations, API docs, quickstarts, installation or troubleshooting guides, READMEs, and documentation navigation. 
 ---
 
-## When to use
+# Writing Technical Documentation
 
-Use this skill when a user needs to:
-- write or improve a tutorial, how-to guide, reference page, or explanation page
-- choose the correct Diátaxis type for a documentation request
-- review or reorganize existing docs that mix multiple documentation types
-- build or improve API docs, quickstarts, installation guides, troubleshooting content, or landing/readme docs
-- design or restructure a documentation set, navigation, or information architecture
+Preserve technical truth and the reader’s ability to proceed. Use Diátaxis to serve the reader’s purpose; let that purpose determine what to include, explain, verify, or separate.
 
-## Operating principles
+## Scope the work
 
-- First determine the job:
-  1. create or revise a page
-  2. audit or reclassify existing docs
-  3. plan or restructure a documentation set
+Choose the requested job:
+- Create or revise a page.
+- Audit existing content.
+- Restructure a documentation set.
 
-- Ask clarifying questions only when critical information is missing and would materially change the output:
-  - product or system being documented
-  - audience and prior knowledge
-  - desired outcome
-  - available source material
-  - version, environment, or scope
+Supplying existing text does not request an audit. Keep local edits local; flag material adjacent problems without silently expanding the assignment.
 
-- If enough context already exists, proceed and state assumptions clearly instead of blocking on questions.
+Follow the project’s documentation home, conventions, and existing source, testing, and publication workflows. Find the maintained input before editing generated documentation. This skill owns documentation content and reader paths; use the project’s established workflows for implementation changes and publishing.
 
-- Never invent technical facts, API behavior, parameters, defaults, outputs, prerequisites, or version details.
-  - If information is missing, mark it as unknown, TODO, or assumption.
-  - For reference documentation especially, prefer omission over fabrication.
+For substantial work, establish:
+- The reader’s task or question.
+- Their starting knowledge.
+- The applicable product, version, and environment.
+- The available evidence.
 
-- Keep one dominant documentation type per page.
-  - If the user’s request is mixed, either split it into companion pages or choose the dominant type and link to the others.
+Use context already supplied. Ask only when an unresolved detail materially changes correctness or usefulness; otherwise proceed with consequential assumptions stated briefly. Do not repeat discovery for a wording-only edit.
 
----
+## Establish technical truth
 
-## Step 1 — Identify the documentation type using the Diátaxis compass
+Before adding or changing consequential technical claims, inspect evidence applicable to their scope: supported contracts, release-specific reference, schemas, implementation, maintained examples, or observed results.
 
-Classify the request by answering two questions:
+Match evidence to the claim. An implementation or successful run establishes behavior under those conditions; it does not automatically establish a supported guarantee. When sources disagree, check versions and scope, preserve the distinction between intended and observed behavior, and expose unresolved material conflicts. Do not invent an authority hierarchy when the project supplies none.
 
-1. Does the content primarily guide **action** or inform **understanding/cognition**?
-2. Is the user trying to **acquire** skill/knowledge or **apply** existing skill/knowledge?
+Never invent behavior, prerequisites, defaults, outputs, limits, or design history.
 
-Use the result:
+- Omit unsupported optional detail.
+- If a missing fact prevents correct use, identify the affected gap and continue independent work.
+- Request the specific missing evidence when necessary.
+- Do not present a partial procedure as ready to follow.
 
-| Action/Cognition | Acquire | Apply |
+Keep relevant evidence traceable in the project’s normal form, such as existing links, source locations, or change notes. Do not require a source ledger for every page.
+
+When retrieving reference material, check that relevant nested definitions and version information were actually included before treating a detail as unspecified.
+
+## Choose the reader’s mode
+
+| Reader need | Type | Governing decision |
 |---|---|---|
-| **Action** | **Tutorial** | **How-to guide** |
-| **Cognition** | **Explanation** | **Reference** |
+| Learn through doing | Tutorial | Arrange a reliable learning experience. |
+| Complete real work | How-to | Guide the task and its necessary decisions. |
+| Consult facts while working | Reference | Describe the relevant contract precisely. |
+| Develop understanding | Explanation | Build a causal or conceptual account. |
 
-### Common mappings for ambiguous requests
+Classify by purpose, independently of seniority or page label. An advanced practitioner can need a tutorial.
 
-- **Quickstart / getting started**
-  - Usually a **tutorial** for beginners
-  - Sometimes an onboarding **how-to** for domain experts who want the fastest path to first success
+- Quickstarts may be tutorials or how-to guides.
+- Installation and troubleshooting are usually task guides.
+- READMEs and landing pages may orient and route among types.
+- Release notes communicate change.
 
-- **Installation guide**
-  - Usually a procedural **how-to** with setup, verification, and troubleshooting
+Keep one dominant reader purpose per page. Include concise context needed to choose, perform, or verify the immediate action. Move extended background elsewhere when it disrupts that purpose. A supporting reason is not by itself a reason to split a page.
 
-- **Troubleshooting**
-  - Usually a problem-focused **how-to**
-  - May include reference-like symptom, error, or diagnostic facts
+## Apply the relevant pattern
 
-- **API documentation**
-  - Usually **reference** for endpoints, methods, fields, errors, and schemas
-  - Often needs companion **tutorials**, **how-tos**, and **explanations**
+Treat these as content decisions, not mandatory headings. Preserve a suitable existing structure.
 
-- **README / landing page / user guide**
-  - Usually not a single Diátaxis type
-  - Treat as a navigation or overview layer that routes users to the right tutorial, how-to, reference, or explanation pages
+### Tutorial
 
-- **Release notes / changelog**
-  - Not a core Diátaxis type
-  - Treat as change communication support content
+- Define the intended starting competence and choose a concrete exercise that exposes the actions and relationships the learner must encounter. Producing an artifact alone does not establish that the exercise teaches the intended capability.
+- Show the destination, provide the required setup, and guide one dependable path with small, meaningful steps. Exclude choices that do not serve the exercise.
+- Show expected results early and at useful checkpoints. Tell the learner what to notice and how to recognize being on track. Distinguish stable output from variable example values.
+- For exercises creating persistent state, explain repeat or reset behavior where needed. Keep resets confined to disposable practice state.
+- Validate against the declared learner, not a generic beginner.
 
-If uncertain, state the dominant user need in one sentence and choose the corresponding type.
+### How-to guide
 
----
+- Start from a real goal, problem, or symptom. Assume the stated baseline competence and include what completes the task.
+- At material branches, give observable conditions or selection criteria. Retain the brief rationale required to choose correctly; link broader background.
+- For troubleshooting, connect symptom to diagnostic check, interpretation, and corrective action. Prefer checks that distinguish likely causes before suggesting unrelated fixes. Never invent a diagnosis from a symptom alone.
+- End with a way to recognize the intended result. Include relevant partial-failure or recovery guidance without cataloguing every possible failure.
 
-## Step 2 — Apply type-specific patterns
+### Reference
 
-### Tutorials (learning-oriented, action + acquisition)
+- Use a consistent schema suited to the public model the reader uses: operations, resources, commands, fields, or configuration. Reflect internals when those internals are the reader’s subject.
+- Describe supported facts precisely. Include applicable syntax, types, requirements, defaults, values, responses, errors, limits, and examples; omit irrelevant fields.
+- Check consequential semantics as well as signatures: side effects, retry behavior, state dependencies, partial failure, asynchronous completion, pagination, or configuration precedence and reload behavior, where relevant and supported.
+- Preserve material version qualifiers. Make unknown contract details visible when they affect correct use.
+- Keep volatile facts in their maintained source and use the project’s reuse mechanism where available.
 
-**Purpose:** Provide a successful learning experience for a user who is at study.
+### Explanation
 
-**Prefer titles like:**
-- Build your first X
-- Create Y from scratch
-- Get started with Z by building A
+- Organize around the reader’s question and a coherent account of how or why the system works. Connect mechanisms, constraints, alternatives, and consequences.
+- Separate documented rationale from your interpretation. Include history or opinion only when supported or clearly identified and useful.
+- Use examples or diagrams when they clarify relationships.
+- Link procedural and factual detail instead of turning the explanation into a task guide or specification.
 
-**Structure:**
-1. What the user will accomplish
-2. Audience
-3. Prerequisites
-4. Setup
-5. Numbered steps
-6. Expected result after each step
-7. Final outcome
-8. Next steps
+## Preserve procedural state
 
-**Rules:**
-- Show the learner where they are going from the start
-- Use small, concrete steps
-- Deliver visible results early and often
-- Tell the learner what they should notice
-- Keep a narrative of expected results
-- Minimise explanation
-- Ignore options and alternatives unless absolutely necessary
-- Choose the safest, surest path
-- Link out to reference or explanation instead of digressing
+When success depends on state, identify the required starting conditions, execution context, values carried between steps, and meaningful signs of progress.
 
-**Validation:**
-- A beginner can complete it end-to-end without external help
-- Each step has a meaningful, visible outcome
-- Unverified or fragile steps are clearly flagged rather than stated with false certainty
+At likely or consequential divergence points, provide:
+- The recognizable symptom.
+- A check that distinguishes the relevant conditions.
+- A supported way to recover or resume.
 
----
+Do not assume every reader starts clean or that repeating an action is harmless. Do not prescribe deleting production state merely to make instructions repeatable.
 
-### How-to guides (problem-oriented, action + application)
+Place necessary prerequisites, decision criteria, and consequential warnings before the affected action. Explain placeholders and where commands run. Keep short operational context in the main flow.
 
-**Purpose:** Help a user who is already at work solve one specific real-world problem or complete one task.
+Constructed contrast:
 
-**Prefer titles like:**
-- How to configure X
-- How to deploy Y to Z
-- How to troubleshoot A when B happens
+- “Choose the appropriate option” leaves a decision unresolved.
+- “Use the existing-resource path if the resource is already present; carry its identifier into the next step” gives a usable condition.
 
-**Structure:**
-1. Goal or problem statement
-2. When to use this guide
-3. Assumptions / prerequisites
-4. Recommended path
-5. Numbered steps and decision points
-6. Verification or expected result
-7. Related reference / explanation links
+The actual condition and behavior must come from the product’s evidence.
 
-**Rules:**
-- Focus on one task or problem
-- Assume baseline competence
-- Action only: no teaching, no conceptual digressions
-- Allow branches, conditional steps, and judgment when real-world complexity requires them
-- Omit unnecessary completeness
-- Prefer the most common or recommended path
-- Mention alternatives only when they are materially useful
+## Audit and restructure at the requested scope
 
-**Validation:**
-- An experienced user can complete the task with minimal confusion or backtracking
-- The guide handles likely pitfalls and relevant branches
-- The task matches a real user goal, not merely a product capability
+For audits, start with priority reader tasks or questions from available evidence, then inspect how the existing content supports them. Use page inventory and Diátaxis classification to diagnose gaps, not as substitutes for task coverage. Label assumed priorities.
 
----
+Report each material finding with:
+- Its location.
+- The supporting evidence.
+- The consequence for the reader.
+- The smallest useful fix.
 
-### Reference (information-oriented, cognition + application)
+Prioritize incorrect guidance, blocked tasks, recurring confusion, and missing contract details over cosmetic uniformity.
 
-**Purpose:** Provide authoritative facts that users consult while working.
+For structural changes, state the reader benefit of each split, merge, or move. Preserve enough context for independently reachable pages to establish their purpose and applicability.
 
-**Prefer titles like:**
-- Configuration options
-- API endpoints
-- CLI flags
-- `POST /users`
-- `deploy` command
+Cross-link specific next needs. Do not generate empty quadrants or companion pages merely to complete the taxonomy.
 
-**Structure:**
-Use a consistent schema that matches the thing being documented.
+When published paths or anchors change, include old-to-new destinations and needed navigation, link, redirect, or alias work using the existing publishing system. Unpublished drafts and local prose edits do not need migration plans.
 
-Examples:
-- For APIs: name/operation, summary, method + endpoint, auth, parameters, request body, responses, errors, examples, limits, related pages
-- For commands: command, syntax, options/flags, defaults, exit codes, examples, related commands
-- For config: field/name, type, default, allowed values, description, examples, warnings
+## Verify proportionately
 
-**Rules:**
-- Describe and only describe
-- Be neutral, precise, and consistent
-- Mirror the structure of the product or machinery
-- Make entries easy to scan
-- Use standard patterns and predictable headings
-- Include warnings, requirements, limits, and examples where appropriate
-- Stamp version/scope when needed
-- Never invent missing details
+Choose checks for the changed claims and realistic failure modes:
 
-**Validation:**
-- A user can find a specific fact in under 30 seconds
-- There is no ambiguity about what is certain vs unknown
-- The schema is consistent across entries
+- Inspect sources for factual agreement.
+- Run changed executable examples from their documented prerequisites when capability and authorization permit.
+- Use existing build and link checks when structure changes.
+- Use reader observation, when available, to assess comprehension and navigation.
 
----
+Keep these forms of evidence distinct. Execution does not establish reader understanding, and a clean build does not establish technical truth.
 
-### Explanation (understanding-oriented, cognition + acquisition)
+Report only checks actually performed. If execution or reader access is unavailable, deliver useful reviewed work with material limits stated.
 
-**Purpose:** Help the reader understand why something works the way it does.
+Do not introduce a new test pipeline for an ordinary documentation edit.
 
-**Prefer titles like:**
-- How X works
-- Understanding Y
-- Why Z is designed this way
-- Authentication vs authorization
+## Deliver the requested result
 
-**Structure:**
-1. Topic or question
-2. Context
-3. Core idea
-4. Why / design rationale / constraints
-5. History, alternatives, and trade-offs
-6. Implications
-7. Related concepts
+Deliver the document, revision, ranked audit, or restructuring plan first.
 
-**Rules:**
-- Focus on understanding, not execution
-- Make connections across concepts
-- Provide context and rationale
-- Discuss alternatives, limits, and trade-offs
-- Perspective and opinion are allowed when framed clearly as interpretation
-- Do not turn it into a procedure or a spec
-
-**Validation:**
-- After reading, the user can explain the concept and its rationale in their own words
-- The page clarifies the why, not just the what
-
----
-
-## Step 3 — Handle audits and restructures explicitly
-
-If the user gives existing documentation or asks to reorganize docs:
-
-1. Inventory the pages or sections
-2. Classify each page by dominant type:
-   - tutorial
-   - how-to
-   - reference
-   - explanation
-   - support/other (README, quickstart, troubleshooting, release notes, etc.)
-3. Flag mixed pages that combine multiple types
-4. Identify missing content based on audience needs and user tasks
-5. Propose a split/merge plan
-6. Recommend navigation, cross-links, and priority order
-
-When prioritizing, prefer:
-- high-frequency or high-friction user tasks
-- onboarding paths
-- core reference gaps
-- pages whose mixed types are causing confusion
-
----
-
-## Step 4 — Maintain separation and integration
-
-- Keep each page to one dominant type
-- Cross-link companion pages:
-  - tutorials → reference + explanation
-  - how-tos → reference + explanation
-  - reference → related how-tos and tutorials
-  - explanation → relevant how-tos and reference
-- Use consistent terminology, headings, and naming across the doc set
-- Prefer plain language and accessible structure
-- Put prerequisite knowledge near the start when it matters
-- Landing pages and READMEs may summarize and route, but should not replace the underlying documentation types
-
----
-
-## Step 5 — Validate before delivering
-
-Check both functional quality and reader fit.
-
-### Functional quality
-- accurate
-- precise
-- internally consistent
-- complete enough for its purpose
-- current in scope/version where relevant
-- explicit about unknowns
-- examples align with stated behavior
-
-### Reader-fit quality
-- matches the audience’s prior knowledge
-- anticipates confusion
-- preserves flow
-- supports the reader’s actual task or question
-- does not force the reader to extract one documentation type from another
-
----
-
-## Response behavior
-
-When responding:
-1. State the chosen mode and documentation type in one sentence
-2. State any important assumptions if you are proceeding without clarifications
-3. Deliver the documentation, audit, or restructure plan
-4. When useful, recommend companion pages rather than overloading one page
+Explain only material assumptions, unresolved facts, and verification limits. Announce the Diátaxis classification only when it helps explain a consequential choice. Do not print the authoring checklist.
