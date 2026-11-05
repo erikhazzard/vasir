@@ -343,7 +343,7 @@
     },
     {
       "name": "documentation__writing",
-      "description": "Creates, restructures, and reviews technical documentation using Diátaxis. Use for tutorials, how-to guides, reference material, explanations, API docs, quickstarts, installation guides, troubleshooting, or documentation architecture.",
+      "description": "Creates, revises, audits, and organizes technical documentation using Diátaxis. Use when authoring or restructuring tutorials, how-to guides, reference, explanations, API docs, quickstarts, installation or troubleshooting guides, READMEs, and documentation navigation.",
       "category": "uncategorized",
       "tags": [],
       "version": "0.1.0",
@@ -1142,6 +1142,7 @@
         "evals/suite.json",
         "references/animation-particles-queries.md",
         "references/benchmark-replay.md",
+        "references/eliminate-unnecessary-work.md",
         "references/frame-pacing-attribution.md",
         "references/load-first-use-assets.md",
         "references/memory-lifecycle.md",
@@ -1190,6 +1191,30 @@
         "scripts/screen_overlap.py"
       ],
       "path": ".agents/skills/writing__authorial-voice",
+      "entry": "SKILL.md"
+    },
+    {
+      "name": "writing__prose-styles",
+      "description": "Writes prose in one of four house voices, lyrical fiction, lyrical realism, narrative journalism and the house voice for players and users. Use for fantasy or real-world storyteller fiction (in the vein of The Name of the Wind), reported narrative, columns and newsletters, or in-game and in-app copy.",
+      "category": "uncategorized",
+      "tags": [],
+      "version": "0.1.0",
+      "recommends": [],
+      "files": [
+        "SKILL.md",
+        "references/house/plainspoken-lyricism.md",
+        "references/house/source-analysis-and-evaluation.md",
+        "references/house/trait-drafting-instruction.md",
+        "references/house/trait-revision-instruction.md",
+        "references/narrative-journalism-rules.md",
+        "scripts/hardchecks.py",
+        "scripts/screen_overlap.py",
+        "voices/house.md",
+        "voices/lyrical-fiction.md",
+        "voices/lyrical-realism.md",
+        "voices/narrative-journalism.md"
+      ],
+      "path": ".agents/skills/writing__prose-styles",
       "entry": "SKILL.md"
     },
     {
