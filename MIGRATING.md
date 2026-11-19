@@ -51,7 +51,7 @@ The earlier Vasir repository had one folder per skill, named `scope__action`. He
 | `game-proof__auditing-first-playable-comprehension` | `game-verify-game` (first-playable) |
 | `game-research__breaking-down-gameplay-video` | `game-verify-game` (gameplay-video) |
 | `handoff__final-quality-gate` | `plan-manage-work-spec` (final-gate) |
-| `messaging-root-agents` | `ratatosk-message-root-agents`, which is not in this repository yet |
+| `messaging-root-agents` | `ratatosk-message-root-agents` |
 | `ops__maintain-incident-postmortem` | `code-analyze-failure` (postmortem) |
 | `persona__selecting` | Retired. No successor. |
 | `physics__creating-interaction-system` | `game-build-game` (physics-interaction) |
