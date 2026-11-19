@@ -1,0 +1,35 @@
+# Manifest
+
+```text
+game_ai_architect_skill/
+  SKILL.md
+  README.md
+  MANIFEST.md
+  references/
+    ai_design_contract.md
+    primitive_discovery.md
+    architecture_selection.md
+    player_perception_fairness.md
+    director_layer.md
+    testing_observability.md
+    pseudocode_patterns.md
+    source_inspiration.md
+  modules/
+    README.md
+    territory_arena.md
+    combat_shooter.md
+    sports_vr.md
+    companion_social.md
+    strategy_tactics.md
+    racing_chase.md
+    simulation_economy.md
+    autoplay_testing.md
+  examples/
+    ai_spec_template.md
+    territory_bot_spec.md
+    bad_vs_good.md
+  checklists/
+    final_review.md
+    architecture_questionnaire.md
+    runtime_llm_gate.md
+```

@@ -1,0 +1,126 @@
+# Render Topology Guard
+
+Use this reference when planning or reviewing batching, instancing, material, pass, post-processing, UI-composition, renderer, or other render-hot-path work. Its job is to stop a local optimization from multiplying frame-global work.
+
+## Contents
+
+- [Hard guard](#hard-guard)
+- [Execution-cardinality audit](#execution-cardinality-audit)
+- [Backend-safe vocabulary](#backend-safe-vocabulary)
+- [Ownership and topology delta](#ownership-and-topology-delta)
+- [Cardinality and cost](#cardinality-and-cost)
+- [Required contrasts](#required-contrasts)
+- [Legitimate multipass exceptions](#legitimate-multipass-exceptions)
+- [Evidence boundary](#evidence-boundary)
+
+## Hard guard
+
+For a local batching or instancing change, frame topology stays constant. Entity, type, material, or batch cardinality may change draw groups inside existing eligible passes; it must not create render owners, scene submissions, full-scene or G-buffer passes, render targets, or terminal-output writes.
+
+Reject the local patch before benchmarking when it:
+
+- creates a full-scene or G-buffer pass/target per entity, type, material, batch, or instance group
+- adds an independent renderer, composer, pipeline, animation loop, or frame callback
+- adds a terminal canvas/default-framebuffer/current-texture write, including a separate UI render
+- hides topology growth behind lower draw calls, unchanged screenshots, or acceptable timing on one device
+
+Only a separately requested architecture change may expand this topology, and it must satisfy the exception and proof requirements below. A topology reduction is allowed when pass removal is itself in scope and semantics survive.
+
+## Execution-cardinality audit
+
+When the change affects shader execution, also read `shader-execution.md`: source-level invocation counts do not establish active-lane utilization, compiled resource costs, or GPU timing.
+
+**Shader work.** For every in-scope fullscreen, high-coverage, or heavily overdrawn fragment shader, trace each expensive block through called functions: its guards and consumers, texture operations and static loop bounds, finest-varying input, and executions across covered fragment invocations (and sample-frequency invocations only when actually enabled). Classify that input as sample/fragment, primitive/instance, draw/pass, frame, or change/event scope; include interpolants, fragment built-ins, texture coordinates, and derivative/LOD inputs. Work whose finest dependency is coarser than the fragment is a source-level lower-cardinality result requested again by each covered fragment invocation. If the work's consumers exist only when a semantically equivalent draw-uniform feature guard passes, test that guard before the work. Report texture operations as a source-level scaling law, not physical memory transactions or measured time.
+
+A coarser dependency proves a source-level invocation-cardinality mismatch, not a safe destination or realized GPU cost. Prefer elimination, exact sample reuse, or an existing draw-uniform guard. Before moving texture work to CPU, a uniform, or another shader stage, prove producer order and freshness, data residency, stage sampler/varying support, interpolation and precision, and equivalent wrap, filter, color-space, derivative, LOD, and anisotropy semantics on every shipping backend. Never move implicit-derivative sampling into fragment-divergent control flow without equivalent explicit gradients or LOD. GPU-only data cannot become a current-frame CPU uniform without readback and synchronization; do not introduce that hot-path round trip for a hoist. A separate 1x1 render-to-texture precompute still requires an offscreen target, a target-write pass, and a later texture sample, so it follows the topology exception and measured-break-even rules. If output equivalence is unproven, label the move a candidate requiring semantic proof and targeted visual regression checks, not the smallest exact fix.
+
+**Whole-frame counters.** For a `WebGLRenderer` frame with multiple `renderer.render()` calls, set `renderer.info.autoReset = false` once. At the application-frame boundary, before any update or subsystem can render, call `renderer.info.reset()`; after all conditional offscreen, world, post, debug, and terminal renders, snapshot the scalar fields of `renderer.info.render` into application-owned values before the next reset. With default auto-reset, moving the read later alone still reports only the latest render call; disabling auto-reset without a per-frame reset accumulates frames. `renderer.info` counts Three-managed draws and primitives, not logical or backend passes, target writes, GPU time, browser composition, or application frames. `renderer.info.render.frame` is renderer-owned, not the application-frame counter; own that boundary separately.
+
+## Backend-safe vocabulary
+
+Do not use “pass,” “render,” or “present” without naming the level:
+
+| Term | Meaning |
+|---|---|
+| `frame_owner` | The one application authority that schedules rendering for an output surface. |
+| `scene_submission` | One application request to render a scene/view, regardless of how the backend expands it. |
+| `logical_pass` | A declared graph/composer/node stage such as shadow, geometry, lighting, post, picking, or UI. |
+| `backend_render_pass` | A WebGPU render pass or the closest observable WebGL framebuffer/attachment execution scope. |
+| `target_write_pass` | One execution that writes an offscreen target, default framebuffer, current canvas texture, or XR layer. |
+| `full_scene_pass` | A pass that traverses/submits a scene-scale visible set, even if a layer or material filter narrows draws. |
+| `gbuffer_pass` | Geometry submission that writes the deferred attachment set; MRT attachments in one execution remain one G-buffer pass. |
+| `draw_group` | A compatible draw or instance batch within a pass; it does not own a frame-global target or pass. |
+| `terminal_output_chain` | The owned route whose final result reaches one canvas/XR output. |
+| `presentation` | Browser/XR compositor publication. It may be implicit and is not inferred from `renderer.render()` count. |
+
+One scene submission can expand into shadows and several backend passes. Several backend passes can write the same current canvas texture before one presentation. WebGPURenderer may fall back to WebGL, and a logical graph may fuse stages. Record declared topology and executed topology separately when observable; never make the guard depend on one backend API name.
+
+## Ownership and topology delta
+
+One `frame_owner` owns each output surface. World, UI, post, picking, mirrors, and effects contribute data or graph nodes to that owner; they do not independently drive the renderer. Multiple canvases or XR layers may have distinct owners only when the product architecture explicitly requires them.
+
+For the touched topology, compare owners, scene/pass executions, targets/attachments, terminal writes, and the content axis that can multiply them. For a changed pass, identify its owner, purpose, cadence, inputs/output, dimensions/samples/formats, and clear/load/store/resolve behavior. Use the existing code or frame manifest; no fixed report schema is required.
+
+Static call sites are insufficient: a single call inside a type loop is several executions. If backend passes are opaque, owners, scene submissions, logical passes, target binds/writes, allocations, and terminal writes are still required.
+
+## Cardinality and cost
+
+Legitimate multiplicity axes include frame, view/eye, camera, light, cascade, cube face, portal/reflection, quality tier, and on-demand event. Entity, instance, enemy type, material, batch, selection, and UI-component count are suspicious axes for any scene-scale pass or target.
+
+State the scaling law. Examples:
+
+- G-buffer executions and attachment sets scale with required views, not enemy types.
+- Instanced draw groups may scale with compatible geometry/material families; frame owners and terminal writes do not.
+- Picking may scale with pointer/request events; it should not silently become an always-on per-object pass.
+- Targets scale with declared effects/views and return to a lifecycle plateau; spawning content must not grow them.
+
+Sweep the implicated axis when risk is material—for example enemy types `1 → 2 → 5`—and verify topology invariants, resource plateau, submission slope, GPU time, and frame-budget misses.
+
+Evaluate cost both ways before approving a deliberate extra pass:
+
+- **Cost of adding:** repeated traversal/culling/sorting, vertex and fragment work, attachment clear/load/store bandwidth, resolves/copies, state transitions, target memory, variants/compile, synchronization, lifecycle, and thermal load.
+- **Cost of refusing or merging:** broken depth/order/color semantics, incompatible attachment/sample requirements, UI readability at scaled resolution, lost effect quality, larger shaders or variants, worse culling, backend limitations, or excessive implementation complexity.
+
+Choose from target facts, not “fewer passes” or “cleaner architecture” alone. Model attachment traffic per pass as a sum over executions, dimensions, samples, formats, and load/store/resolve behavior; heterogeneous passes cannot be represented faithfully by one global pass multiplier.
+
+## Required contrasts
+
+### Instanced enemies and a G-buffer
+
+**Acceptable:** one `InstancedMesh` per compatibility key, often one enemy type when geometry/material differ, participates in the existing geometry/G-buffer and existing shadow/depth/picking paths. Increasing types may add draw groups and shader variants; G-buffer pass/target count, scene submissions, and terminal writes stay constant.
+
+**Reject:** each enemy type owns a scene pass, G-buffer/MRT target, lighting resolve, composer, or render invocation. “One batch per type” means one draw group per type inside a shared eligible pass, never one deferred pipeline per type.
+
+Expected `1 → 5` type sweep: draw groups may rise by four; G-buffer executions remain `1 → 1` per required view, with unchanged attachments and terminal writes. A transparent or otherwise incompatible type may join an existing forward/transparency path; it does not earn a new full G-buffer.
+
+### World and UI
+
+**Acceptable:** DOM overlay composed by the browser, UI draws contributed to the owned scene/graph, or a native-resolution UI target composed by the existing terminal chain. The frame owner controls order, depth clearing, color transform, and output.
+
+**Reject:** the world renderer/composer writes the terminal target, then a UI subsystem independently calls a renderer/composer/pipeline and writes it again—especially when introduced inside an unrelated instancing patch.
+
+A second terminal-target write can be legitimate when native-resolution UI, post-tone-map ordering, depth semantics, XR composition, or backend constraints force it. It remains inside one owner and terminal chain, declares load/store and color behavior, and is an explicit measured architecture decision rather than incidental UI plumbing.
+
+## Legitimate multipass exceptions
+
+Multipass rendering is not itself a defect. Shadows by light/cascade/face, deferred geometry plus lighting, reflections/refractions/portals, transparency, post-processing, on-demand GPU picking, XR views or multiview, and UI after tone mapping can require distinct work. Mobile/WebXR choices must also satisfy the [house rules](mobile-xr-house-rules.md).
+
+Approve an added pass only when all are true:
+
+1. A named visual, interaction, or platform contract requires it.
+2. Its multiplicity follows that contract, not content population by accident.
+3. One frame owner and terminal chain retain authority.
+4. Inputs, outputs, attachments, resolution, samples, and lifecycle are bounded.
+5. Fusion, reuse of an existing pass, DOM composition, on-demand cadence, or lower resolution was considered with its downside.
+6. The active backend/fallback supports the design and the executed topology is checked where observable.
+7. Proof matches the reason for expansion: an optimization shows target-device break-even against the current alternative; a correctness- or platform-required pass demonstrates why cheaper topology cannot satisfy the contract and shows measured target-budget headroom.
+
+An exception may not be smuggled into a local batching, instancing, or material patch. Split it into a separately reviewable architecture decision. When the new topology must exist to measure either proof route, authorize only the smallest reversible isolated prototype; do not merge it into the production path or treat it as accepted architecture before proof.
+
+## Evidence boundary
+
+Reject unintended structural expansion directly from the code. For a deliberate architecture change, establish the requirement, cost both ways, and target-budget proof before accepting it; use a reversible isolated prototype when measurement requires one. Keep a justified architecture change distinct from a local optimization.
+
+The topology delta proves structure, multiplicity, ownership, and patch scope. It does not prove the current bottleneck or a performance win. Pass/draw/target counts are not causal timing evidence; GPU timers, CPU submission timing, repeated same-workload frame distributions, target-device coverage, and thermal tests establish runtime cost.
+
+Proof must also preserve the touched semantics: visible set, culling, picking identity, shadow inclusion, transparency order, depth, color/tone mapping, UI order/readability, resolution policy, XR behavior, and target disposal/loss recovery. When runtime proof is unavailable, report the structural finding and remaining measurement honestly; never convert an unknown timing result into permission for structural fan-out.
