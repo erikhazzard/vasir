@@ -1,4 +1,4 @@
-# Vasir Skills
+# Vasir
 
 Skills for coding agents, and the root operating contract they work under.
 
@@ -7,6 +7,8 @@ Skills for coding agents, and the root operating contract they work under.
 | [skills/](skills/) | One folder per skill. Each has a `SKILL.md` and the references, templates and scripts it needs. |
 | [templates/agents/](templates/agents/) | The root contract, [AGENTS.md](templates/agents/AGENTS.md); a one-line [CLAUDE.md](templates/agents/CLAUDE.md) that loads it in Claude sessions; and snippets for backend, frontend and iOS repositories. |
 | [MIGRATING.md](MIGRATING.md) | What each skill of the earlier Vasir repository is called here. |
+
+The earlier Vasir, a command-line installer with a skill registry, eval suites and a benchmark site, is archived at [vasir-archive](https://github.com/erikhazzard/vasir-archive).
 
 ## Use a skill
 

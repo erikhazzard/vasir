@@ -9,7 +9,7 @@ metadata:
   gc-capability: "engineering"
   gc-status: "draft"
   gc-tags: "backend, security, authorization, game economies, idempotency, concurrency"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/security__auditing-code"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/security__auditing-code"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
   gc-source-sha256: "bdf2e44fd21203269422b8f873d9e00a45e3d2a29724d06512b8b86396b07bb7"
   gc-adaptations: "Portable metadata and project authority; preserved static audit, independent inputs, domain investigation and replay contracts; added causal confirmation and counterevidence checks; separated severity, confidence and urgency; replaced mandatory grading and repeated report matrices with concise evidence-backed findings."

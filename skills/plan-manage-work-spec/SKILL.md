@@ -8,7 +8,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "planning, work-spec, implementation, product-review, continuity, proof-gates, eval-plan"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
   gc-source-skills: "plan__maintain-work-spec, plan__question-spec, plan__implement-work-spec, eval__design-proof-gates, eval__implement-proof-gate, handoff__final-quality-gate, plan__prepare-summary"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
 ---

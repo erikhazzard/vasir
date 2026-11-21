@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "ratatosk, codex, claude, cross-agent-messaging, peer-authority"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills/messaging-root-agents"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills/messaging-root-agents"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
   gc-adaptations: "Portable name. The body is the copy of this skill kept in the Ratatosk repository, at its commit 22839433: delivery goes through the native messages API and its queue, never terminal input, and native Claude roots are covered. Vasir's copy still describes terminal input."
 ---

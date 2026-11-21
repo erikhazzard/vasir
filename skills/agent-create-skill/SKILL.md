@@ -9,7 +9,7 @@ metadata:
   gc-capability: "ai-workflows"
   gc-status: "draft"
   gc-tags: "skill authoring, expert interviews, routing, expertise extraction"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/skills__create-skill"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/skills__create-skill"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
   gc-source-sha256: "e170c65b0a702720190984c0ea4071e0d228e03f6a5d1468c51d60267cfd6afc"
   gc-adaptations: "Portable naming, metadata and report custody; older template and evaluation guidance reconciled with the current entrypoint; all four authoring references retained. Skill analysis added as a fifth reference from skills__create-analysis at d04347b, its body unchanged."

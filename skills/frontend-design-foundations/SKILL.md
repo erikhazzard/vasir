@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "frontend, design-system, interface, components, accessibility, game-ui, html, css, bem, motion, typography"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
   gc-source-skills: "design__building-frontend-interfaces, design__implementing-frontend-css-html, design__animating-interfaces, design__designing-typography"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
 ---

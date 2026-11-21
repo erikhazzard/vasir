@@ -9,7 +9,7 @@ metadata:
   gc-engine: agnostic
   gc-platform: agnostic
   gc-tags: fiction, character, dialogue, plot, revision, narrative
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/writing-storytelling"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/writing-storytelling"
   gc-source-revision: b5ba2208bba5f0dc261768a3495bec7a445863e4
   gc-original-name: writing-storytelling
 ---

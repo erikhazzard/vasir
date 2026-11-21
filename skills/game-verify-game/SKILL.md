@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "game-qa, playtest, first-playable, comprehension, gameplay-analysis"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
   gc-source-skills: "game__qa, game-proof__auditing-first-playable-comprehension, game-research__breaking-down-gameplay-video"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
 ---

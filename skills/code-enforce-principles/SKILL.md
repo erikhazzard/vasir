@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "engineering-principles, contracts, state, migration, risk"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills/code__enforcing-principles"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills/code__enforcing-principles"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
 ---
 

@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "game-development, core-loop, combat, inventory, loot, procedural-generation, game-feel, playable-build"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills"
   gc-source-skills: "game__orchestrating-playable-build, game__building-core-loop, game__building-combat-damage, game__building-inventory-system, game__building-loot-systems, game__generating-procedural-content, game__adding-juice, physics__creating-interaction-system, design__designing-end-screen"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
 ---

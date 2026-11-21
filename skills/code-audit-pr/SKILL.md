@@ -9,7 +9,7 @@ metadata:
   gc-capability: "engineering"
   gc-status: "draft"
   gc-tags: "pull requests, code review, correctness, regressions"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/pr__audit"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/pr__audit"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
   gc-source-sha256: "a87913647f93da72818a835cf7f5ce949612a1cb0928b46d331ab3da4cba8830"
   gc-adaptations: "Portable name and metadata; replaced PR placeholder; optional code-audit handoff no longer assumes Vasir skills; clarified local revision review, workspace preservation, unavailable delegation, remote freshness, and report-only authority."

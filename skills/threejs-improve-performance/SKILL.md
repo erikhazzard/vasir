@@ -10,7 +10,7 @@ metadata:
   gc-status: "draft"
   gc-tags: "performance, rendering, shaders, physics, profiling, memory, assets"
   gc-tools: "rapier, webxr"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills/threejs__improve-performance"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/d04347b0d515d4c3c46b5e012e2c334fdabf83bd/.agents/skills/threejs__improve-performance"
   gc-source-revision: "d04347b0d515d4c3c46b5e012e2c334fdabf83bd"
   gc-source-sha256: "31b27609b8417da88f14a4620fd1e24e9669e5564fb508525eae119cdc0d9a9e"
   gc-adaptations: "Portable name and metadata; one reference self-name updated; runtime guidance preserved; legacy authored evaluations retained separately from generated results. Two lines on Quest GPU timing added on 2026-11-18; the migration notes say where from."

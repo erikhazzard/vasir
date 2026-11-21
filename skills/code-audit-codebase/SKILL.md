@@ -9,7 +9,7 @@ metadata:
   gc-capability: "engineering"
   gc-status: "draft"
   gc-tags: "audit, code review, simplification, correctness, performance, developer experience"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/414863bbdcb6a4eb188e689a068b5d456b177207/.agents/skills/code__auditing"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/414863bbdcb6a4eb188e689a068b5d456b177207/.agents/skills/code__auditing"
   gc-source-revision: "414863bbdcb6a4eb188e689a068b5d456b177207"
   gc-source-sha256: "9122f68d9116c65fcdc0e65922ea46c57263ae9cd571098c1033b8c9188012cd"
   gc-adaptations: "Portable name and metadata; full accretion contract bundled as an embedded reference; current lead composition replaces stale source routing; optional domain-specialist lookup and destination report custody; authored evals excluded from runtime."

@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "testing, test-authoring, regression"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/testing__enforcing-mandate"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/testing__enforcing-mandate"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
 ---
 

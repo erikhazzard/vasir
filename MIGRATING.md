@@ -1,6 +1,6 @@
 # What each earlier skill is called now
 
-The earlier Vasir repository had one folder per skill, named `scope__action`. Here a skill is named `scope-action-subject`, and skills that are called rarely share a package: a short `SKILL.md` says which procedure to read, and each procedure is a file under `references/`. A name followed by brackets is a package and the procedure inside it.
+The earlier Vasir repository, now [vasir-archive](https://github.com/erikhazzard/vasir-archive), had one folder per skill, named `scope__action`. Here a skill is named `scope-action-subject`, and skills that are called rarely share a package: a short `SKILL.md` says which procedure to read, and each procedure is a file under `references/`. A name followed by brackets is a package and the procedure inside it.
 
 | Earlier skill | Now |
 | --- | --- |

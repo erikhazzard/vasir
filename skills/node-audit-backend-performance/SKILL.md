@@ -10,7 +10,7 @@ metadata:
   gc-status: "draft"
   gc-tags: "backend, performance, scalability, latency, cost, concurrency"
   gc-tools: "Node.js, Redis, Valkey, DynamoDB"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/audit__optimizing-node-backend"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/audit__optimizing-node-backend"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
   gc-source-sha256: "fd97cf57495182bcb7945254ca0e76a67511c190c1881c8ba0444c55f014d596"
   gc-adaptations: "Portable metadata and routing; audit scope respects authorized follow-up work; evaluation reference moved outside runtime; preserved technical references; corrected Markdown fences and reference links; removed unsupported past-performance claim."

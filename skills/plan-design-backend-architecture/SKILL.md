@@ -9,7 +9,7 @@ metadata:
   gc-capability: "engineering"
   gc-status: "draft"
   gc-tags: "architecture, backend, scalability, cost"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/plan__question-spec-architecture"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/plan__question-spec-architecture"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
   gc-source-sha256: "14f9ee92a237dae271dc155be60023d7c1f0974767d6bb86c95d5e07bdd01bc8"
   gc-adaptations: "Portable name and metadata; removed tool declaration; replaced Vasir sibling routing with optional installed skills and project-process fallbacks; removed runtime link to author-only evaluations. Technical design guidance and upstream architecture defaults are unchanged."

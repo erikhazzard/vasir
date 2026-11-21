@@ -9,7 +9,7 @@ metadata:
   gc-platforms: "agnostic"
   gc-status: "draft"
   gc-tags: "game-design, core-loop, incentives, critique"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/0366473488660fa797cb819ae992340b5e8589df/.agents/skills/game-design__ensuring-design-coherence"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/0366473488660fa797cb819ae992340b5e8589df/.agents/skills/game-design__ensuring-design-coherence"
   gc-source-revision: "0366473488660fa797cb819ae992340b5e8589df"
 ---
 # Game Core Design Coherence

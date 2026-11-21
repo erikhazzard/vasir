@@ -9,7 +9,7 @@ metadata:
   gc-capability: "writing"
   gc-status: "draft"
   gc-tags: "prose, voice, style, fiction, journalism, technical writing, player copy"
-  gc-source: "https://github.com/erikhazzard/vasir"
+  gc-source: "https://github.com/erikhazzard/vasir-archive"
   gc-source-revision: "working-tree"
   gc-source-checkout-head: "4a3400f768c1f5637d382ec1dd68879d5964dc26"
   gc-source-sha256: "7d91a852ffd26aa64a5e8dc9ff97a87387c299f25eeaa46b24cde5830b49ef77"

@@ -9,7 +9,7 @@ metadata:
   gc-capability: "engineering"
   gc-status: "draft"
   gc-tags: "testing, test audits, coverage, review"
-  gc-source: "https://github.com/erikhazzard/vasir/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/testing__auditing"
+  gc-source: "https://github.com/erikhazzard/vasir-archive/tree/b5ba2208bba5f0dc261768a3495bec7a445863e4/.agents/skills/testing__auditing"
   gc-source-revision: "b5ba2208bba5f0dc261768a3495bec7a445863e4"
   gc-source-sha256: "59c49f22376cffbb0e1bf75a0f50e85b4b5a451a76a8170e2ae858263fd84e88"
   gc-adaptations: "Portable name and metadata; removed tool declarations and Vasir orchestration dependencies; inlined the integration-test definition from code__enforcing-principles at the same revision; made project policies and existing evidence authoritative; optional authoring and repair handoffs."
